@@ -1,0 +1,25 @@
+exports.handler = async function(event) {
+  const COC_API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6Ijk4NWE1NWI0LTQyNzgtNGUzNS1iYWZlLWQ0NjA0OGQ3NTY3OSIsImlhdCI6MTc4MjQ2NzUzMiwic3ViIjoiZGV2ZWxvcGVyLzM2MTAxNGYxLTAxODItNmIzZS03ZjhkLWY1N2ZkYTE3MTljOCIsInNjb3BlcyI6WyJjbGFzaCJdLCJsaW1pdHMiOlt7InRpZXIiOiJkZXZlbG9wZXIvc2lsdmVyIiwidHlwZSI6InRocm90dGxpbmcifSx7ImNpZHJzIjpbIjc1LjIuNjAuNSIsIjk5LjgzLjIzMS42MSIsIjU0LjgwLjIzOS43MiIsIjU0LjE1Mi4xNDQuNzUiLCIzNC4yMDUuNDAuNDEiXSwidHlwZSI6ImNsaWVudCJ9XX0.CADyZpiUFq6MvA45fre0QZdW8axGei6d-Dq2u6TrBir0UHgXFIBSd922e1cQe1IlQODak341gGYuIaiUK5NCkQ';
+  const CLAN_TAG = '%232GYPGPJP9';
+  const endpoint = event.path.replace('/.netlify/functions/coc', '');
+
+  const cocURL = `https://api.clashofclans.com/v1/clans/${CLAN_TAG}${endpoint}`;
+
+  const response = await fetch(cocURL, {
+    headers: {
+      'Authorization': `Bearer ${COC_API_KEY}`,
+      'Accept': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify(data)
+  };
+};

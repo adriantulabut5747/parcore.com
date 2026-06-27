@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Reviewer</title>
+<style>
+  /* BODY STYLING */
+  body { 
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background: linear-gradient(145deg, #ffafbd, #ffc3a0, #a18cd1, #fbc2eb);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #333;
+  }
+
+  @keyframes gradientBG {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2.4em;
+    color: #fff;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+  }
+
+  /* QUIZ CONTAINER */
+  .quiz-container { 
+    max-width: 750px;
+    margin: auto;
+    background: #fff;
+    padding: 30px 35px;
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .quiz-container:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  }
+
+  /* QUESTION */
+  .question { 
+    font-size: 1.35em; 
+    margin-bottom: 25px; 
+    font-weight: 700;
+    color: #8e24aa; /* deep purple */
+    line-height: 1.5;
+  }
+
+  /* OPTIONS BUTTONS */
+  .options button { 
+    display: block;
+    margin: 10px 0;
+    padding: 14px;
+    width: 100%;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 500;
+    background: linear-gradient(120deg, #f3e5f5, #e1bee7);
+    color: #6a1b9a;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: 0.4s ease, transform 0.2s ease;
+  }
+  .options button:hover { 
+    background: linear-gradient(120deg, #ce93d8, #ba68c8);
+    color: #fff;
+    transform: scale(1.05) translateX(3px);
+  }
+  .options button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(186,104,200,0.3);
+  }
+
+  /* SHOW ANSWER */
+  /* SHOW ANSWER */
+.answer { 
+    margin-top: 20px; 
+    font-weight: bold; 
+    font-size: 1.15em;
+    padding: 12px 15px; 
+    border-radius: 12px;
+    display: none;
+    animation: fadeIn 0.5s ease forwards;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+/* Correct answer styling */
+.answer.correct {
+    color: #2e7d32; /* green */
+    background: #e8f5e9;
+    border-left: 6px solid #66bb6a;
+}
+
+/* Wrong answer styling */
+.answer.wrong {
+    color: #c62828; /* red */
+    background: #ffebee;
+    border-left: 6px solid #e53935;
+}
+
+
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-5px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+
+  /* NAVIGATION BUTTONS */
+  .nav-btns { 
+    margin-top: 30px; 
+    text-align: right;
+  }
+  .nav-btns button { 
+    padding: 12px 28px; 
+    margin-left: 12px; 
+    border: none; 
+    border-radius: 20px; 
+    cursor: pointer; 
+    background: linear-gradient(135deg, #ba68c8, #8e24aa);
+    color: #fff; 
+    font-weight: 600;
+    font-size: 1em;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transition: 0.3s ease, transform 0.2s ease;
+  }
+  .nav-btns button:hover { 
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2); 
+    transform: scale(1.08);
+  }
+
+  /* RESPONSIVE */
+  @media screen and (max-width: 500px) {
+    .quiz-container {
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    .question {
+      font-size: 1.15em;
+    }
+    .options button {
+      padding: 12px;
+      font-size: 1em;
+    }
+    .nav-btns button {
+      padding: 10px 20px;
+      font-size: 0.95em;
+    }
+  }
+</style>
+
+</head>
+<body>
+<div><h1>REVIEWER NI KIM</h1></div>
+<div class="quiz-container">
+  <div id="question-container">
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="answer" id="answer"></div>
+    <div class="nav-btns">
+      <button id="prev-btn">Previous</button>
+      <button id="next-btn">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const quiz = [
+  {
+    question: "1. Which of the following statements in respect to determining when an agreement is not necessarily a contract is inaccurate?",
+    options: [
+      "a. The courts are not concerned the intention of the parties as it is a private matter.",
+      "b. The parties in an agreement do not always intend to create legal relations.",
+      "c. Sometimes the Law implies the existence of a valid contract.",
+      "d. An agreement will not give rise a legally enforceable contract if not all elements are satisfied."
+    ],
+    answer: "a. The courts are not concerned the intention of the parties as it is a private matter."
+  },
+  {
+    question: "2. Which of the following statements is the most accurate in respect to the nature of a contract?",
+    options: [
+      "a. The terms 'contract' and 'agreement' mean the same thing.",
+      "b. An agreement is a legally enforceable contract.",
+      "c. A contract is a type of agreement.",
+      "d. Not all contracts are agreements."
+    ],
+    answer: "c. A contract is a type of agreement."
+  },
+  {
+  question: "3. In determining whether the parties to an agreement intended to form a contract, the courts often rely upon rebuttable legal presumptions. In this context, a “rebuttable” presumption is:",
+  options: [
+    "a. One which cannot be disputed by either party.",
+    "b. One which can be disputed by the party disadvantaged by the presumption.",
+    "c. A presumption based upon the evidence.",
+    "d. A reasonable presumption."
+  ],
+  answer: "b. One which can be disputed by the party disadvantaged by the presumption."
+},
+{
+  question: "4. Which of the following situations is the best example of “executed consideration”?",
+  options: [
+    "a. Antonio pays Gregorio ₱500.00 today in return for Gregorio giving Antonio a basket of fruits today.",
+    "b. Antonio promises to pay Gregorio ₱500.00 tomorrow in return for Gregorio giving Antonio a basket of fruits tomorrow.",
+    "c. Antonio promises to pay Gregorio ₱500.00 tomorrow in return for Gregorio giving Antonio a basket of fruits yesterday.",
+    "d. All of the foregoing."
+  ],
+  answer: "a. Antonio pays Gregorio ₱500.00 today in return for Gregorio giving Antonio a basket of fruits today."
+},
+{
+  question: "5. Which of the following situations is the best example of “executory consideration”?",
+  options: [
+    "a. Antonio pays Gregorio ₱500.00 today in return for Gregorio giving Antonio a basket of fruits today.",
+    "b. Antonio promises to pay Gregorio ₱500.00 tomorrow in return for Gregorio giving Antonio a basket of fruits tomorrow.",
+    "c. Antonio promises to pay Gregorio ₱500.00 tomorrow in return for Gregorio giving Antonio a basket of fruits yesterday.",
+    "d. All of the foregoing."
+  ],
+  answer: "b. Antonio promises to pay Gregorio ₱500.00 tomorrow in return for Gregorio giving Antonio a basket of fruits tomorrow."
+},
+{
+  question: "6. Which of the following statements is the best description of a “condition subsequent”?",
+  options: [
+    "a. A term in a contract, the consequences of breach of which cannot be determined until after the breach has occurred and the seriousness of the effects of the breach can be ascertained.",
+    "b. A term in a contract which provides that the contract will terminate on the happening of a particular event.",
+    "c. A term which must be satisfied before a contract can come into existence.",
+    "d. A term in a contract not essential to the main purpose of the contract, non-performance of which will not entitle the plaintiff to rescind the contract."
+  ],
+  answer: "b. A term in a contract which provides that the contract will terminate on the happening of a particular event."
+},
+{
+  question: "7. Which of the following statements is the best description of a “condition precedent”?",
+  options: [
+    "a. A term in a contract, the consequences of breach of which cannot be determined until after the breach has occurred and the seriousness of the effects of the breach can be ascertained.",
+    "b. A term in a contract which provides that the contract will terminate on the happening of a particular event.",
+    "c. A term in a contract, non-performance of which may result in rescission of the contract and/or damages to the plaintiff.",
+    "d. A term which must be satisfied before a contract can come into existence."
+  ],
+  answer: "d. A term which must be satisfied before a contract can come into existence."
+},
+   {
+    question: "8. Which of the following statements is the best description of an “innominate term”?",
+    options: [
+      "a. A term in a contract, the consequences of breach of which cannot be determined until after the breach has occurred and the seriousness of the effects of the breach can be ascertained.",
+      "b. A term in a contract which provides that the contract will terminate on the happening of a particular event.",
+      "c. A term in a contract, non-performance of which may result in rescission of the contract and/ or damages to the plaintiff.",
+      "d. A term in a contract not essential to the main purpose of the contract, non-performance of which will not entitle the plaintiff to rescind the contract."
+    ],
+    answer: "a. A term in a contract, the consequences of breach of which cannot be determined until after the breach has occurred and the seriousness of the effects of the breach can be ascertained."
+  },
+  {
+    question: "9. When is a particular statement more likely to be a term of the contract rather than a mere representation?",
+    options: [
+      "a. A long time has passed between the making of the statement and the final agreement.",
+      "b. The other party was asked to check or verify the statement.",
+      "c. The statement was made with the intention of preventing the other party from finding any defects.",
+      "d. Both parties placed considerable importance on the statement."
+    ],
+    answer: "d. Both parties placed considerable importance on the statement."
+  },
+  {
+    question: "10. Which of the following statements is the best description of a “condition”?",
+    options: [
+      "a. A term in a contract, the consequences of breach of which cannot be determined until after the breach has occurred and the seriousness of the effects of the breach can be ascertained.",
+      "b. A term in a contract which provides that the contract will terminate on the happening of a particular event.",
+      "c. A term in a contract, non-performance of which may result in rescission of the contract and/ or damages to the plaintiff.",
+      "d. A term which must be satisfied before a contract can come into existence."
+    ],
+    answer: "c. A term in a contract, non-performance of which may result in rescission of the contract and/ or damages to the plaintiff."
+  },
+  {
+    question: "11. Which of the following statements is the best description of a “Warranty”?",
+    options: [
+      "a. A term in a contract which provides that the contract will terminate on the happening of a particular event.",
+      "b. A term in a contract, non-performance of which may result in rescission of the contract and/ or damages to the plaintiff.",
+      "c. A term which must be satisfied before a contract can come into existence.",
+      "d. A term in a contract not essential to the main purpose of the contract, non-performance of which will not entitle the plaintiff to rescind the contract."
+    ],
+    answer: "d. A term in a contract not essential to the main purpose of the contract, non-performance of which will not entitle the plaintiff to rescind the contract."
+  },
+  {
+    question: "12. Which of the following situations appears to involve “undue influence” thereby negating genuine consent which is an essential element of a valid contract?",
+    options: [
+      "a. An elderly couple signs a mortgage in favor of a Bank guaranteeing their son’s debts; the Bank manager knows that the couples are unaware of the son’s financial difficulties.",
+      "b. A man induced another to sign a contract by telling him that if he did not, he would report his son to the police for committing a criminal offence.",
+      "c. A woman gave all of her property to the religious order of which she was a member.",
+      "d. All of the above."
+    ],
+    answer: "c. A woman gave all of her property to the religious order of which she was a member."
+  },
+  {
+    question: "13. Which of the following situations appears to involve “duress” thereby negating genuine consent?",
+    options: [
+      "a. An elderly couple signs a mortgage in favor of a Bank guaranteeing their son’s debts; the Bank manager knows that the couples are unaware of the son’s financial difficulties.",
+      "b. A man induced another to sign a contract by telling him that if he did not, he would report his son to the police for committing a criminal offence.",
+      "c. A woman gave all of her property to the religious order of which she was a member.",
+      "d. All of the above."
+    ],
+    answer: "b. A man induced another to sign a contract by telling him that if he did not, he would report his son to the police for committing a criminal offence."
+  },
+  {
+    question: "14. Which of the following situations appears to involve conduct that amounts to “unconscionability”?",
+    options: [
+      "a. An elderly couple signs a mortgage in favor of a Bank guaranteeing their son’s debts; the Bank manager knows that the couples are unaware of the son’s financial difficulties.",
+      "b. A man induced another to sign a contract by telling him that if he did not, he would report his son to the police for committing a criminal offence.",
+      "c. A woman gave all of her property to the religious order of which she was a member.",
+      "d. All of the above."
+    ],
+    answer: "a. An elderly couple signs a mortgage in favor of a Bank guaranteeing their son’s debts; the Bank manager knows that the couples are unaware of the son’s financial difficulties."
+  },
+  {
+    question: "15. Which of the following statements is the best description of “mutual mistake” that has arisen between two parties to a contract?",
+    options: [
+      "a. One of the parties is mistaken as to the nature of document which they have signed.",
+      "b. Both parties are mistaken about a material fact that is important to the subject matter of the contract.",
+      "c. Both parties have made the same mistake about the existence or identity of the subject matter of the contract.",
+      "d. One of the parties is mistaken about a material fact regarding the subject matter of the contract, and the other party takes advantage of this mistake."
+    ],
+    answer: "b. Both parties are mistaken about a material fact that is important to the subject matter of the contract."
+  },
+  {
+    question: "16. Which of the following statements is the best description of “unilateral mistake” made by one party only?",
+    options: [
+      "a. One of the parties is mistaken as to the nature of document which they have signed.",
+      "b. Both parties are mistaken about a material fact that is important to the subject matter of the contract.",
+      "c. Both parties have made the same mistake about the existence or identity of the subject matter of the contract.",
+      "d. One of the parties is mistaken about a material fact regarding the subject matter of the contract, and the other party takes advantage of this mistake."
+    ],
+    answer: "d. One of the parties is mistaken about a material fact regarding the subject matter of the contract, and the other party takes advantage of this mistake."
+  },
+  {
+    question: "17. Which of the following statements is the best description of “common mistake” between parties to a contract?",
+    options: [
+      "a. One of the parties is mistaken as to the nature of document which they have signed.",
+      "b. Both parties are mistaken about a material fact that is important to the subject matter of the contract.",
+      "c. Both parties have made the same mistake about the existence or identity of the subject matter of the contract.",
+      "d. One of the parties is mistaken about a material fact regarding the subject matter of the contract, and the other party takes advantage of this mistake."
+    ],
+    answer: "c. Both parties have made the same mistake about the existence or identity of the subject matter of the contract."
+  },
+  {
+    question: "18. Which of the following statement is the best description of “undue influence” that indicates that genuine consent is lacking?",
+    options: [
+      "a. The improper use of a superior bargaining position to induce a contract.",
+      "b. The improper use of violence or of threats of violence to induce a contract.",
+      "c. The improper use of a position of influence or power to induce a contract.",
+      "d. All of the above."
+    ],
+    answer: "c. The improper use of a position of influence or power to induce a contract."
+  },
+  {
+    question: "19. Which of the following statements is the most accurate description of conduct of “unconscionability”?",
+    options: [
+      "a. The improper use of a superior bargaining position to induce a contract.",
+      "b. The improper use of violence or of threats of violence to induce a contract.",
+      "c. The improper use of a position of influence or power to induce a contract.",
+      "d. All of the above."
+    ],
+    answer: "a. The improper use of a superior bargaining position to induce a contract."
+  },
+  {
+    question: "20. Which of the following statements is the best description of a “negligent” misrepresentation?",
+    options: [
+      "a. A false statement of fact made knowingly, which the other person relies upon and suffers loss.",
+      "b. A false statement of fact made with the belief that it is true, which the other person relies upon and suffers loss.",
+      "c. A false statement of fact made carelessly, which the other person relies upon and suffers loss.",
+      "d. All of the above."
+    ],
+    answer: "c. A false statement of fact made carelessly, which the other person relies upon and suffers loss."
+  },
+  {
+  question: "21. Which of the following statements is the best description of an “innocent” misrepresentation?",
+  options: [
+    "a. A false statement of fact made knowingly, which the other person relies upon and suffers loss.",
+    "b. A false statement of fact made with the belief that it is true, which the other person relies upon and suffers loss.",
+    "c. A false statement of fact made carelessly, which the other person relies upon and suffers loss.",
+    "d. All of the above."
+  ],
+  answer: "b. A false statement of fact made with the belief that it is true, which the other person relies upon and suffers loss."
+},
+{
+  question: "22. Which of the following statements is the best description of a “fraudulent” misrepresentation?",
+  options: [
+    "a. A false statement of fact made knowingly, which the other person relies upon and suffers loss.",
+    "b. A false statement of fact made with the belief that it is true, which the other person relies upon and suffers loss.",
+    "c. A false statement of fact made carelessly, which the other person relies upon and suffers loss.",
+    "d. All of the above."
+  ],
+  answer: "a. A false statement of fact made knowingly, which the other person relies upon and suffers loss."
+},
+{
+  question: "23. Which of the following statements is the best description of the remedy of “restitution”?",
+  options: [
+    "a. The injured party is entitled to set aside the contract and be restored to their pre-contractual position.",
+    "b. The party at fault is restrained from breaching the contract or from committing a wrongful act.",
+    "c. The party at fault is directed to carry out their obligations under the contract.",
+    "d. The party at fault has unjustly obtained a benefit at the injured party’s expense and is ordered to restore it to the injured party."
+  ],
+  answer: "d. The party at fault has unjustly obtained a benefit at the injured party’s expense and is ordered to restore it to the injured party."
+},
+{
+  question: "24. Which of the following statements is the best description of the remedy of “damages”?",
+  options: [
+    "a. The party at fault is restrained from breaching the contract or from committing a wrongful act.",
+    "b. The party at fault is directed to carry out their obligations under the contract.",
+    "c. The party at fault has unjustly obtained a benefit at the injured party’s expense and is ordered to restore it to the injured party.",
+    "d. The injured party is compensated for their loss by putting the parties in the position they would have been in if the contract had been performed."
+  ],
+  answer: "d. The injured party is compensated for their loss by putting the parties in the position they would have been in if the contract had been performed."
+},
+{
+  question: "25. Which of the following statements is the best description of the remedy of “specific performance”?",
+  options: [
+    "a. The injured party is entitled to set aside the contract and be restored to their pre-contractual position.",
+    "b. The party at fault is restrained from breaching the contract or from committing a wrongful act.",
+    "c. The party at fault is directed to carry out their obligations under the contract.",
+    "d. The party at fault has unjustly obtained a benefit at the injured party’s expense and is ordered to restore it to the injured party."
+  ],
+  answer: "c. The party at fault is directed to carry out their obligations under the contract."
+},
+{
+  question: "26. Which of the following statements is the best description of the remedy of “injunction”?",
+  options: [
+    "a. The injured party is entitled to set aside the contract and be restored to their pre-contractual position.",
+    "b. The party at fault is restrained from breaching the contract or from committing a wrongful act.",
+    "c. The party at fault is directed to carry out their obligations under the contract.",
+    "d. The party at fault has unjustly obtained a benefit at the injured party’s expense and is ordered to restore it to the injured party."
+  ],
+  answer: "b. The party at fault is restrained from breaching the contract or from committing a wrongful act."
+},
+{
+  question: "27. Debtor owes Creditor P20,000. On the due date of the obligation, Debtor could not pay. Debtor instead offered his TV set worth P20,000 in payment of the obligation. Creditor agrees.",
+  options: [
+    "a. There is no payment because the debt may only be discharged by the delivery of legal tender.",
+    "b. There is payment pursuant to a facultative obligation because of a substitution.",
+    "c. There is dation in payment or dacion en pago.",
+    "d. There is payment by cession."
+  ],
+  answer: "c. There is dation in payment or dacion en pago."
+},
+{
+  question: "28. Pedro offered to sell to Marita a purported diamond ring which actually was a stone of inferior quality. Believing it to be a genuine diamond ring, Marita bought and paid for the ring. If later on, Marita discovers the misrepresentation, Marita may:",
+  options: [
+    "a. Sue for damages alone because of dolo causante.",
+    "b. Sue for rescission.",
+    "c. For annulment because of dolo incidente.",
+    "d. For annulment because of dolo causante."
+  ],
+  answer: "b. Sue for rescission."
+},
+{
+  question: "29. On June 5, 2022, Jose Dizon was supposed to deliver to Ruben Samia a specified red car. There was no delivery however, on said date. On June 15, 2017, the garage of the car collapsed because of an earthquake and the car was totally destroyed. Is Jose Dizon liable?",
+  options: [
+    "a. No, because he could plead impossibility of performance due to a fortuitous event even if he is in default.",
+    "b. Yes, because Jose Dizon is in legal delay.",
+    "c. No, because there was no demand and the car was lost through a fortuitous event.",
+    "d. Yes, because there is a perfected contract."
+  ],
+  answer: "c. No, because there was no demand and the car was lost through a fortuitous event."
+},
+{
+  question: "30. Which of the following is demand necessary to make the debtor in delay in the performance of his obligation?",
+  options: [
+    "a. When demand would be useless;",
+    "b. When the law so provides;",
+    "c. When the time of performance is of the essence;",
+    "d. When the time of performance has been stipulated."
+  ],
+  answer: "d. When the time of performance has been stipulated."
+},{
+  question: "31. One is not a requisite needed in order that obligation shall be extinguished by loss or destruction of the thing due:",
+  options: [
+    "a. When the thing is lost without the fault of the debtor",
+    "b. When the thing is lost before the debtor has incurred in delay",
+    "c. When the thing lost is generic",
+    "d. When the thing lost is specific"
+  ],
+  answer: "c. When the thing lost is generic (((((COMPUTATION Share of joint creditor Y from the obligation (P12,000 x 2/3) 	P8,000 Since the obligation is joint only on the part of creditor, Y can only proportionately collect his share of 2/3 out of P12,000 or P8,000 from either B and C, the solidary debtors who are not insolvent. Since the obligation is solidary on the party of debtor, B and C will absorb the insolvency of A. )))))"
+},
+{
+  question: "32. Joshua, Russell and Tommy borrowed P6,000,000 from Marian, Anthony and Maricar evidenced by a promissory note worded as follows: 'I promise to pay Marian, Anthony and Maricar P6,000,000. (Sgd) Joshua, Russell and Tommy'. How much can Marian collect from Joshua?",
+  options: [
+    "a. P6,000,000",
+    "b. P3,000,000",
+    "c. P1,000,000",
+    "d. P2,000,000"
+  ],
+  answer: "d. P2,000,000"
+},
+{
+  question: "33. A was having his house repaired by B, who needed construction materials, so A orally told the seller C, 'Give B the materials, I shall be responsible. I shall pay in 30 days.' C delivered the materials. As a result:",
+  options: [
+    "a. The contract is unenforceable because A made an oral agreement to answer for the debt of B",
+    "b. The contract is enforceable because A did not make a special promise to answer for the default of another person",
+    "c. The contract shall be enforceable if there is ratification by A",
+    "d. The contract shall be unenforceable if the value is at least P500.00"
+  ],
+  answer: "b. The contract is enforceable because A did not make a special promise to answer for the default of another person"
+},
+{
+  question: "34. Which of the following statements is not correct?",
+  options: [
+    "a. A solidary creditor can assign his right even without the consent of the other creditors",
+    "b. Remission of the debt by any of the solidary creditors shall extinguish the obligation",
+    "c. If two or more solidary debtors offer to pay, the creditor may choose which offer to accept",
+    "d. The debtor may pay any of the solidary creditors but if any demand has been made by one of them, payment should be made to him"
+  ],
+  answer: "a. A solidary creditor can assign his right even without the consent of the other creditors"
+},
+{
+  question: "35. Which of the following statements is correct?",
+  options: [
+    "a. The effect of a conditional obligation to give, once the condition has been fulfilled, shall retroact to the day of the constitution of the obligation",
+    "b. If the obligation is unilateral, the fruits and interest during the pendency of the condition shall be deemed to have been mutually compensated",
+    "c. If the obligation imposes reciprocal prestations upon the parties, the debtor shall appropriate the fruits and interests received, unless from the nature and circumstances of the obligation it should be inferred that the intention was different",
+    "d. In an obligation to do and not to do, the parties shall determine, in each case the retroactive effect of the condition that has been complied with"
+  ],
+  answer: "a. The effect of a conditional obligation to give, once the condition has been fulfilled, shall retroact to the day of the constitution of the obligation"
+},
+{
+  question: "36. A, B and C are solidary debtors sharing at 1:2:3 of solidary creditors W and Y sharing at 1:2. The obligation is P12,000. If B is a minor and C is insolvent and W condones the obligation of A without the consent of Y, how much can W collect from A?",
+  options: [
+    "a. P8,000",
+    "b. P6,000",
+    "c. P2,000",
+    "d. P0"
+  ],
+  answer: "b. P6,000"
+},
+{
+  question: "37. A, B and C are solidary debtors of W and Y, joint creditors for P12,000 where the share of the debtors in the obligation is 2:3:5 while the share of the creditors is 1:2. If A is insolvent, which of the following is correct?",
+  options: [
+    "a. W can collect from B P3,200",
+    "b. Y can collect from C P6,400",
+    "c. W or Y can collect from B and C P12,000",
+    "d. Y can collect from either B or C P8,000"
+  ],
+  answer: "d. Y can collect from either B or C P8,000"
+},
+{
+  question: "38. A pointed a gun and threatened to kill B if B will not sign a promissory note which reads 'I promise to pay A, P100,000'. Out of fear, B signed the note. It turned out that two days earlier, A’s obligation to B amounting to P100,000 became due and B demanded payment. Now, A alleges compensation. Is A correct?",
+  options: [
+    "a. Yes, because the promissory note is valid",
+    "b. No, because the promissory note was signed only because there was intimidation",
+    "c. Yes, provided B will agree",
+    "d. No, because A’s obligation does not exist"
+  ],
+  answer: "a. Yes, because the promissory note is valid"
+},
+{
+  question: "39. A has two creditors, B and C. the obligation to B is P10,000 and to C is P12,000. Later, with the consent of A and B, W pays B P10,000. Now W and C are the creditors of A. Suppose A has only P12,000, which is correct?",
+  options: [
+    "a. C should be preferred",
+    "b. W should be preferred",
+    "c. C and W should be paid proportionately",
+    "d. A may choose whom to pay"
+  ],
+  answer: "c. C and W should be paid proportionately"
+},
+{
+  question: "40. A, minor, sold the ring of his brother without authority for P600,000. The ring has a fair market value of P1,000,000. The contract is",
+  options: [
+    "a. Rescissible",
+    "b. Voidable",
+    "c. Unenforceable",
+    "d. Void"
+  ],
+  answer: "c. Unenforceable"
+},
+{
+  question: "41. X, Y and Z are W’s sons. Upon the death of W, the three sons found a last will and testament in the cabinet of W. The will showed disposition of a 30-hectare land, the only asset of W at the time of his death in favor of the following: X – 5 hectares, Y – 10 hectares and Z – 15 hectares. X felt discriminated with his share of only 5 hectares. Which is correct?",
+  options: [
+    "a. Reformation of the instrument in order to correct the disparity in the disposal of the property",
+    "b. Annulment of the instrument is the proper remedy to correct the mistake",
+    "c. Rescission is the proper remedy to correct the damage on the part of X",
+    "d. The law does not allow any remedy in this case"
+  ],
+  answer: "d. The law does not allow any remedy in this case"
+},
+{
+  question: "42. A obtained an interest free loan of P50,000 from B evidenced by a promissory note payable six months after date. At maturity, A called B by phone to ask for an extension of one month and offer to pay 20% interest on the loan. Enticed by the 20% interest, B agreed to the extension of maturity. Which is correct?",
+  options: [
+    "a. The interest is a demandable interest by virtue of an agreement",
+    "b. The interest is unenforceable",
+    "c. The loan is valid but the interest is void",
+    "d. The loan and interest are both demandable"
+  ],
+  answer: "c. The loan is valid but the interest is void"
+},
+{
+  question: "43. A, husband and B, wife are legally separated. By order of the court, which decreed the legal separation, A is obliged to give a monthly support of P50,000 to B payable in advance within the first five days of the month. B owes A P50,000 by way of loan. On the other hand, A has not yet given B support of P50,000 for the preceding month and another P50,000 of the present month. All the debts are already due. Based on the foregoing, which of the following statements is incorrect?",
+  options: [
+    "a. If B demands her support for the preceding month, A may set up compensation as regards the loan that B owes him",
+    "b. If B demands her support for the current month, A may claim compensation as regards the loan that B owes him",
+    "c. If A demands payment of the loan, B may set up compensation as regards her support for the preceding month that A owes her",
+    "d. If A demands payment of the loan, B may set up compensation as regards her support for the current month that A owes her"
+  ],
+  answer: "b. If B demands her support for the current month, A may claim compensation as regards the loan that B owes him"
+},
+{
+  question: "44. On January 1, 2022, A bought a parcel of land from B who was insane. The deed of sale was duly acknowledged before a notary public. Six months after the sale, A realized that he needed a larger area on which to construct a commercial building. At about the same time, B who had been undergoing psychiatric treatment was declared of sound mind by his neurologist. Which is correct should a court action be filed today?",
+  options: [
+    "a. A may successfully prosecute a court action to annul the contract on the ground of B’s insanity",
+    "b. B may successfully prosecute a court action to annul the contract on the ground of his insanity",
+    "c. Neither A nor B may successfully prosecute a court action to annul the contract",
+    "d. A may successfully prosecute a court action to annul the contract on the ground of mistake as to the area of the parcel of land"
+  ],
+  answer: "b. B may successfully prosecute a court action to annul the contract on the ground of his insanity"
+},
+{
+  question: "45. A delivered to B the following instrument: In payment of a gambling debt, A made a promissory note which reads: 'I promise to pay B P10,000 Sgd. A.' B indorsed the note in blank before maturity and delivered it to C for value. When due, A refused to pay and C sued B. Could C recover from B?",
+  options: [
+    "a. No, C could not sue B because B did not write the name of C as indorsee",
+    "b. No, the instrument is not negotiable and B is a mere assignor of credit",
+    "c. Yes, provided C gives notice of dishonor to B otherwise B is discharged from liability",
+    "d. Yes, the endorsement will be considered as an assignment, hence B will be liable as an assignor of the instrument"
+  ],
+  answer: "d. Yes, the endorsement will be considered as an assignment, hence B will be liable as an assignor of the instrument"
+},
+{
+  question: "46. In payment of merchandise purchased by A from B, A made a promissory note which reads 'I promise to pay B P10,000. Sgd. A'. B indorsed the note in blank before maturity and delivered to C for value. A failed to pay due to insolvency upon maturity. Could C collect from B?",
+  options: [
+    "a. No, C could not sue B because B did not write the name of C as indorsee",
+    "b. No, the instrument is not negotiable and B is a mere assignor of credit",
+    "c. Yes, provided C gives notice of dishonor to B otherwise B is discharged from liability",
+    "d. Yes, the endorsement will be considered as an assignment, hence B will be liable as an assignor of the instrument"
+  ],
+  answer: "b. No, the instrument is not negotiable and B is a mere assignor of credit"
+},
+{
+  question: "47. Which of the following is a valid stipulation?",
+  options: [
+    "a. A promise to give B P10,000, and if A fails, A will allow B to have sexual intercourse with her",
+    "b. A will give B P10,000, if B will kill C",
+    "c. A agreed to give B a house and lot if B will be his mistress",
+    "d. A agreed to put poison on the food of B’s wife and if A fails, to pay B P10,000 for damages"
+  ],
+  answer: "a. A promise to give B P10,000, and if A fails, A will allow B to have sexual intercourse with her"
+},
+{
+  question: "48. A, B and C are solidarily indebted to D for P9,000 representing the purchase price of 1 gram of shabu but A’s consent has been obtained by violence and intimidation, and B is a minor. How much can D collect from C?",
+  options: [
+    "a. P9,000",
+    "b. P6,000",
+    "c. P3,000",
+    "d. P0"
+  ],
+  answer: "d. P0"
+},
+{
+  question: "49. A, a minor, B and C wrote and signed a promissory note which states 'I promise to pay D P30,000.' At the maturity date of the note, how much may D validly collect from C if B becomes insolvent?",
+  options: [
+    "a. P10,000",
+    "b. P20,000",
+    "c. P30,000",
+    "d. P15,000"
+  ],
+  answer: "b. P20,000"
+},
+{
+  question: "50. A has three outstanding due and demandable obligations to B consisting of: (1) Accounts Payable in the amount of P1,000,000; (2) Notes Payable in the amount of P1,000,000 which is solidary debt with G; (3) Loans Payable with 10% interest in the amount of P1,000,000; and (4) Mortgage Payable in the amount of P1,000,000 which is secured by real estate mortgage over A’s land. A paid P1,000,000 to B and designated the payment to the accounts payable. In which debt shall the payment be applied by B?",
+  options: [
+    "a. Accounts payable",
+    "b. Notes payable",
+    "c. Loans payable",
+    "d. Mortgage payable"
+  ],
+  answer: "a. Accounts payable"
+},{
+  question: "51. A, B and C wrote and signed a promissory note which states 'We promise to pay D and E P60,000.' At the maturity date of the note, D indorsed back the promissory note to A. How much obligation is extinguished and by what mode of extinguishment of obligation?",
+  options: [
+    "a. P20,000 by confusion",
+    "b. P60,000 by compensation",
+    "c. P30,000 by remission",
+    "d. P10,000 by merger"
+  ],
+  answer: "d. P10,000 by merger"
+},
+{
+  question: "52. A has an obligation to deliver a specific cellphone to B but a specific laptop may be substituted in lieu of the specific cellphone. Who has the right of choice in this type of obligation?",
+  options: [
+    "a. A unless there is stipulation to the contrary",
+    "b. B unless there is stipulation to the contrary",
+    "c. Always A",
+    "d. Always B"
+  ],
+  answer: "c. Always A"
+},
+{
+  question: "53. Under the law, anything paid or delivered before the arrival of the suspensive period the obligor being unaware of the period, may be recovered with the fruits and interest. Which is the exception?",
+  options: [
+    "a. The obligor is not aware of the period.",
+    "b. The obligor delivered before the period.",
+    "c. The period is for the benefit of the creditor and debtor.",
+    "d. The obligation involved is an obligation to do and not to do."
+  ],
+  answer: "d. The obligation involved is an obligation to do and not to do."
+},
+{
+  question: "54. Which of the following condonations will NOT extinguish the debtor’s obligation?",
+  options: [
+    "a. The condonation and the acceptance are made orally with the creditor delivering to the debtor simultaneously the promissory note amounting to P10,000.",
+    "b. The condonation is in a public instrument. The acceptance is made in a private instrument. The condonation involves a television set worth P20,000.",
+    "c. The condonation and the acceptance are in a public instrument. The condonation involves a parcel of land.",
+    "d. The condonation is in a public instrument. The acceptance is made orally. The condonation involves a computer printer whose value is P4,000."
+  ],
+  answer: "a. The condonation and the acceptance are made orally with the creditor delivering to the debtor simultaneously the promissory note amounting to P10,000."
+},
+{
+  question: "55. Which of the following circumstances will payment of lesser amount fail to discharge a debt, despite a creditor’s promise to accept the lesser amount in full satisfaction of the debt?",
+  options: [
+    "a. Where the creditor has requested that the debtor pay the lesser amount on an earlier date.",
+    "b. Where the creditor has requested that the debtor pay the lesser amount at a different place.",
+    "c. When the creditor has requested that the debtor pay the lesser amount by cheque instead of cash.",
+    "d. Where the creditor has requested that the debtor accompany payment of the lesser amount with some other act, they were not originally bound by the contract to perform."
+  ],
+  answer: "c. When the creditor has requested that the debtor pay the lesser amount by cheque instead of cash."
+},
+{
+  question: "56. Betina Furniture Co. undertook to deliver to Mr. Magsaysay specified places of living room, dining room and bedroom furniture – all made of narra, for a price stated in the contract. The contract had a penal clause that any violation of the contract would entitle the aggrieved party to damages in the amount of P100,000. The furniture delivered by Betina was made, not of narra but of inferior wood. In a suit to recover damages, Mr. Magsaysay was able to prove that the actual damages he sustained amount to P200,000. How much claim would you award to Mr. Magsaysay?",
+  options: [
+    "a. P50,000",
+    "b. P200,000",
+    "c. P300,000",
+    "d. P100,000"
+  ],
+  answer: "b. P200,000"
+},
+{
+  question: "57. The following are the requisites for the filing of subrogatory action, except:",
+  options: [
+    "a. there must be a failure of the debtor to collect from third persons whether willfully or through negligence",
+    "b. the creditor has a right of credit against the debtor although at the moment is not liquidated.",
+    "c. the act being impugned is fraudulent.",
+    "d. the credit must be due and demandable."
+  ],
+  answer: "c. the act being impugned is fraudulent."
+},
+{
+  question: "58. Demand is necessary in this situation for the debtor to be in delay",
+  options: [
+    "a. When the time is a controlling motive.",
+    "b. When the obligation has been fulfilled.",
+    "c. When the obligor has rendered it beyond his power to perform.",
+    "d. When the debtor delivers a wrong thing in the due date."
+  ],
+  answer: "d. When the debtor delivers a wrong thing in the due date."
+},
+{
+  question: "59. Which of the following statements relative to contracts is incorrect?",
+  options: [
+    "a. If both parties are minors, the contract is unenforceable.",
+    "b. If the insane party entered into the contract during a lucid interval, the contract is voidable.",
+    "c. If one party is a minor and other is not, the contract is voidable.",
+    "d. A contract entered into while in state of drunkenness is voidable."
+  ],
+  answer: "b. If the insane party entered into the contract during a lucid interval, the contract is voidable."
+},
+{
+  question: "60. For a contract to exist, the agreement that was negotiated between the parties must:",
+  options: [
+    "a. contain a promise which is exchanged for something of value.",
+    "b. contain a commitment in undertaking to abide by the agreement.",
+    "c. clearly evidence the promise between the promisor and the promisee.",
+    "d. all of the choices."
+  ],
+  answer: "d. all of the choices."
+},
+{
+  question: "61. Terms may be implied into a contract under the general law or by statute on the basis of a variety of reasons. Which of the following is not one such reason?",
+  options: [
+    "a. That the term follows a well-known trade custom in a particular industry.",
+    "b. That there is a provision in a relevant statute which requires that the term should be implied into every contract of a particular kind.",
+    "c. That by implying the term it would make a fairer bargain.",
+    "d. That by implying the term it would cure an obvious omission and give the contract business efficacy."
+  ],
+  answer: "a. That the term follows a well-known trade custom in a particular industry."
+},
+{
+  question: "62. Mr. S sold a banana plantation to Mr. B for P3 million although its market value is P20 million. It was agreed that Mr. S shall remain in possession as lessee of the land and shall be responsible for the real estate taxes.",
+  options: [
+    "a. The contract gives rise to an action for annulment.",
+    "b. The contract gives rise to an action for rescission.",
+    "c. The contract is presumed to be an equitable mortgage.",
+    "d. The contract is a sale."
+  ],
+  answer: "c. The contract is presumed to be an equitable mortgage."
+},
+{
+  question: "63. Which among the situations below states a correct principle of law?",
+  options: [
+    "a. Third Person pays Debtor’s debt without intending to be reimbursed by Debtor. The payment will not extinguish the obligation even if accepted by Creditor if Debtor does not consent to the payment.",
+    "b. Third person pays Debtor’s debt without intending to be reimbursed by Debtor. The payment will extinguish the obligation if Debtor does not consent to the payment.",
+    "c. Debtor is obliged to give Creditor a Rado watch. Since no Rado watch was available on the due date, Debtor decided to deliver a watch of a different brand more valuable than the one that is due. Creditor must accept the watch.",
+    "d. D owes C P20,000. D pays B, brother of C. The payment is not valid even if it redounded to the benefit of C."
+  ],
+  answer: "d. D owes C P20,000. D pays B, brother of C. The payment is not valid even if it redounded to the benefit of C."
+},
+{
+  question: "64. Samson, Inc. and Goodfit Construction, Inc. are only construction companies available to bid of the construction of the new building at the Katipunan Institute of Technology. Executives from the two companies agreed to fix the bids so that Samson, Inc. wins one contract and Goodfit Construction, Inc. the other contract. Samson, Inc. reneges on the deal and wins both contracts, Goodfit Construction, Inc. sues for breach of contract. Will Samson, Inc. win?",
+  options: [
+    "a. No, agreements to defeat competitive bidding are illegal only in the construction industry.",
+    "b. No, agreements to defeat competitive bidding are illegal.",
+    "c. Yes, agreements to defeat competitive bidding are legal.",
+    "d. Yes, agreements to defeat competitive bidding are legal only in the construction industry."
+  ],
+  answer: "b. No, agreements to defeat competitive bidding are illegal."
+},
+{
+  question: "65. The following are the requisites for the filing of rescissory action, EXCEPT",
+  options: [
+    "a. the debtor has made a subsequent contract conveying a patrimonial benefit to a third person.",
+    "b. the third person who received the property conveyed of, by onerous title, has been an accomplice in the fraud.",
+    "c. the right and actions are not purely personal or inherent in the person of the debtor.",
+    "d. the act of being impugned is fraudulent."
+  ],
+  answer: "c. the right and actions are not purely personal or inherent in the person of the debtor."
+},
+{
+  question: "66. Lennie bought a business class ticket from Alta Airlines. As she checked in, the manager downgraded her to economy on the ground that a congressman had to be accommodated in the business class. Lennie suffered the discomfort and embarrassment of the downgrade. She sued the airlines for quasi-delict but Alta Airlines countered that, since her travel was governed by a contract between them, no quasi-delict could arise. Is the airline correct?",
+  options: [
+    "a. No, the breach of contract may in fact be tortious as when it is tainted as in this case with arbitrariness, gross bad faith, and malice.",
+    "b. No, denying Lennie the comfort and amenities of the business class as provided in the ticket is a tortious act.",
+    "c. Yes, since the facts show a breach of contract, not a quasi-delict.",
+    "d. Yes, since quasi-delict presupposes the absence of a pre-existing contractual relation between the parties."
+  ],
+  answer: "a. No, the breach of contract may in fact be tortious as when it is tainted as in this case with arbitrariness, gross bad faith, and malice."
+},
+{
+  question: "67. Raul, Ester, and Rufus inherited a 10-hectare land from their father. Before the land could be partitioned, however, Raul sold his hereditary right to Raffy, a stranger to the family, for P5 million. Do Ester and Rufus have a remedy for keeping the land within their family?",
+  options: [
+    "a. Yes, they may be subrogated to Raffy’s right provided they buy him out before he registers the sale.",
+    "b. Yes, they may be subrogated to Raffy’s right by reimbursing to him within the required time what he paid Raul.",
+    "c. No, since there was no impediment to Raul selling his inheritance to a stranger.",
+    "d. No, they can be subrogated to Raffy’s right only with his conformity."
+  ],
+  answer: "b. Yes, they may be subrogated to Raffy’s right by reimbursing to him within the required time what he paid Raul."
+},
+{
+  question: "68. X, the owner, constituted a 10-year usufruct on his land as well as on the building standing on it in Y’s favor. After flood totally destroyed the building 5 years later, X told Y that an act of God terminated the usufruct and that he should vacate the land. Is X, the owner of the land, correct?",
+  options: [
+    "a. Yes, since Y cannot use the land without the building.",
+    "b. Yes, since the destruction of the building without the X’s fault terminated the usufruct.",
+    "c. No, since the building was destroyed through no fault of Y.",
+    "d. No, since Y still has the right to use the land and the materials left on it."
+  ],
+  answer: "d. No, since Y still has the right to use the land and the materials left on it."
+},
+{
+  question: "69. Rudolf borrowed P1 million from Rodrigo and Fernando who acted as solidary creditors. When the loan matured, Rodrigo wrote a letter to Rudolf, demanding payment of the loan directly to him. Before Rudolf could comply, Fernando went to see him personally to collect and he paid him. Did Rudolf make a valid payment?",
+  options: [
+    "a. Yes, since the payment covers the whole obligation.",
+    "b. Yes, since Fernando was a solidary creditor, payment to him extinguished the obligation.",
+    "c. No, since Rodrigo, the other solidary creditor, already made a prior demand for payment from Rudolf.",
+    "d. No, since Rudolf should have split the payment between Rodrigo and Fernando."
+  ],
+  answer: "c. No, since Rodrigo, the other solidary creditor, already made a prior demand for payment from Rudolf."
+},
+{
+  question: "70. Roy and Carlos both undertook a contract to deliver to Sam in Manila a boat docked in Subic. Before they could deliver it, however, the boat sank in a storm. The contract provides that fortuitous event shall not exempt Roy and Carlos from their obligation. Owing to the loss of the motor boat, such obligation is deemed converted into one of indemnity for damages. Is the liability of Roy and Carlos joint or solidary?",
+  options: [
+    "a. Neither solidary nor joint since they cannot waive the defense of fortuitous event to which they are entitled.",
+    "b. Joint since the conversion of their liability to one of indemnity for damages made it joint.",
+    "c. Solidary or joint upon the discretion of Sam.",
+    "d. Solidary since Roy and Carlos failed to perform their obligation to deliver the motor boat."
+  ],
+  answer: "b. Joint since the conversion of their liability to one of indemnity for damages made it joint."
+},{
+  question: "71. Anne owed Bessy P1 million due on October 1, 2011 but failed to pay her on due date. Bessy sent a demand letter to Anne giving her 5 days from receipt within which to pay. Two days after receipt of the letter, Anne personally offered to pay Bessy in manager's check but the latter refused to accept the same. The 5 days lapsed. May Anne’s obligation be considered extinguished?",
+  options: [
+    "a. No, since a manager’s check is not considered legal tender in the Philippines.",
+    "b. No, since tender of payment even in cash, if refused, will not discharge the obligation without proper consignation in court.",
+    "c. Yes, since Bessy’s refusal of the manager’s check, which is presumed funded, amounts to a satisfaction of the obligation.",
+    "d. Yes, since Anne tendered payment of the full amount due."
+  ],
+  answer: "b. No, since tender of payment even in cash, if refused, will not discharge the obligation without proper consignation in court."
+},
+{
+  question: "72. Jose went to visit Pablo, a friend one Sunday morning where a card game was going on. Jose joined the game and lost P50,000. He became indebted to the winner for P10, 000 more. Which among the following statements is not correct?",
+  options: [
+    "a. The winner cannot maintain an action to collect the P10,000.",
+    "b. Jose may recover P50,000 from the winner with legal interest from the time he paid the amount lost.",
+    "c. Jose may recover P50,000 from the winner but without legal interest.",
+    "d. If Jose refuses to recover from the winner, the spouse of Jose may institute the action to recover."
+  ],
+  answer: "c. Jose may recover P50,000 from the winner but without legal interest."
+},
+{
+  question: "73. Which of the following is most likely incorrect?",
+  options: [
+    "a. Mr. D promised to deliver to Mr. C 100 bottles of Japanese red wine of a specified brand. Without the knowledge of Mr. D, production of the wine had been stopped. Despite earnest efforts, Mr. D could only deliver ninety (90) bottles. Mr. O’s obligation is deemed fulfilled.",
+    "b. Mr. D promised to deliver 100 sacks of a certain type of rice. He delivered only 90 sacks but the obligee did not object to the incomplete delivery. The obligation may be deemed fully performed.",
+    "c. The creditor cannot be compelled to accept payment or performance by a third person who has no interest in the fulfillment of the obligation or unless there is a stipulation to the contrary.",
+    "d. In the preceding letter (a), Mr. D could recover as though there had been a delivery of 100 bottles."
+  ],
+  answer: "d. In the preceding letter (a), Mr. D could recover as though there had been a delivery of 100 bottles."
+},
+{
+  question: "74. Where the debtor has various debts of the same kind in favor of the same creditor and on the due date the debtor does not have sufficient funds to cover all the debts, the debtor may avail of",
+  options: [
+    "a. Application of payment.",
+    "b. Tender of payment and consignation.",
+    "c. Cession in payment.",
+    "d. Dation in payment."
+  ],
+  answer: "a. Application of payment."
+},
+{
+  question: "75. Mr. Debtor owes Mr. Creditor as follows: P10,000 due February 5; P10,000 due March 5 and P10,000 due April 5, all during the current year. Mr. Debtor has only P10,000 and cannot pay all his obligations. If Mr. Debtor decides to pay P10,000, the amount shall apply:",
+  options: [
+    "a. To the debt chosen by Mr. Creditor.",
+    "b. To the debt chosen by Mr. Debtor.",
+    "c. To the debt due on February 5 being the oldest debt.",
+    "d. To the debt due on April 5 if it is an interesting obligation."
+  ],
+  answer: "b. To the debt chosen by Mr. Debtor."
+},
+{
+  question: "76. Mr. Debtor owes fifteen (15) persons substantial amounts of money. His financial situation indicates that his liabilities exceed his assets. If Mr. Debtor cedes or assigns his properties to his creditors,",
+  options: [
+    "a. The creditors acquire ownership of the properties assigned or ceded.",
+    "b. The creditors shall sell the properties assigned and when sold, the debt of Mr. Debtor is deemed paid regardless of whether or not the net proceeds are equal to or less than the amount of the indebtedness.",
+    "c. The creditors shall sell the properties assigned and when sold, the debt of Mr. Debtor shall only be released to the extent of the net proceeds of the sale.",
+    "d. The cession or assignment shall extinguish the obligation whether or not the creditors sell the properties assigned."
+  ],
+  answer: "c. The creditors shall sell the properties assigned and when sold, the debt of Mr. Debtor shall only be released to the extent of the net proceeds of the sale."
+},
+{
+  question: "77. Mr. Debtor owes Mr. Creditor P100,000. On the due date, Mr. Debtor delivers a cashier’s check for the full amount. Mr. Creditor refuses to accept the check.",
+  options: [
+    "a. Mr. Debtor may make a consignation by depositing the amount due at the disposal of judicial authorities before whom the tender of payment shall be proved in a proper case.",
+    "b. The creditor may be considered in mora accipiendi.",
+    "c. Debtor may make a consignation by depositing the amount due with any bank and in the name of Mr. Creditor.",
+    "d. Mr. Debtor has no legal basis for making a consignation."
+  ],
+  answer: "d. Mr. Debtor has no legal basis for making a consignation."
+},
+{
+  question: "78. As a general rule, consignation must be preceded by a valid tender of payment. Enumerated below however, are situations which allow a consignation without a prior tender of payment. Which is the exception?",
+  options: [
+    "a. When the title to the obligation has been lost.",
+    "b. When two or more persons claim the same right to collect.",
+    "c. When for any cause, the creditor refuses to give a receipt.",
+    "d. When the creditor is absent or unknown, or does not appear at the place of payment."
+  ],
+  answer: "c. When for any cause, the creditor refuses to give a receipt."
+},
+{
+  question: "79. Which among the following fails to state a correct legal principle?",
+  options: [
+    "a. The debtor in obligations to do shall be released when the prestation becomes legally or physically impossible without the fault of the obligor.",
+    "b. Whenever the thing is lost in the possession of the debtor, it shall be presumed that the loss was due to his fault, unless there is proof to the contrary.",
+    "c. An obligation which consists in the delivery of a determinate thing shall be extinguished in any event it should be lost or destroyed without the fault of the debtor.",
+    "d. Condonation or remission is essentially gratuitous, and requires the acceptance by the obligor. It may be made expressly or impliedly."
+  ],
+  answer: "c. An obligation which consists in the delivery of a determinate thing shall be extinguished in any event it should be lost or destroyed without the fault of the debtor."
+},
+{
+  question: "80. Statement No. 1 - the same act of negligence of the defendant that causes injury to another may give rise to a liability based on culpa aquiliana and culpa criminal and the injured party may recover twice from the same act or omission of the defendant. Statement No. 2 - When the defendant causes damage to the plaintiff through the former's fault or negligence, there being no contractual relationship between them, the basis of the defendant’s liability is a quasi-contract.",
+  options: [
+    "a. Both statements are true.",
+    "b. Both statements are false.",
+    "c. Only Statement No. 1 is true.",
+    "d. Only Statement No. 2 is true."
+  ],
+  answer: "d. Only Statement No. 2 is true."
+},
+{
+  question: "81. The quasi-contract of negotiorum gestio requires the following. Which is the exception?",
+  options: [
+    "a. There must be an abandoned or neglected property or business.",
+    "b. Someone voluntary takes charge of that abandoned business or property.",
+    "c. The owner must consent to the management of his business or property by someone.",
+    "d. The owner has the obligation to reimburse the expenses of the person who takes charge of his business or property."
+  ],
+  answer: "c. The owner must consent to the management of his business or property by someone."
+},
+{
+  question: "82. A, a minor, 16 years of age, together with his brothers B and C, both of legal age are jointly and severally liable in a contract of loan to pay X the amount of P120,000. Upon maturity of the obligation, A",
+  options: [
+    "a. is liable to pay the amount of P30,000",
+    "b. is liable to pay the amount of P60,000",
+    "c. is liable to pay him the whole amount of P120,000.",
+    "d. is liable to pay only the amount which benefits him."
+  ],
+  answer: "d. is liable to pay only the amount which benefits him."
+},
+{
+  question: "83. Mr. A was appointed by the court as guardian of the minor X. Mr. A sold the vegetables that were planted in the lot of X. The value of the vegetable is P5,000 but Mr. A sold the vegetables for only P2,000. The contract is",
+  options: [
+    "a. Rescissible",
+    "b. Voidable",
+    "c. Unenforceable",
+    "d. Void"
+  ],
+  answer: "a. Rescissible"
+},
+{
+  question: "84. In order that fraud may make a contract voidable:",
+  options: [
+    "a. It may be incidental but should have been employed by both parties.",
+    "b. It should be serious and should have not have been employed by both contracting parties.",
+    "c. It may be incidental but both parties should not be in pari delicto.",
+    "d. It may be serious and the parties must be in pari delicto."
+  ],
+  answer: "b. It should be serious and should have not have been employed by both contracting parties."
+},
+{
+  question: "85. Which of the following statements is correct?",
+  options: [
+    "a. Negligence signifies the idea of delay in the fulfillment of an obligation.",
+    "b. Delay or default means the failure to perform the obligation on the date agreed upon by the parties.",
+    "c. Incidental fraud is one committed in the performance of an obligation.",
+    "d. Proper diligence of a good father of a family means extra-ordinary diligence."
+  ],
+  answer: "c. Incidental fraud is one committed in the performance of an obligation."
+},
+{
+  question: "86. Jose is under obligation to deliver to Pedro, at the option of Jose, a car, a pick-up truck, or a van, all of which are specific. No. 1 - If the car and the pick-up truck were lost through Jose’s fault, he has no choice but to deliver the van; If the van was lost through a fortuitous event before delivery, the obligation is extinguished and Jose is not liable. No. 2 - If the pick-up truck and the car were lost through a fortuitous event, Jose has no choice but to deliver the van; if before delivery, the van was lost because of Jose’s fault, he is liable.",
+  options: [
+    "a. Both 1 and 2 are true",
+    "b. Both 1 and 2 are false",
+    "c. Only 1 is true",
+    "d. Only 2 is true"
+  ],
+  answer: "a. Both 1 and 2 are true"
+},
+{
+  question: "87. Which is not an element of Novation?",
+  options: [
+    "a. The new obligation is laid down in unequivocal terms.",
+    "b. The new and the old obligations must be on every point incompatible with the other",
+    "c. If they are compatible, the new obligation novates the first",
+    "d. Each of the obligations must have its independent existence"
+  ],
+  answer: "c. If they are compatible, the new obligation novates the first"
+},
+{
+  question: "88. In order that a stipulation in favor of a third person in a contract would be valid and binding upon the parties thereto, three of the requisites are mentioned in the following enumerations. Which among them is not a requisite?",
+  options: [
+    "a. That there must be an existing agency between either of the contracting parties and the third person.",
+    "b. The third person communicated his acceptance to the obligor before its revocation.",
+    "c. There must be a stipulation in favor of a third person.",
+    "d. The contracting parties must have clearly and deliberately conferred a favor upon that third person."
+  ],
+  answer: "a. That there must be an existing agency between either of the contracting parties and the third person."
+},
+{
+  question: "89. The following are the ways by which innominate contracts are regulated, except:",
+  options: [
+    "a. By the stipulation of the parties.",
+    "b. By the general principles of quasi-contracts and delicts",
+    "c. By the rules governing the most analogous nominate contracts.",
+    "d. By the customs of the place."
+  ],
+  answer: "b. By the general principles of quasi-contracts and delicts"
+},
+{
+  question: "90. Which of the following statements is incorrect legal principle?",
+  options: [
+    "a. Creditors are protected in cases of contracts intended to defraud them.",
+    "b. If a contract should contain some stipulation in favor of a third person, he may demand its fulfillment provided he communicated his acceptance to the obligor before its revocation.",
+    "c. In contracts creating real rights, third persons who come into possession of the object of the contract are not bound thereby.",
+    "d. Contracts take effect only between the parties, their assign and heirs, except in case where the rights and obligations arising from the contract are not transmissible by their nature, or by stipulation or by provision of law."
+  ],
+  answer: "c. In contracts creating real rights, third persons who come into possession of the object of the contract are not bound thereby."
+}
+];
+
+
+let currentQuestion = 0;
+let answered = new Array(quiz.length).fill(false);
+
+function loadQuestion() {
+  const q = quiz[currentQuestion];
+  document.getElementById('question').innerText = q.question;
+  const optionsDiv = document.getElementById('options');
+  optionsDiv.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    btn.onclick = () => showAnswer(opt);
+    optionsDiv.appendChild(btn);
+  });
+
+  const ansDiv = document.getElementById('answer');
+  if (answered[currentQuestion]) {
+    ansDiv.style.display = 'block';
+  } else {
+    ansDiv.style.display = 'none';
+    ansDiv.innerText = '';
+  }
+
+  document.getElementById('prev-btn').style.display = currentQuestion === 0 ? 'none' : 'inline-block';
+}
+
+function showAnswer(selected) {
+  const ansDiv = document.getElementById('answer');
+  const q = quiz[currentQuestion];
+  ansDiv.classList.remove('correct', 'wrong'); // reset classes
+
+  if (selected === q.answer) {
+    ansDiv.classList.add('correct');
+    ansDiv.innerText = "Correct! ✅ " + q.answer;
+  } else {
+    ansDiv.classList.add('wrong');
+    ansDiv.innerText = "Wrong ❌. Correct answer: " + q.answer;
+  }
+  ansDiv.style.display = 'block';
+  answered[currentQuestion] = true;
+}
+
+
+document.getElementById('next-btn').onclick = () => {
+  if (currentQuestion < quiz.length - 1) {
+    currentQuestion++;
+    loadQuestion();
+  } else {
+    alert("You've reached the last question!");
+  }
+}
+
+document.getElementById('prev-btn').onclick = () => {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    loadQuestion();
+  }
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>

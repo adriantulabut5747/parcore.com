@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AC | Parcore</title>
+<meta name="description" content="Browse the best Minecraft Vanilla worlds, shaders, resource packs, commands and more — curated by the Parchrome community.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome.netlify.app/minecraft-home.html">
+<meta property="og:title" content="Minecraft Vanilla — Parchrome">
+<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:image" content="https://parchrome.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
+<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="minecrafticons/herojavaseed.jfif">
+<link rel="preload" as="image" href="minecrafticons/javaseeds/s1a-compresso.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="icons/home.jpg">
+<link rel="shortcut icon" href="icons/home.jpg">
+<link rel="apple-touch-icon" href="icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="minecraft-zui.css">
+</head>
+<body>
+
+<!-- ── PAGE LOADER ── -->
+<div id="page-loader">
+  <div class="parchrome-fade"><div class="parchrome-ring"></div></div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- ── TOP BAR ── -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="icons/home.jpg" alt=""></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="openSearch()" style="background:transparent;border:none;padding:0;cursor:pointer;right:15px;position:fixed;margin-top:2px;">
+    <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+      <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+      <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <span id="close-icon" style="display:none;font-size:1.5rem;color:white;">✖</span>
+  </button>
+  <div id="search-overlay">
+    <button id="search-close-btn">✖</button>
+    <input type="text" id="search-input" placeholder="Find your next game" oninput="searchItems()">
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- ── SECONDARY TOP BAR ── -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="minecrafticons/seeds.png" alt="TH10 Icon" class="th-icon">
+    <div class="secondary-content">(Seeds) Minecraft Java</div>
+  </div>
+  <div class="help-container">
+    <div class="help-popup" id="help-popup">
+      <ul><br>
+        <li>🛡️ Tap the clan banner to view recommended CC</li><br>
+        <li>⚠️ Downloads may not work inside Facebook or Messenger. Please open this page in Chrome for the best experience.</li><br>
+        <li>📋 AC Clan Tag: <span id="clan-tag" class="copy-tag">#2GYPGPJP9</span></li><br>
+      </ul>
+    </div>
+    <div class="help-container">
+      <a class="help-button2" href="home.html">
+        <svg width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#bababa" stroke-width="1.008">
+          <path d="M1 6V15H6V11C6 9.89543 6.89543 9 8 9C9.10457 9 10 9.89543 10 11V15H15V6L8 0L1 6Z" fill="#bababa"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="icons/controllericon.png" class="tripleimg">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+
+    <!-- ── HERO SECTION ── -->
+    <div class="hero-section">
+      <img class="hero-video" src="minecrafticons/herojavaseed.jfif" alt="" fetchpriority="high" decoding="sync">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h1 class="hero-title"><img src="minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft" decoding="async"></h1>
+          <style>.hero-minecraft{width:400px;} @media(max-width:970px){.hero-minecraft{width:200px;}}</style>
+          <div class="hero-game-tabs">
+            <a href="minecraft-home.html" class="hero-tab active"><img src="minecrafticons/minecraft-block-logo.png" alt="Vanilla" decoding="async"><span>Java</span></a>
+            <a href="minecrafticons/mc-bedrock-icon.png" class="hero-tab"><img src="minecrafticons/minecraft-bedrock-icon.png" alt="Bedrock" loading="lazy" decoding="async"><span>Bedrock</span></a>
+            <a href="minecrafticons/mc-stroymode-icon.png" class="hero-tab"><img src="minecrafticons/mc-stroymode-icon.png" alt="Story Mode" loading="lazy" decoding="async"><span>Story</span></a>
+            <a href="minecrafticons/mc-dungeons.jfif" class="hero-tab"><img src="minecrafticons/mc-dungeons-removebg-preview.png" alt="Dungeons" loading="lazy" decoding="async"><span>Dungeons</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      /* ── SECTION STYLES ── */
+.cf-section:first-child { padding: 40px 0 15px 0; }
+.cf-section { padding: 15px 0 8px 0; }
+@media (max-width: 970px) { .cf-section:first-child { padding: 0px 0 15px 0; } .mc-content-wrapper { flex-direction: column; } }
+.cf-section-header { display: flex; align-items: center; gap: 12px; padding: 40px 5% 10px 5%; position: relative; border-bottom: 1px solid #2a2a2a; margin: 0 5% 10px 5%; padding-left: 0; padding-right: 0; }
+.cf-section-header::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100px; height: 2px; background: #036e01; }
+@media (max-width: 970px) { .cf-section-header { margin: 26px 0 15px 0; padding: 5px 0 10px 0; } .cf-section-header::after { width: 10cqmax; } }
+.cf-section-title { font-size: clamp(14px, 2vw, 20px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #c0c9d4, #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cf-view-all { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; color: #bbb; background-color: #1a1a1a; padding: 7px 10px; border-radius: 6px; border: 1px solid #2a2a2a; margin-right: 5px; display: inline-flex; align-items: center; transition: all 0.2s ease; }
+.cf-view-all:hover { color: #aaa; }
+.cf-section-header-right { display: none; }.cf-arrow { width: 30px; height: 30px; border-radius: 6px; color: #888; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, color 0.2s; user-select: none; flex-shrink: 0; background-color: #1a1a1a; border: 1px solid #2a2a2a; }
+.cf-arrow:hover { background: #2a2a2a; color: #fff; }
+.cf-arrow:disabled { opacity: 0.6; cursor: default; pointer-events: none; }
+.cf-scroll-wrapper { padding: 0 5%; }
+.cf-row {
+  display: grid;
+  grid-template-columns: repeat(1, 3fr);
+  gap: 14px;
+  overflow: hidden; /* remove scroll */
+}
+.cf-row::-webkit-scrollbar { display: none; }
+.cf-card {
+  flex: unset; /* remove old flex sizing */
+    background: #1c1c1e;
+    width: 100%;
+    border: 1px solid #2e2e2e;
+
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--fb-text-primary);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.cf-card:hover { transform: translateY(-3px); border-color: #333; }
+.cf-card-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #1a1a1a; }
+.cf-card-body { padding: 10px 10px 12px 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.cf-card-name { font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-card-author { font-size: 12px; color: #858585; max-height: calc(1.3em * 2); overflow: hidden; }
+.cf-card-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.cf-card-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; background: #1e1e1e; color: #555; border: 1px solid #2a2a2a; letter-spacing: 0.5px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; }
+.cf-source-icon { width: 14px; height: 14px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+.cf-card-rank { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); color: #fff; font-size: 10px; font-weight: 900; letter-spacing: 0.5px; padding: 3px 7px; border-radius: 5px; font-family: 'Oxanium', sans-serif; z-index: 2; line-height: 1; border: 1px solid rgba(255,255,255,0.08); }
+.cf-card-rank.top3 { color: #cccccc; border-color: rgba(222,222,222,0.3); }
+@media (max-width: 970px) {
+
+  /* Bottom gradient fade on hero banner */
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, #0e0e0e);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cf-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cf-card {
+    flex-direction: row;
+    align-items: stretch;
+    height: 90px;
+  }
+
+  .cf-card-img {
+    width: 90px;
+    height: 90px;
+    aspect-ratio: unset;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  .cf-card-body {
+    padding: 10px 12px;
+    justify-content: center;
+  }
+
+  .cf-card-name {
+    font-size: 12px;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  .cf-card-author {
+    font-size: 10px;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cf-card-rank {
+    top: 6px;
+    left: 6px;
+    font-size: 9px;
+  }
+
+  .cf-scroll-wrapper {
+    padding: 0; 
+  }
+
+  /* hide arrows on mobile */
+  .cf-section-header-right {
+    display: none;
+  }
+}
+
+/* ── CHALLENGE MAPS: always mobile-style layout, every screen size ── */
+/* ── MAP & SEED TOOLS: logo + name header card ── */
+/* ── MAP & SEED TOOLS ── */
+#challenge-maps-row.cf-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tool-card {
+  background: #1c1c1e;
+  border: 1px solid #2e2e2e;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--fb-text-primary);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+.tool-card:hover { transform: translateY(-3px); border-color: #3a3a3a; }
+
+.tool-card-preview {
+  width: 200px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #111;
+}
+.tool-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tool-card-body {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+.tool-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tool-card-favicon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.tool-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tool-card-desc {
+  font-size: 13px;
+  color: #8a8a8a;
+  line-height: 1.5;
+}
+
+.tool-card .cf-card-tag {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+@media (max-width: 970px) {
+  .tool-card-preview { width: 110px; }
+  .tool-card-body { padding: 10px 14px; gap: 6px; }
+  .tool-card-name { font-size: 13px; }
+  .tool-card-desc { font-size: 11px; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+  .tool-card-favicon { width: 18px; height: 18px; }
+}
+</style>
+
+
+
+
+
+
+
+<!-- ── SEED CARD STYLES ── -->
+<style>
+.seed-card-wrap{width:100%;padding:0 5%;margin-bottom:8px;}
+.seed-card{width:100%;background:#111113;border:1px solid #252528;border-radius:16px;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,0.4);margin-top:30px;margin-bottom:30px;}
+.seed-card-slider{position:relative;width:100%;background:#1a1a1c;overflow:hidden;line-height:0;}
+.seed-card-slider img{width:100%;height:450px;object-fit:cover;object-position:center;display:block;cursor:pointer;}
+.seed-card-slider img[data-src]{background:#1a1a1c;min-height:200px;}
+.seed-slider-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,transparent 35%,transparent 55%,rgba(10,10,12,0.88) 100%);pointer-events:none;}
+.seed-slider-top{position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:8px;z-index:6;}
+.seed-card-num{width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-family:"Oxanium",sans-serif;font-size:10px;font-weight:800;color:#888;backdrop-filter:blur(8px);flex-shrink:0;}
+.seed-card-title{font-family:"Oxanium",sans-serif;font-size:16px;font-weight:800;letter-spacing:0.5px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,0.9);}
+.seed-slider-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:36px;height:36px;border-radius:8px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.1);color:#ccc;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);transition:background 0.15s,color 0.15s,border-color 0.15s;user-select:none;line-height:1;margin-bottom:40px;}
+.seed-slider-arrow:hover{background:rgba(20,20,20,0.85);color:#fff;border-color:rgba(255,255,255,0.22);}
+.seed-slider-arrow.left{left:12px;}.seed-slider-arrow.right{right:12px;}
+.seed-slider-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:5px;align-items:center;z-index:6;}
+.seed-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;cursor:pointer;padding:0;transition:background 0.2s,width 0.2s;}
+.seed-dot.active{background:rgba(255,255,255,0.85);border-radius:3px;}
+.seed-card-body{padding:18px 20px 20px;}
+.seed-card-desc{font-size:13px;color:#666;line-height:1.7;margin:0 0 16px;font-family:"Inter",sans-serif;}
+.seed-card-desc strong{color:#a0a0a0;font-weight:500;}
+.seed-row{display:flex;align-items:center;gap:10px;background:#0a0a0c;border:1px solid #222226;border-radius:10px;padding:12px 14px;flex-wrap:nowrap;overflow:hidden;container-type:inline-size;container-name:seed-row;}
+@container seed-row (max-width:420px){.seed-copy-btn-text{display:none;}.seed-copy-btn{padding:7px 9px;gap:0;}}
+.seed-row-label{font-family:"Oxanium",sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#3a3a40;flex-shrink:0;}
+.seed-row-divider{width:1px;height:18px;background:#1e1e22;flex-shrink:0;}
+.seed-row-value{font-family:"Oxanium",sans-serif;font-size:13px;font-weight:500;color:#d0d0d0;letter-spacing:0.3px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.seed-copy-btn{display:inline-flex;align-items:center;gap:6px;background:#1e3a1e;border:1px solid rgba(139,195,74,0.2);border-radius:7px;padding:7px 13px;color:#8bc34a;font-family:"Oxanium",sans-serif;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s,border-color 0.15s;}
+.seed-copy-btn:hover{background:#2a4e2a;border-color:rgba(139,195,74,0.4);}
+.seed-copy-btn svg{flex-shrink:0;}
+.seed-copy-feedback{display:none;font-family:"Oxanium",sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:#8bc34a;text-transform:uppercase;flex-shrink:0;}
+.seed-copy-feedback.show{display:block;}
+.seed-copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2a2a2e;color:#8bc34a;padding:10px 18px;border-radius:40px;font-family:"Oxanium",sans-serif;font-size:13px;font-weight:700;z-index:9999;border:1px solid #3a3a40;white-space:nowrap;animation:seedFadeInOut 1.5s ease forwards;pointer-events:none;}
+@keyframes seedFadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(8px);}15%{opacity:1;transform:translateX(-50%) translateY(0);}85%{opacity:1;transform:translateX(-50%) translateY(0);}100%{opacity:0;transform:translateX(-50%) translateY(-8px);visibility:hidden;}}
+@media(max-width:970px){
+  .seed-card-slider img{height:200px;}
+  .seed-slider-arrow{width:30px;height:30px;font-size:16px;margin-bottom:30px;}
+  .seed-card-title{font-size:11px;}
+  .seed-card-body{padding:12px 12px 14px;}
+  .seed-card-desc{font-size:12px;}
+  .seed-card-wrap{padding:0;}
+  .seed-row{padding:9px 10px;gap:7px;}
+  .seed-row-label{font-size:7px;letter-spacing:1.5px;}
+  .seed-row-value{font-size:11px;}
+}
+.seed-pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 5% 0px 5%;}
+.seed-page-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:#1c1c1e;border:1px solid #2e2e2e;color:#666;font-family:"Oxanium",sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;cursor:pointer;transition:all 0.15s;user-select:none;text-transform:uppercase;}
+.seed-page-btn:hover{background:#2a2a2a;border-color:#444;color:#ccc;}
+.seed-page-btn.active{background:#213621;border-color:rgba(139,195,74,0.35);color:#8bc34a;}
+.seed-page-btn:disabled{opacity:1;cursor:default;pointer-events:none;}
+.seed-page-arrow{width:38px;height:38px;border-radius:8px;background:#1c1c1e;border:1px solid #2e2e2e;color:#555;font-size:20px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;user-select:none;line-height:1;}
+.seed-page-arrow:hover{background:#2a2a2a;border-color:#444;color:#ccc;}
+.seed-page-arrow:disabled{opacity:0.6;cursor:default;pointer-events:none;}
+
+/* ── SPINNER OVERLAY ── */
+.seed-spinner{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.seed-spinner-ring{width:34px;height:34px;border:3px solid rgba(255,255,255,0.15);border-top-color:#ffffff;border-radius:50%;animation:seedSpin 0.7s linear infinite;}
+@keyframes seedSpin{to{transform:rotate(360deg);}}
+
+#seeds-section-header {
+  scroll-margin-top: 60px;
+}
+
+
+
+
+/* ── SEED SEARCH BAR ── */
+.seed-search-wrap {
+  position: relative;
+  margin: 0 0 18px 0;
+  display: flex;
+  align-items: center;
+  padding: 0 5%;
+}
+.seed-search-icon {
+  position: absolute;
+  left: calc(5% + 14px);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.seed-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #1c1c1e;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 12px 38px 12px 38px;
+  font-size: 13px;
+  color: #eee;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.seed-search-input::placeholder { color: #5a5a5a; }
+.seed-search-input:focus {
+  border-color: #4a4a4a;
+  background: #202022;
+}
+.seed-search-clear {
+  position: absolute;
+  right: calc(5% + 10px);
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: none;
+  background: #2a2a2a;
+  color: #999;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.seed-search-clear:hover { background: #353535; color: #fff; }
+.seed-no-results {
+  text-align: center;
+  padding: 40px 20px;
+  margin: 0 5%;
+  color: #666;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: 1px dashed #2a2a2a;
+  border-radius: 12px;
+}
+@media (max-width: 970px) {
+  .seed-search-wrap { margin-bottom: 12px; padding: 0; }
+  .seed-search-icon { left: 12px; }
+  .seed-search-input { padding: 10px 34px 10px 34px; font-size: 12px; }
+  .seed-search-clear { right: 10px; }
+}
+</style>
+<!-- ── LIGHTBOX + PALETTE STYLES ── -->
+<style>
+#gal-lb-fixed-close,#pal-lb-fixed-close{position:fixed;top:16px;right:16px;z-index:99999;width:36px;height:36px;border-radius:50%;background:#222;border:1px solid #444;color:#aaa;font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:color 0.15s,background 0.15s;}
+#gal-lb-fixed-close:hover,#pal-lb-fixed-close:hover{color:#fff;background:#333;}
+#pal-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;cursor:pointer;}
+#pal-lightbox.open{display:flex;}
+#pal-lb-inner{position:relative;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default;}
+#pal-lb-img{max-width:calc(100vw - 40px);max-height:calc(100vh - 80px);width:auto;height:auto;object-fit:contain;border-radius:8px;display:block;touch-action:none;user-select:none;transform-origin:center center;animation:lbZoomIn 0.2s ease;-ms-touch-action:none;will-change:transform;}
+@keyframes lbZoomIn{from{transform:scale(0.93);opacity:0;}to{transform:scale(1);opacity:1;}}
+#pal-lb-prev,#pal-lb-next{display:none;position:fixed;top:50%;transform:translateY(-50%);z-index:99999;width:40px;height:40px;border-radius:8px;background:#3d3d3d;border:1px solid #444;color:#ededed;font-size:24px;cursor:pointer;align-items:center;justify-content:center;transition:color 0.15s,background 0.15s;user-select:none;}
+#pal-lb-prev{left:12px;}#pal-lb-next{right:12px;}
+#pal-lb-prev:hover,#pal-lb-next:hover{background:#4b4a4a;color:#ededed;}
+@media(max-width:970px){#pal-lb-prev{left:6px;width:34px;height:34px;font-size:20px;}#pal-lb-next{right:6px;width:34px;height:34px;font-size:20px;}}
+#gal-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(6px);z-index:9099;overflow-y:auto;cursor:zoom-out;}
+#gal-lightbox.open{display:block;}
+#gal-lb-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:12px;width:480px;max-width:90vw;margin:15vh auto 60px auto;cursor:default;}
+#gal-lb-img{width:100%;object-fit:contain;border-radius:8px;display:block;touch-action:none;user-select:none;transform-origin:center center;animation:lbZoomIn 0.2s ease;}
+#gal-lb-copybox{width:100%;box-sizing:border-box;background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+#gal-lb-name{font-size:13px;font-weight:700;color:#fff;font-family:"Oxanium",sans-serif;}
+#gal-lb-code{font-family:monospace;font-size:12px;color:#7ec87e;word-break:break-all;line-height:1.6;background:#111;border:1px solid #1e1e1e;border-radius:6px;padding:8px 10px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;}
+#gal-lb-copy-btn{width:100%;padding:9px 0;border-radius:7px;border:1px solid #2a2a2a;background:#1e1e1e;color:#aaa;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:"Oxanium",sans-serif;transition:background 0.15s,color 0.15s;}
+#gal-lb-copy-btn:hover{background:#2a2a2a;color:#fff;}
+#gal-lb-feedback{text-align:center;font-size:11px;color:#4caf50;height:14px;font-family:"Oxanium",sans-serif;}
+.cf-section:first-child{padding:40px 0 15px 0;}.cf-section{padding:15px 0 8px 0;}
+@media(max-width:970px){.cf-section:first-child{padding:0px 0 15px 0;}.mc-content-wrapper{flex-direction:column;}}
+.cf-section-header{margin-top:50px;display:flex;align-items:center;gap:12px;padding:40px 5% 10px 5%;position:relative;border-bottom:1px solid #2a2a2a;margin:0 5% 10px 5%;padding-left:0;padding-right:0;}
+.cf-section-header::after{content:"";position:absolute;bottom:-2px;left:0;width:100px;height:2px;background:#036e01;}
+@media(max-width:970px){.cf-section-header{margin:26px 0 15px 0;padding:5px 0 10px 0;}.cf-section-header::after{width:10cqmax;}}
+.cf-section-title{font-size:clamp(14px,2vw,20px);font-weight:900;text-transform:uppercase;letter-spacing:1px;background:linear-gradient(90deg,#c0c9d4,#ffffff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cf-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;overflow:hidden;}
+.layouts-title-box{border-radius:0;padding:12px 20px;text-align:center;background:transparent;border-bottom:1px solid #2a2a2a;position:relative;margin-bottom:20px;margin-left:5%;margin-right:5%;margin-top:20px;}
+.layouts-title-box::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:100px;height:2px;background:#036e01;}
+.layouts-title{font-size:clamp(13px,2vw,16px);font-weight:900;text-transform:uppercase;letter-spacing:1px;background:linear-gradient(90deg,#c0c9d4,#ffffff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.mc-right-sidebar{width:300px;flex-shrink:0;background:#111113;border-left:1px solid #1a1a1a;position:relative;padding-bottom:50px;padding-top:30px;}
+.mc-right-sidebar-inner{position:sticky;top:50px;display:flex;flex-direction:column;gap:4px;padding:20px 14px 10px 14px;}
+.mc-sidebar-group-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#444;padding:0 2px;margin-top:8px;margin-bottom:4px;margin-left:10px;}
+.mc-sidebar-divider{height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.08),transparent);margin:10px 6px;}
+.mc-nav-item{display:flex;align-items:center;gap:10px;padding:10px 17px;border-radius:8px;text-decoration:none;color:#777;font-size:14px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;background:transparent;border:1px solid transparent;transition:all 0.2s ease;white-space:nowrap;}
+.mc-nav-item:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);color:#bbb;transform:translateX(-2px);}
+.mc-nav-item.active{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18);color:#fff;}
+.mc-nav-item img{width:20px;height:20px;object-fit:contain;flex-shrink:0;opacity:0.6;transition:opacity 0.2s;}
+.mc-nav-item:hover img,.mc-nav-item.active img{opacity:1;}
+@media(max-width:1270px){
+  .mc-right-sidebar{display:none;}
+  .mc-mobile-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:35px 5% 40px;background:#0e0e0e;}
+  .mc-mobile-nav-header{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .mc-mobile-nav-line{flex:1;height:1px;background:#252525;}
+  .mc-mobile-nav-title{font-size:9px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#3a3a3a;margin-bottom:5px;}
+  .mc-mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px 4px 7px;border-radius:8px;text-decoration:none;background:#141414;border:1px solid #1e1e1e;color:#484848;font-size:8.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;transition:all 0.15s;position:relative;overflow:hidden;}
+  .mc-mobile-nav-item img{width:22px;height:22px;object-fit:contain;opacity:0.35;transition:opacity 0.15s;image-rendering:pixelated;}
+  .mc-mobile-nav-item.active{background:#383737;border-color:#7a7a7a;color:#fcfcfc;}
+  .mc-mobile-nav-item.active img{opacity:1;}
+  .mc-mobile-nav-item:hover{background:#1a1a1a;border-color:#2a2a2a;color:#777;}
+  .mc-mobile-nav-item:hover img{opacity:0.6;}
+}
+.mc-mobile-nav::after{content:"";grid-column:1/-1;height:1px;background:#252525;margin-top:10px;}
+@media(min-width:1271px){.mc-mobile-nav{display:none;}.mc-dirt-fade{display:none;}}
+.top-vignette{position:sticky;top:0;width:100%;height:60px;background:linear-gradient(to bottom,rgba(0,0,0,0.9),transparent);z-index:0;pointer-events:none;margin-bottom:-60px;}
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+
+    .hero-video{width:100%;height:100%;object-fit:cover;object-position:50% 45%;}
+    @media(max-width:970px){.hero-video{width:100%;height:90%;object-fit:cover;object-position:50% 10%;}}
+    .hero-game-tabs{display:flex;gap:6px;margin-top:20px;}
+    .hero-tab{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px;border-radius:10px;text-decoration:none;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.06);color:#666;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s ease;backdrop-filter:blur(8px);position:relative;overflow:hidden;width:90px;}
+    .hero-tab::before{content:"";position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity 0.2s ease;}
+    .hero-tab:hover::before{opacity:1;}
+    .hero-tab img{width:34px;height:34px;object-fit:contain;border-radius:7px;filter:grayscale(60%) brightness(0.7);transition:filter 0.2s ease,transform 0.2s ease;}
+    .hero-tab:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#bbb;transform:translateY(-2px);}
+    .hero-tab:hover img{filter:grayscale(0%) brightness(1);transform:scale(1.08);}
+    .hero-tab.active{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.28);color:#fff;box-shadow:0 4px 20px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);}
+    .hero-tab.active::before{opacity:1;}
+    .hero-tab.active img{filter:grayscale(0%) brightness(1.1);transform:scale(1.05);}
+    .hero-tab.active::after{content:"";position:absolute;bottom:0;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),transparent);border-radius:2px;}
+    @media(max-width:970px){.hero-game-tabs{justify-content:center;gap:5px;}.hero-tab{min-width:58px;padding:8px 10px;font-size:9px;width:70%;}.hero-tab img{width:28px;height:28px;}}
+    @media(min-width:971px){.hero-game-tabs{justify-content:flex-start;}}
+    @media(min-width:970px){.sites-grid{display:grid;grid-template-columns:repeat(2,1fr);padding:0 5% 8px 5%;}}
+    .top-vignette{position:sticky;top:0;width:100%;height:60px;background:linear-gradient(to bottom,rgba(0,0,0,0.9),transparent);z-index:0;pointer-events:none;margin-bottom:-60px;}
+    </style>
+
+    <div class="coc-content">
+      <div class="top-vignette"></div>
+
+      <!-- ── MOBILE NAV ── -->
+      <div class="mc-mobile-nav">
+        <div class="mc-mobile-nav-header">
+          <div class="mc-mobile-nav-line"></div>
+          <div class="mc-mobile-nav-title">Browse Categories</div>
+          <div class="mc-mobile-nav-line"></div>
+        </div>
+        <a href="mc-java-home.html" class="mc-mobile-nav-item"><img src="minecrafticons/mc-compass.gif" alt="" loading="lazy">Discover</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/vanillaworlds.png" alt="" loading="lazy">Worlds</a>
+        <a href="mc-java-seeds.html" class="mc-mobile-nav-item active"><img src="minecrafticons/seeds.png" alt="">Seeds</a>
+        <a href="mc-java-rp.html" class="mc-mobile-nav-item"><img src="minecrafticons/mc-resourcepacks-icon.png" alt="" loading="lazy">R-Packs</a>
+        <a href="mc-java-commands.html" class="mc-mobile-nav-item"><img src="minecrafticons/commandblock-minecart.gif" alt="" loading="lazy">Mod Packs</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/lantern.gif" alt="" loading="lazy">Shaders</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/commandblock.gif" alt="" loading="lazy">Commands</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/sblock.png" alt="" loading="lazy">Web Tools</a>
+      </div>
+
+      <div class="mc-dirt-fade"></div>
+      <div style="display:flex;flex:1;">
+        <div style="flex:1;min-width:0;padding:0 5%;padding-bottom:100px;">
+
+
+
+
+<!-- MAPS -->
+<div class="cf-section">
+  <div class="cf-section-header">
+     <div class="cf-section-title">
+        Map & Seed Tools
+      </div>
+    <div class="cf-section-header-right">
+      <button class="cf-arrow" onclick="scrollRow('challenge-maps-row', -1)">‹</button>
+      <button class="cf-arrow" onclick="scrollRow('challenge-maps-row', 1)">›</button>
+    </div>
+  </div>
+  <div class="cf-scroll-wrapper">
+    <div class="cf-row" id="challenge-maps-row">
+
+      
+      <a class="tool-card" href="https://www.seedmap.app/seed/?seed=-417261638594580622&edition=java&dimension=0&centerX=90.33936813494532&centerZ=10.478064305915067" target="_blank">
+  <div class="tool-card-preview">
+    <img src="minecrafticons/seedmap.jpg" alt="">
+  </div>
+  <div class="tool-card-body">
+    <div class="tool-card-header">
+      <img class="tool-card-favicon" src="https://www.google.com/s2/favicons?domain=seedmap.app&sz=64" alt="">
+      <span class="tool-card-name">Seed Map</span>
+    </div>
+    <div class="tool-card-desc"> Preview seeds in full 3D before you load into the world</div>
+    <span class="cf-card-tag">SeedMap.app</span>
+  </div>
+</a>
+<a class="tool-card" href="https://www.chunkbase.com/apps/seed-map#seed=2055796538&platform=java_26_2&dimension=overworld&x=-112&z=-137&zoom=0.53" target="_blank">
+  <div class="tool-card-preview">
+    <img src="minecrafticons/chunkbase.jpg" alt="">
+  </div>
+  <div class="tool-card-body">
+    <div class="tool-card-header">
+      <img class="tool-card-favicon" src="https://www.google.com/s2/favicons?domain=chunkbase.com&sz=64" alt="">
+      <span class="tool-card-name">Chunkbase Seed Map</span>
+    </div>
+    <div class="tool-card-desc">The most complete map for structures, ores and slime chunks</div>
+    <span class="cf-card-tag">Chunkbase.com</span>
+  </div>
+</a>
+<a class="tool-card" href="https://ezseed.net/#seed=69420025940101313&x=0&z=0&s=1&ed=java-26.2&view=3d" target="_blank">
+  <div class="tool-card-preview">
+    <img src="minecrafticons/ezseed.jpg" alt="">
+  </div>
+  <div class="tool-card-body">
+    <div class="tool-card-header">
+      <img class="tool-card-favicon" src="https://www.google.com/s2/favicons?domain=ezseed.net&sz=64" alt="">
+      <span class="tool-card-name">EzSeed 3D Viewer</span>
+    </div>
+    <div class="tool-card-desc"> Walk through your terrain in real time with a 3D camera</div>
+    <span class="cf-card-tag">EzSeed.net</span>
+  </div>
+</a>
+<a class="tool-card" href="https://mcseedmap.net/26.2.0-Java/69420025940101313#x=23&z=-3&l=-1.3" target="_blank">
+  <div class="tool-card-preview">
+    <img src="minecrafticons/mcseedmap.jpg" alt="">
+  </div>
+  <div class="tool-card-body">
+    <div class="tool-card-header">
+      <img class="tool-card-favicon" src="https://www.google.com/s2/favicons?domain=mcseedmap.net&sz=64" alt="">
+      <span class="tool-card-name">Mc Seed Map</span>
+    </div>
+    <div class="tool-card-desc">Detailed elevation shading reveals terrain shape at a glance</div>
+    <span class="cf-card-tag">mcseedmap.net</span>
+  </div>
+</a>
+
+
+
+</div>
+  </div>
+</div>
+
+        
+
+<script></script>
+
+
+<!-- ── SECTION HEADER ── -->
+<div class="cf-section-header" id="seeds-section-header">
+  <div class="cf-section-title">
+
+    Top Picked Seeds
+  </div>
+</div>
+
+<!-- ── SEED SEARCH ── -->
+<div class="seed-search-wrap">
+  <svg class="seed-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round">
+    <circle cx="10" cy="10" r="6.5"></circle>
+    <line x1="15" y1="15" x2="20.5" y2="20.5"></line>
+  </svg>
+  <input type="text" id="seedSearch" class="seed-search-input" placeholder="Search seeds by name..." oninput="filterSeeds()">
+  <button id="seedSearchClear" class="seed-search-clear" onclick="clearSeedSearch()" style="display:none;">✕</button>
+</div>
+
+<div id="seedNoResults" class="seed-no-results" style="display:none;">No seeds match your search.</div>
+
+<!-- ── PAGINATION (TOP) ── -->
+<div class="seed-pagination" id="seed-pagination-top">
+  <button class="seed-page-arrow" id="pg-prev-top" onclick="seedChangePage(-1)" disabled>&#8249;</button>
+  <button class="seed-page-btn active" id="pg-1-top" onclick="seedGoToPage(1)">1</button>
+  <button class="seed-page-btn" id="pg-2-top" onclick="seedGoToPage(2)">2</button>
+  <button class="seed-page-btn" id="pg-3-top" onclick="seedGoToPage(3)">3</button>
+  <button class="seed-page-arrow" id="pg-next-top" onclick="seedChangePage(1)">&#8250;</button>
+</div>
+
+
+<!-- ── SEED 1 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc1-slider">
+      <img id="sc1-img" src="minecrafticons/javaseeds/s1a-compresso.jpg" alt="All Biome Continent" fetchpriority="high" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">1</div><span class="seed-card-title">All Biome Continent</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc1',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc1',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc1-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A complete survival seed with every biome and endless terrain variety all in 1000 blocks radius</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-417261638594580622</span>
+        <span class="seed-copy-feedback" id="sc1-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-417261638594580622" data-fb="sc1-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 2 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc2-slider">
+      <img id="sc2-img" src="minecrafticons/javaseeds/s2a-compresso.jpg" alt="Hidden Blossom Village" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">2</div><span class="seed-card-title">Hidden Blossom Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc2',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc2',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc2-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a cherry blossom grove with a village nestled among the blossom trees.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">69420025940101313</span>
+        <span class="seed-copy-feedback" id="sc2-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="69420025940101313" data-fb="sc2-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 3 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc3-slider">
+      <img id="sc3-img" src="minecrafticons/javaseeds/s3a-compresso.jpg" alt="Village &amp; Pillage" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">3</div><span class="seed-card-title">Village &amp; Pillage</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc3',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc3',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc3-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Village and Woodland Mansion on the same island near spawn.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">616431086521619877</span>
+        <span class="seed-copy-feedback" id="sc3-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="616431086521619877" data-fb="sc3-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 4 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc4-slider">
+      <img id="sc4-img" src="minecrafticons/javaseeds/s4a-compresso.jpg" alt="Sky Cliff Village" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">4</div><span class="seed-card-title">Sky Cliff Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc4',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc4',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc4-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A village split between a riverside cliff and the ocean below.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">616431086521619877</span>
+        <span class="seed-copy-feedback" id="sc4-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="616431086521619877" data-fb="sc4-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 5 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc5-slider">
+      <img id="sc5-img" src="minecrafticons/javaseeds/s5a-compresso.jpg" alt="Cherry Lake Sanctuary" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">5</div><span class="seed-card-title">Cherry Lake Sanctuary</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc5',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc5',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc5-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">X:12,000 Z:1,380 features a cherry blossom grove with a middle lake, perfect for a hardcore world</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">1691256543523180978</span>
+        <span class="seed-copy-feedback" id="sc5-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="1691256543523180978" data-fb="sc5-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 6 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc6-slider">
+      <img id="sc6-img" src="minecrafticons/javaseeds/s6a-compresso.jpg" alt="Sakura Lakeside Village" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">6</div><span class="seed-card-title">Sakura Lakeside Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc6',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc6',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc6-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a cherry blossom grove village, with a lakeside and dock-style wooden roads.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">9064150133272194</span>
+        <span class="seed-copy-feedback" id="sc6-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="9064150133272194" data-fb="sc6-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 7 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc7-slider">
+      <img id="sc7-img" src="minecrafticons/javaseeds/s7a-compresso.jpg" alt="Mountain Blossom River" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">7</div><span class="seed-card-title">Mountain Blossom River</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc7',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc7',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc7-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Scenic mountain lake surrounded by winding rivers and vibrant cherry blossom landscapes.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-417261638594580622</span>
+        <span class="seed-copy-feedback" id="sc7-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-417261638594580622" data-fb="sc7-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 8 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc8-slider">
+      <img id="sc8-img" src="minecrafticons/javaseeds/s8a-compresso.jpg" alt="The Jungle Oasis" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">8</div><span class="seed-card-title">The Jungle Oasis</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc8',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc8',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc8-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A jungle spawn featuring a desert oasis and a central lake, perfect for egyp style builds</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-640074097040031353</span>
+        <span class="seed-copy-feedback" id="sc8-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-640074097040031353" data-fb="sc8-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 9 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc9-slider">
+      <img id="sc9-img" src="minecrafticons/javaseeds/s9a-compresso.jpg" alt="Illusioner's Training Island" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">9</div><span class="seed-card-title">Illusioner's Training Island</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc9',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc9',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc9-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn near a pillager outpost on a magical frozen cliff island that feels like an Illusioner's tower.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">6942699783490145785</span>
+        <span class="seed-copy-feedback" id="sc9-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="6942699783490145785" data-fb="sc9-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 10 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc10-slider">
+      <img id="sc10-img" src="minecrafticons/javaseeds/s10a-compresso.jpg" alt="Cherry Village Trio" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">10</div><span class="seed-card-title">Cherry Village Trio</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc10',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc10',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc10-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn directly in a village with a cherry blossom grove nearby and two more villages close to spawn.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-1821424574292533963</span>
+        <span class="seed-copy-feedback" id="sc10-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-1821424574292533963" data-fb="sc10-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 11 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc11-slider">
+      <img id="sc11-img" src="minecrafticons/javaseeds/s11a-compresso.jpg" alt="Twin Forest Grove" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">11</div><span class="seed-card-title">Twin Forest Grove</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc11',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc11',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc11-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a grove split between a dense oak forest and a cherry blossom grove.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">4459605219549419</span>
+        <span class="seed-copy-feedback" id="sc11-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="4459605219549419" data-fb="sc11-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 12 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc12-slider">
+      <img id="sc12-img" src="minecrafticons/javaseeds/s12a-compresso.jpg" alt="Quad Village Lake" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">12</div><span class="seed-card-title">Quad Village Lake</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc12',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc12',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc12-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in four villages surrounding a central lake.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-3361685360695458093</span>
+        <span class="seed-copy-feedback" id="sc12-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-3361685360695458093" data-fb="sc12-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 13 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc13-slider">
+      <img id="sc13-img" src="minecrafticons/javaseeds/s13a-compresso.jpg" alt="Five Wood Grove" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">13</div><span class="seed-card-title">Five Wood Grove</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc13',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc13',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc13-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a massive grove with a central lake and five different wood types inside.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">8888892703318892214</span>
+        <span class="seed-copy-feedback" id="sc13-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="8888892703318892214" data-fb="sc13-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 14 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc14-slider">
+      <img id="sc14-img" src="minecrafticons/javaseeds/s14a-compresso.jpg" alt="Builder's Dream Valley" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">14</div><span class="seed-card-title">Builder's Dream Valley</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc14',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc14',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc14-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn beside a massive C-shaped mountain connected to a cherry grove filled with lakes and rivers.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">28225322</span>
+        <span class="seed-copy-feedback" id="sc14-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="28225322" data-fb="sc14-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 15 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc15-slider">
+      <img id="sc15-img" src="minecrafticons/javaseeds/s15a-compresso.jpg" alt="Isolated Acacia Island" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">15</div><span class="seed-card-title">Isolated Acacia Island</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc15',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc15',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc15-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn on a isolated acacia island with no mainland for over 1,000 blocks.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">8608349212852601365</span>
+        <span class="seed-copy-feedback" id="sc15-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="8608349212852601365" data-fb="sc15-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 16 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc16-slider">
+      <img id="sc16-img" src="minecrafticons/javaseeds/s16a-compresso.jpg" alt="Perfect Castle Spot" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">16</div><span class="seed-card-title">Perfect Castle Spot</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc16',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc16',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc16-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A perfect castle build site featuring a lake in the center and massive mountains as a backdrop.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">34970160616342911</span>
+        <span class="seed-copy-feedback" id="sc16-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="34970160616342911" data-fb="sc16-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 17 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc17-slider">
+      <img id="sc17-img" src="minecrafticons/javaseeds/s17a-compresso.jpg" alt="SkyBlock Village" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">17</div><span class="seed-card-title">SkyBlock Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc17',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc17',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc17-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Literally Spawn on a skyblock village with everything you need to start.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-214726972146453730</span>
+        <span class="seed-copy-feedback" id="sc17-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-214726972146453730" data-fb="sc17-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 18 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc18-slider">
+      <img id="sc18-img" src="minecrafticons/javaseeds/s18a-compresso.jpg" alt="Survival Cherry Island" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">18</div><span class="seed-card-title">Survival Cherry Island</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc18',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc18',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc18-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn on an isolated island with a cherry trees at its center and horses roaming nearby.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-214726972146453730</span>
+        <span class="seed-copy-feedback" id="sc18-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-214726972146453730" data-fb="sc18-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 19 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc19-slider">
+      <img id="sc19-img" src="minecrafticons/javaseeds/s19a-compresso.jpg" alt="Private Island Estate" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">19</div><span class="seed-card-title">Private Island Estate</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc19',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc19',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc19-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn near a chain of connected islands featuring a woodland mansion and a separate village island.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">8080581786688460796</span>
+        <span class="seed-copy-feedback" id="sc19-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="8080581786688460796" data-fb="sc19-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 20 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc20-slider">
+      <img id="sc20-img" src="minecrafticons/javaseeds/s20a-compresso.jpg" alt="Snow Ring Village" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">20</div><span class="seed-card-title">Snow Ring Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc20',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc20',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc20-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A village spawn overlooking a circular snowy grove that shelters a second village.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-4880760388041619186</span>
+        <span class="seed-copy-feedback" id="sc20-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-4880760388041619186" data-fb="sc20-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 21 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc21-slider">
+      <img id="sc21-img" src="minecrafticons/javaseeds/s21a-compresso.jpg" alt="Couple's Paradise Seed" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">21</div><span class="seed-card-title">Couple's Paradise Seed</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc21',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc21',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc21-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn between two perfect circular groves, one cherry blossom and one meadow.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-2098004362385192995</span>
+        <span class="seed-copy-feedback" id="sc21-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-2098004362385192995" data-fb="sc21-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 22 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc22-slider">
+      <img id="sc22-img" src="minecrafticons/javaseeds/s22a-compresso.jpg" alt="Four Village Isle" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">22</div><span class="seed-card-title">Four Village Isle</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc22',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc22',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc22-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn on an island with four villages, each featuring a different biome style.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-8127986865150663286</span>
+        <span class="seed-copy-feedback" id="sc22-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-8127986865150663286" data-fb="sc22-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 23 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc23-slider">
+      <img id="sc23-img" src="minecrafticons/javaseeds/s23a-compresso.jpg" alt="The Heart Of The Grove" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">23</div><span class="seed-card-title">The Heart Of The Grove</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc23',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc23',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc23-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A rare village nestled between a circular grove and a central mountain.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">100000381628293346</span>
+        <span class="seed-copy-feedback" id="sc23-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="100000381628293346" data-fb="sc23-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 24 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc24-slider">
+      <img id="sc24-img" src="minecrafticons/javaseeds/s24a-compresso.jpg" alt="The Heart Of The Grove" decoding="async" onclick="openPalette(this)">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">24</div><span class="seed-card-title">The Mountain Lagoon</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc24',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc24',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc24-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn near a massive island with a water-filled crater surrounded by towering mountains and a mountainside village.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">2055796538</span>
+        <span class="seed-copy-feedback" id="sc24-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="2055796538" data-fb="sc24-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PAGINATION ── -->
+<div class="seed-pagination">
+  <button class="seed-page-arrow" id="pg-prev" onclick="seedChangePage(-1)" disabled>&#8249;</button>
+  <button class="seed-page-btn active" id="pg-1" onclick="seedGoToPage(1)">1</button>
+  <button class="seed-page-btn" id="pg-2" onclick="seedGoToPage(2)">2</button>
+  <button class="seed-page-btn" id="pg-3" onclick="seedGoToPage(3)">3</button>
+  <button class="seed-page-arrow" id="pg-next" onclick="seedChangePage(1)">&#8250;</button>
+</div>
+
+<!-- ── MAIN SCRIPT ── -->
+<script>
+/* ── Slide data: all images per card ── */
+window.seedSlides = {
+  sc1:  ['minecrafticons/javaseeds/s1a-compresso.jpg',
+  'minecrafticons/javaseeds/s1b-compresso.jpg',
+  'minecrafticons/javaseeds/s1c-compresso.jpg',
+  'minecrafticons/javaseeds/s1d-compresso.jpg',
+  'minecrafticons/javaseeds/s1e-compresso.jpg',
+  'minecrafticons/javaseeds/s1f-compresso.jpg',
+  'minecrafticons/javaseeds/s1z-compresso.jpg'
+],
+  sc2:  ['minecrafticons/javaseeds/s2a-compresso.jpg',
+  'minecrafticons/javaseeds/s2b-compresso.jpg',
+  'minecrafticons/javaseeds/s2c-compresso.jpg',
+  'minecrafticons/javaseeds/s2d-compresso.jpg',
+  'minecrafticons/javaseeds/s2z.jpg'
+],
+  sc3:  ['minecrafticons/javaseeds/s3a-compresso.jpg',
+  'minecrafticons/javaseeds/s3b-compresso.jpg',
+  'minecrafticons/javaseeds/s3z.jpg'
+],
+  sc4:  ['minecrafticons/javaseeds/s4a-compresso.jpg',
+  'minecrafticons/javaseeds/s4b-compresso.jpg',
+  'minecrafticons/javaseeds/s4z.jpg'
+],
+  sc5:  ['minecrafticons/javaseeds/s5a-compresso.jpg','minecrafticons/javaseeds/s5b-compresso.jpg','minecrafticons/javaseeds/s5z.jpg'],
+  sc6:  ['minecrafticons/javaseeds/s6a-compresso.jpg','minecrafticons/javaseeds/s6b-compresso.jpg','minecrafticons/javaseeds/s6c-compresso.jpg','minecrafticons/javaseeds/s6z.jpg'],
+  sc7:  ['minecrafticons/javaseeds/s7a-compresso.jpg','minecrafticons/javaseeds/s7b-compresso.jpg','minecrafticons/javaseeds/s7c-compresso.jpg','minecrafticons/javaseeds/s7d-compresso.jpg','minecrafticons/javaseeds/s7e-compresso.jpg','minecrafticons/javaseeds/s7z.jpg'],
+  sc8:  ['minecrafticons/javaseeds/s8a-compresso.jpg','minecrafticons/javaseeds/s8b-compresso.jpg','minecrafticons/javaseeds/s8c-compresso.jpg','minecrafticons/javaseeds/s8z.jpg'],
+  sc9:  ['minecrafticons/javaseeds/s9a-compresso.jpg','minecrafticons/javaseeds/s9b-compresso.jpg','minecrafticons/javaseeds/s9c-compresso.jpg','minecrafticons/javaseeds/s9z.jpg'],
+  sc10: ['minecrafticons/javaseeds/s10a-compresso.jpg','minecrafticons/javaseeds/s10b-compresso.jpg','minecrafticons/javaseeds/s10c-compresso.jpg','minecrafticons/javaseeds/s10z.jpg'],
+  sc11: ['minecrafticons/javaseeds/s11a-compresso.jpg','minecrafticons/javaseeds/s11b-compresso.jpg','minecrafticons/javaseeds/s11c-compresso.jpg','minecrafticons/javaseeds/s11z.jpg'],
+  sc12: ['minecrafticons/javaseeds/s12a-compresso.jpg','minecrafticons/javaseeds/s12b-compresso.jpg','minecrafticons/javaseeds/s12c-compresso.jpg','minecrafticons/javaseeds/s12z.jpg'],
+  sc13: ['minecrafticons/javaseeds/s13a-compresso.jpg','minecrafticons/javaseeds/s13b-compresso.jpg','minecrafticons/javaseeds/s13c-compresso.jpg','minecrafticons/javaseeds/s13z.jpg'],
+  sc14: ['minecrafticons/javaseeds/s14a-compresso.jpg','minecrafticons/javaseeds/s14b-compresso.jpg','minecrafticons/javaseeds/s14c-compresso.jpg','minecrafticons/javaseeds/s14d-compresso.jpg','minecrafticons/javaseeds/s14z.jpg'],
+  sc15: ['minecrafticons/javaseeds/s15a-compresso.jpg','minecrafticons/javaseeds/s15b-compresso.jpg','minecrafticons/javaseeds/s15z.jpg'],
+  sc16: ['minecrafticons/javaseeds/s16a-compresso.jpg','minecrafticons/javaseeds/s16b-compresso.jpg','minecrafticons/javaseeds/s16c-compresso.jpg','minecrafticons/javaseeds/s16z.jpg'],
+  sc17: ['minecrafticons/javaseeds/s17a-compresso.jpg','minecrafticons/javaseeds/s17b-compresso.jpg','minecrafticons/javaseeds/s17c-compresso.jpg','minecrafticons/javaseeds/s17d-compresso.jpg','minecrafticons/javaseeds/s17z.jpg'],
+  sc18: ['minecrafticons/javaseeds/s18a-compresso.jpg','minecrafticons/javaseeds/s18b-compresso.jpg','minecrafticons/javaseeds/s18z.jpg'],
+  sc19: ['minecrafticons/javaseeds/s19a-compresso.jpg','minecrafticons/javaseeds/s19b-compresso.jpg','minecrafticons/javaseeds/s19c-compresso.jpg','minecrafticons/javaseeds/s19z.jpg'],
+  sc20: ['minecrafticons/javaseeds/s20a-compresso.jpg','minecrafticons/javaseeds/s20b-compresso.jpg','minecrafticons/javaseeds/s20c-compresso.jpg','minecrafticons/javaseeds/s20z.jpg'],
+  sc21: ['minecrafticons/javaseeds/s21a-compresso.jpg','minecrafticons/javaseeds/s21b-compresso.jpg','minecrafticons/javaseeds/s21c-compresso.jpg','minecrafticons/javaseeds/s21z.jpg'],
+  sc22: ['minecrafticons/javaseeds/s22a-compresso.jpg','minecrafticons/javaseeds/s22b-compresso.jpg','minecrafticons/javaseeds/s22c-compresso.jpg','minecrafticons/javaseeds/s22z.jpg'],
+  sc23: ['minecrafticons/javaseeds/s23a-compresso.jpg','minecrafticons/javaseeds/s23b-compresso.jpg','minecrafticons/javaseeds/s23c-compresso.jpg','minecrafticons/javaseeds/s23z.jpg'],
+  sc24: ['minecrafticons/javaseeds/s24a-compresso.jpg','minecrafticons/javaseeds/s24b-compresso.jpg','minecrafticons/javaseeds/s24c-compresso.jpg','minecrafticons/javaseeds/s24z.jpg'],
+
+
+};
+window.seedCurrent = {};
+window.seedPreloaded = {};
+
+/* ── Init current index for all cards ── */
+Object.keys(window.seedSlides).forEach(function(id){ window.seedCurrent[id] = 0; });
+
+/* ── Show/hide spinner overlay inside a slider ── */
+function seedShowSpinner(slider) {
+  if (!slider || slider.querySelector('.seed-spinner')) return;
+  var sp = document.createElement('div');
+  sp.className = 'seed-spinner';
+  sp.innerHTML = '<div class="seed-spinner-ring"></div>';
+  slider.appendChild(sp);
+}
+function seedHideSpinner(slider) {
+  if (!slider) return;
+  var sp = slider.querySelector('.seed-spinner');
+  if (sp) sp.remove();
+}
+
+/* ── Navigate to a specific slide index ── */
+window.seedGoTo = function(id, n) {
+  var slides = window.seedSlides[id]; if (!slides) return;
+  window.seedCurrent[id] = (n + slides.length) % slides.length;
+  var cur = window.seedCurrent[id];
+  var imgEl  = document.getElementById(id + '-img');
+  var slider = document.getElementById(id + '-slider');
+
+  if (imgEl) {
+    /* If already cached by browser, swap instantly — no spinner needed */
+    var probe = new Image();
+    probe.src = slides[cur];
+    if (probe.complete) {
+      /* Already in cache — instant swap */
+      imgEl.src = slides[cur];
+      seedHideSpinner(slider);
+    } else {
+      /* Not cached yet — show spinner, swap when loaded */
+      seedShowSpinner(slider);
+      probe.onload = function() {
+        imgEl.src = slides[cur];
+        seedHideSpinner(slider);
+      };
+      probe.onerror = function() {
+        imgEl.src = slides[cur];
+        seedHideSpinner(slider);
+      };
+    }
+  }
+
+  /* Update dots */
+  var dots = document.getElementById(id + '-dots');
+  if (dots) {
+    dots.querySelectorAll('.seed-dot').forEach(function(d, i) {
+      d.classList.toggle('active', i === cur);
+    });
+  }
+
+  /* Eagerly cache prev, next, and next+1 so future clicks feel instant */
+  [-1, 1, 2].forEach(function(offset) {
+    var pre = new Image();
+    pre.src = slides[(cur + offset + slides.length) % slides.length];
+  });
+};
+
+/* ── Arrow nav helper ── */
+window.seedSlideNav = function(id, dir) {
+  seedGoTo(id, (window.seedCurrent[id] || 0) + dir);
+};
+
+/* ── Wire up dot buttons ── */
+Object.keys(window.seedSlides).forEach(function(id) {
+  var dots = document.getElementById(id + '-dots'); if (!dots) return;
+  dots.querySelectorAll('.seed-dot').forEach(function(dot, i) {
+    dot.onclick = function() { seedGoTo(id, i); };
+  });
+});
+
+/* ── On page load: preload all b/c/d/z slides in background ── */
+window.addEventListener('load', function() {
+  Object.keys(window.seedSlides).forEach(function(id) {
+    if (window.seedPreloaded[id]) return;
+    window.seedPreloaded[id] = true;
+    var slides = window.seedSlides[id];
+    for (var i = 1; i < slides.length; i++) {
+      var img = new Image();
+      img.src = slides[i];
+    }
+  });
+});
+
+/* ── Copy seed button logic ── */
+document.querySelectorAll('.seed-copy-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var seed = btn.getAttribute('data-seed');
+    var fbId = btn.getAttribute('data-fb');
+    var done = function() {
+      var fb = document.getElementById(fbId);
+      if (fb) { fb.classList.add('show'); setTimeout(function(){ fb.classList.remove('show'); }, 2000); }
+      var toast = document.createElement('div');
+      toast.className = 'seed-copy-toast';
+      toast.textContent = '✓ Seed copied!';
+      document.body.appendChild(toast);
+      setTimeout(function(){ toast.remove(); }, 1500);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(seed).then(done).catch(function() {
+        var ta = document.createElement('textarea'); ta.value = seed;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done();
+      });
+    } else {
+      var ta = document.createElement('textarea'); ta.value = seed;
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done();
+    }
+  });
+});
+
+/* ── Pagination: show/hide cards by page ── */
+(function() {
+  var CARDS_PER_PAGE = 10, TOTAL_PAGES = 3, currentPage = 1;
+  var allWraps = document.querySelectorAll('.seed-card-wrap');
+  allWraps.forEach(function(wrap, i) { wrap.setAttribute('data-page', Math.floor(i / CARDS_PER_PAGE) + 1); });
+
+function renderPage(page, shouldScroll) {
+    var visible = [], hidden = [];
+    allWraps.forEach(function(wrap) {
+      (parseInt(wrap.getAttribute('data-page')) === page ? visible : hidden).push(wrap);
+    });
+    var fadingOut = hidden.filter(function(w) { return w.style.display !== 'none'; });
+    if (fadingOut.length === 0) { showCards(visible, shouldScroll); }
+    else {
+      fadingOut.forEach(function(w) { w.style.transition = 'opacity 0.2s ease'; w.style.opacity = '0'; });
+      setTimeout(function() {
+        fadingOut.forEach(function(w) { w.style.display = 'none'; w.style.opacity = '1'; });
+        showCards(visible, shouldScroll);
+      }, 200);
+    }
+  for (var p = 1; p <= TOTAL_PAGES; p++) {
+    var btn = document.getElementById('pg-' + p);
+    var btnTop = document.getElementById('pg-' + p + '-top');
+    if (btn) btn.classList.toggle('active', p === page);
+    if (btnTop) btnTop.classList.toggle('active', p === page);
+  }
+  var prev = document.getElementById('pg-prev'), next = document.getElementById('pg-next');
+  var prevTop = document.getElementById('pg-prev-top'), nextTop = document.getElementById('pg-next-top');
+  if (prev) prev.disabled = page <= 1;
+  if (next) next.disabled = page >= TOTAL_PAGES;
+  if (prevTop) prevTop.disabled = page <= 1;
+  if (nextTop) nextTop.disabled = page >= TOTAL_PAGES;
+}
+
+function showCards(cards, shouldScroll) {
+    cards.forEach(function(wrap) { wrap.style.opacity = '0'; wrap.style.display = ''; });
+    if (shouldScroll) {
+      var header = document.getElementById('seeds-section-header');
+      if (header) { header.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+    setTimeout(function() {
+      cards.forEach(function(w) { w.style.transition = 'opacity 0.25s ease'; w.style.opacity = '1'; });
+    }, 120);
+  }
+
+window.seedGoToPage  = function(page) { currentPage = page; renderPage(page, true); };
+window.seedChangePage = function(dir)  { var n = currentPage + dir; if (n < 1 || n > TOTAL_PAGES) return; currentPage = n; renderPage(currentPage, true); };
+renderPage(1, false);z
+})();
+</script>
+
+        </div>
+
+        <!-- ── RIGHT SIDEBAR ── -->
+        <div class="mc-right-sidebar">
+          <div class="mc-right-sidebar-inner">
+            <div class="layouts-title-box"><div class="layouts-title">Browse Categories</div></div>
+            <div class="mc-sidebar-group-label">Discover</div>
+            <a href="mc-java-home.html" class="mc-nav-item"><img src="minecrafticons/mc-compass.gif" alt="" loading="lazy">Discover</a>
+            <div class="mc-sidebar-divider"></div>
+            <div class="mc-sidebar-group-label">Core Content</div>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/vanillaworlds.png" alt="" loading="lazy">Worlds</a>
+            <a href="mc-java-seeds.html" class="mc-nav-item active"><img src="minecrafticons/seeds.png" alt="">Seeds</a>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/commandblock-minecart.gif" alt="" loading="lazy">Mod Packs</a>
+            <div class="mc-sidebar-divider"></div>
+            <div class="mc-sidebar-group-label">Visuals</div>
+            <a href="mc-java-rp.html" class="mc-nav-item"><img src="minecrafticons/mc-resourcepacks-icon.png" alt="" loading="lazy">Resource Packs</a>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/lantern.gif" alt="" loading="lazy">Shaders</a>
+            <div class="mc-sidebar-divider"></div>
+            <div class="mc-sidebar-group-label">Others</div>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/commandblock.gif" alt="" loading="lazy">Commands</a>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/sblock.png" alt="" loading="lazy">Web Tools</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FOOTER ── -->
+      <footer class="site-footer">
+        <div class="footer-icons">
+          <a href="#" aria-label="Facebook" class="footer-icon"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7h-2.4V12h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.3V12h2.5l-.4 2.9h-2.1v7A10 10 0 0022 12z"/></svg></a>
+          <a href="https://discord.gg/rfntEJ5w" target="_blank" aria-label="Discord" class="footer-icon"><svg viewBox="0 0 24 24"><path d="M20 4a16 16 0 00-4-1l-.2.4a14 14 0 00-7.6 0L8 3A16 16 0 004 4C1 9 1 14 2 19a16 16 0 004.8 2.4l1-1.6a10 10 0 01-1.6-.8c.1 0 .2-.1.3-.2a12 12 0 0011 0c.1.1.2.1.3.2-.5.3-1 .6-1.6.8l1 1.6A16 16 0 0022 19c1-5 1-10-2-15zM9.5 15.5c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8zm5 0c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8z"/></svg></a>
+          <a href="#" target="_blank" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M2 6l10 7 10-7v12H2V6zm10 5L2 6h20l-10 5z"/></svg></a>
+        </div>
+        <div class="footer-text">© 2025 Parchrome. All Rights Reserved.</div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- ── GAL LIGHTBOX (commands/worlds) ── -->
+<div id="gal-lightbox" onclick="closeLightbox()">
+  <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
+  <div id="gal-lb-inner" onclick="event.stopPropagation()">
+    <img id="gal-lb-img" src="" alt="">
+    <div id="gal-lb-copybox">
+      <div id="gal-lb-name"></div>
+      <div id="gal-lb-code"></div>
+      <button id="gal-lb-copy-btn" onclick="galCopyCmd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+        Copy Command
+      </button>
+      <div id="gal-lb-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PALETTE LIGHTBOX (seed image fullscreen viewer) ── -->
+<button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+<button id="pal-lb-prev" onclick="palLightboxNav(-1)">&#8249;</button>
+<button id="pal-lb-next" onclick="palLightboxNav(1)">&#8250;</button>
+<div id="pal-lightbox" onclick="closePalette()">
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" src="" alt="">
+  </div>
+</div>
+
+
+
+<!-- ── SIDEBAR + SEARCH + LIGHTBOX SCRIPTS ── -->
+<script>
+function normalizePage(url){if(!url)return"";return url.toString().split('/').pop().split('?')[0].split('#')[0].replace('.html','')||"home";}
+const currentPage=normalizePage(window.location.pathname);
+const topBox=document.getElementById('top-box'),gamesContainer=document.getElementById('games-container'),tripleAList=document.getElementById('triple-a-list');
+let sidebarLoaded=false,sidebarDataCache=null;
+function loadSidebarData(){if(sidebarLoaded)return Promise.resolve(sidebarDataCache);return fetch('./sidebar.json').then(r=>r.json()).then(data=>{sidebarLoaded=true;sidebarDataCache=data;return data;}).catch(e=>console.error("Sidebar load error:",e));}
+function buildSidebarFromJSON(data){
+  data.topBox.forEach(item=>{const a=document.createElement('a');a.href=item.link;a.className='top-box-item';if(normalizePage(item.link)===currentPage||item.activeOn?.map(normalizePage).includes(currentPage))a.classList.add('active');a.innerHTML=`<img src="${item.icon}" class="topbox-icon" onerror="this.style.display='none'"><span>${item.name}</span>`;topBox.appendChild(a);});
+  data.games.forEach(game=>{const a=document.createElement('a');a.href=game.link;a.className='game';if(game.link===currentPage||(game.activeOn?.map(normalizePage).includes(currentPage)))a.classList.add('active');a.innerHTML=`<img src="${game.icon}" class="sidebar-icon" alt=""><span>${game.name}</span>`;gamesContainer.appendChild(a);});
+  data.tripleA.forEach(game=>{const a=document.createElement('a');a.href=game.link||"#";a.className='triple-a-game';a.innerHTML=`<img src="${game.icon}" class="sidebar-icon" alt=""><span>${game.name}</span>`;tripleAList.appendChild(a);});
+}
+function toggleTripleA(){const h=document.querySelector('.triple-a-header'),l=document.getElementById('triple-a-list'),o=h.classList.contains('open');if(o){h.classList.remove('open');h.classList.add('closed');l.style.display='none';}else{h.classList.remove('closed');h.classList.add('open');l.style.display='flex';}}
+function toggleSidebar(){const s=document.getElementById('sidebar'),b=document.getElementById('hamburger');s.classList.toggle('active');b.classList.toggle('active');if(s.classList.contains('active')&&!sidebarLoaded){showSkeletons(topBox,3);showSkeletons(gamesContainer,5);showSkeletons(tripleAList,4);loadSidebarData().then(data=>{topBox.innerHTML='';gamesContainer.innerHTML='';tripleAList.innerHTML='';buildSidebarFromJSON(data);});}}
+function handleDesktopSidebar(){const isD=window.matchMedia("(min-width: 971px)").matches,s=document.getElementById('sidebar');if(isD&&!s.classList.contains('active'))document.getElementById('hamburger').click();}
+document.addEventListener('DOMContentLoaded',handleDesktopSidebar);
+window.addEventListener('resize',handleDesktopSidebar);
+document.addEventListener('DOMContentLoaded',()=>{const h=document.querySelector('.triple-a-header'),l=document.getElementById('triple-a-list');h.classList.add('open');l.style.display='flex';});
+document.querySelector('.secondary-top-bar').addEventListener('click',()=>document.querySelector('.coc-main').scrollTo({top:0,behavior:'smooth'}));
+function toggleHelp(e){e.stopPropagation();const p=document.getElementById('help-popup');p.style.display=p.style.display==='block'?'none':'block';}
+document.addEventListener('click',()=>{document.getElementById('help-popup').style.display='none';});
+window.addEventListener("load",()=>document.documentElement.classList.add("loaded"));
+
+/* ── Search ── */
+let SearchItemList=[],searchoverlay,closeBtn,searchinput,searchIcon,resultsContainer;
+fetch('searchitemstorage.json').then(r=>r.json()).then(data=>{SearchItemList=data;});
+document.addEventListener('DOMContentLoaded',function(){
+  searchoverlay=document.getElementById('search-overlay');closeBtn=document.getElementById('search-close-btn');
+  resultsContainer=document.getElementById('search-results');searchinput=document.getElementById('search-input');searchIcon=document.getElementById('search-icon');
+  function openSearch(){searchoverlay.style.display='block';searchinput.focus();if(!searchinput.value)searchItems();}
+  function closeSearch(){searchinput.value='';resultsContainer.innerHTML='';searchoverlay.style.display='none';}
+  searchIcon.addEventListener('click',openSearch);closeBtn.addEventListener('click',closeSearch);
+  searchoverlay.addEventListener('click',e=>{if(e.target===searchoverlay)closeSearch();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSearch();});
+});
+function shuffleArray(a){const c=[...a];for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]];}return c;}
+function searchItems(){const q=document.getElementById('search-input').value.toLowerCase(),rc=document.getElementById('search-results');rc.innerHTML='';let f;if(!q){f=shuffleArray(SearchItemList).slice(0,7);}else{f=SearchItemList.filter(i=>i.name.toLowerCase().includes(q)||(i.keywords&&i.keywords.some(k=>k.toLowerCase().includes(q))));if(f.length===0){rc.innerHTML='<div style="padding:10px;">No results found</div>';return;}}f.slice(0,7).forEach(item=>{const a=document.createElement('a');a.href=item.link;a.className='search-result-item';a.innerHTML=item.icon?`<img src="${item.icon}" class="result-icon" alt=""> ${item.name}`:item.name;rc.appendChild(a);});if(q&&f.length>10){const vm=document.createElement('div');vm.textContent="View More...";vm.className="view-more";vm.addEventListener('click',()=>{rc.innerHTML='';f.forEach(item=>{const a=document.createElement('a');a.href=item.link;a.className='search-result-item';a.innerHTML=item.icon?`<img src="${item.icon}" class="result-icon" alt=""> ${item.name}`:item.name;rc.appendChild(a);});});rc.appendChild(vm);}}
+
+function scrollRow(id,dir){const r=document.getElementById(id);r.scrollBy({left:dir*300,behavior:'smooth'});}
+document.querySelectorAll('.cf-row').forEach(row=>{row.addEventListener('scroll',()=>updateArrows(row.id));updateArrows(row.id);});
+function updateArrows(id){const r=document.getElementById(id);if(!r)return;const s=r.closest('.cf-section');if(!s)return;const l=s.querySelector('.cf-arrow:first-of-type'),ri=s.querySelector('.cf-arrow:last-of-type');if(l)l.disabled=r.scrollLeft<=4;if(ri)ri.disabled=r.scrollLeft+r.clientWidth>=r.scrollWidth-4;}
+
+/* ── Command modal ── */
+let currentCmd='',cmdFeedbackTimeout;
+function openCmd(el){document.getElementById('cmdModalTitle').textContent=el.dataset.name;document.getElementById('cmdModalSub').textContent=el.dataset.sub;document.getElementById('cmdModalCode').textContent=el.dataset.cmd;currentCmd=el.dataset.cmd;document.getElementById('cmdFeedback').textContent='';document.getElementById('cmdModal').classList.add('open');pushModalState();}
+function closeCmd(){document.getElementById('cmdModal').classList.remove('open');}
+function closeCmdOutside(e){if(e.target===document.getElementById('cmdModal'))closeCmd();}
+function copyCmd(){const fb=()=>{const el=document.createElement('textarea');el.value=currentCmd;el.style.position='fixed';el.style.opacity='0';document.body.appendChild(el);el.focus();el.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(el);showCmdFeedback();};if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(currentCmd).then(showCmdFeedback).catch(fb);else fb();}
+function showCmdFeedback(){const f=document.getElementById('cmdFeedback');f.textContent='✓ Copied to clipboard!';clearTimeout(cmdFeedbackTimeout);cmdFeedbackTimeout=setTimeout(()=>f.textContent='',2500);}
+
+/* ── Gal lightbox (commands) ── */
+let lbScale=1,lbX=0,lbY=0,pinchStartDist=0,pinchStartScale=1,isDragging=false,dragStartX=0,dragStartY=0,dragOriginX=0,dragOriginY=0,galCurrentCmd='',galFeedbackTimeout;
+function openLightbox(el){const src=el.dataset.full||el.querySelector('img').src,img=document.getElementById('gal-lb-img');img.src=src;lbScale=1;lbX=0;lbY=0;applyGalTransform();document.getElementById('gal-lightbox').classList.add('open');pushModalState();document.getElementById('gal-lb-fixed-close').style.display='flex';galCurrentCmd=el.dataset.cmd||'';document.getElementById('gal-lb-name').textContent=el.dataset.name||'';document.getElementById('gal-lb-code').textContent=el.dataset.cmd||'';document.getElementById('gal-lb-feedback').textContent='';document.getElementById('gal-lb-copybox').style.display=galCurrentCmd?'flex':'none';document.addEventListener('keydown',lbEscHandler);}
+function closeLightbox(){const lb=document.getElementById('gal-lightbox');if(!lb.classList.contains('open'))return;lb.classList.remove('open');document.getElementById('gal-lb-fixed-close').style.display='none';document.removeEventListener('keydown',lbEscHandler);if(history.state?.modal)history.back();}
+function lbEscHandler(e){if(e.key==='Escape')closeLightbox();}
+function pushModalState(){history.pushState({modal:true},'');}
+function popModalHandler(){const g=document.getElementById('gal-lightbox'),p=document.getElementById('pal-lightbox'),c=document.getElementById('cmdModal');if(g.classList.contains('open')){g.classList.remove('open');document.getElementById('gal-lb-fixed-close').style.display='none';document.removeEventListener('keydown',lbEscHandler);}else if(p.classList.contains('open')){p.classList.remove('open');document.getElementById('pal-lb-fixed-close').style.display='none';document.getElementById('pal-lb-prev').style.display='none';document.getElementById('pal-lb-next').style.display='none';palScale=1;palPanX=0;palPanY=0;palIsPanning=false;window.onmousemove=null;window.onmouseup=null;document.removeEventListener('keydown',palEscHandler);}else if(c&&c.classList.contains('open'))c.classList.remove('open');}
+window.addEventListener('popstate',popModalHandler);
+function applyGalTransform(){document.getElementById('gal-lb-img').style.transform=`translate(${lbX}px,${lbY}px) scale(${lbScale})`;}
+function galCopyCmd(){const fb=()=>{const el=document.createElement('textarea');el.value=galCurrentCmd;el.style.position='fixed';el.style.opacity='0';document.body.appendChild(el);el.focus();el.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(el);showGalFeedback();};if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(galCurrentCmd).then(showGalFeedback).catch(fb);else fb();}
+function showGalFeedback(){const f=document.getElementById('gal-lb-feedback');f.textContent='✓ Copied!';clearTimeout(galFeedbackTimeout);galFeedbackTimeout=setTimeout(()=>f.textContent='',2500);}
+const lbImg=document.getElementById('gal-lb-img');
+lbImg.addEventListener('touchstart',e=>{if(e.touches.length===2){e.preventDefault();pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);pinchStartScale=lbScale;}else if(e.touches.length===1&&lbScale>1){isDragging=true;dragStartX=e.touches[0].clientX;dragStartY=e.touches[0].clientY;dragOriginX=lbX;dragOriginY=lbY;}},{passive:false});
+lbImg.addEventListener('touchmove',e=>{if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);lbScale=Math.min(Math.max(pinchStartScale*(d/pinchStartDist),1),5);applyGalTransform();}else if(e.touches.length===1&&isDragging){e.preventDefault();lbX=dragOriginX+(e.touches[0].clientX-dragStartX);lbY=dragOriginY+(e.touches[0].clientY-dragStartY);applyGalTransform();}},{passive:false});
+lbImg.addEventListener('touchend',e=>{if(e.touches.length<2)isDragging=false;if(lbScale<=1){lbScale=1;lbX=0;lbY=0;applyGalTransform();}});
+let lastTap=0;lbImg.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTap<280){lbScale=1;lbX=0;lbY=0;applyGalTransform();}lastTap=now;});
+lbImg.addEventListener('click',e=>e.stopPropagation());
+
+/* ── Palette lightbox (seed fullscreen) ── */
+let palScale=1,palStartDist=0,palLastScale=1,palIsPanning=false,palPanStartX=0,palPanStartY=0,palPanX=0,palPanY=0,palCurrentSlides=[],palCurrentIndex=0;
+function getPalClampLimits(){const img=document.getElementById('pal-lb-img'),sw=img.offsetWidth*palScale,sh=img.offsetHeight*palScale;return{maxX:Math.max(0,(sw-window.innerWidth)/2),maxY:Math.max(0,(sh-window.innerHeight)/2)};}
+function clampPalPan(){if(palScale<=1){palPanX=0;palPanY=0;return;}const{maxX,maxY}=getPalClampLimits();palPanX=Math.min(maxX,Math.max(-maxX,palPanX));palPanY=Math.min(maxY,Math.max(-maxY,palPanY));}
+function applyPalTransform(){document.getElementById('pal-lb-img').style.transform=`translate(${palPanX}px,${palPanY}px) scale(${palScale})`;}
+function palEscHandler(e){if(e.key==='Escape')closePalette();}
+function closePalette(){document.body.style.touchAction='';const lb=document.getElementById('pal-lightbox');if(!lb.classList.contains('open'))return;lb.classList.remove('open');document.getElementById('pal-lb-fixed-close').style.display='none';document.getElementById('pal-lb-prev').style.display='none';document.getElementById('pal-lb-next').style.display='none';palScale=1;palPanX=0;palPanY=0;palIsPanning=false;window.onmousemove=null;window.onmouseup=null;document.removeEventListener('keydown',palEscHandler);}
+function palLightboxNav(dir){if(palCurrentSlides.length<=1)return;var img=document.getElementById('pal-lb-img');palScale=1;palPanX=0;palPanY=0;applyPalTransform();img.style.transition='transform 0.2s ease,opacity 0.2s ease';img.style.transform=dir>0?'translateX(-60px) scale(1)':'translateX(60px) scale(1)';img.style.opacity='0';setTimeout(function(){palCurrentIndex=(palCurrentIndex+dir+palCurrentSlides.length)%palCurrentSlides.length;img.src=palCurrentSlides[palCurrentIndex];img.style.transition='none';img.style.transform=dir>0?'translateX(60px) scale(1)':'translateX(-60px) scale(1)';img.style.opacity='0';img.offsetHeight;img.style.transition='transform 0.2s ease,opacity 0.2s ease';img.style.transform='translateX(0px) scale(1)';img.style.opacity='1';updatePalNav();},50);}
+function updatePalNav(){var p=document.getElementById('pal-lb-prev'),n=document.getElementById('pal-lb-next');if(palCurrentSlides.length<=1){p.style.display='none';n.style.display='none';return;}p.style.display='flex';n.style.display='flex';p.style.opacity='1';n.style.opacity='1';}
+function openPalette(el){
+  document.body.style.touchAction='none';
+  var ss=el.closest('.seed-card-slider');
+  if(ss){var cid=ss.querySelector('[id$="-img"]')?ss.querySelector('[id$="-img"]').id.replace('-img',''):null;if(cid&&window.seedSlides&&window.seedSlides[cid]){palCurrentSlides=window.seedSlides[cid].slice();palCurrentIndex=window.seedCurrent[cid]||0;}else{palCurrentSlides=[el.src];palCurrentIndex=0;}}
+  else{var sw=el.closest('.hcpc-slider'),as=sw?Array.from(sw.querySelectorAll('.hcpc-slide')):[el];palCurrentSlides=as.map(function(s){var i=s.querySelector('img');return s.dataset.full||(i?i.src:'');}).filter(Boolean);var ci=as.indexOf(el);palCurrentIndex=ci>=0?ci:0;}
+  var lb=document.getElementById('pal-lightbox'),img=document.getElementById('pal-lb-img');
+  palScale=1;palPanX=0;palPanY=0;palIsPanning=false;
+  img.src=palCurrentSlides[palCurrentIndex];img.style.transform='translate(0px,0px) scale(1)';img.style.cursor='default';
+  lb.classList.add('open');pushModalState();document.getElementById('pal-lb-fixed-close').style.display='flex';updatePalNav();
+  lb.onwheel=function(e){e.preventDefault();var r=img.getBoundingClientRect(),cx=e.clientX-(r.left+r.width/2),cy=e.clientY-(r.top+r.height/2),ps=palScale;palScale=Math.min(Math.max(1,palScale*(1-e.deltaY*0.002)),6);var ratio=palScale/ps;palPanX=palPanX*ratio+cx*(ratio-1);palPanY=palPanY*ratio+cy*(ratio-1);clampPalPan();applyPalTransform();img.style.cursor=palScale>1?'grab':'default';};
+  img.onmousedown=function(e){if(palScale<=1)return;e.preventDefault();palIsPanning=true;palPanStartX=e.clientX-palPanX;palPanStartY=e.clientY-palPanY;img.style.cursor='grabbing';};
+  window.onmousemove=function(e){if(!palIsPanning)return;palPanX=e.clientX-palPanStartX;palPanY=e.clientY-palPanStartY;clampPalPan();applyPalTransform();};
+  window.onmouseup=function(){if(!palIsPanning)return;palIsPanning=false;img.style.cursor=palScale>1?'grab':'default';};
+  img.ontouchstart=function(e){if(e.touches.length===2){e.preventDefault();palStartDist=Math.hypot(e.touches[0].pageX-e.touches[1].pageX,e.touches[0].pageY-e.touches[1].pageY);palLastScale=palScale;}else if(e.touches.length===1&&palScale>1){palIsPanning=true;palPanStartX=e.touches[0].clientX-palPanX;palPanStartY=e.touches[0].clientY-palPanY;}};
+  img.ontouchmove=function(e){e.preventDefault();if(e.touches.length===2){var nd=Math.hypot(e.touches[0].pageX-e.touches[1].pageX,e.touches[0].pageY-e.touches[1].pageY),ps=palScale;palScale=Math.min(Math.max(1,palLastScale*(nd/palStartDist)),6);var ratio=palScale/ps,r=img.getBoundingClientRect(),cx=((e.touches[0].clientX+e.touches[1].clientX)/2)-(r.left+r.width/2),cy=((e.touches[0].clientY+e.touches[1].clientY)/2)-(r.top+r.height/2);palPanX=palPanX*ratio+cx*(ratio-1);palPanY=palPanY*ratio+cy*(ratio-1);clampPalPan();applyPalTransform();}else if(e.touches.length===1&&palIsPanning){palPanX=e.touches[0].clientX-palPanStartX;palPanY=e.touches[0].clientY-palPanStartY;clampPalPan();applyPalTransform();}};
+  img.ontouchend=function(e){if(e.touches.length<2)palIsPanning=false;if(palScale<=1){palScale=1;palPanX=0;palPanY=0;}else clampPalPan();applyPalTransform();};
+  img.onclick=function(e){e.stopPropagation();};lb.onclick=function(e){if(e.target===lb)closePalette();};
+  document.addEventListener('keydown',palEscHandler);
+}
+
+/* ── Skeleton loader for sidebar ── */
+function showSkeletons(c,n){for(let i=0;i<n;i++){const d=document.createElement('div');d.className='skeleton-item';d.innerHTML='<div class="skeleton-icon"></div><div class="skeleton-text"></div>';c.appendChild(d);}}
+
+/* ── Page loader hide ── */
+document.addEventListener('DOMContentLoaded',()=>{document.documentElement.classList.add("loaded");const l=document.getElementById('page-loader');l.classList.add('hidden');setTimeout(()=>l.remove(),400);});
+
+
+
+
+
+
+/* ── Seed search ── */
+(function() {
+  var searchInput = document.getElementById('seedSearch');
+  var clearBtn = document.getElementById('seedSearchClear');
+  var noResults = document.getElementById('seedNoResults');
+  var allWraps = document.querySelectorAll('.seed-card-wrap');
+  var paginationBars = [document.querySelector('.seed-pagination'), document.getElementById('seed-pagination-top')];
+
+  window.filterSeeds = function() {
+    var query = (searchInput.value || '').trim().toLowerCase();
+    clearBtn.style.display = query ? 'flex' : 'none';
+
+    if (!query) {
+      // No search: restore normal pagination behavior
+      paginationBars.forEach(function(bar) { if (bar) bar.style.display = ''; });
+      noResults.style.display = 'none';
+      renderPage(1);
+      return;
+    }
+
+    // Searching: ignore pagination, show all matches across both pages
+    paginationBars.forEach(function(bar) { if (bar) bar.style.display = 'none'; });
+
+    var visibleCount = 0;
+    allWraps.forEach(function(wrap) {
+      var titleEl = wrap.querySelector('.seed-card-title');
+      var title = titleEl ? titleEl.textContent.toLowerCase() : '';
+      var match = title.indexOf(query) !== -1;
+      wrap.style.display = match ? '' : 'none';
+      wrap.style.opacity = '1';
+      if (match) visibleCount++;
+    });
+
+    noResults.style.display = visibleCount === 0 ? '' : 'none';
+  };
+
+  window.clearSeedSearch = function() {
+    searchInput.value = '';
+    filterSeeds();
+    searchInput.focus();
+  };
+})();
+
+
+</script>
+</body>
+</html>

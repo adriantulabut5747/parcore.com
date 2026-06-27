@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AC | Parcore</title>
+<meta name="description" content="Browse the best Minecraft Vanilla worlds, shaders, resource packs, commands and more — curated by the Parchrome community.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/minecraft-home.html">
+<meta property="og:title" content="Minecraft Vanilla — Parchrome">
+<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
+<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="icons/home.jpg">
+<link rel="shortcut icon" href="icons/home.jpg">
+<link rel="apple-touch-icon" href="icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="minecraft-zui.css">
+
+<style>
+
+/* ── FILTER PILLS ── */
+.rp-filter-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0px 0 20px 0;
+}
+.rp-filter-wrap::-webkit-scrollbar { display: none; }
+.rp-filter-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 0;
+  width: max-content;
+  min-width: 100%;
+}
+.rp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: #1c1c1e;
+  border: 1px solid #2e2e2e;
+  color: #555;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  font-family: 'Oxanium', sans-serif;
+  user-select: none;
+}
+.rp-pill:hover {
+  background: #252525;
+  border-color: #3a3a3a;
+  color: #aaa;
+}
+.rp-pill.active {
+  background: #2a2a2a;
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.rp-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.rp-pill.active .rp-pill-dot {
+  background: #7cfc7c;
+}
+  @media (max-width:970px){.rp-filter-row {
+
+  padding: 0px 0 0px 0;
+
+}}
+
+/* ── PACK SEARCH BAR ── */
+.rp-search-wrap {
+  position: relative;
+  margin: 0 0 14px 0;
+  display: flex;
+  align-items: center;
+}
+.rp-search-icon {
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.rp-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #1c1c1e;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 12px 38px 12px 38px;
+  font-size: 13px;
+  color: #eee;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.rp-search-input::placeholder { color: #5a5a5a; }
+.rp-search-input:focus {
+  border-color: #4a4a4a;
+  background: #202022;
+}
+.rp-search-clear {
+  position: absolute;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: none;
+  background: #2a2a2a;
+  color: #999;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rp-search-clear:hover { background: #353535; color: #fff; }
+@media (max-width: 970px) {
+  .rp-search-wrap { margin-bottom: 10px; }
+  .rp-search-input { padding: 10px 34px 10px 34px; font-size: 12px; }
+  .rp-search-icon { left: 12px; }
+ 
+  /* Bottom gradient fade on hero banner */
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, #0e0e0e);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ── NO RESULTS ── */
+.rp-no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: 1px dashed #2a2a2a;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+/* ── SOURCE GROUP HEADERS (shown only on the ALL tab) ── */
+/* Styled as a quiet inline pill rather than a second section header,
+   so it never competes with the "Top RESOURCEPACKS" title + underline. */
+.cf-source-group-label {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  background: #18181a;
+  border: 1px solid #262626;
+  border-radius: 999px;
+  padding: 5px 12px 5px 8px;
+  margin: 22px 0 4px 0;
+  font-family: 'Oxanium', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.cf-source-group-label:hover {
+  background: #222224;
+  border-color: #3a3a3a;
+  color: #ccc;
+}
+.cf-source-group-label:first-of-type { margin-top: 2px; }
+.cf-source-group-label img {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+@media (max-width: 970px) {
+  .cf-source-group-label { margin: 16px 0 2px 0; font-size: 9px; padding: 5px 10px 5px 7px; }
+  .cf-source-group-label:first-of-type { margin-top: 0; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="icons/home.jpg" alt=""></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="openSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+      <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+      <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <span id="close-icon" style="display:none; font-size:1.5rem; color:white;">✖</span>
+  </button>
+  <div id="search-overlay">
+    <button id="search-close-btn">✖</button>
+    <input type="text" id="search-input" placeholder="Find your next game" oninput="searchItems()">
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="minecrafticons/mc-resourcepacks-icon.png" alt="TH10 Icon" class="th-icon">
+    <div class="secondary-content">(Resource Packs) Minecraft Java </div>
+  </div>
+  <div class="help-container">
+    <div class="help-popup" id="help-popup">
+      <ul><br>
+        <li>🛡️ Tap the clan banner to view recommended CC</li><br>
+        <li>⚠️ Downloads may not work inside Facebook or Messenger. Please open this page in Chrome for the best experience.</li><br>
+        <li>📋 AC Clan Tag: <span id="clan-tag" class="copy-tag">#2GYPGPJP9</span></li><br>
+      </ul>
+    </div>
+    <div class="help-container">
+      <a class="help-button2" href="home.html">
+        <svg width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#bababa" stroke-width="1.008">
+          <path d="M1 6V15H6V11C6 9.89543 6.89543 9 8 9C9.10457 9 10 9.89543 10 11V15H15V6L8 0L1 6Z" fill="#bababa"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="icons/controllericon.png" class="tripleimg">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <div class="hero-section">
+      <img class="hero-video" src="minecrafticons/hero-rp.jfif" alt="">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h1 class="hero-title"><img src="minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft"></h1>
+          <style>.hero-minecraft{width:400px;} @media (max-width:970px){.hero-minecraft{width:200px;}}</style>
+          <div class="hero-game-tabs">
+            <a href="minecraft-home.html" class="hero-tab active">
+              <img src="minecrafticons/minecraft-block-logo.png" alt="Vanilla"><span>Java</span>
+            </a>
+            <a href="minecrafticons/mc-bedrock-icon.png" class="hero-tab">
+              <img src="minecrafticons/minecraft-bedrock-icon.png" alt="Bedrock"><span>Bedrock</span>
+            </a>
+            <a href="minecrafticons/mc-stroymode-icon.png" class="hero-tab">
+              <img src="minecrafticons/mc-stroymode-icon.png" alt="Story Mode"><span>Story</span>
+            </a>
+            <a href="minecrafticons/mc-dungeons.jfif" class="hero-tab">
+              <img src="minecrafticons/mc-dungeons-removebg-preview.png" alt="Dungeons"><span>Dungeons</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+    .hero-video {width:100%; height:100%; object-fit:cover; object-position:50% 45%;}
+    @media (max-width:970px){.hero-video{width:100%; height:90%; object-fit:cover; object-position:50% 10%;}}
+    .hero-game-tabs {display:flex; gap:6px; margin-top:20px;}
+    .hero-tab {
+      display:flex; flex-direction:column; align-items:center; gap:7px; padding:10px 10px;
+      border-radius:10px; text-decoration:none; background:rgba(0,0,0,0.55);
+      border:1px solid rgba(255,255,255,0.06); color:#666; font-size:10px; font-weight:700;
+      letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease;
+      backdrop-filter:blur(8px); position:relative; overflow:hidden; width:90px;
+    }
+    .hero-tab::before {
+      content:''; position:absolute; top:0; left:0; width:100%; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      opacity:0; transition:opacity 0.2s ease;
+    }
+    .hero-tab:hover::before {opacity:1;}
+    .hero-tab img {width:34px; height:34px; object-fit:contain; border-radius:7px; filter:grayscale(60%) brightness(0.7); transition:filter 0.2s ease, transform 0.2s ease;}
+    .hero-tab:hover {background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#bbb; transform:translateY(-2px);}
+    .hero-tab:hover img {filter:grayscale(0%) brightness(1); transform:scale(1.08);}
+    .hero-tab.active {background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.28); color:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);}
+    .hero-tab.active::before {opacity:1;}
+    .hero-tab.active img {filter:grayscale(0%) brightness(1.1); transform:scale(1.05);}
+    .hero-tab.active::after {content:''; position:absolute; bottom:0; left:15%; right:15%; height:2px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); border-radius:2px;}
+    @media (max-width:970px){
+      .hero-game-tabs {justify-content:center; gap:5px;}
+      .hero-tab {min-width:58px; padding:8px 10px; font-size:9px; width:70%;}
+      .hero-tab img {width:28px; height:28px;}
+    }
+    @media (min-width:971px){.hero-game-tabs{justify-content:flex-start;}}
+    @media (min-width:970px){.sites-grid{display:grid; grid-template-columns:repeat(2, 1fr); padding:0 5% 8px 5%;}}
+    .top-vignette {
+      position:sticky; top:0; width:100%; height:60px;
+      background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+      z-index:0; pointer-events:none; margin-bottom:-60px;
+    }
+    </style>
+
+    <div class="coc-content">
+      <div class="top-vignette"></div>
+
+      <!-- MOBILE NAV -->
+      <div class="mc-mobile-nav">
+        <div class="mc-mobile-nav-header">
+          <div class="mc-mobile-nav-line"></div>
+          <div class="mc-mobile-nav-title">Browse Categories</div>
+          <div class="mc-mobile-nav-line"></div>
+        </div>
+        <a href="mc-java-home.html" class="mc-mobile-nav-item"><img src="minecrafticons/mc-compass.gif" alt="">Discover</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/vanillaworlds.png" alt="">Worlds</a>
+        <a href="mc-java-seeds.html" class="mc-mobile-nav-item"><img src="minecrafticons/seeds.png" alt="">Seeds</a>
+        <a href="mc-java-rp.html" class="mc-mobile-nav-item active"><img src="minecrafticons/mc-resourcepacks-icon.png" alt="">R-Packs</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/commandblock-minecart.gif" alt="">Mod Packs</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/lantern.gif" alt="">Shaders</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/commandblock.gif" alt="">Commands</a>
+        <a href="mc-java-worlds.html" class="mc-mobile-nav-item"><img src="minecrafticons/sblock.png" alt="">Web Tools</a>
+      </div>
+      <div class="mc-dirt-fade"></div>
+
+      <!-- WRAPPER -->
+      <div style="display:flex; flex:1;">
+        <!-- LEFT: all sections -->
+        <div style="flex:1; min-width:0; padding:0 5%; padding-bottom:100px;">
+
+<style>
+.hcpc-super-wrap { padding: 0 5%; margin-top: 32px; margin-bottom: 8px; }
+.hcpc-wrap {
+  width: 100%;
+  background: #1c1c1e;
+  border: 1px solid #2e2e2e;
+  border-radius: 14px;
+  overflow: visible;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.4);
+  position: relative;
+}
+.hcpc-slider { position: relative; width: 100%; overflow: hidden; background: #111; border-radius: 13px 13px 0 0; line-height: 0; }
+.hcpc-track  { display: flex; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); will-change: transform; }
+.hcpc-slide  { flex: 0 0 100%; width: 100%; position: relative; line-height: 0; }
+.hcpc-slide img { width: 100%; height: 480px; object-fit: cover; object-position: center 40%; display: block; }
+.hcpc-slide-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 30%, transparent 55%, rgba(15,15,15,0.8) 100%); pointer-events: none; }
+.hcpc-nav-controls { position: absolute; bottom: 16px; right: 16px; display: flex; gap: 6px; z-index: 6; }
+.hcpc-arrow {
+  width: 38px; height: 38px; border-radius: 8px;
+  background: rgba(14, 13, 13, 0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #aaa; font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; user-select: none; line-height: 1;
+  backdrop-filter: blur(6px);
+}
+.hcpc-arrow:hover { background: rgba(40,40,40,0.9); color: #fff; border-color: rgba(255,255,255,0.18); }
+.hcpc-dots { position: absolute; bottom: 24px; left: 18px; display: flex; gap: 5px; z-index: 5; }
+.hcpc-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  border: none; cursor: pointer; padding: 0;
+  transition: background 0.2s;
+}
+.hcpc-dot.active { background: rgba(255,255,255,0.92); }
+.hcpc-img-header { position: absolute; top: 0; left: 0; right: 0; z-index: 6; display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); }
+.hcpc-img-header-left { display: flex; align-items: center; gap: 11px; }
+.hcpc-img-icon { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.12); }
+.hcpc-img-title { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 1.8px; text-transform: uppercase; text-shadow: 0 1px 6px rgba(0,0,0,0.9); font-family: 'Oxanium', sans-serif; }
+.hcpc-img-author { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 1.2px; text-transform: uppercase; font-weight: 500; margin-top: 14px; font-family: 'Oxanium', sans-serif; }
+.hcpc-stats {
+  display: flex; align-items: center;
+  padding: 18px 22px 0 22px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  gap: 0;
+}
+.hcpc-stat { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.hcpc-stat svg { color: #555; flex-shrink: 0; }
+.hcpc-stat-val { font-size: 13px; font-weight: 700; color: #e8e8e8; font-family: 'Oxanium', sans-serif; white-space: nowrap; }
+.hcpc-stat-lbl { font-size: 10px; color: #afafaf; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; white-space: nowrap; }
+.hcpc-stat-div { width: 1px; height: 22px; background: #2e2e2e; margin: 0 16px; flex-shrink: 0; }
+.hcpc-bottom {
+  display: flex; flex-direction: row; align-items: center; gap: 20px;
+  padding: 18px 22px 22px 22px;
+  border-top: 1px solid #262626;
+  margin-top: 16px;
+}
+.hcpc-desc { font-size: 14px; color: #888; line-height: 1.75; flex: 1; font-family: 'Inter', sans-serif; }
+.hcpc-desc strong { color: #d4d4d4; font-weight: 600; }
+.hcpc-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.hcpc-dl-group { position: relative; display: inline-flex; align-items: stretch; height: 38px; }
+.hcpc-dl-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 0 14px;
+  border-radius: 8px 0 0 8px;
+  background: #303030;
+  border: 1px solid #404040; border-right: none;
+  color: #e0e0e0;
+  font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  text-decoration: none; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: 'Oxanium', sans-serif;
+  cursor: pointer; box-sizing: border-box;
+}
+.hcpc-dl-btn:hover { background: #3a3a3a; border-color: #4e4e4e; color: #fff; }
+.hcpc-dl-badge {
+  display: inline-block;
+  padding: 2px 7px; border-radius: 4px;
+  background: rgba(83, 83, 83, 0.38);
+  font-size: 8px; font-weight: 700;
+  color: #c9c9c9; letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.08);
+  line-height: 1.6;
+}
+.hcpc-dl-split {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; padding: 0;
+  border-radius: 0 8px 8px 0;
+  background: #303030;
+  border: 1px solid #404040;
+  border-left: 1px solid #272727;
+  color: #c9c9c9;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+  user-select: none; flex-shrink: 0; box-sizing: border-box;
+}
+.hcpc-dl-split:hover { background: #3a3a3a; color: #ccc; }
+.hcpc-dl-split svg { display: block; transition: transform 0.2s; }
+.hcpc-dl-split.open svg { transform: rotate(180deg); }
+.hcpc-dropdown {
+  position: absolute; bottom: calc(100% + 8px); left: 0;
+  min-width: 210px;
+  background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 10px;
+  overflow: hidden; z-index: 20;
+  opacity: 0; pointer-events: none;
+  transform: translateY(5px);
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+.hcpc-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+.hcpc-dropdown a { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; text-decoration: none; transition: background 0.1s; }
+.hcpc-dropdown a:not(:last-child) { border-bottom: 1px solid #242424; }
+.hcpc-dropdown a:hover { background: #252525; }
+.hcpc-dd-left { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; font-family: 'Oxanium', sans-serif; }
+.hcpc-dropdown a:hover .hcpc-dd-left { color: #e0e0e0; }
+.hcpc-dd-hint { font-size: 9px; color: #444; letter-spacing: 0.5px; font-family: 'Oxanium', sans-serif; white-space: nowrap; }
+.hcpc-dropdown a:hover .hcpc-dd-hint { color: #666; }
+.hcpc-copy-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 14px;
+  border-radius: 8px;
+  background: #303030; border: 1px solid #404040;
+  color: #c9c9c9;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+  font-family: 'Oxanium', sans-serif;
+}
+.hcpc-copy-btn:hover { background: #3a3a3a; border-color: #4e4e4e; color: #bbb; }
+.hcpc-copy-btn.copied { color: #4ade80; border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.08); }
+@media (max-width: 970px) {
+  .hcpc-slide img  { height: 200px; }
+  .hcpc-super-wrap { padding: 0; margin-top: 16px; }
+  .hcpc-arrow      { width: 30px; height: 30px; font-size: 17px; }
+  .hcpc-bottom     { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px 14px 16px; }
+  .hcpc-desc       { font-size: 12px; }
+  .hcpc-img-icon   { width: 28px; height: 28px; }
+  .hcpc-img-title  { font-size: 11px; }
+  .hcpc-img-author { font-size: 9px; }
+  .hcpc-actions    { width: 100%; }
+  .hcpc-copy-label { display: none; }
+  .hcpc-copy-btn   { padding: 0 10px; height: 32px; }
+  .hcpc-dl-group   { height: 32px; }
+  .hcpc-dl-btn     { font-size: 8px; padding: 0 11px; border-radius: 7px 0 0 7px; }
+  .hcpc-dl-split   { width: 28px; border-radius: 0 7px 7px 0; }
+  .hcpc-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 12px 14px 0 14px;
+    overflow-x: visible;
+  }
+  .hcpc-stat-div { display: none; }
+  .hcpc-stat {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 10px;
+    border-bottom: 1px solid #242424;
+    gap: 8px;
+  }
+  .hcpc-stat svg { color: #555; flex-shrink: 0; }
+  .hcpc-stat-lbl {
+    flex: 1;
+    font-size: 9px; color: #555;
+    text-transform: uppercase; letter-spacing: 0.9px;
+    font-weight: 600;
+  }
+  .hcpc-stat-val {
+    font-size: 11px; font-weight: 700;
+    color: #d8d8d8;
+    text-align: right;
+    margin-left: auto;
+  }
+  .hcpc-stat:nth-last-child(-n+2) { border-bottom: none; }
+  .hcpc-stats.hcpc-stats--odd .hcpc-stat:last-child { grid-column: 1 / -1; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.hcpc-instance').forEach(function(slider) {
+  var wrap     = slider.closest('.hcpc-wrap');
+  var track    = slider.querySelector('.hcpc-track');
+  var dots     = slider.querySelectorAll('.hcpc-dot');
+  var btnPrev  = slider.querySelector('.hcpc-arrow.left');
+  var btnNext  = slider.querySelector('.hcpc-arrow.right');
+  var split    = wrap.querySelector('.hcpc-dl-split');
+  var dropdown = wrap.querySelector('.hcpc-dropdown');
+  var dlBtn    = wrap.querySelector('.hcpc-dl-btn');
+  var badge    = dlBtn ? dlBtn.querySelector('.hcpc-dl-badge') : null;
+  var total = dots.length, current = 0, timer;
+  function goTo(n) {
+    current = (n + total) % total;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+  }
+  function next() { goTo(current + 1); reset(); }
+  function prev() { goTo(current - 1); reset(); }
+  function reset() { clearInterval(timer); timer = setInterval(next, 8000); }
+  btnNext.addEventListener('click', next);
+  btnPrev.addEventListener('click', prev);
+  dots.forEach(function(d, i) { d.addEventListener('click', function() { goTo(i); reset(); }); });
+  var sx = 0;
+  slider.addEventListener('touchstart', function(e) { sx = e.touches[0].clientX; }, { passive: true });
+  slider.addEventListener('touchend', function(e) {
+    var dx = sx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) dx > 0 ? next() : prev();
+  }, { passive: true });
+  reset();
+  if (split && dropdown) {
+    split.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var open = dropdown.classList.toggle('open');
+      split.classList.toggle('open', open);
+    });
+    dropdown.querySelectorAll('a[data-label]').forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        var label = item.getAttribute('data-label');
+        var href  = item.getAttribute('data-href') || '#';
+        if (badge) badge.textContent = label;
+        if (dlBtn) dlBtn.setAttribute('href', href);
+        dropdown.classList.remove('open');
+        split.classList.remove('open');
+      });
+    });
+    dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+  }
+});
+document.querySelectorAll('.hcpc-stats').forEach(function(s) {
+  var count = s.querySelectorAll('.hcpc-stat').length;
+  if (count % 2 !== 0) s.classList.add('hcpc-stats--odd');
+});
+document.addEventListener('click', function() {
+  document.querySelectorAll('.hcpc-dropdown').forEach(function(d) { d.classList.remove('open'); });
+  document.querySelectorAll('.hcpc-dl-split').forEach(function(s) { s.classList.remove('open'); });
+});
+document.querySelectorAll('.hcpc-copy-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var url = btn.getAttribute('data-copy');
+    navigator.clipboard.writeText(url).then(function() {
+      var label = btn.querySelector('.hcpc-copy-label');
+      btn.classList.add('copied');
+      if (label) label.textContent = 'Copied!';
+      setTimeout(function() {
+        btn.classList.remove('copied');
+        if (label) label.textContent = 'Copy link';
+      }, 2000);
+    });
+  });
+});
+</script>
+
+
+
+          <!-- TOP RESOURCEPACKS -->
+          <div class="cf-section">
+            <div class="cf-section-header">
+              <div class="cf-section-title">
+              
+                Top RESOURCEPACKS
+              </div>
+              <div class="cf-section-header-right">
+                <button class="cf-arrow" onclick="scrollRow('maps-row', -1)">‹</button>
+                <button class="cf-arrow" onclick="scrollRow('maps-row', 1)">›</button>
+              </div>
+            </div>
+
+                      <!-- PACK SEARCH -->
+          <div class="rp-search-wrap">
+            <svg class="rp-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round">
+              <circle cx="10" cy="10" r="6.5"></circle>
+              <line x1="15" y1="15" x2="20.5" y2="20.5"></line>
+            </svg>
+            <input type="text" id="rpPackSearch" class="rp-search-input" placeholder="Search resource packs..." oninput="filterPacks()">
+            <button id="rpPackSearchClear" class="rp-search-clear" onclick="clearPackSearch()" style="display:none;">✕</button>
+          </div>
+
+                      <!-- FILTER PILLS -->
+          <div class="rp-filter-wrap">
+            <div class="rp-filter-row" id="rpPillRow">
+              <button class="rp-pill active" data-filter="all"><span class="rp-pill-dot"></span>All</button>
+              <button class="rp-pill" data-filter="fullpack"><span class="rp-pill-dot"></span>Full Pack</button>
+              <button class="rp-pill" data-filter="foliage"><span class="rp-pill-dot"></span>Foliage</button>
+              <button class="rp-pill" data-filter="tweaks"><span class="rp-pill-dot"></span>Tweaks</button>
+              <button class="rp-pill" data-filter="utility"><span class="rp-pill-dot"></span>Utility</button>
+              <button class="rp-pill" data-filter="animations"><span class="rp-pill-dot"></span>Animations</button>
+              <button class="rp-pill" data-filter="pvp"><span class="rp-pill-dot"></span>PvP</button>
+              <button class="rp-pill" data-filter="gui"><span class="rp-pill-dot"></span>GUI</button>
+              <button class="rp-pill" data-filter="mobs"><span class="rp-pill-dot"></span>Mobs</button>
+              <button class="rp-pill" data-filter="sound"><span class="rp-pill-dot"></span>Sound</button>
+            </div>
+          </div>
+
+          <div id="rpNoResults" class="rp-no-results" style="display:none;">No resource packs match your search.</div>
+
+
+            <div class="cf-scroll-wrapper">
+              <div class="cf-row" id="maps-row">
+
+                   <!-- ══════ SOURCE: VANILLA TWEAKS ══════ -->
+                <a class="cf-source-group-label" data-source="vanillatweaks" href="https://vanillatweaks.net/" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" alt="">Vanilla Tweaks</a>
+                <a class="cf-card" href="https://vanillatweaks.net/picker/resource-packs/" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64"><img src="minecrafticons/vt1.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://tse3.mm.bing.net/th/id/OIP.v0OJw6wyfsMvUIeIzvhv3gHaHa?pid=Api&h=220&P=0" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Vanilla Tweaks R-Packs</span> <span class="cf-card-by">by Xisumavoid</span></div><div class="cf-card-desc">offers various resource packs and data packs</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" alt="">Vanilla Tweaks</span><span class="cf-card-pill">Utility</span></div></div></a>
+                <a class="cf-card" href="https://vanillatweaks.net/picker/crafting-tweaks/" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64"><img src="minecrafticons/vt2.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://tse3.mm.bing.net/th/id/OIP.v0OJw6wyfsMvUIeIzvhv3gHaHa?pid=Api&h=220&P=0" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Vanilla Tweaks Crafting</span> <span class="cf-card-by">by Xisumavoid</span></div><div class="cf-card-desc">offers various resource packs and data packs</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" alt="">Vanilla Tweaks</span><span class="cf-card-pill">Utility</span></div></div></a>
+
+                <!-- ══════ SOURCE: MODRINTH ══════ -->
+                <a class="cf-source-group-label" data-source="modrinth" href="https://modrinth.com/resourcepacks" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/reimagined" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64"><img src="https://wsrv.nl/?url=https%3A%2F%2Fgyazo.com%2Fbc7de590d68cd890727edc11f353c58b.png&n=-1" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://cdn.modrinth.com/data/ta5dy0aA/ef50796f445ed76ee9983725fcfbedb48f071690_96.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Reimagined</span> <span class="cf-card-by">by Modrinth</span></div><div class="cf-card-desc">New block variants, GUIs, sounds, mobs & more</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</span><span class="cf-card-pill">Mobs</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/bare-bones" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64"><img src="https://cdn.modrinth.com/data/rox3U8B6/images/deedac2a9f9143e7d66ec4179f956e448f412dc8_350.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://cdn.modrinth.com/data/rox3U8B6/b502bd8b2a6048f635230da8e8a66eeb4383874b_96.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Bare Bones</span> <span class="cf-card-by">by Modrinth</span></div><div class="cf-card-desc">Clean cartoon-like textures from the trailers</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</span><span class="cf-card-pill">fullpack</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/better-leaves" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64"><img src="https://wsrv.nl/?url=https%3A%2F%2Fmedia.forgecdn.net%2Fattachments%2F893%2F699%2Fbetterleavesbop.jpg&n=-1" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://cdn.modrinth.com/data/uvpymuxq/fe1a61998ae57dc6ad1a4bb028334c3c3925d22f_96.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Motschen's Better Leaves</span> <span class="cf-card-by">by Modrinth</span></div><div class="cf-card-desc">Better Leaves adds additional layers</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</span><span class="cf-card-pill">Foliage</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/x-ray-(-spectator-toggle-able-)" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64"><img src="https://cdn.modrinth.com/data/cached_images/f37b9fe3b3efbdf41f577bb254997d3708aa9431.jpeg" alt=""><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://cdn.modrinth.com/data/2P3I5T3N/c2387e642a8d5952b7eba3397328c2a1296e64fd_96.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">X Ray | Spectator</span> <span class="cf-card-by">by Modrinth</span></div><div class="cf-card-desc">Best X ray texture Pack For Minecraft</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</span><span class="cf-card-pill">Utility</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/patrix-32x" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64"><img src="https://cdn.modrinth.com/data/olO1TaXd/images/276fac920a7fb1dfb6c4660c546d4b71be137f37.jpeg" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://cdn.modrinth.com/data/olO1TaXd/e366b7d44837eea4dd2f27bfcb8d35b389801823_96.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Patrix 32x</span> <span class="cf-card-by">by Modrinth</span></div><div class="cf-card-desc">Realistic textures with vanilla colors for shaders</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/updated-mobs" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64"><img src="https://cdn.modrinth.com/data/BKWKyHqF/images/0f7beeed0021f65129c57d910fdaa997196a562b_350.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://cdn.modrinth.com/data/BKWKyHqF/0df06bcd6c2de2c8d4aa0d1e2779ac880538d147_96.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Updated Mobs</span> <span class="cf-card-by">by Modrinth</span></div><div class="cf-card-desc">40+ new mob models to match Mojang's modern style</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="">Modrinth</span><span class="cf-card-pill">Mobs</span></div></div></a>
+
+                <!-- ══════ SOURCE: PMC ══════ -->
+                <a class="cf-source-group-label" data-source="pmc" href="https://www.planetminecraft.com/texture-packs/" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="">PMC</a>
+                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/modernarch-realism-1-13-1-14-512x512/" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64"><img src="minecrafticons/modernarch.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="minecrafticons/compressed-modernarch.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">ModernArch</span> <span class="cf-card-by">by PMC</span></div><div class="cf-card-desc">Contains 3D models, 1024x resolution</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="">PMC</span><span class="cf-card-pill">Fullpack</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/redstone-tweaks/" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64"><img src="minecrafticons/redstonetweakshoriz.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="minecrafticons/redstonetweaks.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Redstone Tweaks</span> <span class="cf-card-by">by PMC</span></div><div class="cf-card-desc">Visual upgrades for redstone builds</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="">PMC</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+
+
+                <!-- ══════ SOURCE: CURSE FORGE ══════ -->
+                <a class="cf-source-group-label" data-source="curseforge" href="https://www.curseforge.com/minecraft/texture-packs" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-animations"  target="_blank" data-tags="animations" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1297/467/fa1-10-png.png" alt=""><div class="cf-card-body"><div class="cf-card-toprow"> <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1402/911/256/256/638909354589974674.png"alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fresh Animations</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Make your game like the trailers!</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Animations</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-moves" target="_blank" data-tags="animations" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="minecrafticons/freshmoves.jpg" alt=""><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/985/357/256/256/638494820573552980.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fresh Moves</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Gives fancy animations to the player entity.</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Animations</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/stay-true" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/296/685/wheat-1.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/274/491/256/256/637258639542653246.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Stay True</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Upgraded foliage, leaves and plants.</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/dramatic-skys" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/722/543/2023-09-01_13.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/917/149/64/64/638376852371569173.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Dramatic Skys</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Realistic biome skies, stars and auroras</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/armory-conglomery" target="_blank" data-tags="equipment" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1298/848/armoryconglomeryrender-png.png" alt="Armory Conglomery"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1052/120/64/64/638582142111026544.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Armory Conglomery</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A huge collection of retextured armor sets and weapons with unique designs</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Equipment</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/blues-better-monsters" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/950/217/2024-08-25_00.png" alt="Blue's Better Monsters"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/attachments/1067/253/witchrenderbbm4.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Blue's Better Monsters</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Detailed mob retextures for all hostile monsters — scarier and more vivid</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+                
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/simple-grass-flowers" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/916/901/banner.png" alt="Simple Grass Flowers"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1040/720/64/64/638566745953594402_animated.gif" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Simple Grass Flowers</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Adds vanilla-friendly flowers, clovers and rocks to grass, podzol and mycelium</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/tissous-zombie-pack-optifine-1-7x-1-20" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/878/239/cover-1.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1004/750/64/64/638525963061053653.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Tissou's Zombie Pack</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Hundreds of creepy zombie texture variants</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/round-trees-mc-vanilla-1-8-1-13" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1325/110/2025-09-15_11-20-07-webp.webp" alt="Round Trees"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/240/251/64/64/637119835795720422.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Round Trees</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Makes vanilla trees look fuller and rounder without breaking the classic feel</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/wisps-better-lanterns" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1145/282/banner.png" alt="Wisp's Better Lanterns"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1208/490/64/64/638785886677728969_animated.gif" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Wisp's Better Lanterns</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Upgraded 3D lantern models with glowing detail and hanging chain textures</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/actually-3d-workbenches" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1327/316/thumbnail-min-png.png" alt="Actually 3D Workbenches"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1445/211/64/64/638937318848190363.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Actually 3D Workbenches</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Gives every vanilla workstation a full 3D model overhaul — furnaces, crafting tables and more</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/refined-cats" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1395/222/jpg1-min-jpg.jpg" alt="Refined Cats"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1480/869/64/64/638962514092041933.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Refined Cats</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Cuter and more detailed cat textures with new fur patterns and variants</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/better-dogs" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/755/295/poker.png" alt="Better Dogs"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1216/55/64/64/638794904863614691.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better Dogs</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Cuter and more realistic wolf/dog textures with breed variants and collar colors</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/nautilus3d" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/636/984/2.png" alt="Nautilus 3D"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/984/147/64/64/638492932669697831.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Nautilus 3D</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Full 3D model overhaul for the entire game — blocks, items and entities in stunning depth</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/minimal-armor-countxd" target="_blank" data-tags="equipment" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/648/154/nethrite.png" alt="Minimal Armor Count"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/803/723/64/64/638169464679761238.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Minimal Armor Count</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Adds a clean numerical armor value display to your HUD</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Equipment</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/better-horses-x-fresh-animations" target="_blank" data-tags="animations" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/947/817/banner_horse-fresh.png" alt="Better Horses x Fresh Animations"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1066/21/64/64/638599793093659037.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better Horses x Fresh Animations</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Fresh Animations compatibility patch bringing smooth animations to better horse textures</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Animations</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/crops-3d" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/279/617/3d-crops_potato_vanilla.png" alt="Crops 3D"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/250/811/64/64/637180378912502171.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Crops 3D</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Turns all farmland crops into lush 3D plants that actually look grown</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/dead-bush-overgrowth" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1479/539/90f4d74cfb0776d6b0af9660f4e9a559e3d45a55-png.png" alt="Dead Bush Overgrowth"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1627/580/64/64/639044354352951226.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Dead Bush Overgrowth</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Transforms the flat dead bush into a full 3D overgrown shrub model</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/yamete-ghast" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1200/185/diapositiva2-png.PNG" alt="Yamete Ghast"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1289/327/64/64/638838161441588101.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Yamete Ghast</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Replaces the Ghast with an anime girl face — chaotic but iconic</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/arcles-medieval-containers" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/986/902/2024-10-07_20.png" alt="Arcle's Medieval Containers"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1095/692/64/64/638640940673737251_animated.gif" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Arcle's Medieval Containers</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A full medieval overhaul of all storage blocks — barrels, chests, shulkers and more</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/deep-origins-overlays" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1565/88/frame-12-png.png" alt="Deep Origins Overlays"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1704/271/64/64/639082583739241797.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Deep Origins Overlays</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Dark atmospheric overlays for a moody underground and deep origins aesthetic</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/armor-display" target="_blank" data-tags="equipment" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/783/767/thikarmor.png" alt="Armor Display"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/927/580/64/64/638398202700853698.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Armor Display</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Shows worn armor pieces visually on your HUD for quick status checks</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Equipment</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/grimdark-pirate" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/465/824/cover-grimdarkpiratepack.png" alt="GrimDark Pirate"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/877/380/64/64/638302527016071239.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">GrimDark Pirate</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A dark gritty pirate-themed full overhaul with weathered wood, rope and nautical textures</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/default-style-christmas-pack" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/772/710/bees.png" alt="Default Style Christmas Pack"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1136/951/64/64/638698884411334642.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Default Style Christmas Pack</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Full holiday overhaul in vanilla style — snow, lights, gifts and festive blocks</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/whimscape" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/913/162/monsters_2.png" alt="Whimscape"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/757/264/64/64/638093726004795463.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Whimscape</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A whimsical full-pack overhaul with painterly textures and a storybook art style</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/crops-3d-reforged" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="minecrafticons/crops4d.png" alt="Crops 3D Reforged"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1130/502/64/64/638689570676896261.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Crops 3D Reforged</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">An updated and expanded version of Crops 3D with even more detailed farm plants</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/armor-reimagined" target="_blank" data-tags="equipment" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://i.gyazo.com/bf2a4599a4a2e1659d2dbf75175c1a5d.png" alt="Armor Reimagined"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1483/65/64/64/638963990254575269.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Armor Reimagined</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Completely redesigned armor sets with detailed unique looks for each tier</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Equipment</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-textures" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1238/659/image-1-png.png" alt="Fresh Textures"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1352/112/64/64/638878521888374665.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fresh Textures</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A complete vanilla-style texture overhaul that feels like the game was always meant to look this good</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/default-style-halloween-pack" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/746/341/mobs.png" alt="Default Style Halloween Pack"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon"  src="https://media.forgecdn.net/avatars/thumbnails/1004/890/64/64/638526113389073966.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Default Style Halloween Pack</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Spooky seasonal overhaul in vanilla style — pumpkins, ghosts and eerie blocks everywhere</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/boss-refreshed" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1204/539/allofem-png.png" alt="Boss Refreshed"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1295/13/64/64/638841706493782993.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Boss Refreshed</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Revamped textures for all Minecraft bosses — Wither, Elder Guardian, Ender Dragon and more</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/quadral-pack" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/247/63/2019-02-22_16.png" alt="Quadral Pack"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/849/357/64/64/638250285316109327.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Quadral</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A vibrant full pack with bold colors and clean geometric textures across the whole game</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/plasticraft-lego" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1054/408/2024-12-30-1.png" alt="Plasticraft LEGO"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1146/673/64/64/638713071217943736.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Plasticraft LEGO</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Turns the entire game into a LEGO world — plastic textures, stud tops, the full experience</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/digs-simple-pack" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/673/691/cherry-grove-small.png" alt="Dig's Simple Pack"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1597/73/64/64/639032267027550076.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Dig's Simple Pack</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A clean minimalist full pack with flat colors and simple shapes — easy on the eyes</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/legendary-rt-textures" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1353/38/lrt_rt_28-27-jpg.jpg" alt="Legendary RT Textures"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1474/76/64/64/638956988523086308.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Legendary RT Textures</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">High-res PBR textures designed for ray tracing and advanced shader setups</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/blockpixel" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/763/343/2023-10-14_20.png" alt="Blockpixel"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/609/663/64/64/637990910091427654.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Blockpixel</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Retro pixel-art full overhaul with vibrant colors and a nostalgic 8-bit charm</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/simonkraft" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1050/470/2024-12-27_02.jpg" alt="Simonkraft"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/303/489/64/64/637372638603736570.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Simonkraft</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A German handcrafted full pack with warm earthy tones and medieval influences</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/ms-painted" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/971/651/2024-07-06_17.png" alt="MS Painted"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/896/851/64/64/638341947148819479.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">MS Painted</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">The whole game redrawn in Microsoft Paint — hilariously detailed and surprisingly charming</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/battered-old-stuff" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/273/236/2019-12-22_14.png" alt="Battered Old Stuff"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/241/10/64/64/637125032251320776.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Battered Old Stuff</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Worn, aged and weathered textures that make your world feel lived-in and rustic</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/villager-variety" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://zonacraft.net/wp-content/uploads/2024/08/villager-variety-texture-pack.webp" alt="Villager Variety"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1063/996/64/64/638596988367889308.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Villager Variety</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Dozens of unique villager skin variants so no two villagers look the same</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/remodeled-doors" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1147/654/2025-04-03_22-58-39-png.png" alt="Remodeled Doors"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1356/786/64/64/638881344839749104.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Remodeled Doors</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">All door types redesigned with 3D panels, handles and improved wood grain detail</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/foliage-plus" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/643/432/new-1.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/800/19/64/64/638163001728854181.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Foliage+</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Foliages like grass, leaves, ferns, etc. look more admirable and realistic. </div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/better-3d-ladder" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/464/821/ladder2.png" alt="Better 3D Ladder"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/552/645/64/64/637892144187482681.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better 3D Ladder</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Replaces flat ladder textures with proper 3D runged ladder models</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/faithless" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/614/566/villager.png" alt="Faithless"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1074/981/64/64/638611939315408748.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Faithless</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">A faithful-style complete overhaul keeping vanilla proportions but upgrading every texture</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/genshin-villager" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1334/547/screenshot_7-png.png" alt="Genshin Villager"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1149/320/64/64/638716474521073697.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Genshin Villager</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Replaces villager textures with Genshin Impact character skins</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/low-on-fire" target="_blank" data-tags="pvp" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/433/29/half.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/494/548/64/64/637806308919001110.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Low on Fire</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Low fire on your screen! Vanilla Friendly</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">PvP</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/visible-ancient-debris" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="minecrafticons/ancientdebris.jpg" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/856/174/64/64/638259766633541058.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Visible Ancient Debris</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Adds a golden outline to the regular ancient debris texture</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Utility</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/rounded-sun-and-moon" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://i.postimg.cc/63k4ScBV/moonphazes-named.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1574/845/64/64/639020393809919229.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Rounded Sun and Moon</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Gives the Sun and Moon nice, rounded edges!</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/xray-ultimate-1-11-compatible" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1387/335/2025-04-16_18-51-57-jpg.jpg" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/824/59/64/64/638208888555552105.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Xray Ultimate</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Highlights ores for faster, efficient mining</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Utility</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/mandalas-gui-dark-mode" target="_blank" data-tags="gui" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1204/402/new-tooltip-and-slot-highlight.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/595/587/64/64/637970567654390772.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Mandala's GUI - Dark Mode</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Sleek dark mode for menus and inventory</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">GUI</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/enhanced-boss-bars" target="_blank" data-tags="gui" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1732/820/enderdragon-update4-png.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1862/162/64/64/639169235205617564.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Enhanced Boss Bars</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Dramatic styled health bars for every boss</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">GUI</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/skys-3d-enchanting-table" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1259/626/enchant-png.png" alt="Sky's 3D Enchanting Table"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1363/626/64/64/638885589151549486.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Sky's 3D Enchanting Table</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Gives the enchanting table a detailed 3D model with an open book on top</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/crossbow-shotgun" target="_blank" data-tags="equipment" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1298/999/diapositiva4-png.PNG" alt="Crossbow Shotgun"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1413/430/64/64/638915888153673918.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Crossbow Shotgun</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Retextures the crossbow into a detailed pump-action shotgun model</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Equipment</span></div></div></a>
+
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/excalibur" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/417/926/2020-06-14_19.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/473/850/64/64/637766076580792794.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Excalibur</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Medieval-style rustic tools, weapons and blocks</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/mizuno-better-leaves" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1575/491/screenshot_10-png.png" alt="Mizuno Better Leaves"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1159/290/64/64/638727904187732327.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Mizuno's Better Leaves</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Lush layered leaf textures designed to pair with Mizuno's 16 Craft pack</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/als-spiders-revamped" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1236/178/2025-06-30_11.png" alt="Al's Spiders Revamped"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1530/580/64/64/638994137153705823.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Al's Spiders Revamped</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Creepy realistic spider texture revamp with multiple variants</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/canoe-boats" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/944/627/2024-08-15_21.png" alt="Canoe Boats"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1063/628/64/64/638596534793853914.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Canoe Boats</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Retextures vanilla boats into sleek wooden canoes</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/waifu-anime-beds" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1489/952/overview.png" alt="Waifu Anime Beds"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1637/910/64/64/639048199253739358.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Waifu Anime Beds</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Replaces all 16 bed colors with anime waifu artwork designs</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/gigachad-villager" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1006/605/2024-11-02_19.png" alt="GigaChad Villager"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1110/970/64/64/638662408583988042.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">GigaChad Villager</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Replaces villager faces with the GigaChad meme — enough said</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/oaks-better-cactus" target="_blank" data-tags="foliage" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1423/344/5ffe6e667178f4800dcd2df89bd672f2cb6d03aa-png.png" alt="Oak's Better Cactus"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1559/550/64/64/639011976256965882.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Oak's Better Cactus</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Gives cacti a rounder, more natural 3D look while staying vanilla friendly</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Foliage</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/universal-3d-archery" target="_blank" data-tags="equipment" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/1070/747/thumbnail.jpg" alt="Universal 3D Archery"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1159/806/64/64/638728418205669739.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Universal 3D Archery</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">3D models for bows, crossbows and arrows with smooth pull animations</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Equipment</span></div></div></a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/enhanced-item-frame" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/506/890/img5.jpg" alt="Enhanced Item Frame"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/622/525/64/64/638015212447204996.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Enhanced Item Frame</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Decorative wooden item frames with improved 3D depth and detail</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/visual-travelers-titles" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/1059/671/2025-01-07_21.png" alt="Visual Traveler's Titles">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/611/463/64/64/637995723024972817.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Visual Traveler's Titles</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Stylized 3D dimension logos in Dungeons game style</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/stay-clear" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/1126/559/screenshot-2025-03-14-230722-png.png" alt="Stay Clear">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1199/548/64/64/638776059542419067.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Stay Clear</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Makes the glass from Stay True clearer and fixes culling issues</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/blinking-ender-eyes" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/253/762/eye.png" alt="Blinking Ender Eyes">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1011/53/64/64/638534960609788746_animated.gif" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Blinking Ender Eyes</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Adds animated blinking to end portal frames and ender eyes</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/better-lanterns" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/614/321/huge_2023-01-29_19.png" alt="Better Lanterns">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/987/499/64/64/638498554072987799.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better Lanterns</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Enhanced 3D lantern and chain models for a more immersive look</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/alternative-rain-sounds" target="_blank" data-tags="sound" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="minecrafticons/alternative-rain-sounds.webp" alt="Alternative Rain Sounds">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/814/104/64/64/638189110921970248.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Alternative Rain Sounds</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Replaces the default rain sounds with more realistic alternatives</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Sound</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/enhanced-audio" target="_blank" data-tags="sound" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://tse4.mm.bing.net/th/id/OIP.RYOoXyhcXUwQjiu7uKmMTAHaEK?pid=Api&h=220&P=0" alt="Enhanced Audio">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1063/522/64/64/638596340873103284.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Enhanced Audio</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Overhauled sounds for a richer and more immersive audio experience</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Sound</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/no-potion-particles" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://tse1.mm.bing.net/th/id/OIP.yukO6oS75TpsbqG_hMkUowHaFv?pid=Api&h=220&P=0" alt="No Potion Particles">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://tse1.mm.bing.net/th/id/OIP.yukO6oS75TpsbqG_hMkUowHaFv?pid=Api&h=220&P=0" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">No Potion Particles</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Removes distracting potion effect particles from your screen</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Utility</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/malfu-combat-animation" target="_blank" data-tags="animations" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/description/null/description_75db2462-6fbe-4925-9fbd-9d911a2d6b77.png" alt="Malfu Combat Animation">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1260/102/64/64/638820480161685248.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Malfu Combat Animation</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Smooth and dynamic combat animations for weapons and tools</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Animations</span></div></div>
+</a>
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/vanilla-exp" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/1687/283/logo-bg-png.png" alt="Vanilla EXP">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1805/977/64/64/639142800223454995.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Vanilla EXP</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Enhances the XP orb visuals while keeping the vanilla style</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Fullpack</span></div></div>
+</a>
+
+
+
+
+<!-- ══════ ANIMATIONS ══════ -->
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fa-player-extension" target="_blank" data-tags="animations" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/1451/428/player_cave-2-png.png" alt="Fresh Animations: Player Extension">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1583/647/64/64/639025156581167648.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fresh Animations: Player Extension</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Animates the player model in Fresh Animations' style — an official FA extension</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Animations</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-compats-emf" target="_blank" data-tags="animations" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://cdn.modrinth.com/data/cached_images/a46acffbb1fdd8c58b070ee25eb46c8ba271c1c7_0.webp" alt="Fresh Compats (EMF pack)">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/985/365/64/64/638494825255870634.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fresh Compats (EMF pack)</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Fresh Animations compatibility for Supplementaries and Quark mods</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Animations</span></div></div>
+</a>
+
+<!-- ══════ TWEAKS ══════ -->
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/mcs" target="_blank" data-tags="sound" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/avatars/thumbnails/871/107/64/64/638288366729788554.png" alt="MCS">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/871/107/64/64/638288366729788554.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">MCS</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">A Minecraft resource pack with various visual tweaks and improvements</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Sound</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/soft-weather" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/401/871/comparison-snow.png" alt="Soft Weather">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/445/301/64/64/637701014975860719.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Soft Weather</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Makes rain and snow less visually obtrusive with added transparency</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/farcrs-re-crafted" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/786/619/longswords.png" alt="Farcr's Re-Crafted">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/879/196/64/64/638306521386023136.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Farcr's Re-Crafted</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">A small but charming Minecraft reinterpretation with refreshed textures</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/slim-fire" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/917/438/soul-comparison.png" alt="Slim Fire">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1041/135/64/64/638567368315994246.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Slim Fire</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Slims down the fire overlay so it blocks less of your view</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/better-end-portal-frame" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/432/600/2022-02-14_17.png" alt="Better End Portal Frame">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/364/19/64/64/637530810644075800.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better End Portal Frame</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Refreshed end portal frame texture with improved detail and visual clarity</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+
+<!-- ══════ MOBS ══════ -->
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/ender-dragon-revamp" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/460/151/ender_dragon_pic.PNG" alt="Ender Dragon Revamp">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/544/451/64/64/637876206575507808.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Ender Dragon Revamp</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">A full revamp of the Minecraft ender dragon texture</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/realistic-mobs" target="_blank" data-tags="mobs" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/975/606/realistic-mobs.png" alt="Realistic Mobs">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1134/588/64/64/638695442149695484.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Realistic Mobs</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Discover new realistic textures for vanilla mobs</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Mobs</span></div></div>
+</a>
+
+<!-- ══════ GUI ══════ -->
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/prominent-ui-x-mandala" target="_blank" data-tags="gui" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/avatars/934/361/638410482218252050.png" alt="Prominent UI x Mandala's GUI">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/934/361/64/64/638410482218252050.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Prominent UI x Mandala's GUI</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Adds compatibility between Prominent UI and Mandala's GUI packs</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">GUI</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/better-vanilla-gui" target="_blank" data-tags="gui" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://www.bisecthosting.com/images/CF/Better_Vanilla_GUI/MP_BetterVanillaGUI_header.webp" alt="Better Vanilla GUI">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1524/317/64/64/638989765415539180.webp" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better Vanilla GUI</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">New GUIs for all Minecraft crafting tables, inventories and workstations</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">GUI</span></div></div>
+</a>
+
+<!-- ══════ REALISTIC ══════ -->
+<a class="cf-card" href="" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/852/176/jungle-wood.jpg" alt="Realistic Woods">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1284/419/64/64/638835340044795612.webp" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Realistic Woods</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">More realistic and beautiful wood textures while keeping the Minecraft feel</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div>
+</a>
+
+<!-- ══════ UTILITY ══════ -->
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fullbright-ub" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/1600/210/fullbright-ub-26-1-webp.webp" alt="Fullbright UB">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/582/198/64/64/637947962185657941.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fullbright UB</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Maximum brightness in Minecraft — works with Sodium, Optifine and Vanilla</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Utility</span></div></div>
+</a>
+
+
+
+
+<!-- ══════ REALISTIC / TWEAKS ══════ -->
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/chests-reimagined" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="https://media.forgecdn.net/attachments/658/407/16267657-bet3333333te2222rspyglassportada_l.png" alt="Chests Reimagined">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/815/371/64/64/638191502007658345.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Chests Reimagined</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Updated 3D chest models with refreshed textures and new sounds</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+
+<a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fancy-beds" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64">
+  <img src="minecrafticons/fancybeds.png" alt="Fancy Beds">
+  <div class="cf-card-body"><div class="cf-card-toprow">
+    <img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/1380/80/64/64/638895163038135450.png" alt="">
+    <div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fancy Beds</span> <span class="cf-card-by">by Curse Forge</span></div>
+    <div class="cf-card-desc">Makes all beds fancier and cuter with improved textures</div></div>
+  </div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Tweaks</span></div></div>
+</a>
+
+
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/alacrity" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/624/891/interior_2.jpg" alt="Alacrity"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/425/112/256/256/637653561683931081.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Alacrity</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">32x RPG-inspired overhaul with custom 3D models and a medieval magic atmosphere</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/xalis-enchanted-books" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/392/474/v0.png" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/377/691/64/64/637555914455642734.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Xali's Enchanted Books</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Unique book covers for every enchantment</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Utility</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/eclectic-trove-legendary-tooltips" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64"><img src="https://media.forgecdn.net/attachments/482/519/fire_frame_demo.gif" alt="mc-rpacks"><div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://media.forgecdn.net/avatars/thumbnails/446/386/64/64/637703765231062618.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Eclectic Trove</span> <span class="cf-card-by">by Curse Forge</span></div><div class="cf-card-desc">Custom item tooltip frames for Legendary Tooltips</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="">Curse Forge</span><span class="cf-card-pill">Utility</span></div></div></a>
+
+
+
+
+
+
+
+                
+             
+
+
+
+                <!-- ══════ SOURCE: RESOURCEPACK.NET ══════ -->
+                <a class="cf-source-group-label" data-source="resourcepacknet" href="https://resourcepack.net/" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64" alt="">ResourcePack.net</a>
+                <a class="cf-card" href="https://resourcepack.net/x-ray-ultimate-resource-pack/" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64"><img src="https://resourcepack.net/fl/images/2015/02/X-Ray-Ultimate-Resource-Pack-for-minecraft-4-840x472.jpg" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://resourcepack.net/fl/images/2015/02/X-Ray-Ultimate-Resource-Pack-for-minecraft-4-840x472.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">X-Ray Ultimate</span> <span class="cf-card-by">by ResourcePack.net</span></div><div class="cf-card-desc">#1 most popular pack on the site — see ores instantly</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64" alt="">ResourcePack.net</span><span class="cf-card-pill">Utility</span></div></div></a>
+                <a class="cf-card" href="https://resourcepack.net/sapixcraft-resource-pack/" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64"><img src="https://resourcepack.net/fl/images/2020/03/SapixCraft-Resource-Pack-for-minecraft-textures-13-840x473.jpg" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://resourcepack.net/fl/images/2020/03/SapixCraft-Resource-Pack-for-minecraft-textures-8-840x473.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">SapixCraft</span> <span class="cf-card-by">by ResourcePack.net</span></div><div class="cf-card-desc">Vibrant resolutions from 16x up to 512x</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64" alt="">ResourcePack.net</span><span class="cf-card-pill">Full Pack</span></div></div></a>
+                <a class="cf-card" href="https://resourcepack.net/default-3d-resource-pack/" target="_blank" data-tags="tweaks" data-source-icon="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64"><img src="https://resourcepack.net/fl/images/2020/03/3D-Default-resource-pack-1-840x473.jpg" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://resourcepack.net/fl/images/2020/03/3D-Default-resource-pack-1-840x473.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Default 3D</span> <span class="cf-card-by">by ResourcePack.net</span></div><div class="cf-card-desc">Adds 3D depth to vanilla blocks and items</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64" alt="">ResourcePack.net</span><span class="cf-card-pill">Tweaks</span></div></div></a>
+                <a class="cf-card" href="https://resourcepack.net/john-smith-legacy-resource-pack/" target="_blank" data-tags="fullpack" data-source-icon="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64"><img src="https://resourcepack.net/fl/images/2019/08/John-Smith-Legacy-Resource-Pack-for-minecraft-textures-8-840x352.jpg" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://resourcepack.net/fl/images/2019/08/John-Smith-Legacy-Resource-Pack-for-minecraft-textures-7-840x352.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">John Smith Legacy</span> <span class="cf-card-by">by ResourcePack.net</span></div><div class="cf-card-desc">Rustic medieval-style stone, wood and plants</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64" alt="">ResourcePack.net</span><span class="cf-card-pill">fullpack</span></div></div></a>
+                <a class="cf-card" href="https://resourcepack.net/optifine-hd/" target="_blank" data-tags="utility" data-source-icon="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64"><img src="https://resourcepack.net/fl/images/2019/09/OPTIFINE-THUMBNAIL-BY-RESOURCEPACK.NET_.jpg" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://resourcepack.net/fl/images/2019/09/OPTIFINE-THUMBNAIL-BY-RESOURCEPACK.NET_.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">OptiFine</span> <span class="cf-card-by">by ResourcePack.net</span></div><div class="cf-card-desc">The essential mod/tool for HD textures and shaders</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=resourcepack.net&sz=64" alt="">ResourcePack.net</span><span class="cf-card-pill">Utility</span></div></div></a>
+
+                <!-- ══════ SOURCE: SHOCKBYTE ══════ -->
+                <a class="cf-source-group-label" data-source="shockbyte" href="https://shockbyte.com/blog" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=shockbyte.com&sz=64" alt="">Shockbyte</a>
+                <a class="cf-card" href="https://shockbyte.com/blog/minecraft-pvp-texture-packs" target="_blank" data-tags="pvp" data-source-icon="https://www.google.com/s2/favicons?domain=shockbyte.com&sz=64"><img src="https://storyblok.shockbyte.com/f/296405/1366X768/a680da6de4/minecraft-rpg-texture-pack.png" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://storyblok.shockbyte.com/f/296405/1366X768/af502cfc32/shockbyte-pvp-texture-pack.png" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Better PVP (Resource Pack for Pros)</span> <span class="cf-card-by">by Shockbyte</span></div><div class="cf-card-desc">Simplified models, bright armors, near-zero lag</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=shockbyte.com&sz=64" alt="">Shockbyte</span><span class="cf-card-pill">PvP</span></div></div></a>
+
+                <!-- ══════ SOURCE: CRAFTYMANIA ══════ -->
+                <a class="cf-source-group-label" data-source="craftymania" href="https://craftymania.net/" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64" alt="">CraftyMania</a>
+                <a class="cf-card" href="https://craftymania.net/absolute-pvp-resource-pack/" target="_blank" data-tags="pvp" data-source-icon="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64"><img src="https://craftymania.net/wp-content/uploads/2025/07/Absolute-PVP-Resource-Pack-2.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://craftymania.net/wp-content/uploads/2025/07/Absolute-PVP-Resource-Pack-2.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Absolute PVP</span> <span class="cf-card-by">by CraftyMania</span></div><div class="cf-card-desc">Compact, clean swords for perfect duel visibility</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64" alt="">CraftyMania</span><span class="cf-card-pill">PvP</span></div></div></a>
+                <a class="cf-card" href="https://craftymania.net/golde-v2-pvp-resource-pack/" target="_blank" data-tags="pvp" data-source-icon="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64"><img src="https://craftymania.net/wp-content/uploads/2025/08/Golde-V2-Minecraft-PVP-Resource-Pack-2.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://craftymania.net/wp-content/uploads/2025/08/Golde-V2-Minecraft-PVP-Resource-Pack-2.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Golde V2 PVP</span> <span class="cf-card-by">by CraftyMania</span></div><div class="cf-card-desc">a bright cyan theme that stands out during combat.</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64" alt="">CraftyMania</span><span class="cf-card-pill">PvP</span></div></div></a>
+                <a class="cf-card" href="https://craftymania.net/fury-pvp-resource-pack/" target="_blank" data-tags="pvp" data-source-icon="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64"><img src="https://craftymania.net/wp-content/uploads/2025/09/Fury-PVP-Resource-Pack-6.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://craftymania.net/wp-content/uploads/2025/09/Fury-PVP-Resource-Pack-3.webp" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Fury PVP</span> <span class="cf-card-by">by CraftyMania</span></div><div class="cf-card-desc">Adds extra texture and clarity to blocks and items, making everything feel sharper </div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64" alt="">CraftyMania</span><span class="cf-card-pill">PvP</span></div></div></a>
+                <a class="cf-card" href="https://craftymania.net/zion-v2-pvp-resource-pack/" target="_blank" data-tags="pvp" data-source-icon="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64"><img src="https://craftymania.net/wp-content/uploads/2025/08/Zion-V2-PVP-Resource-Pack-4.webp" alt=""> <div class="cf-card-body"><div class="cf-card-toprow"><img class="cf-card-author-icon" src="https://i.ytimg.com/vi/TSQWD690vu4/hqdefault.jpg" alt=""><div class="cf-card-textblock"><div class="cf-card-namerow"><span class="cf-card-name">Zion V2 PVP </span> <span class="cf-card-by">by CraftyMania</span></div><div class="cf-card-desc">a minimalist texture pack designed with competitive players in mind</div></div></div><div class="cf-card-pills"><span class="cf-card-pill is-source"><img src="https://www.google.com/s2/favicons?domain=craftymania.net&sz=64" alt="">CraftyMania</span><span class="cf-card-pill">PvP</span></div></div></a>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="mc-right-sidebar">
+          <div class="mc-right-sidebar-inner">
+            <div class="layouts-title-box"><div class="layouts-title">Browse Categories</div></div>
+            <div class="mc-sidebar-group-label">Discover</div>
+            <a href="mc-java-home.html" class="mc-nav-item"><img src="minecrafticons/mc-compass.gif" alt="">Discover</a>
+            <div class="mc-sidebar-divider"></div>
+            <div class="mc-sidebar-group-label">Core Content</div>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/vanillaworlds.png" alt="">Worlds</a>
+            <a href="mc-java-seeds.html" class="mc-nav-item"><img src="minecrafticons/seeds.png">Seeds</a>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/commandblock-minecart.gif" alt="">Mod Packs</a>
+            <div class="mc-sidebar-divider"></div>
+            <div class="mc-sidebar-group-label">Visuals</div>
+            <a href="mc-java-rp.html" class="mc-nav-item active"><img src="minecrafticons/mc-resourcepacks-icon.png" alt="">Resource Packs</a>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/lantern.gif" alt="">Shaders</a>
+            <div class="mc-sidebar-divider"></div>
+            <div class="mc-sidebar-group-label">others</div>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/commandblock.gif" alt="">Commands</a>
+            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/sblock.png" alt="">Web Tools</a>
+          </div>
+        </div>
+      </div>
+
+      <footer class="site-footer">
+        <div class="footer-icons">
+          <a href="#" aria-label="Facebook" class="footer-icon"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7h-2.4V12h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.3V12h2.5l-.4 2.9h-2.1v7A10 10 0 0022 12z"/></svg></a>
+          <a href="https://discord.gg/rfntEJ5w" target="_blank" aria-label="Discord" class="footer-icon"><svg viewBox="0 0 24 24"><path d="M20 4a16 16 0 00-4-1l-.2.4a14 14 0 00-7.6 0L8 3A16 16 0 004 4C1 9 1 14 2 19a16 16 0 004.8 2.4l1-1.6a10 10 0 01-1.6-.8c.1 0 .2-.1.3-.2a12 12 0 0011 0c.1.1.2.1.3.2-.5.3-1 .6-1.6.8l1 1.6A16 16 0 0022 19c1-5 1-10-2-15zM9.5 15.5c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8zm5 0c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8z"/></svg></a>
+          <a href="#" target="_blank" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M2 6l10 7 10-7v12H2V6zm10 5L2 6h20l-10 5z"/></svg></a>
+        </div>
+        <div class="footer-text">© 2025 Parchrome. All Rights Reserved.</div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY LIGHTBOX (banners) -->
+<div id="gal-lightbox" onclick="closeLightbox()">
+  <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
+  <div id="gal-lb-inner" onclick="event.stopPropagation()">
+    <img id="gal-lb-img" src="" alt="">
+    <div id="gal-lb-copybox">
+      <div id="gal-lb-name"></div>
+      <div id="gal-lb-code"></div>
+      <button id="gal-lb-copy-btn" onclick="galCopyCmd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+        Copy Command
+      </button>
+      <div id="gal-lb-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+<button id="pal-lb-prev" onclick="palLightboxNav(-1)">&#8249;</button>
+<button id="pal-lb-next" onclick="palLightboxNav(1)">&#8250;</button>
+<div id="pal-lightbox" onclick="closePalette()">
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" src="" alt="">
+  </div>
+</div>
+
+<style>
+#gal-lb-fixed-close, #pal-lb-fixed-close {
+  position: fixed; top: 16px; right: 16px; z-index: 99999;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #222; border: 1px solid #444; color: #aaa; font-size: 16px;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+#gal-lb-fixed-close:hover, #pal-lb-fixed-close:hover { color: #fff; background: #333; }
+.pal-card {
+  flex: 0 0 calc((100% - 2 * 14px) / 2.2);
+  border-radius: 10px; overflow: hidden; cursor: pointer;
+  border: 1px solid #1e1e1e; transition: transform 0.2s ease, border-color 0.2s ease;
+  background: #111; display: flex; flex-direction: column;
+}
+.pal-card:hover { transform: translateY(-3px); border-color: #333; }
+.pal-card img { width: 100%; height: 250px; object-fit: cover; display: block; background: #1a1a1a; image-rendering: pixelated; }
+.pal-card-label { padding: 8px 12px; font-size: 11px; font-weight: 700; color: #a9a9a9; letter-spacing: 1px; text-transform: uppercase; font-family: 'Oxanium', sans-serif; }
+.pal-card:hover .pal-card-label { color: #888; }
+@media (max-width: 970px) { .pal-card { flex: 0 0 calc(80% - 14px); } .pal-card img { height: 140px; } }
+#pal-lightbox {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; cursor: pointer;
+}
+#pal-lightbox.open { display: flex; }
+#pal-lb-close {
+  display: none; position: fixed; top: 16px; right: 16px; z-index: 99999;
+  width: 36px; height: 36px; border-radius: 50%; background: #222; border: 1px solid #444;
+  color: #aaa; font-size: 16px; cursor: pointer; align-items: center; justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+#pal-lb-close:hover { color: #fff; background: #333; }
+#pal-lb-inner { position: relative; display: flex; align-items: center; justify-content: center; padding: 20px; cursor: default; }
+#pal-lb-img {
+  max-width: calc(100vw - 40px); max-height: calc(100vh - 80px);
+  width: auto; height: auto; object-fit: contain; border-radius: 8px; display: block;
+  touch-action: none; user-select: none; transform-origin: center center;
+  animation: lbZoomIn 0.2s ease; -ms-touch-action: none; will-change: transform;
+}
+#pal-lb-prev, #pal-lb-next {
+  display: none; position: fixed; top: 50%; transform: translateY(-50%); z-index: 99999;
+  width: 40px; height: 40px; border-radius: 8px; background: #3d3d3d; border: 1px solid #444;
+  color: #ededed; font-size: 24px; cursor: pointer; align-items: center; justify-content: center;
+  transition: color 0.15s, background 0.15s; user-select: none;
+}
+#pal-lb-prev { left: 12px; }
+#pal-lb-next { right: 12px; }
+#pal-lb-prev:hover, #pal-lb-next:hover { background: #4b4a4a; border: 1px solid #444; color: #ededed; }
+@media (max-width: 970px) {
+  #pal-lb-prev { left: 6px; width: 34px; height: 34px; font-size: 20px; }
+  #pal-lb-next { right: 6px; width: 34px; height: 34px; font-size: 20px; }
+}
+.gal-card {
+  flex: 0 0 calc((90% - 5 * 24px) / 5.3);
+  border-radius: 10px; overflow: hidden; cursor: pointer;
+  border: 1px solid #1e1e1e; transition: transform 0.2s ease, border-color 0.2s ease;
+  background: #111; display: block;
+}
+@media (max-width: 1400px) { .gal-card { flex: 0 0 calc((100% - 4 * 14px) / 4.2); } }
+@media (max-width: 1100px) { .gal-card { flex: 0 0 calc((100% - 3 * 14px) / 3.2); } }
+@media (max-width: 970px)  { .gal-card { flex: 0 0 calc((100% - 5 * 14px) / 4.2); } }
+@media (max-width: 768px)  { .gal-card { flex: 0 0 calc((100% - 4 * 14px) / 4.5); } }
+@media (max-width: 480px)  { .gal-card { flex: 0 0 calc((100% - 14px) / 2.7); } }
+.gal-card:hover { transform: translateY(-3px); border-color: #333; }
+.gal-card img { width: 100%; aspect-ratio: 8 / 16; object-fit: cover; display: block; background: #1a1a1a; }
+#gal-lightbox {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(6px); z-index: 9099; overflow-y: auto; cursor: zoom-out;
+}
+#gal-lightbox.open { display: block; }
+#gal-lb-inner {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+  width: 480px; max-width: 90vw; margin: 15vh auto 60px auto; cursor: default;
+}
+#gal-lb-img { width: 100%; object-fit: contain; border-radius: 8px; display: block; touch-action: none; user-select: none; transform-origin: center center; animation: lbZoomIn 0.2s ease; }
+@keyframes lbZoomIn { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+#gal-lb-copybox {
+  width: 100%; box-sizing: border-box; background: #0d0d0d; border: 1px solid #222;
+  border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;
+}
+#gal-lb-name { font-size: 13px; font-weight: 700; color: #fff; font-family: 'Oxanium', sans-serif; }
+#gal-lb-code {
+  font-family: monospace; font-size: 12px; color: #7ec87e; word-break: break-all;
+  line-height: 1.6; background: #111; border: 1px solid #1e1e1e; border-radius: 6px; padding: 8px 10px;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+}
+#gal-lb-copy-btn {
+  width: 100%; padding: 9px 0; border-radius: 7px; border: 1px solid #2a2a2a; background: #1e1e1e;
+  color: #aaa; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: 'Oxanium', sans-serif; transition: background 0.15s, color 0.15s;
+}
+#gal-lb-copy-btn:hover { background: #2a2a2a; color: #fff; }
+#gal-lb-feedback { text-align: center; font-size: 11px; color: #4caf50; height: 14px; font-family: 'Oxanium', sans-serif; }
+.cf-section:first-child { padding: 40px 0 15px 0; }
+.cf-section { padding: 15px 0 8px 0; }
+@media (max-width: 970px) { .cf-section:first-child { padding: 0px 0 15px 0; } .mc-content-wrapper { flex-direction: column; } }
+.cf-section-header { display: flex; align-items: center; gap: 12px; padding: 64px 0 10px 0; position: relative; border-bottom: 1px solid #2a2a2a; margin: 0 0 10px 0; padding-left: 0; padding-right: 0; }
+.cf-section-header::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100px; height: 2px; background: #036e01; }
+@media (max-width: 970px) { .cf-section-header { margin: 26px 0 15px 0; padding: 5px 0 10px 0; } .cf-section-header::after { width: 10cqmax; } }
+.cf-section-title { font-size: clamp(14px, 2vw, 20px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #c0c9d4, #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cf-view-all { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; color: #bbb; background-color: #1a1a1a; padding: 7px 10px; border-radius: 6px; border: 1px solid #2a2a2a; margin-right: 5px; display: inline-flex; align-items: center; transition: all 0.2s ease; }
+.cf-view-all:hover { color: #aaa; }
+.cf-section-header-right { display: none; }
+.cf-arrow { width: 30px; height: 30px; border-radius: 6px; color: #888; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, color 0.2s; user-select: none; flex-shrink: 0; background-color: #1a1a1a; border: 1px solid #2a2a2a; }
+.cf-arrow:hover { background: #2a2a2a; color: #fff; }
+.cf-arrow:disabled { opacity: 0.6; cursor: default; pointer-events: none; }
+.cf-scroll-wrapper { padding: 0 0; }
+.cf-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; overflow: hidden; }
+.cf-row::-webkit-scrollbar { display: none; }
+.cf-card {
+  flex: unset; background: #1c1c1e; border: 1px solid #2e2e2e;
+  border-radius: 12px; overflow: hidden; text-decoration: none;
+  color: var(--fb-text-primary); transition: transform 0.2s ease, border-color 0.2s ease;
+  display: flex; flex-direction: column; position: relative;
+}
+.cf-card:hover { transform: translateY(-3px); border-color: #333; }
+.cf-card-img-placeholder {
+  width: 100%;
+  height: 160px;
+  background: #141416;
+  display: block;
+  flex-shrink: 0;
+}.cf-card > img:first-child {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  object-fit: fill;  /* ← change from cover to fill */
+  display: block;
+
+  flex-shrink: 0;
+}
+.cf-card-body { padding: 14px 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.cf-card-toprow { display: flex; align-items: flex-start; gap: 12px; }
+.cf-card-author-icon {
+  width: 42px; height: 42px; border-radius: 9px; object-fit: cover; flex-shrink: 0;
+  background: #262626; border: 1px solid #2e2e2e;
+}
+.cf-card-textblock { min-width: 0; flex: 1; }
+.cf-card-namerow { font-size: 16px; line-height: 1.3; }
+.cf-card-name { font-weight: 700; color: #fff; }
+.cf-card-by { font-weight: 500; color: #777; font-size: 13px; margin-left: 4px; }
+.cf-card-desc { font-size: 13px; color: #8a8a8a; line-height: 1.45; margin-top: 4px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.cf-card-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.cf-card-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  padding: 4px 10px; border-radius: 999px;
+  background: #232325; color: #9a9a9a; border: 1px solid #2e2e2e;
+  white-space: nowrap;
+}
+.cf-card-pill.is-source { color: #c9c9c9; }
+.cf-card-pill.is-source img { width: 12px; height: 12px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+@media (max-width: 970px) {
+  .cf-row { grid-template-columns: 1fr; gap: 12px; }
+  .cf-card { flex-direction: column; height: auto; }
+  .cf-card-img-placeholder { height: 160px; }
+  .cf-card-body { padding: 12px 14px 14px 14px; gap: 8px; }
+  .cf-card-author-icon { width: 36px; height: 36px; border-radius: 8px; }
+  .cf-card-namerow { font-size: 14px; }
+  .cf-card-by { font-size: 12px; }
+  .cf-card-desc { font-size: 12px; }
+  .cf-scroll-wrapper { padding: 0 0; }
+  .cf-section-header-right { display: none; }
+  .cf-section { padding: 0px 0 8px 0; }
+  .cf-card > img:first-child {
+  height: 150px;}
+
+}
+.layouts-title-box { border-radius: 0; padding: 12px 20px; text-align: center; background: transparent; border-bottom: 1px solid #2a2a2a; position: relative; margin-bottom: 20px; margin-left: 5%; margin-right: 5%; margin-top: 20px; }
+.layouts-title-box::after { content: ''; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 100px; height: 2px; background: #036e01; }
+.layouts-title { font-size: clamp(13px, 2vw, 16px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #c0c9d4, #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mc-right-sidebar { width: 300px; flex-shrink: 0; background: #111113; padding-top: 20px; border-left: 1px solid #1a1a1a; position: relative; padding-bottom: 50px; padding-top: 30px; }
+.mc-right-sidebar-inner { position: sticky; top: 50px; display: flex; flex-direction: column; gap: 4px; padding: 20px 14px 10px 14px; }
+.mc-sidebar-group-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #444; padding: 0 2px; margin-top: 8px; margin-bottom: 4px; margin-left: 10px; }
+.mc-sidebar-divider { height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent); margin: 10px 6px; }
+.mc-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 17px; border-radius: 8px; text-decoration: none; color: #777; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; background: transparent; border: 1px solid transparent; transition: all 0.2s ease; white-space: nowrap; }
+.mc-nav-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); color: #bbb; transform: translateX(-2px); }
+.mc-nav-item.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: #fff; }
+.mc-nav-item img { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; opacity: 0.6; transition: opacity 0.2s; }
+.mc-nav-item:hover img, .mc-nav-item.active img { opacity: 1; }
+@media (max-width: 1270px) {
+  .mc-right-sidebar { display: none; }
+  .mc-mobile-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 35px 5% 40px; background: #0e0e0e; }
+  .mc-mobile-nav-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .mc-mobile-nav-line { flex: 1; height: 1px; background: #252525; }
+  .mc-mobile-nav-title { font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #3a3a3a; margin-bottom: 5px; }
+  .mc-mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 4px 7px; border-radius: 8px; text-decoration: none; background: #141414; border: 1px solid #1e1e1e; color: #484848; font-size: 8.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.15s; position: relative; overflow: hidden; }
+  .mc-mobile-nav-item img { width: 22px; height: 22px; object-fit: contain; opacity: 0.35; transition: opacity 0.15s; image-rendering: pixelated; }
+  .mc-mobile-nav-item.active { background: #383737; border-color: #7a7a7a; color: #fcfcfc; }
+  .mc-mobile-nav-item.active img { opacity: 1; }
+  .mc-mobile-nav-item:hover { background: #1a1a1a; border-color: #2a2a2a; color: #777; }
+  .mc-mobile-nav-item:hover img { opacity: 0.6; }
+}
+.mc-mobile-nav::after { content: ''; grid-column: 1 / -1; height: 1px; background: #252525; margin-top: 10px; }
+@media (min-width: 1271px) { .mc-mobile-nav { display: none; } .mc-dirt-fade { display: none; } }
+.top-vignette { position: sticky; top: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); z-index: 0; pointer-events: none; margin-bottom: -60px; }
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+</style>
+
+<script>
+// ── NORMALIZER ──
+function normalizePage(url) {
+  if (!url) return "";
+  return url.toString().split('/').pop().split('?')[0].split('#')[0].replace('.html', '') || "home";
+}
+const currentPage = normalizePage(window.location.pathname);
+
+// ── SIDEBAR ──
+const topBox = document.getElementById('top-box');
+const gamesContainer = document.getElementById('games-container');
+const tripleAList = document.getElementById('triple-a-list');
+let sidebarLoaded = false;
+let sidebarDataCache = null;
+
+function loadSidebarData() {
+  if (sidebarLoaded) return Promise.resolve(sidebarDataCache);
+  return fetch('./sidebar.json').then(res => res.json()).then(data => {
+    sidebarLoaded = true; sidebarDataCache = data; return data;
+  }).catch(err => console.error("Sidebar load error:", err));
+}
+
+function buildSidebarFromJSON(data) {
+  data.topBox.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.link; a.className = 'top-box-item';
+    const isActive = normalizePage(item.link) === currentPage || item.activeOn?.map(normalizePage).includes(currentPage);
+    if (isActive) a.classList.add('active');
+    a.innerHTML = `<img src="${item.icon}" class="topbox-icon" onerror="this.style.display='none'"><span>${item.name}</span>`;
+    topBox.appendChild(a);
+  });
+  data.games.forEach(game => {
+    const a = document.createElement('a');
+    a.href = game.link; a.className = 'game';
+    if (game.link === currentPage || (game.activeOn?.map(normalizePage).includes(currentPage))) a.classList.add('active');
+    a.innerHTML = `<img src="${game.icon}" class="sidebar-icon" alt=""><span>${game.name}</span>`;
+    gamesContainer.appendChild(a);
+  });
+  data.tripleA.forEach(game => {
+    const a = document.createElement('a');
+    a.href = game.link || "#"; a.className = 'triple-a-game';
+    a.innerHTML = `<img src="${game.icon}" class="sidebar-icon" alt=""><span>${game.name}</span>`;
+    tripleAList.appendChild(a);
+  });
+}
+
+function toggleTripleA() {
+  const header = document.querySelector('.triple-a-header');
+  const list = document.getElementById('triple-a-list');
+  const isOpen = header.classList.contains('open');
+  if (isOpen) { header.classList.remove('open'); header.classList.add('closed'); list.style.display = 'none'; }
+  else { header.classList.remove('closed'); header.classList.add('open'); list.style.display = 'flex'; }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const burger = document.getElementById('hamburger');
+  sidebar.classList.toggle('active');
+  burger.classList.toggle('active');
+  if (sidebar.classList.contains('active') && !sidebarLoaded) {
+    showSkeletons(topBox, 3);
+    showSkeletons(gamesContainer, 5);
+    showSkeletons(tripleAList, 4);
+    loadSidebarData().then(data => {
+      topBox.innerHTML = '';
+      gamesContainer.innerHTML = '';
+      tripleAList.innerHTML = '';
+      buildSidebarFromJSON(data);
+    });
+  }
+}
+
+function handleDesktopSidebar() {
+  const isDesktop = window.matchMedia("(min-width: 971px)").matches;
+  const sidebar = document.getElementById('sidebar');
+  if (isDesktop && !sidebar.classList.contains('active')) document.getElementById('hamburger').click();
+}
+document.addEventListener('DOMContentLoaded', handleDesktopSidebar);
+window.addEventListener('resize', handleDesktopSidebar);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const header = document.querySelector('.triple-a-header');
+  const list = document.getElementById('triple-a-list');
+  header.classList.add('open');
+  list.style.display = 'flex';
+});
+
+// ── SECONDARY TOP BAR ──
+document.querySelector('.secondary-top-bar').addEventListener('click', () => {
+  document.querySelector('.coc-main').scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── HELP POPUP ──
+function toggleHelp(event) {
+  event.stopPropagation();
+  const popup = document.getElementById('help-popup');
+  popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+}
+document.addEventListener('click', () => { document.getElementById('help-popup').style.display = 'none'; });
+
+// ── PAGE LOAD ──
+window.addEventListener("load", () => { document.documentElement.classList.add("loaded"); });
+
+// ── SEARCH ──
+let SearchItemList = [], searchoverlay, closeBtn, searchinput, searchIcon, resultsContainer, isLoaded = false;
+fetch('searchitemstorage.json').then(res => res.json()).then(data => { SearchItemList = data; isLoaded = true; });
+
+document.addEventListener('DOMContentLoaded', function () {
+  searchoverlay = document.getElementById('search-overlay');
+  closeBtn = document.getElementById('search-close-btn');
+  resultsContainer = document.getElementById('search-results');
+  searchinput = document.getElementById('search-input');
+  searchIcon = document.getElementById('search-icon');
+
+  function openSearch() { searchoverlay.style.display = 'block'; searchinput.focus(); if (!searchinput.value) searchItems(); }
+  function closeSearch() { searchinput.value = ''; resultsContainer.innerHTML = ''; searchoverlay.style.display = 'none'; }
+  searchIcon.addEventListener('click', openSearch);
+  closeBtn.addEventListener('click', closeSearch);
+  searchoverlay.addEventListener('click', e => { if (e.target === searchoverlay) closeSearch(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+});
+
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function searchItems() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const resultsContainer = document.getElementById('search-results');
+  resultsContainer.innerHTML = '';
+  let filtered;
+  if (!query) { filtered = shuffleArray(SearchItemList).slice(0, 7); }
+  else {
+    filtered = SearchItemList.filter(item => {
+      if (item.name.toLowerCase().includes(query)) return true;
+      if (item.keywords && item.keywords.some(k => k.toLowerCase().includes(query))) return true;
+      return false;
+    });
+    if (filtered.length === 0) { resultsContainer.innerHTML = `<div style="padding:10px;">No results found</div>`; return; }
+  }
+  const limitedResults = query ? filtered.slice(0, 7) : filtered;
+  limitedResults.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.link; a.className = 'search-result-item';
+    a.innerHTML = item.icon ? `<img src="${item.icon}" class="result-icon" alt=""> ${item.name}` : item.name;
+    resultsContainer.appendChild(a);
+  });
+  if (query && filtered.length > 10) {
+    const viewMore = document.createElement('div');
+    viewMore.textContent = "View More..."; viewMore.className = "view-more";
+    viewMore.addEventListener('click', () => {
+      resultsContainer.innerHTML = '';
+      filtered.forEach(item => {
+        const a = document.createElement('a');
+        a.href = item.link; a.className = 'search-result-item';
+        a.innerHTML = item.icon ? `<img src="${item.icon}" class="result-icon" alt=""> ${item.name}` : item.name;
+        resultsContainer.appendChild(a);
+      });
+    });
+    resultsContainer.appendChild(viewMore);
+  }
+}
+
+// ── SCROLL ROWS ──
+function scrollRow(id, dir) {
+  const row = document.getElementById(id);
+  row.scrollBy({ left: dir * 300, behavior: 'smooth' });
+}
+document.querySelectorAll('.cf-row').forEach(row => {
+  row.addEventListener('scroll', () => updateArrows(row.id));
+  updateArrows(row.id);
+});
+function updateArrows(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const section = row.closest('.cf-section');
+  if (!section) return;
+  const leftBtn = section.querySelector('.cf-arrow:first-of-type');
+  const rightBtn = section.querySelector('.cf-arrow:last-of-type');
+  const atStart = row.scrollLeft <= 4;
+  const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
+  if (leftBtn) leftBtn.disabled = atStart;
+  if (rightBtn) rightBtn.disabled = atEnd;
+}
+
+// ── COMMAND MODAL ──
+let currentCmd = '', cmdFeedbackTimeout;
+function openCmd(el) {
+  document.getElementById('cmdModalTitle').textContent = el.dataset.name;
+  document.getElementById('cmdModalSub').textContent = el.dataset.sub;
+  document.getElementById('cmdModalCode').textContent = el.dataset.cmd;
+  currentCmd = el.dataset.cmd;
+  document.getElementById('cmdFeedback').textContent = '';
+  document.getElementById('cmdModal').classList.add('open');
+  pushModalState();
+}
+function closeCmd() { document.getElementById('cmdModal').classList.remove('open'); }
+function closeCmdOutside(e) { if (e.target === document.getElementById('cmdModal')) closeCmd(); }
+function copyCmd() {
+  const fallback = () => {
+    const el = document.createElement('textarea');
+    el.value = currentCmd; el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el); el.focus(); el.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(el); showCmdFeedback();
+  };
+  if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(currentCmd).then(showCmdFeedback).catch(fallback); }
+  else { fallback(); }
+}
+function showCmdFeedback() {
+  const fb = document.getElementById('cmdFeedback');
+  fb.textContent = '✓ Copied to clipboard!';
+  clearTimeout(cmdFeedbackTimeout);
+  cmdFeedbackTimeout = setTimeout(() => fb.textContent = '', 2500);
+}
+
+// ── GALLERY LIGHTBOX (banners) ──
+let lbScale = 1, lbX = 0, lbY = 0;
+let pinchStartDist = 0, pinchStartScale = 1;
+let isDragging = false, dragStartX = 0, dragStartY = 0, dragOriginX = 0, dragOriginY = 0;
+let galCurrentCmd = '', galFeedbackTimeout;
+
+function openLightbox(el) {
+  const src = el.dataset.full || el.querySelector('img').src;
+  const img = document.getElementById('gal-lb-img');
+  img.src = src;
+  lbScale = 1; lbX = 0; lbY = 0;
+  applyGalTransform();
+  document.getElementById('gal-lightbox').classList.add('open');
+  pushModalState();
+  document.getElementById('gal-lb-fixed-close').style.display = 'flex';
+  galCurrentCmd = el.dataset.cmd || '';
+  document.getElementById('gal-lb-name').textContent = el.dataset.name || '';
+  document.getElementById('gal-lb-code').textContent = el.dataset.cmd || '';
+  document.getElementById('gal-lb-feedback').textContent = '';
+  document.getElementById('gal-lb-copybox').style.display = galCurrentCmd ? 'flex' : 'none';
+  document.addEventListener('keydown', lbEscHandler);
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('gal-lightbox');
+  if (!lb.classList.contains('open')) return;
+  lb.classList.remove('open');
+  document.getElementById('gal-lb-fixed-close').style.display = 'none';
+  document.removeEventListener('keydown', lbEscHandler);
+  if (history.state?.modal) history.back();
+}
+
+function lbEscHandler(e) { if (e.key === 'Escape') closeLightbox(); }
+
+// ── BACK BUTTON CLOSES MODALS ──
+function pushModalState() { history.pushState({ modal: true }, ''); }
+
+function popModalHandler() {
+  const galLb = document.getElementById('gal-lightbox');
+  const palLb = document.getElementById('pal-lightbox');
+  const cmd   = document.getElementById('cmdModal');
+  if (galLb.classList.contains('open')) {
+    galLb.classList.remove('open');
+    document.getElementById('gal-lb-fixed-close').style.display = 'none';
+    document.removeEventListener('keydown', lbEscHandler);
+  } else if (palLb.classList.contains('open')) {
+    palLb.classList.remove('open');
+    document.getElementById('pal-lb-fixed-close').style.display = 'none';
+    document.getElementById('pal-lb-prev').style.display = 'none';
+    document.getElementById('pal-lb-next').style.display = 'none';
+    palScale = 1; palPanX = 0; palPanY = 0; palIsPanning = false;
+    window.onmousemove = null; window.onmouseup = null;
+    document.removeEventListener('keydown', palEscHandler);
+  } else if (cmd && cmd.classList.contains('open')) {
+    cmd.classList.remove('open');
+  }
+}
+
+window.addEventListener('popstate', popModalHandler);
+
+function applyGalTransform() {
+  document.getElementById('gal-lb-img').style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbScale})`;
+}
+
+function galCopyCmd() {
+  const fallback = () => {
+    const el = document.createElement('textarea');
+    el.value = galCurrentCmd; el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el); el.focus(); el.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(el); showGalFeedback();
+  };
+  if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(galCurrentCmd).then(showGalFeedback).catch(fallback); }
+  else { fallback(); }
+}
+
+function showGalFeedback() {
+  const fb = document.getElementById('gal-lb-feedback');
+  fb.textContent = '✓ Copied!';
+  clearTimeout(galFeedbackTimeout);
+  galFeedbackTimeout = setTimeout(() => fb.textContent = '', 2500);
+}
+
+const lbImg = document.getElementById('gal-lb-img');
+lbImg.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    pinchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    pinchStartScale = lbScale;
+  } else if (e.touches.length === 1 && lbScale > 1) {
+    isDragging = true;
+    dragStartX = e.touches[0].clientX; dragStartY = e.touches[0].clientY;
+    dragOriginX = lbX; dragOriginY = lbY;
+  }
+}, { passive: false });
+lbImg.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    lbScale = Math.min(Math.max(pinchStartScale * (dist / pinchStartDist), 1), 5);
+    applyGalTransform();
+  } else if (e.touches.length === 1 && isDragging) {
+    e.preventDefault();
+    lbX = dragOriginX + (e.touches[0].clientX - dragStartX);
+    lbY = dragOriginY + (e.touches[0].clientY - dragStartY);
+    applyGalTransform();
+  }
+}, { passive: false });
+lbImg.addEventListener('touchend', e => {
+  if (e.touches.length < 2) isDragging = false;
+  if (lbScale <= 1) { lbScale = 1; lbX = 0; lbY = 0; applyGalTransform(); }
+});
+let lastTap = 0;
+lbImg.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTap < 280) { lbScale = 1; lbX = 0; lbY = 0; applyGalTransform(); }
+  lastTap = now;
+});
+lbImg.addEventListener('click', e => e.stopPropagation());
+
+// ── PALETTE LIGHTBOX ──
+let palScale = 1, palStartDist = 0, palLastScale = 1;
+let palIsPanning = false, palPanStartX = 0, palPanStartY = 0, palPanX = 0, palPanY = 0;
+let palCurrentSlides = [], palCurrentIndex = 0;
+
+function getPalClampLimits() {
+  const img = document.getElementById('pal-lb-img');
+  const scaledW = img.offsetWidth * palScale;
+  const scaledH = img.offsetHeight * palScale;
+  return {
+    maxX: Math.max(0, (scaledW - window.innerWidth) / 2),
+    maxY: Math.max(0, (scaledH - window.innerHeight) / 2)
+  };
+}
+
+function clampPalPan() {
+  if (palScale <= 1) { palPanX = 0; palPanY = 0; return; }
+  const { maxX, maxY } = getPalClampLimits();
+  palPanX = Math.min(maxX, Math.max(-maxX, palPanX));
+  palPanY = Math.min(maxY, Math.max(-maxY, palPanY));
+}
+
+function applyPalTransform() {
+  document.getElementById('pal-lb-img').style.transform = `translate(${palPanX}px, ${palPanY}px) scale(${palScale})`;
+}
+
+function palEscHandler(e) { if (e.key === 'Escape') closePalette(); }
+
+function closePalette() {
+  document.body.style.touchAction = '';
+  const lb = document.getElementById('pal-lightbox');
+  if (!lb.classList.contains('open')) return;
+  lb.classList.remove('open');
+  document.getElementById('pal-lb-fixed-close').style.display = 'none';
+  document.getElementById('pal-lb-prev').style.display = 'none';
+  document.getElementById('pal-lb-next').style.display = 'none';
+  palScale = 1; palPanX = 0; palPanY = 0; palIsPanning = false;
+  window.onmousemove = null; window.onmouseup = null;
+  document.removeEventListener('keydown', palEscHandler);
+}
+
+function palLightboxNav(dir) {
+  if (palCurrentSlides.length <= 1) return;
+  var img = document.getElementById('pal-lb-img');
+  palScale = 1; palPanX = 0; palPanY = 0;
+  applyPalTransform();
+  img.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+  img.style.transform = dir > 0 ? 'translateX(-60px) scale(1)' : 'translateX(60px) scale(1)';
+  img.style.opacity = '0';
+  setTimeout(function() {
+    palCurrentIndex = (palCurrentIndex + dir + palCurrentSlides.length) % palCurrentSlides.length;
+    img.src = palCurrentSlides[palCurrentIndex];
+    img.style.transition = 'none';
+    img.style.transform = dir > 0 ? 'translateX(60px) scale(1)' : 'translateX(-60px) scale(1)';
+    img.style.opacity = '0';
+    img.offsetHeight;
+    img.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+    img.style.transform = 'translateX(0px) scale(1)';
+    img.style.opacity = '1';
+    updatePalNav();
+  }, 50);
+}
+
+function updatePalNav() {
+  var prevBtn = document.getElementById('pal-lb-prev');
+  var nextBtn = document.getElementById('pal-lb-next');
+  if (palCurrentSlides.length <= 1) {
+    prevBtn.style.display = 'none'; nextBtn.style.display = 'none'; return;
+  }
+  prevBtn.style.display = 'flex'; nextBtn.style.display = 'flex';
+  prevBtn.style.opacity = '1'; nextBtn.style.opacity = '1';
+}
+
+function openPalette(el) {
+  document.body.style.touchAction = 'none';
+  var sliderWrap = el.closest('.hcpc-slider');
+  var allSlides = sliderWrap ? Array.from(sliderWrap.querySelectorAll('.hcpc-slide')) : [el];
+  palCurrentSlides = allSlides.map(function(slide) {
+    var img = slide.querySelector('img');
+    return slide.dataset.full || (img ? img.src : '');
+  }).filter(Boolean);
+  var clickedIndex = allSlides.indexOf(el);
+  palCurrentIndex = clickedIndex >= 0 ? clickedIndex : 0;
+  var lb  = document.getElementById('pal-lightbox');
+  var img = document.getElementById('pal-lb-img');
+  palScale = 1; palPanX = 0; palPanY = 0; palIsPanning = false;
+  img.src = palCurrentSlides[palCurrentIndex];
+  img.style.transform = 'translate(0px, 0px) scale(1)';
+  img.style.cursor = 'default';
+  lb.classList.add('open');
+  pushModalState();
+  document.getElementById('pal-lb-fixed-close').style.display = 'flex';
+  updatePalNav();
+  lb.onwheel = function(e) {
+    e.preventDefault();
+    var rect = img.getBoundingClientRect();
+    var cx = e.clientX - (rect.left + rect.width / 2);
+    var cy = e.clientY - (rect.top + rect.height / 2);
+    var prevScale = palScale;
+    palScale = Math.min(Math.max(1, palScale * (1 - e.deltaY * 0.002)), 6);
+    var ratio = palScale / prevScale;
+    palPanX = palPanX * ratio + cx * (ratio - 1);
+    palPanY = palPanY * ratio + cy * (ratio - 1);
+    clampPalPan(); applyPalTransform();
+    img.style.cursor = palScale > 1 ? 'grab' : 'default';
+  };
+  img.onmousedown = function(e) {
+    if (palScale <= 1) return;
+    e.preventDefault(); palIsPanning = true;
+    palPanStartX = e.clientX - palPanX; palPanStartY = e.clientY - palPanY;
+    img.style.cursor = 'grabbing';
+  };
+  window.onmousemove = function(e) {
+    if (!palIsPanning) return;
+    palPanX = e.clientX - palPanStartX; palPanY = e.clientY - palPanStartY;
+    clampPalPan(); applyPalTransform();
+  };
+  window.onmouseup = function() {
+    if (!palIsPanning) return;
+    palIsPanning = false;
+    img.style.cursor = palScale > 1 ? 'grab' : 'default';
+  };
+  img.ontouchstart = function(e) {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      palStartDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+      palLastScale = palScale;
+    } else if (e.touches.length === 1 && palScale > 1) {
+      palIsPanning = true;
+      palPanStartX = e.touches[0].clientX - palPanX;
+      palPanStartY = e.touches[0].clientY - palPanY;
+    }
+  };
+  img.ontouchmove = function(e) {
+    e.preventDefault();
+    if (e.touches.length === 2) {
+      var newDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+      var prevScale = palScale;
+      palScale = Math.min(Math.max(1, palLastScale * (newDist / palStartDist)), 6);
+      var ratio = palScale / prevScale;
+      var rect = img.getBoundingClientRect();
+      var cx = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - (rect.left + rect.width / 2);
+      var cy = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - (rect.top + rect.height / 2);
+      palPanX = palPanX * ratio + cx * (ratio - 1);
+      palPanY = palPanY * ratio + cy * (ratio - 1);
+      clampPalPan(); applyPalTransform();
+    } else if (e.touches.length === 1 && palIsPanning) {
+      palPanX = e.touches[0].clientX - palPanStartX;
+      palPanY = e.touches[0].clientY - palPanStartY;
+      clampPalPan(); applyPalTransform();
+    }
+  };
+  img.ontouchend = function(e) {
+    if (e.touches.length < 2) palIsPanning = false;
+    if (palScale <= 1) { palScale = 1; palPanX = 0; palPanY = 0; }
+    else clampPalPan();
+    applyPalTransform();
+  };
+  img.onclick = function(e) { e.stopPropagation(); };
+  lb.onclick = function(e) { if (e.target === lb) closePalette(); };
+  document.addEventListener('keydown', palEscHandler);
+}
+
+// ── SKELETONS ──
+function showSkeletons(container, count) {
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'skeleton-item';
+    div.innerHTML = `<div class="skeleton-icon"></div><div class="skeleton-text"></div>`;
+    container.appendChild(div);
+  }
+}
+
+// ── PAGE LOADER ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.documentElement.classList.add("loaded");
+  const loader = document.getElementById('page-loader');
+  loader.classList.add('hidden');
+  setTimeout(() => loader.remove(), 400);
+});
+
+// ── PACK SEARCH + FILTER PILLS (combined) ──
+(function() {
+  var pills = document.querySelectorAll('#rpPillRow .rp-pill');
+  var cards = document.querySelectorAll('.cf-card[data-tags]');
+  var groupLabels = document.querySelectorAll('.cf-source-group-label');
+  var searchInput = document.getElementById('rpPackSearch');
+  var clearBtn = document.getElementById('rpPackSearchClear');
+  var noResults = document.getElementById('rpNoResults');
+  var activeFilter = 'all';
+
+  function updateGroupLabelVisibility() {
+    // Hide a source group's header if every card in that group is currently hidden
+    groupLabels.forEach(function(label) {
+      var node = label.nextElementSibling;
+      var hasVisibleCard = false;
+      while (node && !node.classList.contains('cf-source-group-label')) {
+        if (node.classList && node.classList.contains('cf-card') && node.style.display !== 'none') {
+          hasVisibleCard = true;
+          break;
+        }
+        node = node.nextElementSibling;
+      }
+      label.style.display = hasVisibleCard ? '' : 'none';
+    });
+  }
+
+  function applyFilters() {
+    var query = (searchInput.value || '').trim().toLowerCase();
+    clearBtn.style.display = query ? 'flex' : 'none';
+
+    var visibleCount = 0;
+    cards.forEach(function(card) {
+      var tags = card.getAttribute('data-tags').split(' ');
+      var matchesFilter = activeFilter === 'all' || tags.indexOf(activeFilter) !== -1;
+
+      var nameEl = card.querySelector('.cf-card-name');
+      var byEl = card.querySelector('.cf-card-by');
+      var descEl = card.querySelector('.cf-card-desc');
+      var haystack = (
+        (nameEl ? nameEl.textContent : '') + ' ' +
+        (byEl ? byEl.textContent : '') + ' ' +
+        (descEl ? descEl.textContent : '')
+      ).toLowerCase();
+      var matchesSearch = !query || haystack.indexOf(query) !== -1;
+
+      var show = matchesFilter && matchesSearch;
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+
+    // Source group headers only make sense on the ALL tab with no active search
+    var showGroupLabels = (activeFilter === 'all' && !query);
+    groupLabels.forEach(function(label) {
+      label.style.display = showGroupLabels ? '' : 'none';
+    });
+    if (showGroupLabels) updateGroupLabelVisibility();
+
+    noResults.style.display = visibleCount === 0 ? '' : 'none';
+  }
+
+  pills.forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      pills.forEach(function(p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+      activeFilter = pill.getAttribute('data-filter');
+      applyFilters();
+    });
+  });
+
+  window.filterPacks = applyFilters;
+  window.clearPackSearch = function() {
+    searchInput.value = '';
+    applyFilters();
+    searchInput.focus();
+  };
+
+  applyFilters();
+})();
+</script>
+</body>
+</html>
