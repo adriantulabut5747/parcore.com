@@ -19,7 +19,7 @@ jobs:
           python-version: '3.11'
       - name: Get runner IP
         run: curl https://api.ipify.org
-        
+
       - name: Run war updater
         env:
           COC_API_KEY: ${{ secrets.COC_API_KEY }}
@@ -32,3 +32,5 @@ jobs:
           git add war.json
           git diff --cached --quiet || git commit -m "Auto-update war.json"
           git push
+      - name: Trigger Netlify deploy
+        run: curl -X POST -d {} ${{ secrets.NETLIFY_HOOK }}
