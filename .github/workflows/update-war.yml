@@ -1,0 +1,32 @@
+name: Update War Data
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-war:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run war updater
+        env:
+          COC_API_KEY: ${{ secrets.COC_API_KEY }}
+        run: python war_updater.py
+
+      - name: Commit and push updated war.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add war.json
+          git diff --cached --quiet || git commit -m "Auto-update war.json"
+          git push
