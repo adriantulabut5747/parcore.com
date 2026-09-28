@@ -1,0 +1,55 @@
+# Refreshes clan-stats.json (the numbers on th18-layouts.html's clan card)
+# every 30 minutes. GitHub Pages can't run code per visitor, so the stats are
+# fetched on a schedule and committed as a plain file instead. A commit is
+# only made when a number changed (see scripts/clan-stats.mjs).
+#
+# Needs one repo secret: COC_API_KEY (Settings -> Secrets and variables ->
+# Actions). Run it by hand any time from the Actions tab ("Run workflow").
+# Note: GitHub may start scheduled runs late, or skip them when busy.
+name: Update clan stats
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clan-stats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      # Only the script and the stats file -- not the whole 600 MB site.
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+            clan-stats.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch clan stats
+        env:
+          COC_API_KEY: ${{ secrets.COC_API_KEY }}
+        run: node scripts/clan-stats.mjs
+
+      - name: Commit if changed
+        run: |
+          # git status (not git diff) also sees the file if it's brand new
+          if [ -z "$(git status --porcelain -- clan-stats.json)" ]; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add clan-stats.json
+          git commit -m "Update clan stats"
+          git push

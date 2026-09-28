@@ -1,0 +1,6 @@
+;/*FB_PKG_DELIM*/
+
+__d("CometComposerLinksInPostDialogQuery_facebookRelayOperation",[],(function(t,n,r,o,a,i){a.exports="28566085299655826"}),null);
+__d("CometComposerLinksInPostDialogQuery$Parameters",["CometComposerLinksInPostDialogQuery_facebookRelayOperation"],(function(t,n,r,o,a,i){"use strict";var e={kind:"PreloadableConcreteRequest",params:{id:n("CometComposerLinksInPostDialogQuery_facebookRelayOperation"),metadata:{},name:"CometComposerLinksInPostDialogQuery",operationKind:"query",text:null}};a.exports=e}),null);
+__d("CometComposerLinksInPostDialog.entrypoint",["CometComposerLinksInPostDialogQuery$Parameters","JSResourceForInteraction"],(function(t,n,r,o,a,i,l){"use strict";var e={getPreloadProps:function(t){var e=t.entrypoint,n=t.waterfall_event;return{queries:{root:{options:{fetchPolicy:"network-only"},parameters:r("CometComposerLinksInPostDialogQuery$Parameters"),variables:{entrypoint:e,waterfall_event:n}}}}},root:r("JSResourceForInteraction")("CometComposerLinksInPostDialog.react").__setRef("CometComposerLinksInPostDialog.entrypoint")};l.default=e}),98);
+__d("CometFullscreenComposer_shouldFetchCrosspostMetadata.relayprovider",["gkx"],(function(t,n,r,o,a,i,l){"use strict";var e={get:function(){return r("gkx")("8460")}};l.default=e}),98);

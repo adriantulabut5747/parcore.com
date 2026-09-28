@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="../">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>action-row lab</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="11layout.css">
+<link rel="stylesheet" href="1coclayouts.css">
+
+<style>
+  /* 11layout.css hides body until real page-loader JS adds html.loaded --
+     this lab has no loader, so force visibility on. */
+  html, body{ visibility:visible !important; }
+
+  /* ---- base card styling, copied from th18-layouts.html so variants render true to the live page ---- */
+  body{ background:#0e0e11; padding:40px 20px; }
+  .lab-title{ color:#e9e9ec; font-family:'Inter',sans-serif; font-size:22px; margin:0 0 4px; }
+  .lab-sub{ color:#9a9ea6; font-family:'Inter',sans-serif; font-size:13px; margin:0 0 36px; }
+  .lab-row{ display:flex; flex-wrap:wrap; gap:28px; margin-bottom:56px; }
+  .lab-label{ color:#e9e9ec; font-family:'Inter',sans-serif; font-size:14px; font-weight:600; margin:0 0 10px; }
+  .lab-note{ color:#7b7f88; font-family:'Inter',sans-serif; font-size:12px; margin:6px 0 0; max-width:340px; }
+  .lab-card-wrap{ width:340px; }
+
+  .discord-card{
+    padding:12px 12px 14px;
+    border:1px solid rgba(255,255,255,0.06);
+    max-width:340px;
+    margin:0;
+  }
+  .fullscreen-image{ overflow:visible; border-radius:0; }
+  .fullscreen-image::after{ display:none; }
+  .card-media{ position:relative; overflow:hidden; border-radius:10px; }
+  .card-media img.zoomable{ display:block; width:100%; height:auto; }
+  .image-badge, .image-logo{ top:10px; height:32px; border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08); }
+  .image-badge{ display:inline-flex; align-items:center; left:auto; right:10px; padding:0 11px; font-size:11px; letter-spacing:1px; background:linear-gradient(135deg, #5e1d1d 0%, #2a0d0d 100%); border:1px solid rgba(220,90,90,0.25); }
+  .image-logo{ width:32px; left:10px; right:auto; background:rgba(16,16,20,0.78); border:1px solid rgba(255,255,255,0.12); }
+  .image-logo img{ width:22px; height:22px; margin:0; border-radius:5px; }
+  .cc-popup{ display:none; }
+
+  /* ---- shared icon svg rules ---- */
+  .icon-box svg, .ghost-btn svg{ width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* =========================================================
+     VARIANT 0 -- current production version, for side-by-side reference
+     ========================================================= */
+  .v0 .action-row{ display:flex; align-items:stretch; justify-content:center; gap:8px; margin-top:12px; }
+  .v0 .download-btn{ flex:0 1 auto; margin-top:0; padding:11px 20px; }
+  .v0 .download-btn::before{ content:none; }
+  .v0 .icon-box{ flex:0 0 40px; width:40px; display:flex; align-items:center; justify-content:center; position:relative; padding:0; border:0; border-radius:9px; background:linear-gradient(to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%); color:#e9e9ec; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,0.4); }
+  .v0 .like-btn{ flex:0 0 auto; width:auto; min-width:40px; padding:0 12px; gap:6px; display:flex; align-items:center; }
+  .v0 .like-btn .like-heart{ width:17px; height:17px; flex-shrink:0; stroke:#9a9ea6; }
+  .v0 .like-count{ font-size:12.5px; font-weight:700; color:#e9e9ec; }
+
+  /* =========================================================
+     VARIANT 1 -- clear primary CTA. Copy Layout goes full-width and gets
+     an accent color, since it's the ONLY action that actually leaves the
+     page (Discord/game deep-link). Copy-link and like drop the matching
+     grey box and become quiet ghost icons docked above the image instead
+     of competing in the row -- copy-link moves next to the badge corner,
+     like becomes a small overlay chip bottom-right of the image.
+     ========================================================= */
+  .v1 .card-media{ margin-bottom:0; }
+  .v1 .corner-like{
+    position:absolute; right:10px; bottom:10px; display:flex; align-items:center; gap:5px;
+    padding:5px 10px; border-radius:20px; background:rgba(16,16,20,0.72);
+    border:1px solid rgba(255,255,255,0.12); color:#e9e9ec; cursor:pointer;
+    backdrop-filter:blur(4px);
+  }
+  .v1 .corner-like svg{ width:15px; height:15px; stroke:#c7c9cf; }
+  .v1 .corner-like .like-count{ font-size:11.5px; font-weight:700; }
+  .v1 .corner-copy{
+    position:absolute; left:10px; bottom:10px; display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:20px; background:rgba(16,16,20,0.72);
+    border:1px solid rgba(255,255,255,0.12); color:#e9e9ec; cursor:pointer; backdrop-filter:blur(4px);
+  }
+  .v1 .action-row{ margin-top:12px; }
+  .v1 .download-btn{
+    display:flex; width:100%; margin-top:0; padding:12px 20px; justify-content:center;
+    background:linear-gradient(135deg, #3a6ea5 0%, #244a76 100%);
+    box-shadow:0 4px 14px rgba(36,74,118,0.45);
+  }
+  .v1 .download-btn::before{ content:none; }
+
+  /* =========================================================
+     VARIANT 2 -- one continuous segmented control instead of three
+     separate floating boxes. Same three actions, but they share one
+     pill/track with hairline dividers, so the row reads as a single
+     object rather than a "box - gap - box - gap - box" cluster.
+     ========================================================= */
+  .v2 .action-row{
+    display:flex; align-items:stretch; margin-top:12px; border-radius:10px; overflow:hidden;
+    background:linear-gradient(to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  }
+  .v2 .action-row > *{ border-radius:0; box-shadow:none; background:none; }
+  .v2 .icon-box{ flex:0 0 44px; width:44px; display:flex; align-items:center; justify-content:center; border:0; color:#c7c9cf; cursor:pointer; padding:0; position:relative; }
+  .v2 .icon-box::after{ content:""; position:absolute; right:0; top:20%; bottom:20%; width:1px; background:rgba(255,255,255,0.1); }
+  .v2 .download-btn{ flex:1; display:flex; align-items:center; justify-content:center; margin:0; padding:11px 14px; color:#e9e9ec; position:relative; }
+  .v2 .download-btn::before{ content:none; }
+  .v2 .download-btn::after{ content:""; position:absolute; right:0; top:20%; bottom:20%; width:1px; background:rgba(255,255,255,0.1); }
+  .v2 .like-btn{ flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:0 14px; color:#9a9ea6; cursor:pointer; }
+  .v2 .like-btn .like-heart{ width:16px; height:16px; stroke:#9a9ea6; }
+  .v2 .like-count{ font-size:12px; font-weight:700; color:#e9e9ec; }
+  .v2 .icon-box:hover, .v2 .download-btn:hover, .v2 .like-btn:hover{ filter:brightness(1.15); }
+
+  /* =========================================================
+     VARIANT 3 -- utility row above, primary button below. Instead of
+     fighting for space in one line, copy-link + like sit on a slim
+     borderless strip right under the image (icon + count only, no boxes),
+     and Copy Layout gets its own full-width row underneath as the one
+     real button on the card.
+     ========================================================= */
+  .v3 .utility-row{ display:flex; align-items:center; justify-content:flex-end; gap:16px; margin-top:10px; padding:0 2px; }
+  .v3 .ghost-btn{ display:flex; align-items:center; gap:5px; background:none; border:0; padding:0; color:#9a9ea6; cursor:pointer; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; }
+  .v3 .ghost-btn:hover{ color:#e9e9ec; }
+  .v3 .ghost-btn svg{ width:15px; height:15px; stroke:currentColor; }
+  .v3 .ghost-btn.is-liked{ color:#e4a0a0; }
+  .v3 .ghost-btn.is-liked svg{ fill:rgba(214,64,64,0.55); stroke:rgba(228,96,96,0.9); }
+  .v3 .action-row{ margin-top:8px; }
+  .v3 .download-btn{ display:flex; width:100%; margin-top:0; padding:12px 20px; justify-content:center; }
+  .v3 .download-btn::before{ content:none; }
+
+  /* =========================================================
+     VARIANT 4 -- Facebook style: no gradients, no shadows, no separate
+     boxes. Three equal-width flat buttons in one thin strip, divided
+     only by a hairline top border on the strip itself (like FB's
+     Like/Comment/Share row). Icon + label side by side, everything the
+     same weight since FB doesn't visually rank its three actions either
+     -- the whole point is that it stays out of the way. Hover/press is
+     just a soft grey background wash, nothing else moves.
+     ========================================================= */
+  .v4 .action-row{
+    display:flex; align-items:stretch; margin-top:10px; padding-top:6px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .v4 .action-row > *{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+    background:none; border:0; border-radius:6px; margin:0; padding:9px 4px;
+    color:#9a9ea6; font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600;
+    text-decoration:none; cursor:pointer; box-shadow:none;
+  }
+  .v4 .action-row > *:hover{ background:rgba(255,255,255,0.06); color:#e9e9ec; }
+  .v4 .action-row > *:active{ background:rgba(255,255,255,0.1); }
+  .v4 .download-btn::before{ content:none; }
+  .v4 .download-btn{ text-transform:none; letter-spacing:normal; color:#dcdde0; }
+  .v4 .like-btn.is-liked{ color:#e4a0a0; }
+  .v4 .like-btn.is-liked svg{ fill:rgba(214,64,64,0.55); stroke:rgba(228,96,96,0.9); }
+  .v4 .icon-box svg, .v4 .like-heart{ width:16px; height:16px; }
+</style>
+</head>
+<body>
+
+<h1 class="lab-title">action-row experiments</h1>
+<p class="lab-sub">th18-layouts.html · .discord-card action-row · opened directly via file:// so no JSON/JS dependency needed to see the CSS</p>
+
+<div class="lab-row">
+  <div class="lab-card-wrap">
+    <p class="lab-label">0 — current (reference)</p>
+    <div class="discord-card v0">
+      <div class="card-media">
+        <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="" class="zoomable" loading="lazy">
+        <div class="image-logo"><img src="icons/acbanner.jpg" alt="" loading="lazy"></div>
+        <span class="image-badge">TH18</span>
+      </div>
+      <div class="action-row">
+        <button type="button" class="icon-box copy-link-btn" title="Copy link"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+        <a class="download-btn" href="#">Copy Layout</a>
+        <button type="button" class="icon-box like-btn" title="Like"><svg viewBox="0 0 24 24" class="like-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="like-count">128</span></button>
+      </div>
+    </div>
+    <p class="lab-note">Three grey boxes of near-equal weight, evenly spaced — nothing tells you which one matters. That's likely the "off" feeling.</p>
+  </div>
+
+  <div class="lab-card-wrap">
+    <p class="lab-label">1 — primary CTA, utilities off the row</p>
+    <div class="discord-card v1">
+      <div class="card-media">
+        <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="" class="zoomable" loading="lazy">
+        <div class="image-logo"><img src="icons/acbanner.jpg" alt="" loading="lazy"></div>
+        <span class="image-badge">TH18</span>
+        <button type="button" class="corner-copy" title="Copy link"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+        <button type="button" class="corner-like" title="Like"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="like-count">128</span></button>
+      </div>
+      <div class="action-row">
+        <a class="download-btn" href="#">Copy Layout</a>
+      </div>
+    </div>
+    <p class="lab-note">Copy Layout is the only action that leaves the page, so it's the only one that gets a full button and accent color. Copy-link/like become quiet overlay chips on the image itself, out of the row entirely.</p>
+  </div>
+
+  <div class="lab-card-wrap">
+    <p class="lab-label">2 — one segmented control</p>
+    <div class="discord-card v2">
+      <div class="card-media">
+        <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="" class="zoomable" loading="lazy">
+        <div class="image-logo"><img src="icons/acbanner.jpg" alt="" loading="lazy"></div>
+        <span class="image-badge">TH18</span>
+      </div>
+      <div class="action-row">
+        <button type="button" class="icon-box copy-link-btn" title="Copy link"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+        <a class="download-btn" href="#">Copy Layout</a>
+        <button type="button" class="like-btn" title="Like"><svg viewBox="0 0 24 24" class="like-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="like-count">128</span></button>
+      </div>
+    </div>
+    <p class="lab-note">Same three buttons, but one shared background + hairline dividers instead of three floating boxes with gaps — reads as one control, closer to what the code comment already claims it's going for.</p>
+  </div>
+
+  <div class="lab-card-wrap">
+    <p class="lab-label">3 — utility strip above, button below</p>
+    <div class="discord-card v3">
+      <div class="card-media">
+        <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="" class="zoomable" loading="lazy">
+        <div class="image-logo"><img src="icons/acbanner.jpg" alt="" loading="lazy"></div>
+        <span class="image-badge">TH18</span>
+      </div>
+      <div class="utility-row">
+        <button type="button" class="ghost-btn copy-link-btn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy link</button>
+        <button type="button" class="ghost-btn like-btn is-liked"><svg viewBox="0 0 24 24" class="like-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>128</button>
+      </div>
+      <div class="action-row">
+        <a class="download-btn" href="#">Copy Layout</a>
+      </div>
+    </div>
+    <p class="lab-note">Utilities become plain text+icon links on their own thin row (no boxes at all), Copy Layout keeps the current dark-gradient button but goes full width underneath.</p>
+  </div>
+
+  <div class="lab-card-wrap">
+    <p class="lab-label">4 — Facebook style: flat &amp; equal</p>
+    <div class="discord-card v4">
+      <div class="card-media">
+        <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="" class="zoomable" loading="lazy">
+        <div class="image-logo"><img src="icons/acbanner.jpg" alt="" loading="lazy"></div>
+        <span class="image-badge">TH18</span>
+      </div>
+      <div class="action-row">
+        <button type="button" class="icon-box copy-link-btn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy link</button>
+        <a class="download-btn" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Copy Layout</a>
+        <button type="button" class="like-btn is-liked"><svg viewBox="0 0 24 24" class="like-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>128</button>
+      </div>
+    </div>
+    <p class="lab-note">No gradients, no shadows, no separate boxes — one thin strip with a hairline top border, three equal flat buttons, hover is just a soft grey wash. This is the "get out of the way" version: nothing competes for attention, the row just sits quietly under the image the way FB's Like/Comment/Share does.</p>
+  </div>
+</div>
+
+</body>
+</html>

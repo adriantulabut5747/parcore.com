@@ -1,36 +1,818 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title> Parcore | Clash of Clans</title>
 
-<!-- Google Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Oxanium -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<!-- Teko Russo Orbitron Sora -->
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="icon" href="icons/home.jpg">
 <link rel="shortcut icon" href="icons/home.jpg">
 <link rel="apple-touch-icon" href="icons/home.jpg">
 
+<meta property="og:title" content="TH18 Base Layouts | Parchrome">
+<meta property="og:description" content="Copy the latest TH18 Clash of Clans base layouts and links.">
+<meta property="og:url" content="https://parchrome.netlify.app/th18-layouts.html">
+<meta property="og:type" content="website">
+
+<link rel="stylesheet" href="11layout.css">
 <link rel="stylesheet" href="1coclayouts.css">
 
 
 <style>
-  .image-badge {background-color: #4545bb;}
-  .discord-card { background: linear-gradient( 180deg,  rgba(88, 101, 242, 0.28),
-    rgba(25, 26, 27, 0.5)); border-radius: 10px;  padding: 16px;  max-width: 850px;  margin:  auto;  box-shadow: 0 4px 12px rgba(0,0,0,1);}
-                        
+  /* ============================================================
+     LAYOUT CARD -- one design for every card. Built from the sixth
+     exploration variant (centred action row, generous card padding)
+     with the frame/mat dropped so the screenshot runs full-bleed, and
+     the TH badge back on the image itself. The CC recommendation is
+     not printed on the card: it lives behind the clan banner toggle
+     top-left, as a popup, so the card stays quiet until asked.
+     Palette is the page's near-monochrome greys -- the card is the hero's
+     dark grey surface -- plus the muted red reserved for the liked heart
+     and the cc-popup accent border.
+     ============================================================ */
+
+  .discord-card{
+    padding:12px 12px 14px;
+    background:#121316;               /* the hero's surface (--t18-surface) */
+    max-width:850px;
+    margin:auto;
+  }
+
+  /* .fullscreen-image used to carry overflow:hidden and the hover zoom
+     while also containing the action row, so it clipped the buttons'
+     shadows. The clip and radius belong to the image box alone. */
+  .fullscreen-image{ overflow:visible; border-radius:0; }
+  .fullscreen-image::after{ display:none; }
+  .fullscreen-image:hover img{ transform:none; }
+  /* 6px, not 10: nested inside the card's 16px corners with 12px of
+     padding, the inner corner should be about outer minus padding so the
+     two curves run parallel. 10px read as puffy against the card edge. */
+  .card-media{
+    position:relative;
+    overflow:hidden;
+    border-radius:6px;
+  }
+  .card-media img.zoomable{ display:block; width:100%; height:auto; }
+  .card-media:hover img.zoomable{ transform:scale(1.035); }
+
+  /* Corner chrome: badge top-right, clan banner top-left. Same height,
+     radius, fill and hairline so the two read as one set. */
+  .image-badge, .image-logo{
+    top:10px;
+    height:32px;
+    border-radius:8px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  /* TH badge: a solid royal-blue chip instead of the old washed-out
+     translucent navy. Smaller (26px) so it labels the image without
+     competing with it; a vertical blue gradient with a light top edge
+     gives it a slight raised, game-UI feel, and the soft blue glow keeps
+     it readable over bright or busy screenshots. */
+  .image-badge{
+    display:inline-flex;
+    align-items:center;
+    left:auto; right:10px;
+    height:26px;
+    padding:0 9px;
+    border-radius:6px;
+    font-family:'Oxanium', sans-serif;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.2px;
+    color:#fff;
+    text-shadow:0 1px 1px rgba(10,20,70,0.6);
+    background:linear-gradient(180deg, #5b86f2 0%, #3a5fd6 52%, #2b47b3 100%);
+    border:1px solid rgba(160,185,255,0.55);
+    box-shadow:0 2px 8px rgba(20,35,110,0.55), inset 0 1px 0 rgba(255,255,255,0.28);
+  }
+  .image-logo{
+    width:32px;
+    left:10px; right:auto;
+    background:rgba(16,16,20,0.78);
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .image-logo:hover, .image-logo:focus-visible{ border-color:rgba(255,255,255,0.3); }
+  .image-logo img{ width:22px; height:22px; margin:0; border-radius:5px; }
+  .cc-popup{ top:44px; left:8px; border-top:2px solid rgba(220,90,90,0.5); }
+
+  /* Action bar (study 01, "Action bar", from the card studies): one row
+     under the screenshot -- like on the left, Copy Layout as the one big
+     button, share on the right. Same pill material as before for the
+     main button; like and share are quieter ghost buttons so they don't
+     compete with it.
+     - Like: heart with the count beside it (Facebook-style), nothing at 0.
+       Saves to the same Firebase counts as before.
+     - Copy Layout: the base's in-game link (opens Clash on a phone).
+     - Share: the phone's own share sheet on touch devices; on desktop a
+       small panel (Copy link + Facebook / X / Reddit / WhatsApp). It shares
+       this page with the base's id on the end (#base-th18-3), and a visitor
+       arriving on that link is scrolled to the base and sees it glow.
+     CC: the small TH icon on the image's top-left (.th-cc) opens the
+     card's .cc-popup (script under the grid). */
+
+  /* TH icon, top-left of the screenshot. No chip behind it -- just the
+     icon with a stacked drop-shadow so it lifts off any artwork. It
+     doubles as the button for that base's recommended CC. */
+  .th-cc{
+    position:absolute;
+    top:8px; left:8px;
+    z-index:6;
+    width:30px; height:30px;
+    padding:0;
+    border:0;
+    background:none;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease;
+  }
+  .th-cc img{
+    display:block;
+    width:100%; height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,0.7)) drop-shadow(0 3px 6px rgba(0,0,0,0.55));
+  }
+  .th-cc:hover, .th-cc[aria-expanded="true"]{ transform:scale(1.1); }
+  .th-cc:focus-visible{ outline:2px solid rgba(255,255,255,0.5); outline-offset:2px; border-radius:6px; }
+
+  /* A compact cluster in the middle of the card: heart, Copy Layout,
+     share, side by side. The middle column is only as wide as the
+     button (`auto`, not 1fr) and `justify-content:center` centres the
+     whole group, so heart and share sit right beside Copy instead of out
+     on the card edges. Heart and share keep equal fixed columns (68px --
+     room for the heart plus a count up to "1,204"), so Copy Layout stays
+     dead centre whatever the count is. */
+  .action-row.card-bar{
+    --bar-h:34px;
+    display:grid;
+    grid-template-columns:68px auto 68px;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-top:12px;
+  }
+  /* "Ghost" buttons (picked from 5 trial variations): no fill, no shadow,
+     no border -- the row stays out of the way of the screenshot. The
+     boxes are still there (same height and tap area), just invisible
+     until hovered, when a faint fill shows what's clickable. Hierarchy
+     comes from contrast alone: Copy Layout's label is lighter (#c9ccd2)
+     than the muted grey heart and share (#8b9099). */
+  .corner-like, .card-share, .layout-link{
+    box-sizing:border-box;
+    height:var(--bar-h);
+    border-radius:8px;
+    border:0;
+    background:none;
+    box-shadow:none;
+  }
+  /* Heart and share: same key face + soft shadow as Copy Layout, so the
+     three read as one row of buttons. */
+  .corner-like, .card-share{
+    background:var(--key-face);
+    box-shadow:var(--key-soft);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    width:100%;
+    padding:0 8px;
+    color:#8b9099;
+    font-family:'Oxanium', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, transform .1s ease, box-shadow .1s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .corner-like:hover, .card-share:hover,
+  .card-share[aria-expanded="true"]{ background:var(--key-face-hover); color:var(--text-main); }
+  .corner-like:active, .card-share:active{ transform:translateY(1px); box-shadow:var(--key-soft-pressed); transition-duration:0s; }
+  .corner-like:focus-visible, .card-share:focus-visible{ outline:2px solid rgba(255,255,255,0.35); outline-offset:2px; }
+  .corner-like:disabled{ cursor:progress; }
+
+  .like-heart, .bar-ico{
+    width:18px; height:18px;
+    flex-shrink:0;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.9;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .like-heart{ transition:fill .15s ease, stroke .15s ease; }
+  /* The "like" is a flame ("this base is hot"), not a heart. Unliked: a
+     grey outline like the share icon. Liked: filled with an ember ramp
+     (amber -> orange, #heartActiveFill at the top of the body) with a
+     soft warm glow -- the one warm accent on the card, and only once the
+     visitor has lit it. Icon: Lucide "flame" (ISC licence). */
+  .corner-like.is-liked{ color:#fff; }
+  .corner-like.is-liked .like-heart{
+    fill:url(#heartActiveFill);
+    stroke:#ffb26b;
+    filter:drop-shadow(0 0 5px rgba(255,138,61,0.45));
+  }
+  .like-count{ font-variant-numeric:tabular-nums; line-height:1; }
+  .corner-like.just-liked .like-heart{ animation:like-pop .32s cubic-bezier(.22,1,.36,1); }
+  @keyframes like-pop{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.25); }
+    100%{ transform:scale(1); }
+  }
+
+  .layout-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:170px;                  /* a fixed, comfortable width -- not stretched to the card */
+    padding:0 24px;
+    color:#c9ccd2;                    /* a step lighter than heart/share: the primary */
+    font-family:'Oxanium', sans-serif;
+    font-weight:var(--ghost-font-weight);
+    font-size:var(--ghost-font-size);
+    letter-spacing:0.7px;
+    text-transform:uppercase;
+    text-decoration:none;
+    white-space:nowrap;
+    /* Keycap face (see --key-* tokens) but with a soft, natural shadow
+       instead of the hard 3px dark edge: a light top edge, a 1px contact
+       shadow and a faint blur under it. Hover is one step lighter; a press
+       sinks it 1px. */
+    background:var(--key-face);
+    border:0;
+    box-shadow:var(--key-soft);
+    transition:background .15s ease, color .15s ease, transform .1s ease, box-shadow .1s ease;
+  }
+  .layout-link:hover{ background:var(--key-face-hover); color:var(--text-main); }
+  .layout-link:active{ transform:translateY(1px); box-shadow:var(--key-soft-pressed); transition-duration:0s; }
+  .layout-link:focus-visible{ outline:2px solid rgba(255,255,255,0.35); outline-offset:2px; }
+
+  /* Share panel (desktop). One panel, moved into whichever card opened it. */
+  .share-panel{
+    position:absolute;
+    right:12px;
+    bottom:62px;
+    z-index:20;
+    width:220px;
+    padding:6px;
+    border-radius:12px;
+    background:rgba(20,21,26,0.97);
+    border:1px solid rgba(255,255,255,0.12);
+    box-shadow:0 14px 34px rgba(0,0,0,0.6);
+    -webkit-backdrop-filter:blur(10px);
+            backdrop-filter:blur(10px);
+  }
+  .share-panel[hidden]{ display:none; }
+  .share-panel a, .share-panel button{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    padding:9px 10px;
+    border:0;
+    border-radius:8px;
+    background:none;
+    color:#d5d8de;
+    font-family:'Oxanium', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+    text-align:left;
+    cursor:pointer;
+  }
+  .share-panel a:hover, .share-panel button:hover,
+  .share-panel a:focus-visible, .share-panel button:focus-visible{ background:rgba(255,255,255,0.08); color:#fff; outline:none; }
+  .share-panel .bar-ico{ width:16px; height:16px; }
+  .share-panel .sp-copy.copied{ color:#8fe0ac; }
+  .share-panel hr{ border:0; height:1px; background:rgba(255,255,255,0.08); margin:4px 6px; }
+
+  /* A visitor arriving on a shared link: the base glows twice. */
+  .discord-card.is-target{ animation:base-glow 1.6s ease-in-out 2; }
+  @keyframes base-glow{
+    0%, 100%{ box-shadow:0 6px 18px rgba(0,0,0,0.35), 0 0 0 0 rgba(255,255,255,0); }
+    50%{ box-shadow:0 6px 18px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.45); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .corner-like.just-liked .like-heart, .discord-card.is-target{ animation:none; }
+    .discord-card.is-target{ box-shadow:0 6px 18px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.45); }
+  }
+
+  /* Buttons outside the layout cards (the clan card's pills) still use
+     .download-btn; these two rules were shared with the old Copy Layout
+     button and stay for them. */
+  /* GHOST BUTTON TOKENS -- taken from coc-home.html's .ch-btn.ch-btn-ghost
+     (font size + weight from .ch-btn, fill + border from .ch-btn-ghost),
+     WITHOUT its hard white offset shadow. Defined once here so any button
+     on this page can reuse them: var(--ghost-bg) etc. If coc-home's
+     ghost button changes, update these four (and the 10.5px phone size). */
+  :root{
+    --ghost-font-size:11.5px;         /* 10.5px on phones, like coc-home */
+    --ghost-font-weight:800;
+    --ghost-bg:#15161a;
+    --ghost-border:#3a3d44;
+    --ghost-border-hover:#5a5e66;     /* coc-home's ghost hover border */
+    /* KEYCAP (button lab #6): a raised key -- a top-lit gradient face, a
+       hairline of light on its top edge, and a hard 3px dark edge under it.
+       Used for the ACTIVE tab / Town Hall chip and for every Copy Layout
+       and clan button. Inactive tabs/chips stay flat near-black. Each
+       hover is simply one step lighter than the state it's on -- never
+       white:  flat #0b0b0c -> flat hover #1e1f23 -> key -> key hover.  */
+    --key-face:linear-gradient(180deg, #26282e, #1b1c21);
+    --key-face-hover:linear-gradient(180deg, #31343b, #24262b);
+    --key-edge:0 3px 0 #08090a, inset 0 1px 0 rgba(255,255,255,0.08);
+    --key-pressed:0 0 0 #08090a, inset 0 2px 5px rgba(0,0,0,0.6);
+    --flat-hover:#1e1f23;
+    /* The card buttons (heart, Copy Layout, share) use the key face with a
+       SOFT shadow instead of the hard 3px edge: light top edge, 1px contact
+       shadow, faint blur. Pressed = sunk 1px. */
+    --key-soft:inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 2px rgba(0,0,0,0.4), 0 4px 10px -4px rgba(0,0,0,0.45);
+    --key-soft-pressed:inset 0 1px 3px rgba(0,0,0,0.45);
+  }
+  @media (max-width:970px){ :root{ --ghost-font-size:10.5px; } }
+
+  /* .download-btn = the clan card's "Join Our Clan" / "Join Global Chat"
+     buttons, now in the ghost style above. 1coclayouts.css gives this
+     class a grey gradient and drop shadows (rest, hover and press); all
+     of that is overridden here -- flat fill, 1px border, no shadow. */
+  .download-btn{
+    flex:0 1 auto;
+    margin-top:0;
+    padding:12px 21px 12px 47px;       /* +1px each side: the 1px border is gone */
+    border:0;
+    background:var(--key-face);
+    box-shadow:var(--key-edge);
+    font-size:var(--ghost-font-size);
+    font-weight:var(--ghost-font-weight);
+    transition:background .15s ease, color .15s ease, transform .1s ease, box-shadow .1s ease;
+  }
+  .download-btn:hover{ background:var(--key-face-hover); color:var(--text-main); box-shadow:var(--key-edge); filter:none; transform:none; }
+  .download-btn:active{ box-shadow:var(--key-pressed); filter:none; transform:translateY(3px); }
+  .download-btn.copied{ color:#8fe0ac; }
+  .download-btn:focus-visible{
+    outline:2px solid rgba(255,255,255,0.35);
+    outline-offset:2px;
+  }
+
+  /* "Join Our Clan" / "Join Global Chat" buttons (th18 only for now) --
+     same .download-btn pill (gradient, rounded, icon box baked into
+     ::before) as the "Copy Layout" buttons above, just two more icon
+     variants swapped in via their own ::before background-image. Icons
+     are Material Symbols' filled "person" and "public" glyphs.
+
+     Deliberately NOT using the old .contact-icons wrapper: 1coclayouts.css
+     styles `.contact-icons a` as a 38x38 icon square, and that selector
+     outranks .download-btn, so the <a> pill got squashed while the
+     <button> pill next to it didn't. Own class = no inherited icon-row
+     rules, and both children style identically from .download-btn. */
+  .clan-action-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  /* line-height pinned because the two pills are different elements: a
+     <button> uses the UA's `normal`, an <a> inherits the paragraph's --
+     left alone they'd render at visibly different heights. */
+  .clan-action-row .download-btn{
+    flex:0 0 auto;
+    white-space:nowrap;
+    line-height:1;
+  }
+
+  .download-btn.icon-person::before{
+    background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e9e9ec'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / 13px 13px;
+  }
+  .download-btn.icon-globe::before{
+    background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e9e9ec'%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A9.987 9.987 0 015.08 16zm2.95-8H5.08c.96-1.65 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a10.03 10.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z'/%3E%3C/svg%3E") no-repeat center / 13px 13px;
+  }
+
+  @media (max-width:970px){
+    /* More air on phones: cards 32px apart (was 20), same inner padding
+       as desktop (was 10/10/12), 12px from screenshot to buttons. */
+    .grid-container{ gap:32px; }
+    .discord-card{
+      padding:12px 12px 14px;
+      background:#121316;
+    }
+    .image-badge, .image-logo{ height:28px; top:8px; }
+    .image-badge{ height:24px; padding:0 8px; font-size:10px; right:8px; }
+    .image-logo{ width:28px; left:8px; }
+    .image-logo img{ width:19px; height:19px; }
+    .cc-popup{ top:40px; left:8px; }
+    .th-cc{ width:26px; height:26px; }
+    .action-row{ margin-top:10px; }
+    .download-btn{ padding:11px 17px 11px 43px; }
+    /* Phones: a smaller cluster so all three fit comfortably on narrow
+       screens (a 360px phone has ~316px inside the card; this row is ~264px). */
+    .action-row.card-bar{ --bar-h:34px; grid-template-columns:54px auto 54px; gap:6px; margin-top:12px; }
+    .corner-like, .card-share{ padding:0 6px; gap:5px; font-size:12px; }
+    .like-heart, .bar-ico{ width:16px; height:16px; }
+    .layout-link{ min-width:140px; padding:0 16px; font-size:11.5px; letter-spacing:0.5px; }
+  }
 
 
-@media (max-width: 768px) {.discord-card {  background: linear-gradient(
-       90deg,  rgba(88, 101, 242, 0.28),
-   rgba(25, 26, 27, 0.5));}}
+  /* ---- Secondary top bar redesign (matches coc-home.html) ----
+     1coclayouts.css likely defines .stb-divider / .th-icon already (same
+     role coc-home.html's own inline copies used to play before its
+     redesign) -- .stb-divider-end is new, so it needs a definition
+     somewhere, and this page's own <style> (loaded after 1coclayouts.css)
+     is the right place per the "don't edit shared files" rule. */
+  .stb-divider-end{
+    width:1px;
+    height:24px;
+    margin:0 16px;
+    flex-shrink:0;
+    background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.2) 20%, rgba(255,255,255,0.2) 80%, transparent 100%);
+  }
+  @media (max-width:970px){
+    .stb-divider-end{ display:none !important; }
+  }
+
+  /* th-icon override, same values as coc-home.html, in case 1coclayouts.css
+     ships the old 32px/20px sizing (like 11layout.css does). */
+  .th-icon{ width:22px; height:22px; }
+  @media (max-width:970px){
+    .th-icon{ width:16px; height:16px; }
+  }
+
+  /* Secondary top bar: 1coclayouts.css loads after 11layout.css, so its
+     unconditional .secondary-top-bar rule (right:0, width:calc(...),
+     plus its own >=971px background) beats both fixes 11layout.css
+     already has for this bar. Two separate problems, both re-declared
+     here since this page's own <style> loads after both files:
+
+     1) Colour -- 1coclayouts.css's >=971px media query sets the old
+        olive gradient (#1b1c18 -> #252621), overriding 11layout.css's
+        flat rgba(22,22,26,0.88) + blur that coc-home actually shows.
+        coc-home never hits this because it doesn't load 1coclayouts.css
+        at all. Re-assert 11layout.css's colour so this page matches. */
+  @media (min-width:971px){
+    .secondary-top-bar{
+      background: rgba(22, 22, 26, 0.88);
+      -webkit-backdrop-filter: blur(14px) saturate(118%);
+      backdrop-filter: blur(14px) saturate(118%);
+    }
+  }
+
+  /* 2) Scrollbar overlap -- 11layout.css insets the bar by --scrollbar-w
+     so it stops at .coc-main's content edge instead of running under the
+     scrollbar, but only at >=971px: real phones use overlay scrollbars
+     that reserve no width, so insetting there would leave a bare 10px
+     gap. A desktop browser window resized down to phone width still has
+     a classic, space-reserving scrollbar though (that's how this was
+     caught). No width or pointer gate any more: --scrollbar-w is MEASURED
+     by the script at the end of <head> (0 where scrollbars float over the
+     page, as on real phones), so the inset is always exactly right. The
+     old pointer:fine gate skipped Chrome's DevTools phone mode, which
+     reports a touch screen but still draws a 10px scrollbar. */
+  .top-bar,
+  .secondary-top-bar{
+    right: var(--scrollbar-w, 0px);
+    width: auto;
+  }
+  @media (min-width:971px){ .coc-main{ scrollbar-gutter: stable; } }   /* phones: .coc-main doesn't scroll, so no gutter */
+
+  /* EXPERIMENT (th18 only): the inset above is exactly as wide as
+     --scrollbar-w (10px, matched to 11layout.css's ::-webkit-scrollbar
+     width further down that file) -- that's what makes the corner notch
+     read as "too big". Narrowing the actual scrollbar shrinks the gap
+     with it, instead of leaving the bars inset by more than the
+     scrollbar actually needs. Page-scoped since ::-webkit-scrollbar
+     isn't a class selector -- can't limit it to one element, only to
+     this page's stylesheet. */
+  /* --scrollbar-w is no longer guessed here: every element also gets
+     `scrollbar-width: thin` (11layout.css), and current Chrome then IGNORES
+     ::-webkit-scrollbar, so the real bar was ~10px while this said 6px --
+     the bars covered the other 4px. The script at the end of <head>
+     measures .coc-main's actual scrollbar and sets the variable itself. */
+  ::-webkit-scrollbar{ width: 6px; }
+  ::-webkit-scrollbar-thumb{ border-width: 1px; }
+
+
+  /* ---- .whats-up spacing ----
+     Measured: on desktop the box sat 82px under the secondary bar but
+     only 44px above the tabs (24px margin + .first-layer's 20px), so it
+     floated away from the nav. .coc-main's padding-top is
+     calc(100px + topbar) in 1coclayouts.css = 140px against 88px of
+     bars; 90px here + .coc-content's 30px puts the box 32px under the
+     bar, and margin-bottom 12px + 20px makes it 32px above the tabs.
+     Inside: the 60px icon top-aligned against an 82px text block left
+     a gap beneath it -- centred now. Body text is capped so a line
+     stays around 100 characters instead of running the full 1150px. */
+  @media (min-width:971px){
+    .coc-main{ padding-top: calc(var(--topbar-height, 40px) + 48px + 2px); }
+    /* Desktop side insets match coc-home.html's page column: 12% each
+       side (coc-home sets it as `margin: 0 12%` on each section; same
+       resulting width). Change one page -> change the other. Phones keep
+       1coclayouts.css's 10px sides on purpose -- coc-home's 5% made the
+       base cards too small. */
+    .coc-content{ padding-left:12%; padding-right:12%; }
+  }
+  .whats-up{
+    align-items:center;
+    gap:18px;
+    padding:20px 24px;
+    margin-bottom:12px;
+  }
+  .whats-new-text{ max-width:100ch; }
+  .whats-up-strong{ margin-bottom:6px; }
+  @media (max-width:970px){
+    .whats-up{
+      gap:14px;
+      padding:14px 16px;
+      margin-bottom:8px;
+    }
+  }
+
+  /* .second-layer is the TH8-TH18 switcher strip -- thz-script.js fills
+     it from the same data every other TH page relies on for its ONLY
+     TH switcher. This page also has the secondary top bar's own
+     dsn-chip TH row (11layout.css/js, added when this page got that
+     redesign), so past 970px there are two identical TH switchers
+     stacked on screen. Hide the older one here, desktop only -- other
+     TH pages don't have the secondary-top-bar version, so this can't
+     touch them (page-scoped override, not a shared-file change), and
+     mobile still needs it since the secondary top bar's chip row is
+     replaced by the bottom sheet nav down there. */
+  @media (min-width:971px){
+    .second-layer-container, .th-rail{ display:none; }
+  }
+  /* Town Hall strip scroll line (mobile). The native scrollbar is hidden
+     -- phones ignore scrollbar styling anyway -- and this line takes its
+     place: a hairline across the full width (the divider) plus a lighter
+     2px segment sized and placed like a scrollbar thumb. */
+  .second-layer-container{ scrollbar-width:none; -ms-overflow-style:none; }
+  /* A swipe that starts on the Town Hall strip only scrolls the strip
+     sideways: touch-action:pan-x hands vertical drags to nothing, so the
+     page can't move and a downward drag can't trigger pull-to-refresh;
+     overscroll-behavior stops hitting the strip's end from chaining into
+     the page or the browser's back-swipe. Same for the desktop top-bar
+     chip strips. */
+  .second-layer-container, .dsn-categories-scroll{
+    touch-action:pan-x;
+    overscroll-behavior:contain;
+  }
+  .second-layer-container::-webkit-scrollbar{ display:none; }
+  .th-rail{
+    position:relative;
+    height:2px;
+    margin-top:12px;
+    overflow:hidden;
+  }
+  .th-rail::before{
+    content:"";
+    position:absolute;
+    left:0; right:0; top:50%;
+    height:1px;
+    transform:translateY(-50%);
+    background:rgba(255,255,255,0.04);
+  }
+  .th-rail span{
+    position:absolute;
+    left:0; top:0;
+    height:2px;
+    width:0;
+    border-radius:2px;
+    background:rgba(255,255,255,0.11);   /* fainter than before (.18) */
+    will-change:transform;
+    transition:opacity .6s ease;
+  }
+  .th-rail.is-static span{ display:none; }
+  /* Once the visitor has scrolled the strip they know it scrolls: the thumb
+     fades out and stays gone (remembered in localStorage, so it doesn't come
+     back on the next visit). The hairline stays -- it's also the divider. */
+  .th-rail.is-done span{ opacity:0; }
+
+  /* Trial: give the active TH chip in the dsn-chip strip the same
+     rounded-corner + bezel look as the Copy Layout button. Note the
+     button doesn't actually use a CSS `border` -- what reads as a rim in
+     the screenshot is its outer box-shadow (0 4px 14px black) plus the
+     lighter top of its own gradient fill, so that's copied here too,
+     alongside overriding 11layout.css's ".stb-dsn-wrap .dsn-chip" 16px
+     radius (same specificity, wins on source order since this page's
+     <style> loads after that file). Page-scoped, not a 11layout.css
+     edit -- that file's chip strip is shared by all 14 pages. */
+  .dsn-chip.active, .stb-dsn-wrap .dsn-chip.active{
+    border-radius:9px;
+    border-color:rgba(255,255,255,0.28);
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  }
+
+  /* stb-hub-link icons: outline/fill pair like #bottomNav's .bn-item
+     icons, same toggle mechanism (.bn-item .bn-ico-fill{display:none} /
+     .active swaps them) since .stb-hub-link's existing single-svg
+     fill:none->currentColor toggle (11layout.css) assumes hwr's plus-icon
+     shape, not a second, purpose-drawn filled icon. */
+  /* Bottom nav labels in Sora, sentence case ("Home", not "HOME").
+     1coclayouts.css sets Oxanium caps for every TH page; this overrides it
+     here only (coc-home.html has the same change in its own copy). */
+  .bn-item, .bn-more-label{
+    font-family:'Sora', sans-serif;
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:0;
+    text-transform:none;
+  }
+
+  .stb-hub-link .hub-ico-fill{ display:none; }
+  .stb-hub-link.active .hub-ico{ display:none; }
+  .stb-hub-link.active .hub-ico-fill{ display:block; }
+
+  /* Page label ("Townhall 18 Layouts") in Sora 500, matching
+     homewebresources.html -- its label renders in Sora because the inner
+     .secondary-content-desktop span sets it, even though hwr-css.css puts
+     Oxanium on the wrapper. Two classes to outrank 11layout.css's mobile
+     ".secondary-content { font-family:'Oxanium' }". */
+  .secondary-top-bar .secondary-content{ font-family:'Sora', sans-serif; font-weight:500; }
+
+</style>
+
+<style>
+/* =====================================================================
+   CLASH CLOCK (th18) -- same event cards as coc-home.html's Clash Clock,
+   replacing the old "Today's Events" box. The card rules below are
+   coc-home's CLASH CLOCK block, tightened for this page (smaller padding,
+   icon and timer -- the events are secondary here, the layouts are the
+   page), so they are no longer an exact copy: carry any design change
+   across by hand.
+   No section heading on this page (removed on request); the cards sit
+   straight under the pagination.
+   ===================================================================== */
+.cc-section{
+  container: cc / inline-size;
+  margin: 36px 0 0;
+}
+@media (max-width: 970px){
+  .cc-section{ margin: 28px 0 8px; }
+}
+
+/* The old six event cards (.cc-event-*) were replaced by pinned tags --
+   see "Clash Clock tags" in the TH18 COC-HOME THEME block. */
+
+/* ---- Official clan card (.clan-card) ---------------------------------
+   Just the title and two buttons on the Clash Clock card material
+   (#121316, faint white border, 12px radius), with the Wall Breaker
+   (wallbreaker-tight.png) standing on the card's bottom edge. The Join
+   button shows the tag it copies. Simplified Sep 2026: the logo tile,
+   the "Clan tag" / "Connect with me" labels, a separate tag chip that
+   did the same job as the Join button, and the paragraph were removed. */
+.clan-card{
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  margin: 16px 0 45px;                 /* (overridden by the spacing block below) */
+  border-radius: 12px;
+  background:
+    radial-gradient(45% 90% at 92% 100%, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0) 70%),
+    #121316;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: visible;                   /* let the Wall Breaker stick out of the top edge */
+}
+.clan-body{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+}
+.clan-title{
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #f1f2f4;
+}
+.clan-card .clan-action-row{ margin: 0; }
+/* the tag the Join button copies, muted after its label; green with it on copy */
+.clan-btn-tag{ margin-left: 6px; color: #8b9099; letter-spacing: 0.4px; }
+.download-btn.copied .clan-btn-tag{ color: inherit; }
+
+.clan-art{ position: relative; pointer-events: none; }
+/* The Wall Breaker stands on the card's bottom edge and is 46px taller than
+   the card, so his head and shoulders pop out above the top edge like a
+   mascot peeking in -- by the same amount whether the stats row is showing
+   (taller card) or not. */
+.clan-art img{
+  position: absolute;
+  right: 40px;
+  bottom: 0;
+  height: calc(100% + 46px);
+  width: auto;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.55));
+}
+
+/* Live stats row: three small tiles in the event cards' material. */
+.clan-stats{ display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
+.clan-stats[hidden], .clan-stat[hidden]{ display: none; }
+.clan-stat{
+  min-width: 104px;
+  padding: 10px 14px 11px;
+  border-radius: 10px;
+  background: #141519;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.clan-stat dt{
+  margin: 0 0 7px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 9.5px; font-weight: 700; line-height: 1;
+  letter-spacing: 1.3px; text-transform: uppercase;
+  color: #8b9099;
+}
+.clan-stat dd{
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 19px; font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #f1f2f4;
+}
+.clan-stat dd small{ margin-left: 4px; font-size: 11px; font-weight: 700; color: #8b9099; }
+
+@media (max-width: 970px){
+  .clan-card{ grid-template-columns: minmax(0, 1fr) 96px; margin: 12px 0 32px; }
+  .clan-body{ padding: 16px; gap: 14px; }
+  .clan-title{ font-size: 14px; }
+  /* phones: fully inside the (taller, stacked-buttons) card -- a 3px
+     poke-out just looked like a mistake */
+  .clan-art img{ right: 8px; height: 132px; width: auto; }
+  .clan-stats{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .clan-stat{ min-width: 0; padding: 9px 10px 10px; }
+  .clan-stat dd{ font-size: 16px; }
+  /* Phones: the two buttons stack full width, so the tag always fits. */
+  .clan-card .clan-action-row{ display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .clan-card .clan-action-row .download-btn{ width: 100%; padding: 11px 11px 11px 43px; justify-content: center; font-size: var(--ghost-font-size); }
+}
+/* On a narrow phone the art would squeeze the text and buttons -- drop it. */
+@media (max-width: 460px){
+  .clan-card{ grid-template-columns: minmax(0, 1fr); }
+  .clan-art{ display: none; }
+}
+
+/* Clash Clock list header: small muted caps sitting 10px above the
+   panel, same voice as the labels inside the cards. */
+.cc-label-row{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  margin:0 2px 10px;
+}
+.cc-label{
+  margin:0;
+  font-family:'Oxanium', sans-serif;
+  font-size:11px; font-weight:700;
+  letter-spacing:1.6px; text-transform:uppercase;
+  color:#9ea3ab;
+}
+.cc-label-note{
+  font-family:'Sora', sans-serif;
+  font-size:11px;
+  color:#6f737a;
+}
+
+/* ---- PAGE SPACING ------------------------------------------------------
+   One vertical rhythm for the whole page, three steps:
+     inside a group ........ 12 desktop / 10 mobile
+     parts of a section .... 16-32      / 12-24
+     between sections ...... 64         / 48
+   Everything that sets a vertical gap between blocks is overridden here
+   (1coclayouts.css and the older rules above had grown to 20/36/46/44/
+   16/75 with no pattern), so change spacing in this block only.
+     intro (Revenge Tower) -> tabs ........ 16 / 12
+     tabs -> TH strip (mobile) ............ 10
+     TH strip -> scroll line (mobile) ..... 12
+     nav -> first row of bases ............ 32 / 24
+     between rows of bases ................ 30 / 32 (unchanged)
+     last row -> page numbers ............. 28 / 24  (they belong to the grid)
+     page numbers -> Clash Clock .......... 64 / 48  (section break)
+     clock cards -> clan card ............. 12 / 10  (same as between clock cards)
+     clan card -> footer .................. 64 / 48  (section break)      */
+.whats-up{ margin-bottom:0; }
+.first-layer{ margin-top:16px; margin-bottom:0; }
+.coc-content > .grid-container{ margin-top:32px; }
+.pagination-wrap{ margin:28px 0 0; }
+.cc-section{ margin:64px 0 0; }
+.clan-card{ margin:64px 0 34px; }             /* 64: the Wall Breaker pokes ~45px out of the card's top edge, so this keeps his head clear of the event tags above. + .coc-content's 30px bottom padding = 64 below */
+/* Desktop spacing, one scale (8 / 16 / 24 / 32 / 64). Things that belong
+   together sit closer: the tabs control the grid, so tabs -> grid (16) is
+   tighter than hero -> tabs (32); cards 24 apart both ways; grid ->
+   page numbers 24; section breaks stay 64. */
+@media (min-width:971px){
+  .coc-content > .grid-container{ margin-top:16px; gap:24px; }
+  .pagination-wrap{ margin-top:24px; }
+}
+@media (max-width:970px){
+  .first-layer{ margin-top:12px; margin-bottom:10px; }
+  .coc-content > .grid-container{ margin-top:24px; }
+  .pagination-wrap{ margin:24px 0 0; }
+  .cc-section{ margin:48px 0 0; }
+  .clan-card{ margin:20px 0 48px; }             /* mobile .coc-content has no bottom padding */
+}
 </style>
 
 <style>
@@ -45,8 +827,699 @@
 </style>
 
 
+<style>
+/* =======================================================================
+   TH18 COC-HOME THEME -- th18-layouts.html restyled to match
+   coc-home.html: its kicker (mono caps + pulsing red dots), Orbitron
+   headline with one red word, stats row, hero card with a red badge,
+   and its button materials (dark ghost with a hard offset
+   shadow; red primary with a dark-red offset shadow). Red is the one
+   accent; the old blue card gradient is replaced by a very faint red.
+   The layout cards' and their three buttons' layouts are untouched --
+   only colours, type and icons change there.
+   Scoped to .coc-content, loaded last in <head>, so the top bar,
+   secondary top bar, sidebar and bottom nav keep their own styles.
+   ======================================================================= */
+.coc-content{
+  --t18-red:#c23b3b;
+  --t18-red-2:#d04747;
+  --t18-red-deep:#5a1616;
+  --t18-surface:#121316;
+  --t18-surface-2:#15161a;
+  --t18-line:rgba(255,255,255,0.08);
+  --t18-line-2:#2a2c30;
+  --t18-text:#f2f3f5;
+  --t18-muted:#9ea3ab;
+  --t18-faint:#6d7178;
+  /* a whisper of red light at the top of the page, like coc-home's hero */
+  background:radial-gradient(1100px 460px at 22% 0%, rgba(194,59,59,0.07), rgba(194,59,59,0) 70%);
+}
+
+/* ---- Hero ------------------------------------------------------------
+   One card, two columns: the copy (Revenge Tower art | two-line title,
+   then "Did you know?") and, on the right, the six clan events, 2 x 3.
+   Red and dark grey only: one red wash from the bottom-left over the
+   #121316 card. */
+.t18-hero{
+  position:relative;
+  isolation:isolate;                   /* keeps the star layer behind the content */
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto;
+  grid-template-areas:"copy events";
+  align-items:center;
+  column-gap:32px;
+  row-gap:18px;
+  padding:28px 32px;
+  margin-top:12px;
+  border-radius:16px;
+  border:1px solid var(--t18-line);
+  background:
+    radial-gradient(70% 90% at 0% 100%, rgba(194,59,59,0.09), rgba(194,59,59,0) 70%),
+    radial-gradient(60% 70% at 18% 0%, rgba(255,255,255,0.025), rgba(255,255,255,0) 70%),
+    var(--t18-surface);
+}
+/* Starfield: a sparse scatter of tiny points, mostly warm white with a
+   couple of faint red ones, denser on the left and thinning out toward the
+   events. They twinkle slowly (opacity only, so nothing moves or leaves
+   the card). A layer of radial-gradient dots, not an image. */
+.t18-hero::before{
+  content:"";
+  position:absolute; inset:0; z-index:-1;
+  border-radius:inherit;
+  pointer-events:none;
+  background:
+    radial-gradient(1.5px 1.5px at 6% 22%,  rgba(255,244,228,.75), transparent),
+    radial-gradient(1px 1px     at 13% 74%, rgba(255,244,228,.55), transparent),
+    radial-gradient(1.5px 1.5px at 21% 90%, rgba(255,214,176,.55), transparent),
+    radial-gradient(1px 1px     at 28% 12%, rgba(255,244,228,.45), transparent),
+    radial-gradient(2px 2px     at 34% 64%, rgba(224,99,99,.45),   transparent),
+    radial-gradient(1px 1px     at 40% 30%, rgba(255,244,228,.40), transparent),
+    radial-gradient(1.5px 1.5px at 46% 86%, rgba(255,244,228,.35), transparent),
+    radial-gradient(1px 1px     at 52% 16%, rgba(255,214,176,.35), transparent),
+    radial-gradient(1px 1px     at 3% 58%,  rgba(255,244,228,.45), transparent),
+    radial-gradient(1.5px 1.5px at 17% 46%, rgba(255,244,228,.30), transparent),
+    radial-gradient(1px 1px     at 58% 70%, rgba(224,99,99,.35),   transparent),
+    radial-gradient(1px 1px     at 63% 8%,  rgba(255,244,228,.25), transparent);
+  animation:t18-twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes t18-twinkle{ from{ opacity:.55; } to{ opacity:1; } }
+.t18-hero-copy{ grid-area:copy; align-self:center; }
+/* Pulse for the red dot on the "Live events" label (.cc-label::before). */
+@keyframes t18-dot{
+  0%,100%{ opacity:.55; transform:scale(.9); box-shadow:0 0 4px rgba(194,59,59,.5); }
+  50%{ opacity:1; transform:scale(1.15); box-shadow:0 0 10px rgba(194,59,59,.95); }
+}
+/* "TH18 BASE" in Oxanium, "LAYOUTS" (the <em>) in Orbitron. One line on
+   desktop -- sized off the copy column's width (cqi, see the 971px+ rule)
+   so it never overflows beside the events -- two lines on phones. */
+.t18-title{
+  margin:0 0 12px;
+  font-family:'Oxanium', sans-serif;
+  font-size:clamp(28px, 2.9vw, 44px);
+  white-space:nowrap;
+  font-weight:800;
+  line-height:1.02;
+  letter-spacing:.3px;
+  text-transform:uppercase;
+  color:var(--t18-text);
+  text-shadow:0 3px 12px rgba(0,0,0,0.5);
+}
+/* Red word, no glow: it used to carry a pulsing red text-shadow. */
+.t18-title em{
+  font-style:normal;
+  font-family:'Orbitron', sans-serif;
+  font-weight:900;
+  letter-spacing:-1px;
+  color:var(--t18-red);
+}
+/* Hero copy is just the title and this line now -- the red-dot label
+   line above the title and the Layouts / Flames / Pages stats row were
+   removed, so the sentence is the last thing in the block (no bottom
+   margin). */
+/* DID YOU KNOW? -- replaces the old intro sentence (.t18-sub) directly
+   under the title, and the fact text takes that sentence's colour and
+   type (Sora 15px / 1.65, #c9ccd2; 13.5px on phones). The small label
+   stays red (#e06363 -- the accent #c23b3b is only ~3.9:1 on this
+   background, too faint at 10px; this is ~5.4:1). No top margin: the
+   title's own bottom margin is the gap. */
+.t18-dyk{ margin-top:0; max-width:52ch; }
+.t18-dyk[hidden]{ display:none; }
+.t18-dyk-label{
+  display:block;
+  margin-bottom:6px;
+  font-family:'Oxanium', sans-serif;
+  font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:#e06363;                       /* red, lighter than the accent: #c23b3b is ~3.9:1 here, too faint at 10px; this is ~5.4:1 */
+}
+.t18-dyk-stage{ display:grid; }
+/* The fact box is a button: click / tap / Enter for another fact. */
+.t18-dyk{ cursor:pointer; -webkit-tap-highlight-color:transparent; border-radius:6px; }
+.t18-dyk:focus-visible{ outline:2px solid rgba(255,255,255,0.75); outline-offset:6px; }
+/* Two lines at most. The facts in coc-dyk.json are written to fit in
+   two; the clamp is the safety net -- a longer one ends in "..." instead
+   of growing the card. */
+.t18-dyk-fact{
+  grid-area:1 / 1;               /* all facts stacked in one cell */
+  margin:0;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  overflow:hidden;
+  font-family:'Sora', sans-serif;
+  font-size:15px; line-height:1.65;
+  color:#c9ccd2;
+  opacity:0;
+  transform:translateY(3px);
+  transition:opacity .22s ease, transform .22s ease;   /* leaving: quick */
+}
+/* Arriving: waits for the old fact to finish fading, then rises in -- the
+   two never overlap (they share one grid cell). */
+.t18-dyk-fact.is-on{ opacity:1; transform:none; transition:opacity .35s ease .22s, transform .35s cubic-bezier(.2,.8,.2,1) .22s; }
+@media (prefers-reduced-motion: reduce){
+  .t18-dyk-fact, .t18-dyk-fact.is-on{ transition:none; transform:none; }
+  .t18-hero::before{ animation:none; }
+}
+@media (max-width:970px){
+  .t18-dyk-fact{ font-size:13px; line-height:1.55; }
+}
+/* Narrow phones: the box is too narrow for a two-full-line fact, so allow
+   three instead of cutting it off with "...". */
+@media (max-width:499px){
+  .t18-dyk-fact{ -webkit-line-clamp:3; line-clamp:3; }
+}
+
+/* Title row: just the two-line title now (the Revenge Tower art was removed). */
+.t18-head{ display:flex; align-items:center; gap:18px; margin-bottom:20px; }
+.t18-head .t18-title{ margin:0; }
+
+/* ---- Banner events (right column) ------------------------------------
+   Six small cards, 2 x 3, one per event: the event's icon in a tile on
+   the left, its name over the countdown on the right. A hairline
+   separates the block from the copy. A running event (or an always-on
+   one, counting to its end) gets a red LIVE tag on its icon; one that's
+   only counting down to its start gets nothing. Times are grey either
+   way. Cards lift a shade on hover. */
+.t18-events{
+  grid-area:events;
+  display:grid; grid-template-columns:repeat(2, 176px); gap:8px;
+  margin:0; padding:0 0 0 28px;
+  border-left:1px solid rgba(255,255,255,0.06);
+  list-style:none;
+}
+.t18-event{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px 8px 8px;
+  border-radius:12px;
+  background:#141519;                  /* dark grey-black, solid: the stars don't show through */
+  border:1px solid rgba(255,255,255,0.06);
+  text-decoration:none;
+  transition:background-color .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.t18-event:hover{ background:#1a1b20; border-color:rgba(255,255,255,0.12); }
+.t18-event:focus-visible{ outline:2px solid rgba(255,255,255,0.75); outline-offset:2px; }
+.t18-event-icon{
+  position:relative;
+  flex-shrink:0;
+  width:34px; height:34px;
+  display:grid; place-items:center;
+  border-radius:9px;
+  background:#1a1b1f;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.t18-event-icon img{
+  width:23px; height:23px; object-fit:contain;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}
+/* Running events (anything coc-events.js hasn't marked .is-upcoming): a
+   solid LIVE tag on the icon's bottom edge, like a live stream's profile
+   picture (the icon's own border stays grey -- a red edge was tried and
+   removed). The tag's red gently brightens and dims.
+   Upcoming events get nothing -- no dot, no tag. (Replaced the old red /
+   grey corner dot, Sep 2026; picked from 4 previews.) */
+.t18-event:not(.is-upcoming) .t18-event-icon::after{
+  content:"LIVE";
+  position:absolute; left:50%; bottom:-6px;
+  transform:translateX(-50%);
+  padding:2px 4px 1px;
+  border-radius:3px;
+  background:#d04747;
+  box-shadow:0 0 0 2px #141519;        /* the card's colour: cuts the tag out of the icon's edge */
+  font:800 7px/1 'Oxanium', sans-serif; letter-spacing:.8px;
+  color:#fff;
+  animation:t18-live 2s ease-in-out infinite;
+}
+@keyframes t18-live{ 0%,100%{ background:#d04747; } 50%{ background:#ff5a4f; } }
+.t18-event-text{ display:flex; flex-direction:column; gap:5px; min-width:0; }
+.t18-event-name{
+  font-family:'Oxanium', sans-serif;
+  font-size:10px; font-weight:800; line-height:1.1; letter-spacing:1.1px; text-transform:uppercase;
+  color:#c9ccd2;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.t18-event:hover .t18-event-name{ color:#fff; }
+.t18-event-time{
+  font-family:'Oxanium', sans-serif;
+  font-size:12px; font-weight:800; line-height:1; letter-spacing:.3px;
+  font-variant-numeric:tabular-nums;
+  color:#8b9099;                       /* grey, running or not -- the LIVE tag shows which are running */
+  white-space:nowrap;
+}
+.t18-event-time::before{ content:"ends "; font-weight:700; }
+.t18-event.is-upcoming .t18-event-time{ color:#8b9099; }
+.t18-event.is-upcoming .t18-event-time::before{ content:"starts "; }
+.t18-event-time span{ margin-left:1px; font-size:.82em; }
+
+/* Prev / next buttons exist for phones only. */
+.t18-ev-navli{ display:none; }
+/* Desktop: cards that don't fit the rows beside the text (set by script). */
+@media (min-width:971px){ .t18-events > li.is-over{ display:none; } }
+/* Desktop title: one line, sized off the copy column so it can't overflow. */
+@media (min-width:971px){
+  .t18-hero-copy{ container-type:inline-size; }
+  /* desktop: the whole title in Orbitron (phones keep "TH18 BASE" in Oxanium) */
+  .t18-title{ font-size:clamp(24px, 8.4cqi, 44px); font-family:'Orbitron', sans-serif; font-weight:900; letter-spacing:-1px; }
+  .t18-title br{ display:none; }
+}
+
+/* ---- Event tags (Live events, under the page numbers) ----------------
+   Pinned notes, redrawn in the page's own material: the ghost-button
+   fill and border, Oxanium caps and digits. Each sits a degree or so off straight, the way a pinned note
+   would, and straightens and lifts on hover. The time text carries the
+   state: red "ends ..." while the event runs, grey "starts ..." while it's
+   only counting down (.is-upcoming from coc-events.js). */
+.t18-tag{
+  position:relative;
+  display:inline-flex; align-items:baseline; gap:8px;
+  padding:9px 13px 8px;
+  border-radius:4px;
+  background:var(--ghost-bg);
+  border:1px solid var(--ghost-border);
+  box-shadow:0 6px 14px -6px rgba(0,0,0,0.8);
+  font-family:'Oxanium', sans-serif;
+  font-size:10.5px; font-weight:800; line-height:1; letter-spacing:1.3px; text-transform:uppercase;
+  color:#c9ccd2; text-decoration:none; white-space:nowrap;
+  transform:rotate(var(--tilt, 0deg));
+  transition:transform .2s cubic-bezier(.2,.8,.2,1), border-color .15s ease, color .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.t18-tag:hover, .t18-tag:focus-visible{
+  transform:translateY(-2px);
+  border-color:var(--ghost-border-hover);
+  color:#fff;
+}
+.t18-tag:focus-visible{ outline:2px solid rgba(255,255,255,0.75); outline-offset:3px; }
+/* (The round "pin" on top of each tag -- red live, grey upcoming -- was
+   removed on request, Sep 2026. The time's colour and "ends" / "starts"
+   wording below already carry the same state.) */
+.t18-tag-time{
+  font-family:'Oxanium', sans-serif;   /* not Orbitron: its slashed zero read as "1d Øh" */
+  font-size:10.5px; font-weight:800; letter-spacing:.4px;
+  text-transform:none;                 /* "1d 3h", not "1D 3H" */
+  font-variant-numeric:tabular-nums;
+}
+.t18-tag-time span{ margin-left:1px; font-size:.85em; }
+/* Running (or always-on, counting to its end/reset): "ends ..." in red.
+   Not started yet (.is-upcoming from coc-events.js): "starts ..." in grey. */
+.t18-tag-time{ color:#e06363; }
+.t18-tag.is-upcoming .t18-tag-time{ color:#8b9099; }
+.t18-tag-time::before{
+  content:"ends ";
+  font-family:'Oxanium', sans-serif; font-weight:700; letter-spacing:.5px;
+}
+.t18-tag.is-upcoming .t18-tag-time::before{ content:"starts "; }
+/* "Time Left" / "Starts in" stays in the link for screen readers only;
+   the time's colour and "ends" / "starts" say the same thing visually. */
+.t18-vh{
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0;
+}
+
+/* Tabs, Town Hall chips, page numbers and all buttons keep the site's
+   grey materials (1coclayouts.css / the rules above) -- no red states. */
+
+/* ---- Layout cards: colours only -------------------------------------- */
+/* Card background: the hero's dark grey surface (#121316) with the same
+   8%-white hairline, so hero, cards and clan card read as one family and
+   the base screenshots are the only colour. (History: blue-grey
+   #282c53 -> #151617 until Sep 2026; a dark red #3a1d21 was tried before
+   that.) The hairline is an inset shadow, not a border, so it adds no
+   size. Set here and in the base .discord-card rule + its phone override. */
+.coc-content .discord-card{
+  background:#121316;
+  box-shadow:0 6px 18px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.08);
+  transition:box-shadow .25s ease, transform .25s ease;
+}
+.coc-content .discord-card:hover{
+  box-shadow:0 12px 28px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.14);
+}
+
+/* CC popover + share menu in the same material */
+.coc-content .cc-popup{
+  background:#15161a;
+  border:1px solid #3a3d44;
+  border-top:2px solid var(--t18-red);
+  border-radius:8px;
+}
+.coc-content .share-panel{ background:#15161a; border:1px solid #3a3d44; border-radius:8px; }
+
+/* ---- Live events label: coc-home kicker voice ------------------------ */
+.coc-content .cc-label{ display:inline-flex; align-items:center; gap:8px; font-size:10px; letter-spacing:2.2px; color:#8b9099; }
+.coc-content .cc-label::before{
+  content:""; width:5px; height:5px; border-radius:50%;
+  background:var(--t18-red); box-shadow:0 0 6px rgba(194,59,59,0.8);
+  animation:t18-dot 2.6s ease-in-out infinite;
+}
+.coc-content .cc-label-note{ font-family:'Oxanium', sans-serif; font-size:10px; letter-spacing:1.6px; text-transform:uppercase; color:var(--t18-faint); }
+
+/* ---- Clan card: coc-home's clan box -------------------------------- */
+.coc-content .clan-card{
+  background:
+    radial-gradient(50% 85% at 82% 78%, rgba(194,59,59,0.16) 0%, rgba(194,59,59,0) 72%),
+    var(--t18-surface);
+}
+.coc-content .clan-title{ font-family:'Orbitron', sans-serif; font-size:20px; font-weight:900; letter-spacing:-0.2px; text-transform:uppercase; }
+.coc-content .clan-title em{ font-style:normal; color:var(--t18-red); text-shadow:0 0 18px rgba(194,59,59,0.4); }
+/* ---- Spacing for the head --------------------------------------------
+   Card -> tabs 20px (14 on phones). */
+.coc-content .first-layer{ margin-top:20px; }
+@media (min-width:971px){ .coc-content .first-layer{ margin-top:32px; } }   /* desktop: hero -> tabs on the spacing scale (see ".clan-card" block) */
+
+/* ---- Page numbers --------------------------------------------------------
+   Simplified from 1coclayouts.css's boxed pill (shared with the other TH
+   pages, so overridden here): no container, just the buttons, in the same
+   states as the tabs -- flat near-black numbers, a step lighter on hover,
+   the current page is the raised key. "Next" is plain caps text. */
+.coc-content .pagination{ gap:8px; padding:0; background:none; border:0; box-shadow:none; }
+.coc-content .pagination a{
+  min-width:36px; height:36px; padding:0 12px;
+  border-radius:8px;
+  background:rgba(11, 11, 12, 0.8);
+  color:var(--text-muted);
+  font-family:'Oxanium', sans-serif; font-size:12.5px; font-weight:800;
+  transition:background .2s, color .2s;
+}
+.coc-content .pagination a:hover{ background:var(--flat-hover); color:var(--text-secondary); transform:none; }
+.coc-content .pagination a.active{ background:var(--key-face); color:var(--text-main); box-shadow:var(--key-edge); }
+.coc-content .pagination a.active:hover{ background:var(--key-face-hover); }
+.coc-content .pagination a.next{
+  margin-left:2px; padding:0 8px;
+  background:none; border:0; border-radius:8px;
+  font-size:11px; letter-spacing:1.3px; text-transform:uppercase;
+}
+.coc-content .pagination a.next:hover{ background:none; color:var(--text-main); }
+
+/* ---- Layouts / Army / Guides tabs + Town Hall chips --------------------
+   One set of states for both rows: flat near-black at rest (1coclayouts.css's
+   own fill), a step lighter on hover, and the ACTIVE one is a raised keycap
+   (--key-* tokens) that gets a step lighter again on hover. Oxanium caps,
+   with the secondary top bar's own icons in front of each tab label --
+   outline normally, filled on the active tab, like the top bar. The icons
+   are added by the nav script at the bottom of the page (HUB_ICONS). */
+.coc-content .first-layer button{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  min-height:40px;
+  padding:0 10px;
+  border-radius:8px;
+  background:rgba(11, 11, 12, 0.8);
+  border:0;
+  box-shadow:none;
+  font-family:'Oxanium', sans-serif;
+  font-size:11.5px; font-weight:800; letter-spacing:1.3px; text-transform:uppercase;
+  color:var(--text-muted);
+  transition:background 0.2s, color 0.2s;
+}
+.coc-content .first-layer button:hover,
+.coc-content .second-layer button:hover{ background:var(--flat-hover); color:var(--text-secondary); }
+.coc-content .first-layer button.active,
+.coc-content .second-layer button.active{
+  background:var(--key-face);
+  color:var(--text-main);
+  box-shadow:var(--key-edge);
+}
+.coc-content .first-layer button.active{ font-weight:800; }
+.coc-content .first-layer button.active:hover,
+.coc-content .second-layer button.active:hover{ background:var(--key-face-hover); }
+/* Room for the active chip's 3px key edge inside the strip's scroll box
+   (overflow-x:auto clips anything that hangs below it). */
+.coc-content .second-layer{ padding-bottom:4px; }
+.coc-content .first-layer button:focus-visible{ outline:2px solid rgba(255,255,255,0.35); outline-offset:2px; }
+.fl-ico, .fl-ico-fill{ width:16px; height:16px; flex-shrink:0; }
+.fl-ico-fill{ display:none; }
+.first-layer button.active .fl-ico{ display:none; }
+.first-layer button.active .fl-ico-fill{ display:block; }
+
+/* ---- Clash Clock tags (Live events, under the page numbers) ------------
+   The six events as the same pinned tags as the banner (.t18-tag: ghost
+   fill, pin, tilt, starts/ends wording), a size up, each with its event
+   icon in the Clash Tools tile (.cc-event-icon). 3 across on desktop,
+   2 across on phones. Not links, so no hover lift. */
+.t18-clock{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:18px 14px;
+  margin:0; padding:8px 0 0;           /* headroom for the pins */
+  list-style:none;
+}
+.t18-clock-tag{
+  display:flex; align-items:center; gap:12px;
+  min-width:0;
+  padding:12px 14px;
+  border-radius:8px;
+  font-size:11px; letter-spacing:1.2px;
+  cursor:default;
+}
+.t18-clock-tag:nth-child(3n+1){ --tilt:-1deg; }
+.t18-clock-tag:nth-child(3n+2){ --tilt:.8deg; }
+.t18-clock-tag:nth-child(3n){ --tilt:-.4deg; }
+.t18-clock-tag:hover{ transform:rotate(var(--tilt)); border-color:var(--ghost-border); color:#c9ccd2; }
+/* Desktop: the six sit straight and aligned in their grid (the tilt is
+   for phones, and for the three pinned tags in the banner). */
+@media (min-width:971px){ .t18-clock .t18-clock-tag{ --tilt:0deg; } }
+.t18-clock-tag .cc-event-icon{
+  flex-shrink:0;
+  width:36px; height:36px;
+  display:grid; place-items:center;
+  border-radius:9px;
+  background:#1a1b1f;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.t18-clock-tag .cc-event-icon img{
+  width:24px; height:24px; object-fit:contain;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}
+.t18-clock-text{ display:flex; flex-direction:column; gap:7px; min-width:0; }
+.t18-clock-tag .t18-tag-name{ overflow:hidden; text-overflow:ellipsis; }
+.t18-clock-tag .t18-tag-time{ font-size:13px; }
+
+@media (min-width:1351px) and (max-width:1519px){
+  .t18-events{ grid-template-columns:repeat(2, 164px); }
+  .t18-dyk-fact{ font-size:14px; }     /* with the narrower cards, keeps every fact to 2 lines */
+}
+/* Wide screens: the text column stops at 560px (the one-line title at its
+   44px max is ~530px; the fact box is 52ch, ~481px) and the event cards
+   stretch into the rest, instead of a dead gap opening between the text and
+   the events. The events column's minimum is its content (auto), so on
+   narrower screens the TEXT column gives way, never the cards' 176px
+   floor. Cards stop at 300px on very wide screens; the block then sits
+   right, where it always was. */
+@media (min-width:1440px){
+  .t18-hero{ grid-template-columns:minmax(0, 560px) minmax(auto, 1fr); }
+  .t18-events{ grid-template-columns:repeat(2, minmax(176px, 300px)); justify-self:end; }
+}
+/* 1350px and down: there's no room beside the text, so the events move
+   under it -- still 2 per row, 2 rows (4 cards) -- and the hairline goes. */
+@media (max-width:1350px){
+  .t18-hero{ grid-template-columns:minmax(0, 1fr); grid-template-areas:"copy" "events"; row-gap:18px; }
+  .t18-events{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; padding:0; border-left:0; }
+}
+@media (max-width:1180px){
+  .t18-hero{ padding:22px 26px 20px; }
+}
+/* ---- Phone hero ------------------------------------------------------
+   Same card, compact:
+     row 1: two-line title | [‹] one event card [›]
+     row 2: "Did you know?" + the fact, full width
+   .t18-hero-copy steps aside (display:contents) so the title and the fact
+   box can sit in the card's grid directly. */
+@media (max-width:970px){
+  .t18-hero{
+    container-type:inline-size;          /* title/tower size off the card's width (cqi) */
+    grid-template-columns:minmax(0, 1fr) auto;
+    grid-template-areas:
+      "head events"
+      "dyk  dyk";
+    column-gap:10px;
+    row-gap:14px;
+    padding:18px 16px;
+    margin-top:22px;                   /* clear air under the fixed top bars */
+    border-radius:14px;
+  }
+  .t18-hero-copy{ display:contents; }
+  .t18-head{ grid-area:head; align-self:center; gap:10px; margin:0; }
+  .t18-dyk{ grid-area:dyk; }
+  /* sized off the card so "TH18 BASE" still fits beside the event card on a 360px phone */
+  .t18-title{ font-size:clamp(17px, 6cqi, 24px); }
+  .t18-dyk-label{ margin-bottom:4px; font-size:10.5px; }
+  /* One compact card at a time, prev / next either side. All six cards
+     share the middle cell (so it's as wide as the widest and never jumps);
+     only .is-current shows. The leaving card fades out, the next slides in. */
+  .t18-events{ display:grid; grid-template-columns:auto minmax(0, auto) auto; align-items:center; column-gap:2px; padding:0; border-left:0; align-self:center; }
+  .t18-ev-navli{ display:block; grid-row:1; }
+  .t18-ev-navli--prev{ grid-column:1; }
+  .t18-ev-navli--next{ grid-column:3; }
+  .t18-events > li:not(.t18-ev-navli){
+    grid-column:2; grid-row:1;
+    opacity:0; visibility:hidden; transform:translateX(8px);
+    transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+  }
+  .t18-events > li.is-current{
+    opacity:1; visibility:visible; transform:none;
+    transition:opacity .25s ease .1s, transform .3s cubic-bezier(.2,.8,.2,1) .1s, visibility 0s;
+  }
+  /* the buttons: just a grey chevron, no box -- brighter when pressed */
+  .t18-ev-nav{
+    display:grid; place-items:center;
+    width:20px; height:34px; padding:0;
+    border:0; border-radius:6px; background:none;
+    color:#5a5e66; cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    transition:color .15s ease, background-color .15s ease;
+  }
+  .t18-ev-nav svg{ width:15px; height:15px; }
+  .t18-ev-nav:hover, .t18-ev-nav:active{ color:#c9ccd2; background:rgba(255,255,255,0.04); }
+  .t18-ev-nav:focus-visible{ outline:2px solid rgba(255,255,255,0.6); outline-offset:1px; }
+  .t18-event{ gap:8px; padding:5px 10px 5px 5px; border-radius:10px; }
+  .t18-event-icon{ width:26px; height:26px; border-radius:7px; }
+  .t18-event-icon img{ width:18px; height:18px; }
+  .t18-event:not(.is-upcoming) .t18-event-icon::after{ bottom:-5px; padding:2px 3px 1px; font-size:6px; }
+  .t18-event-text{ gap:4px; }
+  .t18-event-name{ font-size:10px; letter-spacing:.6px; }
+  .t18-event-time{ font-size:11px; }
+  .t18-clock{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px 10px; }
+  .t18-clock-tag{ gap:10px; padding:10px 11px; font-size:10px; letter-spacing:1px; }
+  .t18-clock-tag:nth-child(odd){ --tilt:-1deg; }
+  .t18-clock-tag:nth-child(even){ --tilt:.8deg; }
+  .t18-clock-tag .cc-event-icon{ width:32px; height:32px; }
+  .t18-clock-tag .cc-event-icon img{ width:22px; height:22px; }
+  .t18-clock-tag .t18-tag-time{ font-size:12px; }
+  .coc-content .first-layer{ margin-top:14px; gap:8px; }
+  .coc-content .first-layer button{ min-height:38px; gap:6px; font-size:10.5px; letter-spacing:1px; }
+  .fl-ico, .fl-ico-fill{ width:14px; height:14px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .coc-content .cc-label::before{ animation:none; }
+  .t18-event .t18-event-icon::after{ animation:none; }
+  .t18-tag{ transition:none; }
+}
+
+/* ---- Background grain --------------------------------------------------
+   A very faint film-grain texture over the page background, so the flat
+   dark gradient doesn't read as plain digital black. The grain is a tiny
+   inline SVG (feTurbulence noise, greyscale, contrast-boosted, 220px tile)
+   laid over .coc-main's own gradient at 8% -- a background LAYER, not an
+   element, so nothing is added to the page and stacking is untouched.
+   Solid surfaces (hero, cards) cover it; it shows only around them.
+   The gradient under it was darkened (23 -> 16 top, 12 -> 4 bottom) to
+   cancel the lift the 8% grain adds, so the page is as dark as before:
+   measured 16.8 vs 16.9 near the top, 13.2 vs 13.5 lower down.
+   Strength: the rect's opacity in the SVG (0.08). */
+.coc-main{
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(16, 16, 16), rgb(4, 4, 4));
+  background-size:220px 220px, auto;
+  background-blend-mode:normal, normal;
+}
+
+/* ---- Space above the hero = space below it ---------------------------
+   .coc-main's top padding now equals the fixed bars exactly, .coc-content
+   adds nothing on top, and the hero's own margin is the whole gap -- the
+   same as hero -> tabs: 32px on desktop, 14px on phones. */
+@media (min-width:971px){
+  .coc-main{ padding-top: calc(var(--topbar-height, 40px) + 48px); }   /* top bar + secondary bar */
+  .coc-content{ padding-top:0; }
+  .coc-content .t18-hero{ margin-top:32px; }
+}
+@media (max-width:970px){
+  .coc-main{ padding-top: calc(var(--topbar-height, 52px) + 38px); }   /* top bar + secondary bar */
+  .coc-content{ padding-top:0; }
+  .coc-content .t18-hero{ margin-top:14px; }
+}
+
+
+/* ---- Phones scroll the whole page, like homewebresources ----------------
+   The bug: below 971px .coc-main was the scroll container (body is
+   height:100vh + overflow:hidden), and the fixed top bars sit over any
+   scrollbar INSIDE the page -- so its top was always covered. homewebres
+   lets body grow and scroll instead: then the scrollbar is the browser
+   window's own, which fixed bars can never cover (they stop at its edge on
+   their own). Same here. The scroll lock that used to rely on .coc-main
+   (sidebar / More sheet / search) is replaced by the script below, which
+   pins the page in place while one of those is open. Desktop unchanged. */
+@media (max-width:970px){
+  body{ height:auto; overflow:auto; }
+  /* The More sheet's lock (html.no-scroll) also sets body height:100%,
+     which shrinks the page to one screen and snaps the scroll position to
+     0 before it can be saved -- closing the sheet then jumped to the top.
+     Keep the real height; the script pins the page instead. (:root only
+     raises specificity over the older rule.) */
+  html.no-scroll:root body{ height:auto; }
+}
+</style>
+<script>
+// Stop the fixed top bars exactly at .coc-main's scrollbar: measure its real
+// width (0 on phones, whose scrollbars float over the page) and hand it to
+// the CSS as --scrollbar-w. Re-measured on resize.
+(function(){
+  // Desktop: .coc-main scrolls and its scrollbar runs the full height, with
+  // both bars stopping at its edge (same as homewebresources / coc-home).
+  // Phones: the page itself scrolls, .coc-main has no scrollbar, so this is
+  // 0 and the bars simply stop at the window's own scrollbar.
+  function setScrollbarWidth(){
+    var main = document.querySelector('.coc-main');
+    if (!main) return;
+    document.documentElement.style.setProperty('--scrollbar-w', (main.offsetWidth - main.clientWidth) + 'px');
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    setScrollbarWidth();
+    // the scrollbar can appear or change after load (content, fonts, zoom)
+    var main = document.querySelector('.coc-main');
+    if (main && window.ResizeObserver) new ResizeObserver(setScrollbarWidth).observe(main);
+  });
+  window.addEventListener('load', setScrollbarWidth);
+  window.addEventListener('resize', setScrollbarWidth);
+})();
+</script>
+<script>
+// Phones scroll the page itself (see "Phones scroll the whole page" in the
+// CSS). While the sidebar, the More sheet or the search overlay is open the
+// page must not scroll behind it: body.overflow:hidden alone doesn't stop
+// that on iOS, so pin body in place (position:fixed at the current offset)
+// and put the scroll position back when it closes. Same technique as
+// hwr-js.js's stbLockScroll. Watches the classes those features already set.
+(function(){
+  var mq = window.matchMedia('(max-width: 970px)');
+  var lockedY = null;
+  var lastY = 0;       // last real scroll position, in case a lock's CSS already reset it
+  window.addEventListener('scroll', function(){ if (lockedY === null) lastY = window.pageYOffset; }, { passive: true });
+  function wantLock(){
+    return document.body.classList.contains('sidebar-open') ||
+           document.body.classList.contains('search-modal-open') ||
+           document.documentElement.classList.contains('no-scroll');
+  }
+  function sync(){
+    var want = mq.matches && wantLock();
+    var b = document.body.style;
+    if (want && lockedY === null) {
+      // lastY first: it's from before the lock's own CSS could shift the page
+      lockedY = lastY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      b.position = 'fixed'; b.top = (-lockedY) + 'px';
+      b.left = '0'; b.right = '0'; b.width = '100%'; b.height = 'auto';
+    } else if (!want && lockedY !== null) {
+      var y = lockedY; lockedY = null;
+      b.position = ''; b.top = ''; b.left = ''; b.right = ''; b.width = ''; b.height = '';
+      window.scrollTo({ top: y, behavior: 'instant' });
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var mo = new MutationObserver(sync);
+    mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    // Tapping the secondary bar scrolls to the top (11layout.js scrolls
+    // .coc-main, which no longer moves on phones -- scroll the page too).
+    var bar = document.querySelector('.secondary-top-bar');
+    if (bar) bar.addEventListener('click', function(){
+      if (mq.matches) window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+})();
+</script>
 </head>
 <body>
+<!-- Shared ember gradient for the liked flame. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="heartActiveFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd36b"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#e2531f"/></linearGradient></defs></svg>
   
   <div id="page-loader">
   <div class="parchrome-fade">
@@ -54,8 +1527,6 @@
   </div>
   <span class="parchrome-label">Parchrome</span>
 </div>
-
-
 
 
 <!-- Top Nav -->
@@ -72,21 +1543,23 @@
     </div> <a href="home.html">Parchrome</a></div>
 
 <!-- Search button -->
-<button id="search-btn" onclick="openSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
+<button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
   <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
     <!-- Magnifying glass -->
     <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
     <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
   </svg>
-  <span id="close-icon" style="display:none; font-size: 1.5rem; color: white;">✖</span></button>
+  <span id="close-icon">✖</span></button>
 <!-- Overlay -->
 <div id="search-overlay">
-  <!-- Close button -->
-  <button id="search-close-btn">✖</button>
-  <!-- Search input -->
-  <input type="text" id="search-input" placeholder="Find your next game..." oninput="searchItems()">
+  <div id="search-input-wrap">
+    <input type="search" id="search-input" placeholder="Find your next game..." oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+    <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+  </div>
   <!-- Search results -->
-  <div id="search-results"></div></div></div>
+  <div id="search-results"></div>
+  <div id="search-view-more" class="hero-search-viewmore" style="display:none;">Loading more…</div>
+</div></div>
 
 <!-- Secondary Top Bar -->
 <div class="secondary-top-bar" id="secondary-top-bar">
@@ -98,36 +1571,41 @@
 </div>
   </div>
 
+  <div class="stb-divider" aria-hidden="true"></div>
 
-
-  <div class="help-container">
-    <div class="help-button" onclick="toggleHelp(event)">
-      <svg width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" fill="none" xmlns="http://www.w3.org/2000/svg"
-       stroke="#c2c2c2"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" 
-       stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 5.5C5.5 4.11929 6.61929 3 8 3C9.38071 3 
-        10.5 4.11929 10.5 5.5C10.5 6.88071 9.38071 8 8 8H7V11H8C11.0376 11 13.5 8.53757 13.5 5.5C13.5 2.46243 11.0376
-         0 8 0C4.96243 0 2.5 2.46243 2.5 5.5H5.5Z" fill="#bebebe"></path> <path d="M10 13H7V16H10V13Z" fill="#bebebe"></path> </g></svg>
-         </div>
-    <div class="help-popup" id="help-popup">
-      <strong>Info</strong> <ul> <br> 
-  <li>🛡️ Tap the clan banner to view recommended CC</li><br>
-  <li>⚠️ Downloads may not work inside Facebook or Messenger.
-Please open this page in Chrome for the best experience.</li><br>
-<li>📋 AC Clan Tag: <span id="clan-tag" class="copy-tag">#2GYPGPJP9</span></li><br></ul>
-<div id="copy-msg" style="position:absolute; top:-30px; right:0; background:#242424;
- color:white; padding:8px 16px; border-radius:4px; display:none; font-size:20px;">Clan Tag Copied!</div>   </div>
-
-  <div class="help-container2">
-    <a class="help-button2" href="home.html">
-  <svg fill="#bebebe" width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" xmlns="http://www.w3.org/2000/svg" stroke="#bebebe">
-    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-    <g id="SVGRepo_iconCarrier"> <path d="M12.207 9H5V7h7.136L11.05 5.914 12.464 4.5 16 8.036l-3.536 3.535-1.414-1.414L12.207 9zM10 
-       4H8V2H2v12h6v-2h2v4H0V0h10v4z" fill-rule="evenodd"></path> </g></svg>
-       </a>
+  <!-- dsn-chip strip: Town Halls TH18→TH8, built from coc-nav-data.json.
+       No more dropdown -- each chip links straight to that TH's layouts
+       page. Markup/behavior mirrors hwr's .stb-dsn-wrap (11layout.css/js),
+       same as coc-home.html. -->
+  <div class="stb-dsn-wrap" id="stbDsnWrap">
+    <button class="dsn-scroll-btn dsn-scroll-left" id="dsnScrollLeft" aria-label="Scroll left">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
+    <button class="dsn-scroll-btn dsn-scroll-right" id="dsnScrollRight" aria-label="Scroll right">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
+
+  <!-- Divider between the two strips -- caps off the dsn-chip row before
+       the stb-hub-link row begins, same as hwr's reference layout. -->
+  <div class="stb-divider-end" aria-hidden="true"></div>
+
+  <!-- stb-hub-link strip: Home / Layouts / Armies / Guides, built from
+       coc-nav-data.json's primaryNav. data-hub-nav="off" opts this out of
+       11layout.js's hwr-only hub-nav builder (initHubNav), which would
+       otherwise overwrite it with hwr's own Home/Bookmarks/etc. -->
+  <div class="stb-hub-nav" id="stbHubNav" data-hub-nav="off">
+    <button class="dsn-scroll-btn dsn-scroll-left" id="hubScrollLeft" aria-label="Scroll left">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+    <button class="dsn-scroll-btn dsn-scroll-right" id="hubScrollRight" aria-label="Scroll right">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
 </div></div>
-
-
 
 
     <!-- Main -->
@@ -139,326 +1617,969 @@ Please open this page in Chrome for the best experience.</li><br>
     <div class="games-container" id="games-container"></div>
     <!-- Triple A Games -->
   <div class="triple-a-container">
-      <div class="triple-a-header" onclick="toggleTripleA()">
-        <img  src="icons/controllericon.png" class="tripleimg">
-        Triple A Games <span class="arrow">></span>
-      </div>
+      <div class="triple-a-header" id="triple-a-header" onclick="toggleTripleA()"></div>
       <div class="triple-a-list" id="triple-a-list"></div> </div></div>
 
       
   <div class="coc-main" >
 
-
      <div class="coc-content">
 
-       <div class="whats-up">
-  <img src="clashofclans/th18layouts/th18def.png" alt="TH18" class="whats-new-icon">
-  <div class="whats-new-text"><span class="desktop-text">
+       <!-- PAGE HERO ("Hanging tags" mockup, tags brought inside): one
+            card holding everything. Left: the Orbitron headline with one
+            red word, "Did you know?", then the pinned event tags. Right:
+            the Revenge Tower standing on its own like a trophy, with its
+            badge, name and one line under it. Styles: the TH18 COC-HOME
+            THEME block at the end of <head>. -->
+       <section class="t18-hero" aria-labelledby="t18-title">
+         <div class="t18-hero-copy">
+           <div class="t18-head">
+             <h1 class="t18-title" id="t18-title">TH18 base<br> <em>layouts</em></h1>
+           </div>
+           <!-- DID YOU KNOW? -- sits where the intro sentence (.t18-sub) used
+                to be, in that sentence's colour and type. Facts live in coc-dyk.json (edit that file,
+                not this markup). The script below shuffles them on every
+                visit and fades to the next one on its own. Hidden until the
+                JSON loads, so a failed fetch leaves no empty label behind. -->
+           <div class="t18-dyk" id="t18-dyk" role="button" tabindex="0" hidden>
+             <span class="t18-dyk-label">Did you know?</span>
+             <div class="t18-dyk-stage"></div>
+           </div>
+           <script>
+           (function(){
+             var box = document.getElementById('t18-dyk');
+             if (!box || !window.fetch) return;
+             var stage = box.querySelector('.t18-dyk-stage');
+             fetch('coc-dyk.json')
+               .then(function(r){ return r.json(); })
+               .then(function(data){
+                 var facts = (data.facts || []).map(function(f){ return f.text; }).filter(Boolean);
+                 if (!facts.length) return;
+                 // Fisher-Yates shuffle: a different first fact on every visit.
+                 for (var i = facts.length - 1; i > 0; i--) {
+                   var j = Math.floor(Math.random() * (i + 1)), t = facts[i];
+                   facts[i] = facts[j]; facts[j] = t;
+                 }
+                 // Every fact sits in the same grid cell, so the box is always
+                 // as tall as the longest one -- the page below never jumps
+                 // when a short fact follows a long one. Only one is visible.
+                 var els = facts.map(function(text){
+                   var p = document.createElement('p');
+                   p.className = 't18-dyk-fact';
+                   p.textContent = text;
+                   p.setAttribute('aria-hidden', 'true');
+                   stage.appendChild(p);
+                   return p;
+                 });
+                 var at = 0, timer = null, paused = false;
+                 function show(n){
+                   els[at].classList.remove('is-on'); els[at].setAttribute('aria-hidden', 'true');
+                   at = n;
+                   els[at].classList.add('is-on'); els[at].removeAttribute('aria-hidden');
+                 }
+                 // Longer facts stay up longer: 3.5s plus ~45ms per character,
+                 // never under 6s, so there's time to read the whole thing.
+                 function schedule(){
+                   clearTimeout(timer);
+                   if (paused || els.length < 2) return;
+                   var ms = Math.max(6000, 3500 + els[at].textContent.length * 45);
+                   timer = setTimeout(function(){
+                     stage.removeAttribute('aria-live');   // timed changes stay silent
+                     show((at + 1) % els.length); schedule();
+                   }, ms);
+                 }
+                 // It holds still while someone is reading it: pointer over it
+                 // or keyboard focus on it (WCAG 2.2.2 -- moving content must be
+                 // pausable). Touch screens rotate on the same timer; with no
+                 // hover to pause, a tap skips to the next fact and restarts
+                 // the clock so it gets its full reading time. Focus only
+                 // pauses on non-touch screens -- a tap focuses the box too,
+                 // which would otherwise freeze it after the first tap.
+                 // Click / tap / Enter / Space all advance, and a fact the
+                 // visitor asked for is announced to screen readers.
+                 var touch = !!(window.matchMedia && matchMedia('(hover: none)').matches);
+                 function hold(){ paused = true; clearTimeout(timer); }
+                 function release(){ paused = false; schedule(); }
+                 function next(){
+                   if (els.length < 2) return;
+                   stage.setAttribute('aria-live', 'polite');
+                   show((at + 1) % els.length);
+                   schedule();
+                 }
+                 if (!touch) {
+                   box.addEventListener('mouseenter', hold);
+                   box.addEventListener('mouseleave', release);
+                   box.addEventListener('focusin', hold);
+                   box.addEventListener('focusout', release);
+                 }
+                 box.addEventListener('click', next);
+                 box.addEventListener('keydown', function(e){
+                   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); next(); }
+                 });
+                 box.title = touch ? 'Tap for another fact' : 'Click for another fact';
+                 show(0);
+                 box.hidden = false;
+                 schedule();
+               })
+               .catch(function(err){ console.error('Did you know: failed to load coc-dyk.json', err); });
+           })();
+           </script>
+         </div>
 
-   <div class="whats-up-strong">Revenge Tower</div> 
+         <!-- EVENTS -- all six clan events on the card: event icon | name
+              over countdown. coc-events.js fills [data-timer] and sets
+              .is-live / .is-upcoming on each link: counting to an end = red
+              "ends 1d 3h" and a red dot on the icon, not started = grey
+              "starts 4d 4h" and a grey dot (the words are CSS). Each jumps to
+              Live events. Desktop: 2 per row; as many rows (2 or 3) as fit
+              beside the text, the rest hidden -- set by the script below.
+              Phones: ONE compact card beside the title, starting on Raid
+              Weekend, with small prev / next buttons either side (no
+              auto-rotate). -->
+         <ul class="t18-events" aria-label="Clan events">
+           <li class="t18-ev-navli t18-ev-navli--prev"><button type="button" class="t18-ev-nav" data-step="-1" aria-label="Previous event"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></li>
+           <li><a class="t18-event" href="#events-section" data-event="raid"><span class="t18-event-icon"><img src="clashofclans/coctools/raidmedals2.webp" alt="" decoding="async"></span><span class="t18-event-text"><span class="t18-event-name">Raid Weekend</span> <b class="t18-event-time" data-timer>--</b></span></a></li>
+           <li><a class="t18-event" href="#events-section" data-event="cwl"><span class="t18-event-icon"><img src="clashofclans/coctools/cwl2.webp" alt="" decoding="async"></span><span class="t18-event-text"><span class="t18-event-name">CWL</span> <b class="t18-event-time" data-timer>--</b></span></a></li>
+           <li><a class="t18-event" href="#events-section" data-event="clangames"><span class="t18-event-icon"><img src="clashofclans/coctools/clangames2.webp" alt="" decoding="async"></span><span class="t18-event-text"><span class="t18-event-name">Clan Games</span> <b class="t18-event-time" data-timer>--</b></span></a></li>
+           <li><a class="t18-event" href="#events-section" data-event="trader"><span class="t18-event-icon"><img src="clashofclans/coctools/trader2.webp" alt="" decoding="async"></span><span class="t18-event-text"><span class="t18-event-name">Trader Shop</span> <b class="t18-event-time" data-timer>--</b></span></a></li>
+           <li><a class="t18-event" href="#events-section" data-event="season"><span class="t18-event-icon"><img src="clashofclans/coctools/battlepass.webp" alt="" decoding="async"></span><span class="t18-event-text"><span class="t18-event-name">Battle Pass</span> <b class="t18-event-time" data-timer>--</b></span></a></li>
+           <li><a class="t18-event" href="#events-section" data-event="legend"><span class="t18-event-icon"><img src="clashofclans/coctools/legend-league.png" alt="" decoding="async"></span><span class="t18-event-text"><span class="t18-event-name">Legend League</span> <b class="t18-event-time" data-timer>--</b></span></a></li>
+           <li class="t18-ev-navli t18-ev-navli--next"><button type="button" class="t18-ev-nav" data-step="1" aria-label="Next event"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></li>
+         </ul>
+         <script>
+         // Desktop (1351px+): 2 cards per row, and only as many rows as fit
+         // beside the text column -- at least 2, at most 3 -- the rest hidden
+         // (.is-over). 971-1350px: under the text, 2 x 2. Phones: one card at a
+         // time, Raid Weekend first, stepped with the prev / next buttons.
+         (function(){
+           var list = document.querySelector('.t18-events');
+           if (!list) return;
+           var items = [].slice.call(list.querySelectorAll('li:not(.t18-ev-navli)'));
+           var copy = document.querySelector('.t18-hero-copy');
+           var phone = window.matchMedia('(max-width:970px)');
+           var wide = window.matchMedia('(min-width:1351px)');
+           var at = 0;
+           function show(){
+             items.forEach(function(li, i){ li.classList.toggle('is-current', i === at); });
+           }
+           var lastKey = '';
+           function fitRows(){
+             var rows = 2;
+             if (wide.matches && copy) {
+               var textH = copy.getBoundingClientRect().height;
+               var cardH = (items[0].getBoundingClientRect().height) || 52;
+               rows = Math.max(2, Math.min(3, Math.floor((textH + 8) / (cardH + 8))));
+             }
+             var key = (phone.matches ? 'p' : 'd') + rows;
+             if (key === lastKey) return;       // only touch the DOM when the answer changes
+             lastKey = key;
+             items.forEach(function(li, i){ li.classList.toggle('is-over', !phone.matches && i >= rows * 2); });
+           }
+           list.addEventListener('click', function(e){
+             var btn = e.target.closest('.t18-ev-nav');
+             if (!btn) return;
+             at = (at + (+btn.getAttribute('data-step')) + items.length) % items.length;
+             show();
+           });
+           show();
+           fitRows();
+           window.addEventListener('resize', fitRows);
+           if (window.ResizeObserver && copy) new ResizeObserver(fitRows).observe(copy);
+         })();
+         </script>
 
-  - Is a powerful defense unlocked at TH-18 that fires high-damage shots which ricochet between targets.
-   Its damage increases as the attacker destroys more of the base, reaching maximum power when 40% destruction
-  
-  </span>
-  
-    <span class="mobile-text">
-      <div class="whats-up-strong">Revenge Tower</div>  
-     - Is a defense that grows stronger as attackers destroy buildings, reaching maximum damage at 40% destruction.</span></div>
-  </div> 
-
-  
-
-
+       </section>
 
     <!-- First Layer -->
-    <div class="first-layer">
-      <button class="active" onclick="location.href='th18-layouts.html'">Layouts</button>
-      <button onclick="location.href='th18-army.html'">Army</button>
-      <button onclick="location.href='coctools.html'">Guides</button>
-    </div>
+    <div class="first-layer" data-role="first-layer"></div>
 
     <!-- Second Layer -->
   <div class="second-layer-container" id="second-layer-container">
-  <div class="second-layer" id="second-layer">
-<button data-th="TH-18" class="active th-btn" onclick="goToTH('th18-layouts.html', this)"><img src="icons/th18icon.png" alt="TH18">18</button>
-<button data-th="TH-17" onclick="goToTH('th17-layouts.html', this)"><img src="icons/th17icon.webp" alt="TH18">17</button>
-<button data-th="TH-16" onclick="goToTH('th16-layouts.html', this)"><img src="icons/th16icon.webp" alt="TH18">16</button>
-<button data-th="TH-15" onclick="goToTH('th15-layouts.html', this)"><img src="icons/th15icon.webp" alt="TH18">15</button>
-<button data-th="TH-14" onclick="goToTH('th14-layouts.html', this)"><img src="icons/th14icon.webp" alt="TH18">14</button>
-<button data-th="TH-13" onclick="goToTH('th13-layouts.html', this)"><img src="icons/th13icon.webp" alt="TH18">13</button>
-<button data-th="TH-12" onclick="goToTH('th12-layouts.html', this)"><img src="icons/th12icon.webp" alt="TH18">12</button>
-<button data-th="TH-11" onclick="goToTH('th11-layouts.html', this)"><img src="icons/th11icon.webp" alt="TH18">11</button>
-<button data-th="TH-10" onclick="goToTH('th10-layouts.html', this)"><img src="icons/th10icon.webp" alt="TH18">10</button>
-<button data-th="TH-9" onclick="goToTH('th9-layouts.html', this)"><img src="icons/th9icon.webp" alt="TH18">9</button>
-<button data-th="TH-8" onclick="goToTH('th8-layouts.html', this)"><img src="icons/th8icon.webp" alt="TH18">8</button>
-  </div>
+  <div class="second-layer" id="second-layer" data-role="second-layer"></div>
 </div>
+  <!-- Scroll line for the Town Hall strip (mobile): a full-width hairline
+       that doubles as the divider, with a brighter segment showing which
+       part of the strip is in view. Driven by the script below it. -->
+  <div class="th-rail" id="th-rail" aria-hidden="true"><span></span></div>
+  <script>
+  (function(){
+    var box = document.getElementById('second-layer-container');
+    var rail = document.getElementById('th-rail');
+    if (!box || !rail) return;
+    var thumb = rail.firstElementChild;
+    function update(){
+      var total = box.scrollWidth, view = box.clientWidth;
+      if (!total || !view) return;
+      var frac = Math.min(1, view / total);
+      rail.classList.toggle('is-static', frac >= 1);   // nothing to scroll: plain line
+      var max = total - view;
+      var pos = max > 0 ? box.scrollLeft / max : 0;
+      // Short fixed-width thumb (48px) travelling the full line.
+      var railW = rail.clientWidth, tw = Math.min(48, railW);
+      thumb.style.width = tw + 'px';
+      thumb.style.transform = 'translateX(' + (pos * (railW - tw)) + 'px)';
+    }
+    // Hide the thumb for good once the strip has been scrolled: wait until
+    // the scroll settles (700ms of quiet) so it doesn't vanish mid-swipe.
+    var KEY = 'parchrome-th-rail-seen', idle = null;
+    function seen(){ try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+    if (seen()) rail.classList.add('is-done');
+    box.addEventListener('scroll', function(){
+      if (rail.classList.contains('is-done')) return;
+      clearTimeout(idle);
+      idle = setTimeout(function(){
+        rail.classList.add('is-done');
+        try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      }, 700);
+    }, { passive: true });
+    box.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    window.addEventListener('load', update);
+    document.addEventListener('parchome:coc-nav-ready', function(){ requestAnimationFrame(update); });
+    if (window.ResizeObserver) new ResizeObserver(update).observe(document.getElementById('second-layer'));
+    update();
+  })();
+  </script>
 
 
-<div class="army-divider">
-  <span class="army-divider-icon"></span>
-  <div class="army-divider-line"></div>
-</div>
 
 
     <!-- Bases Grid -->
     <div class="grid-container">
 
+  <div class="discord-card" id="base-th18-2">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="TH18 base layout 2" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>NA</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-2" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAygWmgQ5RAu7TfbN78yx" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-2" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
+  <div class="discord-card" id="base-th18-1">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-1-compresso.jpg" alt="TH18 base layout 1" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>NA</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-1" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAsaFV6gO089KTmPIpFBY" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-1" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-  <!-- 2 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>NA</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-2_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-    https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAygWmgQ5RAu7TfbN78yx
-    "target="_blank">Copy Layout  </a></div></div>
+  <div class="discord-card" id="base-th18-3">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-3_watermarked-compresso.jpg" alt="TH18 base layout 3" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-3" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAsh-SJv_5mwMlyra9uCN" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-3" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-    
+  <div class="discord-card" id="base-th18-4">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-4_watermarked-compresso.jpg" alt="TH18 base layout 4" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-4" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAss-0qe2T0idCee4rRp9" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-4" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-  <!-- 1 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>NA</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-1-compresso.jpg" alt="Base 1" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAsaFV6gO089KTmPIpFBY
-    "target="_blank">Copy Layout  </a></div></div>
+  <div class="discord-card" id="base-th18-7">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-7_watermarked-compresso.jpg" alt="TH18 base layout 7" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-7" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAy2jVxMVhaBlyOlhEWn8" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-7" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
+  <div class="discord-card" id="base-th18-8">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-8_watermarked-compresso.jpg" alt="TH18 base layout 8" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-8" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0GYYqnv6edt2hYRL0oP" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-8" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-    
-  <!-- 3 -->  
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-3_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAsh-SJv_5mwMlyra9uCN
-    "target="_blank">Copy Layout  </a></div></div>
+  <div class="discord-card" id="base-th18-9">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-9_watermarked-compresso.jpg" alt="TH18 base layout 9" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-9" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0MctW5TQrvxhokWjQ1X" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-9" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-  <!-- 4 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-4_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAss-0qe2T0idCee4rRp9
-    "target="_blank">Copy Layout  </a></div></div>
+  <div class="discord-card" id="base-th18-10">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-10_watermarked-compresso.jpg" alt="TH18 base layout 10" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-10" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0ReXYHdUiTgexuiMpV2" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-10" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-  <!-- 7 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-7_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBAy2jVxMVhaBlyOlhEWn8
-    "target="_blank">Copy Layout  </a></div></div>
+  <div class="discord-card" id="base-th18-11">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-11_watermarked-compresso.jpg" alt="TH18 base layout 11" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-11" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0vomKjOByXFqyyAyfMM" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-11" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
-      <!-- 8 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-8_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0GYYqnv6edt2hYRL0oP
-    "target="_blank">Copy Layout  </a></div></div>
-
-      <!-- 9 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-9_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0MctW5TQrvxhokWjQ1X
-    "target="_blank">Copy Layout  </a></div></div>
-
-      <!-- 10 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-10_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0ReXYHdUiTgexuiMpV2
-    "target="_blank">Copy Layout  </a></div></div>
- 
-
-
-
-      <!-- 11 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-11_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0vomKjOByXFqyyAyfMM
-    "target="_blank">Copy Layout  </a></div></div>
- 
-
-
-
-
-    
-      <!-- 12 -->
-   <div class="discord-card">
-  <div class="fullscreen-image"><div class="image-badge">TH18</div>
-    <div class="image-logo" onclick="toggleCC(this)">
-    <img src="icons/acbanner.jpg" alt="AC Logo"></div><div class="cc-popup">
-    <strong>Recommended CC</strong><ul>
-    <li>1 Furance</li>
-    <li>2 Ice Golem</li>
-    <li>7 Archers</li></ul></div>
-    <img src="clashofclans/th18layouts/compressed-th18-12_watermarked-compresso.jpg" alt="Base 2" class="zoomable" loading="lazy"> <a class="download-btn"
-    href="
-https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0_HysnZ3Ft5h8natU9A
-    "target="_blank">Copy Layout  </a></div></div>
- 
-
-
-
-
-
-
-
-
+  <div class="discord-card" id="base-th18-12">
+    <div class="card-media">
+      <img src="clashofclans/th18layouts/compressed-th18-12_watermarked-compresso.jpg" alt="TH18 base layout 12" class="zoomable" loading="lazy" onclick="openPalette(this)">
+      <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="icons/th18icon.png" alt="" decoding="async"></button>
+      <div class="cc-popup"><strong>Recommended CC</strong><ul><li>1 Furnace</li><li>2 Ice Golem</li><li>7 Archers</li></ul></div>
+    </div>
+    <div class="action-row card-bar">
+      <button type="button" class="corner-like" data-layout-id="th18-12" aria-pressed="false" aria-label="Like this base" title="Like this base"><svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span class="like-count" data-layout-count hidden>0</span></button>
+      <a class="layout-link" href="https://link.clashofclans.com/en/?action=OpenLayout&id=TH18%3AHV%3AAAAAMQAAAAKBA0_HysnZ3Ft5h8natU9A" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+      <button type="button" class="card-share" data-share="base-th18-12" aria-label="Share this base" title="Share this base"><svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
+    </div>
+  </div>
 
   </div>
 
-  <div class="army-divider" style="margin-top: 40px;">
-  <div class="army-divider-line"></div>
-</div>
-
-
    <!-- Pagination  -->
+   <div class="pagination-wrap">
     <div class="pagination">
   <a href="th18-layouts.html" class="page active">1</a>
   <a href="th18-layouts2.html" class="page">2</a>
 
-  <a href="th18-layouts2.html" class="next">Next &raquo;</a>
+  <a href="th18-layouts2.html" class="next">Next<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
   </div>
 
-
-  
-<!-- Quick Links -->
-<div class="quick-links">
-  <a href="th17-army.html">TH-17 Army Setup</a>
-  <a href="th17-layouts.html">TH-17 Layouts</a>
-  <a href="th18-army.html">TH-18 Army Setup</a>
-<a href="coctools.html">CoC Guides</a></div>
-</div>
-
-<!-- Combined Clan Box -->
-<div class="clan-box">
-  <img src="icons/aclogonb.png" alt="Ascendere Clan" class="clan-box-img">
-  <div class="clan-box-content">
-    <div class="clan-box-title">Become a Clan Member</div>
-    <div class="clan-box-text">
-      Visit our official clan <strong>Ascendere</strong><br>
-      Clan Tag: <span id="ascendere-clan-tag" class="clan-tag-click">#2GYPGPJP9</span>
+  <!-- CLASH CLOCK -- same cards as coc-home.html's Clash Clock (copied
+       markup; coc-events.js fills the data-* hooks and flags live events).
+       id kept: coc-events.js still looks up #events-section. -->
+  <section class="cc-section" id="events-section" aria-labelledby="cc-label">
+    <!-- Small list header (grouped-list pattern), not a big title: tells
+         the reader a new section starts after the page numbers. -->
+    <div class="cc-label-row">
+      <h2 class="cc-label" id="cc-label">Live events</h2>
+      <span class="cc-label-note">Your local time</span>
     </div>
-    <div class="whats-new-text" style="margin-top:12px;">
-Ascendere brings you top-quality Clash of Clans bases, exclusively for the AC fam!
- We post only top-tier layouts, perfect for CWL and ranked battles, making sure every layout helps you stay ahead in wars and regular gameplay.
-  We carefully choose the best among the best to ensure every base is top-notch. Thank you for supporting our community, 
-  your dedication keeps Ascendere growing and inspires us to bring you even more premium contents.    </div>
+    <!-- The six events as pinned tags (same material and starts/ends
+         wording as the banner's tags), each with its event icon in the
+         Clash Tools tile. Replaced the old six boxed cards. Not links --
+         this IS the events section. coc-events.js fills them. -->
+    <ul class="t18-clock" aria-label="Clan events">
+      <li class="t18-tag t18-clock-tag" data-event="raid"><span class="cc-event-icon"><img src="clashofclans/coctools/raidmedals2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Raid Weekend</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="cwl"><span class="cc-event-icon"><img src="clashofclans/coctools/cwl2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Clan War League</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="clangames"><span class="cc-event-icon"><img src="clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Clan Games</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="trader"><span class="cc-event-icon"><img src="clashofclans/coctools/trader2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Trader Shop</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="season"><span class="cc-event-icon"><img src="clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name" data-name="short">Battle Pass</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="legend"><span class="cc-event-icon"><img src="clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Legend League</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+    </ul>
+  </section>
+
+<!-- Official clan card: the title and two buttons, nothing else. "Join Our
+     Clan" copies the clan tag (copyClanTagBtn, which turns it green for a
+     moment) and shows the tag it copies; "Join Global Chat" opens the
+     in-game chat. Styles: .clan-card in the CLASH CLOCK <style> block.
+     (Simplified Sep 2026: the logo tile, "Clan tag" / "Connect with me"
+     labels, the separate tag chip -- it did the same job as the Join
+     button -- and the paragraph were removed.) -->
+<section class="clan-card" aria-labelledby="clan-title">
+  <div class="clan-body">
+    <h2 class="clan-title" id="clan-title">Visit our official <em>clan</em></h2>
+    <!-- Clan stats, filled by the script below from clan-stats.json. That
+         file is refreshed every 30 minutes by a GitHub Action
+         (.github/workflows/clan-stats.yml -> scripts/clan-stats.mjs).
+         Hidden until the numbers load, so a missing file just leaves the
+         card as title + buttons. War wins only shows if the clan's war log
+         is public. -->
+    <dl class="clan-stats" id="clanStats" hidden>
+      <div class="clan-stat"><dt>Members</dt><dd data-stat="members"></dd></div>
+      <div class="clan-stat"><dt>Clan level</dt><dd data-stat="level"></dd></div>
+      <div class="clan-stat" data-stat-box="war"><dt>War wins</dt><dd data-stat="warWins"></dd></div>
+    </dl>
+    <div class="clan-action-row">
+      <button type="button" class="download-btn icon-person" onclick="copyClanTagBtn(this)" title="Copy clan tag to clipboard" data-copy="#2GYPGPJP9">Join Our Clan <span class="clan-btn-tag">#2GYPGPJP9</span></button>
+      <a class="download-btn icon-globe" href="https://link.clashofclans.com/en/?action=OpenGlobalChat&chatId=P46a9cfc5f81340b1b43363b9a30316fb" target="_blank" rel="noopener noreferrer" title="Opens the global chat in Clash of Clans">Join Global Chat</a>
+    </div>
   </div>
+
+  <div class="clan-art" aria-hidden="true">
+    <img src="clashofclans/coctools/wallbreaker-tight.png" alt="" loading="lazy" decoding="async">
+  </div>
+</section>
+<script>
+// Clan stats: read clan-stats.json (kept fresh by a GitHub Action), fill
+// the three tiles, then show the row. Any failure leaves the row hidden.
+(function(){
+  var box = document.getElementById('clanStats');
+  if (!box) return;
+  function fill(d){
+    if (!d || typeof d.members !== 'number') return;
+    function set(name, html){ var el = box.querySelector('[data-stat="' + name + '"]'); if (el) el.innerHTML = html; }
+    set('members', d.members + '<small>/' + (d.maxMembers || 50) + '</small>');
+    set('level', d.level);
+    var war = box.querySelector('[data-stat-box="war"]');
+    if (d.warLogPublic && typeof d.warWins === 'number') {
+      set('warWins', d.warWins.toLocaleString() + (d.warWinStreak > 1 ? '<small>' + d.warWinStreak + ' streak</small>' : ''));
+    } else if (war) {
+      war.hidden = true;                 // private war log: no war numbers to show
+    }
+    box.hidden = false;
+  }
+  if (!window.fetch) return;
+  fetch('clan-stats.json', { cache: 'no-cache' })   // no-cache: always check for a newer copy
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(fill)
+    .catch(function(){});
+})();
+</script>
+
 </div>
 
-    
 
 
 
 
 
+ <footer class="pf-footer">
 
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
 
+  <div class="pf-footer-divider"></div>
 
- <footer class="site-footer">
-  <div class="footer-icons">
-   <!-- Facebook -->
-    <a href="#" aria-label="Facebook" class="footer-icon">
-     <svg viewBox="0 0 24 24">
-          <path d="M22 12a10 10 0 10-11.5 9.9v-7h-2.4V12h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2 .2 2  
-          .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.3V12h2.5l-.4 2.9h-2.1v7A10 10 0 0022 12z"/></svg></a>
-   <!-- TikTok -->
-    <a href="https://discord.gg/rfntEJ5w" target="_blank" aria-label="TikTok" class="footer-icon">
-    <svg viewBox="0 0 24 24">
-          <path d="M20 4a16 16 0 00-4-1l-.2.4a14 14 0 00-7.6 0L8 3A16 16 0 004 
-           4C1 9 1 14 2 19a16 16 0 004.8 2.4l1-1.6a10 10 0 01-1.6-.8c.1 0 .2-.1.3-.2a12 12 0 0011 0c.1.1.2.1.3.2-.5.3-1 .6-1.6.8l1 1.6A16 16 0 0022 19c1-5 1-10-2-15zM9.5 15.5c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8zm5 0c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8z"/>
-        </svg></a>
-   <!-- Discord -->
-    <a href="#" target="_blank" aria-label="Discord">
-    <svg viewBox="0 0 24 24">
-          <path d="M2 6l10 7 10-7v12H2V6zm10  
-          5L2 6h20l-10 5z"/></svg></a>
-    </div>
-  <div class="footer-text">
-    © 2025 Parchrome. All Rights Reserved.
-  </div></footer>
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
 </div>
-
-
 
 <meta name="viewport"
   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+          <span class="more-sheet-title">Clash of Clans Contents</span>
+          <button class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list">
+                          <div class="th-cols">
+                  <div class="th-col">
+                    <div class="th-col-head">Layouts</div>
+                    <div class="th-mini-grid" data-role="more-layouts-grid"></div>
+                  </div>
+                  <div class="th-col">
+                    <div class="th-col-head">Armies</div>
+                    <div class="th-mini-grid" data-role="more-armies-grid"></div>
+                  </div>
+                </div>
 
-
-<script src="thz-script.js"></script>
-
-
-<div id="imageZoom" class="image-zoom" onclick="closeZoom()">
-  <img id="zoomedImg" src="">
+  <div class="more-acc open" data-acc="guides">
+            <div class="more-acc-toggle more-acc-static">
+              <span class="more-acc-title">Guides</span>
+            </div>
+            <div class="more-acc-panel">
+              <div class="more-acc-inner">
+                <div class="more-guides-list" data-role="more-guides-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
 </div>
 
+<!-- Bottom Nav (mobile) -->
+<div class="bn-bar" id="bottomNav" data-hub-nav="off">
+  <a href="coc-home.html" class="bn-item" data-role="bn-home">
+    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11h18v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 11V5h11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-3.5a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11V8.5M21 11V8.5M6.5 5V3M10.2 5V3M13.8 5V3M17.5 5V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11h18v9a1 1 0 0 1-1 1h-6v-3.5a2 2 0 0 0-4 0V21H4a1 1 0 0 1-1-1z" fill="currentColor" stroke="none"/><path d="M6.5 5h11v6h-11z" fill="currentColor" opacity="0.55" stroke="none"/><path d="M3 11V8.5M21 11V8.5M6.5 5V3M10.2 5V3M13.8 5V3M17.5 5V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Home</span>
+  </a>
+  <a href="th18-layouts.html" class="bn-item" data-role="bn-layouts">
+    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5L9 3.5l6 3 6-3v14l-6 3-6-3-6 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3.5v14M15 6.5v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.55"><path d="M3 6.5L7.6 4.2V18.2L3 20.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.4 5.8L21 3.5V17.5L16.4 19.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M10.4 4.2L13.6 5.8V19.8L10.4 18.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Layouts</span>
+  </a>
+
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <div class="bn-more-spacer"></div>
+    <span class="bn-more-label">More</span>
+  </div>
+
+  <a href="th18-army.html" class="bn-item" data-role="bn-armies">
+    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 17.5L3 6V3h3l11.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.55"><path d="M14.5 6.5L18 3h3v3l-3.5 3.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4M7 17l-3 3M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M14.5 17.5L3 6V3h3l11.5 11.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Armies</span>
+  </a>
+  <a href="coctools.html" class="bn-item" data-role="bn-guides">
+    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 16v-.6c0-1.1-.6-2-1.5-2.8A6 6 0 1 1 16.5 12.6c-.9.8-1.5 1.7-1.5 2.8V16Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 18.8h5.6M10.4 21.2h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 16v-.6c0-1.1-.6-2-1.5-2.8A6 6 0 1 1 16.5 12.6c-.9.8-1.5 1.7-1.5 2.8V16Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/><path d="M12 6a2.6 2.6 0 0 1 2.6 2.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 18.8h5.6M10.4 21.2h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Guides</span>
+  </a>
+</div>
+
+<!-- Palette Lightbox (zoomable image viewer) -->
+<button id="pal-lb-close" onclick="closePalette()">✕</button>
+<div id="pal-lightbox">
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" src="" alt="">
+  </div>
+</div>
+
+<script src="11layout.js" defer></script>
+<script src="thz-script.js"></script>
+<script src="coc-events.js"></script>
+
+<!-- ============================================================
+     FIREBASE (LAYOUT LIKES)
+     Same project home.html's feedback form already uses
+     (parchrome-feedback), different collection ("layoutLikes") so the
+     two features don't collide. One doc per page: layoutLikes/th18-layouts,
+     with a single "counts" map field keyed by each card's data-layout-id
+     (th18-1, th18-2, ...) -- one read on page load fetches every count
+     on the page instead of one read per card.
+
+     >>> REQUIRES a Firestore rule allowing this. Console > Firestore
+     Database > Rules, add (next to whatever already allows the
+     "feedback" collection):
+
+       match /layoutLikes/{doc} {
+         allow read: if true;
+         allow write: if request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['counts']);
+       }
+
+     That still lets anyone write (there's no login system on this site
+     to check against), but restricts it to touching only the counts
+     map -- nobody can use this hole to overwrite other fields or other
+     documents. Like-once-per-browser is enforced client-side below via
+     localStorage, which stops accidental double-likes but not someone
+     clearing site data or using another browser -- there's no way to
+     enforce real one-per-person without actual user accounts.
+     ============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+// Clan card's "Join Our Clan" pill: copies the clan tag off data-copy and
+// flashes green. (The layout cards' copy-to-clipboard is gone -- their
+// "Copy Layout" is a plain link to the in-game base now.)
+function copyClanTagBtn(btn){
+  var tag = btn.dataset.copy;
+  navigator.clipboard.writeText(tag).then(function(){
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.classList.remove('copied'); }, 1200);
+  });
+}
+
+(function initLayoutLikes(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyAa8B5rIP0Y9w9jBN_mzKzkFW3xMdI9wgo",
+    authDomain: "parchrome-feedback.firebaseapp.com",
+    projectId: "parchrome-feedback",
+    storageBucket: "parchrome-feedback.firebasestorage.app",
+    messagingSenderId: "546895020356",
+    appId: "1:546895020356:web:f145067c0b71dde2341711"
+  };
+  // home.html already calls firebase.initializeApp() if it's ever loaded
+  // in the same context; guard so this page never double-initialises.
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const PAGE_DOC_ID = 'th18-layouts';
+  const STORAGE_KEY = 'parchrome_liked_' + PAGE_DOC_ID;
+  const docRef = db.collection('layoutLikes').doc(PAGE_DOC_ID);
+
+  function getLikedSet(){
+    try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+  function saveLikedSet(set){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); }
+    catch (e) { /* localStorage unavailable (private mode, quota) -- like still works for this session */ }
+  }
+
+  const buttons = Array.from(document.querySelectorAll('.corner-like[data-layout-id]'));
+  if (!buttons.length) return;
+  buttons.forEach(function(btn){
+    btn.addEventListener('animationend', function(){ btn.classList.remove('just-liked'); });
+  });
+
+  // The count sits beside the heart; nothing at 0 (a lone "0" is clutter).
+  // The label and tooltip carry the same number for screen readers.
+  function setCount(el, n){
+    const btn = el.closest('.corner-like');
+    el.textContent = n.toLocaleString('en-US');
+    el.hidden = n <= 0;
+    const liked = btn.classList.contains('is-liked');
+    const label = (liked ? 'Unlike this base' : 'Like this base') + (n > 0 ? ' (' + n + (n === 1 ? ' like)' : ' likes)') : '');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    btn.dataset.count = n;
+  }
+  const readCount = el => parseInt(el.closest('.corner-like').dataset.count, 10) || 0;
+
+  const liked = getLikedSet();
+  buttons.forEach(function(btn){
+    if (liked.has(btn.dataset.layoutId)) {
+      btn.classList.add('is-liked');
+      btn.setAttribute('aria-pressed', 'true');
+    }
+  });
+
+  // One read for every card's count on this page.
+  docRef.get().then(function(snap){
+    const counts = (snap.exists && snap.data().counts) || {};
+    buttons.forEach(function(btn){
+      const n = counts[btn.dataset.layoutId] || 0;
+      setCount(btn.querySelector('[data-layout-count]'), n);
+    });
+  }).catch(function(err){
+    console.error('Layout likes: failed to load counts:', err);
+  });
+
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const id = btn.dataset.layoutId;
+      const countEl = btn.querySelector('[data-layout-count]');
+      const wasLiked = btn.classList.contains('is-liked');
+      const delta = wasLiked ? -1 : 1;
+
+      // Optimistic UI -- update immediately, revert only if the write fails.
+      btn.disabled = true;
+      btn.classList.toggle('is-liked', !wasLiked);
+      btn.setAttribute('aria-pressed', String(!wasLiked));
+      setCount(countEl, Math.max(0, readCount(countEl) + delta));
+      if (!wasLiked) {
+        btn.classList.remove('just-liked');
+        void btn.offsetWidth;            // restart the pop if tapped again quickly
+        btn.classList.add('just-liked');
+      }
+      if (wasLiked) liked.delete(id); else liked.add(id);
+      saveLikedSet(liked);
+
+      docRef.set(
+        { counts: { [id]: firebase.firestore.FieldValue.increment(delta) } },
+        { merge: true }
+      ).catch(function(err){
+        console.error('Layout likes: write failed, reverting:', err);
+        btn.classList.toggle('is-liked', wasLiked);
+        btn.setAttribute('aria-pressed', String(wasLiked));
+        setCount(countEl, Math.max(0, readCount(countEl) - delta));
+        if (wasLiked) liked.add(id); else liked.delete(id);
+        saveLikedSet(liked);
+      }).finally(function(){
+        btn.disabled = false;
+      });
+    });
+  });
+})();
+</script>
+
+<script>
+// TH icon on each card opens that base's recommended CC. Stops the click
+// from reaching thz-script.js's document listener, which closes every
+// .cc-popup on any click outside .image-logo.
+(function(){
+  var btns = document.querySelectorAll('.th-cc');
+  function closeAll(except){
+    btns.forEach(function(b){
+      if (b === except) return;
+      b.setAttribute('aria-expanded', 'false');
+      var p = b.parentElement.querySelector('.cc-popup');
+      if (p) p.style.display = 'none';
+    });
+  }
+  btns.forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var p = b.parentElement.querySelector('.cc-popup');
+      var open = b.getAttribute('aria-expanded') !== 'true';
+      closeAll(b);
+      p.style.display = open ? 'block' : 'none';
+      b.setAttribute('aria-expanded', String(open));
+    });
+  });
+  document.addEventListener('click', function(e){ if (!e.target.closest('.cc-popup')) closeAll(null); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeAll(null); });
+})();
+</script>
+
+<script>
+// Share button on each layout card. Shares this page with the card's id on
+// the end (th18-layouts.html#base-th18-3) so the link brings people to
+// Parchrome, not straight into the game.
+//  - Touch devices: the phone's own share sheet (navigator.share), which
+//    lists whatever apps that person has.
+//  - Desktop (or no share sheet): one small panel with Copy link and four
+//    share links. Discord has no web share link, so "Copy link" covers it.
+(function initCardShare(){
+  var btns = document.querySelectorAll('.card-share[data-share]');
+  if (!btns.length) return;
+
+  var ICONS = {
+    link: '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+    out: '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>'
+  };
+  var panel = document.createElement('div');
+  panel.className = 'share-panel';
+  panel.hidden = true;
+  panel.setAttribute('role', 'menu');
+  panel.innerHTML =
+    '<button type="button" class="sp-copy" role="menuitem">' + ICONS.link + '<span>Copy link</span></button><hr>' +
+    '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="facebook">' + ICONS.out + 'Facebook</a>' +
+    '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="x">' + ICONS.out + 'X</a>' +
+    '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="reddit">' + ICONS.out + 'Reddit</a>' +
+    '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="whatsapp">' + ICONS.out + 'WhatsApp</a>';
+  var copyBtn = panel.querySelector('.sp-copy');
+  var openBtn = null;
+  var TITLE = 'TH18 base layout on Parchrome';
+
+  function urlFor(id){ return location.origin + location.pathname + '#' + id; }
+  function close(){
+    panel.hidden = true;
+    if (openBtn) { openBtn.setAttribute('aria-expanded', 'false'); openBtn = null; }
+  }
+  function open(btn){
+    var url = urlFor(btn.dataset.share), u = encodeURIComponent(url), t = encodeURIComponent(TITLE);
+    var to = {
+      facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u,
+      x: 'https://twitter.com/intent/tweet?url=' + u + '&text=' + t,
+      reddit: 'https://www.reddit.com/submit?url=' + u + '&title=' + t,
+      whatsapp: 'https://wa.me/?text=' + t + '%20' + u
+    };
+    panel.querySelectorAll('a[data-to]').forEach(function(a){ a.href = to[a.dataset.to]; });
+    copyBtn.dataset.url = url;
+    copyBtn.classList.remove('copied');
+    copyBtn.querySelector('span').textContent = 'Copy link';
+    var card = btn.closest('.discord-card');
+    card.appendChild(panel);
+    // The action row is a centred cluster, so the share button no longer
+    // sits at the card's right edge -- line the panel's right edge up with
+    // the button instead of the card.
+    panel.style.right = Math.max(0, card.getBoundingClientRect().right - btn.getBoundingClientRect().right) + 'px';
+    panel.hidden = false;
+    openBtn = btn;
+    btn.setAttribute('aria-expanded', 'true');
+    copyBtn.focus({ preventScroll: true });
+  }
+
+  var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  btns.forEach(function(btn){
+    btn.setAttribute('aria-haspopup', 'menu');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      if (touch && navigator.share) {
+        navigator.share({ title: TITLE, url: urlFor(btn.dataset.share) }).catch(function(){});
+        return;
+      }
+      if (openBtn === btn) close(); else { close(); open(btn); }
+    });
+  });
+
+  copyBtn.addEventListener('click', function(){
+    var url = copyBtn.dataset.url;
+    function done(){
+      copyBtn.classList.add('copied');
+      copyBtn.querySelector('span').textContent = 'Link copied';
+      setTimeout(close, 900);
+    }
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Copy this link:', url); });
+    else prompt('Copy this link:', url);
+  });
+  panel.addEventListener('click', function(e){
+    e.stopPropagation();
+    if (e.target.closest('a[data-to]')) setTimeout(close, 0);
+  });
+  document.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && openBtn) { var b = openBtn; close(); b.focus(); }
+  });
+
+  // Arriving on a shared link: bring that base into view and let it glow.
+  function highlight(){
+    var id = decodeURIComponent(location.hash.slice(1));
+    if (!/^base-/.test(id)) return;
+    var card = document.getElementById(id);
+    if (!card) return;
+    card.scrollIntoView({ block: 'center' });
+    card.classList.remove('is-target');
+    void card.offsetWidth;
+    card.classList.add('is-target');
+    card.addEventListener('animationend', function(){ card.classList.remove('is-target'); }, { once: true });
+  }
+  window.addEventListener('load', function(){ setTimeout(highlight, 300); });
+  window.addEventListener('hashchange', highlight);
+})();
+</script>
+
+<script>
+// Secondary top bar (desktop): dsn-chip Town Hall row + stb-hub-link row,
+// both built from coc-nav-data.json. No dropdown any more -- each TH chip
+// links straight to that TH's layouts page (layoutHref). Reuses the same
+// arrow/scroll wiring hwr's strips use (window.updateDsnScrollArrows /
+// window.updateStbHubNavArrows, both exposed by 11layout.js). Identical
+// to coc-home.html's copy of this script, just a different currentPage
+// fallback.
+(function initCocSecondaryTopBar(){
+  var dsnScroll = document.getElementById('dsnCategoriesScroll');
+  var hubScroll = document.getElementById('stbHubNavScroll');
+  if (!dsnScroll && !hubScroll) return;
+
+  function normalize(url){
+    return (url || '').toString().split('/').pop().split('?')[0].split('#')[0];
+  }
+  var currentPage = normalize(window.location.pathname) || 'th18-layouts.html';
+
+  // stb-hub-link: Home / Layouts / Armies / Guides, from primaryNav.
+  // Active when that item's own href matches the current page --
+  // on th18-layouts.html that's Layouts. Icon set v2: the old ones
+  // (raster images, then a first inline-SVG pass) didn't read as a
+  // matched set and the old "Armies" glyph was literally half of
+  // Lucide's crossed-swords icon (one blade + hilt, no mirror), which
+  // is why it read as a stray slash instead of swords -- completed
+  // into the real two-sword icon here. Same set as #bottomNav below.
+  var HUB_ICONS = {
+    home: {
+      outline: '<path d="M3 11h18v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 11V5h11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-3.5a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11V8.5M21 11V8.5M6.5 5V3M10.2 5V3M13.8 5V3M17.5 5V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      fill: '<path d="M3 11h18v9a1 1 0 0 1-1 1h-6v-3.5a2 2 0 0 0-4 0V21H4a1 1 0 0 1-1-1z" fill="currentColor" stroke="none"/><path d="M6.5 5h11v6h-11z" fill="currentColor" opacity="0.55" stroke="none"/><path d="M3 11V8.5M21 11V8.5M6.5 5V3M10.2 5V3M13.8 5V3M17.5 5V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+    },
+    // Icon set v5 (two-tone): Home = a castle (your Clash home base),
+    // Layouts = a folded map, Armies = crossed swords, Guides = a light bulb
+    // (tips), all at a 1.8 line weight. Active = filled in two tones: the
+    // main part solid white, a secondary part at 55% (reads as light grey) --
+    // the castle's keep, the map's outer panels, the back sword, the bulb's
+    // glass. Grey pieces sit in <g opacity> so overlapping bits don't
+    // double up. Pieces meant to be fill-only carry stroke="none" because
+    // the nav CSS strokes the whole <svg>. Same paths as #bottomNav below;
+    // change both together.
+    layouts: {
+      outline: '<path d="M3 6.5L9 3.5l6 3 6-3v14l-6 3-6-3-6 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3.5v14M15 6.5v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      fill: '<g opacity="0.55"><path d="M3 6.5L7.6 4.2V18.2L3 20.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.4 5.8L21 3.5V17.5L16.4 19.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M10.4 4.2L13.6 5.8V19.8L10.4 18.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+    },
+    armies: {
+      outline: '<path d="M14.5 17.5L3 6V3h3l11.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      fill: '<g opacity="0.55"><path d="M14.5 6.5L18 3h3v3l-3.5 3.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4M7 17l-3 3M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M14.5 17.5L3 6V3h3l11.5 11.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+    },
+    guides: {
+      outline: '<path d="M9 16v-.6c0-1.1-.6-2-1.5-2.8A6 6 0 1 1 16.5 12.6c-.9.8-1.5 1.7-1.5 2.8V16Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 18.8h5.6M10.4 21.2h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      fill: '<path d="M9 16v-.6c0-1.1-.6-2-1.5-2.8A6 6 0 1 1 16.5 12.6c-.9.8-1.5 1.7-1.5 2.8V16Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/><path d="M12 6a2.6 2.6 0 0 1 2.6 2.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.2 18.8h5.6M10.4 21.2h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+    }
+  };
+
+  // The same icons go on the Layouts / Army / Guides tabs under the hero.
+  // thz-script.js builds those buttons after its own fetch, then fires
+  // parchome:coc-nav-ready -- so decorate on that event (and once now, in
+  // case they already exist). Matched by label; skipped if already done.
+  function iconFirstLayer(){
+    var keyFor = { 'Layouts':'layouts', 'Army':'armies', 'Guides':'guides' };
+    document.querySelectorAll('.first-layer button').forEach(function(btn){
+      var icon = HUB_ICONS[keyFor[btn.textContent.trim()]];
+      if (!icon || btn.querySelector('.fl-ico')) return;
+      btn.insertAdjacentHTML('afterbegin',
+        '<svg class="fl-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' + icon.outline + '</svg>' +
+        '<svg class="fl-ico-fill" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' + icon.fill + '</svg>');
+    });
+  }
+  document.addEventListener('parchome:coc-nav-ready', iconFirstLayer);
+  iconFirstLayer();
 
 
+  fetch('./coc-nav-data.json')
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      // dsn-chip: TH18 -> TH8. Active when the current page is either that
+      // TH's layouts or army page (activeOn covers both).
+      if (dsnScroll && Array.isArray(data.townhalls)) {
+        dsnScroll.innerHTML = data.townhalls.map(function(th){
+          var isActive = (th.activeOn || []).map(normalize).indexOf(currentPage) !== -1;
+          return '<a href="' + th.layoutHref + '" class="dsn-chip' + (isActive ? ' active' : '') + '">' +
+            '<img src="' + th.layoutIcon + '" alt="" class="dsn-chip-icon">' +
+            '<span>' + th.label + '</span></a>';
+        }).join('');
+        if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
+      }
 
-    
-
-
+      if (hubScroll && data.primaryNav) {
+        var order = ['home', 'layouts', 'armies', 'guides'];
+        hubScroll.innerHTML = order.map(function(key){
+          var item = data.primaryNav[key];
+          var icon = HUB_ICONS[key];
+          if (!item || !icon) return '';
+          var isActive = normalize(item.href) === currentPage;
+          return '<a href="' + item.href + '" class="stb-hub-link' + (isActive ? ' active' : '') + '">' +
+            '<svg class="hub-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' + icon.outline + '</svg>' +
+            '<svg class="hub-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' + icon.fill + '</svg>' +
+            '<span>' + item.label + '</span></a>';
+        }).join('');
+        if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
+      }
+    })
+    .catch(function(err){ console.error('COC secondary top bar nav failed to load:', err); });
+})();
+</script>
 
 
 

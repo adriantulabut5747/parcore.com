@@ -62,7 +62,7 @@
   <!-- Close button -->
   <button id="search-close-btn">✖</button>
   <!-- Search input -->
-  <input type="text" id="search-input" placeholder="Find your next game"  oninput="searchItems()">
+  <input type="search" id="search-input" placeholder="Find your next game"  oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
   <!-- Search results -->
   <div id="search-results"></div></div></div>
 <!-- Secondary Top Bar -->
@@ -156,84 +156,373 @@
     <!-- Bases Grid -->
     <div class="grid-container">
 
+<!-- Bases Grid -->
+<div class="grid-container">
 
-
-<div class="message-box">
-  <div class="message-title-row">
-    <img src="icons/cocicon.jpg" class="message-icon" alt="Glossary Icon">
-    <p class="message-title">General Terms</p></div>
-  <div class="sub-title">
-    <p><strong>FC </strong><br> - Friendly Challenge.</p>
-     <p><strong>Mirror </strong><br> - war term used to refer to the opposing war base with the same base number as the player.</p>
-          <p><strong>Swag </strong><br> - A term used to refer to the action of either not using certain troops and/or spells.</p>
-          <p><strong>Kiting </strong><br> - A technique where you place a troop to lure friendly or enemy troops to a specific location. For example, placing a troop to lure your Warden exactly where you want it to go.</p>
-
-  </div></div>
-
-
-
-
-  <div class="message-box">
-  <div class="message-title-row">
-    <img src="icons/Balloon_info.webp" class="message-icon" alt="Glossary Icon">
-  <p class="message-title">Troop Terms </p></div><div class="sub-title">
-        <p><strong>Coco Loons </strong><br> - A Balloon deployed as a sacrifice in order to trigger Seeking Air Mines.</p>
-    <p><strong>Hybrid </strong><br> - Combination of Hog Riders and Miners. </p>
-    <p><strong>Hydra </strong><br> - Combination of Dragons and Dragon riders. </p>
-    <p><strong>Lavaloon </strong><br> - Uses Lava Hounds to tank defenses while Balloons follow behind.</p>
-        <p><strong>FF </strong><br> - Abbreviation for Flame Flinger.</p>
-        <p><strong>Big Boy </strong><br> - A Subtroop spawned by the Super Witch that resembles a large Skeleton.</p>
-
-     <p><strong>Queen Charge <span style="color: #999999;">(QC) </span> </strong> <br> - uses the Archer Queen along with Healers to take out key defenses deep into the base.</strong></p>
-  <p><strong> Queen Walk <span style="color: #999999;">(QW)</span></strong> <br> uses the Archer Queen along with Healers to take out a portion "OUTSIDE" base for funneling purposes.</p>
-    <p><strong>RC Charge <span style="color: #999999;">(Spirit Walk) </span></strong><br> - Combines the Invisibility spell with the Royal Champion, letting her charge deep into the base.</p>
-    <p><strong>Warden Walk <span style="color: #999999;">(Fireball) </span></strong><br> - Using the Wardens Fireball to destroy clustered defenses while being supported by Healers and spells.</p>
-
-</div></div>
-
-
-
-<div class="message-box">
-  <div class="message-title-row">
-    <img src="icons/loglauncher.webp" class="message-icon" alt="Glossary Icon">
-    <p class="message-title">Attack Strategies</p></div>
-  <div class="sub-title">
-        <p><strong>Funneling </strong><br> - is the process of taking out key buildings so that your troops will be directed towards the core of the base (such as using QC on the left and siege barracks on the right.)</p>
-
-    <p><strong>Smash Attacks </strong><br> - Focuses on sending high hitpoint troops into the middle of the base and rely heavily on the Grand Warden’s ability.</p>
-    <p><strong>Hero Dive Attacks <span style="color: #999999;">(SUI) </span> </strong><br> - Uses the Log Launcher to open the path for your heroes, sending them deep into the base. </p>
-    <p><strong>Spam Attacks </strong><br> - A straightforward strategy where large numbers of troops are deployed quickly with minimal funneling </p>
-    <p><strong>Skelly/Bat Donut Attack </strong><br> - Uses Skeleton or Bat Spells with Invisibility to destroy key defenses, usually the Clan Castle.</p>
-    <p><strong>Blizzard Attacks </strong><br> - Uses the Battle Blimp carrying Super Wizards inside, supported by well timed Invisibility spells to wipe out the core of the base.</p>
-    <p><strong>Fireball Attacks </strong><br> -Using the Wardens Fireball equipment to destroy clustered defenses while being supported by Healers and spells.</p>
-    <p><strong>Sniping </strong><br> - The act of destroying Buildings from a distance without retaliation (such as Archers placed barely out of range of a defense)</p>
-
+  <!-- Glossary Search -->
+  <div class="gloss-search-wrap">
+    <svg class="gloss-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="21" y2="21" stroke-linecap="round"/>
+    </svg>
+    <input class="gloss-search" type="text" placeholder="Search terms, e.g. Queen Charge..." id="glossSearch" oninput="filterGloss()">
   </div>
+
+  <!-- Filter Pills -->
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="setGlossFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setGlossFilter('general', this)">General</button>
+    <button class="filter-btn" onclick="setGlossFilter('troops', this)">Troops</button>
+    <button class="filter-btn" onclick="setGlossFilter('attacks', this)">Attacks</button>
+    <button class="filter-btn" onclick="setGlossFilter('base', this)">Base</button>
+  </div>
+
+  <!-- Sections rendered by JS -->
+  <div id="glossContainer"></div>
+  <div class="gloss-no-results" id="glossNoResults">No terms found for "<span id="glossNoQ"></span>"</div>
+
 </div>
 
 
+<style>
+/* ── Glossary Grid ─────────────────────────────────────────── */
+.grid-container {
+  display: block;
+  padding: 0 0 12px;
+}
 
-<div class="message-box">
-  <div class="message-title-row">
-    <img src="icons/th18icon.png" class="message-icon" alt="Glossary Icon">
-  <p class="message-title">Base Terminology</p></div><div class="sub-title">
-  <p><strong>Island </strong>A defense surrounded by nothing and then a layer of the wall in all directions.</p>
-  <p><strong>Backend </strong> A part of the base at the end of an attack.</p>
-  <p><strong>Trash Buildings </strong><br> - Non-defenses that are placed on the outside. (Collectors, Barracks, etc.)</p>
-  <p><strong>Core </strong><br> - The center of a base or the heaviest defenses stacked</p>
-  <p><strong>Tesla Farm  </strong><br> - A pack of tesla popping up clustered</p>
-  <p><strong>Troll Tesla </strong><br> - A Tesla in the corner, mainly used to create time fails.</p>
-  <p><strong>Trophy Base </strong><br> - A base used to minimise trophy loss. Resources aren't a big concern of trophy bases</p>
-  <p><strong>Farm Base </strong><br> - Focus on protecting resources by placing storages in well-defended compartments</p>
-  <p><strong>Hybrid Base </strong><br> - A Mix of war and farming strategies, aiming to protect resources while maintaining a strong defensive core.</p>
-  <p><strong>War Base </strong><br> - A base used to minimise trophy loss. Resources aren't a big concern of trophy bases</p>
+/* Search */
+.gloss-search-wrap {
+  position: relative;
+  margin-bottom: 14px;
+}
+.gloss-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: #666;
+  pointer-events: none;
+}
+.gloss-search {
+  width: 100%;
+  background: #1a1a1e;
+  border: 1px solid #2a2a30;
+  border-radius: 10px;
+  padding: 10px 14px 10px 38px;
+  color: #dfe1e4;
+  font-size: 14px;
+  font-family: 'Oxanium', 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.gloss-search:focus { border-color: #ababab; }
+.gloss-search::placeholder { color: #555; }
 
-  
+/* Filter pills */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.filter-btn {
+  background: rgba(11, 11, 12, 0.8);
+  border: 1px solid #2a2a30;
+  border-radius: 8px;
+  color: #aaa;
+  font-size: 12px;
+  padding: 5px 13px;
+  cursor: pointer;
+  font-family: 'Oxanium', 'Inter', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.filter-btn.active
+ {
+  background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Section card */
+.gloss-section {
+  background: #161618;
+  border: 1px solid #222226;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.gloss-section:hover { border-color: #333; }
+
+/* Section header */
+.gloss-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  background: #18181c;
+  border-bottom: 1px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+.gloss-section.open .gloss-header {
+  border-bottom-color: #222226;
+  background: #1c1c20;
+}
+.gloss-header-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.gloss-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f5c542;
+  flex: 1;
+  letter-spacing: 0.3px;
+}
+.gloss-header-count {
+  background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+  color: #bebebe;
+  border: 1px solid rgba(201, 201, 201, 0.4);
+  border-radius: 20px;
+  font-size: 11px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+.gloss-chevron {
+  width: 15px;
+  height: 15px;
+  color: #555;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+.gloss-section.open .gloss-chevron { transform: rotate(90deg); }
+
+/* Section body */
+.gloss-body {
+  display: none;
+  padding: 0 16px 6px;
+}
+.gloss-section.open .gloss-body { display: block; }
+
+/* Term row */
+.gloss-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #1e1e22;
+  align-items: flex-start;
+}
+.gloss-item:last-child { border-bottom: none; }
+
+.gloss-term {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  min-width: 115px;
+  flex-shrink: 0;
+  line-height: 1.4;
+  padding-top: 1px;
+}
+.gloss-term .abbr-pill {
+  display: inline-block;
+  background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+  color: #d6d2d2;
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  vertical-align: middle;
+  font-weight: 600;
+}
+.gloss-divider {
+  width: 1px;
+  background: #2a2a30;
+  min-height: 18px;
+  align-self: stretch;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.gloss-def {
+  font-size: 13px;
+  color: #9ea3b0;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* No results */
+.gloss-no-results {
+  display: none;
+  text-align: center;
+  color: #555;
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .gloss-term { min-width: 90px; font-size: 12px; }
+  .gloss-def  { font-size: 12px; }
+  .gloss-header-title { font-size: 14px; }
+  .gloss-header { padding: 12px 14px; }
+  .gloss-body { padding: 0 14px 4px; }
+  .gloss-item { gap: 10px; }
+}
+</style>
 
 
+<script>
+/* ── Glossary Data ─────────────────────────────────────────── */
+const GLOSS_DATA = [
+  {
+    id: 'general', label: 'General Terms', icon: 'icons/cocicon.jpg',
+    terms: [
+      { term: 'FC', def: 'Friendly Challenge — a war simulation between clanmates without affecting loot or trophies.' },
+      { term: 'Mirror', def: 'War term for the opposing base that shares the same number as yours in the war lineup.' },
+      { term: 'Swag', def: 'The act of intentionally leaving certain troops and/or spells unused during an attack.' },
+      { term: 'Kiting', def: 'Placing a troop to lure friendly or enemy troops toward a desired location, e.g. directing your Warden to the right spot.' },
+      { term: 'Max', def: 'A base or player with every building, troop, spell, and hero at the highest possible level for their Town Hall.' },
+      { term: 'Rushed', def: 'A player who upgraded their Town Hall before maxing troops, heroes, or buildings at the previous level.' },
+    ]
+  },
+  {
+    id: 'troops', label: 'Troop Terms', icon: 'icons/Balloon_info.webp',
+    terms: [
+      { term: 'Coco Loons', def: 'Balloons deployed as a sacrifice to trigger Seeking Air Mines and clear the path safely for the main air army.' },
+      { term: 'Hybrid', def: 'Combined army of Hog Riders and Miners used together for wide ground coverage.' },
+      { term: 'Hydra', def: 'Combined army of Dragons and Dragon Riders, typically paired with Rage spells.' },
+      { term: 'Lavaloon', def: 'Lava Hounds tank air defenses at the front while Balloons follow behind to deal damage.' },
+      { term: 'FF', abbr: 'Flame Flinger', def: 'Abbreviation for the Flame Flinger siege machine.' },
+      { term: 'Big Boy', def: 'The large Skeleton subtroop spawned by the Super Witch during battle.' },
+      { term: 'Queen Charge', abbr: 'QC', def: 'Archer Queen deployed alongside Healers to destroy key defenses deep inside the base.' },
+      { term: 'Queen Walk', abbr: 'QW', def: 'Archer Queen uses Healers to clear the outside perimeter of a base strictly for funneling purposes.' },
+      { term: 'RC Charge', abbr: 'Spirit Walk', def: 'Combines Invisibility Spells with the Royal Champion to let her charge deep into the core undetected.' },
+      { term: 'Warden Walk', abbr: 'Fireball', def: 'Grand Warden uses his Fireball equipment to destroy clustered defenses, protected by Healers and spells.' },
+    ]
+  },
+  {
+    id: 'attacks', label: 'Attack Strategies', icon: 'icons/loglauncher.webp',
+    terms: [
+      { term: 'Funneling', def: 'Destroying edge buildings to channel troops toward the core, e.g. Queen Charge on one side and Siege Barracks on the other.' },
+      { term: 'Smash Attack', def: 'High-HP troops sent into the center relying heavily on the Grand Warden\'s ability to keep them alive.' },
+      { term: 'Hero Dive', abbr: 'SUI', def: 'Uses a Log Launcher to open a path and send heroes deep into the base.' },
+      { term: 'Spam Attack', def: 'Deploying large numbers of troops quickly with minimal funneling — effective against open spread-out bases.' },
+      { term: 'Bat/Skelly Donut', def: 'Skeleton or Bat Spells combined with Invisibility to destroy key defenses, typically the Clan Castle.' },
+      { term: 'Blizzard Attack', def: 'A Battle Blimp carries Super Wizards into the core, supported by well-timed Invisibility spells.' },
+      { term: 'Fireball Attack', def: 'Warden\'s Fireball equipment destroys clustered defenses, supported by Healers and spells.' },
+      { term: 'Sniping', def: 'Destroying buildings from outside their defense range — typically Archers placed barely out of reach.' },
+    ]
+  },
+  {
+    id: 'base', label: 'Base Terminology', icon: 'icons/th18icon.png',
+    terms: [
+      { term: 'Island Defense', def: 'A defense fully surrounded by walls with open space on all sides, forcing attackers through multiple wall layers.' },
+      { term: 'Backend', def: 'The area or defenses at the far end of a base that attacking troops reach last.' },
+      { term: 'Trash Buildings', def: 'Non-defensive buildings (Barracks, Collectors) placed on the outer edge to drain attacker deploy time.' },
+      { term: 'Core', def: 'The center of a base or the tightest cluster of high-value defenses.' },
+      { term: 'Tesla Farm', def: 'Multiple Hidden Teslas clustered together that pop up simultaneously to overwhelm troops.' },
+      { term: 'Troll Tesla', def: 'A lone Hidden Tesla placed in a corner to drain attack time and cause time-fail situations.' },
+      { term: 'Trophy Base', def: 'A defensive layout built to minimize trophy loss — protecting resources is not the concern.' },
+      { term: 'Farm Base', def: 'A layout focused on keeping resource storages locked inside heavily defended compartments.' },
+      { term: 'Hybrid Base', def: 'Balances war and farming — protects resources while maintaining a strong defensive core.' },
+      { term: 'War Base', def: 'A layout designed to be as hard as possible to three-star; loot protection is irrelevant.' },
+    ]
+  }
+];
 
+let glossActiveFilter = 'all';
 
-  </div></div>
+function buildGloss() {
+  const container = document.getElementById('glossContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  GLOSS_DATA.forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'gloss-section open';
+    section.dataset.cat = cat.id;
+
+    const termRows = cat.terms.map(t => `
+      <div class="gloss-item" data-search="${t.term.toLowerCase()} ${(t.abbr||'').toLowerCase()} ${t.def.toLowerCase()}">
+        <div class="gloss-term">${t.term}${t.abbr ? `<span class="abbr-pill">${t.abbr}</span>` : ''}</div>
+        <div class="gloss-divider"></div>
+        <div class="gloss-def">${t.def}</div>
+      </div>
+    `).join('');
+
+    section.innerHTML = `
+      <div class="gloss-header" onclick="toggleGlossSection(this.parentElement)">
+        <img class="gloss-header-img" src="${cat.icon}" onerror="this.style.display='none'" alt="">
+        <span class="gloss-header-title">${cat.label}</span>
+        <span class="gloss-header-count">${cat.terms.length}</span>
+        <svg class="gloss-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div class="gloss-body">${termRows}</div>
+    `;
+    container.appendChild(section);
+  });
+}
+
+function toggleGlossSection(el) {
+  el.classList.toggle('open');
+}
+
+function setGlossFilter(cat, btn) {
+  glossActiveFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterGloss();
+}
+
+function filterGloss() {
+  const q = (document.getElementById('glossSearch')?.value || '').toLowerCase().trim();
+  const sections = document.querySelectorAll('.gloss-section');
+  let anyVisible = false;
+
+  sections.forEach(section => {
+    const catMatch = glossActiveFilter === 'all' || glossActiveFilter === section.dataset.cat;
+    if (!catMatch) { section.style.display = 'none'; return; }
+
+    const items = section.querySelectorAll('.gloss-item');
+    let visCount = 0;
+    items.forEach(item => {
+      const show = !q || (item.dataset.search || '').includes(q);
+      item.style.display = show ? '' : 'none';
+      if (show) visCount++;
+    });
+
+    const show = visCount > 0;
+    section.style.display = show ? '' : 'none';
+    if (show) {
+      anyVisible = true;
+      const badge = section.querySelector('.gloss-header-count');
+      if (badge) badge.textContent = visCount;
+      if (q) section.classList.add('open');
+    }
+  });
+
+  const noRes = document.getElementById('glossNoResults');
+  const noQ = document.getElementById('glossNoQ');
+  if (noRes) noRes.style.display = anyVisible ? 'none' : 'block';
+  if (noQ) noQ.textContent = q;
+}
+
+// Init on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', buildGloss);
+} else {
+  buildGloss();
+}
+</script>
 
 
 

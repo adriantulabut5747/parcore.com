@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Search Logs</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #0f0f10;
+    color: #eee;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 32px 24px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  input#filter {
+    background: #1a1a1c; border: 1px solid #2c2c30; color: #eee;
+    padding: 8px 12px; border-radius: 8px; font-size: 14px; flex: 1; min-width: 180px;
+  }
+  button {
+    background: #1a1a1c; border: 1px solid #2c2c30; color: #eee;
+    padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+  }
+  button:hover { background: #232326; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th {
+    text-align: left; color: #999; font-weight: 500; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 10px 12px; border-bottom: 1px solid #2c2c30;
+  }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #1c1c1e; }
+  tbody tr:hover { background: #16161a; }
+  .ign { font-weight: 600; }
+  .tag { color: #888; }
+  .region { display: inline-block; padding: 2px 8px; border-radius: 6px; background: #232326; font-size: 12px; }
+  .time { color: #888; font-size: 13px; white-space: nowrap; }
+  .empty, .loading { color: #777; padding: 40px 0; text-align: center; }
+  .count { color: #888; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>Search Logs</h1>
+<div class="sub">Valorant tracker — visitor lookups</div>
+
+<div class="toolbar">
+  <input type="text" id="filter" placeholder="Filter by name or tag…">
+  <button id="refresh-btn">Refresh</button>
+  <span class="count" id="count"></span>
+</div>
+
+<div id="content" class="loading">Loading…</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCo88EeZQQW17cXSB97UXz0tuZbB_CgWMo",
+    authDomain: "trackervalorant-42e14.firebaseapp.com",
+    projectId: "trackervalorant-42e14",
+    storageBucket: "trackervalorant-42e14.firebasestorage.app",
+    messagingSenderId: "1058942511167",
+    appId: "1:1058942511167:web:0c921d734162d881df708a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let allRows = [];
+
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: 'numeric', minute: '2-digit'
+    });
+  }
+
+  function render(rows) {
+    const content = document.getElementById('content');
+    document.getElementById('count').textContent = rows.length + ' result' + (rows.length === 1 ? '' : 's');
+
+    if (!rows.length) {
+      content.innerHTML = '<div class="empty">No searches logged yet.</div>';
+      return;
+    }
+
+    const rowsHtml = rows.map(r => `
+      <tr>
+        <td class="ign">${escapeHtml(r.name || '—')}</td>
+        <td class="tag">#${escapeHtml(r.tag || '—')}</td>
+        <td><span class="region">${escapeHtml((r.region || '—').toUpperCase())}</span></td>
+        <td class="time">${fmtTime(r.timestamp)}</td>
+      </tr>
+    `).join('');
+
+    content.innerHTML = `
+      <table>
+        <thead>
+          <tr><th>IGN</th><th>Tag</th><th>Region</th><th>Searched</th></tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    `;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  async function loadLogs() {
+    const content = document.getElementById('content');
+    content.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      const q = query(collection(db, 'searches'), orderBy('timestamp', 'desc'), limit(500));
+      const snap = await getDocs(q);
+      allRows = snap.docs.map(d => d.data());
+      applyFilter();
+    } catch (err) {
+      content.innerHTML = '<div class="empty">Failed to load logs: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function applyFilter() {
+    const term = document.getElementById('filter').value.trim().toLowerCase();
+    if (!term) { render(allRows); return; }
+    render(allRows.filter(r =>
+      (r.name || '').toLowerCase().includes(term) ||
+      (r.tag || '').toLowerCase().includes(term)
+    ));
+  }
+
+  document.getElementById('refresh-btn').addEventListener('click', loadLogs);
+  document.getElementById('filter').addEventListener('input', applyFilter);
+
+  loadLogs();
+</script>
+</body>
+</html>

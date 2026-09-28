@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AC | Parcore</title>
+<meta name="description" content="Browse the best Minecraft Vanilla worlds, shaders, resource packs, commands and more — curated by the Parchrome community.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/mc-java.html">
+<meta property="og:title" content="Minecraft Vanilla — Parchrome">
+<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
+<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="icons/home.jpg">
+<link rel="shortcut icon" href="icons/home.jpg">
+<link rel="apple-touch-icon" href="icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="11layout.css">
+
+<style>
+  
+
+   body { visibility: hidden; }
+  #page-loader { position: fixed; inset: 0; background: #0f0f10; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; z-index: 999999; gap: 16px; visibility: visible; opacity: 1; transition: opacity 0.4s ease;}
+  #page-loader.hidden { opacity: 0; pointer-events: none; }
+  .parchrome-fade { opacity: 0; animation: parchrome-fadein 0.5s ease 0.5s forwards; }
+  .parchrome-ring { width: 44px; height: 44px; border-radius: 50%;
+    border: 3px solid #2a2a2a; border-top: 3px solid #9f0000; animation: parchrome-spin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;}
+  .parchrome-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #555; font-family: sans-serif;
+    opacity: 0; animation: parchrome-fadein 0.5s ease 0.5s forwards; }
+  @keyframes parchrome-spin { to { transform: rotate(360deg); } }
+  @keyframes parchrome-fadein { to { opacity: 1; } }
+  html.loaded body { visibility: visible; }
+
+
+@media (max-width: 970px) {.discord-card { background: linear-gradient( 90deg, rgba(240, 34, 34, 0.2), rgba(25, 26, 27, 0.5));}}
+html { visibility: hidden; }
+html.loaded { visibility: visible; }
+:root {
+  --bg-main: #202225;
+  --bg-tertiary: #0f0f10;
+  --bg-sidebar: #0f0f10;
+  --bg-hover: #202122;
+  --bg-box: #161616;
+  --bg-box-active: #303135;
+  --accent:#c22d2d;
+  --text-main: #eff2f5;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+}
+
+:root {
+  --ac-blue: #1877F2;
+  --ac-blue-dark: #166FE5;
+  --ac-background: #18191A;
+  --ac-surface: #242526;
+  --ac-surface-darker:rgb(26, 27, 27);
+  --ac-surface-light: #3A3B3C;
+  --ac-text-primary: #E4E6EB;
+  --ac-text-secondary: #B0B3B8;
+  --ac-divider: #3E4042;
+  --ac-green: #42B72A;
+  --ac-red: #F02849;
+}
+
+
+
+
+* {margin: 0; padding: 0; box-sizing: border-box; font-family: 'oxanium', sans-serif;}
+body {height: 100vh; background: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; overflow: hidden;}
+*{scrollbar-width:thin; scrollbar-color:#2f3136 #121318;}
+.icon {width:18px; height:18px; stroke:var(--text-muted); stroke-width:2; fill:none; flex-shrink:0;}
+.coc-main {display:flex; flex-direction:column; flex:1 1 auto; overflow-y:auto;}
+.mc-content-wrapper{ display:flex; flex:1; }
+@media (max-width:970px){
+  .mc-content-wrapper{ flex-direction:column; }
+}
+/* Tracks the left sidebar's responsive width instead of a fixed 320px.
+   --sidebar-width is max(245px, 16%), but a percentage resolves against
+   the containing block -- the left rail's is the full-width .main while
+   this one's is the narrower .coc-main, so the same declaration comes out
+   smaller here. 16vw measures what the left rail effectively measures. */
+/* Hidden below 1400px, the width hwr drops its own right column
+   (.box-two) at -- past that point the content needs the room more. */
+@media (max-width:1400px){ .mc-right-sidebar{ display:none; } }
+.mc-right-sidebar{ width:max(var(--sidebar-min-width), 16vw); min-width:var(--sidebar-min-width); flex-shrink:0; background:#111113; padding-top:30px; padding-bottom:50px; border-left:1px solid #1a1a1a; position:relative; }
+.mc-right-sidebar-inner{ position:sticky; top:50px; display:flex; flex-direction:column; gap:4px; padding:28px 14px 10px 14px; }
+
+/* ── NEW SIDEBAR CARDS ── */
+.sb-card{ margin:6px 6px 18px 6px; background:#17171a; border:1px solid #232326; border-radius:12px; overflow:hidden; }
+.sb-pick{ padding:16px 16px 20px 16px; }
+.sb-pick-img{ height:120px; border-radius:8px; margin-bottom:12px; background:linear-gradient(135deg, #2a2a2e, #1a1a1c); display:flex; align-items:center; justify-content:center; color:#444; font-size:11px; letter-spacing:1px; text-transform:uppercase; border:1px solid #232326; overflow:hidden; }
+.sb-pick-img img{ width:100%; height:100%; object-fit:cover; }
+.sb-pick-name{ font-size:15px; font-weight:700; color:#eee; margin-bottom:4px; }
+.sb-pick-desc{ font-size:12.5px; color:#777; line-height:1.45; margin-bottom:14px; }
+.sb-pick-btn{ display:block; text-align:center; padding:11px; border-radius:7px; background:#1c1c1f; border:1px solid rgba(255,255,255,0.1); color:#dcdde0; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-decoration:none; transition:all .2s ease; }
+.sb-pick-btn:hover{ background:#232326; border-color:rgba(255,255,255,0.2); color:#fff; }
+.sb-tags{ display:flex; flex-wrap:wrap; gap:8px; padding:16px 16px 20px 16px; }
+.sb-tag{ font-size:12.5px; padding:7px 13px; border-radius:20px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#999; text-decoration:none; transition:all .2s ease; }
+.sb-tag:hover{ background:rgba(255,255,255,0.09); color:#fff; border-color:rgba(255,255,255,0.16); }
+.sb-stats{ display:flex; padding:16px; }
+.sb-stat{ flex:1; text-align:center; }
+.sb-stat-num{ font-family:'Oxanium', sans-serif; font-size:21px; font-weight:800; color:#fff; display:block; }
+.sb-stat-lbl{ font-size:10.5px; color:#666; text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+.sb-stat-div{ width:1px; background:#232326; margin:2px 4px; }
+.sb-discord{ margin:6px 6px 18px 6px; border-radius:12px; padding:18px 16px; background:linear-gradient(145deg, rgba(88,101,242,0.14), rgba(88,101,242,0.03)); border:1px solid rgba(88,101,242,0.25); text-align:center; }
+.sb-discord-icon{ width:32px; height:32px; margin:0 auto 10px auto; opacity:0.9; }
+.sb-discord-title{ font-family:'Oxanium',sans-serif; font-size:14px; font-weight:800; color:#eee; letter-spacing:.5px; }
+.sb-discord-sub{ font-size:12px; color:#888; margin:5px 0 14px 0; line-height:1.45; }
+.sb-discord-btn{ display:inline-block; padding:9px 20px; border-radius:7px; text-decoration:none; background:#5865F2; color:#fff; font-size:12.5px; font-weight:700; letter-spacing:.5px; transition:filter .2s ease; }
+.sb-discord-btn:hover{ filter:brightness(1.1); }
+.mc-right-sidebar-inner::-webkit-scrollbar{ width:6px; }
+.mc-right-sidebar-inner::-webkit-scrollbar-track{ background:#121318; }
+.mc-right-sidebar-inner::-webkit-scrollbar-thumb{ background:#2f3136; border-radius:10px; border:2px solid #121318; }
+.mc-right-sidebar-inner::-webkit-scrollbar-thumb:hover{ background:#3a3d43; }
+.mc-sidebar-card{ display:block; position:relative; width:100%; height:110px; border-radius:10px; overflow:hidden; text-decoration:none; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08); }
+.mc-sidebar-card img.mc-sidebar-card-img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s ease; }
+.mc-sidebar-card:hover img.mc-sidebar-card-img{ transform:scale(1.06); }
+.mc-sidebar-card::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%); }
+.mc-sidebar-card-info{ position:absolute; left:10px; right:10px; bottom:8px; display:flex; align-items:center; gap:8px; z-index:1; }
+.mc-sidebar-card-icon{ width:26px; height:26px; border-radius:6px; object-fit:cover; flex-shrink:0; box-shadow:0 0 0 1px rgba(255,255,255,0.15); }
+.mc-sidebar-card-name{ font-size:12.5px; font-weight:700; color:#fff; letter-spacing:0.3px; text-shadow:0 1px 3px rgba(0,0,0,0.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+@media (max-width:1270px){}
+@media (max-width:970px){
+  .mc-right-sidebar{ width:100%; padding:20px 0; border-left:none; border-top:1px solid #1a1a1a; display: block;}
+  .mc-right-sidebar-inner{ position:static; top:auto; padding:20px 5% 10px 5%; gap:6px; }
+  .sb-card{ margin:0 0 16px 0; }
+  .sb-discord{ margin:0 0 16px 0; }
+  .mc-sidebar-group-label{ margin-left:0; }
+  .mc-right-sidebar-inner .layouts-title-box{ margin-left:0; margin-right:0; margin-top:0; }
+}
+.layouts-title-box{ border-radius:0; padding:12px 20px; text-align:center; background:transparent; border-bottom:1px solid #2a2a2a; position:relative; margin-bottom:24px; margin-left:5%; margin-right:5%; margin-top:44px; }
+.layouts-title-box::after{ content:''; position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:100px; height:2px; background:#861c1c; }
+.layouts-title{ font-size:clamp(16px, 2vw, 19px); font-weight:900; text-transform:uppercase; letter-spacing:1px; background:linear-gradient(90deg, #c0c9d4, #ffffff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.mc-sidebar-group-label{ font-size:11.5px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:#666; padding:0 2px; margin-top:10px; margin-bottom:6px; margin-left:10px; }
+.mc-sidebar-divider{ height:1px; background:linear-gradient(90deg, rgba(255,255,255,0.08), transparent); margin:10px 6px; }
+.mc-nav-item{ display:flex; align-items:center; gap:10px; padding:10px 17px; border-radius:8px; text-decoration:none; color:#777; font-size:14px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase; background:transparent; border:1px solid transparent; transition:all 0.2s ease; white-space:nowrap; }
+.mc-nav-item:hover{ background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.08); color:#bbb; transform:translateX(-2px); }
+.mc-nav-item.active{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.18); color:#fff; }
+.mc-nav-item img{ width:20px; height:20px; object-fit:contain; flex-shrink:0; opacity:0.6; transition:opacity 0.2s; }
+.mc-nav-item:hover img, .mc-nav-item.active img{ opacity:1; }
+::-webkit-scrollbar {width:10px;}
+::-webkit-scrollbar-track {background:#121318;}
+::-webkit-scrollbar-thumb {background:#2f3136; border-radius:10px; border:2px solid #121318;}
+::-webkit-scrollbar-thumb:hover {background:#3a3d43;}
+.whats-up-strong {font-weight:900; font-size:16px;}
+.coc-content {position:relative; background-image:url('icons/dirtwallpaper.jfif'); background-repeat:repeat; background-size:1200px 600px;}
+.coc-content::before {content:''; position:absolute; inset:0; background:rgba(0,0,0,0.8); pointer-events:none;}
+.coc-content > * {position:relative; z-index:1;}
+@keyframes zoomIn {from {transform:scale(0.95); opacity:0;} to {transform:scale(1); opacity:1;}}
+.site-footer {
+  flex-shrink:0; width:100%; background:linear-gradient(180deg, #0f0f10, #0b0b0c);
+  border-top:1px solid #2f3136; padding:18px 0; display:flex; flex-direction:column; align-items:center; gap:12px;
+}
+.footer-icons {display:flex; gap:12px; justify-content:center; align-items:center;}
+.footer-icons a {
+  width:38px; height:38px; background:#161616; border-radius:10px; display:flex;
+  align-items:center; justify-content:center; transition:transform 0.2s ease, background 0.2s ease;
+}
+.footer-icons a:hover {transform:translateY(-2px); background:#202225;}
+.footer-icons svg {width:20px; height:20px; fill:white;}
+.footer-text {font-size:12px; color:var(--text-muted); letter-spacing:0.4px;}
+html, body {touch-action:pan-x pan-y; overscroll-behavior:contain;}
+* {-webkit-tap-highlight-color:transparent;}
+.result-icon {width:18px; height:18px; margin-right:8px; vertical-align:middle; object-fit:contain;}
+.view-more {padding:8px 12px; color:#ccc; cursor:pointer; font-weight:500; text-align:center; transition:color 0.2s;}
+.view-more:hover {color:#fff; cursor:pointer;}
+@media (max-width: 970px){
+  .quick-links a {font-size:14px;}
+  .image-logo img {width:40px; height:40px; object-fit:contain; filter:brightness(1.1); border-radius:50px; margin-top:2px; margin-left:2px;}
+  .site-footer {padding-bottom:100px; padding-top:50px;}
+  .footer-text {font-size:9px;}
+  .download-btn {margin-top:14px; padding:10px 20px; font-size:-2px; border-radius:8px;}
+  .fullscreen-image {width:100%; margin-bottom:30px;}
+  .second-layer-container {margin-bottom:0px;}
+  .pagination {font-size:12px;}
+  .desktop-text {display:none;}
+  .mobile-text {display:inline;}
+  .whats-new-text {font-size:10.2px;}
+  .fullscreen-image {position:relative; width:100%; text-align:center; margin:0 auto; margin-bottom:10px;}
+  .clan-box-img {width:80px; height:80px; border-radius:10px;}
+  .clan-box {margin-left:25px; margin-right:25px;}
+  .clan-box-text {font-size:12.5px;}
+}
+@media (min-width:969px) {
+  .whats-new-text {font-size:16px;}
+  .whats-up-strong {font-size:20px;}
+  .second-layer button {padding-left:20px; padding-right:20px; padding-top:5px; padding-bottom:5px;}
+  .search-input {top:0px;}
+  .search-overlay {top:0px;}
+  .second-layer button img {width:28px; height:28px;}
+  .second-layer button {padding-left:25px; padding-right:25px;}
+}
+.search-close-btn {position:absolute; top:20px; right:20px; background:none; border:none; font-size:1.8rem; color:#fff; cursor:pointer; z-index:10000; transition:transform 0.2s;}
+.search-close-btn:hover {transform:rotate(90deg);}
+
+/* ============================================================
+   TOP-BAR SEARCH
+   Icon morph (magnifying glass <-> ✖), result grid built from the
+   site's existing .cf-card design (fed by searchitemstorage.json),
+   clear button, body scroll lock, and mobile back-button support
+   (handled in the JS in minecraft-zscript.js).
+   ============================================================ */
+body.search-modal-open { overflow:hidden !important; }
+body.search-modal-open .coc-main { overflow:hidden !important; }
+
+/* ---- fg-card box design (Popular Topics / hero search style) ---- */
+.fg-card {
+  flex: 0 0 33.3333%;
+  max-width: 33.3333%;
+  box-sizing: border-box;
+  padding: 0 10px;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+.fg-img-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16/10;
+  background: #1a1a1a;
+}
+.fg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s cubic-bezier(.25,.8,.25,1), filter .3s ease;
+  filter: brightness(0.88) contrast(1.05);
+}
+.fg-card:hover .fg-img {
+  transform: scale(1.07);
+  filter: brightness(1.05) contrast(1.05);
+}
+.fg-img-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.75) 100%);
+  pointer-events: none;
+}
+.fg-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  color: #fff;
+  z-index: 3;
+}
+.fg-tag-new { background: linear-gradient(90deg, #2b0707, #5f0808); }
+.fg-tag-hot { background: linear-gradient(90deg, #ad0000, #ff3b3b); }
+.fg-icon-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #161616;
+  border: 2px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 3;
+  transition: transform .3s ease, border-color .3s ease;
+}
+.fg-icon-badge img { width: 100%; height: 100%; object-fit: cover; }
+.fg-card:hover .fg-icon-badge { transform: scale(1.08); border-color: rgba(255,255,255,0.4); }
+.fg-info { padding: 12px 4px 4px; }
+.fg-title {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ffffff, #cfd6ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 3px;
+}
+.fg-sub { font-size: 13px; color: #8a8d93; font-weight: 500; }
+
+/* Top-bar search's "load more" sentinel — auto-loads on scroll
+   instead of a click button, so it's a quiet text hint. */
+.search-viewmore-sentinel {
+  display:block; margin:20px auto 40px; padding:8px; text-align:center;
+  color:#8a8d93; font-family:'Oxanium', sans-serif; font-size:13px; font-weight:600;
+  letter-spacing:0.5px; opacity:0.8;
+}
+
+.result-icon {width:18px; height:18px; margin-right:8px; vertical-align:middle; object-fit:contain;}
+.coc-main {background:linear-gradient(135deg, #000000, #0f0f0f); font-family:'Segoe UI', sans-serif;}
+.hero-section {
+  position:relative; min-width:100%; min-height:450px; max-height:500px; overflow:hidden;
+  flex:0 0 auto; box-shadow:0 14px 12px rgba(0,0,0,0.5); text-align:center; background-color:#2b2b35;
+}
+.hero-video {height:100%; object-fit:cover; object-position:50% 50%; transform:scaleX(1); margin:auto; width:100%; display:flex; z-index:1;}
+.hero-overlay {
+  position:absolute; inset:0; display:flex; align-items:center; padding-left:5%;
+  background:linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.4)),
+             linear-gradient(to top, rgba(0,0,0,0.2), rgba(0,0,0,0.4)),
+             linear-gradient(90deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,2) 100%);
+  background-blend-mode:overlay; z-index:2;
+}
+.hero-content {max-width:600px; text-align:left; color:#fff; animation:fadeInUp 1s ease forwards; margin-left:5%; margin-top:120px;}
+.hero-title {
+  font-size:clamp(30px, 8vw, 70px); font-weight:900; margin-bottom:16px; line-height:1.0;
+  text-transform:uppercase; background:linear-gradient(90deg, #f8f8f8, #d6cece, #b7b6b6);
+  background-clip:text; -webkit-background-clip:text; color:transparent; text-shadow:2px 4px 8px rgba(0,0,0,0.4);
+}
+.hero-tagline {font-size:clamp(16px, 1.2vw, 20px); opacity:0.9; margin-bottom:32px; color:#c8c8c8; line-height:1.5; text-shadow:0 1px 3px rgba(0,0,0,0.6);}
+@keyframes fadeInUp {0% {opacity:0; transform:translateY(20px);} 100% {opacity:1; transform:translateY(0);}}
+@media (max-width: 970px){
+  .hero-overlay {
+    flex-direction:column; justify-content:center; align-items:center; padding-left:5%; padding-right:5%;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.2)),
+               linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%);
+    background-blend-mode:overlay;
+  }
+  .hero-content {max-width:100%; margin-left:0; text-align:center; margin-bottom:110px;}
+  .hero-video {height:100%; align-content:center; justify-content:center; width:100%; object-fit:cover; object-position:center 100%; margin-top:44px;}
+  .hero-button {margin:0 auto; display:inline-flex; justify-content:center; align-items:center;}
+  .hero-title {
+    line-height:1.2; background:linear-gradient(360deg, #8a7f7f, #ffffff, #faf4f4);
+    background-clip:text; -webkit-background-clip:text; color:transparent;
+    text-shadow:2px 4px 8px rgba(0,0,0,0.4); margin-bottom:0px; margin-top:70px;
+    filter:drop-shadow(5px 4px 8px rgba(0,0,0,1.5));
+  }
+  .hero-tagline {font-size:clamp(13px, 3vw, 1px); margin-bottom:5px;}
+  .hero-section {position:relative; width:100%; min-height:340px; max-height:300px; overflow:hidden; margin-top: -10px;}
+  .hero-button {padding:8px 12px; font-size:12px;}
+  .hideonphone {display:none;}
+}
+@media (min-width: 968px){.hideonpc {display:none;}}
+/* ============================================================
+   BOTTOM NAV (mobile) + MORE MODAL + DESKTOP SUB NAV
+   ============================================================ */
+
+/* ---- Mobile bottom nav ---- */
+.bn-bar{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  height:60px;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 6px;
+  background:rgba(15,15,16,0.72);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  border-top:1px solid rgba(255,255,255,0.06);
+  z-index:9999;
+  transform:translateY(0);
+  transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change:transform;
+}
+.bn-bar.bn-hidden{
+  transform:translateY(115%);
+  transition:transform .32s cubic-bezier(0.4, 0, 1, 1);
+}
+.bn-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  text-decoration:none;
+  color:#7d7f85;
+  font-family:'Oxanium',sans-serif;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+  transition:all .15s ease;
+  padding:6px 0;
+  margin:0 2px;
+  position:relative;
+  overflow:hidden;
+  border-radius:10px;
+  border:1px solid transparent;
+}
+.bn-item img{ width:22px; height:22px; object-fit:contain; transition:opacity .15s, transform .2s ease; opacity:0.75; }
+.bn-item.active img,.bn-item:hover img{ opacity:1; }
+.bn-item.active,.bn-item:hover{ color:#ffffff; }
+/* The active item is marked on the icon itself: a white outline traced
+   around the cube. drop-shadow follows the image's alpha rather than its
+   box, so it hugs the shape; two passes at 1px give an even edge without
+   turning into a glow. Replaces a filled panel + border + drop shadow +
+   underline, all of which were saying the same thing at once. */
+.bn-item.active img{
+  transform:scale(1.05);
+  filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px rgba(255,255,255,0.85));
+}
+
+.bn-more-wrap{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  position:relative;
+  padding:6px 0;
+}
+.bn-more-spacer{
+  width:22px;
+  height:22px;
+}
+.bn-more{
+  position:absolute;
+  top:-22px;
+  left:50%;
+  transform:translateX(-50%);
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:1.5px solid #3a3a3e;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#232326;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.5),
+    0 0 0 4px rgba(15,15,16,0.72);
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.bn-more:hover{
+  background:#28282b;
+  border-color:#48484d;
+}
+.bn-more:active{ transform:translateX(-50%) scale(0.92); }
+.bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
+.bn-more-wrap.open .bn-more{
+  background:#2c2c30;
+  border-color:#55555b;
+}
+.bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
+.bn-more-label{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+  color:#7d7f85;
+  font-family:'Oxanium',sans-serif;
+  transition:color .15s;
+}
+.bn-more-wrap.open .bn-more-label{ color:#e9e9ec; }
+
+/* ---- More modal (bottom sheet) ---- */
+.more-overlay{
+  position:fixed;
+  inset:0;
+  bottom:60px;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  z-index:9997;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .28s ease, visibility 0s linear .28s;
+}
+.more-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transition:opacity .28s ease, visibility 0s linear 0s;
+}
+.more-sheet{
+  width:100%;
+  max-width:600px;
+  background:#161618;
+  border:1px solid #2a2a2e;
+  border-bottom:none;
+  border-radius:20px 20px 0 0;
+  padding:8px 16px 20px;
+  box-shadow:0 -8px 30px rgba(0,0,0,0.5);
+  transform:translateY(100%);
+  transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height:80vh;
+  overflow-y:auto;
+}
+.more-overlay.open .more-sheet{ transform:translateY(0); }
+.more-sheet.dragging{ transition:none; }
+.more-sheet-handle{
+  width:36px; height:4px; border-radius:4px;
+  background:#3a3a3e;
+  margin:6px auto 10px;
+  position:relative;
+  touch-action:none;
+  cursor:grab;
+}
+.more-sheet-handle::before{
+  content:'';
+  position:absolute;
+  top:-14px; left:-30px; right:-30px; bottom:-14px;
+}
+.more-sheet-handle:active{ cursor:grabbing; }
+.more-sheet-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-bottom:8px;
+  margin-bottom:4px;
+  border-bottom:1px solid #232326;
+}
+.more-sheet-title{
+  font-family:'Oxanium',sans-serif;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:#fff;
+  position:relative;
+  padding-left:12px;
+}
+.more-sheet-title::before{
+  content:"";
+  position:absolute;
+  left:0; top:50%;
+  transform:translateY(-50%);
+  width:4px; height:14px;
+  background:linear-gradient(180deg,#c22d2d,#6e1414);
+  border-radius:2px;
+}
+.more-sheet-close{
+  width:30px; height:30px;
+  border-radius:50%;
+  background:#1f1f22;
+  border:1px solid #2a2a2e;
+  display:flex; align-items:center; justify-content:center;
+  color:#9a9ba1;
+  cursor:pointer;
+  transition:color .15s, border-color .15s, background .15s;
+}
+.more-sheet-close svg{ width:14px; height:14px; }
+.more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
+.more-list{
+  display:flex;
+  flex-direction:column;
+}
+.more-empty{
+  padding:24px 6px;
+  text-align:center;
+  color:#6c6f76;
+  font-family:'Oxanium',sans-serif;
+  font-size:12.5px;
+  letter-spacing:0.3px;
+}
+.more-row{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:11px 6px;
+  margin:0 -6px;
+  border-radius:10px;
+  text-decoration:none;
+  border-top:1px solid #202023;
+  transition:background .15s;
+}
+.more-row:first-child{ border-top:none; }
+.more-row:hover, .more-row:active{ background:rgba(255,255,255,0.035); }
+.more-row.active{ background:rgba(255,255,255,0.035); }
+.more-row.active::before{
+  content:"";
+  position:absolute;
+  left:-6px; top:8px; bottom:8px;
+  width:3px;
+  border-radius:2px;
+  background:linear-gradient(180deg,#c22d2d,#6e1414);
+}
+.more-row.active .more-row-icon::before{ background:#3a3a3e; }
+.more-row.active .more-row-icon::after{ background:#232326; }
+.more-row.active .more-row-icon svg{ stroke:#fff; color:#fff; }
+.more-row.active .more-row-title{ color:#fff; }
+.more-row-icon{
+  position:relative;
+  isolation:isolate;
+  flex-shrink:0;
+  width:42px; height:42px;
+  display:flex; align-items:center; justify-content:center;
+  clip-path:polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+  transition:transform .15s;
+}
+.more-row-icon::before{
+  content:"";
+  position:absolute; inset:0; z-index:-2;
+  clip-path:polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+  background:#2a2a2e;
+}
+.more-row-icon::after{
+  content:"";
+  position:absolute; inset:1.3px; z-index:-1;
+  clip-path:polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  background:#1c1c1f;
+  transition:background .15s;
+}
+.more-row-icon svg{ width:18px; height:18px; stroke:#c8cbcd; color:#c8cbcd; transition:stroke .15s, color .15s; }
+.more-row-icon img{ width:18px; height:18px; object-fit:contain; }
+.more-row:hover .more-row-icon::before{ background:#3a3a3e; }
+.more-row:hover .more-row-icon::after{ background:#232326; }
+.more-row:hover .more-row-icon svg{ stroke:#fff; color:#fff; }
+.more-row-text{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  flex:1 1 auto;
+  min-width:0;
+}
+.more-row-title{
+  font-family:'Oxanium',sans-serif;
+  font-size:13.5px;
+  font-weight:700;
+  letter-spacing:0.3px;
+  color:#eff2f5;
+}
+.more-row-desc{
+  font-family:'Oxanium',sans-serif;
+  font-size:11px;
+  font-weight:400;
+  color:#8a8f98;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.more-row-chevron{
+  flex-shrink:0;
+  width:16px; height:16px;
+  stroke:#5c5f66;
+  color:#5c5f66;
+  transition:transform .15s, stroke .15s, color .15s;
+}
+.more-row:hover .more-row-chevron{ stroke:#e9e9ec; color:#e9e9ec; transform:translateX(3px); }
+
+/* ---- More modal: section titles / category grid / tool rows ---- */
+.more-section-title{
+  font-family:'Oxanium',sans-serif;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:#9a9ba1;
+  padding:9px 6px 5px;
+  border-top:1px solid #202023;
+  margin-top:3px;
+}
+.more-list > .more-section-title:first-child{
+  border-top:none;
+  margin-top:0;
+  padding-top:0;
+}
+.more-guides-list{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:6px;
+  padding-left:16px;
+}
+.more-guides-list .more-row{
+  padding:8px 8px;
+  margin:0;
+  border-top:none;
+  border-radius:8px;
+  background:#1b1b1e;
+  border:1px solid #26262a;
+}
+.more-guides-list .more-row:hover{
+  background:#212124;
+}
+.more-guides-list .more-row-icon{
+  width:30px;
+  height:30px;
+}
+
+/* ---- More modal: mc-mobile-nav style 4-col grid (Java / Bedrock / Story Mode / Dungeons) ---- */
+.more-app-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:5px;
+  padding:0 4px 6px 18px;
+}
+.more-app-grid-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:8px 4px 7px;border-radius:8px;text-decoration:none;background:#1f1f1f;border:1px solid #1e1e1e;
+  color:#acacac;font-size:8.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;transition:all 0.15s;
+  position:relative;overflow:hidden;
+}
+.more-app-grid-item img{width:22px;height:22px;object-fit:contain;opacity:0.55;transition:opacity 0.15s;image-rendering:pixelated;}
+.more-app-grid-item.active{background:#3d3c3c;border-color:#7a7a7a;color:#fcfcfc;}
+.more-app-grid-item.active img{opacity:1;}
+.more-app-grid-item:hover{background:#1a1a1a;border-color:#2a2a2a;color:#777;}
+.more-app-grid-item:hover img{opacity:0.6;}
+
+/* ---- Desktop secondary nav (below secondary-top-bar) ---- */
+.desktop-sub-nav{
+  position:fixed;
+  top:100px;
+  left:400px;
+  right:0;
+  width:calc(100% - 400px);
+  height:44px;
+  display:none;
+  align-items:center;
+  gap:6px;
+  padding:0 22px;
+  background:linear-gradient(90deg, #1b1c18ee, #25262182);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid #232326;
+  box-shadow:0 2px 6px rgba(0,0,0,0.35);
+  z-index:14;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+.desktop-sub-nav::-webkit-scrollbar{ display:none; }
+.dsn-link{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  white-space:nowrap;
+  text-decoration:none;
+  color:var(--text-muted);
+  font-family:'Oxanium',sans-serif;
+  font-size:13px;
+  font-weight:500;
+  padding:5px 14px;
+  border:none;
+  border-radius:8px;
+  background:transparent;
+  cursor:pointer;
+  transition:background .2s, color .2s;
+}
+.dsn-link img{ width:18px; height:18px; object-fit:contain; flex-shrink:0; opacity:0.75; transition:opacity .15s; }
+.dsn-link:hover{ background:var(--bg-hover); color:var(--text-secondary); }
+.dsn-link:hover img{ opacity:1; }
+.dsn-link.active{
+  background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+  color: var(--text-main);
+  font-weight:600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.dsn-link.active img{ opacity:1; }
+.dsn-divider{
+  flex-shrink:0;
+  width:1px;
+  height:22px;
+  background:rgba(255,255,255,0.1);
+  margin:0 6px;
+}
+.dsn-scroll-wrap{
+  position:fixed;
+  top:100px;
+  left:400px;
+  right:0;
+  width:calc(100% - 400px);
+  height:44px;
+  z-index:14;
+  display:none;
+}
+@media (min-width:971px){
+  .dsn-scroll-wrap{ display:block; }
+}
+.dsn-scroll-wrap .desktop-sub-nav{
+  position:static;
+  width:100%;
+  height:100%;
+}
+.dsn-arrow{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:34px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  cursor:pointer;
+  color:var(--text-main);
+  z-index:2;
+  opacity:0;
+  transition:opacity .15s;
+  pointer-events:none;
+}
+.dsn-arrow.show{ display:flex; opacity:1; pointer-events:auto; }
+.dsn-arrow svg{ width:16px; height:16px; }
+.dsn-arrow-left{
+  left:0;
+  background:linear-gradient(90deg, #1b1c18 55%, transparent);
+}
+.dsn-arrow-right{
+  right:0;
+  background:linear-gradient(270deg, #1b1c18 55%, transparent);
+}
+
+@media (max-width:970px){
+  .bn-bar{ display:flex; }
+  .desktop-sub-nav{ display:none !important; }
+  .coc-main{ padding-bottom:76px; }
+}
+@media (min-width:971px){
+  .desktop-sub-nav{ display:flex; position:static; width:100%; height:100%; }
+  .bn-bar{ display:none !important; }
+  .more-overlay{ bottom:0; }
+}
+
+/* Lock body scroll when More menu sheet is open */
+html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%; }
+
+/* ---- Mobile "Discover Categories" chip grid (top of content) ---- */
+@media(max-width:1270px){
+  .mc-mobile-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:35px 5% 40px;background:#0e0e0e;}
+  .mc-mobile-nav-header{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .mc-mobile-nav-line{flex:1;height:1px;background:#252525;}
+  .mc-mobile-nav-title{font-size:9px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#3a3a3a;margin-bottom:5px;}
+  .mc-mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    padding:8px 4px 7px;border-radius:8px;text-decoration:none;background:#1f1f1f;border:1px solid #1e1e1e;
+    color:#acacac;font-size:8.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;transition:all 0.15s;
+    position:relative;overflow:hidden;}
+  .mc-mobile-nav-item img{width:22px;height:22px;object-fit:contain;opacity:0.55;transition:opacity 0.15s;image-rendering:pixelated;}
+  .mc-mobile-nav-item.active{background:#3d3c3c;border-color:#7a7a7a;color:#fcfcfc;}
+  .mc-mobile-nav-item.active img{opacity:1;}
+  .mc-mobile-nav-item:hover{background:#1a1a1a;border-color:#2a2a2a;color:#777;}
+  .mc-mobile-nav-item:hover img{opacity:0.6;}
+}
+.mc-mobile-nav::after{content:"";grid-column:1/-1;height:1px;background:#252525;margin-top:10px;}
+
+.mc-dirt-fade {
+  width:100%; height:50px;
+  background:linear-gradient(to bottom, #0e0e0e, transparent);
+  pointer-events:none; margin-top:-1px;
+}
+
+@media (min-width: 1271px) { .mc-mobile-nav { display: none; } .mc-dirt-fade { display: none; } }
+
+</style>
+
+</head>
+<body>  
+
+  
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+
+
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="icons/home.jpg" alt=""></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="minecrafticons/vanillaworlds.png" alt="TH10 Icon" class="th-icon">
+    <div class="secondary-content">Minecraft Java Worlds</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <!-- hwr's own strip markup, ids and all: 11layout.js wires the arrows by
+       these ids, and the CSS deciding how the two strips share the bar is
+       keyed to these wrappers. Sections left, editions right, both filled
+       from mc-contents.json by the nav script below. -->
+  <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+  <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+  <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
+       from hwr-categories.json on the hwr pages. This bar holds the Minecraft
+       editions instead, so it opts out of being rebuilt. -->
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+
+
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="icons/controllericon.png" class="tripleimg">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <div class="hero-section">
+      <img class="hero-video" src="minecrafticons/minecarftearth.jpg" alt="">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h1 class="hero-title"><img src="minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft"></h1>
+          <style>.hero-minecraft{width:400px;} @media (max-width:970px){.hero-minecraft{width:270px;}}</style>
+          <div class="hero-game-tabs"><!-- rendered from mc-contents.json --></div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+    .hero-video {width:100%; height:100%; object-fit:cover; object-position:50% 45%;}
+    @media (max-width:970px){.hero-video{width:100%; height:90%; object-fit:cover; object-position:50% 10%;}}
+    .hero-game-tabs {display:flex; gap:6px; margin-top:20px;}
+    .hero-tab {
+      display:flex; flex-direction:column; align-items:center; gap:7px; padding:10px 10px;
+      border-radius:10px; text-decoration:none; background:rgba(0,0,0,0.55);
+      border:1px solid rgba(255,255,255,0.06); color:#666; font-size:10px; font-weight:700;
+      letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease;
+      backdrop-filter:blur(8px); position:relative; overflow:hidden; width:90px;
+    }
+    .hero-tab::before {
+      content:''; position:absolute; top:0; left:0; width:100%; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      opacity:0; transition:opacity 0.2s ease;
+    }
+    .hero-tab:hover::before {opacity:1;}
+    .hero-tab img {width:34px; height:34px; object-fit:contain; border-radius:7px; filter:grayscale(60%) brightness(0.7); transition:filter 0.2s ease, transform 0.2s ease;}
+    .hero-tab:hover {background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#bbb; transform:translateY(-2px);}
+    .hero-tab:hover img {filter:grayscale(0%) brightness(1); transform:scale(1.08);}
+    .hero-tab.active {background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.28); color:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);}
+    .hero-tab.active::before {opacity:1;}
+    .hero-tab.active img {filter:grayscale(0%) brightness(1.1); transform:scale(1.05);}
+    .hero-tab.active::after {content:''; position:absolute; bottom:0; left:15%; right:15%; height:2px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); border-radius:2px;}
+    @media (max-width:970px){
+      .hero-game-tabs {display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; width:100%; max-width:300px; margin:14px auto 0; justify-content:unset;}
+      .hero-tab {
+        flex-direction:row; align-items:center; justify-content:center; gap:6px;
+        padding:9px 10px; font-size:9px; width:100%; min-width:0;
+      }
+      .hero-tab span {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+      .hero-tab img {width:20px; height:20px; flex-shrink:0;}
+    }
+    @media (min-width:971px){.hero-game-tabs{justify-content:flex-start;}}
+    @media (min-width:970px){.sites-grid{display:grid; grid-template-columns:repeat(2, 1fr); padding:0 5% 8px 5%;}}
+/* static, not sticky: pinned to .coc-main's top it ended up behind the
+   raised secondary bar, showing only its faded half. Discover never had
+   this because its document scrolls, so the vignette scrolls away -- this
+   gives every page that same behaviour. */
+    .top-vignette {
+      position: static; width:100%; height:60px;
+      background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+      z-index:0; pointer-events:none; margin-bottom:-60px;
+    }
+    
+/* ============================================================
+   NOTHING BEHIND THE BARS BUT THE PAGE ITSELF
+   ============================================================
+   .main used to carry margin-top:52px to clear the fixed top bar, so
+   .coc-main began at y=52. The mobile secondary bar is only 38px tall,
+   so the moment it lifted into the top bar's slot on scroll, y=38..52
+   was a strip of bare <body> between the bar and the content. The
+   scroller now starts at the top of the viewport and gives that 52px
+   back as padding, so content sits exactly where it did before and
+   there is no seam whatever the bars do.
+
+   The sidebar took its offset from .main's margin, so it carries it
+   itself at desktop widths; on mobile it is a fixed drawer with its
+   own top:52px and never depended on it. */
+.main{ margin-top: 0; }
+.coc-main{ padding-top: var(--topbar-height, 52px); }
+@media (min-width: 971px){
+  .sidebar{ margin-top: var(--topbar-height, 40px); }
+}
+
+/* ============================================================
+   HERO BANNER — hwr's hero-image layout
+   ============================================================
+   hwr's .hero-bg-img is absolutely positioned and fills the hero, which
+   is what makes its parallax cheap: the image is out of flow, so moving
+   it is a compositor-only change. This banner was an in-flow flex item,
+   so each transform forced layout inside the flex container first --
+   that is the stutter. Same declarations, applied here. Comes last so
+   it beats the earlier rules written for the in-flow version; their
+   object-position still applies, so each breakpoint keeps its framing. */
+.hero-section{ position: relative; }
+.hero-video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
+  z-index: 0;
+}
+</style>
+
+    <div class="coc-content">
+      <div class="top-vignette"></div>
+
+      <!-- MOBILE NAV -->
+      <div class="mc-mobile-nav">
+        <div class="mc-mobile-nav-header">
+          <div class="mc-mobile-nav-line"></div>
+          <div class="mc-mobile-nav-title">Discover Categories</div>
+          <div class="mc-mobile-nav-line"></div>
+        </div>
+        <!-- items rendered from mc-contents.json -->
+      </div>
+      <div class="mc-dirt-fade"></div>
+
+      <!-- WRAPPER -->
+      <div class="mc-content-wrapper">
+        <!-- LEFT: all sections -->
+        <div style="flex:1; min-width:0; padding:0 5%; padding-bottom:100px;">
+
+
+
+
+
+
+          
+
+
+
+
+
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="mc-right-sidebar">
+          <div class="mc-right-sidebar-inner" id="rightSidebar">
+            <div class="layouts-title-box"><div class="layouts-title">Discover More</div></div>
+
+            <!-- Editor's Pick -->
+            <div class="mc-sidebar-group-label">Editor's Pick</div>
+            <div class="sb-card">
+              <div class="sb-pick">
+                <div class="sb-pick-img"><img src="minecrafticons/hardcoreparcore-compresso.jpg" alt=""></div>
+                <div class="sb-pick-name">Parcrop Village</div>
+                <div class="sb-pick-desc">Download a handcrafted survival world with 3,000+ days of progress.</div>
+                <a href="mc-java-worlds.html" class="sb-pick-btn">View World</a>
+              </div>
+            </div>
+
+            <!-- Trending Tags -->
+            <div class="mc-sidebar-group-label">Trending Tags</div>
+            <div class="sb-card">
+              <div class="sb-tags">
+                <a href="mc-java-seeds.html" class="sb-tag">#seeds</a>
+                <a href="mc-java-worlds.html" class="sb-tag">#parkour</a>
+                <a href="mc-java-worlds.html" class="sb-tag">#hcpc</a>
+                <a href="mc-java-shaders.html" class="sb-tag">#shaders</a>
+                <a href="mc-java-commands.html" class="sb-tag">#commands</a>
+              </div>
+            </div>
+
+            <!-- Library Stats -->
+            <div class="mc-sidebar-group-label">Library Stats</div>
+            <div class="sb-card">
+              <div class="sb-stats">
+                <div class="sb-stat"><span class="sb-stat-num">30+</span><div class="sb-stat-lbl">Seeds</div></div>
+                <div class="sb-stat-div"></div>
+                <div class="sb-stat"><span class="sb-stat-num">20+</span><div class="sb-stat-lbl">Worlds</div></div>
+                <div class="sb-stat-div"></div>
+                <div class="sb-stat"><span class="sb-stat-num">80+</span><div class="sb-stat-lbl">R-Packs</div></div>
+              </div>
+            </div>
+
+            <!-- Discord CTA -->
+            <div class="sb-discord">
+              <svg class="sb-discord-icon" viewBox="0 0 24 24" fill="#5865F2"><path d="M20 4a16 16 0 00-4-1l-.2.4a14 14 0 00-7.6 0L8 3A16 16 0 004 4C1 9 1 14 2 19a16 16 0 004.8 2.4l1-1.6a10 10 0 01-1.6-.8c.1 0 .2-.1.3-.2a12 12 0 0011 0c.1.1.2.1.3.2-.5.3-1 .6-1.6.8l1 1.6A16 16 0 0022 19c1-5 1-10-2-15zM9.5 15.5c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8zm5 0c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8z"/></svg>
+              <div class="sb-discord-title">Join the Community</div>
+              <div class="sb-discord-sub">Get notified when new worlds drop, and vote on what we curate next.</div>
+              <a href="https://discord.gg/rfntEJ5w" target="_blank" class="sb-discord-btn">Join Discord</a>
+            </div>
+          </div>
+        </div>
+
+
+
+      
+      </div>
+
+      
+
+      <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+        <div class="more-sheet-title">Minecraft</div>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"><!-- rendered from mc-contents.json --></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <a href="mc-java-home.html" class="bn-item active">
+    <img src="minecrafticons/minecraft-block-logo.png" alt="">
+    Java
+  </a>
+  <a href="minecrafticons/mc-bedrock-icon.png" class="bn-item">
+    <img src="minecrafticons/minecraft-bedrock-icon.png" alt="">
+    Bedrock
+  </a>
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+  <a href="minecrafticons/mc-stroymode-icon.png" class="bn-item">
+    <img src="minecrafticons/mc-stroymode-icon.png" alt="">
+    Story
+  </a>
+  <a href="minecrafticons/mc-dungeons.jfif" class="bn-item">
+    <img src="minecrafticons/mc-dungeons-removebg-preview.png" alt="">
+    Dungeons
+  </a>
+</div>
+
+</div>
+
+<script src="11layout.js"></script>
+
+<script>
+
+// ── NORMALIZER ──
+
+
+
+// ── SIDEBAR ──
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const header = document.querySelector('.triple-a-header');
+  const list = document.getElementById('triple-a-list');
+  header.classList.add('open');
+  list.style.display = 'flex';
+});
+
+// ── SECONDARY TOP BAR ──
+document.querySelector('.secondary-top-bar').addEventListener('click', () => {
+  document.querySelector('.coc-main').scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── HELP POPUP ──
+
+
+// ── PAGE LOAD ──
+window.addEventListener("load", () => { document.documentElement.classList.add("loaded"); });
+
+// ── SEARCH ──
+
+
+
+
+
+
+
+
+
+
+
+fetch('herosearch.json')
+  .then(res => res.json())
+  .then(data => {
+    topSearchItems = data;
+    topSearchIsLoaded = true;
+  })
+  .catch(err => console.error('Top-bar search data failed to load:', err));
+
+
+
+// Renders a single result as an fg-card — same box design used by
+// Popular Topics / home.html's hero search results.
+
+
+
+
+// Main search function — called on every keystroke and when the
+// overlay first opens (with an empty query, showing a random sample).
+
+
+
+
+// `fromPopstate` is true when triggered by the back button/gesture itself —
+// in that case the browser is already consuming the history entry, so we
+// must NOT call history.back() again (that would navigate off the page).
+
+
+
+
+window.addEventListener('popstate', () => {
+  if (searchoverlay && searchoverlay.style.display === 'block') {
+    closeSearch(true);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  searchoverlay = document.getElementById('search-overlay');
+  resultsContainer = document.getElementById('search-results');
+  searchinput = document.getElementById('search-input');
+  searchIcon = document.getElementById('search-icon');
+  topSearchViewMoreBtn = document.getElementById('search-view-more');
+  searchInputClearBtn = document.getElementById('search-input-clear');
+
+  searchinput.addEventListener('input', searchItems);
+  searchoverlay.addEventListener('click', e => { if (e.target === searchoverlay) closeSearch(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  // Auto-loads the next batch of results a bit before the user actually
+  // reaches the bottom (rootMargin gives it a head start), so scrolling
+  // feels continuous instead of hitting a button.
+  searchScrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && topSearchVisibleCount < topSearchCurrentMatches.length) {
+        topSearchVisibleCount += TOP_SEARCH_LOAD_MORE_COUNT;
+        renderTopSearchVisible();
+      }
+    });
+  }, { root: searchoverlay, rootMargin: '0px 0px 400px 0px' });
+
+  searchInputClearBtn.addEventListener('click', () => {
+    searchinput.value = '';
+    searchItems();
+    searchinput.focus();
+  });
+});
+
+// PAGE LOADER — fires when HTML is parsed, doesn't wait for images/fonts
+document.addEventListener('DOMContentLoaded', () => {
+  document.documentElement.classList.add("loaded");
+  const loader = document.getElementById('page-loader');
+  loader.classList.add('hidden');
+  setTimeout(() => loader.remove(), 400);
+});
+
+
+
+// Skeleton for sidebar when not loaded
+      function showSkeletons(container, count) {
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'skeleton-item';
+    div.innerHTML = `
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-text"></div>`;
+    container.appendChild(div);
+  }
+}
+
+
+// ============================================================
+// BOTTOM NAV + MORE MODAL + DESKTOP SUB NAV
+// ============================================================
+function bnLockScroll(){
+  document.documentElement.classList.add('no-scroll');
+  var cocMain = document.querySelector('.coc-main');
+  if(cocMain) cocMain.style.overflow = 'hidden';
+}
+function bnUnlockScroll(){
+  document.documentElement.classList.remove('no-scroll');
+  var cocMain = document.querySelector('.coc-main');
+  if(cocMain) cocMain.style.overflow = '';
+  if(window.bnResyncAfterModal) window.bnResyncAfterModal();
+}
+// Tracks whether we've pushed a throwaway history entry for the open sheet,
+// same pattern as the search modal — lets the phone's back button/gesture
+// close the sheet instead of navigating off the page.
+let moreMenuHistoryState = false;
+
+function openMoreMenu(){
+  var overlay = document.getElementById('moreOverlay');
+  var wrap = document.getElementById('bnMoreWrap');
+  overlay.classList.add('open');
+  if(wrap) wrap.classList.add('open');
+  bnLockScroll();
+
+  if(!moreMenuHistoryState){
+    history.pushState({ moreMenuModal: true }, '');
+    moreMenuHistoryState = true;
+  }
+}
+function toggleMoreMenu(){
+  var overlay = document.getElementById('moreOverlay');
+  var isOpen = overlay.classList.contains('open');
+  if(isOpen){
+    closeMoreMenu();
+  } else {
+    openMoreMenu();
+  }
+}
+// `fromPopstate` is true when triggered by the back button/gesture itself —
+// in that case the browser is already consuming the history entry, so we
+// must NOT call history.back() again (that would navigate off the page).
+function closeMoreMenu(e, fromPopstate){
+  document.getElementById('moreOverlay').classList.remove('open');
+  var wrap = document.getElementById('bnMoreWrap');
+  if(wrap) wrap.classList.remove('open');
+  bnUnlockScroll();
+
+  if(moreMenuHistoryState){
+    moreMenuHistoryState = false;
+    if(!fromPopstate){
+      history.back(); // cleans up the throwaway history entry pushed by openMoreMenu()
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var moreOverlay = document.getElementById('moreOverlay');
+  if(moreOverlay){
+    moreOverlay.addEventListener('touchmove', function(e){
+      if(!e.target.closest('.more-sheet')) e.preventDefault();
+    }, {passive:false});
+  }
+});
+
+// Mobile back button / gesture support: closes the sheet instead of
+// leaving the page, if it happens to be open when back fires.
+window.addEventListener('popstate', () => {
+  var overlay = document.getElementById('moreOverlay');
+  if(overlay && overlay.classList.contains('open')){
+    closeMoreMenu(null, true);
+  }
+});
+
+// DRAG-TO-CLOSE: dragging the handle down past ~28% of the sheet's
+// height (or a fast flick) closes the sheet; otherwise it snaps back.
+(function initMoreSheetDrag(){
+  const sheet = document.querySelector('.more-sheet');
+  const handle = document.querySelector('.more-sheet-handle');
+  const overlay = document.getElementById('moreOverlay');
+  if(!sheet || !handle || !overlay) return;
+
+  let dragging = false;
+  let startY = 0;
+  let dragY = 0;
+  let sheetHeight = 0;
+  let lastY = 0;
+  let lastT = 0;
+  let velocity = 0;
+
+  function onPointerDown(e){
+    dragging = true;
+    startY = e.clientY;
+    lastY = startY;
+    lastT = Date.now();
+    velocity = 0;
+    sheetHeight = sheet.getBoundingClientRect().height || 1;
+    sheet.classList.add('dragging');
+    if(handle.setPointerCapture) handle.setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e){
+    if(!dragging) return;
+    const now = Date.now();
+    const dt = now - lastT;
+    if(dt > 0) velocity = (e.clientY - lastY) / dt; // px per ms
+    lastY = e.clientY;
+    lastT = now;
+
+    dragY = Math.max(0, e.clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+    overlay.style.opacity = String(1 - Math.min(dragY / sheetHeight, 1) * 0.9);
+  }
+
+  function onPointerUp(){
+    if(!dragging) return;
+    dragging = false;
+    sheet.classList.remove('dragging');
+
+    const pastThreshold = dragY > sheetHeight * 0.28;
+    const fastFlick = velocity > 0.6; // flicked down quickly
+    overlay.style.opacity = '';
+
+    if(pastThreshold || fastFlick){
+      closeMoreMenu();
+      requestAnimationFrame(() => { sheet.style.transform = ''; });
+    } else {
+      sheet.style.transform = '';
+    }
+    dragY = 0;
+  }
+
+  handle.addEventListener('pointerdown', onPointerDown);
+  handle.addEventListener('pointermove', onPointerMove);
+  handle.addEventListener('pointerup', onPointerUp);
+  handle.addEventListener('pointercancel', onPointerUp);
+})();
+
+// ===================================================
+// BOTTOM NAV AUTO-HIDE ON SCROLL (mobile, app-style)
+// Visible by default. Hides as soon as you scroll down.
+// Only comes back once you scroll UP a decent amount
+// (a tiny upward nudge won't bring it back).
+// ===================================================
+(function(){
+  const bnBar = document.getElementById('bottomNav');
+  const cocMain = document.querySelector('.coc-main');
+  if(!bnBar) return;
+
+  const DOWN_HIDE_THRESHOLD = 8;   // px of downward travel before it hides
+  const UP_SHOW_THRESHOLD   = 55;  // px of upward travel before it reappears
+  const TOP_REVEAL_ZONE     = 40;  // always shown near the very top
+
+  function getScrollY(){
+    const winY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const mainY = cocMain ? cocMain.scrollTop : 0;
+    return Math.max(winY, mainY);
+  }
+
+  let lastY = getScrollY();
+  let upAccum = 0;
+  let downAccum = 0;
+  let ticking = false;
+  let suppressUntil = 0; // Date.now() timestamp; while active, scroll events are tracked but never allowed to hide the nav
+
+  function showNav(){ bnBar.classList.remove('bn-hidden'); }
+  function hideNav(){ bnBar.classList.add('bn-hidden'); }
+
+  function onScroll(){
+    const currentY = getScrollY();
+
+    // Suppressed window (right after a modal closes): just resync the
+    // baseline, don't act on the delta — a modal's scroll-lock unwinding
+    // can fire a fake "scrolled down" event that isn't a real user scroll.
+    if(Date.now() < suppressUntil){
+      lastY = currentY;
+      showNav();
+      ticking = false;
+      return;
+    }
+
+    const delta = currentY - lastY;
+
+    if(currentY <= TOP_REVEAL_ZONE){
+      showNav();
+      upAccum = 0;
+      downAccum = 0;
+      lastY = currentY;
+      ticking = false;
+      return;
+    }
+
+    if(delta > 0){
+      downAccum += delta;
+      upAccum = 0;
+      if(downAccum > DOWN_HIDE_THRESHOLD) hideNav();
+    } else if(delta < 0){
+      upAccum += -delta;
+      downAccum = 0;
+      if(upAccum > UP_SHOW_THRESHOLD) showNav();
+    }
+
+    lastY = currentY;
+    ticking = false;
+  }
+
+  function requestTick(){
+    if(!ticking){
+      window.requestAnimationFrame(onScroll);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', requestTick, {passive:true});
+  if(cocMain) cocMain.addEventListener('scroll', requestTick, {passive:true});
+
+  // Never keep it hidden while the "More" sheet is open
+  const moreOverlay = document.getElementById('moreOverlay');
+  if(moreOverlay){
+    new MutationObserver(function(){
+      if(moreOverlay.classList.contains('open')) showNav();
+    }).observe(moreOverlay, {attributes:true, attributeFilter:['class']});
+  }
+
+  // Closing a modal (more-sheet, search, etc.) toggles overflow/scroll-lock
+  // on html/body/.coc-main, and mobile browsers can fire a synthetic scroll
+  // event during that unlock as things reflow — sometimes a frame or two
+  // late, not immediately. Call this after any modal-close: it force-shows
+  // the nav and mutes the hide logic for a short window so that fake event
+  // can't sneak a "scrolled down" past the resync.
+  window.bnResyncAfterModal = function(){
+    suppressUntil = Date.now() + 500;
+    lastY = getScrollY();
+    upAccum = 0;
+    downAccum = 0;
+    showNav();
+
+    // Keep re-baselining across the next several frames in case the
+    // browser's own scroll-position correction lands a bit later.
+    let frames = 0;
+    function tick(){
+      lastY = getScrollY();
+      showNav();
+      frames++;
+      if(frames < 20) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  };
+
+  // Lets other UI (e.g. opening the search bar) hide the nav on demand,
+  // independent of actual scrolling.
+  window.bnHideNav = function(){ hideNav(); };
+})();
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeMoreMenu();
+});
+
+// Highlight the active bottom-nav / desktop sub-nav / mobile "More" sheet item based on current page
+(function highlightActiveNavItems(){
+  function baseName(filename){
+    return (filename || '').replace(/(\D)\d+\.html$/i, '$1.html');
+  }
+  var page = baseName(window.location.pathname.split('/').pop().split('?')[0].split('#')[0] || 'mc-java-home.html');
+  document.querySelectorAll('.bn-item').forEach(function(el){
+    var href = baseName((el.getAttribute('href') || '').split('/').pop());
+    el.classList.toggle('active', href === page);
+  });
+  document.querySelectorAll('.dsn-link').forEach(function(el){
+    var href = baseName((el.getAttribute('href') || '').split('/').pop());
+    el.classList.toggle('active', href === page);
+  });
+  document.querySelectorAll('.dsn-mini, .dsn-guide-box, .dsn-guide-row').forEach(function(el){
+    var href = baseName((el.getAttribute('href') || '').split('/').pop());
+    el.classList.toggle('active', href === page);
+  });
+  document.querySelectorAll('.th-mini, .more-row').forEach(function(el){
+    var href = baseName((el.getAttribute('href') || '').split('/').pop());
+    el.classList.toggle('active', href === page);
+  });
+})();
+
+// Desktop sub-nav horizontal scroll arrows (shown only when content overflows)
+(function dsnScrollArrows(){
+  var track = document.getElementById('dsnScrollTrack');
+  var left = document.getElementById('dsnArrowLeft');
+  var right = document.getElementById('dsnArrowRight');
+  if(!track || !left || !right) return;
+
+  function update(){
+    var overflow = track.scrollWidth > track.clientWidth + 1;
+    var atStart = track.scrollLeft <= 1;
+    var atEnd = track.scrollLeft >= (track.scrollWidth - track.clientWidth - 1);
+    left.classList.toggle('show', overflow && !atStart);
+    right.classList.toggle('show', overflow && !atEnd);
+  }
+
+  left.addEventListener('click', function(){
+    track.scrollBy({ left: -200, behavior: 'smooth' });
+  });
+  right.addEventListener('click', function(){
+    track.scrollBy({ left: 200, behavior: 'smooth' });
+  });
+
+  track.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+  // Re-check shortly after load in case fonts/images shift layout width
+  setTimeout(update, 300);
+  // Re-check once the nav has been populated from mc-contents.json
+  document.addEventListener('nav-data-ready', function(){ setTimeout(update, 0); });
+})();
+
+</script>
+<script>
+/* ============================================================
+   NAV RENDER — renders hero tabs, mobile "Discover Categories"
+   grid, the "More" sheet, and the desktop sub-nav — all from
+   mc-contents.json.
+
+   To add/remove/edit a nav item on EVERY page, just edit
+   mc-contents.json. Nothing here needs to change.
+   ============================================================ */
+(function () {
+  function normalizePage(url) {
+    if (!url) return "";
+    return url.toString().split('/').pop().split('?')[0].split('#')[0].replace('.html', '') || "home";
+  }
+  const currentPage = normalizePage(window.location.pathname);
+  const isCurrent = (link) => normalizePage(link) === currentPage;
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // ---- item renderers ----
+  function heroTabHtml(item) {
+    const active = isCurrent(item.link) ? ' active' : '';
+    return `<a href="${escapeHtml(item.link)}" class="hero-tab${active}">
+      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}"><span>${escapeHtml(item.name)}</span>
+    </a>`;
+  }
+
+  function mobileNavItemHtml(item) {
+    const active = isCurrent(item.link) ? ' active' : '';
+    return `<a href="${escapeHtml(item.link)}" class="mc-mobile-nav-item${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+  }
+
+  function moreAppGridItemHtml(item) {
+    const active = isCurrent(item.link) ? ' active' : '';
+    return `<a href="${escapeHtml(item.link)}" class="more-app-grid-item${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+  }
+
+  function dsnLinkHtml(item) {
+    const active = isCurrent(item.link) ? ' active' : '';
+    // hwr's chip classes, styled once in 11layout.css, so the bar matches
+    return `<a href="${escapeHtml(item.link)}" class="dsn-chip${active}"><img class="dsn-chip-icon" src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+  }
+
+  // Sections use hwr's .dsn-chip; the destinations on the right use its
+  // .stb-hub-link -- the same split hwr makes between its own two strips.
+  function stbHubLinkHtml(item) {
+    const active = isCurrent(item) ? ' active' : '';
+    return `<a href="${escapeHtml(item.link)}" class="stb-hub-link${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+  }
+
+  // ---- section renderers ----
+  function renderHeroTabs(data) {
+    const wrap = document.querySelector('.hero-game-tabs');
+    if (!wrap || !data.heroTabs) return;
+    wrap.innerHTML = data.heroTabs.map(heroTabHtml).join('');
+  }
+
+  function renderMobileNav(data) {
+    const nav = document.querySelector('.mc-mobile-nav');
+    if (!nav || !data.mobileNav) return;
+    // Keep the header row (the "Discover Categories" divider), replace only the item links.
+    const header = nav.querySelector('.mc-mobile-nav-header');
+    nav.innerHTML = '';
+    if (header) nav.appendChild(header);
+    nav.insertAdjacentHTML('beforeend', data.mobileNav.map(mobileNavItemHtml).join(''));
+  }
+
+  // Same sheet hwr builds: one row per edition, each folding open to that
+  // edition's own sections. The row for the edition you are on starts open.
+  function renderMoreSheet(data) {
+    const list = document.querySelector('.more-list');
+    if (!list || !data.moreSheet) return;
+
+    const editions = (data.desktopSubNav && data.desktopSubNav.editions) || data.heroTabs || [];
+    const editionFor = (title) => editions.find((e) =>
+      e.name === title || title.split(' ')[0] === e.name) || {};
+
+    let html = '';
+    Object.keys(data.moreSheet).forEach((title) => {
+      const items = data.moreSheet[title] || [];
+      const ed = editionFor(title);
+      const open = isCurrent(ed) ? ' open' : '';
+      const active = isCurrent(ed) ? ' active' : '';
+
+      const toc = items.map((it) => {
+        const cur = isCurrent(it) ? ' is-current' : '';
+        return `<a href="${escapeHtml(it.link)}" class="stb-toc-card${cur}">` +
+          `<img class="stb-toc-icon" src="${escapeHtml(it.image)}" alt="">` +
+          `<span class="stb-toc-name">${escapeHtml(it.name)}</span>` +
+          `</a>`;
+      }).join('');
+
+      html += `<div class="th-mini-wrap${open}">` +
+        `<div class="th-mini-toggle${active}">` +
+        `<a href="${escapeHtml(ed.link || '#')}" class="th-mini th-mini-link${active}">` +
+        `<img src="${escapeHtml(ed.image || '')}" alt="">` +
+        `<span>${escapeHtml(title)}</span>` +
+        `</a>` +
+        `<button type="button" class="th-mini-chevron-btn" onclick="toggleThMiniDropdown(this)" aria-label="Toggle ${escapeHtml(title)} sections">` +
+        `<svg class="th-mini-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` +
+        `</button>` +
+        `</div>` +
+        `<div class="th-mini-dropdown"><div class="th-mini-dropdown-inner"><div class="stb-toc-grid stb-toc-grid-2col">${toc}</div></div></div>` +
+        `</div>`;
+    });
+    list.innerHTML = `<div class="th-mini-grid">${html}</div>`;
+  }
+
+  function renderDesktopSubNav(data) {
+    if (!data.desktopSubNav) return;
+    const { editions = [], categories = [] } = data.desktopSubNav;
+    // Sections on the left, editions on the right -- the same split hwr makes
+    // between its category chips and its hub destinations.
+    const sections = document.getElementById('dsnCategoriesScroll');
+    const dests = document.getElementById('stbHubNavScroll');
+    if (sections) sections.innerHTML = categories.map(dsnLinkHtml).join('');
+    if (dests) dests.innerHTML = editions.map(stbHubLinkHtml).join('');
+    // scrollWidth is only meaningful once the chips exist -- the same
+    // re-measure hwr's renderCategoryNav() does after it injects.
+    if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
+    if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
+  }
+
+  // ---- init ----
+  function renderAll(data) {
+    renderHeroTabs(data);
+    renderMobileNav(data);
+    renderMoreSheet(data);
+    renderDesktopSubNav(data);
+    document.dispatchEvent(new CustomEvent('nav-data-ready', { detail: data }));
+  }
+
+  function init() {
+    fetch('mc-contents.json')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load mc-contents.json: ' + res.status);
+        return res.json();
+      })
+      .then(renderAll)
+      .catch((err) => console.error('[nav-render]', err));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

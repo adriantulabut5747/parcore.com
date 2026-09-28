@@ -85,7 +85,7 @@
   <!-- Close button -->
   <button id="search-close-btn">✖</button>
   <!-- Search input -->
-  <input type="text" id="search-input" placeholder="Find your next game" oninput="searchItems()">
+  <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
   <!-- Search results -->
   <div id="search-results"></div></div></div>
 
@@ -173,340 +173,508 @@
 
     <!-- Bases Grid -->
     <div class="grid-container">
+<!-- Bases Grid -->
+<div class="grid-container">
 
-
-
-<div class="message-box">
-  <div class="message-title-row">
-  <img src="icons/coc-fireball.webp" class="message-icon" alt="Fireball icon">
-  <p class="message-title">Fireball Equipment Guide</p>
-</div>
-
-<p class="sub-title">Fireball’s range at level (23 to 27)</p>
- <div class="discord-carousel">
-  <button class="arrow left">&#10094;</button> <!-- left arrow -->
-  <div class="discord-images">
-    <img src="clashofclans/coctools/coc-2x2.png">
-    <img src="clashofclans/coctools/coc-3x3.jpg">
-    <img src="clashofclans/coctools/coc-4x4.jpg">
+  <!-- Equipment Tabs -->
+  <div class="eq-tabs">
+    <button class="eq-tab active" onclick="switchEq('fireball', this)">
+      <img src="icons/coc-fireball.webp" alt=""> Fireball
+    </button>
+    <button class="eq-tab" onclick="switchEq('gauntlet', this)">
+      <img src="icons/coc-actionfigure.webp" alt=""> Action Figure
+    </button>
   </div>
-  <button class="arrow right">&#10095;</button> <!-- right arrow -->
-</div>
-  <div class="message-text">
+
+  <!-- ── FIREBALL PANEL ── -->
+  <div class="eq-panel active" id="eq-fireball">
+
+    <div class="eq-hero-card">
+      <img class="eq-hero-img" src="icons/coc-fireball.webp" alt="Fireball">
+      <div class="eq-hero-info">
+        <div class="eq-hero-name">Fireball</div>
+        <div class="eq-hero-sub">Grand Warden equipment. Launches a massive projectile that explodes on impact, dealing splash damage in a radius around the target tile.</div>
+        <span class="eq-rarity">★ Epic Equipment</span>
+      </div>
+    </div>
+
+    <div class="eq-stat-row">
+      <div class="eq-stat">
+        <div class="eq-stat-label">Max Damage</div>
+        <div class="eq-stat-val gold">4,100</div>
+      </div>
+      <div class="eq-stat">
+        <div class="eq-stat-label">Max Radius</div>
+        <div class="eq-stat-val red">6 tiles</div>
+      </div>
+      <div class="eq-stat">
+        <div class="eq-stat-label">Max Level</div>
+        <div class="eq-stat-val">27</div>
+      </div>
+    </div>
+
+    <div class="eq-section-head">Radius progression</div>
+    <div class="eq-radius-row">
+      <div class="eq-radius-card">
+        <div class="eq-radius-label">Lv 1–8</div>
+        <div class="tile-vis">
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+          <div class="tile-sq"></div><div class="tile-sq"></div>
+        </div>
+        <div class="eq-radius-val">4 tiles</div>
+      </div>
+      <div class="eq-radius-card">
+        <div class="eq-radius-label">Lv 9–23</div>
+        <div class="tile-vis">
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+          <div class="tile-sq on"></div><div class="tile-sq"></div>
+        </div>
+        <div class="eq-radius-val">5 tiles</div>
+      </div>
+      <div class="eq-radius-card milestone-card">
+        <div class="eq-radius-label">Lv 24–27</div>
+        <div class="tile-vis">
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+          <div class="tile-sq on"></div><div class="tile-sq on"></div>
+        </div>
+        <div class="eq-radius-val red">6 tiles</div>
+      </div>
+    </div>
+
+    <div class="eq-section-head">Range diagrams (Lv 23–27)</div>
+    <div class="eq-carousel" id="fbCarousel">
+      <button class="eq-car-btn l" onclick="carScroll('fbCarousel', -1)">&#10094;</button>
+      <div class="eq-carousel-inner" id="fbImgs" onscroll="updateDots('fbCarousel')">
+        <img src="clashofclans/coctools/coc-2x2.png" alt="2x2 range" onclick="eqZoom(this.src)">
+        <img src="clashofclans/coctools/coc-3x3.jpg" alt="3x3 range" onclick="eqZoom(this.src)">
+        <img src="clashofclans/coctools/coc-4x4.jpg" alt="4x4 range" onclick="eqZoom(this.src)">
+      </div>
+      <button class="eq-car-btn r" onclick="carScroll('fbCarousel', 1)">&#10095;</button>
+      <div class="eq-carousel-dots" id="fbDots">
+        <div class="eq-dot on"></div>
+        <div class="eq-dot"></div>
+        <div class="eq-dot"></div>
+      </div>
+    </div>
+
+    <div class="eq-section-head">Upgrade stats</div>
+    <div class="eq-table-wrap" id="fbTableWrap">
+      <table class="eq-table">
+        <thead>
+          <tr>
+            <th>Lv</th>
+            <th>Radius</th>
+            <th>Damage</th>
+            <th class="ore-shiny">
+              <img src="clashofclans/coctools/Shiny_Ore.webp" class="ore-icon" alt="Shiny">
+            </th>
+            <th class="ore-glow">
+              <img src="clashofclans/coctools/Glowy_Ore.webp" class="ore-icon" alt="Glowy">
+            </th>
+            <th class="ore-star">
+              <img src="clashofclans/coctools/Starry_Ore.webp" class="ore-icon" alt="Starry">
+            </th>
+          </tr>
+        </thead>
+        <tbody id="fbTableBody"></tbody>
+      </table>
+    </div>
+    <button class="eq-toggle-btn" id="fbToggle" onclick="toggleFbTable()">Show all 27 levels ▾</button>
   </div>
-</div>
 
+  <!-- ── GIANT GAUNTLET PANEL ── -->
+  <div class="eq-panel" id="eq-gauntlet">
 
+    <div class="eq-hero-card">
+      <img class="eq-hero-img" src="icons/coc-actionfigure.webp" alt="Giant Giant">
+      <div class="eq-hero-info">
+        <div class="eq-hero-name">Giant Giant</div>
+        <div class="eq-hero-sub">Archer Queen equipment. Summons a massive Giant Giant fighter that deals AoE damage and soaks hits for your army.</div>
+        <span class="eq-rarity">★ Epic Equipment</span>
+      </div>
+    </div>
 
- <div class="message-box">
-   <div class="message-title-row">
-  <img src="icons/coc-fireball.webp" class="message-icon" alt="Fireball icon">
-  <p class="message-title">Fireball Equipment Guide <span style="color: rgb(160, 159, 159); font-size: -3px;" class="smallertitle">(stats)</span></p>
-</div>
-<div class="table-wrapper collapsed" id="statsTable">
-  <table>
-   <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Level</th>
-          <th>Damage Radius</th>
-          <th>Projectile Damage</th>
+    <div class="eq-stat-row">
+      <div class="eq-stat">
+        <div class="eq-stat-label">Max DPS</div>
+        <div class="eq-stat-val gold">620</div>
+      </div>
+      <div class="eq-stat">
+        <div class="eq-stat-label">Max HP</div>
+        <div class="eq-stat-val red">15,000</div>
+      </div>
+      <div class="eq-stat">
+        <div class="eq-stat-label">Max Level</div>
+        <div class="eq-stat-val">9</div>
+      </div>
+    </div>
 
-          <th><img src="clashofclans/coctools/Shiny_Ore.webp" alt=""></th>
-          <th><img src="clashofclans/coctools/Glowy_Ore.webp"></th>
-          <th><img src="clashofclans/coctools/Starry_Ore.webp"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>4 tiles</td><td>1,500</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
-        <tr><td>2</td><td>4 tiles</td><td>1,500</td><td>120</td><td>-</td><td>-</td></tr>
-        <tr><td>3</td><td>4 tiles</td><td>1,700</td><td>240</td><td>20</td><td>-</td></tr>
-        <tr><td>4</td><td>4 tiles</td><td>1,700</td><td>400</td><td>-</td><td>-</td></tr>
-        <tr><td>5</td><td>4 tiles</td><td>1,800</td><td>600</td><td>-</td><td>-</td></tr>
-        <tr><td>6</td><td>4 tiles</td><td>1,950</td><td>840</td><td>100</td><td>-</td></tr>
-        <tr><td>7</td><td>4 tiles</td><td>1,950</td><td>1,120</td><td>-</td><td>-</td></tr>
-        <tr><td>8</td><td>4 tiles</td><td>2,050</td><td>1,440</td><td>-</td><td>-</td></tr>
-        <tr><td>9</td><td>5 tiles</td><td>2,200</td><td>1,800</td><td>200</td><td>10</td></tr>
-        <tr><td>10</td><td>5 tiles</td><td>2,200</td><td>1,900</td><td>-</td><td>-</td></tr>
-        <tr><td>11</td><td>5 tiles</td><td>2,350</td><td>2,000</td><td>-</td><td>-</td></tr>
-        <tr><td>12</td><td>5 tiles</td><td>2,650</td><td>2,100</td><td>400</td><td>20</td></tr>
-        <tr><td>13</td><td>5 tiles</td><td>2,650</td><td>2,200</td><td>-</td><td>-</td></tr>
-        <tr><td>14</td><td>5 tiles</td><td>2,750</td><td>2,300</td><td>-</td><td>-</td></tr>
-        <tr><td>15</td><td>5 tiles</td><td>3,100</td><td>2,400</td><td>600</td><td>30</td></tr>
-        <tr><td>16</td><td>5 tiles</td><td>3,100</td><td>2,500</td><td>-</td><td>-</td></tr>
-        <tr><td>17</td><td>5 tiles</td><td>3,250</td><td>2,600</td><td>-</td><td>-</td></tr>
-        <tr><td>18</td><td>5 tiles</td><td>3,400</td><td>2,700</td><td>600</td><td>50</td></tr>
-        <tr><td>19</td><td>5 tiles</td><td>3,400</td><td>2,800</td><td>-</td><td>-</td></tr>
-        <tr><td>20</td><td>5 tiles</td><td>3,500</td><td>2,900</td><td>-</td><td>-</td></tr>
-        <tr><td>21</td><td>5 tiles</td><td>3,650</td><td>3,000</td><td>600</td><td>100</td></tr>
-        <tr><td>22</td><td>5 tiles</td><td>3,650</td><td>3,100</td><td>-</td><td>-</td></tr>
-        <tr><td>23</td><td>5 tiles</td><td>3,750</td><td>3,200</td><td>-</td><td>-</td></tr>
-        <tr><td>24</td><td>6 tiles</td><td>3,900</td><td>3,300</td><td>600</td><td>120</td></tr>
-        <tr><td>25</td><td>6 tiles</td><td>3,900</td><td>3,400</td><td>-</td><td>-</td></tr>
-        <tr><td>26</td><td>6 tiles</td><td>3,950</td><td>3,500</td><td>-</td><td>-</td></tr>
-        <tr><td>27</td><td>6 tiles</td><td>4,100</td><td>3,600</td><td>600</td><td>150</td></tr>
-      </tbody>
-    </table>
-  </table>
- </div>
-<div class="view-more-wrapper">
-  <button class="view-more-btn" onclick="toggleTable()">View more</button>
-</div></div>
+    <div class="eq-section-head">Giant Giant Stats</div>
+    <div class="eq-table-box">
+      <table class="eq-gauntlet-table">
+        <thead>
+          <tr>
+            <th>Lv</th>
+            <th>DPS</th>
+            <th>HP</th>
+            <th>Blacksmith</th>
+          </tr>
+        </thead>
+        <tbody id="ggBody"></tbody>
+      </table>
+    </div>
 
-
-
-<div class="message-box stats-table">
- <div class="message-title-row">
-  <img src="icons/coc-actionfigure.webp" class="message-icon" alt="Fireball icon">
-  <p class="message-title">Giant Giant Stats <span style="color: rgb(160, 159, 159); font-size: -3px;" class="smallertitle">(action figure)</span></p>
-</div>
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Level</th>
-          <th>DPS</th>
-          
-          <th>HP</th>
-          <th>Blacksmith </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>110</td><td>800</td><td>3</td></tr>
-        <tr><td>2</td><td>140</td><td>1,600</td><td>4</td></tr>
-        <tr><td>3</td><td>165</td><td>2,400</td><td>5</td></tr>
-        <tr><td>4</td><td>190</td><td>3,200</td><td>6</td></tr>
-        <tr><td>5</td><td>240</td><td>4,800</td><td>7</td></tr>
-        <tr><td>6</td><td>310</td><td>7,000</td><td>8</td></tr>
-        <tr><td>7</td><td>430</td><td>9,000</td><td>9</td></tr>
-        <tr><td>8</td><td>550</td><td>12,500</td><td>10</td></tr>
-        <tr><td>9</td><td>620</td><td>15,000</td><td>11</td></tr>
-      </tbody>
-    </table>
   </div>
+
+  <!-- Zoom overlay -->
+  <div id="eqZoomOverlay" onclick="this.style.display='none'">
+    <img id="eqZoomImg" alt="zoomed">
+  </div>
+
 </div>
-
-
-
-
-
- 
-
-
-
- 
-
-
-
-
-
 
 
 <style>
+/* ── Equipment Grid ─────────────────────────────────── */
+.grid-container { display: block; padding: 0 0 12px; position: relative; }
 
-/* ===== DISCORD CAROUSEL FIX ===== */
+/* Tabs */
+.eq-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.eq-tab {
+  display: flex; align-items: center; gap: 7px;
+  background: #161618; border: 1px solid #222226;
+  border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  font-size: 13px; color: #9ea3b0; font-family: 'Oxanium', 'Inter', sans-serif;
+  transition: all .2s;
+}
+.eq-tab img { width: 22px; height: 22px; object-fit: contain; border-radius: 4px; }
+.eq-tab.active { background: rgba(159,0,0,.18);  background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4);}
 
-.discord-carousel {
-  position: relative;
-  margin-top: 8px;
+/* Panels */
+.eq-panel { display: none; }
+.eq-panel.active { display: block; }
+
+/* Hero card */
+.eq-hero-card {
+  background: #161618; border: 1px solid #222226;
+  border-radius: 14px; padding: 16px; margin-bottom: 14px;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.eq-hero-img {
+  width: 58px; height: 58px; object-fit: contain; border-radius: 10px;
+  background: #0b0b0c; flex-shrink: 0; border: 1px solid #2a2a30;
+}
+.eq-hero-name { font-size: 16px; font-weight: 800; color: #f5c542; margin-bottom: 4px; }
+.eq-hero-sub { font-size: 12px; color: #9ea3b0; line-height: 1.55; }
+.eq-rarity {
+  display: inline-flex; align-items: center; gap: 4px;
+   background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border-radius: 20px; font-size: 11px; 
+  padding: 3px 9px; margin-top: 8px; font-weight: 700;
 }
 
-.discord-images { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; 
-                  -webkit-overflow-scrolling: touch; touch-action: pan-x; scroll-behavior: smooth; padding-bottom: 6px;  overflow: auto;              /* allow both X and Y */
-  touch-action: auto;          /* allow all gestures */
-  -webkit-overflow-scrolling: touch; /* allow vertical page scroll */}
-.discord-images::-webkit-scrollbar { height: 6px;}
-.discord-images::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px;}
-.discord-images img { flex: 0 0 85%; max-width: 90%; border-radius: 8px; cursor: zoom-in;
-                   object-fit: cover; scroll-snap-align: center; user-select: none; pointer-events: auto;}
-
-/* ===== ARROWS ===== */
-.discord-carousel .arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.35);
-                   border: none; color: #fff; font-size: 22px; padding: 8px 10px; border-radius: 50%; cursor: pointer; z-index: 10;}
-.discord-carousel .arrow.left { left: 6px; }
-.discord-carousel .arrow.right { right: 6px; }
-@media (max-width: 480px) {/* Hide arrows ONLY on small mobile */
-  .discord-carousel .arrow {
-    display: none; }.sub-title{font-size: 11px;} .smallertitle{font-size: 11px;}}
-@media (min-width: 1200px) { .message-box { margin-left: 40px; } .discord-images img {
-    flex: 0 0 45%;
-    max-width: 60%;} 
-      .message-icon {
-    width: 25px;
-    height: 25px;
-  }
-
+/* Stat badges */
+.eq-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.eq-stat {
+  background: #161618; border: 1px solid #222226;
+  border-radius: 10px; padding: 10px 8px 8px; text-align: center;
 }
-/* Table */
-.stats-table table, .table-wrapper table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 600px;
-  margin-top: 8px;
-  font-size: 14px;
-  color: #dcddde;
+.eq-stat-label {
+  font-size: 10px; color: #9ea3b0; margin-bottom: 4px;
+  letter-spacing: .5px; text-transform: uppercase;
 }
-.stats-table th, .stats-table td, .table-wrapper th, .table-wrapper td {
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 8px 12px;
-  text-align: center;
+.eq-stat-val { font-size: 18px; font-weight: 800; color: #fff; }
+.eq-stat-val.gold { color: #f5c542; }
+.eq-stat-val.red { color: #eaeaea; }
+
+/* Section head */
+.eq-section-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: #f5c542;
+  margin: 18px 0 10px; letter-spacing: .3px;
 }
-.stats-table th, .table-wrapper th {
-  background: rgba(255,255,255,0.1);
-  font-weight: 700;
+.eq-section-head::after { content: ''; flex: 1; height: 1px; background: #222226; }
+
+/* Radius row */
+.eq-radius-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.eq-radius-card {
+  background: #161618; border: 1px solid #222226;
+  border-radius: 10px; padding: 12px 8px; text-align: center;
 }
-.stats-table td, .table-wrapper td {
-  background: rgba(255,255,255,0.05);
+.eq-radius-label { font-size: 10px; color: #9ea3b0; margin-bottom: 7px; text-transform: uppercase; letter-spacing: .5px; }
+.tile-vis { display: flex; justify-content: center; gap: 2px; margin-bottom: 7px; }
+.tile-sq { width: 7px; height: 7px; background: #333; border-radius: 1px; }
+.tile-sq.on { background: #d9d9d9; }
+.eq-radius-val { font-size: 14px; font-weight: 800; color: #fff; }
+.eq-radius-val.red { color: #d1d1d1; }
+
+/* Carousel */
+.eq-carousel { position: relative; margin-bottom: 4px; }
+.eq-carousel-inner {
+  display: flex; gap: 10px; overflow-x: auto;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth; padding-bottom: 6px;
 }
-
-/* Table wrapper for mobile scroll */
-.table-wrapper { overflow-x: auto; }
-
-
-
-
-
-.table-wrapper {
-  margin-top: 0;
-  transition: max-height 0.4s ease;
+.eq-carousel-inner::-webkit-scrollbar { height: 4px; }
+.eq-carousel-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+.eq-carousel-inner img {
+  flex: 0 0 88%; max-width: 88%; border-radius: 10px;
+  object-fit: cover; scroll-snap-align: center; cursor: zoom-in;
+  border: 1px solid #222226;
 }
-
-/* collapsed state */
-.table-wrapper.collapsed {
-  max-height: 395px; /* adjust this to show ~5–6 rows */
-  overflow: hidden;
+.eq-car-btn {
+  position: absolute; top: 45%; transform: translateY(-50%);
+  background: rgba(0,0,0,.55); border: none; color: #fff;
+  font-size: 18px; width: 32px; height: 32px; border-radius: 50%;
+  cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center;
 }
+.eq-car-btn.l { left: 6px; }
+.eq-car-btn.r { right: 6px; }
+.eq-carousel-dots { display: flex; justify-content: center; gap: 5px; margin-top: 8px; }
+.eq-dot { width: 6px; height: 6px; border-radius: 50%; background: #2a2a30; transition: background .2s; }
+.eq-dot.on { background: #d2d2d2; }
 
-/* expanded state */
-.table-wrapper.expanded {
-  max-height: 2000px; /* big enough for full table */
+/* Upgrade table */
+.eq-table-wrap {
+  overflow: auto; border-radius: 10px; border: 1px solid #222226;
+  max-height: 300px; transition: max-height .4s ease;
 }
-
-.view-more-btn {
-  margin-top: 10px;
-  background: none;
-  border: none;
-  color: #cfcfcf;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-top: 20px;
-  text-decoration: underline;
+.eq-table-wrap.expanded { max-height: 1800px; }
+.eq-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+.eq-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+.eq-table { width: 100%; border-collapse: collapse; font-size: 13px; color: #dfe1e4; }
+.eq-table thead th {
+  background: #1c1c20; color: #f5c542; font-weight: 700;
+  padding: 9px 10px; text-align: center; position: sticky; top: 0; z-index: 2;
+  border-bottom: 1px solid #222226; white-space: nowrap; font-size: 12px;
 }
-
-.view-more-btn:hover {
-  text-decoration: underline;
+.eq-table thead th:first-child { text-align: left; padding-left: 12px; }
+.eq-table tbody td {
+  padding: 8px 10px; text-align: center;
+  border-bottom: 1px solid #1a1a1e; font-size: 13px;
 }
-
-.view-more-wrapper {
-  text-align: center;
+.eq-table tbody td:first-child { text-align: left; padding-left: 12px; font-weight: 700; color: #fff; }
+.eq-table tbody tr:last-child td { border-bottom: none; }
+.eq-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+.eq-table tbody tr.milestone td { background: rgba(245,197,66,.05); }
+.lvl-badge {
+  display: inline-block; background: rgba(255,255,255,.07);
+  border-radius: 4px; padding: 1px 6px; font-size: 11px;
 }
+.milestone .lvl-badge { background: rgba(245,197,66,.15); color: #f5c542; }
+.ore-icon { width: 20px; height: 20px; object-fit: contain; vertical-align: middle; }
+.ore-shiny { color: #c0a060; }
+.ore-glow { color: #5ab8d4; }
+.ore-star { color: #c47af5; }
 
-
-
-
-.skeleton-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 10px;
-  margin-bottom: 12px;
-  width: calc(100% - 32px);
-  margin-left: 18px;
-  border-radius: 6px;
-  background: #1a1a1a;
-  animation: shimmer 1.2s infinite linear;
-  background: linear-gradient(
-    90deg,
-    #1a1a1a 25%,
-    #252525 50%,
-    #1a1a1a 75%
-  );
-  background-size: 200% 100%;
+/* Toggle */
+.eq-toggle-btn {
+  display: block; width: 100%; margin-top: 10px;
+  background: none; border: 1px solid #2a2a30;
+  border-radius: 8px; color: #9ea3b0; font-size: 13px;
+  padding: 8px; cursor: pointer; font-family: 'Oxanium', 'Inter', sans-serif;
+  transition: all .2s;
 }
+.eq-toggle-btn:hover { border-color: rgba(211, 211, 211, 0.4); color: #fff; }
 
-.skeleton-icon {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background: #2a2a2a;
-  flex-shrink: 0;
+/* Gauntlet table */
+.eq-table-box { border-radius: 10px; border: 1px solid #222226; overflow: hidden; }
+.eq-gauntlet-table { width: 100%; border-collapse: collapse; font-size: 13px; color: #dfe1e4; }
+.eq-gauntlet-table th {
+  background: #1c1c20; color: #f5c542; font-size: 12px;
+  padding: 9px 10px; font-weight: 700; text-align: center;
+  border-bottom: 1px solid #222226;
 }
-
-.skeleton-text {
-  height: 14px;
-  border-radius: 4px;
-  background: #2a2a2a;
-  flex: 1;
+.eq-gauntlet-table th:first-child { text-align: left; padding-left: 12px; }
+.eq-gauntlet-table td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #1a1a1e; }
+.eq-gauntlet-table td:first-child { text-align: left; padding-left: 12px; font-weight: 700; color: #fff; }
+.eq-gauntlet-table tr:last-child td { border-bottom: none; }
+.eq-gauntlet-table tr:hover td { background: rgba(255,255,255,.03); }
+.hp-bar { display: flex; align-items: center; gap: 6px; }
+.hp-fill { height: 5px; border-radius: 3px; background: #989898; min-width: 4px; flex-shrink: 0; }
+.bs-badge {
+  display: inline-block; background: rgba(245,197,66,.12);
+  color: #f5c542; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700;
 }
 
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+/* Zoom overlay */
+#eqZoomOverlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.88); z-index: 99999;
+  align-items: center; justify-content: center;
+  cursor: zoom-out;
 }
+#eqZoomOverlay img { max-width: 95%; max-height: 92vh; border-radius: 10px; }
 
-
-/* PARCHROME LOADER */
-body { visibility: hidden; }
-#page-loader { position: fixed; inset: 0; background: #0f0f10; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; z-index: 999999; gap: 16px; visibility: visible; opacity: 1; transition: opacity 0.4s ease;}
-#page-loader.hidden { opacity: 0; pointer-events: none; }
-.parchrome-fade { opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
-.parchrome-ring { width: 44px; height: 44px; border-radius: 50%;
-  border: 3px solid #2a2a2a; border-top: 3px solid #9f0000; animation: parchrome-spin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;}
-.parchrome-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #555; font-family: sans-serif;
-  opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
-  @keyframes parchrome-spin { to { transform: rotate(360deg); } }
-  @keyframes parchrome-fadein { to { opacity: 1; } }
- html.loaded body { visibility: visible; }
-
-
+/* Mobile */
+@media (max-width: 480px) {
+  .eq-car-btn { display: none; }
+  .eq-carousel-inner img { flex: 0 0 94%; max-width: 94%; }
+  .eq-stat-val { font-size: 15px; }
+  .eq-hero-name { font-size: 14px; }
+  .eq-hero-sub { font-size: 11px; }
+  .eq-radius-row { gap: 6px; }
+  .eq-radius-val { font-size: 12px; }
+}
+@media (min-width: 1200px) {
+  .eq-carousel-inner img { flex: 0 0 55%; max-width: 25%; }  .eq-car-btn { display: none; }
+  .eq-carousel-dots { display: none; }
+}
 </style>
 
 
-
-
 <script>
-function toggleTable() {
-  const table = document.getElementById("statsTable");
-  const btn = event.target;
+const FB_DATA = [
+  [1,'4 tiles',1500,'N/A','-','-'],
+  [2,'4 tiles',1500,120,'-','-'],
+  [3,'4 tiles',1700,240,20,'-'],
+  [4,'4 tiles',1700,400,'-','-'],
+  [5,'4 tiles',1800,600,'-','-'],
+  [6,'4 tiles',1950,840,100,'-'],
+  [7,'4 tiles',1950,1120,'-','-'],
+  [8,'4 tiles',2050,1440,'-','-'],
+  [9,'5 tiles',2200,1800,200,10],
+  [10,'5 tiles',2200,1900,'-','-'],
+  [11,'5 tiles',2350,2000,'-','-'],
+  [12,'5 tiles',2650,2100,400,20],
+  [13,'5 tiles',2650,2200,'-','-'],
+  [14,'5 tiles',2750,2300,'-','-'],
+  [15,'5 tiles',3100,2400,600,30],
+  [16,'5 tiles',3100,2500,'-','-'],
+  [17,'5 tiles',3250,2600,'-','-'],
+  [18,'5 tiles',3400,2700,600,50],
+  [19,'5 tiles',3400,2800,'-','-'],
+  [20,'5 tiles',3500,2900,'-','-'],
+  [21,'5 tiles',3650,3000,600,100],
+  [22,'5 tiles',3650,3100,'-','-'],
+  [23,'5 tiles',3750,3200,'-','-'],
+  [24,'6 tiles',3900,3300,600,120],
+  [25,'6 tiles',3900,3400,'-','-'],
+  [26,'6 tiles',3950,3500,'-','-'],
+  [27,'6 tiles',4100,3600,600,150],
+];
+const FB_MILESTONES = new Set([9,15,18,21,24,27]);
+const FB_PREVIEW = 9;
+let fbExpanded = false;
 
-  if (table.classList.contains("collapsed")) {
-    table.classList.remove("collapsed");
-    table.classList.add("expanded");
-    btn.textContent = "View less";
-  } else {
-    table.classList.remove("expanded");
-    table.classList.add("collapsed");
-    btn.textContent = "View more";
-  }
+function eqFmt(v){ return typeof v === 'number' ? v.toLocaleString() : v; }
+
+function buildFbTable() {
+  const tbody = document.getElementById('fbTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const rows = fbExpanded ? FB_DATA : FB_DATA.slice(0, FB_PREVIEW);
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (FB_MILESTONES.has(r[0])) tr.classList.add('milestone');
+    tr.innerHTML = `
+      <td><span class="lvl-badge">${r[0]}</span></td>
+      <td>${r[1]}</td>
+      <td>${eqFmt(r[2])}</td>
+      <td class="ore-shiny">${eqFmt(r[3])}</td>
+      <td class="ore-glow">${eqFmt(r[4])}</td>
+      <td class="ore-star">${eqFmt(r[5])}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
+function toggleFbTable() {
+  fbExpanded = !fbExpanded;
+  const wrap = document.getElementById('fbTableWrap');
+  const btn = document.getElementById('fbToggle');
+  if (wrap) wrap.classList.toggle('expanded', fbExpanded);
+  if (btn) btn.textContent = fbExpanded ? 'Show less ▴' : 'Show all 27 levels ▾';
+  buildFbTable();
+}
 
-document.querySelectorAll('.discord-carousel').forEach(carousel => {
-  const container = carousel.querySelector('.discord-images');
-  const left = carousel.querySelector('.arrow.left');
-  const right = carousel.querySelector('.arrow.right');
+const GG_DATA = [
+  [1,110,800,3],[2,140,1600,4],[3,165,2400,5],[4,190,3200,6],
+  [5,240,4800,7],[6,310,7000,8],[7,430,9000,9],[8,550,12500,10],[9,620,15000,11]
+];
+const GG_MAX_HP = 15000;
 
-  // Hide arrows if only 1 or 0 images
-  if (container.querySelectorAll('img').length <= 1) {
-    left.style.display = 'none';
-    right.style.display = 'none';
-  }
-
-  const scrollByAmount = () => container.clientWidth * 0.9;
-
-  left?.addEventListener('click', () => {
-    container.scrollBy({ left: -scrollByAmount(), behavior: 'smooth' });
+function buildGGTable() {
+  const tbody = document.getElementById('ggBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  GG_DATA.forEach(r => {
+    const barW = Math.round((r[2] / GG_MAX_HP) * 90);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="lvl-badge">${r[0]}</span></td>
+      <td>${r[1].toLocaleString()}</td>
+      <td>
+        <div class="hp-bar">
+          <div class="hp-fill" style="width:${barW}px"></div>
+          <span style="font-size:12px;">${r[2].toLocaleString()}</span>
+        </div>
+      </td>
+      <td><span class="bs-badge">BS ${r[3]}</span></td>
+    `;
+    tbody.appendChild(tr);
   });
+}
 
-  right?.addEventListener('click', () => {
-    container.scrollBy({ left: scrollByAmount(), behavior: 'smooth' });
-  });
-});
+function switchEq(id, btn) {
+  document.querySelectorAll('.eq-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.eq-tab').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('eq-' + id);
+  if (panel) panel.classList.add('active');
+  btn.classList.add('active');
+}
 
+function carScroll(carId, dir) {
+  const inner = document.querySelector('#' + carId + ' .eq-carousel-inner');
+  if (inner) inner.scrollBy({ left: dir * inner.clientWidth * 0.9, behavior: 'smooth' });
+}
+
+function updateDots(carId) {
+  const inner = document.querySelector('#' + carId + ' .eq-carousel-inner');
+  const dots = document.querySelectorAll('#' + carId + ' .eq-dot');
+  if (!inner || !dots.length) return;
+  const idx = Math.round(inner.scrollLeft / Math.max(inner.clientWidth, 1));
+  dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+}
+
+function eqZoom(src) {
+  const o = document.getElementById('eqZoomOverlay');
+  const img = document.getElementById('eqZoomImg');
+  if (o && img) { img.src = src; o.style.display = 'flex'; }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => { buildFbTable(); buildGGTable(); });
+} else {
+  buildFbTable();
+  buildGGTable();
+}
 </script>
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
 
 
 

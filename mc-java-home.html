@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,21 +26,22 @@
 <link rel="shortcut icon" href="icons/home.jpg">
 <link rel="apple-touch-icon" href="icons/home.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="minecraft-zui.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="11layout.css">
+<link rel="stylesheet" href="mc-java.css">
+
 
 </head>
-<body>  
+<body class="mc-home">  
 
-  
   <div id="page-loader">
   <div class="parchrome-fade">
     <div class="parchrome-ring"></div>
   </div>
   <span class="parchrome-label">Parchrome</span>
 </div>
-
-
-
 
 <!-- Top Nav -->
 <div class="top-bar">
@@ -50,45 +50,64 @@
     <span></span><span></span><span></span>
   </div>
   <div class="top-bar-title">
-    <div class="topbar-logo"><img src="icons/home.jpg" alt=""></div>
+    <div class="topbar-logo"><img src="icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
     Parchrome
   </div>
-  <button id="search-btn" onclick="openSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
-    <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
-      <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
-      <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-    </svg>
-    <span id="close-icon" style="display:none; font-size:1.5rem; color:white;">✖</span>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
   </button>
   <div id="search-overlay">
-    <button id="search-close-btn">✖</button>
-    <input type="text" id="search-input" placeholder="Find your next game" oninput="searchItems()">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
     <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
   </div>
 </div>
 
 <!-- Secondary Top Bar -->
 <div class="secondary-top-bar" id="secondary-top-bar">
   <div class="secondary-left">
-    <img src="icons/minecraft.png" alt="TH10 Icon" class="th-icon">
-    <div class="secondary-content">Minecraft Java Edition</div>
+    <img src="icons/minecraft.png" alt="TH10 Icon" class="th-icon" loading="lazy" decoding="async">
+    <div class="secondary-content">
+          <!-- Desktop shows just the section name; mobile adds the hardcoded
+               "you are here" crumb. Structure mirrors the HWR bar so the two
+               read identically, but the group is static here rather than
+               driven by a scroll-spy. -->
+          <span class="secondary-content-desktop">Minecraft Java</span>
+          <span class="secondary-content-mobile">
+            <span class="sc-mobile-text">Minecraft Java</span>
+            <span class="sc-mobile-group">Discover</span>
+          </span>
+        </div>
   </div>
-  <div class="help-container">
-    <div class="help-popup" id="help-popup">
-      <ul><br>
-        <li>🛡️ Tap the clan banner to view recommended CC</li><br>
-        <li>⚠️ Downloads may not work inside Facebook or Messenger. Please open this page in Chrome for the best experience.</li><br>
-        <li>📋 AC Clan Tag: <span id="clan-tag" class="copy-tag">#2GYPGPJP9</span></li><br>
-      </ul>
-    </div>
-    <div class="help-container">
-      <a class="help-button2" href="home.html">
-        <svg width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#bababa" stroke-width="1.008">
-          <path d="M1 6V15H6V11C6 9.89543 6.89543 9 8 9C9.10457 9 10 9.89543 10 11V15H15V6L8 0L1 6Z" fill="#bababa"></path>
-        </svg>
-      </a>
-    </div>
-  </div>
+    <div class="stb-divider" aria-hidden="true"></div>
+  <!-- hwr's own strip markup, ids and all: 11layout.js wires the arrows by
+       these ids, and the CSS deciding how the two strips share the bar is
+       keyed to these wrappers. Sections left, editions right, both filled
+       from mc-contents.json by the nav script below. -->
+  <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+  <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+  <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
+       from hwr-categories.json on the hwr pages. This bar holds the Minecraft
+       editions instead, so it opts out of being rebuilt. -->
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+
 </div>
 
 <!-- Main -->
@@ -98,7 +117,7 @@
     <div class="games-container" id="games-container"></div>
     <div class="triple-a-container">
       <div class="triple-a-header" onclick="toggleTripleA()">
-        <img src="icons/controllericon.png" class="tripleimg">
+        <img src="icons/controllericon.png" class="tripleimg" loading="lazy" decoding="async" alt="">
         Triple A Games <span class="arrow">></span>
       </div>
       <div class="triple-a-list" id="triple-a-list"></div>
@@ -106,158 +125,157 @@
   </div>
 
   <div class="coc-main">
-    <div class="hero-section">
-      <img class="hero-video" src="icons/minecrafthero.jfif" alt="">
+    <!-- HERO v2 — see the "HERO v2" block in mc-java.css. The edition wordmark
+         swaps per edition (Bedrock / Story / Dungeons logos are already in
+         minecrafticons/); the live version pills keep the original hvs-* ids so
+         the Mojang piston-meta fetch in mc-java.js drives them unchanged. -->
+    <div class="hero-section hero-v2">
+      <img class="hero-video" src="minecrafticons/minecarftearth.jpg" alt="" fetchpriority="high" decoding="async">
       <div class="hero-overlay">
         <div class="hero-content">
-          <h1 class="hero-title"><img src="minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft"></h1>
-          <style>.hero-minecraft{width:400px;} @media (max-width:970px){.hero-minecraft{width:200px;}}</style>
-          <div class="hero-game-tabs">
-            <a href="mc-java-home.html" class="hero-tab active">
-              <img src="minecrafticons/minecraft-block-logo.png" alt="Vanilla"><span>Java</span>
-            </a>
-            <a href="minecrafticons/mc-bedrock-icon.png" class="hero-tab">
-              <img src="minecrafticons/minecraft-bedrock-icon.png" alt="Bedrock"><span>Bedrock</span>
-            </a>
-            <a href="minecrafticons/mc-stroymode-icon.png" class="hero-tab">
-              <img src="minecrafticons/mc-stroymode-icon.png" alt="Story Mode"><span>Story</span>
-            </a>
-            <a href="minecrafticons/mc-dungeons.jfif" class="hero-tab">
-              <img src="minecrafticons/mc-dungeons-removebg-preview.png" alt="Dungeons"><span>Dungeons</span>
-            </a>
+          <div class="hero-eyebrow"><span class="hero-eyebrow-lead">Play more</span><span class="hero-eyebrow-sep">&middot;</span><span class="hero-eyebrow-em">Search less</span></div>
+          <h1 class="hero-title"><img src="minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft" alt="Minecraft"></h1>
+          <p class="hero-tagline">Everything for Minecraft Java, in one place. Seeds, packs, shaders, mods and tools — every one tried before it got listed.</p>
+          <div class="hero-live" id="hero-version-strip">
+            <span class="hero-live-item">
+              <span class="hero-live-dot"></span>
+              <span class="hero-live-label">Release</span>
+              <span class="hero-live-version" id="hvs-release-version">—</span>
+              <span class="hero-live-updated" id="hvs-release-updated">loading…</span>
+            </span>
+            <span class="hero-live-item">
+              <span class="hero-live-dot"></span>
+              <span class="hero-live-label">Snapshot</span>
+              <span class="hero-live-version" id="hvs-snapshot-version">—</span>
+              <span class="hero-live-updated" id="hvs-snapshot-updated">loading…</span>
+            </span>
           </div>
         </div>
       </div>
     </div>
 
-    <style>
-    .hero-video {width:100%; height:100%; object-fit:cover; object-position:50% 45%;}
-    @media (max-width:970px){.hero-video{width:100%; height:90%; object-fit:cover; object-position:50% 10%;}}
-    .hero-game-tabs {display:flex; gap:6px; margin-top:20px;}
-    .hero-tab {
-      display:flex; flex-direction:column; align-items:center; gap:7px; padding:10px 10px;
-      border-radius:10px; text-decoration:none; background:rgba(0,0,0,0.55);
-      border:1px solid rgba(255,255,255,0.06); color:#666; font-size:10px; font-weight:700;
-      letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease;
-      backdrop-filter:blur(8px); position:relative; overflow:hidden; width:90px;
-    }
-    .hero-tab::before {
-      content:''; position:absolute; top:0; left:0; width:100%; height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-      opacity:0; transition:opacity 0.2s ease;
-    }
-    .hero-tab:hover::before {opacity:1;}
-    .hero-tab img {width:34px; height:34px; object-fit:contain; border-radius:7px; filter:grayscale(60%) brightness(0.7); transition:filter 0.2s ease, transform 0.2s ease;}
-    .hero-tab:hover {background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#bbb; transform:translateY(-2px);}
-    .hero-tab:hover img {filter:grayscale(0%) brightness(1); transform:scale(1.08);}
-    .hero-tab.active {background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.28); color:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);}
-    .hero-tab.active::before {opacity:1;}
-    .hero-tab.active img {filter:grayscale(0%) brightness(1.1); transform:scale(1.05);}
-    .hero-tab.active::after {content:''; position:absolute; bottom:0; left:15%; right:15%; height:2px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); border-radius:2px;}
-    @media (max-width:970px){
-      .hero-game-tabs {justify-content:center; gap:5px;}
-      .hero-tab {min-width:58px; padding:8px 10px; font-size:9px; width:70%;}
-      .hero-tab img {width:28px; height:28px;}
-    }
-    @media (min-width:971px){.hero-game-tabs{justify-content:flex-start;}}
-    @media (min-width:970px){.sites-grid{display:grid; grid-template-columns:repeat(2, 1fr); padding:0 5% 8px 5%;}}
-    .top-vignette {
-      position:sticky; top:0; width:100%; height:60px;
-      background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-      z-index:0; pointer-events:none; margin-bottom:-60px;
-    }
-    </style>
 
     <div class="coc-content">
       <div class="top-vignette"></div>
-
 
       <!-- MOBILE NAV -->
       <div class="mc-mobile-nav">
         <div class="mc-mobile-nav-header">
           <div class="mc-mobile-nav-line"></div>
-          <div class="mc-mobile-nav-title">Browse Categories</div>
+          <div class="mc-mobile-nav-title">Discover Categories</div>
           <div class="mc-mobile-nav-line"></div>
         </div>
-        <a href="mc-java-home.html" class="mc-mobile-nav-item active"><img src="minecrafticons/mc-compass.gif" alt="">Discover</a>
-        <a href="mc-java-worlds.html" class="mc-mobile-nav-item "><img src="minecrafticons/vanillaworlds.png" alt="">Worlds</a>
-        <a href="mc-java-seeds.html" class="mc-mobile-nav-item"><img src="minecrafticons/seeds.png" alt="">Seeds</a>
-        <a href="mc-java-rp.html" class="mc-mobile-nav-item"><img src="minecrafticons/mc-resourcepacks-icon.png" alt="">R-Packs</a>
-        <a href="mc-java-mods.html" class="mc-mobile-nav-item"><img src="minecrafticons/commandblock-minecart.gif" alt="">Mod Packs</a>
-        <a href="mc-java-shaders.html" class="mc-mobile-nav-item"><img src="minecrafticons/lantern.gif" alt="">Shaders</a>
-        <a href="mc-java-commands.html" class="mc-mobile-nav-item"><img src="minecrafticons/commandblock.gif" alt="">Commands</a>
-        <a href="mc-java-tools.html" class="mc-mobile-nav-item"><img src="minecrafticons/sblock.png" alt="">Web Tools</a>
+        <!-- items rendered from mc-contents.json -->
       </div>
       <div class="mc-dirt-fade"></div>
+
       <!-- WRAPPER -->
-      <div style="display:flex; flex:1;">
+      <div class="mc-content-wrapper">
         <!-- LEFT: all sections -->
-        <div style="flex:1; min-width:0; padding:0 5%; padding-bottom:100px;">
+        <div class="mc-col" style="flex:1; min-width:0; padding-bottom:100px;">
 
           <!-- MAPS -->
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Top 10 Worlds (maps)</div>
-              <div class="cf-section-header-right">
-                <a href="mc-java-worlds.html" class="cf-view-all">View more</a>
-                <button class="cf-arrow" onclick="scrollRow('maps-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('maps-row', 1)">›</button>
+              </div>
+              <div class="cf-section-subtitle-row">
+                <div class="cf-section-subtitle">Maps ready for your saves folder.</div>
+                <div class="cf-section-header-right">
+                  <a href="mc-java-worlds.html" class="cf-view-all">View more</a>
+                  <button class="cf-arrow" onclick="scrollRow('maps-row', -1)">‹</button>
+                  <button class="cf-arrow" onclick="scrollRow('maps-row', 1)">›</button>
+                </div>
               </div>
             </div>
             <div class="cf-scroll-wrapper">
               <div class="cf-row" id="maps-row">
-                <a class="cf-card" href="https://hielkemaps.com/maps/parkour-spiral" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://hielkemaps.com/media/maps/parkour-spiral/thumbnail.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">Parkour Spiral</div><div class="cf-card-author">The ultimate spiral parkour challenge</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="mc-java-worlds.html" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="minecrafticons/hardcoreparcore-compresso.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">Parcorp Village</div><div class="cf-card-author">3000 Days Hardcore World by ACP</div><div class="cf-card-meta"><img src="icons/home.jpg" class="cf-source-icon" alt=""><span class="cf-card-tag">Parcore</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/worlds/oneblock" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="minecrafticons/oneblockskyblock.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">One Block Skyblock</div><div class="cf-card-author">Start with one block (Tiny Takeover)</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=hielkemaps.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Hielkemaps</span></div></div></a>
-                <a class="cf-card" href="https://hermitcraft.com/" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="minecrafticons/hermitcraft-compresso.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">Hermitcraft</div><div class="cf-card-author">A server full of massive creations</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=hermitcraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Hermitcraft</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/mosslorn-1000x1000-custom-abandoned-city-map-with-loot-lore-and-hundreds-of-secrets-to-find/" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="minecrafticons/mosslorn-compresso.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">[Mosslorn] Overgrown City</div><div class="cf-card-author">Explore a ruined city full of secrets</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/gotham-city-by-flowzzy/" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="minecrafticons/gothamcity.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Gotham City</div><div class="cf-card-author">Gotham City inspired by Arkham games</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.mediafire.com/file/5uik0uao8c69t8a/Korea+University+Campus+in+Seoul,+South+Korea.rar/file" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="minecrafticons/koreaimage.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Korea University Campus</div><div class="cf-card-author">Explore a detailed campus built among rolling hills</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=mediafire.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Media Fire</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/atheria-v2-0/" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="minecrafticons/atheria.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">Atheria (v2.06)</div><div class="cf-card-author">Explore a growing city full of landmarks</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/stonehill-castle-4407920/" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="minecrafticons/stonehill.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">Stonehill Castle</div><div class="cf-card-author">A royal fortress full of secrets</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/zaxestas/" target="_blank"><span class="cf-card-rank top3">#10</span><img class="cf-card-img" src="minecrafticons/zaxestas1.jpg" alt=""><div class="cf-card-body"><div class="cf-card-name">Zaxestas</div><div class="cf-card-author">Advanced Survival Map with enhanced terrain</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://hielkemaps.com/maps/parkour-spiral" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://hielkemaps.com/media/maps/parkour-spiral/thumbnail.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Parkour Spiral</div><div class="cf-card-author">The ultimate spiral parkour challenge</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
+                <a class="cf-card" href="mc-java-worlds.html" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="minecrafticons/hardcoreparcore-compresso.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Parcorp Village</div><div class="cf-card-author">3000 Days Hardcore World by ACP</div><div class="cf-card-meta"><img src="icons/home.jpg" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Parcore</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/worlds/oneblock" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="minecrafticons/oneblockskyblock.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">One Block Skyblock</div><div class="cf-card-author">Start with one block (Tiny Takeover)</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=hielkemaps.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Hielkemaps</span></div></div></a>
+                <a class="cf-card" href="https://hermitcraft.com/" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="minecrafticons/hermitcraft-compresso.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Hermitcraft</div><div class="cf-card-author">A server full of massive creations</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=hermitcraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Hermitcraft</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/project/mosslorn-1000x1000-custom-abandoned-city-map-with-loot-lore-and-hundreds-of-secrets-to-find/" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="minecrafticons/mosslorn-compresso.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">[Mosslorn] Overgrown City</div><div class="cf-card-author">Explore a ruined city full of secrets</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/project/gotham-city-by-flowzzy/" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="minecrafticons/gothamcity.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Gotham City</div><div class="cf-card-author">Gotham City inspired by Arkham games</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.mediafire.com/file/5uik0uao8c69t8a/Korea+University+Campus+in+Seoul,+South+Korea.rar/file" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="minecrafticons/koreaimage.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Korea University Campus</div><div class="cf-card-author">Explore a detailed campus built among rolling hills</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=mediafire.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Media Fire</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/project/atheria-v2-0/" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="minecrafticons/atheria.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Atheria (v2.06)</div><div class="cf-card-author">Explore a growing city full of landmarks</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/project/stonehill-castle-4407920/" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="minecrafticons/stonehill.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Stonehill Castle</div><div class="cf-card-author">A royal fortress full of secrets</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/project/zaxestas/" target="_blank"><span class="cf-card-rank top3">#10</span><img class="cf-card-img" src="minecrafticons/zaxestas1.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Zaxestas</div><div class="cf-card-author">Advanced Survival Map with enhanced terrain</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
               </div>
             </div>
           </div>
 
           <!-- COMMANDS -->
           <div class="cf-section-header">
+            <div class="cf-section-title-row">
             <div class="cf-section-title">most copied Commands</div>
-            <div class="cf-section-header-right"><a href="#" class="cf-view-all">View more</a></div>
+            </div>
+            <div class="cf-section-subtitle-row">
+              <div class="cf-section-subtitle">Gear, mob and world commands.</div>
+              <div class="cf-section-header-right"><a href="mc-java-commands.html" class="cf-view-all">View more</a></div>
+            </div>
           </div>
+          
           <div class="cmd-grid">
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="minecrafticons/netheritesword.png" alt=""><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">One Shot Anything</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Super Pickaxe" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd='give @a netherite_pickaxe[custom_name=["",{"text":"God Pickaxe","bold":true,"color":"yellow"}],lore=[[{"text":"insta mine unli range","color":"yellow"}]],enchantments={efficiency:3,silk_touch:1,unbreaking:4},attribute_modifiers=[{type:block_break_speed,amount:1024,operation:add_value,id:"1778783273551"},{type:attack_speed,amount:1024,operation:add_value,id:"1778783273552"},{type:mining_efficiency,amount:1024,operation:add_value,id:"1778783273553"},{type:block_interaction_range,amount:64,operation:add_value,id:"1778783273554"},{type:submerged_mining_speed,amount:9,operation:add_value,id:"1778783273555"}]]'><img class="cmd-icon" src="minecrafticons/netheritepickaxe.png" alt=""><div class="cmd-info"><div class="cmd-name">Super Pickaxe</div><div class="cmd-sub">Insta Mine • Long Range</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Super Fast Horse" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd='give @a stick[custom_name=["",{"text":"KNOCKBACK STICK","bold":true,"color":"dark_purple"}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:"1778780766940"}]]'><img class="cmd-icon" src="minecrafticons/saddle.png" alt=""><div class="cmd-info"><div class="cmd-name">God Horse</div><div class="cmd-sub">Summons Super Fast Horse</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Knockback Stick" data-sub="Sting like a bee" data-cmd='give @a stick[custom_name=["",{"text":"KNOCKBACK STICK","bold":true,"color":"dark_purple"}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:"1778780766940"}]]'><img class="cmd-icon" src="minecrafticons/enchanted stick.png" alt=""><div class="cmd-info"><div class="cmd-name">Knockback Stick</div><div class="cmd-sub">Enemies Go Weeeeee</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Immortal Wolf" data-sub="Makes your wolf invincible" data-cmd="/effect give @e[type=wolf,sort=nearest,limit=1] resistance 999999 255 true"><img class="cmd-icon" src="minecrafticons/babywolf.png" alt=""><div class="cmd-info"><div class="cmd-name">Immortal Wolf</div><div class="cmd-sub">Unkillable Doggo</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="icons/placeholder.png" alt=""><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="icons/placeholder.png" alt=""><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="icons/placeholder.png" alt=""><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="minecrafticons/netheritesword.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">One Shot Anything</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="Super Pickaxe" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd='give @a netherite_pickaxe[custom_name=["",{"text":"God Pickaxe","bold":true,"color":"yellow"}],lore=[[{"text":"insta mine unli range","color":"yellow"}]],enchantments={efficiency:3,silk_touch:1,unbreaking:4},attribute_modifiers=[{type:block_break_speed,amount:1024,operation:add_value,id:"1778783273551"},{type:attack_speed,amount:1024,operation:add_value,id:"1778783273552"},{type:mining_efficiency,amount:1024,operation:add_value,id:"1778783273553"},{type:block_interaction_range,amount:64,operation:add_value,id:"1778783273554"},{type:submerged_mining_speed,amount:9,operation:add_value,id:"1778783273555"}]]'><img class="cmd-icon" src="minecrafticons/netheritepickaxe.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">Super Pickaxe</div><div class="cmd-sub">Insta Mine • Long Range</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="Super Fast Horse" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd='give @a stick[custom_name=["",{"text":"KNOCKBACK STICK","bold":true,"color":"dark_purple"}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:"1778780766940"}]]'><img class="cmd-icon" src="minecrafticons/saddle.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Horse</div><div class="cmd-sub">Summons Super Fast Horse</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="Knockback Stick" data-sub="Sting like a bee" data-cmd='give @a stick[custom_name=["",{"text":"KNOCKBACK STICK","bold":true,"color":"dark_purple"}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:"1778780766940"}]]'><img class="cmd-icon" src="minecrafticons/enchanted stick.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">Knockback Stick</div><div class="cmd-sub">Enemies Go Weeeeee</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="Immortal Wolf" data-sub="Makes your wolf invincible" data-cmd="/effect give @e[type=wolf,sort=nearest,limit=1] resistance 999999 255 true"><img class="cmd-icon" src="minecrafticons/babywolf.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">Immortal Wolf</div><div class="cmd-sub">Unkillable Doggo</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="icons/placeholder.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="icons/placeholder.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="icons/placeholder.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+          </div>
+
+          <!-- MINECRAFT SERVERS -->
+          <div class="cf-section-header">
+            <div class="cf-section-title-row">
+            <div class="cf-section-title">Top servers</div>
+            </div>
+            <div class="cf-section-subtitle-row">
+              <div class="cf-section-subtitle">Live player counts for public servers.</div>
+              <div class="cf-section-header-right">
+                <a href="#" class="cf-view-all">View more</a>
+                <button class="cf-arrow" onclick="scrollRow('server-row', -1)">‹</button>
+                <button class="cf-arrow" onclick="scrollRow('server-row', 1)">›</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cf-scroll-wrapper">
+            <div class="cf-row" id="server-row">
+              <!-- server cards are injected here by JS, ranked by live player count -->
+              <div class="server-card server-card-loading"><div class="server-spinner"></div><span>Loading live server stats…</span></div>
+            </div>
           </div>
 
           <!-- RESOURCE PACKS -->
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Top 10 ResourcePacks</div>
-              <div class="cf-section-header-right">
-                <a href="mc-java-rp.html" class="cf-view-all">View more</a>
-                <button class="cf-arrow" onclick="scrollRow('resourcepackrow-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('resourcepackrow-row', 1)">›</button>
+              </div>
+              <div class="cf-section-subtitle-row">
+                <div class="cf-section-subtitle">Packs that change how the game looks.</div>
+                <div class="cf-section-header-right">
+                  <a href="mc-java-rp.html" class="cf-view-all">View more</a>
+                  <button class="cf-arrow" onclick="scrollRow('resourcepackrow-row', -1)">‹</button>
+                  <button class="cf-arrow" onclick="scrollRow('resourcepackrow-row', 1)">›</button>
+                </div>
               </div>
             </div>
             <div class="cf-scroll-wrapper">
               <div class="cf-row" id="resourcepackrow-row">
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-animations" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/1402/911/256/256/638909354589974674.png" alt=""><div class="cf-card-body"><div class="cf-card-name">Fresh Animations</div><div class="cf-card-author">Make your game like the trailers!</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="https://vanillatweaks.net/picker/resource-packs/" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="minecrafticons/vanillatweaks.jpg"><div class="cf-card-body"><div class="cf-card-name">Vanilla Tweaks</div><div class="cf-card-author">offers various resource packs and data packs</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Vanilla Tweaks</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/resourcepack/better-leaves" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/uvpymuxq/fe1a61998ae57dc6ad1a4bb028334c3c3925d22f_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Motschen's Better Leaves</div><div class="cf-card-author">Better Leaves adds additional layers</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/resourcepack/x-ray-(-spectator-toggle-able-)" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/2P3I5T3N/c2387e642a8d5952b7eba3397328c2a1296e64fd_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">X Ray | Spectator</div><div class="cf-card-author">Best X ray texture Pack For Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-moves" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/985/357/256/256/638494820573552980.png" alt=""><div class="cf-card-body"><div class="cf-card-name">Fresh Moves</div><div class="cf-card-author">Gives fancy animations to the player entity.</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/modernarch-realism-1-13-1-14-512x512/" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="minecrafticons/compressed-modernarch.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">ModernArch</div><div class="cf-card-author">Contains 3D models, 1024x resolution</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/rename-items/" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="minecrafticons/renameitems.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Rename Items</div><div class="cf-card-author">Unlock custom textures by renaming items</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/stay-true" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/274/491/256/256/637258639542653246.png" alt=""><div class="cf-card-body"><div class="cf-card-name">Stay True</div><div class="cf-card-author">Upgraded foliage, leaves and plants.</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/redstone-tweaks/" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="minecrafticons/redstonetweaks.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Redstone Tweaks</div><div class="cf-card-author">Visual upgrades for redstone builds</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/low-on-fire" target="_blank"><span class="cf-card-rank top3">#10</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/494/548/64/64/637806308919001110.png" alt=""><div class="cf-card-body"><div class="cf-card-name">Low on Fire</div><div class="cf-card-author">Low fire on your screen! Vanilla Friendly</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Curse Forge</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-animations" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/1402/911/256/256/638909354589974674.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Fresh Animations</div><div class="cf-card-author">Make your game like the trailers!</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
+                <a class="cf-card" href="https://vanillatweaks.net/picker/resource-packs/" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="minecrafticons/vanillatweaks.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Vanilla Tweaks</div><div class="cf-card-author">offers various resource packs and data packs</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Vanilla Tweaks</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/better-leaves" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/uvpymuxq/fe1a61998ae57dc6ad1a4bb028334c3c3925d22f_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Motschen's Better Leaves</div><div class="cf-card-author">Better Leaves adds additional layers</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/resourcepack/x-ray-(-spectator-toggle-able-)" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/2P3I5T3N/c2387e642a8d5952b7eba3397328c2a1296e64fd_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">X Ray | Spectator</div><div class="cf-card-author">Best X ray texture Pack For Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-moves" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/985/357/256/256/638494820573552980.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Fresh Moves</div><div class="cf-card-author">Gives fancy animations to the player entity.</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/modernarch-realism-1-13-1-14-512x512/" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="minecrafticons/compressed-modernarch.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">ModernArch</div><div class="cf-card-author">Contains 3D models, 1024x resolution</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/rename-items/" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="minecrafticons/renameitems.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Rename Items</div><div class="cf-card-author">Unlock custom textures by renaming items</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/stay-true" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/274/491/256/256/637258639542653246.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Stay True</div><div class="cf-card-author">Upgraded foliage, leaves and plants.</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
+                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/redstone-tweaks/" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="minecrafticons/redstonetweaks.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Redstone Tweaks</div><div class="cf-card-author">Visual upgrades for redstone builds</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
+                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/low-on-fire" target="_blank"><span class="cf-card-rank top3">#10</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/494/548/64/64/637806308919001110.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Low on Fire</div><div class="cf-card-author">Low fire on your screen! Vanilla Friendly</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
               </div>
             </div>
           </div>
@@ -265,48 +283,77 @@
           <!-- SHADERS -->
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Top 10 Shaders</div>
-              <div class="cf-section-header-right">
-                <a href="mc-java-shaders.html" class="cf-view-all">View more</a>
-                <button class="cf-arrow" onclick="scrollRow('shaders-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('shaders-row', 1)">›</button>
+              </div>
+              <div class="cf-section-subtitle-row">
+                <div class="cf-section-subtitle">Lighting, shadow and water overhauls.</div>
+                <div class="cf-section-header-right">
+                  <a href="mc-java-shaders.html" class="cf-view-all">View more</a>
+                  <button class="cf-arrow" onclick="scrollRow('shaders-row', -1)">‹</button>
+                  <button class="cf-arrow" onclick="scrollRow('shaders-row', 1)">›</button>
+                </div>
               </div>
             </div>
             <div class="cf-scroll-wrapper">
               <div class="cf-row" id="shaders-row">
-                <a class="cf-card" href="https://modrinth.com/shader/bsl-shaders" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/Q1vvjJYV/2a611a3cb434fb52fb81fa5dace13c5d8b67e55d_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">BSL Shaders</div><div class="cf-card-author">Real-time lighting and stunning sky effects</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://minecraftshader.com/sildurs-vibrant-shaders/" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="https://minecraftshader.com/wp-content/uploads/2021/11/sildurs-vibrant-shaders.jpg.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Sildurs Vibrant Shaders</div><div class="cf-card-author">Improved visuals with dynamic shadows</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=minecraftshader.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">MC Shaders</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/nostalgia-shader" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/xEItlMn3/49ba53348dd4902ad2a3ae49cc643550ead201bc.png" alt=""><div class="cf-card-body"><div class="cf-card-name">Nostalgia Shaders</div><div class="cf-card-author">Classic shaders with a modern visual style</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/mellow" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/BUxf36AP/b2cc2e9b97e5e0c4c7fcd89b7e295f29a29b9c6d_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Mellow Shaders</div><div class="cf-card-author">Shaderpack with a painterly aesthetic</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/super-duper-vanilla" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/LMIZZNxZ/5d09a380b6da014dcbca683879cdfb4a94603cf8_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Super Duper Vanilla</div><div class="cf-card-author">Inspired by Super Duper Graphics style</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt=""><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt=""><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/bsl-shaders" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/Q1vvjJYV/2a611a3cb434fb52fb81fa5dace13c5d8b67e55d_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">BSL Shaders</div><div class="cf-card-author">Real-time lighting and stunning sky effects</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://minecraftshader.com/sildurs-vibrant-shaders/" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="https://minecraftshader.com/wp-content/uploads/2021/11/sildurs-vibrant-shaders.jpg.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Sildurs Vibrant Shaders</div><div class="cf-card-author">Improved visuals with dynamic shadows</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=minecraftshader.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">MC Shaders</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/nostalgia-shader" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/xEItlMn3/49ba53348dd4902ad2a3ae49cc643550ead201bc.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Nostalgia Shaders</div><div class="cf-card-author">Classic shaders with a modern visual style</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/mellow" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/BUxf36AP/b2cc2e9b97e5e0c4c7fcd89b7e295f29a29b9c6d_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Mellow Shaders</div><div class="cf-card-author">Shaderpack with a painterly aesthetic</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/super-duper-vanilla" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/LMIZZNxZ/5d09a380b6da014dcbca683879cdfb4a94603cf8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Super Duper Vanilla</div><div class="cf-card-author">Inspired by Super Duper Graphics style</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
+                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
               </div>
             </div>
           </div>
 
           <!-- BANNERS/SHIELDS GALLERY -->
+          <!-- CURATED INTRO BANNER -->
+          <div class="curated-banner-wrap">
+            <div class="curated-banner">
+              <div class="curated-banner-img">
+                <img src="minecrafticons/minecraft fox.jpg" alt="" loading="lazy" decoding="async">
+              </div>
+              <div class="curated-banner-text">
+                <div class="curated-banner-eyebrow">Minecraft Curated Resources</div>
+                <div class="curated-banner-title">Play more.<span class="curated-banner-title-em">Search less.</span></div>
+                <p class="curated-banner-tagline">Every link on this page was opened and played before it made the list. Handpicked by Parcore, so you skip the junk part.</p>
+                <div class="curated-banner-badges">
+                  <div class="skin-result-badge"><span class="skin-result-badge-dot"></span>Curated</div>
+                  <div class="skin-result-badge"><span class="skin-result-badge-dot"></span>Tested</div>
+                  <div class="skin-result-badge"><span class="skin-result-badge-dot"></span>Trusted</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Popular Banners/Shields</div>
-              <div class="cf-section-header-right">
-                <a href="#" class="cf-view-all">View more</a>
-                <button class="cf-arrow" onclick="scrollRow('gallery-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('gallery-row', 1)">›</button>
+              </div>
+              <div class="cf-section-subtitle-row">
+                <div class="cf-section-subtitle">Banner designs with give commands.</div>
+                <div class="cf-section-header-right">
+                  <a href="#" class="cf-view-all">View more</a>
+                  <button class="cf-arrow" onclick="scrollRow('gallery-row', -1)">‹</button>
+                  <button class="cf-arrow" onclick="scrollRow('gallery-row', 1)">›</button>
+                </div>
               </div>
             </div>
             <div class="cf-scroll-wrapper">
               <div class="cf-row" id="gallery-row">
-                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcb-bowl.jpg" data-name="Bowl Banner" data-cmd='/give @p minecraft:black_banner[banner_patterns=[{"pattern":"stripe_downleft","color":"red"},{"pattern":"cross","color":"black"},{"pattern":"creeper","color":"white"},{"pattern":"circle","color":"light_gray"},{"pattern":"globe","color":"white"},{"pattern":"skull","color":"white"},{"pattern":"stripe_middle","color":"brown"},{"pattern":"half_horizontal_bottom","color":"red"},{"pattern":"curly_border","color":"black"},{"pattern":"stripe_bottom","color":"black"}]] 1'><img src="minecrafticons/banners/mcbi-bowl.png" alt=""></div>
-                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcb-door.jpg" data-name="Door Banner" data-cmd="/give @p minecraft:banner{...}"><img src="minecrafticons/banners/mcbi-door.png" alt=""></div>
-                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt=""></div>
-                                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt=""></div>
+                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcb-bowl.jpg" data-name="Bowl Banner" data-cmd='/give @p minecraft:black_banner[banner_patterns=[{"pattern":"stripe_downleft","color":"red"},{"pattern":"cross","color":"black"},{"pattern":"creeper","color":"white"},{"pattern":"circle","color":"light_gray"},{"pattern":"globe","color":"white"},{"pattern":"skull","color":"white"},{"pattern":"stripe_middle","color":"brown"},{"pattern":"half_horizontal_bottom","color":"red"},{"pattern":"curly_border","color":"black"},{"pattern":"stripe_bottom","color":"black"}]] 1'><img src="minecrafticons/banners/mcbi-bowl.png" alt="" loading="lazy" decoding="async"></div>
+                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcb-door.jpg" data-name="Door Banner" data-cmd="/give @p minecraft:banner{...}"><img src="minecrafticons/banners/mcbi-door.png" alt="" loading="lazy" decoding="async"></div>
+                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
+                                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
 
-                                                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt=""></div>
+                                                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
 
-                                                                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt=""></div>
+                                                                <div class="gal-card" onclick="openLightbox(this)" data-full="minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
 
               </div>
             </div>
@@ -315,154 +362,234 @@
           <!-- COLOR PALETTES -->
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Color Palettes</div>
-              <div class="cf-section-header-right">
-                <button class="cf-arrow" onclick="scrollRow('palette-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('palette-row', 1)">›</button>
               </div>
+              <div class="cf-section-subtitle">Block sets and hex references.</div>
             </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="palette-row">
+            <div class="pal-grid-wrapper">
+              <div class="pal-grid" id="palette-row">
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 1.jpg" 
-                data-name="Color Palette" data-cmd=""><img src="minecrafticons/pins/pallete 1.jpg" alt="Overworld Palette">
-                <div class="pal-card-label">Color Palette</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 1.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/pallete 1.jpg" alt="Color Gradient" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Color Gradient</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 2.jpg" 
-                data-name="Complete Color Collection" data-cmd=""><img src="minecrafticons/pins/pallete 2.jpg" alt="Overworld Palette">
-                <div class="pal-card-label">Complete Color Collection</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 2.jpg" data-name="Complete Color Collection" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/pallete 2.jpg" alt="Complete Collection" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Complete Collection</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 3.jpg" 
-                data-name="Hex Color Palette" data-cmd=""><img src="minecrafticons/pins/pallete 3.jpg" alt="Overworld Palette">
-                <div class="pal-card-label">Hex Color Palette</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 3.jpg" data-name="Hex Color Palette" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/pallete 3.jpg" alt="Hex Block Palette" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Hex Block Palette</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 4.jpg" 
-                data-name="Color Palette" data-cmd=""><img src="minecrafticons/pins/pallete 4.jpg" alt="Overworld Palette">
-                <div class="pal-card-label">Color Palette</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 4.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/pallete 4.jpg" alt="Block Palette" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Block Palette</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 5.jpg" 
-                data-name="Color Palette" data-cmd=""><img src="minecrafticons/pins/pallete 5.jpg" alt="Overworld Palette">
-                <div class="pal-card-label">Color Wheel</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/pallete 5.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/pallete 5.jpg" alt="Color Wheel" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Color Wheel</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/color pallete 5.webp" 
-                data-name="Color Palette" data-cmd=""><img src="minecrafticons/pins/color pallete 5.webp" alt="Overworld Palette">
-                <div class="pal-card-label">Color Wheel</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/color pallete 5.webp" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/color pallete 5.webp" alt="Color Spectrum" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Color Spectrum</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/blockcolorapp.jpg" 
-                data-name="Color Palette" data-cmd=""><img src="minecrafticons/pins/blockcolorapp.jpg" alt="Overworld Palette">
-                <div class="pal-card-label"><a style="color: #6278d9;" href="https://blockcolors.app/" target="_blank">blockcolor.app</a></div></div>
-
-
+                <div class="pal-card pal-card-wide" onclick="openPalette(this)" data-full="minecrafticons/pins/blockcolorapp.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/blockcolorapp.jpg" alt="blockcolor.app" loading="lazy" decoding="async">
+                  <a class="pal-ext-link" href="https://blockcolors.app/" target="_blank" rel="noopener" aria-label="Open blockcolor.app in a new tab" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">blockcolor.app</div></div>
 
               </div>
-
-
-
-
             </div>
           </div>
 
-
-
-            <!-- Armour tunic colors -->
+          <!-- Armour tunic colors -->
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Armour colors</div>
-              <div class="cf-section-header-right">
-                <button class="cf-arrow" onclick="scrollRow('leather-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('leather-row', 1)">›</button>
               </div>
+              <div class="cf-section-subtitle">Leather dye and trim colour codes.</div>
             </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="leather-row">
+            <div class="pal-grid-wrapper">
+              <div class="pal-grid" id="leather-row">
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/armor color.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/armor color.jpg" alt="Overworld Palette"><div class="pal-card-label">Leather Tunic Colors</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/clothescolors.jfif" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/clothescolors.jfif" alt="Leather Tunic Colors" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Leather Tunic Colors</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/armor trim colors.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/armor trim colors.jpg" alt="Overworld Palette"><div class="pal-card-label">Colored Armor Trims</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/armor trim colors.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/armor trim colors.jpg" alt="Colored Armor Trims" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Colored Armor Trims</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/text color.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/text color.jpg" alt="Overworld Palette"><div class="pal-card-label">Text Color Code</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/text color.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/text color.jpg" alt="Text Color Code" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Text Color Code</div></div>
 
                </div>
             </div>
           </div>
 
-
-
-
-
-                  <!-- Miscellanous -->
+          <!-- Miscellanous -->
           <div class="cf-section">
             <div class="cf-section-header">
+              <div class="cf-section-title-row">
               <div class="cf-section-title">Guides</div>
-              <div class="cf-section-header-right">
-                <button class="cf-arrow" onclick="scrollRow('misc-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('misc-row', 1)">›</button>
               </div>
+              <div class="cf-section-subtitle">Charts for ores, circles and food.</div>
             </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="misc-row">
+            <div class="pal-grid-wrapper">
+              <div class="pal-grid" id="misc-row">
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/ore distribution.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/ore distribution.jpg" alt="Overworld Palette"><div class="pal-card-label">Ore distribution</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/ore distribution.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/ore distribution.jpg" alt="Ore distribution" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Ore distribution</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/minecraft circles.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/minecraft circles.jpg" alt="Overworld Palette"><div class="pal-card-label">Circle Guide</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/minecraft circles.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/minecraft circles.jpg" alt="Circle Guide" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Circle Guide</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/food web.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/food web.jpg" alt="Overworld Palette"><div class="pal-card-label">Food Web</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/food web.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/food web.jpg" alt="Food Web" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Food Web</div></div>
 
-                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/letters & numbers guide.jpg" data-name="Color Palette" data-cmd="">
-                  <img src="minecrafticons/pins/letters & numbers guide.jpg" alt="Overworld Palette"><div class="pal-card-label">Letters & Numbers</div></div>
+                <div class="pal-card" onclick="openPalette(this)" data-full="minecrafticons/pins/letters & numbers guide.jpg" data-cmd="">
+                  <div class="pal-card-media"><img src="minecrafticons/pins/letters & numbers guide.jpg" alt="Letters & Numbers" loading="lazy" decoding="async">
+                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
+                  <div class="pal-card-label">Letters & Numbers</div></div>
 
-                
                </div>
             </div>
           </div>
 
+          <!-- SKIN LOOKUP -->
+          <div class="cf-section">
+            <div class="cf-section-header">
+              <div class="cf-section-title-row">
+              <div class="cf-section-title">Player Skin Lookup</div>
+              </div>
+              <div class="cf-section-subtitle">Find and download any player skin.</div>
+            </div>
 
+            <div class="skin-lookup">
+              <div class="skin-search-box">
+                <div class="skin-search-left">
+                  <p class="skin-search-intro">Search for any Java Edition player by username to view their skin, head render, and download links.</p>
+                  <form class="skin-search-bar" id="skin-search-form">
+                    <svg class="skin-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <input type="text" id="skin-search-input" class="skin-search-input" placeholder="Enter a Java username…" autocomplete="off" maxlength="16">
+                    <button type="button" id="skin-clear-btn" class="skin-search-clear-btn" aria-label="Clear">✕</button>
+                    <button type="submit" class="skin-search-btn">Search</button>
+                  </form>
+                </div>
+                <div class="skin-search-banner">
+                  <img class="skin-search-banner-img" src="https://i.pinimg.com/736x/a5/f5/6b/a5f56b77dcf08b177bab95ce8f0b3c7c.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+              </div>
 
-
-
-
+              <div id="skin-result" class="skin-result"></div>
+            </div>
+          </div>
 
         </div>
 
         <!-- RIGHT SIDEBAR -->
         <div class="mc-right-sidebar">
-          <div class="mc-right-sidebar-inner">
-            <div class="layouts-title-box"><div class="layouts-title">Browse Categories</div></div>
-            <div class="mc-sidebar-group-label">Discover</div>
-            <a href="mc-java-home.html" class="mc-nav-item active"><img src="minecrafticons/mc-compass.gif" alt="">Discover</a>
-            <div class="mc-sidebar-divider"></div>
-            <div class="mc-sidebar-group-label">Core Content</div>
-            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/vanillaworlds.png" alt="">Worlds</a>
-            <a href="mc-java-seeds.html" class="mc-nav-item"><img src="minecrafticons/seeds.png">Seeds</a>
-            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/commandblock-minecart.gif" alt="">Mod Packs</a>
-            <div class="mc-sidebar-divider"></div>
-            <div class="mc-sidebar-group-label">Visuals</div>
-            <a href="mc-java-rp.html" class="mc-nav-item"><img src="minecrafticons/mc-resourcepacks-icon.png" alt="">Resource Packs</a>
-            <a href="mc-java-shaders.html" class="mc-nav-item"><img src="minecrafticons/lantern.gif" alt="">Shaders</a>
-            <div class="mc-sidebar-divider"></div>
-            <div class="mc-sidebar-group-label">others</div>
-            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/commandblock.gif" alt="">Commands</a>
-            <a href="mc-java-worlds.html" class="mc-nav-item"><img src="minecrafticons/sblock.png" alt="">Web Tools</a>
+          <div class="mc-right-sidebar-inner" id="rightSidebar">
+
+
+            <!-- Box 2: adaptive -- live Java version status (same
+                 piston-meta feed as the hero strip, its own independent
+                 fetch) plus a vertical "Browse Categories" card list --
+                 one card per other MC page, background image = that
+                 page's own hero photo, count fit to however much
+                 height is actually free (mcFitSidebarCategories in
+                 mc-java.js). The earlier On This Page / Continue
+                 Browsing widgets are still fully implemented
+                 (mcInitSidebarJumpNav / mcInitSidebarRecent) but not
+                 mounted here for now -- three adaptive-height widgets
+                 stacked in one box fights the category list for the
+                 exact space it needs to size itself against; add their
+                 markup back below the divider if you want them
+                 alongside this instead of in place of it. -->
+            <div class="mc-sidebar-panel">
+              <div class="mc-sb-cat-title">Latest Release</div>
+              <div class="mc-sb-version">
+                <div class="mc-sb-version-row">
+                  <span class="mc-sb-version-dot"></span>
+                  <span class="mc-sb-version-label">Release</span>
+                  <span class="mc-sb-version-num" id="mcsb-release-version">—</span>
+                  <span class="mc-sb-version-updated" id="mcsb-release-updated"></span>
+                </div>
+                <div class="mc-sb-version-row">
+                  <span class="mc-sb-version-dot is-snapshot"></span>
+                  <span class="mc-sb-version-label">Snapshot</span>
+                  <span class="mc-sb-version-num" id="mcsb-snapshot-version">—</span>
+                  <span class="mc-sb-version-updated" id="mcsb-snapshot-updated"></span>
+                </div>
+              </div>
+
+              <div class="mc-sb-divider"></div>
+
+              <div class="mc-sb-cat">
+                <div class="mc-sb-cat-title">Browse Categories</div>
+                <div class="mc-sb-cat-list" id="mcsbCatList"></div>
+              </div>
+            </div>
+            <!-- Latest Mojang patch note. Rendered by mcInitVersionFeed() in
+                 mc-java.js; "View more" opens #vtModal with the full feed. -->
+            <div class="mc-sidebar-ad-box">
+              <div class="vt-sb-head">
+                <div class="mc-sb-cat-title">From Mojang</div>
+                <button type="button" class="vt-sb-more" onclick="openVtFeed()">View more</button>
+              </div>
+              <div class="vt-sb-latest" id="vt-sb-latest">
+                <div class="vt-feed-skel"></div>
+              </div>
+            </div>
+
           </div>
         </div>
+
       </div>
 
-      
+      <footer class="pf-footer">
 
-      <footer class="site-footer">
-        <div class="footer-icons">
-          <a href="#" aria-label="Facebook" class="footer-icon"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.5 9.9v-7h-2.4V12h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.3V12h2.5l-.4 2.9h-2.1v7A10 10 0 0022 12z"/></svg></a>
-          <a href="https://discord.gg/rfntEJ5w" target="_blank" aria-label="Discord" class="footer-icon"><svg viewBox="0 0 24 24"><path d="M20 4a16 16 0 00-4-1l-.2.4a14 14 0 00-7.6 0L8 3A16 16 0 004 4C1 9 1 14 2 19a16 16 0 004.8 2.4l1-1.6a10 10 0 01-1.6-.8c.1 0 .2-.1.3-.2a12 12 0 0011 0c.1.1.2.1.3.2-.5.3-1 .6-1.6.8l1 1.6A16 16 0 0022 19c1-5 1-10-2-15zM9.5 15.5c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8zm5 0c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8z"/></svg></a>
-          <a href="#" target="_blank" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M2 6l10 7 10-7v12H2V6zm10 5L2 6h20l-10 5z"/></svg></a>
-        </div>
-        <div class="footer-text">© 2025 Parchrome. All Rights Reserved.</div>
-      </footer>
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
     </div>
   </div>
 </div>
@@ -471,7 +598,7 @@
 <div id="gal-lightbox" onclick="closeLightbox()">
   <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
   <div id="gal-lb-inner" onclick="event.stopPropagation()">
-    <img id="gal-lb-img" src="" alt="">
+    <img id="gal-lb-img" alt="" loading="lazy" decoding="async">
     <div id="gal-lb-copybox">
       <div id="gal-lb-name"></div>
       <div id="gal-lb-code"></div>
@@ -487,8 +614,17 @@
 <!-- PALETTE LIGHTBOX -->
 <div id="pal-lightbox" onclick="closePalette()">
   <button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+  <!-- Prev/next were only ever built on the worlds and seeds pages. The grids
+       here are galleries too, so they get the same controls; palLightboxNav()
+       is shared and needs these ids to exist before it can be called. -->
+  <button id="pal-lb-prev" onclick="event.stopPropagation();palLightboxNav(-1)" aria-label="Previous image">&#8249;</button>
+  <button id="pal-lb-next" onclick="event.stopPropagation();palLightboxNav(1)" aria-label="Next image">&#8250;</button>
   <div id="pal-lb-inner" onclick="event.stopPropagation()">
-    <img id="pal-lb-img" src="" alt="">
+    <img id="pal-lb-img" alt="" loading="lazy" decoding="async">
+  </div>
+  <div id="pal-lb-bar">
+    <div id="pal-lb-title"></div>
+    <div id="pal-lb-count"></div>
   </div>
 </div>
 
@@ -507,330 +643,58 @@
   </div>
 </div>
 
-<style>
-/* ── SHARED LIGHTBOX CLOSE BTN ── */
-#gal-lb-fixed-close, #pal-lb-fixed-close {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 99999;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #222;
-  border: 1px solid #444;
-  color: #aaa;
-  font-size: 16px;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.15s, background 0.15s;
-}
-#gal-lb-fixed-close:hover, #pal-lb-fixed-close:hover { color: #fff; background: #333; }
-
-
-/* ── PALETTE CARDS ── */
-.pal-card {
-  flex: 0 0 calc((100% - 2 * 14px) / 2.2);
-  border-radius: 10px; overflow: hidden; cursor: pointer;
-  border: 1px solid #1e1e1e; transition: transform 0.2s ease, border-color 0.2s ease;
-  background: #111; display: flex; flex-direction: column;
-}
-
-.pal-card:hover { transform: translateY(-3px); border-color: #333; }
-.pal-card img { width: 100%; height: 250px; object-fit: cover; display: block; background: #1a1a1a; image-rendering: pixelated; }
-.pal-card-label { padding: 8px 12px; font-size: 11px; font-weight: 700; color: #a9a9a9; letter-spacing: 1px; text-transform: uppercase;
-   font-family: 'Oxanium', sans-serif; }
-.pal-card:hover .pal-card-label { color: #888; }
-@media (max-width: 970px) { .pal-card { flex: 0 0 calc(80% - 14px); } .pal-card img { height: 140px; } }
-
-
-
-/* ── PALETTE LIGHTBOX ── */
-#pal-lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(6px);
-  z-index: 9099;
-  overflow-y: auto;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  display: none; /* hidden by default */
-
-  
-}
-#pal-lightbox.open { display: flex; } /* flex not block */
-
-#pal-lb-inner {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  padding: 20px;
-  cursor: default;
-}
-
-#pal-lb-img {
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 100px);
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 8px;
-  display: block;
-  image-rendering: pixelated;
-  touch-action: none;
-  user-select: none;
-  transform-origin: center center;
-  animation: lbZoomIn 0.2s ease;
-}
-
-
-/* ── GALLERY CARDS ── */
-.gal-card {
-  flex: 0 0 calc((90% - 5 * 24px) / 5.3);
-  border-radius: 10px; overflow: hidden; cursor: pointer;
-  border: 1px solid #1e1e1e; transition: transform 0.2s ease, border-color 0.2s ease;
-  background: #111; display: block;
-}
-
-
-@media (max-width: 1400px) {
-  .gal-card { flex: 0 0 calc((100% - 4 * 14px) / 4.2); }
-}
-@media (max-width: 1100px) {
-  .gal-card { flex: 0 0 calc((100% - 3 * 14px) / 3.2); }
-}
-@media (max-width: 970px) {
-  .gal-card { flex: 0 0 calc((100% - 5 * 14px) / 4.2); }
-}
-@media (max-width: 768px) {
-  .gal-card { flex: 0 0 calc((100% - 4 * 14px) / 4.5); }
-}
-@media (max-width: 480px) {
-  .gal-card { flex: 0 0 calc((100% - 14px) / 2.7); }
-}
-
-
-.gal-card:hover { transform: translateY(-3px); border-color: #333; }
-.gal-card img { width: 100%; aspect-ratio: 8 / 16; object-fit: cover; display: block; background: #1a1a1a; }
-
-/* ── BANNERS GALLERY LIGHTBOX ── */
-#gal-lightbox {
-  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(6px); z-index: 9099; overflow-y: auto;
-   cursor: zoom-out;}
-#gal-lightbox.open { display: block; }
-#gal-lb-inner { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 12px; width: 480px; max-width: 90vw;
-  margin: 15vh auto 60px auto; cursor: default;}
-#gal-lb-img { width: 100%; object-fit: contain; border-radius: 8px; display: block; touch-action: none; user-select: none; transform-origin: center center;
-  animation: lbZoomIn 0.2s ease;}
-  @keyframes lbZoomIn { from { transform: scale(0.93); opacity: 0; } to   { transform: scale(1); opacity: 1; }}
-#gal-lb-copybox {
-  width: 100%;
-  box-sizing: border-box;
-  background: #0d0d0d;
-  border: 1px solid #222;
-  border-radius: 8px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-#gal-lb-name { font-size: 13px; font-weight: 700; color: #fff; font-family: 'Oxanium', sans-serif; }
-#gal-lb-code {
-  font-family: monospace; font-size: 12px; color: #7ec87e; word-break: break-all;
-  line-height: 1.6; background: #111; border: 1px solid #1e1e1e; border-radius: 6px; padding: 8px 10px;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
-}
-#gal-lb-copy-btn {
-  width: 100%; padding: 9px 0; border-radius: 7px; border: 1px solid #2a2a2a; background: #1e1e1e;
-  color: #aaa; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-  font-family: 'Oxanium', sans-serif; transition: background 0.15s, color 0.15s;
-}
-#gal-lb-copy-btn:hover { background: #2a2a2a; color: #fff; }
-#gal-lb-feedback { text-align: center; font-size: 11px; color: #4caf50; height: 14px; font-family: 'Oxanium', sans-serif; }
-
-
-
-
-
-/* ── COMMAND GRID & MODAL ── */
-.cmd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 5%; }
-.cmd-box { display: flex; align-items: center; gap: 10px; padding: 12px 14px;    background: #1c1c1e;
-    border: 1px solid #2e2e2e; border-radius: 8px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
-.cmd-box:hover { background: #181818; border-color: #2a2a2a;   border: 1px solid #2e2e2e; }
-.cmd-icon { width: 38px; height: 38px; border-radius: 6px; object-fit: contain; flex-shrink: 0; background: #1a1a1a; image-rendering: pixelated; }
-.cmd-info { flex: 1; min-width: 0; }
-.cmd-name { font-size: 15px; font-weight: 700; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-.cmd-sub { font-size: 11px; color: #8f8f8f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cmd-arrow { width: 28px; height: 28px; border-radius: 6px; background: #1a1a1a; border: 1px solid #222; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
-.cmd-arrow svg { width: 13px; height: 13px; stroke: #444; transition: stroke 0.15s; }
-.cmd-box:hover .cmd-arrow { background: #222; border-color: #333; }
-.cmd-box:hover .cmd-arrow svg { stroke: #aaa; }
-.cmd-modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 10000; align-items: center; justify-content: center; }
-.cmd-modal-backdrop.open { display: flex; }
-.cmd-modal { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; width: 520px; max-width: 90vw; position: relative; animation: popIn 0.18s ease; }
-@keyframes popIn { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.cmd-modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: #444; font-size: 16px; cursor: pointer; transition: color 0.15s; }
-.cmd-modal-close:hover { color: #fff; }
-.cmd-modal-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-.cmd-modal-sub { font-size: 12px; color: #555; margin-bottom: 16px; }
-.cmd-code-box { background: #0d0d0d; border: 1px solid #222; border-radius: 8px; padding: 12px 14px; font-family: monospace; font-size: 12px; color: #7ec87e; word-break: break-all; line-height: 1.6; margin-bottom: 14px; }
-.cmd-copy-btn { width: 100%; padding: 10px 0; border-radius: 7px; border: 1px solid #2a2a2a; background: #1e1e1e; color: #aaa; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: background 0.15s, color 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.cmd-copy-btn:hover { background: #2a2a2a; color: #fff; }
-.cmd-copy-feedback { text-align: center; font-size: 11px; color: #4caf50; height: 14px; margin-top: 8px; }
-@media (max-width: 970px) { .cmd-grid { grid-template-columns: 1fr; padding: 0 0; } .cmd-box:nth-child(n+6) { display: none; } }
-
-/* ── SECTION STYLES ── */
-.cf-section:first-child { padding: 40px 0 15px 0; }
-.cf-section { padding: 15px 0 8px 0; }
-@media (max-width: 970px) { .cf-section:first-child { padding: 0px 0 15px 0; } .mc-content-wrapper { flex-direction: column; } }
-.cf-section-header { display: flex; align-items: center; gap: 12px; padding: 40px 5% 10px 5%; position: relative; border-bottom: 1px solid #2a2a2a; margin: 0 5% 10px 5%; padding-left: 0; padding-right: 0; }
-.cf-section-header::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100px; height: 2px; background: #036e01; }
-@media (max-width: 970px) { .cf-section-header { margin: 26px 0 15px 0; padding: 5px 0 10px 0; } .cf-section-header::after { width: 7cqmax; } }
-.cf-section-title { font-size: clamp(14px, 2vw, 20px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #c0c9d4, #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.cf-view-all { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; color: #bbb; background-color: #1a1a1a; padding: 7px 10px; border-radius: 6px; border: 1px solid #2a2a2a; margin-right: 5px; display: inline-flex; align-items: center; transition: all 0.2s ease; }
-.cf-view-all:hover { color: #aaa; }
-.cf-section-header-right { margin-left: auto; display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
-.cf-arrow { width: 30px; height: 30px; border-radius: 6px; color: #888; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, color 0.2s; user-select: none; flex-shrink: 0; background-color: #1a1a1a; border: 1px solid #2a2a2a; }
-.cf-arrow:hover { background: #2a2a2a; color: #fff; }
-.cf-arrow:disabled { opacity: 0.6; cursor: default; pointer-events: none; }
-.cf-scroll-wrapper { position: relative; padding: 0 5%; }
-.cf-row { display: flex; gap: 14px; flex-wrap: nowrap; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.cf-row::-webkit-scrollbar { display: none; }
-.cf-card { flex: 0 0 calc((100% - 5 * 14px) / 5.3);     background: #1c1c1e;
-
-    border: 1px solid #2e2e2e; border-radius: 10px; 
-          overflow: hidden; text-decoration: none; color: var(--fb-text-primary); transition: transform 0.2s ease, border-color 0.2s ease; display: flex;
-          flex-direction: column; position: relative; }
-.cf-card:hover { transform: translateY(-3px); border-color: #333; }
-.cf-card-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #1a1a1a; }
-.cf-card-body { padding: 10px 10px 12px 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.cf-card-name { font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cf-card-author { font-size: 12px; color: #858585; max-height: calc(1.3em * 2); overflow: hidden; }
-.cf-card-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-.cf-card-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; background: #1e1e1e; color: #555; border: 1px solid #2a2a2a; letter-spacing: 0.5px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; }
-.cf-source-icon { width: 14px; height: 14px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
-.cf-card-rank { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); color: #fff; font-size: 10px; font-weight: 900; letter-spacing: 0.5px; padding: 3px 7px; border-radius: 5px; font-family: 'Oxanium', sans-serif; z-index: 2; line-height: 1; border: 1px solid rgba(255,255,255,0.08); }
-.cf-card-rank.top3 { color: #cccccc; border-color: rgba(222,222,222,0.3); }
-
-@media (max-width: 970px) {
-
-  /* Bottom gradient fade on hero banner */
-  .hero-section::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: linear-gradient(to bottom, transparent, #0e0e0e);
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-
-
-
-
-  .cf-card { flex: 0 0 calc(50% - 30px); }
-  
-  .cf-card-name { font-size: 13px; }
-  .cf-card-author { font-size: 11px; }
-  .cf-scroll-wrapper { padding: 0 0; }
-  .cf-view-all { font-size: 9px; padding: 4px 10px; margin-right: 0; margin-bottom: 3px; }
-  .cf-arrow { display: none; }
-  .cf-section-header { justify-content: space-between; padding: 0px 0% 5px 0%; }
-
-}
-/* Default — desktop: ~5 cards visible */
-.cf-card {
-  flex: 0 0 calc((100% - 5 * 14px) / 5.3);
-}
-@media (max-width: 1700px) {
-  .cf-card { flex: 0 0 calc((100% - 4 * 14px) / 4.2); }
-}
-@media (max-width: 1400px) {
-  .cf-card { flex: 0 0 calc((100% - 3 * 14px) / 3.2); }
-}
-@media (max-width: 1270px) {
-  .cf-card { flex: 0 0 calc((100% - 4 * 14px) / 4.2); }
-}
-@media (max-width: 1270px) {
-  .cf-card { flex: 0 0 calc((100% - 3 * 14px) / 3.5); }
-}
-@media (max-width: 970px) {
-  .cf-card { flex: 0 0 calc((100% - 5 * 14px) / 5.2); }
-}
-@media (max-width: 810px) {
-  .cf-card { flex: 0 0 calc((100% - 4 * 14px) / 4.5); }
-}
-@media (max-width: 680px) {
-  .cf-card { flex: 0 0 calc((100% - 14px) / 3.5); }
-}
-@media (max-width: 480px) {
-  .cf-card { flex: 0 0 calc((100% - 14px) / 2.25); }
-}
-
-/* ── RIGHT SIDEBAR (FOR PC ── */
-.layouts-title-box { border-radius: 0; padding: 12px 20px; text-align: center; background: transparent; border-bottom: 1px solid #2a2a2a; position: relative; margin-bottom: 20px; margin-left: 5%; margin-right: 5%; margin-top: 20px; }
-.layouts-title-box::after { content: ''; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 100px; height: 2px; background: #036e01; }
-.layouts-title { font-size: clamp(13px, 2vw, 16px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #c0c9d4, #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.mc-right-sidebar { width: 300px; flex-shrink: 0; background: #111113; padding-top: 20px; border-left: 1px solid #1a1a1a; position: relative; padding-bottom: 50px; padding-top: 30px; }
-.mc-right-sidebar-inner { position: sticky; top: 50px; display: flex; flex-direction: column; gap: 4px; padding: 20px 14px 10px 14px; }
-.mc-sidebar-group-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #444; padding: 0 2px; margin-top: 8px; margin-bottom: 4px; margin-left: 10px; }
-.mc-sidebar-divider { height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent); margin: 10px 6px; }
-.mc-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 17px; border-radius: 8px; text-decoration: none; color: #777; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; background: transparent; border: 1px solid transparent; transition: all 0.2s ease; white-space: nowrap; }
-.mc-nav-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); color: #bbb; transform: translateX(-2px); }
-.mc-nav-item.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: #fff; }
-.mc-nav-item img { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; opacity: 0.6; transition: opacity 0.2s; }
-.mc-nav-item:hover img, .mc-nav-item.active img { opacity: 1; }
-
-/* ── MOBILE NAV TOP BAR  ── */
-@media (max-width: 1270px) {
-  .mc-right-sidebar { display: none; }
-  .mc-mobile-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 35px 5% 40px; background: #0e0e0e; }
-  .mc-mobile-nav-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-  .mc-mobile-nav-line { flex: 1; height: 1px; background: #252525; }
-  .mc-mobile-nav-title { font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #3a3a3a; margin-bottom: 5px; }
-  .mc-mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 4px 7px; border-radius: 8px; text-decoration: none; background: #141414; border: 1px solid #1e1e1e; color: #484848; font-size: 8.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.15s; position: relative; overflow: hidden; }
-  .mc-mobile-nav-item img { width: 22px; height: 22px; object-fit: contain; opacity: 0.35; transition: opacity 0.15s; image-rendering: pixelated; }
-  .mc-mobile-nav-item.active { background: #383737; border-color: #7a7a7a; color: #fcfcfc; }
-  .mc-mobile-nav-item.active img { opacity: 1; }
-  .mc-mobile-nav-item:hover { background: #1a1a1a; border-color: #2a2a2a; color: #777; }
-  .mc-mobile-nav-item:hover img { opacity: 0.6; }
-}
-.mc-mobile-nav::after { content: ''; grid-column: 1 / -1; height: 1px; background: #252525; margin-top: 10px; }
-@media (min-width: 1271px) { .mc-mobile-nav { display: none; } .mc-dirt-fade { display: none; } }
-
-.top-vignette { position: sticky; top: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); z-index: 0; pointer-events: none; margin-bottom: -60px; }
-
-@media (max-width: 970px) {
-body {
-  overflow: auto; /*removes top bar */
-  height: auto;   
-}}
-</style>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+        <div class="more-sheet-title">Minecraft</div>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"><!-- rendered from mc-contents.json --></div>
+    </div>
+  </div>
+</div>
 
-<script src="minecraft-zscript.js"></script>
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+</div>
+
+<script src="11layout.js"></script>
+
+<script src="mc-java.js"></script>
+<!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
+<div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
+  <div class="vt-modal-panel" onclick="event.stopPropagation()">
+    <div class="vt-modal-head">
+      <div>
+        <div class="vt-modal-title">Recent Updates</div>
+        <div class="vt-modal-sub">Official Java patch notes from Mojang</div>
+      </div>
+      <button type="button" class="vt-modal-close" onclick="closeVtFeed()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="vt-modal-body">
+      <div class="vt-feed-list" id="vt-modal-list">
+        <div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

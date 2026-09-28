@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="11layout.css">
+  <link rel="stylesheet" href="hwr-css.css">
+  <meta charset="UTF-8">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Parchrome | Bookmarks</title>
+
+  <!-- Preload the hero background image: it's the page's Largest
+     Contentful Paint (LCP) element, so the browser should start
+     fetching it immediately instead of discovering it late, after
+     parsing CSS down to the .hero-bg-img rule. fetchpriority="high"
+     (also set on the <img> tag itself, below) reinforces that. -->
+
+  <!-- Google Fonts: Inter, Oxanium, Orbitron, Sora combined into a single
+     stylesheet request instead of 4 separate ones (was 4 round trips
+     to fonts.googleapis.com before any of this text could render). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="icons/home.jpg">
+  <link rel="shortcut icon" href="icons/home.jpg">
+  <link rel="apple-touch-icon" href="icons/home.jpg">
+
+
+  <script src="11layout.js" defer></script>
+  <script src="hwr-bookmarks.js" defer></script>
+
+  <!-- Page-only styles for the box-one "Your Bookmarks" box. Everything
+       reusable (search input, filter chips, sort dropdown, view toggle,
+       card grid, empty states) borrows the existing hwr-css.css classes
+       as-is — only the bits unique to this page live here. -->
+  <style>
+    /* THE BOX itself — same two-corner radial-glow border + #131212 fill
+       .web-item uses (see its own comment in hwr-css.css for the full
+       breakdown of why it's two gradients instead of a plain border),
+       just at a bigger radius/padding since this wraps the whole
+       search+filter+grid stack instead of a single row. */
+    .bm-box {
+      margin: 24px 15% 48px 15%;
+      padding: 22px 22px 26px;
+      border: 1px solid transparent;
+      border-radius: 18px;
+      background:
+        linear-gradient(#131212, #131212) padding-box,
+        radial-gradient(130% 160% at 0% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box,
+        radial-gradient(130% 160% at 100% 100%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box;
+      overflow: hidden;
+    }
+
+    @media (max-width: 970px) {
+      .bm-box {
+        margin: 20px 5% 40px 5%;
+        padding: 18px 16px 22px;
+        border-radius: 16px;
+      }
+    }
+
+    .bm-box-subtitle {
+      margin: 0 0 16px;
+      font-family: 'Sora', sans-serif;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #97999d;
+      max-width: 560px;
+    }
+
+    /* Search bar + Browse Settings bar reuse .nav-panel-search /
+       .browse-filter-bar wholesale, but those come styled for sitting
+       inside .nav-query-panel's own card — here they sit directly inside
+       .bm-box's padding, so they get their own rounded edges + hairline
+       borders instead of relying on a parent card to provide them. */
+    .bm-search {
+      border-radius: 10px;
+      border: 1px solid #2a2a2a;
+      margin-bottom: 14px;
+    }
+
+    .bm-controls-bar {
+      border-top: none;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    /* Category chips — horizontally scrollable row of .filter-chip-styled
+       buttons, one per distinct category found in the saved sites.
+       Scrollbar hidden since the row already has enough visual affordance
+       (chips clipped at the edge) to read as scrollable. */
+    .bm-cat-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+
+    .bm-cat-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .bm-cat-row:empty {
+      display: none;
+      margin-bottom: 0;
+    }
+
+    /* Grid of saved-site cards — plain .web-item cards, reusing that
+       class directly so box view / list view (.is-compact, toggled by
+       the view-mode buttons) works for free. .web-list normally carries
+       15% side margins for when it sits directly in box-one; here it's
+       nested inside .bm-box's own padding instead, so that's zeroed out. */
+    #bmBox .web-list {
+      margin: 0;
+    }
+
+    #bmBox .web-item {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Both empty states normally carry 15%/5% side margins for sitting
+       directly in box-one — here they're nested in .bm-box's own
+       padding, so flush left/right instead, and shown/hidden via plain
+       display rather than the site's .is-visible class (simpler state
+       to drive from this page's own small script). */
+    #bmBox .global-empty-state {
+      display: none;
+      margin: 10px 0 0;
+    }
+
+    #bmBox .global-empty-state.is-visible {
+      display: flex;
+    }
+
+    @media (max-width: 970px) {
+      #bmBox .global-empty-state {
+        margin: 10px 0 0;
+      }
+    }
+
+    /* ===================================================
+       HERO "LAST ADDED" CALLOUT — replaces the old category
+       jump-pills (.hero-tags) with a single live card pointing
+       at whatever was most recently bookmarked. Reuses the
+       existing .hero-tags-wrap/.hero-tags-label wrapper classes
+       from hwr-css.css as-is (same fade-in timing, spacing, and
+       mobile max-width/centering), only the inner card here is
+       new. Populated/kept in sync by initHeroLastSaved() further
+       down the page.
+       =================================================== */
+    .hero-lastsaved {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 16px 9px 9px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s var(--ease-pro), border-color 0.2s var(--ease-pro);
+      max-width: 340px;
+    }
+
+    /* 3 across on desktop, 2 on mobile (the 3rd is hidden below). Using a
+       grid rather than flex so all cards share one width and the row stays
+       even no matter how long each site name is. */
+    .hero-lastsaved-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+    }
+
+    /* With fewer than 3 bookmarks, a 3-column grid would squeeze one or two
+       cards into a third of the row and strand them. data-count is written
+       by updateHeroLastSaved() so the column count matches what is actually
+       there -- an attribute rather than :has() so support is not a question
+       and the state is inspectable in devtools. */
+    .hero-lastsaved-grid[data-count="1"] { grid-template-columns: minmax(0, 340px); }
+    .hero-lastsaved-grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .hero-lastsaved:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .hero-lastsaved:active {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .hero-lastsaved-icon-wrap {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      border-radius: 9px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* HwrIcons 'parent' mode drops the letter straight into the icon wrap
+       and removes the <img>; the wrap is already a centered white square,
+       so only the type needs describing. */
+    .hero-lastsaved-fallback {
+      font-family: 'Oxanium', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      color: #1c1c1e;
+      text-transform: uppercase;
+    }
+
+    .hero-lastsaved-icon-wrap-empty {
+      background: rgba(194, 59, 59, 0.18);
+      color: #c23b3b;
+    }
+
+    .hero-lastsaved-icon {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+
+    .hero-lastsaved-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .hero-lastsaved-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #eceded;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+    }
+
+    .hero-lastsaved-time {
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: #9a9c9f;
+    }
+
+    .hero-lastsaved-arrow {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+      margin-left: 2px;
+      color: #83858a;
+    }
+
+    @media (max-width: 970px) {
+      .hero-lastsaved {
+        max-width: 100%;
+        /* Two cards share the row now, so the roomy desktop padding and the
+           trailing arrow both have to go or the name has nowhere to sit. */
+        padding: 8px 10px 8px 8px;
+        gap: 9px;
+      }
+
+      .hero-lastsaved-name {
+        max-width: none;
+      }
+
+      /* Only the first two are shown on mobile. */
+      .hero-lastsaved-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero-lastsaved-grid>:nth-child(n+3) {
+        display: none;
+      }
+
+      .hero-lastsaved-arrow {
+        display: none;
+      }
+
+      .hero-lastsaved-icon-wrap {
+        width: 28px;
+        height: 28px;
+      }
+
+      .hero-lastsaved-name {
+        font-size: 11.5px;
+      }
+
+      .hero-lastsaved-time {
+        font-size: 10px;
+      }
+
+      /* The shared wrapper caps itself at 360px for the 2-up tag tiles on
+         the other pages; two bookmark cards need more room than that. */
+      #heroLastSavedWrap {
+        /* Never wider than the space available -- a flat 460px overflowed
+           the hero on a 430px-wide phone and clipped the second card. */
+        max-width: min(460px, 100%);
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="page-loader">
+    <!-- Primary top bar: hamburger (left) · centered logo · search icon (right) -->
+    <div class="pl-topbar">
+      <div class="pl-shimmer pl-hamburger"></div>
+      <div class="pl-shimmer pl-logo"></div>
+      <div class="pl-shimmer pl-topbar-icon"></div>
+    </div>
+    <!-- Secondary top bar: page icon+label · category chip row · info icon -->
+    <div class="pl-subbar">
+      <div class="pl-shimmer pl-subbar-icon"></div>
+      <div class="pl-shimmer pl-subbar-label"></div>
+      <div class="pl-subbar-divider"></div>
+      <div class="pl-subbar-chips">
+        <div class="pl-shimmer pl-chip" style="width:70px"></div>
+        <div class="pl-shimmer pl-chip" style="width:58px"></div>
+        <div class="pl-shimmer pl-chip" style="width:84px"></div>
+        <div class="pl-shimmer pl-chip" style="width:62px"></div>
+        <div class="pl-shimmer pl-chip" style="width:68px"></div>
+        <div class="pl-shimmer pl-chip" style="width:54px"></div>
+        <div class="pl-shimmer pl-chip" style="width:74px"></div>
+      </div>
+      <div class="pl-subbar-divider"></div>
+      <div class="pl-shimmer pl-subbar-icon"></div>
+    </div>
+
+    <div class="pl-body">
+      <!-- Left sidebar: Main Lobby / Web Resources / games list / Triple A -->
+      <div class="pl-sidebar">
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:60%"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-active">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:75%"></div>
+        </div>
+        <div class="pl-sb-divider"></div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:80%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:65%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:70%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:60%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:75%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:55%"></div>
+        </div>
+        <div class="pl-sb-divider"></div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-row" style="width:65%"></div>
+          <div class="pl-shimmer pl-sb-chevron"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-sub">
+          <div class="pl-shimmer pl-sb-icon-sm"></div>
+          <div class="pl-shimmer pl-row" style="width:70%"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-sub">
+          <div class="pl-shimmer pl-sb-icon-sm"></div>
+          <div class="pl-shimmer pl-row" style="width:55%"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-sub">
+          <div class="pl-shimmer pl-sb-icon-sm"></div>
+          <div class="pl-shimmer pl-row" style="width:65%"></div>
+        </div>
+      </div>
+
+      <!-- Main column: hero banner / TOC card / search bar / result rows -->
+      <div class="pl-content">
+        <div class="pl-hero">
+          <div class="pl-shimmer pl-hero-tag"></div>
+          <div class="pl-shimmer pl-hero-title"></div>
+          <div class="pl-shimmer pl-hero-title" style="width:55%"></div>
+          <div class="pl-shimmer pl-hero-sub"></div>
+          <div class="pl-hero-pills">
+            <div class="pl-shimmer pl-pill" style="width:110px"></div>
+            <div class="pl-shimmer pl-pill" style="width:130px"></div>
+            <div class="pl-shimmer pl-pill" style="width:120px"></div>
+            <div class="pl-shimmer pl-pill" style="width:100px"></div>
+          </div>
+        </div>
+
+        <div class="pl-shimmer pl-section-label"></div>
+        <div class="pl-toc">
+          <div class="pl-toc-head-row">
+            <div class="pl-shimmer pl-toc-icon"></div>
+            <div class="pl-shimmer pl-row" style="width:130px"></div>
+            <div class="pl-shimmer pl-row pl-toc-badge" style="width:60px"></div>
+          </div>
+          <div class="pl-toc-grid">
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:70%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:55%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:65%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:50%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:60%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:45%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:58%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:40%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:52%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:35%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pl-shimmer pl-searchbar"></div>
+
+        <div class="pl-list">
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:45%"></div>
+              <div class="pl-shimmer pl-row" style="width:75%; height:10px;"></div>
+            </div>
+          </div>
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:38%"></div>
+              <div class="pl-shimmer pl-row" style="width:65%; height:10px;"></div>
+            </div>
+          </div>
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:50%"></div>
+              <div class="pl-shimmer pl-row" style="width:70%; height:10px;"></div>
+            </div>
+          </div>
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:42%"></div>
+              <div class="pl-shimmer pl-row" style="width:60%; height:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Discover More sticky panel (wide desktop only) -->
+      <div class="pl-discover">
+        <div class="pl-shimmer pl-discover-label"></div>
+        <div class="pl-discover-card"></div>
+        <div class="pl-discover-card"></div>
+        <div class="pl-discover-card"></div>
+      </div>
+    </div>
+
+    <!-- Mobile bottom nav: Home / Music / More / Gaming / Movies -->
+    <div class="pl-bottomnav">
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon pl-bn-icon-mid"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <header>
+    <!-- Top Nav -->
+    <div class="top-bar">
+      <div class="top-bar-left-avatar"></div>
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <a class="top-bar-title" href="home.html">
+        <div class="topbar-logo">
+          <img src="icons/home.jpg" alt="">
+        </div> Parchrome
+      </a>
+
+      <!-- Search button -->
+      <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
+        <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+          <!-- Magnifying glass -->
+          <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none" />
+          <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span id="close-icon">✖</span>
+      </button>
+    </div>
+    <!-- Overlay — moved out of .top-bar: .top-bar has `transform` +
+         `will-change: transform` (for its scroll auto-hide), which makes
+         it a containing block for position:fixed descendants. Being
+         nested inside it was cropping the modal down to .top-bar's own
+         52px height instead of covering the full viewport. Living here,
+         directly in <header>, it's fixed relative to the viewport again. -->
+    <div id="search-overlay">
+      <!-- Search input -->
+      <div id="search-input-wrap">
+        <input type="search" id="search-input" placeholder="Find your next game..." oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+        <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+      </div>
+      <!-- Search results -->
+      <div id="search-results"></div>
+      <div id="search-view-more" class="hero-search-viewmore" style="display:none;">Loading more…</div>
+    </div>
+
+
+    <!-- Secondary Top Bar -->
+    <div class="secondary-top-bar" id="secondary-top-bar">
+      <div class="secondary-left">
+        <img src="icons/webicon.png" alt="TH10 Icon" class="th-icon" id="secondaryTopIcon">
+        <a href="homewebresources.html" class="secondary-content" id="secondaryContentLink">
+          <span class="secondary-content-desktop">Web Resources</span>
+          <span class="secondary-content-mobile" id="secondaryContentMobile">
+            <span id="scMobileText">Web Resources</span>
+
+            <span id="scMobileGroup"></span>
+          </span>
+        </a>
+      </div>
+
+
+      <div class="stb-divider" aria-hidden="true"></div>
+
+      <!-- Desktop-only: the category chips, same three-part strip as the
+           hub nav below -- left arrow + #dsnCategoriesScroll + right arrow.
+           Chips are injected by hwr-js.js's renderCategoryNav() from
+           hwr-categories.json; the arrows are wired by initDsnCategoriesScroll()
+           and only exist while the strip actually overflows. -->
+      <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Categories">
+        <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"><!-- populated from hwr-categories.json --></div>
+        <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </nav>
+
+      <!-- Desktop-only divider — separates "Web Resources" chip-scroller
+       from the info button on the right, same treatment .stb-divider
+       gives elsewhere in this bar. -->
+      <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+
+      <!-- Desktop-only: Web Resources hub navigation. Identical markup on
+           every hwr page now: left arrow + #stbHubNavScroll strip + right
+           arrow, with the links themselves populated by 11layout.js's
+           initHubNav() from hwr-categories.json's "hubNav" key -- edit that
+           file to add/remove/rename/re-icon destinations and every page
+           follows. Active state is real per-page tracking (whichever entry's
+           "link" matches the current page), never hardcoded. The arrows are
+           wired by hwr-js.js's initStbHubNavScroll() and only exist while the
+           strip actually overflows -- .is-hidden is display:none, so when
+           they're not needed they take up no room at all. Hidden below 971px
+           since .bn-bar already covers that width. -->
+      <nav class="stb-hub-nav" id="stbHubNav" aria-label="Web Resources navigation">
+        <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"><!-- populated from hwr-categories.json --></div>
+        <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </nav>
+
+      <div class="stb-divider" aria-hidden="true"></div>
+
+      <!-- Info ("i") button — the only place the bookmarking explainer
+       lives on the page now. .stb-mobile-actions is the last flex
+       child in .secondary-top-bar (space-between), so this sits on
+       the right at every width. -->
+      <div class="stb-mobile-actions" id="stbMobileActions">
+        <div class="stb-info-dropdown-wrap" id="stbInfoDropdownWrap">
+          <button type="button" class="stb-icon-btn" id="stbInfoBtn" aria-label="Info" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9.25" />
+              <line x1="12" y1="11" x2="12" y2="16.5" stroke-width="2.4" />
+              <circle cx="12" cy="7.6" r="1.3" fill="currentColor" stroke="none" />
+            </svg>
+          </button>
+          <div class="stb-info-dropdown" id="stbInfoDropdown" role="dialog" aria-hidden="true">
+            <div class="stb-info-dd-badge">
+              <svg class="stb-info-dd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3h12v18l-6-4.5L6 21V3z" />
+              </svg>
+            </div>
+            <h3 class="stb-info-dd-heading">Saving your Favorite Sites</h3>
+            <p class="stb-info-dd-text">
+              See a site you like? Tap the <span class="stb-info-dd-chip"><svg class="stb-info-dd-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 3h12v18l-6-4.5L6 21V3z" />
+                </svg><strong>bookmark button</strong></span> on it.
+            </p>
+            <p class="stb-info-dd-text">
+              It gets saved! Go back to the <span class="stb-info-dd-chip"><img class="stb-info-dd-icon-inline" src="icons/webicon.png" alt=""><strong>Web Resources Home</strong></span> to see all your saved sites in one box.
+            </p>
+          </div>
+        </div>
+
+        <!-- Browse Settings dropdown — same controls/markup as box-three
+         (the desktop-sidebar panel, ≥1401px), just wrapped in this
+         popup instead of sitting inline. Reuses box-three's .b3-card
+         markup wholesale (see the dual-scoped ".box-three .b3-*,
+         .stb-settings-dropdown .b3-*" rules above) rather than a
+         separate set of dropdown-only styles, so there's exactly one
+         version of this panel's look to maintain. Every control here
+         just proxies a click/change to its sidebar counterpart (see
+         initStbSettingsDropdown below) so both stay perfectly in sync
+         no matter which one is used, on any width. -->
+        <div class="stb-settings-dropdown-wrap" id="stbSettingsDropdownWrap">
+          <button type="button" class="stb-icon-btn" id="stbSettingsBtn" aria-label="Browse settings" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="1.9" />
+              <circle cx="12" cy="12" r="1.9" />
+              <circle cx="12" cy="19" r="1.9" />
+            </svg>
+          </button>
+          <div class="stb-settings-dropdown" id="stbSettingsDropdown" role="dialog" aria-hidden="true">
+
+            <!-- "Bookmarks" card — mobile-only mirror of box-two's
+             "Recently Bookmarked" card (reads window.HwrBookmarks the
+             same way), but WITHOUT that card's adaptive vh-based row
+             count. This dropdown already scrolls internally and has no
+             sticky-panel height budget to fill, so it just always shows
+             a fixed 3-item preview (min and max, never more, never
+             fewer once there are 3+ saved) instead of growing/shrinking
+             with viewport height. Placed first, above "Browse Settings",
+             so saved sites are the first thing tapped in here. Populated
+             by initStbSettingsBookmarks below. -->
+            <div class="b3-card b3-bookmarks-card" id="stbSettingsBookmarksSection">
+              <div class="b3-toc-head">
+                <span class="b3-toc-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                  </svg>
+                </span>
+                <span class="b3-toc-title">Bookmarks</span>
+                <span class="b3-toc-total" id="stbSettingsBookmarksTotal">0 saved</span>
+              </div>
+              <div class="stb-toc-grid b3-toc-grid" id="stbSettingsBookmarksGrid"><!-- populated by initStbSettingsBookmarks() --></div>
+              <p class="b3-bookmarks-empty" id="stbSettingsBookmarksEmpty">No bookmarks yet — tap the bookmark icon on any tool to save it here.</p>
+              <button type="button" class="b3-bookmarks-viewall" id="stbSettingsBookmarksViewAll" style="display:none;" title="Takes you back to the lobby, filtered to your saved sites">View All Saved</button>
+            </div>
+
+            <div class="b3-card b3-controls-card">
+              <div class="b3-controls-label">Browse Settings</div>
+
+              <div class="b3-controls-row">
+                <div class="b3-view-toggle" role="group" aria-label="Layout">
+                  <button type="button" class="b3-view-btn" id="settingsViewListBtn" title="List view — one row per tool">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6" />
+                      <line x1="4" y1="12" x2="20" y2="12" />
+                      <line x1="4" y1="18" x2="20" y2="18" />
+                    </svg>
+                  </button>
+                  <button type="button" class="b3-view-btn" id="settingsViewBoxBtn" title="Box view — compact grid">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+                      <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+                      <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+                      <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="sort-order-wrap b3-sort-wrap">
+                  <select class="sort-order-select b3-sort-select" id="settingsSortSelect" aria-label="Sort order">
+                    <option value="default">Featured</option>
+                    <option value="az">A–Z</option>
+                    <option value="za">Z–A</option>
+                  </select>
+                  <svg class="sort-order-chevron b3-sort-chevron" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="b3-filter-row">
+                <button type="button" class="b3-filter-chip" id="settingsBookmarkToggle" role="switch" aria-checked="false" title="Show just the sites you've saved">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                  </svg>
+                  Saved Only
+                </button>
+                <button type="button" class="b3-filter-chip" id="settingsFlatToggle" role="switch" aria-checked="false" title="Show every tool together, no section headers">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="7" x2="21" y2="7" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="17" x2="21" y2="17" />
+                  </svg>
+                  Merge
+                </button>
+              </div>
+            </div>
+
+            <!-- "On This Page" table of contents — same per-page sections
+             data (hwr-categories.json → sections[<this file>]) as the
+             desktop sidebar's nav-chip list and box-three's own copy,
+             just rendered as .stb-toc-card rows here instead. Hidden
+             until the PAGE SECTIONS script below finds sections for
+             this page; a page with none simply never shows it. Rows
+             are populated (and the scroll-spy "you are here"
+             highlight applies to them automatically, since they
+             share .stb-toc-card with every other TOC on the page)
+             further down this file. -->
+            <div class="b3-card b3-toc-card" id="stbSettingsTocSection" style="display:none;">
+              <div class="b3-toc-head">
+                <span class="b3-toc-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="6" x2="20" y2="6" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="18" x2="14" y2="18" />
+                  </svg>
+                </span>
+                <span class="b3-toc-title">On This Page</span>
+                <span class="b3-toc-total" id="stbSettingsTocTotal">0 items</span>
+              </div>
+              <div class="stb-toc-grid b3-toc-grid" id="stbSettingsTocGrid"><!-- populated from hwr-categories.json --></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stb-dd-overlay" id="stbDdOverlay" aria-hidden="true"></div>
+  </header>
+
+
+  <!-- Main -->
+  <div class="main">
+
+    <div class="sidebar" id="sidebar">
+      <!-- Top Box -->
+      <div class="top-box" id="top-box"></div>
+      <!-- Games list -->
+      <div class="games-container" id="games-container"></div>
+      <!-- Triple A Games -->
+      <div class="triple-a-container">
+        <div class="triple-a-header" onclick="toggleTripleA()">
+          <img src="icons/controllericon.png" class="tripleimg">
+          Triple A Games <span class="arrow">></span>
+        </div>
+        <div class="triple-a-list" id="triple-a-list"></div>
+      </div>
+    </div>
+
+
+    <div class="coc-main" id="main-content" role="main">
+
+
+      <div class="hero-section">
+        <img class="hero-bg-img" src="https://i.pinimg.com/736x/29/9a/54/299a5472e41588bb852ffc904b6e7bb4.jpg" alt="" fetchpriority="high">
+        <div class="hero-bg-overlay" aria-hidden="true"></div>
+        <div class="hero-content">
+          <span class="hero-kicker"><span class="hero-kicker-dot"></span>Parchrome &middot; Web Resources</span>
+          <h1 class="hero-title" id="heroTitle"><span id="heroTitleText"><span class="hero-title-accent">Your</span> <span class="hero-title-collection">Bookmarks</span></span></h1>
+          <p class="hero-stat-strip" id="heroStatStrip" aria-hidden="true">
+            <span class="hero-stat-strip-dot" aria-hidden="true"></span>
+            <span class="hero-stat-strip-text" id="heroStatStripText"></span>
+          </p>
+          <div class="hero-tags-wrap" id="heroLastSavedWrap">
+            <span class="hero-tags-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" /></svg>
+              Recently Added
+            </span>
+            <!-- Filled by updateHeroLastSaved(): up to 3 cards, of which CSS
+                 shows only the first 2 below 971px. Built in JS rather than
+                 hand-written here because the count is data-driven -- a
+                 brand new visitor has none, and someone with one bookmark
+                 should see one card, not one card and two empty frames. -->
+            <div class="hero-lastsaved-grid" id="heroLastSavedGrid"></div>
+            <a href="homewebresources.html" class="hero-lastsaved hero-lastsaved-empty" id="heroLastSavedEmpty" style="display:none;">
+              <span class="hero-lastsaved-icon-wrap hero-lastsaved-icon-wrap-empty">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" /></svg>
+              </span>
+              <span class="hero-lastsaved-body">
+                <span class="hero-lastsaved-name">No bookmarks yet</span>
+                <span class="hero-lastsaved-time">Tap Browse Web Resources to save your first site</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- These 4 tags are hand-authored real links (not JS-swapped) — the
+       swap-on-load logic in hwr-js.js (search "HERO TAGS — sourced from
+       hwr-categories.json") only looks for the AI page's specific 4
+       titles (Text to Speech / Video Generation / Image Generation /
+       Audio Generation), so it never touches this page. Each tag scrolls
+       to its matching section via hwrScrollToToc, same as a TOC entry —
+       keep the 4 href/onclick anchors here in sync with this page's
+       section ids in hwr-categories.json if those ever change. -->
+
+
+
+
+      <div class="coc-content">
+
+
+        <!-- Bases Grid -->
+
+
+        <!-- Single shared fetch of hwr-categories.json — every script on this
+     page that needs it (page-sections TOC/content below, the desktop
+     category strip, and the mobile page-label swap further down)
+     reuses this ONE promise instead of each firing its own request. -->
+
+        <div class="box-container">
+          <div class="box-one">
+
+            <!-- Section heading — same .layouts-title-box language every
+         box-one page opens with (see hwr-ai.html's "Table of Contents"),
+         just pointed at the bookmarks list instead. bmHeaderCount is
+         filled in by renderBookmarks() below. -->
+            <div class="layouts-title-box toc-heading-box">
+              <div class="layouts-title-row">
+                <div class="layouts-title">
+                  <svg class="layouts-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                  </svg>
+                  <span>Your Bookmarks</span>
+                </div>
+                <div class="layouts-title-actions">
+                  <span class="layouts-count" id="bmHeaderCount">0 saved</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- THE BOX — every saved site lives in here. Border + fill are
+         the exact two-corner radial-glow trick .web-item uses further
+         down the page (see its comment there for the full breakdown),
+         just scaled up to card-sized rounding/padding since this is
+         one big container instead of a single row. -->
+            <div class="bm-box" id="bmBox">
+
+              <p class="bm-box-subtitle">Every site you've bookmarked across Parchrome, all in one place — search, filter by category, and manage them below.</p>
+
+              <!-- Search -->
+              <div class="nav-panel-search bm-search" id="bmSearchWrap">
+                <div class="nav-panel-search-inner">
+                  <svg class="site-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+                    <circle cx="10" cy="10" r="6.5"></circle>
+                    <line x1="15" y1="15" x2="20.5" y2="20.5"></line>
+                  </svg>
+                  <input type="text" id="bmSearchInput" class="site-search-input" placeholder="Search your bookmarks">
+                  <button type="button" id="bmSearchClear" class="site-search-clear" aria-label="Clear search" style="display:none;">✕</button>
+                </div>
+              </div>
+
+              <!-- Category filter chips — built from whatever categories
+           actually show up in the saved list, so a page with only
+           bookmarked games never shows an empty "Movies" chip. -->
+              <div class="bm-cat-row" id="bmCatRow"></div>
+
+              <!-- Sort / view / clear-all — same control language as the
+           Browse Settings bar elsewhere on the site (.browse-filter-bar
+           family), reused as-is. -->
+              <div class="browse-filter-bar bm-controls-bar">
+                <div class="browse-filter-body">
+
+                  <div class="filter-bar-group filter-bar-group-arrange">
+                    <div class="view-mode-toggle" role="group" aria-label="View mode">
+                      <button type="button" class="view-mode-btn" id="bmViewListBtn" data-mode="list" aria-pressed="false" title="List view">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="4" y1="6" x2="20" y2="6" />
+                          <line x1="4" y1="12" x2="20" y2="12" />
+                          <line x1="4" y1="18" x2="20" y2="18" />
+                        </svg>
+                      </button>
+                      <button type="button" class="view-mode-btn" id="bmViewBoxBtn" data-mode="box" aria-pressed="false" title="Box view">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+                          <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+                          <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+                          <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="sort-order-wrap">
+                      <select class="sort-order-select" id="bmSortSelect" aria-label="Sort order">
+                        <option value="default">Recently Saved</option>
+                        <option value="az">A–Z</option>
+                        <option value="za">Z–A</option>
+                      </select>
+                      <svg class="sort-order-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <span class="filter-bar-spacer"></span>
+
+                  <div class="filter-bar-group filter-bar-group-toggles">
+                    <button type="button" class="filter-chip bm-clear-chip" id="bmClearAllBtn" title="Remove every saved bookmark">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                      </svg>
+                      Clear All
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Results -->
+              <div class="web-list" id="bmGrid"></div>
+
+              <!-- Nothing saved anywhere on the site yet. -->
+              <div class="global-empty-state" id="bmEmptyNone">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                </svg>
+                <div class="global-empty-title">No Bookmarks Yet</div>
+                <div class="global-empty-sub">You haven't saved any sites yet. Tap the bookmark button on a site you like anywhere on Parchrome and it'll show up here.</div>
+                <a href="homewebresources.html" class="global-empty-clear" style="text-decoration:none;">Browse Web Resources</a>
+              </div>
+
+              <!-- Bookmarks exist, but the current search/category filter
+           matched none of them. -->
+              <div class="global-empty-state" id="bmEmptyFiltered">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="10" cy="10" r="6.5" />
+                  <line x1="15" y1="15" x2="20.5" y2="20.5" />
+                  <line x1="7.5" y1="10" x2="12.5" y2="10" />
+                </svg>
+                <div class="global-empty-title">No matches found</div>
+                <div class="global-empty-sub">Nothing in your bookmarks matches that search or category. Try another keyword or clear the filters.</div>
+                <button type="button" class="global-empty-clear" id="bmEmptyFilteredClear">Clear filters</button>
+              </div>
+
+            </div>
+
+            <!-- ===================================================
+            BACKUP & RESTORE -- the same panel as homewebresources.html.
+            Both are driven by HwrBookmarks.exportBookmarks() /
+            importBookmarks() in hwr-bookmarks.js and the identical
+            initBackupPanel() block below, so behaviour stays in step.
+            =================================================== -->
+            <div class="lib-section">
+            <div class="layouts-title-box" id="backupTitleBox">
+            <div class="layouts-title">Backup &amp; Restore</div>
+            <div class="layouts-subtitle">Keep your bookmarks safe, or move them to another device.</div>
+            </div>
+
+            <div class="lib-panel">
+            <div class="bk-body">
+            <div class="bk-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            <span id="bkNoteText">Your bookmarks are stored in <b>this browser only</b>. Clearing site data, switching browser, or opening the site on your phone will not carry them over.</span>
+            </div>
+
+            <div class="bk-actions">
+            <button type="button" class="bk-btn is-primary" id="bkExport">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M21 21H3"/></svg>
+            Download backup
+            </button>
+            <button type="button" class="bk-btn" id="bkCopy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            Copy as code
+            </button>
+            <button type="button" class="bk-btn" id="bkImportFile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M21 21H3"/></svg>
+            Restore from file
+            </button>
+            <input type="file" id="bkFileInput" accept="application/json,.json,.txt" hidden>
+            <span class="bk-status" id="bkStatus"></span>
+            </div>
+
+            <div class="bk-paste">
+            <textarea id="bkPasteInput" placeholder="…or paste a backup code here to restore it" spellcheck="false"></textarea>
+            <div class="bk-paste-row">
+            <button type="button" class="bk-btn" id="bkPasteRestore">Restore from code</button>
+            </div>
+            </div>
+            </div>
+            </div>
+            </div>
+          </div>
+
+          <div class="box-two">
+
+            <div class="box-three" id="boxThreePanel">
+
+              <div class="b3-card b3-controls-card">
+                <div class="b3-controls-label">Browse Settings</div>
+
+                <div class="b3-controls-row">
+                  <div class="b3-view-toggle" role="group" aria-label="Layout">
+                    <button type="button" class="b3-view-btn" id="sbTwoViewListBtn" title="List view — one row per tool">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="4" y1="18" x2="20" y2="18" />
+                      </svg>
+                    </button>
+                    <button type="button" class="b3-view-btn" id="sbTwoViewBoxBtn" title="Box view — compact grid">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+                        <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+                        <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+                        <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="sort-order-wrap b3-sort-wrap">
+                    <select class="sort-order-select b3-sort-select" id="sbTwoSortSelect" aria-label="Sort order">
+                      <option value="default">Featured</option>
+                      <option value="az">A–Z</option>
+                      <option value="za">Z–A</option>
+                    </select>
+                    <svg class="sort-order-chevron b3-sort-chevron" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="b3-filter-row">
+                  <button type="button" class="b3-filter-chip" id="sbTwoBookmarkToggle" role="switch" aria-checked="false" title="Show just the sites you've saved">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                    </svg>
+                    Saved Only
+                  </button>
+                  <button type="button" class="b3-filter-chip" id="sbTwoFlatToggle" role="switch" aria-checked="false" title="Show every tool together, no section headers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="3" y1="7" x2="21" y2="7" />
+                      <line x1="3" y1="12" x2="21" y2="12" />
+                      <line x1="3" y1="17" x2="21" y2="17" />
+                    </svg>
+                    Merge
+                  </button>
+                </div>
+              </div>
+
+              <!-- "On This Page" card — bordered like .web-item, dotted-leader
+           rows like a printed table of contents. Hidden via inline
+           style until PAGE SECTIONS/initBoxThreePanel populate it. -->
+              <div class="b3-card b3-toc-card" id="sbTwoTocSection" style="display:none;">
+                <div class="b3-toc-head">
+                  <span class="b3-toc-badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6" />
+                      <line x1="4" y1="12" x2="20" y2="12" />
+                      <line x1="4" y1="18" x2="14" y2="18" />
+                    </svg>
+                  </span>
+                  <span class="b3-toc-title">On This Page</span>
+                  <span class="b3-toc-total" id="sbTwoTocTotal">0 items</span>
+                </div>
+                <div class="stb-toc-grid b3-toc-grid" id="sbTwoTocGrid"><!-- populated from hwr-categories.json --></div>
+              </div>
+
+              <!-- "Discover More" card -- replaces the Recently Bookmarked
+           list that the other 12 pages carry here. On THIS page that list
+           was just a shorter copy of the page's own main content, so the
+           slot is given over to category jump-off cards instead.
+
+           The card design is the mobile .fg-card from 11layout.css (the
+           search-results card): full-bleed background photo, a left-to-right
+           dark gradient over it, a round icon badge, and the text on top.
+           Restyled here under b3- names rather than reusing #search-results'
+           rules, which are scoped to that overlay and carry its sizing.
+
+           Ids deliberately differ from sbTwoBookmarks* so the shared
+           initBoxThreeBookmarks() in hwr-js.js finds no #sbTwoBookmarksSection
+           and bails on this page, leaving the other 12 untouched. -->
+              <div class="b3-card b3-discover-card" id="sbTwoDiscoverSection">
+                <a class="b3-toc-head b3-discover-head" href="homewebresources.html" title="Browse every category">
+                  <span class="b3-toc-badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M15.5 8.5l-2 5-5 2 2-5z" />
+                    </svg>
+                  </span>
+                  <span class="b3-toc-title">Discover More</span>
+                  <svg class="b3-discover-head-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+                <div class="b3-discover-grid" id="sbTwoDiscoverGrid"><!-- built by initBoxThreeDiscover() --></div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+
+
+        <!-- CARD LIST — populated from websites.json -->
+        <!-- data-default-cat: set per page, e.g. "anime" on hwr-anime.html -->
+
+
+
+      </div>
+
+
+
+<style>
+/* Backup & Restore panel — .lib-panel shell plus the .bk-* styles,
+   copied from homewebresources.html so both pages present this feature
+   identically. Only the rules this page uses were brought across; the
+   library list and Today's Pick markup live on the landing page only.
+   Kept page-local rather than moved into hwr-css.css so the rest of the
+   series is untouched — if a third page grows one of these, promote
+   them to the shared sheet instead of copying a third time. */
+.lib-section{
+  position: relative;
+  padding: 4px 15% 10px 15%;
+}
+
+/* .lib-section already supplies the 15% (5% mobile) gutter, so
+   hwr-css.css's own .layouts-title-box side margins would inset this
+   heading a second time and float it right of its own panel. This
+   page-local block comes after the external sheet, so equal specificity
+   is enough to win. Same rule exists on homewebresources.html. */
+.lib-section .layouts-title-box{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* hwr-css.css pulls the page's FIRST heading up under the hero with
+   .layouts-title-box:first-child{margin-top:-72px}. This heading is the
+   first child of its own .lib-section, so it matched that rule too and
+   was dragged 72px up, overlapping the bookmarks panel above it. Restore
+   the normal heading spacing; the extra class here outranks that rule. */
+.lib-section .layouts-title-box:first-child{
+  margin-top: 50px;
+}
+
+@media (min-width: 971px){
+  .lib-section .layouts-title-box:first-child{
+    margin-top: 70px;
+  }
+}
+
+/* ===================================================
+   DISCOVER MORE (box-three)
+
+   Lifted from the mobile .fg-card in 11layout.css -- the compact
+   horizontal card used by the search overlay: the artwork is the card's
+   background, a left-to-right dark gradient keeps the text readable over
+   whatever the photo happens to be, a round icon badge sits at the left,
+   and the name/count ride on top. Same 80px card height as that design.
+
+   Written under b3- names instead of reusing #search-results' rules,
+   because those are scoped to that overlay and carry its widths.
+   =================================================== */
+.b3-discover-head{
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.b3-discover-head:hover .b3-toc-title{ color: #fff; }
+
+.b3-discover-head-arrow{
+  width: 13px;
+  height: 13px;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #5f6166;
+  transition: transform .18s ease, color .18s ease;
+}
+
+.b3-discover-head:hover .b3-discover-head-arrow{
+  color: #c23b3b;
+  transform: translateX(2px);
+}
+
+.b3-discover-grid{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.b3-discover-item{
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  background: #1a1a1a;
+}
+
+.b3-discover-img-wrap{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.b3-discover-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.88) contrast(1.05);
+  transition: transform .5s cubic-bezier(.25,.8,.25,1), filter .3s ease;
+}
+
+.b3-discover-item:hover .b3-discover-img{
+  transform: scale(1.07);
+  filter: brightness(1.05) contrast(1.05);
+}
+
+/* The gradient is what makes the text legible on any photo -- darkest at
+   the left where the badge and name sit, clearing towards the right so
+   the artwork still reads as artwork. */
+.b3-discover-shade{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.75) 45%, rgba(12,12,14,0.25) 100%);
+}
+
+.b3-discover-badge{
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #161616;
+  border: 2px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 3;
+  transition: transform .3s ease, border-color .3s ease;
+  box-sizing: border-box;
+}
+
+.b3-discover-item:hover .b3-discover-badge{
+  transform: translateY(-50%) scale(1.08);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.b3-discover-badge img{
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* Same first-letter fallback the rest of the site uses when a favicon
+   comes back as google's grey globe. */
+.b3-discover-badge.web-icon-fallback{
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.b3-discover-info{
+  position: relative;
+  z-index: 2;
+  margin-left: 68px;
+  padding-right: 12px;
+  min-width: 0;
+  /* Both lines are <span>s, so without this they run together on one line
+     ("Manga14 sites"). Column flex also centers them against the 80px card. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.b3-discover-name{
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  margin-bottom: 2px;
+}
+
+.b3-discover-count{
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+.lib-panel{
+  border: 1px solid #1e1e20;
+  border-radius: 14px;
+  background: #101011;
+  overflow: hidden;
+}
+
+/* Two columns on desktop. The old box stacked three rows down the left
+   and left the right half of a 1100px container empty. */
+/* Hairline between the columns rather than a second bordered card. */
+/* Text button ("clear"), quiet until hovered. */
+/* ROWS -------------------------------------------------------------
+   Same row anatomy as the bookmarks box had: one hairline between rows,
+   a red edge marker on hover, no box per item. */
+/* EMPTY STATES ------------------------------------------------------
+   Small now, not a 200px void — each column is only half the panel, and
+   the other half almost always has content. */
+/* TODAY'S PICK ------------------------------------------------------
+   A wide spotlight rather than another list: it's one item, and it earns
+   the horizontal space the old box wasted. */
+/* BACKUP ------------------------------------------------------------ */
+.bk-body{ padding: 4px 18px 18px 18px; }
+
+.bk-note{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  background: rgba(194,59,59,0.055);
+  border: 1px solid rgba(194,59,59,0.2);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: #9a9ca0;
+  margin-bottom: 14px;
+}
+
+.bk-note svg{ width: 15px; height: 15px; flex-shrink: 0; color: #c96a6a; margin-top: 1px; }
+.bk-note b{ color: #d6d7da; font-weight: 600; }
+
+.bk-actions{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.bk-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: 1px solid #2a2a2e;
+  background: #171718;
+  cursor: pointer;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #c4c6ca;
+  transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.bk-btn:hover{ background: #1d1d1f; border-color: #38383e; color: #fff; transform: translateY(-1px); }
+.bk-btn:active{ transform: none; }
+.bk-btn svg{ width: 13px; height: 13px; }
+
+.bk-btn.is-primary{
+  border-color: rgba(194,59,59,0.4);
+  background: rgba(194,59,59,0.1);
+  color: #e8b4b4;
+}
+
+.bk-btn.is-primary:hover{ background: rgba(194,59,59,0.17); border-color: rgba(194,59,59,0.6); color: #fff; }
+
+.bk-btn:disabled{ opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.bk-btn:focus-visible{ outline: 2px solid rgba(194,59,59,0.6); outline-offset: 2px; }
+
+/* Paste-a-code path, for moving between devices without a file. */
+.bk-paste{ margin-top: 13px; }
+
+.bk-paste textarea{
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 74px;
+  resize: vertical;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid #232326;
+  background: #0c0c0d;
+  color: #c9cbcf;
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.bk-paste textarea::placeholder{ color: #4e5055; }
+.bk-paste textarea:focus{ outline: none; border-color: #38383e; }
+
+.bk-paste-row{ display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+
+.bk-status{
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #7d7f84;
+}
+
+.bk-status.is-ok{ color: #7fb87f; }
+.bk-status.is-err{ color: #d97a7a; }
+
+/* MOBILE ------------------------------------------------------------ */
+@media (max-width: 970px){
+  .lib-section{ padding: 0 5% 8px 5%; }
+
+  /* Columns stack, so the divider has to move from the side to the top. */
+  .lib-split{ grid-template-columns: 1fr; }
+  .lib-col + .lib-col{ border-left: none; border-top: 1px solid #1a1a1c; }
+  .lib-col{ padding: 2px 14px 15px 14px; }
+
+  .lib-head{ padding: 12px 0 10px 0; }
+  .lib-head h3{ font-size: 11px; }
+  .lib-item{ gap: 10px; padding: 11px 2px; }
+  .lib-item::before{ left: -14px; }
+
+  /* No hover on touch: the time/remove swap can't work, so drop the
+     timestamp and leave remove permanently visible. */
+  .lib-time{ display: none; }
+  .lib-remove{ opacity: 1; pointer-events: auto; position: static; margin-left: 2px; }
+  .lib-item:hover{ padding-left: 2px; }
+
+  .pick-body{ flex-wrap: wrap; gap: 14px; padding: 15px; }
+  .pick-icon{ width: 48px; height: 48px; border-radius: 12px; }
+  .pick-name{ font-size: 16px; }
+  .pick-open{ width: 100%; justify-content: center; }
+
+  .bk-body{ padding: 2px 14px 15px 14px; }
+  .bk-actions .bk-btn{ flex: 1 1 auto; justify-content: center; }
+}
+</style>
+
+<script>
+/* ===================================================
+   BACKUP & RESTORE PANEL — wiring only; the storage logic lives in
+   HwrBookmarks.exportBookmarks() / importBookmarks() (hwr-bookmarks.js).
+
+   This exact block appears on homewebresources.html AND
+   hwr-bookmarks.html. It is written to bail out cleanly when the panel
+   isn't on the page, so it's safe to paste onto any hwr page that grows
+   one later.
+   =================================================== */
+(function initBackupPanel(){
+  function start(){
+    var exportBtn  = document.getElementById('bkExport');
+    var copyBtn    = document.getElementById('bkCopy');
+    var fileBtn    = document.getElementById('bkImportFile');
+    var fileInput  = document.getElementById('bkFileInput');
+    var pasteInput = document.getElementById('bkPasteInput');
+    var pasteBtn   = document.getElementById('bkPasteRestore');
+    var statusEl   = document.getElementById('bkStatus');
+    var noteText   = document.getElementById('bkNoteText');
+    if(!exportBtn || !window.HwrBookmarks) return;
+
+    var statusTimer = null;
+    function say(msg, kind){
+      if(!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.className = 'bk-status' + (kind ? ' is-' + kind : '');
+      clearTimeout(statusTimer);
+      // Errors stay put; successes clear themselves so the row doesn't
+      // keep announcing something that happened a minute ago.
+      if(kind !== 'err') statusTimer = setTimeout(function(){
+        statusEl.textContent = '';
+        statusEl.className = 'bk-status';
+      }, 6000);
+    }
+
+    // Nothing to back up is worth saying out loud, otherwise "Download
+    // backup" silently hands over an empty file.
+    function refreshState(){
+      var n = window.HwrBookmarks.getBookmarks().length;
+      var empty = n === 0;
+      exportBtn.disabled = empty;
+      if(copyBtn) copyBtn.disabled = empty;
+      if(noteText){
+        noteText.innerHTML = empty
+          ? 'You have no bookmarks yet. Once you save some they live in <b>this browser only</b> — back them up here so clearing site data or switching device doesn\'t lose them.'
+          : '<b>' + n + '</b> bookmark' + (n === 1 ? '' : 's') + ' stored in <b>this browser only</b>. Clearing site data, switching browser, or opening the site on your phone will not carry them over.';
+      }
+    }
+
+    function applyImport(text){
+      var res = window.HwrBookmarks.importBookmarks(text);
+      if(!res.ok){ say(res.error, 'err'); return; }
+      say(res.added
+            ? 'Restored ' + res.added + ' bookmark' + (res.added === 1 ? '' : 's') +
+              (res.skipped ? ' (' + res.skipped + ' already saved)' : '') + '.'
+            : 'Nothing new — all ' + res.skipped + ' were already saved.',
+          'ok');
+      refreshState();
+      // The library panel only exists on homewebresources.html.
+      if(typeof window.HwrResyncBookmarksBox === 'function') window.HwrResyncBookmarksBox();
+      if(typeof window.HwrResyncBookmarksPage === 'function') window.HwrResyncBookmarksPage();
+    }
+
+    exportBtn.addEventListener('click', function(){
+      var data = window.HwrBookmarks.exportBookmarks();
+      var blob = new Blob([data], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var d = new Date();
+      var stamp = d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+      a.download = 'parchrome-bookmarks-' + stamp + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // Revoking immediately can cancel the download in some browsers.
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+      say('Backup downloaded.', 'ok');
+    });
+
+    if(copyBtn){
+      copyBtn.addEventListener('click', function(){
+        var data = window.HwrBookmarks.exportBookmarks();
+        // navigator.clipboard needs a secure context (https or localhost);
+        // opened straight off the filesystem it's undefined, so fall back
+        // to showing the code for manual copying rather than failing.
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(data).then(function(){
+            say('Backup code copied to clipboard.', 'ok');
+          }).catch(function(){
+            if(pasteInput){ pasteInput.value = data; pasteInput.select(); }
+            say('Couldn’t copy automatically — select the text below and copy it.', 'err');
+          });
+        } else {
+          if(pasteInput){ pasteInput.value = data; pasteInput.select(); }
+          say('Copying needs a secure page — select the text below and copy it.', 'err');
+        }
+      });
+    }
+
+    if(fileBtn && fileInput){
+      fileBtn.addEventListener('click', function(){ fileInput.click(); });
+      fileInput.addEventListener('change', function(){
+        var file = fileInput.files && fileInput.files[0];
+        if(!file) return;
+        var reader = new FileReader();
+        reader.onload = function(){ applyImport(String(reader.result || '')); };
+        reader.onerror = function(){ say('Could not read that file.', 'err'); };
+        reader.readAsText(file);
+        // Reset so picking the same file twice still fires 'change'.
+        fileInput.value = '';
+      });
+    }
+
+    if(pasteBtn && pasteInput){
+      pasteBtn.addEventListener('click', function(){
+        var text = pasteInput.value.trim();
+        if(!text){ say('Paste a backup code first.', 'err'); return; }
+        applyImport(text);
+        pasteInput.value = '';
+      });
+    }
+
+    window.addEventListener('storage', function(e){
+      if(e.key === 'hwr_bookmarks') refreshState();
+    });
+
+    refreshState();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
+</script>
+
+      <footer class="pf-footer">
+
+        <!-- Socials, legal links, copyright, and disclaimer are all rendered
+        from 11footer.json at runtime -- edit that file to change any of
+        them (including social links) without touching this HTML. -->
+        <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+        <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+        <div class="pf-footer-divider"></div>
+
+        <!-- Web Resources links -- populated at runtime from hwr-categories.json
+        via window.HwrCategoriesPromise (same shared fetch the dsn-chip nav
+        uses), so this list stays in sync with the site nav automatically. -->
+        <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+        <div class="pf-footer-divider"></div>
+
+        <div class="pf-footer-bottom">
+          <div class="pf-footer-legal" id="pfFooterLegal"></div>
+        </div>
+
+        <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+        <!-- Copyright moved to its own last line, below the disclaimer,
+        instead of sharing the legal-links row -- so it reads as the
+        final line of the footer rather than sitting up top next to
+        Terms/Privacy/etc. -->
+        <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+
+      </footer>
+    </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+
+    <div id="imageZoom" class="image-zoom" onclick="closeZoom()">
+      <img id="zoomedImg" src="">
+    </div>
+
+
+    <!-- More Menu Modal (mobile) -->
+    <div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+      <div class="more-sheet" onclick="event.stopPropagation()">
+        <div class="more-sheet-scroll">
+          <div class="more-sheet-top">
+            <div class="more-sheet-handle"></div>
+            <div class="more-sheet-header">
+              <span class="more-sheet-title">Web Resources</span>
+              <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="more-list">
+            <div class="more-section-title">Categories</div>
+            <div class="th-mini-grid" id="thMiniGrid"><!-- populated from hwr-categories.json --></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav (mobile). The .bn-item links themselves are populated
+     by 11layout.js's initHubNav() from hwr-categories.json's "hubNav"
+     key, inserted around #bnMoreWrap (first half before it, rest after).
+     Active state is real per-page tracking now, not hardcoded — so
+     nothing here lights up as active on this page (hwr-anime.html isn't
+     one of the hub destinations). -->
+    <div class="bn-bar" id="bottomNav">
+      <div class="bn-more-wrap" id="bnMoreWrap">
+        <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;">
+            <rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            <rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            <rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            <rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+          </svg>
+        </button>
+        <div class="bn-more-spacer"></div>
+        <span class="bn-more-label">More</span>
+      </div>
+    </div>
+
+
+    <!-- Mobile secondary-content: swap the "Web Resources" label for the
+     current page's own name + icon (sourced from hwr-categories.json),
+     matched against the current filename. Desktop keeps the static
+     "Web Resources" link and never runs this. -->
+
+    <!-- Fix: kill the stray gap between the search/filter pills and the
+     category grid below — several elements in that chain had their own
+     margins (search wrap, pill outer, the empty wsite-list placeholder),
+     which stacked up into extra space. Zeroing them out and giving the
+     grid one deliberate, controlled top spacing instead. -->
+
+  <script src="hwr-js.js"></script>
+
+  <!-- ===================================================
+       BOOKMARKS BOX — reads window.HwrBookmarks (hwr-bookmarks.js)
+       directly; nothing here touches hwr-websites.json or the
+       hwr-categories.json fetch other pages use, since a bookmark
+       already carries its own name/link/icon/sub/cat at save time.
+       Runs on DOMContentLoaded rather than inline so it's guaranteed
+       to fire after hwr-bookmarks.js (deferred, from <head>) has set
+       up window.HwrBookmarks, regardless of exact script load order.
+       =================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var CAT_LABELS = {
+        ai: 'AI Tools',
+        gaming: 'Gaming',
+        webgaming: 'Web Games',
+        torrenting: 'Torrenting',
+        anime: 'Anime',
+        movies: 'Movies',
+        asiandrama: 'Asian Drama',
+        music: 'Music',
+        manga: 'Reading',
+        parcode: 'Parcode'
+      };
+
+      var BOOKMARK_ICON =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21V3z"/></svg>';
+
+      var grid = document.getElementById('bmGrid');
+      var catRow = document.getElementById('bmCatRow');
+      var searchInput = document.getElementById('bmSearchInput');
+      var searchClear = document.getElementById('bmSearchClear');
+      var searchWrap = document.getElementById('bmSearchWrap');
+      var sortSelect = document.getElementById('bmSortSelect');
+      var viewListBtn = document.getElementById('bmViewListBtn');
+      var viewBoxBtn = document.getElementById('bmViewBoxBtn');
+      var clearAllBtn = document.getElementById('bmClearAllBtn');
+      var headerCount = document.getElementById('bmHeaderCount');
+      var bmBox = document.getElementById('bmBox');
+      var emptyNone = document.getElementById('bmEmptyNone');
+      var emptyFiltered = document.getElementById('bmEmptyFiltered');
+      var emptyFilteredClear = document.getElementById('bmEmptyFilteredClear');
+
+      // Everything that should disappear entirely when nothing has ever
+      // been saved (search bar, category chips, sort/view/clear-all bar,
+      // and the grid itself) — only the "No Bookmarks Yet" state shows then.
+      var controlsAndGrid = [searchWrap, catRow, bmBox.querySelector('.bm-controls-bar'), grid];
+
+      var state = { all: [], cat: 'all', query: '', sort: 'default', view: 'list' };
+
+      function label(cat) {
+        if (!cat) return 'Other';
+        if (CAT_LABELS[cat]) return CAT_LABELS[cat];
+        return cat.charAt(0).toUpperCase() + cat.slice(1);
+      }
+
+      // HERO "LAST ADDED" CALLOUT — sits in the hero banner in place of
+      // the old category jump-pills. Points at whichever bookmark was
+      // saved most recently; refreshed any time the saved list changes
+      // (initial load, toggling a bookmark off from this page, Clear All).
+      // savedAt is only present on bookmarks saved after this feature
+      // shipped — older entries fall back to a plain "Recently saved".
+      var heroGrid = document.getElementById('heroLastSavedGrid');
+      var heroEmpty = document.getElementById('heroLastSavedEmpty');
+
+      // 3 cards are built; CSS hides the 3rd below 971px so a phone shows 2.
+      var HERO_LASTSAVED_MAX = 3;
+
+      function timeAgo(ts) {
+        if (!ts) return 'Recently saved';
+        var sec = Math.floor((Date.now() - ts) / 1000);
+        if (sec < 60) return 'Just now';
+        var min = Math.floor(sec / 60);
+        if (min < 60) return min + (min === 1 ? ' minute ago' : ' minutes ago');
+        var hr = Math.floor(min / 60);
+        if (hr < 24) return hr + (hr === 1 ? ' hour ago' : ' hours ago');
+        var day = Math.floor(hr / 24);
+        if (day < 30) return day + (day === 1 ? ' day ago' : ' days ago');
+        var month = Math.floor(day / 30);
+        if (month < 12) return month + (month === 1 ? ' month ago' : ' months ago');
+        var year = Math.floor(month / 12);
+        return year + (year === 1 ? ' year ago' : ' years ago');
+      }
+
+      function buildHeroCard(site) {
+        var a = document.createElement('a');
+        a.className = 'hero-lastsaved';
+        a.href = site.link || '#';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+
+        var iconWrap = document.createElement('span');
+        iconWrap.className = 'hero-lastsaved-icon-wrap';
+        var img = document.createElement('img');
+        img.className = 'hero-lastsaved-icon';
+        img.src = site.icon || '';
+        img.alt = '';
+        img.loading = 'lazy';
+        iconWrap.appendChild(img);
+
+        var body = document.createElement('span');
+        body.className = 'hero-lastsaved-body';
+        var name = document.createElement('span');
+        name.className = 'hero-lastsaved-name';
+        name.textContent = site.name || 'Untitled';
+        var time = document.createElement('span');
+        time.className = 'hero-lastsaved-time';
+        time.textContent = timeAgo(site.savedAt);
+        body.appendChild(name);
+        body.appendChild(time);
+
+        a.appendChild(iconWrap);
+        a.appendChild(body);
+        a.insertAdjacentHTML('beforeend',
+          '<svg class="hero-lastsaved-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>');
+
+        // Same first-letter fallback used by the other bookmark lists --
+        // google's favicon service answers 200 with a grey globe for a
+        // domain it has no icon for, so an error handler alone misses it.
+        if (window.HwrIcons) {
+          window.HwrIcons.watch(img, site.name, 'hero-lastsaved-fallback', 'parent');
+        }
+        return a;
+      }
+
+      function updateHeroLastSaved() {
+        if (!heroGrid || !heroEmpty) return;
+
+        var recent = state.all.slice(0, HERO_LASTSAVED_MAX);
+        heroGrid.innerHTML = '';
+
+        if (!recent.length) {
+          heroGrid.removeAttribute('data-count');
+          heroEmpty.style.display = 'flex';
+          return;
+        }
+
+        heroEmpty.style.display = 'none';
+        recent.forEach(function (site) {
+          heroGrid.appendChild(buildHeroCard(site));
+        });
+        // Drives the column count so 1 or 2 bookmarks do not sit in a
+        // 3-wide grid; see the [data-count] rules in the stylesheet.
+        heroGrid.setAttribute('data-count', String(recent.length));
+      }
+
+      function load() {
+        var saved = (window.HwrBookmarks ? window.HwrBookmarks.getBookmarks() : []) || [];
+        // Most-recently-saved first by default — matches "Recently
+        // Bookmarked" elsewhere on the site (box-three's own copy).
+        state.all = saved.slice().reverse();
+      }
+
+      function buildCatChips() {
+        var seen = [];
+        state.all.forEach(function (site) {
+          if (site.cat && seen.indexOf(site.cat) === -1) seen.push(site.cat);
+        });
+
+        if (seen.length < 2) {
+          // Nothing to filter between with 0-1 categories — skip the row.
+          catRow.innerHTML = '';
+          return;
+        }
+
+        var html = '<button type="button" class="filter-chip bm-cat-chip is-active" data-cat="all">All (' + state.all.length + ')</button>';
+        seen.forEach(function (cat) {
+          var count = state.all.filter(function (s) { return s.cat === cat; }).length;
+          html += '<button type="button" class="filter-chip bm-cat-chip" data-cat="' + cat + '">' + label(cat) + ' (' + count + ')</button>';
+        });
+        catRow.innerHTML = html;
+
+        catRow.querySelectorAll('.bm-cat-chip').forEach(function (chip) {
+          chip.addEventListener('click', function () {
+            state.cat = chip.getAttribute('data-cat');
+            catRow.querySelectorAll('.bm-cat-chip').forEach(function (c) {
+              c.classList.toggle('is-active', c === chip);
+            });
+            render();
+          });
+        });
+      }
+
+      function renderCard(site) {
+        var a = document.createElement('a');
+        a.href = site.link;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'web-item';
+
+        a.innerHTML =
+          '<span class="web-icon-wrap" data-name="' + (site.name || '?') + '">' +
+          '<img src="' + site.icon + '" class="web-icon" alt="" loading="lazy" ' +
+          'onerror="window.hwrIconFallback(this);" onload="window.hwrIconCheckPlaceholder(this);">' +
+          '</span>' +
+          '<div class="web-info">' +
+          '<div class="web-title">' + site.name + '</div>' +
+          '<div class="web-sub">' + (site.sub || '') + '</div>' +
+          '</div>' +
+          '<span class="web-actions">' +
+          '<button type="button" class="web-bookmark-btn is-bookmarked" aria-label="Remove bookmark" aria-pressed="true">' +
+          BOOKMARK_ICON +
+          '</button>' +
+          '</span>';
+
+        a.querySelector('.web-bookmark-btn').addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!window.HwrBookmarks) return;
+          window.HwrBookmarks.toggleBookmark(site); // already saved, so this removes it
+          load();
+          buildCatChips();
+          render();
+          updateHeroLastSaved();
+          // Keep box-three's own "Recently Bookmarked" mini-list (if this
+          // page has one) in sync, same hooks the rest of the site calls
+          // after a bookmark change.
+          if (window.hwrRefreshBoxThreeBookmarks) window.hwrRefreshBoxThreeBookmarks();
+          if (window.hwrRefreshStbSettingsBookmarks) window.hwrRefreshStbSettingsBookmarks();
+        });
+
+        return a;
+      }
+
+      function render() {
+        var q = state.query.trim().toLowerCase();
+        var list = state.all.filter(function (site) {
+          if (state.cat !== 'all' && site.cat !== state.cat) return false;
+          if (!q) return true;
+          return (site.name || '').toLowerCase().indexOf(q) !== -1 ||
+            (site.sub || '').toLowerCase().indexOf(q) !== -1;
+        });
+
+        if (state.sort === 'az') {
+          list.sort(function (a, b) { return (a.name || '').localeCompare(b.name || ''); });
+        } else if (state.sort === 'za') {
+          list.sort(function (a, b) { return (b.name || '').localeCompare(a.name || ''); });
+        }
+
+        headerCount.textContent = state.all.length + (state.all.length === 1 ? ' saved' : ' saved');
+
+        if (state.all.length === 0) {
+          controlsAndGrid.forEach(function (el) { el.style.display = 'none'; });
+          emptyFiltered.classList.remove('is-visible');
+          emptyNone.classList.add('is-visible');
+          return;
+        }
+
+        emptyNone.classList.remove('is-visible');
+        controlsAndGrid.forEach(function (el) { el.style.display = ''; });
+        // Category row hides itself via CSS (:empty) when buildCatChips()
+        // decided there weren't enough categories to bother with.
+
+        grid.innerHTML = '';
+        if (list.length === 0) {
+          emptyFiltered.classList.add('is-visible');
+        } else {
+          emptyFiltered.classList.remove('is-visible');
+          list.forEach(function (site) { grid.appendChild(renderCard(site)); });
+        }
+      }
+
+      // Search
+      searchInput.addEventListener('input', function () {
+        state.query = searchInput.value;
+        searchClear.style.display = state.query ? 'flex' : 'none';
+        render();
+      });
+      searchClear.addEventListener('click', function () {
+        searchInput.value = '';
+        state.query = '';
+        searchClear.style.display = 'none';
+        render();
+      });
+
+      // Sort
+      sortSelect.addEventListener('change', function () {
+        state.sort = sortSelect.value;
+        render();
+      });
+
+      // View mode (list / box) — .web-list.is-compact already has full
+      // desktop + mobile styling in hwr-css.css, same class the rest of
+      // the site's Box view uses.
+      function setView(mode) {
+        state.view = mode;
+        grid.classList.toggle('is-compact', mode === 'box');
+        viewListBtn.classList.toggle('is-active', mode === 'list');
+        viewBoxBtn.classList.toggle('is-active', mode === 'box');
+        viewListBtn.setAttribute('aria-pressed', mode === 'list');
+        viewBoxBtn.setAttribute('aria-pressed', mode === 'box');
+      }
+      viewListBtn.addEventListener('click', function () { setView('list'); });
+      viewBoxBtn.addEventListener('click', function () { setView('box'); });
+
+      // Clear filters (shown inside the "no matches" empty state)
+      emptyFilteredClear.addEventListener('click', function () {
+        searchInput.value = '';
+        state.query = '';
+        state.cat = 'all';
+        searchClear.style.display = 'none';
+        catRow.querySelectorAll('.bm-cat-chip').forEach(function (c) {
+          c.classList.toggle('is-active', c.getAttribute('data-cat') === 'all');
+        });
+        render();
+      });
+
+      // Clear all — wipes every saved bookmark after a plain confirm().
+      clearAllBtn.addEventListener('click', function () {
+        if (!state.all.length) return;
+        if (!confirm('Remove all ' + state.all.length + ' saved bookmarks? This can\'t be undone.')) return;
+        if (!window.HwrBookmarks) return;
+        window.HwrBookmarks.clearBookmarks();
+        load();
+        buildCatChips();
+        render();
+        updateHeroLastSaved();
+        if (window.hwrRefreshBoxThreeBookmarks) window.hwrRefreshBoxThreeBookmarks();
+        if (window.hwrRefreshStbSettingsBookmarks) window.hwrRefreshStbSettingsBookmarks();
+      });
+
+      setView('list');
+      load();
+      buildCatChips();
+      render();
+      updateHeroLastSaved();
+    });
+  </script>
+
+<script>
+/* ===================================================
+   DISCOVER MORE (box-three) — builds the category cards.
+
+   Reuses window.HwrCategoriesPromise / HwrWebsitesPromise from hwr-js.js,
+   so this adds no extra network request; both are already in flight by
+   the time this runs.
+
+   HOW MANY CARDS: as many as fit. The shared initBoxThreeBookmarks() that
+   normally owns this slot stretches its last card to fill box-three's
+   leftover height, but it bails on this page (no #sbTwoBookmarksSection),
+   so filling the column is this block's job instead. Cards are appended
+   one at a time and the last one is pulled back off as soon as the panel
+   would outgrow the viewport budget — no hardcoded card count or height,
+   so it stays correct if either is restyled later.
+   =================================================== */
+(function initBoxThreeDiscover(){
+  var section = document.getElementById('sbTwoDiscoverSection');
+  var grid = document.getElementById('sbTwoDiscoverGrid');
+  if(!section || !grid) return;
+
+  var panel = document.getElementById('boxThreePanel') || section.parentElement;
+  var STICKY_TOP = 20;      // same budget initBoxThreeBookmarks() uses
+  var BOTTOM_GAP = 20;
+
+  // Mirrors HWR_PAGE_CAT_MAP in hwr-js.js. Read from the global when it is
+  // there; that map is defined inside the category-page render path, which
+  // does not run on this page, so the copy is the fallback rather than the
+  // other way round.
+  var CAT_MAP = window.HWR_PAGE_CAT_MAP || {
+    'hwr-ai.html': 'ai', 'hwr-anime.html': 'anime', 'hwr-asiandrama.html': 'asiandrama',
+    'hwr-games.html': 'gaming', 'hwr-manga.html': 'manga', 'hwr-movies.html': 'movies',
+    'hwr-music.html': 'music', 'hwr-parcode.html': 'parcode', 'hwr-torrent.html': 'torrenting',
+    'hwr-webgames.html': 'webgaming', 'hwr-fun.html': 'fun'
+  };
+
+  var cats = [];
+  var counts = {};
+
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function shuffle(list){
+    var a = list.slice();
+    for(var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCard(cat){
+    var slug = CAT_MAP[cat.link];
+    var n = counts[slug];
+    var sub = n ? (n + (n === 1 ? ' site' : ' sites')) : 'Browse category';
+    var initial = (cat.name || '?').trim().charAt(0).toUpperCase();
+
+    var a = document.createElement('a');
+    a.className = 'b3-discover-item';
+    a.href = cat.link;
+    a.title = cat.name + ' — ' + sub;
+    a.innerHTML =
+      '<span class="b3-discover-img-wrap">' +
+        '<img class="b3-discover-img" src="' + esc(cat.bg) + '" alt="" loading="lazy"' +
+          (cat.bgStyle ? ' style="' + esc(cat.bgStyle) + '"' : '') + '>' +
+      '</span>' +
+      '<span class="b3-discover-shade"></span>' +
+      '<span class="b3-discover-badge" data-fallback="' + esc(initial) + '">' +
+        '<img src="' + esc(cat.icon) + '" alt="" loading="lazy">' +
+      '</span>' +
+      '<span class="b3-discover-info">' +
+        '<span class="b3-discover-name">' + esc(cat.name) + '</span>' +
+        '<span class="b3-discover-count">' + esc(sub) + '</span>' +
+      '</span>';
+    return a;
+  }
+
+  function render(){
+    if(!cats.length) return;
+    grid.innerHTML = '';
+    section.style.minHeight = '';
+
+    var budget = window.innerHeight - STICKY_TOP - BOTTOM_GAP;
+    var picks = shuffle(cats);
+
+    for(var i = 0; i < picks.length; i++){
+      var card = buildCard(picks[i]);
+      grid.appendChild(card);
+      // Always keep the first card even on a very short viewport, so the
+      // panel is never an empty titled box.
+      if(i > 0 && panel.scrollHeight > budget - BOTTOM_GAP){
+        grid.removeChild(card);
+        break;
+      }
+    }
+
+    if(window.HwrIcons){
+      window.HwrIcons.watchAll(grid, '.b3-discover-badge img',
+                               'web-icon-fallback', 'parent', 'data-fallback');
+    }
+  }
+
+  var t = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(t);
+    t = setTimeout(render, 150);
+  });
+
+  Promise.all([
+    window.HwrCategoriesPromise || Promise.resolve(null),
+    window.HwrWebsitesPromise || Promise.resolve(null)
+  ]).then(function(res){
+    var data = res[0], sites = res[1];
+    if(!data || !Array.isArray(data.categories)) return;
+    cats = data.categories.filter(function(c){ return c && c.link && c.name; });
+
+    if(Array.isArray(sites)){
+      sites.forEach(function(s){
+        if(s && s.cat) counts[s.cat] = (counts[s.cat] || 0) + 1;
+      });
+    }
+    render();
+  }).catch(function(err){
+    console.error('Discover More failed to load:', err);
+  });
+})();
+</script>
+</body>
+
+</html>

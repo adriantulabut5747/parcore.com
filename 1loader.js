@@ -70,3 +70,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // if loaderShown is false, body was never hidden, nothing to do
   });
 });
+

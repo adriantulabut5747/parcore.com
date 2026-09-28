@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XP Grind Audio Lab — Stem Test</title>
+<style>
+  :root {
+    --bg: #14110f;
+    --panel: #1d1917;
+    --line: #332c27;
+    --text: #f1ebe3;
+    --muted: #a99c8e;
+    --amber: #e8a33d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 40px 20px;
+  }
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+  .sub {
+    color: var(--muted);
+    margin-top: 0;
+    margin-bottom: 32px;
+    font-size: 15px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .panel h2 {
+    font-size: 16px;
+    margin: 0 0 6px 0;
+  }
+  .panel p.desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px 0;
+    line-height: 1.5;
+  }
+  input[type="file"] {
+    display: block;
+    width: 100%;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .modes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .mode-btn {
+    flex: 1;
+    min-width: 110px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 10px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .mode-btn.active {
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  button.primary {
+    width: 100%;
+    background: var(--amber);
+    color: #1a1410;
+    border: none;
+    padding: 12px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary:disabled {
+    background: #4a4038;
+    color: #8a7d70;
+    cursor: not-allowed;
+  }
+  audio {
+    width: 100%;
+    margin-top: 16px;
+  }
+  .status {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 10px;
+    min-height: 18px;
+  }
+  label.field-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  code {
+    display: block;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: pre-wrap;
+    margin-top: 12px;
+  }
+  .stem-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    margin-bottom: 8px;
+    background: var(--bg);
+  }
+  .stem-row.muted { opacity: 0.45; }
+  .stem-name { flex: 1; font-size: 14px; }
+  .stem-name small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+    word-break: break-all;
+  }
+  .stem-toggle {
+    min-width: 78px;
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .stem-row.muted .stem-toggle {
+    border-color: var(--line);
+    color: var(--muted);
+  }
+  .transport {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0 12px;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--amber);
+  }
+  .time {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 4px;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+  }
+  .note {
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    margin-top: 28px;
+    padding-top: 16px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Stem Test Lab</h1>
+  <p class="sub">Upload your own audio file to try instrument/vocal isolation. No song downloading here — bring a file you already have rights to.</p>
+
+  <div class="panel">
+    <h2>1. In-browser vocal isolation</h2>
+    <p class="desc">Runs instantly, no server or API. Uses center-channel cancellation — subtracts the right channel from the left, which removes audio that's panned dead-center in the stereo mix (often vocals). It's a rough trick, not real AI separation, but it works for a quick proof of concept.</p>
+    <input type="file" id="fileInput" accept="audio/*">
+    <div class="modes">
+      <button class="mode-btn active" data-mode="original">Original</button>
+      <button class="mode-btn" data-mode="novocal">Remove center (vocal-ish)</button>
+    </div>
+    <audio id="player" controls></audio>
+    <div class="status" id="status1"></div>
+  </div>
+
+  <div class="panel">
+    <h2>2. Real 4-stem separation (Demucs)</h2>
+    <p class="desc">There is no API key for this. Demucs is a model that runs on your own computer &mdash; you separate a song from the terminal, and it writes four WAV files. Load all four here and they play locked in sync, so muting one part leaves the rest of the band playing.</p>
+    <label class="field-label">Select all 4 WAV files at once (vocals, drums, bass, other)</label>
+    <input type="file" id="stemInput" accept="audio/*" multiple>
+    <div id="stemList"><p class="empty">No stems loaded yet.</p></div>
+    <div class="transport">
+      <button class="mode-btn" id="playBtn" disabled>Play</button>
+      <button class="mode-btn" id="stopBtn" disabled>Stop</button>
+      <button class="mode-btn" id="allOnBtn" disabled>Unmute all</button>
+    </div>
+    <input type="range" id="seek" min="0" max="1000" value="0" step="1" disabled>
+    <div class="time" id="timeLabel">0:00 / 0:00</div>
+    <div class="status" id="status2"></div>
+  </div>
+
+  <p class="note">
+    Center-channel cancellation only works on stereo tracks where vocals are mixed dead-center — it won't cleanly isolate drums or a specific guitar, and it'll sound thin/phasey. For anything close to production quality (splitting drums, bass, lead guitar separately), you need a real model like Demucs — Panel 2 is that real model &mdash; Demucs, running locally, no service and no key. Once the four stems play in sync here, the remaining work is only wrapping the same command in a small Python server so the page can do the separation itself instead of you running it by hand.
+  </p>
+  
+</main>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const player = document.getElementById('player');
+  const status1 = document.getElementById('status1');
+  const modeBtns = document.querySelectorAll('.mode-btn');
+  let audioCtx, sourceBuffer, currentMode = 'original';
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    status1.textContent = 'Decoding audio...';
+    const arrayBuffer = await file.arrayBuffer();
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    sourceBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    status1.textContent = 'Loaded. ' + sourceBuffer.numberOfChannels + ' channel(s), ' + sourceBuffer.duration.toFixed(1) + 's';
+    renderMode(currentMode);
+  });
+
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+      if (sourceBuffer) renderMode(currentMode);
+    });
+  });
+
+  function renderMode(mode) {
+    if (!sourceBuffer) return;
+    status1.textContent = 'Processing...';
+    if (mode === 'original' || sourceBuffer.numberOfChannels < 2) {
+      const blob = bufferToWavBlob(sourceBuffer);
+      player.src = URL.createObjectURL(blob);
+      status1.textContent = mode === 'novocal' && sourceBuffer.numberOfChannels < 2
+        ? 'This file is mono — center-channel removal needs stereo audio.'
+        : 'Playing original.';
+      return;
+    }
+    const left = sourceBuffer.getChannelData(0);
+    const right = sourceBuffer.getChannelData(1);
+    const out = audioCtx.createBuffer(2, sourceBuffer.length, sourceBuffer.sampleRate);
+    const outL = out.getChannelData(0);
+    const outR = out.getChannelData(1);
+    for (let i = 0; i < sourceBuffer.length; i++) {
+      const diff = left[i] - right[i];
+      outL[i] = diff;
+      outR[i] = diff;
+    }
+    const blob = bufferToWavBlob(out);
+    player.src = URL.createObjectURL(blob);
+    status1.textContent = 'Center-channel removed. Compare against Original.';
+  }
+
+  function bufferToWavBlob(buffer) {
+    const numChannels = buffer.numberOfChannels;
+    const length = buffer.length * numChannels * 2 + 44;
+    const arrBuf = new ArrayBuffer(length);
+    const view = new DataView(arrBuf);
+    const writeString = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+    writeString(0, 'RIFF');
+    view.setUint32(4, length - 8, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, buffer.sampleRate, true);
+    view.setUint32(28, buffer.sampleRate * numChannels * 2, true);
+    view.setUint16(32, numChannels * 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, 'data');
+    view.setUint32(40, length - 44, true);
+    let offset = 44;
+    for (let i = 0; i < buffer.length; i++) {
+      for (let ch = 0; ch < numChannels; ch++) {
+        let sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+    }
+    return new Blob([arrBuf], { type: 'audio/wav' });
+  }
+
+  // ---- Stem mixer: 4 buffers started off one clock so they cannot drift ----
+  const STEM_ORDER = ['vocals', 'drums', 'bass', 'other'];
+  const stemInput  = document.getElementById('stemInput');
+  const stemList   = document.getElementById('stemList');
+  const playBtn    = document.getElementById('playBtn');
+  const stopBtn    = document.getElementById('stopBtn');
+  const allOnBtn   = document.getElementById('allOnBtn');
+  const seek       = document.getElementById('seek');
+  const timeLabel  = document.getElementById('timeLabel');
+  const status2    = document.getElementById('status2');
+
+  let mixCtx = null;
+  let stems = {};        // name -> { buffer, gain, muted, filename }
+  let sources = [];      // live AudioBufferSourceNodes for this playthrough
+  let playing = false;
+  let startedAt = 0;     // ctx time the current playthrough began
+  let offset = 0;        // seconds into the song that playthrough began at
+  let duration = 0;
+  let ticker = null;
+  let scrubbing = false;
+
+  stemInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    hardStop();
+    stems = {};
+    status2.textContent = 'Decoding ' + files.length + ' file(s)...';
+    mixCtx = mixCtx || new (window.AudioContext || window.webkitAudioContext)();
+
+    const leftovers = [];
+    for (const f of files) {
+      const name = f.name.toLowerCase();
+      const match = STEM_ORDER.find(k => name.includes(k) && !stems[k]);
+      if (match) { await addStem(match, f); } else { leftovers.push(f); }
+    }
+    // Files renamed so they no longer say "vocals"/"drums"/etc: fill remaining slots in order.
+    for (const f of leftovers) {
+      const slot = STEM_ORDER.find(k => !stems[k]);
+      if (slot) await addStem(slot, f);
+    }
+
+    const loaded = STEM_ORDER.filter(k => stems[k]);
+    if (!loaded.length) { status2.textContent = 'Could not decode any of those files.'; return; }
+
+    duration = Math.max.apply(null, loaded.map(k => stems[k].buffer.duration));
+    offset = 0;
+    renderStems();
+    playBtn.disabled = stopBtn.disabled = allOnBtn.disabled = seek.disabled = false;
+    updateClock(0);
+    status2.textContent = 'Loaded ' + loaded.length + ' stem(s): ' + loaded.join(', ') + '. ' +
+      (loaded.length < 4 ? 'Expected 4 - check you selected them all. ' : '') +
+      'Press Play, then mute a part.';
+  });
+
+  async function addStem(key, file) {
+    try {
+      const buf = await mixCtx.decodeAudioData(await file.arrayBuffer());
+      const gain = mixCtx.createGain();
+      gain.connect(mixCtx.destination);
+      stems[key] = { buffer: buf, gain: gain, muted: false, filename: file.name };
+    } catch (err) {
+      status2.textContent = 'Could not decode ' + file.name + ': ' + err.message;
+    }
+  }
+
+  function renderStems() {
+    stemList.innerHTML = '';
+    STEM_ORDER.forEach(key => {
+      const st = stems[key];
+      if (!st) return;
+      const row = document.createElement('div');
+      row.className = 'stem-row' + (st.muted ? ' muted' : '');
+      const label = document.createElement('div');
+      label.className = 'stem-name';
+      label.textContent = key;
+      const sub = document.createElement('small');
+      sub.textContent = st.filename;
+      label.appendChild(sub);
+      row.appendChild(label);
+      const btn = document.createElement('button');
+      btn.className = 'stem-toggle';
+      btn.textContent = st.muted ? 'Muted' : 'On';
+      btn.addEventListener('click', () => {
+        st.muted = !st.muted;
+        // Ramp rather than a hard jump - a step change in gain clicks audibly.
+        st.gain.gain.setTargetAtTime(st.muted ? 0 : 1, mixCtx.currentTime, 0.01);
+        row.classList.toggle('muted', st.muted);
+        btn.textContent = st.muted ? 'Muted' : 'On';
+      });
+      row.appendChild(btn);
+      stemList.appendChild(row);
+    });
+  }
+
+  function startSources(at) {
+    stopSources();
+    if (at >= duration) at = 0;
+    const t = mixCtx.currentTime + 0.06;  // lead time so all four are scheduled before any starts
+    STEM_ORDER.forEach(key => {
+      const st = stems[key];
+      if (!st) return;
+      const src = mixCtx.createBufferSource();
+      src.buffer = st.buffer;
+      src.connect(st.gain);
+      src.start(t, at);
+      sources.push(src);
+    });
+    startedAt = t;
+    offset = at;
+    playing = true;
+    playBtn.textContent = 'Pause';
+    if (ticker) clearInterval(ticker);
+    ticker = setInterval(tick, 100);
+  }
+
+  function stopSources() {
+    sources.forEach(s => { try { s.stop(); } catch (err) {} });
+    sources = [];
+  }
+
+  function elapsed() {
+    return playing ? Math.min(duration, mixCtx.currentTime - startedAt + offset) : offset;
+  }
+
+  function pause() {
+    offset = elapsed();
+    stopSources();
+    playing = false;
+    playBtn.textContent = 'Play';
+    if (ticker) { clearInterval(ticker); ticker = null; }
+  }
+
+  function hardStop() {
+    stopSources();
+    playing = false;
+    offset = 0;
+    if (ticker) { clearInterval(ticker); ticker = null; }
+    playBtn.textContent = 'Play';
+    updateClock(0);
+  }
+
+  function tick() {
+    const e = elapsed();
+    if (e >= duration - 0.02) { hardStop(); return; }
+    if (!scrubbing) updateClock(e);
+  }
+
+  function updateClock(sec) {
+    timeLabel.textContent = fmt(sec) + ' / ' + fmt(duration);
+    if (!scrubbing) seek.value = duration ? Math.round((sec / duration) * 1000) : 0;
+  }
+
+  function fmt(sec) {
+    if (!isFinite(sec) || sec < 0) return '0:00';
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (!mixCtx) return;
+    if (mixCtx.state === 'suspended') mixCtx.resume();
+    if (playing) pause(); else startSources(offset);
+  });
+
+  stopBtn.addEventListener('click', hardStop);
+
+  allOnBtn.addEventListener('click', () => {
+    STEM_ORDER.forEach(key => {
+      const st = stems[key];
+      if (!st) return;
+      st.muted = false;
+      st.gain.gain.setTargetAtTime(1, mixCtx.currentTime, 0.01);
+    });
+    renderStems();
+  });
+
+  seek.addEventListener('input', () => {
+    scrubbing = true;
+    timeLabel.textContent = fmt((seek.value / 1000) * duration) + ' / ' + fmt(duration);
+  });
+
+  seek.addEventListener('change', () => {
+    const target = (seek.value / 1000) * duration;
+    scrubbing = false;
+    if (playing) startSources(target); else { offset = target; updateClock(target); }
+  });
+</script>
+</body>
+</html>
