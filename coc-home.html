@@ -2109,7 +2109,7 @@ function warModalEscHandler(e) {
           <div class="th-meta">
             <span class="th-label">Town Hall</span>
             <span class="th-name">18</span>
-            <span class="th-count">13 layouts <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            <span class="th-count"><span data-count-from="th18-layouts.json">13 layouts</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </div>
         </div>
       </a>
@@ -2121,7 +2121,7 @@ function warModalEscHandler(e) {
           <div class="th-meta">
             <span class="th-label">Town Hall</span>
             <span class="th-name">17</span>
-            <span class="th-count">41 layouts <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            <span class="th-count"><span data-count-from="th17-layouts.json">30 layouts</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </div>
         </div>
       </a>
@@ -2223,6 +2223,25 @@ function warModalEscHandler(e) {
       </a>
 
     </div>
+<script>
+// Layout counts on the Town Hall cards: a count wrapped in
+// [data-count-from] is read from that TH's JSON (the number of bases in it),
+// so adding or removing a base updates it here too. The typed number is the
+// fallback if the file can't be read. Town Halls still on the old design have
+// no JSON yet and keep their typed number.
+(function () {
+  if (!window.fetch) return;
+  document.querySelectorAll('[data-count-from]').forEach(function (el) {
+    fetch(el.getAttribute('data-count-from'))
+      .then(function (r) { return r.json(); })
+      .then(function (page) {
+        var n = (page.bases || []).length;
+        if (n) el.textContent = n + (n === 1 ? ' layout' : ' layouts');
+      })
+      .catch(function () {});
+  });
+})();
+</script>
 
 
 </div></div>

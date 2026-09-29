@@ -407,15 +407,22 @@
 
       if (hubScroll && data.primaryNav) {
         var order = ['home', 'layouts', 'armies', 'guides'];
+        // Layouts / Armies point at THIS Town Hall's pages (primaryNav only
+        // holds TH18's), the same way thz-script.js repoints the bottom nav.
+        var th = (data.townhalls || []).find(function (t) {
+          return (t.activeOn || []).map(normalize).indexOf(currentPage) !== -1;
+        });
+        var hrefFor = { layouts: th && th.layoutHref, armies: th && th.armyHref };
         hubScroll.innerHTML = order
           .map(function (key) {
             var item = data.primaryNav[key];
             var icon = HUB_ICONS[key];
             if (!item || !icon) return '';
-            var isActive = normalize(item.href) === currentPage;
+            var href = hrefFor[key] || item.href;
+            var isActive = normalize(href) === currentPage;
             return (
               '<a href="' +
-              item.href +
+              href +
               '" class="stb-hub-link' +
               (isActive ? ' active' : '') +
               '">' +
