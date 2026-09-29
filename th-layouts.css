@@ -1730,43 +1730,60 @@ html.loaded {
   }
 }
 
-/* ---- Show more (replaced the page-2 files, Sep 2026) -------------------
-   The first 10 bases show; th-layouts.js hides the rest (the [hidden]
-   attribute) and puts "Show N more" under the grid, in the page-number
-   spot (.pagination-wrap keeps its spacing). One press shows them all.
-   Same keycap as the active page number it replaced. */
+/* ---- Pages (one HTML file per Town Hall, Sep 2026) ---------------------
+   th-layouts.js shows 10 bases at a time and hides the rest ([hidden]);
+   the page numbers under the grid (#layout-pages) are built by it too, and
+   the whole row stays hidden when a TH has only one page. "Prev" mirrors
+   the existing "Next" styling above. */
 .discord-card[hidden],
-.show-more-wrap[hidden] {
+.pagination-wrap[hidden] {
   display: none;
 }
-.show-more-wrap {
-  display: flex;
-  justify-content: center;
-}
-.show-more {
-  min-height: 40px;
-  padding: 0 22px;
+.coc-content .pagination a.prev {
+  margin-right: 2px;
+  padding: 0 8px;
+  background: none;
   border: 0;
   border-radius: 8px;
-  background: var(--key-face);
-  box-shadow: var(--key-edge);
-  color: var(--text-main);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11.5px;
-  font-weight: 800;
+  font-size: 11px;
   letter-spacing: 1.3px;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.2s;
 }
-.show-more:hover {
-  background: var(--key-face-hover);
+.coc-content .pagination a.prev:hover {
+  background: none;
+  color: var(--text-main);
 }
-.show-more:active {
-  box-shadow: var(--key-pressed);
-  transform: translateY(3px);
+.pagination a.prev svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  transition: transform 0.18s ease;
 }
-.show-more:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 2px;
+.pagination a.prev:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Phone breadcrumb: "Townhall 18 Layouts / Page 1/2" in the secondary top
+   bar -- the same treatment as the HWR pages' #scMobileGroup (hwr-css.css):
+   0.9em, regular weight after the title's 500, and a grey "/" drawn by
+   ::before so the script only sets the text. Empty (one-page TH) = hidden.
+   Desktop: not shown. */
+.stb-page {
+  display: none;
+}
+@media (max-width: 970px) {
+  .stb-page {
+    display: inline;
+    font-size: 0.9em;
+    font-weight: 400;
+  }
+  .stb-page:empty {
+    display: none;
+  }
+  .stb-page::before {
+    content: '/';
+    margin: 0 6px;
+    color: #6f6f6f;
+    font-weight: 400;
+  }
 }

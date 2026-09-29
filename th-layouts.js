@@ -439,13 +439,16 @@
     });
 })();
 
-// ---- Layout cards -------------------------------------------------------
-// Built from the page's JSON (<div class="grid-container" data-layouts=
-// "th18-layouts.json">), one card per entry in "bases", in order. The first
-// PAGE_SIZE show; the rest wait behind a "Show N more" button (this replaced
-// the separate th18-layouts2.html page, Sep 2026). A shared link to a hidden
-// base (#base-th18-14) opens them all first. Likes, CC popups and share are
-// wired up once every card exists.
+// ---- Layout cards + pages ---------------------------------------------
+// Cards are built from the page's JSON (<div class="grid-container"
+// data-layouts="th18-layouts.json">), one per entry in "bases", in order,
+// and shown PAGE_SIZE at a time. All the pages live in this one HTML file
+// (th18-layouts2.html is only a redirect now): page 2 is ?page=2, so
+// refresh keeps the page, Back returns to the previous one and page links
+// can be shared. Changing page jumps to the very top. On phones the
+// secondary top bar shows "Townhall 18 Layouts / Page 1/2" (#stbPage). A
+// shared link to a base on another page (#base-th18-14) opens that page.
+// Likes, CC popups and share are wired up once every card exists.
 (function layoutCards() {
   var grid = document.querySelector('.grid-container[data-layouts]');
   if (!grid || !window.fetch) return;
@@ -458,84 +461,129 @@
     '<svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>';
   var SHARE =
     '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>';
+  // Template tag: builds the string, then drops the whitespace between tags.
+  function tidy(strings) {
+    var out = strings[0];
+    for (var i = 1; i < strings.length; i++) out += arguments[i] + strings[i];
+    return out.replace(/>\s+</g, '><').trim();
+  }
+  function arrow(d) {
+    return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="${d}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
 
-  function cardHtml(page, b, hidden) {
+  function cardHtml(page, b) {
     var id = 'th' + page.th + '-' + b.id;
-    var cc = (b.cc && b.cc.length ? b.cc : ['NA'])
-      .map(function (t) {
-        return '<li>' + esc(t) + '</li>';
-      })
-      .join('');
-    return (
-      '<div class="discord-card" id="base-' +
-      id +
-      '"' +
-      (hidden ? ' hidden' : '') +
-      '>' +
-      '<div class="card-media">' +
-      '<img src="' +
-      esc(page.imageDir + b.image) +
-      '" alt="TH' +
-      page.th +
-      ' base layout ' +
-      b.id +
-      '" class="zoomable" loading="lazy" onclick="openPalette(this)">' +
-      '<button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="' +
-      esc(page.icon) +
-      '" alt="" decoding="async"></button>' +
-      '<div class="cc-popup"><strong>Recommended CC</strong><ul>' +
-      cc +
-      '</ul></div>' +
-      '</div>' +
-      '<div class="action-row card-bar">' +
-      '<button type="button" class="corner-like" data-layout-id="' +
-      id +
-      '" aria-pressed="false" aria-label="Like this base" title="Like this base">' +
-      HEART +
-      '<span class="like-count" data-layout-count hidden>0</span></button>' +
-      '<a class="layout-link" href="' +
-      esc(b.link) +
-      '" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>' +
-      '<button type="button" class="card-share" data-share="base-' +
-      id +
-      '" aria-label="Share this base" title="Share this base">' +
-      SHARE +
-      '</button>' +
-      '</div>' +
-      '</div>'
-    );
+    var cc = (b.cc && b.cc.length ? b.cc : ['NA']).map((t) => `<li>${esc(t)}</li>`).join('');
+    // Indented here for reading; the whitespace between tags is stripped
+    // so the built card is exactly the old hand-written markup.
+    return tidy`
+      <div class="discord-card" id="base-${id}">
+        <div class="card-media">
+          <img src="${esc(page.imageDir + b.image)}" alt="TH${page.th} base layout ${b.id}" class="zoomable" loading="lazy" onclick="openPalette(this)">
+          <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="${esc(page.icon)}" alt="" decoding="async"></button>
+          <div class="cc-popup"><strong>Recommended CC</strong><ul>${cc}</ul></div>
+        </div>
+        <div class="action-row card-bar">
+          <button type="button" class="corner-like" data-layout-id="${id}" aria-pressed="false" aria-label="Like this base" title="Like this base">${HEART}<span class="like-count" data-layout-count hidden>0</span></button>
+          <a class="layout-link" href="${esc(b.link)}" target="_blank" rel="noopener noreferrer" title="Open this base in Clash of Clans">Copy Layout</a>
+          <button type="button" class="card-share" data-share="base-${id}" aria-label="Share this base" title="Share this base">${SHARE}</button>
+        </div>
+      </div>`;
   }
 
   fetch(grid.getAttribute('data-layouts'))
-    .then(function (r) {
-      return r.json();
-    })
+    .then((r) => r.json())
     .then(function (page) {
-      var bases = page.bases || [];
-      grid.innerHTML = bases
-        .map(function (b, i) {
-          return cardHtml(page, b, i >= PAGE_SIZE);
-        })
-        .join('');
+      grid.innerHTML = (page.bases || []).map((b) => cardHtml(page, b)).join('');
+      var cards = [].slice.call(grid.children);
+      var pages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
+      var nav = document.getElementById('layout-pages');
+      var crumb = document.getElementById('stbPage');
+      var current = 0;
 
-      var more = document.getElementById('show-more');
-      function revealAll() {
-        grid.querySelectorAll('.discord-card[hidden]').forEach(function (c) {
-          c.hidden = false;
+      function pageFromUrl() {
+        var n = parseInt(new URLSearchParams(location.search).get('page'), 10);
+        return n >= 1 && n <= pages ? n : 1;
+      }
+      // Page 1 is the plain address; later pages add ?page=N.
+      function urlFor(n) {
+        var q = new URLSearchParams(location.search);
+        if (n > 1) q.set('page', n);
+        else q.delete('page');
+        var qs = q.toString();
+        return location.pathname + (qs ? '?' + qs : '');
+      }
+      function navHtml() {
+        var h = '';
+        if (current > 1) h += `<a href="${urlFor(current - 1)}" class="prev" data-page="${current - 1}">${arrow('M15 5l-7 7 7 7')}Prev</a>`;
+        for (var i = 1; i <= pages; i++) {
+          h +=
+            i === current
+              ? `<a href="${urlFor(i)}" class="page active" data-page="${i}" aria-current="page">${i}</a>`
+              : `<a href="${urlFor(i)}" class="page" data-page="${i}">${i}</a>`;
+        }
+        if (current < pages)
+          h += `<a href="${urlFor(current + 1)}" class="next" data-page="${current + 1}">Next${arrow('M9 5l7 7-7 7')}</a>`;
+        return h;
+      }
+      function show(n) {
+        current = n;
+        cards.forEach(function (c, i) {
+          c.hidden = Math.floor(i / PAGE_SIZE) + 1 !== n;
         });
-        if (more) more.parentElement.hidden = true;
+        if (nav) {
+          nav.innerHTML = navHtml();
+          nav.parentElement.hidden = pages < 2;
+        }
+        if (crumb) crumb.textContent = pages > 1 ? 'Page ' + n + '/' + pages : '';
       }
-      if (more && bases.length > PAGE_SIZE) {
-        more.textContent = 'Show ' + (bases.length - PAGE_SIZE) + ' more';
-        more.parentElement.hidden = false;
-        more.addEventListener('click', revealAll);
+      // Desktop scrolls .coc-main, phones scroll the page itself: reset
+      // both. Instant, not smooth -- the cards have already changed.
+      function toTop() {
+        var main = document.querySelector('.coc-main');
+        if (main) {
+          main.style.scrollBehavior = 'auto';
+          main.scrollTop = 0;
+          main.style.scrollBehavior = '';
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' });
       }
+
+      if (nav) {
+        nav.addEventListener('click', function (e) {
+          var a = e.target.closest('a[data-page]');
+          if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return; // new-tab clicks follow the link
+          e.preventDefault();
+          var n = +a.getAttribute('data-page');
+          if (n === current) return;
+          history.pushState({ page: n }, '', urlFor(n));
+          show(n);
+          toTop();
+        });
+      }
+      // Back / Forward between pages. Hash links (#events-section) fire
+      // this too, so only act when the page number actually changed.
+      window.addEventListener('popstate', function () {
+        var n = pageFromUrl();
+        if (n !== current) {
+          show(n);
+          toTop();
+        }
+      });
+      // For share links: switch to whichever page holds this card.
+      function showCard(card) {
+        var n = Math.floor(cards.indexOf(card) / PAGE_SIZE) + 1;
+        if (n === current) return;
+        history.replaceState(null, '', urlFor(n) + location.hash);
+        show(n);
+      }
+      show(pageFromUrl());
 
       // Like counts: one Firestore doc per page, named after the file
       // (layoutLikes/th18-layouts), keyed by each card's data-layout-id.
       initLayoutLikes('th' + page.th + '-layouts');
       initCcPopups();
-      initCardShare('TH' + page.th + ' base layout on Parchrome', revealAll);
+      initCardShare('TH' + page.th + ' base layout on Parchrome', showCard);
     })
     .catch(function (err) {
       console.error('Layout cards: failed to load ' + grid.getAttribute('data-layouts'), err);
@@ -696,7 +744,7 @@ function initCcPopups() {
 //    lists whatever apps that person has.
 //  - Desktop (or no share sheet): one small panel with Copy link and four
 //    share links. Discord has no web share link, so "Copy link" covers it.
-function initCardShare(title, revealAll) {
+function initCardShare(title, showCard) {
   var btns = document.querySelectorAll('.card-share[data-share]');
   if (!btns.length) return;
 
@@ -819,7 +867,7 @@ function initCardShare(title, revealAll) {
     if (!/^base-/.test(id)) return;
     var card = document.getElementById(id);
     if (!card) return;
-    if (card.hidden) revealAll(); // a base behind "Show more"
+    if (card.hidden) showCard(card); // a base on another page
     card.scrollIntoView({ block: 'center' });
     card.classList.remove('is-target');
     void card.offsetWidth;
