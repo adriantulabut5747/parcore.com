@@ -37,40 +37,21 @@ exports.handler = async function () {
 
   const headers = { Authorization: 'Bearer ' + key, Accept: 'application/json' };
   try {
-    // clan info + war log, asked for at the same time
-    const [clanRes, logRes] = await Promise.all([
-      fetch(API, { headers }),
-      fetch(API + '/warlog?limit=100', { headers })
-    ]);
-    if (!clanRes.ok) return reply(502, { error: 'Clash API answered ' + clanRes.status });
-    const c = await clanRes.json();
-    const log = logRes.ok ? await logRes.json() : null;
+    const res = await fetch(API, { headers });
+    if (!res.ok) return reply(502, { error: 'Clash API answered ' + res.status });
+    const c = await res.json();
 
+    // Streak = the game's own warWinStreak, so it matches what players see
+    // in-game (same choice as scripts/clan-stats.mjs).
     return reply(200, {
       level: c.clanLevel,
       members: c.members,
       maxMembers: 50,
       warLogPublic: !!c.isWarLogPublic,
       warWins: c.warWins,
-      warWinStreak: streakSkippingDraws(log) ?? c.warWinStreak
+      warWinStreak: c.warWinStreak
     }, 600);
   } catch (err) {
     return reply(502, { error: 'Could not reach the Clash API' });
   }
 };
-
-// Our win streak, the way the clan counts it: wins since the last LOSS.
-// Draws don't break it (they're skipped, not counted), and neither do
-// war-log entries without a result (CWL summaries). Newest war first.
-// Game's own warWinStreak is only the fallback if the log can't be read
-// (it didn't match this count -- 33 vs 36 when this was written).
-function streakSkippingDraws(log) {
-  if (!log || !Array.isArray(log.items)) return null;
-  let streak = 0;
-  for (const war of log.items) {
-    if (war.result === 'lose') return streak;
-    if (war.result === 'win') streak++;
-    // 'tie' or no result: skip
-  }
-  return streak;   // no loss anywhere in the log: every win it holds
-}

@@ -16,6 +16,8 @@
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
 <link rel="stylesheet" href="11layout.css">
+<!-- Live events + official clan card, shared with th18-layouts.html -->
+<link rel="stylesheet" href="coc-clan-clock.css">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AC | Parcore</title>
@@ -75,8 +77,14 @@ body {height: 100vh; background: var(--bg-main); color: var(--text-main); displa
  
 }                           
 /* Bases grid */
+/* Film grain (same look as th18-layouts): a tiny inline-SVG noise tile laid on
+   top of the background. Its average shade is set to match this dark
+   background, so it adds texture without making the page lighter.
+   Strength = the rect opacity (0.5) and the slope (0.5) in the SVG. */
 .coc-content {
-    background: linear-gradient(180deg, #070809 0%, #0b0505 100% );
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='-0.215'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E") 0 0 / 220px 220px,
+      linear-gradient(180deg, #070809 0%, #0b0505 100% );
 }
 
 @keyframes zoomIn {
@@ -200,7 +208,9 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain;}
 
 
 .coc-main{
- background: linear-gradient(180deg, #181818 0%, #0f0d0d 100%);
+ background:
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='-0.178'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='-0.178'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='-0.178'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E") 0 0 / 220px 220px,               /* film grain, see .coc-content */
+   linear-gradient(180deg, #181818 0%, #0f0d0d 100%);
 
   font-family: 'Segoe UI', sans-serif;}
 
@@ -1106,249 +1116,6 @@ Please open this page in Chrome for the best experience.</li><br>
   font-size: 16px;
 }
 
-/* CLASH CLOCK ---------------------------------------------------------- */
-/* Rebuilt to match the page's other listing sections (Featured Townhalls,
-   Clash Tools): same .layouts-title-box heading, same card material
-   (#121316, faint white border, 12px radius) and the same rule for colour
-   -- neutral everywhere, red only where something needs attention. The
-   old version gave each event its own accent hue (six at once) plus a
-   hex frame, and painted any live event's whole card red, so two red
-   cards shouted over the rest.
-
-   Now the only red is "happening now": a Live pill with a pulsing dot,
-   a red label and a red progress fill (no red border -- it made the
-   whole card shout again) -- and live cards move to the front of the
-   grid (order:-1), so what's running reads first.
-
-   The progress bar is new: coc-events.js already computed how far
-   through the current stretch each event is (the [data-progress] hook)
-   and nothing was showing it. For a running event it's how much of the
-   event has gone; for a reset or an upcoming event, how much of the
-   wait. Last section before the footer, hence the bottom padding. */
-.cc-section {
-  padding-bottom: 96px;
-}
-.cc-section .layouts-title { margin: 0; }
-
-.cc-event-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin: 0 12%;
-}
-
-.cc-event {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  padding: 18px 18px 16px;
-  border-radius: 12px;
-  background: #121316;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.25s ease;
-}
-
-.cc-event-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  margin-bottom: 18px;
-}
-/* Same icon tile as the Clash Tools cards. */
-.cc-event-icon {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  background: #1a1b1f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.cc-event-icon img {
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
-}
-.cc-event-name {
-  flex: 1;
-  min-width: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  color: #f1f2f4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Hidden unless coc-events.js marks the card live. Only Raid, CWL and
-   Clan Games carry one -- the resets are always "running", so a Live
-   badge on them would mean nothing. */
-.cc-live {
-  display: none;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(194, 59, 59, 0.14);
-  border: 1px solid rgba(194, 59, 59, 0.45);
-  color: #ff8a8a;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-}
-.cc-live::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ff6b6b;
-  box-shadow: 0 0 8px rgba(255, 107, 107, 0.9);
-  animation: cc-live-pulse 1.6s ease-in-out infinite;
-}
-@keyframes cc-live-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(0.75); }
-}
-
-/* The countdown. coc-events.js wraps each unit letter in a <span>, so
-   the digits lead and d/h/m step back; tabular so it doesn't jitter as
-   it ticks. */
-.cc-event-timer {
-  font-family: 'Orbitron', sans-serif;
-  font-variant-numeric: tabular-nums;
-  font-size: 28px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: #fff;
-  white-space: nowrap;
-  margin-bottom: 14px;
-}
-.cc-event-timer span {
-  font-size: 14px;
-  font-weight: 700;
-  color: #6f737a;
-  margin-left: 2px;
-}
-
-.cc-event-bar {
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-.cc-event-bar span {
-  display: block;
-  height: 100%;
-  width: 0;
-  border-radius: inherit;
-  background: #9ea3ab;
-}
-
-/* margin-top:auto keeps every card's footer on one line across a row. */
-.cc-event-meta {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-  margin-top: auto;
-}
-.cc-event-label {
-  flex-shrink: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: #8b9099;
-  white-space: nowrap;
-}
-/* The wall-clock time it lands on, in the reader's own timezone
-   (coc-events.js formats it) -- "13d 22h" can't be planned around, a
-   date can. */
-.cc-event-date {
-  min-width: 0;
-  font-family: 'Sora', sans-serif;
-  font-size: 11.5px;
-  color: #9ea3ab;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* HAPPENING NOW -- set by coc-events.js on whichever of Raid / CWL /
-   Clan Games is actually running. */
-.cc-event.is-live { order: -1; }
-.cc-event.is-live .cc-live { display: inline-flex; }
-.cc-event.is-live .cc-event-bar span { background: #c23b3b; }
-.cc-event.is-live .cc-event-label { color: #ff8a8a; }
-
-@media (prefers-reduced-motion: reduce) {
-  .cc-live::before { animation: none; }
-}
-
-/* 2 across below 1360px -- 3 across fits the numbers but starts cutting
-   dates short ("Sat, Sep 26, 04:0..." at 1280px), and a date you can't
-   read is worse than none. */
-@media (max-width: 1360px) {
-  .cc-event-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-/* Mobile: compact rows so six events don't run a full screen of scroll.
-   Icon + name + label/date on the left, countdown on the right, progress
-   bar along the bottom edge. */
-@media (max-width: 970px) {
-  .cc-section { padding-bottom: 64px; }
-  .cc-event-list {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-    margin: 0 5%;
-  }
-  .cc-event {
-    display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) auto;
-    grid-template-areas:
-      "icon name  timer"
-      "icon meta  timer"
-      "bar  bar   bar";
-    column-gap: 12px;
-    row-gap: 3px;
-    align-items: center;
-    padding: 12px 14px;
-  }
-  .cc-event-head { display: contents; }
-  .cc-event-icon { grid-area: icon; }
-  .cc-event-name { grid-area: name; font-size: 13.5px; }
-  .cc-live { display: none !important; }       /* the red label + bar carry it here */
-  .cc-event-timer {
-    grid-area: timer;
-    justify-self: end;
-    font-size: 22px;
-    margin: 0;
-  }
-  .cc-event-timer span { font-size: 12px; }
-  .cc-event-meta {
-    grid-area: meta;
-    justify-content: flex-start;
-    gap: 8px;
-    margin: 0;
-  }
-  .cc-event-label { font-size: 9px; letter-spacing: 1.1px; }
-  .cc-event-date { font-size: 11px; }
-  .cc-event-bar { grid-area: bar; height: 3px; margin: 10px 0 0; }
-}
-
-
 
 /* RIGHT COLUMN — four entry-point cards ------------------------------ */
 /* Base rule is a flush 2x2 -- this is what mobile/tablet use as-is. Desktop
@@ -1821,10 +1588,12 @@ function warModalEscHandler(e) {
      make the section read as lit from above. */
   background-color: #0a0a0b;
   background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='-0.215'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"),                /* film grain, see .coc-content */
     radial-gradient(120% 520px at 50% 0%, rgba(194, 59, 59, 0.07), transparent 60%),
     radial-gradient(90% 700px at 50% 0%, rgba(255, 255, 255, 0.035), transparent 70%),
     linear-gradient(180deg, #0d0d0f 0%, #0a0a0b 40%, #08080a 100%);
-  background-repeat: no-repeat;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;   /* the grain tiles; the glows don't */
+  background-size: 220px 220px, auto, auto, auto;
   /* Was 120px -- with nothing placed in it, that read as dead space before
      the feature banner rather than a deliberate gap. Trimmed to pair with
      the banner's own top fade (.cl-feature-scrim) instead of doing all the
@@ -1968,7 +1737,10 @@ function warModalEscHandler(e) {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  aspect-ratio: 16 / 10;
+  /* Only takes effect in the 2-column range (971-1399px): 1400px+ and
+     phones set their own ratios below. Was 16:10 -- ~237px tall cards in
+     5 rows made the grid ~1250px; 21:9 (the phone ratio) cuts it to ~880. */
+  aspect-ratio: 21 / 9;
   padding: 18px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2113,9 +1885,21 @@ function warModalEscHandler(e) {
   transform: translateX(3px);
 }
 
+/* Floor for the 21:9 cards on narrow desktops: at ~1000px they came out
+   115px tall, the TH18 "Latest" tag ran into the icon and the text stack
+   covered the whole base. 150px keeps the footer clear of the tag.
+   width:100% + min-width:0 are load-bearing: a grid item with a ratio
+   doesn't stretch, it derives its width from its height -- so the floor
+   made the cards 150 x 21/9 = 350px wide and pushed them over each other.
+   Pinning the width makes the height the side that gives: the card keeps
+   its column's width and just gets taller than 21:9 at the floor. */
+@media (min-width: 971px) and (max-width: 1399px) {
+  .th-card { width: 100%; min-width: 0; min-height: 150px; }
+}
+
 @media (min-width: 1400px) {
   .layouts-list { grid-template-columns: repeat(4, 1fr); }
-  /* Doubled class to beat .th-card's own aspect-ratio above. 16:9 is the
+  /* Doubled class to beat .th-card's own aspect-ratio (21:9) above. 16:9 is the
      screenshots' native ratio, so the wide cards show the full base. */
   .th-card.th-card--wide {
     grid-column: span 2;
@@ -2699,223 +2483,22 @@ function warModalEscHandler(e) {
 </style>
 
 
- <style>
-.tracker-container {
-  padding-top: 5px;
-  padding-bottom: 50px;
-  width: 100%;
-}
-
-/* ── OFFICIAL CLAN (.ct-quality-box) ─────────────────
-   Rebuilt. Was ported from home.html's .quality-box, but that version
-   capped the box at max-height:300px (it clipped its own content as soon
-   as the text wrapped), squeezed the image to 90% beside a 100%-wide
-   column on mobile, and its three icon links were unfilled placeholders
-   (facebook.com/yourprofile, discord.gg/yourserver, your@email.com).
-
-   Now the same card language as .th-card / .ct-card (#121316, faint white
-   border, 12px radius), with a soft red glow behind the Super Wizard so
-   the art has somewhere to sit. Copy column reuses the hero's kicker and
-   the .cl-feature-title treatment above it, so all three sections share
-   one voice. The two buttons are th18-layouts.html's .clan-action-row
-   pills -- "Join Our Clan" copies the tag, "Join Global Chat" opens the
-   in-game chat. */
-.ct-quality-box {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(200px, 36%);
-  margin: 40px 12%;
-  border-radius: 12px;
-  overflow: hidden;
-  background:
-    radial-gradient(50% 85% at 82% 78%, rgba(194, 59, 59, 0.2) 0%, rgba(194, 59, 59, 0) 72%),
-    #121316;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.ct-quality-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 40px 44px;
-}
-.ct-quality-content .ch-kicker { margin-bottom: 16px; }
-
-.ct-quality-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(22px, 2.1vw, 32px);
-  font-weight: 900;
-  line-height: 1.12;
-  letter-spacing: -0.2px;
-  text-transform: uppercase;
-  color: #f2f3f5;
-  margin: 0 0 14px;
-}
-.ct-quality-title em {
-  font-style: normal;
-  color: #c23b3b;
-  text-shadow: 0 0 18px rgba(194, 59, 59, 0.4);
-}
-
-.ct-quality-text {
-  font-family: 'Sora', sans-serif;
-  font-size: 14.5px;
-  line-height: 1.7;
-  color: #b5bac1;
-  max-width: 48ch;
-  margin: 0;
-}
-
-/* The tag is shown as well as copied by the button -- people also type
-   it into the in-game search by hand. */
-.ct-quality-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #8b9099;
-}
-.ct-quality-tag code {
-  font-family: 'Oxanium', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  color: #f1f2f4;
-  padding: 4px 9px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.ct-quality-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
-}
-
-/* .download-btn pill, copied from 1coclayouts.css (base) plus
-   th18-layouts.html's .clan-action-row overrides -- this page doesn't
-   load 1coclayouts.css. Scoped to .ct-quality-actions so it can't leak
-   onto anything else here. */
-.ct-quality-actions .download-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  padding: 11px 20px 11px 46px;
-  border: 0;
-  border-radius: 9px;
-  overflow: hidden;
-  color: var(--text-main);
-  font-family: 'Oxanium', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-  background: linear-gradient(to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-  transition: filter 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-}
-.ct-quality-actions .download-btn::before {
-  content: "";
-  position: absolute;
-  left: 3px;
-  top: 3px;
-  bottom: 3px;
-  width: 32px;
-  border-radius: 6px;
-}
-.ct-quality-actions .download-btn:hover {
-  filter: brightness(1.15);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transform: translateY(-1px);
-}
-.ct-quality-actions .download-btn:active {
-  transform: scale(0.97);
-  filter: brightness(0.9);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-.ct-quality-actions .download-btn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 2px;
-}
-.ct-quality-actions .download-btn.copied { color: #8fe0ac; }
-.ct-quality-actions .download-btn.icon-person::before {
-  background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e9e9ec'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / 13px 13px;
-}
-.ct-quality-actions .download-btn.icon-globe::before {
-  background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e9e9ec'%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A9.987 9.987 0 015.08 16zm2.95-8H5.08c.96-1.65 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a10.03 10.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z'/%3E%3C/svg%3E") no-repeat center / 13px 13px;
-}
-
-/* Tight-cropped render, anchored to the bottom edge -- the bust is cut
-   at the waist in the source, so sitting flush on the card's edge makes
-   that crop read as deliberate. */
-.ct-quality-art {
-  position: relative;
-  min-height: 280px;
-  pointer-events: none;
-}
-.ct-quality-art img {
-  position: absolute;
-  right: 12%;
-  bottom: 0;
-  height: 92%;
-  width: auto;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6));
-}
-
-@media (max-width: 1150px) {
-  .ct-quality-content { padding: 34px 32px; }
-  .ct-quality-art img { right: 4%; }
-}
-
-/* Mobile: art becomes a band across the top, glow centred under it, and
-   the copy stacks below it centred -- same as .cl-feature's mobile
-   layout above. */
-@media (max-width: 970px) {
-  .ct-quality-box {
-    grid-template-columns: 1fr;
-    margin: 10px 5%;
-    background:
-      radial-gradient(70% 50% at 50% 26%, rgba(194, 59, 59, 0.22) 0%, rgba(194, 59, 59, 0) 72%),
-      #121316;
-  }
-  .ct-quality-art {
-    order: -1;
-    min-height: 0;
-    height: 170px;
-  }
-  .ct-quality-art img {
-    left: 50%;
-    right: auto;
-    height: 100%;
-    transform: translateX(-50%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
-            mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
-  }
-  .ct-quality-content {
-    align-items: center;
-    text-align: center;
-    padding: 18px 20px 24px;
-  }
-  .ct-quality-content .ch-kicker { justify-content: center; margin-bottom: 12px; }
-  .ct-quality-title { font-size: clamp(20px, 6vw, 26px); margin-bottom: 10px; }
-  .ct-quality-text { font-size: 13px; line-height: 1.65; }
-  .ct-quality-tag { margin-top: 14px; }
-  .ct-quality-actions { justify-content: center; margin-top: 18px; }
+<style>
+/* LIVE EVENTS + CLAN CARD + FAQ SPACING -- their look is in coc-clan-clock.css
+   (shared with th18-layouts.html); only this page's placement is here.
+   Same 12% / 5% side insets as the other sections. The Clash Tools grid's
+   own bottom padding (70 / 50) is the gap above "Live events". Clock ->
+   clan card is 64 on desktop because the Super Wizard's head pokes ~46px
+   above the card; on phones he sits inside it, so 20. Clan card -> FAQ
+   is a section break (64 / 48). The FAQ's bottom margin (96 / 64) is the
+   old Clash Clock's space above the footer. */
+.coc-content .cc-section{ margin:0 12%; }
+.coc-content .clan-card{ margin:64px 12% 0; }
+.coc-content .t18-faq{ margin:64px 12% 96px; }
+@media (max-width:970px){
+  .coc-content .cc-section{ margin:0 5%; }
+  .coc-content .clan-card{ margin:20px 5% 0; }
+  .coc-content .t18-faq{ margin:48px 5% 64px; }
 }
 </style>
 
@@ -2969,21 +2552,18 @@ function warModalEscHandler(e) {
 <style>
 /* ── CLASH TOOLS (.ct-grid) ──────────────────────────
    Six external tools. Same card language as .th-card above -- #121316
-   ground, faint white border, red-tinted border + lift on hover.
+   ground, faint white border, lift on hover.
 
-   Each card leads with a preview of the tool itself, because a name and
-   a sentence didn't tell anyone what they'd land on. Previews live in
-   clashofclans/coctools/previews/, all cropped 16:9 to the one thing the
-   tool does (the spin wheel, the unit picker, the tracker screen) --
-   full-page screenshots shrunk to card size were just unreadable
-   websites. Sources: the two Clasher Pro shots and the Clash Ninja one
-   are fresh captures; the other three are crops of images that were
-   already in coctools/.
+   No preview images (removed Sep 2026). They were screenshots of six
+   other websites, each in its own colours and layout, shrunk until their
+   text was unreadable -- they made the section look like a link dump.
+   Each card is now a row: the site's favicon in the same icon tile as the
+   Live events tags below, then name, one line and the domain.
 
    Titles name the job ("Damage Calculator"), not the site -- two of the
    six are on clasher.pro. The site shows in the footer, which also tells
    people where an external link is taking them. Favicons are local
-   copies (coctools/favicons/), not live google.com/s2/favicons calls. */
+   128px copies (coctools/favicons/), not live google.com/s2/favicons calls. */
 .ct-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2995,9 +2575,10 @@ function warModalEscHandler(e) {
 .ct-card {
   position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
   border-radius: 12px;
-  overflow: hidden;
   background: #121316;
   border: 1px solid rgba(255, 255, 255, 0.08);
   text-decoration: none;
@@ -3016,45 +2597,13 @@ function warModalEscHandler(e) {
   outline-offset: 3px;
 }
 
-.ct-card-media {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  background: #0d0e10;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-.ct-card-shot {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.9);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
-}
-.ct-card:hover .ct-card-shot {
-  transform: scale(1.04);
-  filter: brightness(1);
-}
-
-.ct-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 16px 18px;
-}
-.ct-card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
 /* Three favicons carry their own square background and two are
    transparent -- the tile makes both read as the same rounded icon. */
 .ct-card-icon {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: 10px;
   overflow: hidden;
   background: #1a1b1f;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -3064,6 +2613,23 @@ function warModalEscHandler(e) {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* flex column + the description's flex:1 push the domain down, so the
+   domains sit level across a row even when one description runs longer. */
+.ct-card-body {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+.ct-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 20px;
+  margin-bottom: 6px;
 }
 .ct-card-name {
   flex: 1;
@@ -3085,8 +2651,6 @@ function warModalEscHandler(e) {
   color: #e05252;
   transform: translate(2px, -2px);
 }
-/* flex:1 pushes the footer down, so the domain lines sit level across a
-   row even when one description runs longer. */
 .ct-card-desc {
   flex: 1;
   margin: 0;
@@ -3096,9 +2660,7 @@ function warModalEscHandler(e) {
   color: #9ea3ab;
 }
 .ct-card-foot {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 10px;
   font-family: 'Oxanium', sans-serif;
   font-size: 11px;
   font-weight: 600;
@@ -3112,10 +2674,7 @@ function warModalEscHandler(e) {
   .ct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Mobile: one column, and each card becomes a row -- preview on the
-   left, text beside it. Six full-width 16:9 previews stacked would be
-   ~2000px of scroll. The favicon drops out here since the preview
-   already identifies the tool. */
+/* Mobile: one column of compact rows. */
 @media (max-width: 970px) {
   .ct-grid {
     grid-template-columns: 1fr;
@@ -3123,38 +2682,19 @@ function warModalEscHandler(e) {
     gap: 10px;
     padding-bottom: 50px;
   }
-  .ct-card { flex-direction: row; }
-  .ct-card-media {
-    flex: 0 0 116px;
-    aspect-ratio: auto;
-    border-bottom: none;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  /* Most previews have their subject on the left (the wheel, the unit
-     picker, the P.E.K.K.A) -- a centred crop at this width cut it off.
-     War Tracker's is centred, so it opts back out. */
-  .ct-card-shot { object-position: 0% 50%; }
-  .ct-card-shot--center { object-position: 50% 50%; }
-  .ct-card-body { padding: 12px 14px; }
+  .ct-card { gap: 12px; padding: 14px; }
+  .ct-card-icon { width: 36px; height: 36px; border-radius: 9px; }
   .ct-card-head { margin-bottom: 4px; }
-  .ct-card-icon { display: none; }
   .ct-card-name { font-size: 14px; }
   .ct-card-arrow { width: 13px; height: 13px; }
   .ct-card-desc { font-size: 12px; line-height: 1.5; }
-  .ct-card-foot {
-    margin-top: 6px;
-    padding-top: 0;
-    border-top: none;
-    font-size: 10.5px;
-  }
+  .ct-card-foot { margin-top: 6px; font-size: 10.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ct-card,
-  .ct-card-shot,
   .ct-card-arrow { transition: none; }
   .ct-card:hover,
-  .ct-card:hover .ct-card-shot,
   .ct-card:hover .ct-card-arrow { transform: none; }
 }
 </style>
@@ -3189,12 +2729,9 @@ function warModalEscHandler(e) {
 
   <div class="ct-grid">
     <a class="ct-card" href="https://www.clashofstats.com/" target="_blank" rel="noopener">
-      <div class="ct-card-media">
-        <img class="ct-card-shot" src="clashofclans/coctools/previews/player-rankings.jpg" alt="" width="800" height="450" loading="lazy" decoding="async">
-      </div>
+      <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clashofstats.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
       <div class="ct-card-body">
         <div class="ct-card-head">
-          <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clashofstats.png" alt="" width="28" height="28" loading="lazy" decoding="async"></span>
           <span class="ct-card-name">Player Rankings</span>
           <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
@@ -3204,12 +2741,9 @@ function warModalEscHandler(e) {
     </a>
 
     <a class="ct-card" href="https://www.warreport.app/#/clans/2GYPGPJP9" target="_blank" rel="noopener">
-      <div class="ct-card-media">
-        <img class="ct-card-shot ct-card-shot--center" src="clashofclans/coctools/previews/war-tracker.jpg" alt="" width="800" height="450" loading="lazy" decoding="async">
-      </div>
+      <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/warreport.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
       <div class="ct-card-body">
         <div class="ct-card-head">
-          <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/warreport.png" alt="" width="28" height="28" loading="lazy" decoding="async"></span>
           <span class="ct-card-name">War Tracker</span>
           <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
@@ -3219,12 +2753,9 @@ function warModalEscHandler(e) {
     </a>
 
     <a class="ct-card" href="https://www.clash.ninja/" target="_blank" rel="noopener">
-      <div class="ct-card-media">
-        <img class="ct-card-shot" src="clashofclans/coctools/previews/upgrade-tracker.jpg" alt="" width="800" height="450" loading="lazy" decoding="async">
-      </div>
+      <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clashninja.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
       <div class="ct-card-body">
         <div class="ct-card-head">
-          <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clashninja.png" alt="" width="28" height="28" loading="lazy" decoding="async"></span>
           <span class="ct-card-name">Upgrade Tracker</span>
           <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
@@ -3234,12 +2765,9 @@ function warModalEscHandler(e) {
     </a>
 
     <a class="ct-card" href="https://clasharmies.com/army-builder" target="_blank" rel="noopener">
-      <div class="ct-card-media">
-        <img class="ct-card-shot" src="clashofclans/coctools/previews/army-builder.jpg" alt="" width="800" height="450" loading="lazy" decoding="async">
-      </div>
+      <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clasharmies.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
       <div class="ct-card-body">
         <div class="ct-card-head">
-          <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clasharmies.png" alt="" width="28" height="28" loading="lazy" decoding="async"></span>
           <span class="ct-card-name">Army Builder</span>
           <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
@@ -3249,12 +2777,9 @@ function warModalEscHandler(e) {
     </a>
 
     <a class="ct-card" href="https://clasher.pro/labs/coc-damage-calculator" target="_blank" rel="noopener">
-      <div class="ct-card-media">
-        <img class="ct-card-shot" src="clashofclans/coctools/previews/damage-calculator.jpg" alt="" width="800" height="450" loading="lazy" decoding="async">
-      </div>
+      <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clasherpro.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
       <div class="ct-card-body">
         <div class="ct-card-head">
-          <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clasherpro.png" alt="" width="28" height="28" loading="lazy" decoding="async"></span>
           <span class="ct-card-name">Damage Calculator</span>
           <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
@@ -3264,12 +2789,9 @@ function warModalEscHandler(e) {
     </a>
 
     <a class="ct-card" href="https://clasher.pro/labs/coc-troop-spin" target="_blank" rel="noopener">
-      <div class="ct-card-media">
-        <img class="ct-card-shot" src="clashofclans/coctools/previews/troop-spinner.jpg" alt="" width="800" height="450" loading="lazy" decoding="async">
-      </div>
+      <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clasherpro.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
       <div class="ct-card-body">
         <div class="ct-card-head">
-          <span class="ct-card-icon"><img src="clashofclans/coctools/favicons/clasherpro.png" alt="" width="28" height="28" loading="lazy" decoding="async"></span>
           <span class="ct-card-name">Troop Spinner</span>
           <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
@@ -3279,146 +2801,105 @@ function warModalEscHandler(e) {
     </a>
   </div>
 
-
-<div class="tracker-container">
-
-  
-
-  <div class="ct-quality-box">
-    <div class="ct-quality-content">
-      <div class="ch-kicker">
-        <span>Official clan</span>
-        <span>Ascendere</span>
-      </div>
-      <h2 class="ct-quality-title">Join our official <em>clan</em></h2>
-      <p class="ct-quality-text">
-        Ascendere brings you top-quality Clash of Clans bases, exclusively
-        for the AC fam. Top-tier layouts, tested for CWL and ranked battles.
-      </p>
-      <div class="ct-quality-tag">Clan tag <code>#2GYPGPJP9</code></div>
-      <!-- Same two pills as th18-layouts.html's .clan-action-row: "Join
-           Our Clan" copies the tag (copyClanTagBtn below), "Join Global
-           Chat" opens the in-game chat. -->
-      <div class="ct-quality-actions">
-        <button type="button" class="download-btn icon-person" onclick="copyClanTagBtn(this)" title="Copy clan tag to clipboard" data-copy="#2GYPGPJP9">Join Our Clan</button>
-        <a class="download-btn icon-globe" href="https://link.clashofclans.com/en/?action=OpenGlobalChat&amp;chatId=P46a9cfc5f81340b1b43363b9a30316fb" target="_blank" rel="noopener noreferrer" title="Opens the global chat in Clash of Clans">Join Global Chat</a>
-      </div>
-    </div>
-
-    <div class="ct-quality-art" aria-hidden="true">
-      <img src="clashofclans/coctools/supwiz-tight.png" alt="" loading="lazy" decoding="async">
-    </div>
-  </div>
-
-<script>
-// Same copy-and-flash as th18-layouts.html's copyClanTagBtn(): copies
-// data-copy, tints the button green for 1.2s.
-function copyClanTagBtn(btn){
-  navigator.clipboard.writeText(btn.dataset.copy).then(function(){
-    btn.classList.add('copied');
-    setTimeout(function(){ btn.classList.remove('copied'); }, 1200);
-  });
-}
-</script>
-
-
-  </div>
-
   
   </div>
 
-<!-- CLASH CLOCK. Last section before the footer. coc-events.js fills
-     every data-event / data-timer / data-label / data-name / data-date /
-     data-progress hook and adds .is-live to whichever of Raid / CWL /
-     Clan Games is running -- this is only the shell. Styles: the CLASH
-     CLOCK block in <head>. -->
-<section class="cc-section" aria-labelledby="cc-title">
-  <div class="layouts-title-box">
-    <h2 class="layouts-title" id="cc-title">Clash Clock</h2>
-    <div class="layouts-subtitle">Live countdowns to every event in the game, shown in your local time.</div>
+<!-- LIVE EVENTS + OFFICIAL CLAN CARD -- the last two sections before the
+     footer. Same markup as th18-layouts.html's (keep the two copies in
+     step); the look is shared in coc-clan-clock.css and the clan card's
+     script in coc-clan-clock.js, so a style change there shows on both
+     pages. Differences here: the Super Wizard instead of the Wall Breaker,
+     and the page's spacing (LIVE EVENTS + CLAN CARD SPACING in <head>).
+     Replaced the old Clash Clock cards and "Join our official clan" box,
+     Sep 2026. coc-events.js fills every data-event / data-timer hook and
+     adds .is-upcoming to events that haven't started. -->
+<section class="cc-section" id="events-section" aria-labelledby="cc-label">
+  <div class="cc-label-row">
+    <h2 class="cc-label" id="cc-label">Live events</h2>
+    <span class="cc-label-note">Your local time</span>
+  </div>
+    <ul class="t18-clock" aria-label="Clan events">
+      <li class="t18-tag t18-clock-tag" data-event="raid"><span class="cc-event-icon"><img src="clashofclans/coctools/raidmedals2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Raid Weekend</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="cwl"><span class="cc-event-icon"><img src="clashofclans/coctools/cwl2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Clan War League</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="clangames"><span class="cc-event-icon"><img src="clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Clan Games</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="trader"><span class="cc-event-icon"><img src="clashofclans/coctools/trader2.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Trader Shop</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="season"><span class="cc-event-icon"><img src="clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name" data-name="short">Battle Pass</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+      <li class="t18-tag t18-clock-tag" data-event="legend"><span class="cc-event-icon"><img src="clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async"></span><span class="t18-clock-text"><span class="t18-tag-name">Legend League</span> <b class="t18-tag-time" data-timer>--</b></span></li>
+    </ul>
+</section>
+
+<!-- Official clan card: title, "Join Our Clan" (copies the tag -- shows it
+     too on desktop) and "Join Global Chat", then the live stats and the
+     last 10 wars from clan-stats.json. -->
+<section class="clan-card" aria-labelledby="clan-title">
+  <div class="clan-body">
+    <h2 class="clan-title" id="clan-title">Play with <em>Ascendere</em></h2>
+    <!-- Logo + the two buttons. -->
+    <div class="clan-actions">
+    <span class="clan-logo"><img src="icons/aclogonobg-cropped.png" alt="Ascendere" loading="lazy" decoding="async"></span>
+    <div class="clan-action-row">
+      <button type="button" class="download-btn icon-copy" onclick="copyClanTagBtn(this)" title="Copy the clan tag" data-copy="#2GYPGPJP9"><span class="clan-btn-label">Join <span class="clan-sm-hide">Our </span>Clan</span> <span class="clan-btn-tag">#2GYPGPJP9</span></button>
+      <span class="t18-vh" id="clanCopyStatus" aria-live="polite"></span>
+      <a class="download-btn icon-globe" href="https://link.clashofclans.com/en/?action=OpenGlobalChat&chatId=P46a9cfc5f81340b1b43363b9a30316fb" target="_blank" rel="noopener noreferrer" title="Opens the global chat in Clash of Clans"><span><span class="clan-sm-hide">Join </span>Global Chat</span></a>
+    </div>
+    </div>
+    <!-- Clan stats, under the buttons. Filled by coc-clan-clock.js from
+         clan-stats.json, which a GitHub Action refreshes every 30 minutes
+         (.github/workflows/clan-stats.yml -> scripts/clan-stats.mjs).
+         Hidden until the numbers load, so a missing file just leaves the
+         card as title + buttons. War wins only shows if the clan's war log
+         is public. -->
+    <dl class="clan-stats" id="clanStats" hidden>
+      <div class="clan-stat"><dt>Members</dt><dd data-stat="members"></dd></div>
+      <div class="clan-stat"><dt>Clan level</dt><dd data-stat="level"></dd></div>
+      <div class="clan-stat" data-stat-box="war"><dt>War record</dt><dd data-stat="record"></dd></div>
+      <div class="clan-stat" data-stat-box="streak"><dt>Win streak</dt><dd data-stat="streak"></dd></div>
+    </dl>
+    <!-- Last 10 wars (W / D / L, newest on the left) and when the numbers
+         last changed. Hidden until loaded. -->
+    <div class="clan-form" id="clanForm" hidden>
+      <span class="clan-form-label">Last 10 wars</span>
+      <ol class="clan-wars" id="clanWars" aria-label="Last 10 war results, newest first"></ol>
+      <span class="clan-updated" id="clanUpdated"></span>
+    </div>
   </div>
 
-  <div class="cc-event-list">
-        <div class="cc-event" data-event="raid">
-          <div class="cc-event-head">
-            <span class="cc-event-icon"><img src="clashofclans/coctools/raidmedals2.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="cc-event-name">Raid Weekend</span>
-            <span class="cc-live">Live</span>
-          </div>
-          <div class="cc-event-timer" data-timer>--<span>h</span></div>
-          <div class="cc-event-bar" aria-hidden="true"><span data-progress></span></div>
-          <div class="cc-event-meta">
-            <span class="cc-event-label" data-label="bare">Starts in</span>
-            <span class="cc-event-date" data-date></span>
-          </div>
-        </div>
+  <div class="clan-art" aria-hidden="true">
+    <img src="clashofclans/coctools/supwiz-tight.png" alt="" loading="lazy" decoding="async">
+  </div>
+</section>
+<script src="coc-clan-clock.js" defer></script>
 
-        <div class="cc-event" data-event="cwl">
-          <div class="cc-event-head">
-            <span class="cc-event-icon"><img src="clashofclans/coctools/cwl2.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="cc-event-name">Clan War League</span>
-            <span class="cc-live">Live</span>
-          </div>
-          <div class="cc-event-timer" data-timer>--<span>h</span></div>
-          <div class="cc-event-bar" aria-hidden="true"><span data-progress></span></div>
-          <div class="cc-event-meta">
-            <span class="cc-event-label" data-label="bare">Starts in</span>
-            <span class="cc-event-date" data-date></span>
-          </div>
-        </div>
-
-        <div class="cc-event" data-event="trader">
-          <div class="cc-event-head">
-            <span class="cc-event-icon"><img src="clashofclans/coctools/trader2.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="cc-event-name">Trader Shop</span>
-          </div>
-          <div class="cc-event-timer" data-timer>--<span>h</span></div>
-          <div class="cc-event-bar" aria-hidden="true"><span data-progress></span></div>
-          <div class="cc-event-meta">
-            <span class="cc-event-label" data-label="bare">Refreshes in</span>
-            <span class="cc-event-date" data-date></span>
-          </div>
-        </div>
-
-        <div class="cc-event" data-event="season">
-          <div class="cc-event-head">
-            <span class="cc-event-icon"><img src="clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="cc-event-name" data-name="short">Battle Pass</span>
-          </div>
-          <div class="cc-event-timer" data-timer>--<span>h</span></div>
-          <div class="cc-event-bar" aria-hidden="true"><span data-progress></span></div>
-          <div class="cc-event-meta">
-            <span class="cc-event-label" data-label="bare">Ends in</span>
-            <span class="cc-event-date" data-date></span>
-          </div>
-        </div>
-
-        <div class="cc-event" data-event="clangames">
-          <div class="cc-event-head">
-            <span class="cc-event-icon"><img src="clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="cc-event-name">Clan Games</span>
-            <span class="cc-live">Live</span>
-          </div>
-          <div class="cc-event-timer" data-timer>--<span>h</span></div>
-          <div class="cc-event-bar" aria-hidden="true"><span data-progress></span></div>
-          <div class="cc-event-meta">
-            <span class="cc-event-label" data-label="bare">Starts in</span>
-            <span class="cc-event-date" data-date></span>
-          </div>
-        </div>
-
-        <div class="cc-event" data-event="legend">
-          <div class="cc-event-head">
-            <span class="cc-event-icon"><img src="clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async"></span>
-            <span class="cc-event-name">Legend League</span>
-          </div>
-          <div class="cc-event-timer" data-timer>--<span>h</span></div>
-          <div class="cc-event-bar" aria-hidden="true"><span data-progress></span></div>
-          <div class="cc-event-meta">
-            <span class="cc-event-label" data-label="bare">Resets in</span>
-            <span class="cc-event-date" data-date></span>
-          </div>
-        </div>
+<!-- FAQ: same look as th18-layouts.html's (coc-clan-clock.css), questions
+     reworded for the hub page -- visitors reach the Copy Layout buttons
+     through a Town Hall card, and this page covers every Town Hall, not
+     just TH18. Native <details>/<summary>: no script, keyboard-friendly,
+     and the answers stay in the page text for search engines. -->
+<section class="t18-faq" aria-labelledby="t18-faq-label">
+  <div class="cc-label-row">
+    <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
+  </div>
+  <div class="t18-faq-list">
+    <details class="t18-faq-item">
+      <summary>How do I copy a base into my game?</summary>
+      <p>Pick your Town Hall under <b>Featured Townhalls</b>, then tap <b>Copy Layout</b> under any base. Clash of Clans opens with the layout loaded, so just save it to one of your layout slots.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Why won&rsquo;t the Copy Layout link open the game?</summary>
+      <p>Apps like Discord, Facebook and Messenger open links in their own built-in browser, which can&rsquo;t launch the game. Tap the <b>&#8942;</b> menu, choose <b>Open in Chrome</b> (or your usual browser), then tap Copy Layout again.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Can I use a base made for a different Town Hall?</summary>
+      <p>Only one level away. Base links work one Town Hall level up or down, and anything you haven&rsquo;t unlocked yet is simply left out. Any further than that and the link won&rsquo;t copy.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Are these bases good for war, CWL or trophy pushing?</summary>
+      <p>Yes. We choose quality over quantity. We only post bases that have proven themselves, so every layout here is built to hold up in war, CWL and on the ladder.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>How do I join Ascendere?</summary>
+      <p>Join our <b>Global Chat</b> and let us know you&rsquo;re interested. We&rsquo;ll reply and set you up with a quick tryout. We pick a base, you attack it, and a clean three-star earns your spot. You&rsquo;ll need <b>Town Hall 11</b> or higher.</p>
+    </details>
   </div>
 </section>
 

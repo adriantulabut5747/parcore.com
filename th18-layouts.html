@@ -27,6 +27,8 @@
 
 <link rel="stylesheet" href="11layout.css">
 <link rel="stylesheet" href="1coclayouts.css">
+<!-- Live events + official clan card, shared with coc-home.html -->
+<link rel="stylesheet" href="coc-clan-clock.css">
 
 
 <style>
@@ -306,9 +308,6 @@
     .discord-card.is-target{ box-shadow:0 6px 18px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.45); }
   }
 
-  /* Buttons outside the layout cards (the clan card's pills) still use
-     .download-btn; these two rules were shared with the old Copy Layout
-     button and stay for them. */
   /* GHOST BUTTON TOKENS -- taken from coc-home.html's .ch-btn.ch-btn-ghost
      (font size + weight from .ch-btn, fill + border from .ch-btn-ghost),
      WITHOUT its hard white offset shadow. Defined once here so any button
@@ -339,60 +338,7 @@
   }
   @media (max-width:970px){ :root{ --ghost-font-size:10.5px; } }
 
-  /* .download-btn = the clan card's "Join Our Clan" / "Join Global Chat"
-     buttons, now in the ghost style above. 1coclayouts.css gives this
-     class a grey gradient and drop shadows (rest, hover and press); all
-     of that is overridden here -- flat fill, 1px border, no shadow. */
-  .download-btn{
-    flex:0 1 auto;
-    margin-top:0;
-    padding:12px 21px 12px 47px;       /* +1px each side: the 1px border is gone */
-    border:0;
-    background:var(--key-face);
-    box-shadow:var(--key-edge);
-    font-size:var(--ghost-font-size);
-    font-weight:var(--ghost-font-weight);
-    transition:background .15s ease, color .15s ease, transform .1s ease, box-shadow .1s ease;
-  }
-  .download-btn:hover{ background:var(--key-face-hover); color:var(--text-main); box-shadow:var(--key-edge); filter:none; transform:none; }
-  .download-btn:active{ box-shadow:var(--key-pressed); filter:none; transform:translateY(3px); }
-  .download-btn.copied{ color:#8fe0ac; }
-  .download-btn:focus-visible{
-    outline:2px solid rgba(255,255,255,0.35);
-    outline-offset:2px;
-  }
-
-  /* "Join Our Clan" / "Join Global Chat" buttons (th18 only for now) --
-     same .download-btn pill (gradient, rounded, icon box baked into
-     ::before) as the "Copy Layout" buttons above, just two more icon
-     variants swapped in via their own ::before background-image. Icons
-     are Material Symbols' filled "person" and "public" glyphs.
-
-     Deliberately NOT using the old .contact-icons wrapper: 1coclayouts.css
-     styles `.contact-icons a` as a 38x38 icon square, and that selector
-     outranks .download-btn, so the <a> pill got squashed while the
-     <button> pill next to it didn't. Own class = no inherited icon-row
-     rules, and both children style identically from .download-btn. */
-  .clan-action-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-  }
-  /* line-height pinned because the two pills are different elements: a
-     <button> uses the UA's `normal`, an <a> inherits the paragraph's --
-     left alone they'd render at visibly different heights. */
-  .clan-action-row .download-btn{
-    flex:0 0 auto;
-    white-space:nowrap;
-    line-height:1;
-  }
-
-  .download-btn.icon-person::before{
-    background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e9e9ec'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E") no-repeat center / 13px 13px;
-  }
-  .download-btn.icon-globe::before{
-    background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e9e9ec'%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A9.987 9.987 0 015.08 16zm2.95-8H5.08c.96-1.65 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a10.03 10.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z'/%3E%3C/svg%3E") no-repeat center / 13px 13px;
-  }
+  /* Moved to coc-clan-clock.css (shared with coc-home.html), Sep 2026: the clan card's .download-btn pills (.clan-action-row, icon-copy, icon-globe). */
 
   @media (max-width:970px){
     /* More air on phones: cards 32px apart (was 20), same inner padding
@@ -409,7 +355,6 @@
     .cc-popup{ top:40px; left:8px; }
     .th-cc{ width:26px; height:26px; }
     .action-row{ margin-top:10px; }
-    .download-btn{ padding:11px 17px 11px 43px; }
     /* Phones: a smaller cluster so all three fit comfortably on narrow
        screens (a 360px phone has ~316px inside the card; this row is ~264px). */
     .action-row.card-bar{ --bar-h:34px; grid-template-columns:54px auto 54px; gap:6px; margin-top:12px; }
@@ -636,143 +581,19 @@
 </style>
 
 <style>
-/* =====================================================================
-   CLASH CLOCK (th18) -- same event cards as coc-home.html's Clash Clock,
-   replacing the old "Today's Events" box. The card rules below are
-   coc-home's CLASH CLOCK block, tightened for this page (smaller padding,
-   icon and timer -- the events are secondary here, the layouts are the
-   page), so they are no longer an exact copy: carry any design change
-   across by hand.
-   No section heading on this page (removed on request); the cards sit
-   straight under the pagination.
-   ===================================================================== */
-.cc-section{
-  container: cc / inline-size;
-  margin: 36px 0 0;
-}
+/* Moved to coc-clan-clock.css (shared with coc-home.html), Sep 2026: the Live events section (.cc-section, the tags) and the official
+   clan card (.clan-card), including their phone rules. Page spacing for both is
+   in PAGE SPACING below. */
+
+/* ---- FAQ (under the clan card) ----------------------------------------
+   Look: coc-clan-clock.css (shared with coc-home.html). Only this page's
+   spacing is here. Gap above: 64 (a section break) -- set here in full,
+   because it merges with the clan card's 34px bottom margin (adjacent
+   margins collapse to the bigger one); below: 34 + .coc-content's 30px
+   padding = 64. */
+.t18-faq{ margin: 64px 0 34px; }
 @media (max-width: 970px){
-  .cc-section{ margin: 28px 0 8px; }
-}
-
-/* The old six event cards (.cc-event-*) were replaced by pinned tags --
-   see "Clash Clock tags" in the TH18 COC-HOME THEME block. */
-
-/* ---- Official clan card (.clan-card) ---------------------------------
-   Just the title and two buttons on the Clash Clock card material
-   (#121316, faint white border, 12px radius), with the Wall Breaker
-   (wallbreaker-tight.png) standing on the card's bottom edge. The Join
-   button shows the tag it copies. Simplified Sep 2026: the logo tile,
-   the "Clan tag" / "Connect with me" labels, a separate tag chip that
-   did the same job as the Join button, and the paragraph were removed. */
-.clan-card{
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px;
-  margin: 16px 0 45px;                 /* (overridden by the spacing block below) */
-  border-radius: 12px;
-  background:
-    radial-gradient(45% 90% at 92% 100%, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0) 70%),
-    #121316;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: visible;                   /* let the Wall Breaker stick out of the top edge */
-}
-.clan-body{
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 22px;
-}
-.clan-title{
-  margin: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  color: #f1f2f4;
-}
-.clan-card .clan-action-row{ margin: 0; }
-/* the tag the Join button copies, muted after its label; green with it on copy */
-.clan-btn-tag{ margin-left: 6px; color: #8b9099; letter-spacing: 0.4px; }
-.download-btn.copied .clan-btn-tag{ color: inherit; }
-
-.clan-art{ position: relative; pointer-events: none; }
-/* The Wall Breaker stands on the card's bottom edge and is 46px taller than
-   the card, so his head and shoulders pop out above the top edge like a
-   mascot peeking in -- by the same amount whether the stats row is showing
-   (taller card) or not. */
-.clan-art img{
-  position: absolute;
-  right: 40px;
-  bottom: 0;
-  height: calc(100% + 46px);
-  width: auto;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.55));
-}
-
-/* Live stats row: three small tiles in the event cards' material. */
-.clan-stats{ display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
-.clan-stats[hidden], .clan-stat[hidden]{ display: none; }
-.clan-stat{
-  min-width: 104px;
-  padding: 10px 14px 11px;
-  border-radius: 10px;
-  background: #141519;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-.clan-stat dt{
-  margin: 0 0 7px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 9.5px; font-weight: 700; line-height: 1;
-  letter-spacing: 1.3px; text-transform: uppercase;
-  color: #8b9099;
-}
-.clan-stat dd{
-  margin: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 19px; font-weight: 800; line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: #f1f2f4;
-}
-.clan-stat dd small{ margin-left: 4px; font-size: 11px; font-weight: 700; color: #8b9099; }
-
-@media (max-width: 970px){
-  .clan-card{ grid-template-columns: minmax(0, 1fr) 96px; margin: 12px 0 32px; }
-  .clan-body{ padding: 16px; gap: 14px; }
-  .clan-title{ font-size: 14px; }
-  /* phones: fully inside the (taller, stacked-buttons) card -- a 3px
-     poke-out just looked like a mistake */
-  .clan-art img{ right: 8px; height: 132px; width: auto; }
-  .clan-stats{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .clan-stat{ min-width: 0; padding: 9px 10px 10px; }
-  .clan-stat dd{ font-size: 16px; }
-  /* Phones: the two buttons stack full width, so the tag always fits. */
-  .clan-card .clan-action-row{ display: grid; grid-template-columns: 1fr; gap: 8px; }
-  .clan-card .clan-action-row .download-btn{ width: 100%; padding: 11px 11px 11px 43px; justify-content: center; font-size: var(--ghost-font-size); }
-}
-/* On a narrow phone the art would squeeze the text and buttons -- drop it. */
-@media (max-width: 460px){
-  .clan-card{ grid-template-columns: minmax(0, 1fr); }
-  .clan-art{ display: none; }
-}
-
-/* Clash Clock list header: small muted caps sitting 10px above the
-   panel, same voice as the labels inside the cards. */
-.cc-label-row{
-  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
-  margin:0 2px 10px;
-}
-.cc-label{
-  margin:0;
-  font-family:'Oxanium', sans-serif;
-  font-size:11px; font-weight:700;
-  letter-spacing:1.6px; text-transform:uppercase;
-  color:#9ea3ab;
-}
-.cc-label-note{
-  font-family:'Sora', sans-serif;
-  font-size:11px;
-  color:#6f737a;
+  .t18-faq{ margin: 0 0 48px; }             /* the clan card's 48px bottom margin is the gap above */
 }
 
 /* ---- PAGE SPACING ------------------------------------------------------
@@ -878,10 +699,12 @@
     radial-gradient(60% 70% at 18% 0%, rgba(255,255,255,0.025), rgba(255,255,255,0) 70%),
     var(--t18-surface);
 }
-/* Starfield: a sparse scatter of tiny points, mostly warm white with a
-   couple of faint red ones, denser on the left and thinning out toward the
-   events. They twinkle slowly (opacity only, so nothing moves or leaves
-   the card). A layer of radial-gradient dots, not an image. */
+/* Starfield (hero): a sparse scatter of tiny points, mostly
+   warm white with a couple of faint red ones, denser on the left. A layer
+   of radial-gradient dots, not an image. The pattern is a 240px-tall tile
+   repeated down the card and scrolled up by exactly one tile per 60s, so
+   the stars drift upward (~4px/s) in a seamless loop, while the opacity
+   twinkle breathes on top. Reduced-motion users get still stars. */
 .t18-hero::before{
   content:"";
   position:absolute; inset:0; z-index:-1;
@@ -900,26 +723,25 @@
     radial-gradient(1.5px 1.5px at 17% 46%, rgba(255,244,228,.30), transparent),
     radial-gradient(1px 1px     at 58% 70%, rgba(224,99,99,.35),   transparent),
     radial-gradient(1px 1px     at 63% 8%,  rgba(255,244,228,.25), transparent);
-  animation:t18-twinkle 6s ease-in-out infinite alternate;
+  background-size:100% 240px;
+  background-repeat:repeat-y;
+  animation:t18-twinkle 6s ease-in-out infinite alternate, t18-drift 60s linear infinite;
 }
 @keyframes t18-twinkle{ from{ opacity:.55; } to{ opacity:1; } }
+@keyframes t18-drift{ from{ background-position:0 0; } to{ background-position:0 -240px; } }
+
 .t18-hero-copy{ grid-area:copy; align-self:center; }
-/* Pulse for the red dot on the "Live events" label (.cc-label::before). */
-@keyframes t18-dot{
-  0%,100%{ opacity:.55; transform:scale(.9); box-shadow:0 0 4px rgba(194,59,59,.5); }
-  50%{ opacity:1; transform:scale(1.15); box-shadow:0 0 10px rgba(194,59,59,.95); }
-}
-/* "TH18 BASE" in Oxanium, "LAYOUTS" (the <em>) in Orbitron. One line on
+/* The whole title in Orbitron ("TH18 BASE" was Oxanium on phones until Sep 2026). One line on
    desktop -- sized off the copy column's width (cqi, see the 971px+ rule)
    so it never overflows beside the events -- two lines on phones. */
 .t18-title{
   margin:0 0 12px;
-  font-family:'Oxanium', sans-serif;
+  font-family:'Orbitron', sans-serif;
   font-size:clamp(28px, 2.9vw, 44px);
   white-space:nowrap;
-  font-weight:800;
+  font-weight:900;
   line-height:1.02;
-  letter-spacing:.3px;
+  letter-spacing:-1px;
   text-transform:uppercase;
   color:var(--t18-text);
   text-shadow:0 3px 12px rgba(0,0,0,0.5);
@@ -1083,58 +905,7 @@
   .t18-title br{ display:none; }
 }
 
-/* ---- Event tags (Live events, under the page numbers) ----------------
-   Pinned notes, redrawn in the page's own material: the ghost-button
-   fill and border, Oxanium caps and digits. Each sits a degree or so off straight, the way a pinned note
-   would, and straightens and lifts on hover. The time text carries the
-   state: red "ends ..." while the event runs, grey "starts ..." while it's
-   only counting down (.is-upcoming from coc-events.js). */
-.t18-tag{
-  position:relative;
-  display:inline-flex; align-items:baseline; gap:8px;
-  padding:9px 13px 8px;
-  border-radius:4px;
-  background:var(--ghost-bg);
-  border:1px solid var(--ghost-border);
-  box-shadow:0 6px 14px -6px rgba(0,0,0,0.8);
-  font-family:'Oxanium', sans-serif;
-  font-size:10.5px; font-weight:800; line-height:1; letter-spacing:1.3px; text-transform:uppercase;
-  color:#c9ccd2; text-decoration:none; white-space:nowrap;
-  transform:rotate(var(--tilt, 0deg));
-  transition:transform .2s cubic-bezier(.2,.8,.2,1), border-color .15s ease, color .15s ease;
-  -webkit-tap-highlight-color:transparent;
-}
-.t18-tag:hover, .t18-tag:focus-visible{
-  transform:translateY(-2px);
-  border-color:var(--ghost-border-hover);
-  color:#fff;
-}
-.t18-tag:focus-visible{ outline:2px solid rgba(255,255,255,0.75); outline-offset:3px; }
-/* (The round "pin" on top of each tag -- red live, grey upcoming -- was
-   removed on request, Sep 2026. The time's colour and "ends" / "starts"
-   wording below already carry the same state.) */
-.t18-tag-time{
-  font-family:'Oxanium', sans-serif;   /* not Orbitron: its slashed zero read as "1d Øh" */
-  font-size:10.5px; font-weight:800; letter-spacing:.4px;
-  text-transform:none;                 /* "1d 3h", not "1D 3H" */
-  font-variant-numeric:tabular-nums;
-}
-.t18-tag-time span{ margin-left:1px; font-size:.85em; }
-/* Running (or always-on, counting to its end/reset): "ends ..." in red.
-   Not started yet (.is-upcoming from coc-events.js): "starts ..." in grey. */
-.t18-tag-time{ color:#e06363; }
-.t18-tag.is-upcoming .t18-tag-time{ color:#8b9099; }
-.t18-tag-time::before{
-  content:"ends ";
-  font-family:'Oxanium', sans-serif; font-weight:700; letter-spacing:.5px;
-}
-.t18-tag.is-upcoming .t18-tag-time::before{ content:"starts "; }
-/* "Time Left" / "Starts in" stays in the link for screen readers only;
-   the time's colour and "ends" / "starts" say the same thing visually. */
-.t18-vh{
-  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
-  overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0;
-}
+/* Moved to coc-clan-clock.css (shared with coc-home.html), Sep 2026: .t18-tag, .t18-tag-time and .t18-vh. */
 
 /* Tabs, Town Hall chips, page numbers and all buttons keep the site's
    grey materials (1coclayouts.css / the rules above) -- no red states. */
@@ -1164,23 +935,7 @@
 }
 .coc-content .share-panel{ background:#15161a; border:1px solid #3a3d44; border-radius:8px; }
 
-/* ---- Live events label: coc-home kicker voice ------------------------ */
-.coc-content .cc-label{ display:inline-flex; align-items:center; gap:8px; font-size:10px; letter-spacing:2.2px; color:#8b9099; }
-.coc-content .cc-label::before{
-  content:""; width:5px; height:5px; border-radius:50%;
-  background:var(--t18-red); box-shadow:0 0 6px rgba(194,59,59,0.8);
-  animation:t18-dot 2.6s ease-in-out infinite;
-}
-.coc-content .cc-label-note{ font-family:'Oxanium', sans-serif; font-size:10px; letter-spacing:1.6px; text-transform:uppercase; color:var(--t18-faint); }
-
-/* ---- Clan card: coc-home's clan box -------------------------------- */
-.coc-content .clan-card{
-  background:
-    radial-gradient(50% 85% at 82% 78%, rgba(194,59,59,0.16) 0%, rgba(194,59,59,0) 72%),
-    var(--t18-surface);
-}
-.coc-content .clan-title{ font-family:'Orbitron', sans-serif; font-size:20px; font-weight:900; letter-spacing:-0.2px; text-transform:uppercase; }
-.coc-content .clan-title em{ font-style:normal; color:var(--t18-red); text-shadow:0 0 18px rgba(194,59,59,0.4); }
+/* Moved to coc-clan-clock.css (shared with coc-home.html), Sep 2026: the Live events label and the clan card's red glow + title. */
 /* ---- Spacing for the head --------------------------------------------
    Card -> tabs 20px (14 on phones). */
 .coc-content .first-layer{ margin-top:20px; }
@@ -1250,48 +1005,7 @@
 .first-layer button.active .fl-ico{ display:none; }
 .first-layer button.active .fl-ico-fill{ display:block; }
 
-/* ---- Clash Clock tags (Live events, under the page numbers) ------------
-   The six events as the same pinned tags as the banner (.t18-tag: ghost
-   fill, pin, tilt, starts/ends wording), a size up, each with its event
-   icon in the Clash Tools tile (.cc-event-icon). 3 across on desktop,
-   2 across on phones. Not links, so no hover lift. */
-.t18-clock{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:18px 14px;
-  margin:0; padding:8px 0 0;           /* headroom for the pins */
-  list-style:none;
-}
-.t18-clock-tag{
-  display:flex; align-items:center; gap:12px;
-  min-width:0;
-  padding:12px 14px;
-  border-radius:8px;
-  font-size:11px; letter-spacing:1.2px;
-  cursor:default;
-}
-.t18-clock-tag:nth-child(3n+1){ --tilt:-1deg; }
-.t18-clock-tag:nth-child(3n+2){ --tilt:.8deg; }
-.t18-clock-tag:nth-child(3n){ --tilt:-.4deg; }
-.t18-clock-tag:hover{ transform:rotate(var(--tilt)); border-color:var(--ghost-border); color:#c9ccd2; }
-/* Desktop: the six sit straight and aligned in their grid (the tilt is
-   for phones, and for the three pinned tags in the banner). */
-@media (min-width:971px){ .t18-clock .t18-clock-tag{ --tilt:0deg; } }
-.t18-clock-tag .cc-event-icon{
-  flex-shrink:0;
-  width:36px; height:36px;
-  display:grid; place-items:center;
-  border-radius:9px;
-  background:#1a1b1f;
-  border:1px solid rgba(255,255,255,0.08);
-}
-.t18-clock-tag .cc-event-icon img{
-  width:24px; height:24px; object-fit:contain;
-  filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5));
-}
-.t18-clock-text{ display:flex; flex-direction:column; gap:7px; min-width:0; }
-.t18-clock-tag .t18-tag-name{ overflow:hidden; text-overflow:ellipsis; }
-.t18-clock-tag .t18-tag-time{ font-size:13px; }
+/* Moved to coc-clan-clock.css (shared with coc-home.html), Sep 2026: the Clash Clock tags (.t18-clock). */
 
 @media (min-width:1351px) and (max-width:1519px){
   .t18-events{ grid-template-columns:repeat(2, 164px); }
@@ -1377,21 +1091,12 @@
   .t18-event-text{ gap:4px; }
   .t18-event-name{ font-size:10px; letter-spacing:.6px; }
   .t18-event-time{ font-size:11px; }
-  .t18-clock{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px 10px; }
-  .t18-clock-tag{ gap:10px; padding:10px 11px; font-size:10px; letter-spacing:1px; }
-  .t18-clock-tag:nth-child(odd){ --tilt:-1deg; }
-  .t18-clock-tag:nth-child(even){ --tilt:.8deg; }
-  .t18-clock-tag .cc-event-icon{ width:32px; height:32px; }
-  .t18-clock-tag .cc-event-icon img{ width:22px; height:22px; }
-  .t18-clock-tag .t18-tag-time{ font-size:12px; }
   .coc-content .first-layer{ margin-top:14px; gap:8px; }
   .coc-content .first-layer button{ min-height:38px; gap:6px; font-size:10.5px; letter-spacing:1px; }
   .fl-ico, .fl-ico-fill{ width:14px; height:14px; }
 }
 @media (prefers-reduced-motion: reduce){
-  .coc-content .cc-label::before{ animation:none; }
   .t18-event .t18-event-icon::after{ animation:none; }
-  .t18-tag{ transition:none; }
 }
 
 /* ---- Background grain --------------------------------------------------
@@ -2016,15 +1721,25 @@
 <!-- Official clan card: the title and two buttons, nothing else. "Join Our
      Clan" copies the clan tag (copyClanTagBtn, which turns it green for a
      moment) and shows the tag it copies; "Join Global Chat" opens the
-     in-game chat. Styles: .clan-card in the CLASH CLOCK <style> block.
+     in-game chat. Styles: coc-clan-clock.css; script: coc-clan-clock.js
+     (both shared with coc-home.html -- keep this markup in step with its copy).
      (Simplified Sep 2026: the logo tile, "Clan tag" / "Connect with me"
      labels, the separate tag chip -- it did the same job as the Join
      button -- and the paragraph were removed.) -->
 <section class="clan-card" aria-labelledby="clan-title">
   <div class="clan-body">
-    <h2 class="clan-title" id="clan-title">Visit our official <em>clan</em></h2>
-    <!-- Clan stats, filled by the script below from clan-stats.json. That
-         file is refreshed every 30 minutes by a GitHub Action
+    <h2 class="clan-title" id="clan-title">Play with <em>Ascendere</em></h2>
+    <!-- Logo + the two buttons. -->
+    <div class="clan-actions">
+    <span class="clan-logo"><img src="icons/aclogonobg-cropped.png" alt="Ascendere" loading="lazy" decoding="async"></span>
+    <div class="clan-action-row">
+      <button type="button" class="download-btn icon-copy" onclick="copyClanTagBtn(this)" title="Copy the clan tag" data-copy="#2GYPGPJP9"><span class="clan-btn-label">Join <span class="clan-sm-hide">Our </span>Clan</span> <span class="clan-btn-tag">#2GYPGPJP9</span></button>
+      <span class="t18-vh" id="clanCopyStatus" aria-live="polite"></span>
+      <a class="download-btn icon-globe" href="https://link.clashofclans.com/en/?action=OpenGlobalChat&chatId=P46a9cfc5f81340b1b43363b9a30316fb" target="_blank" rel="noopener noreferrer" title="Opens the global chat in Clash of Clans"><span><span class="clan-sm-hide">Join </span>Global Chat</span></a>
+    </div>
+    </div>
+    <!-- Clan stats, under the buttons. Filled by the script below from
+         clan-stats.json, which a GitHub Action refreshes every 30 minutes
          (.github/workflows/clan-stats.yml -> scripts/clan-stats.mjs).
          Hidden until the numbers load, so a missing file just leaves the
          card as title + buttons. War wins only shows if the clan's war log
@@ -2032,11 +1747,15 @@
     <dl class="clan-stats" id="clanStats" hidden>
       <div class="clan-stat"><dt>Members</dt><dd data-stat="members"></dd></div>
       <div class="clan-stat"><dt>Clan level</dt><dd data-stat="level"></dd></div>
-      <div class="clan-stat" data-stat-box="war"><dt>War wins</dt><dd data-stat="warWins"></dd></div>
+      <div class="clan-stat" data-stat-box="war"><dt>War record</dt><dd data-stat="record"></dd></div>
+      <div class="clan-stat" data-stat-box="streak"><dt>Win streak</dt><dd data-stat="streak"></dd></div>
     </dl>
-    <div class="clan-action-row">
-      <button type="button" class="download-btn icon-person" onclick="copyClanTagBtn(this)" title="Copy clan tag to clipboard" data-copy="#2GYPGPJP9">Join Our Clan <span class="clan-btn-tag">#2GYPGPJP9</span></button>
-      <a class="download-btn icon-globe" href="https://link.clashofclans.com/en/?action=OpenGlobalChat&chatId=P46a9cfc5f81340b1b43363b9a30316fb" target="_blank" rel="noopener noreferrer" title="Opens the global chat in Clash of Clans">Join Global Chat</a>
+    <!-- Last 10 wars (W / D / L, newest on the left) and when the numbers
+         last changed. Hidden until loaded. -->
+    <div class="clan-form" id="clanForm" hidden>
+      <span class="clan-form-label">Last 10 wars</span>
+      <ol class="clan-wars" id="clanWars" aria-label="Last 10 war results, newest first"></ol>
+      <span class="clan-updated" id="clanUpdated"></span>
     </div>
   </div>
 
@@ -2044,32 +1763,41 @@
     <img src="clashofclans/coctools/wallbreaker-tight.png" alt="" loading="lazy" decoding="async">
   </div>
 </section>
-<script>
-// Clan stats: read clan-stats.json (kept fresh by a GitHub Action), fill
-// the three tiles, then show the row. Any failure leaves the row hidden.
-(function(){
-  var box = document.getElementById('clanStats');
-  if (!box) return;
-  function fill(d){
-    if (!d || typeof d.members !== 'number') return;
-    function set(name, html){ var el = box.querySelector('[data-stat="' + name + '"]'); if (el) el.innerHTML = html; }
-    set('members', d.members + '<small>/' + (d.maxMembers || 50) + '</small>');
-    set('level', d.level);
-    var war = box.querySelector('[data-stat-box="war"]');
-    if (d.warLogPublic && typeof d.warWins === 'number') {
-      set('warWins', d.warWins.toLocaleString() + (d.warWinStreak > 1 ? '<small>' + d.warWinStreak + ' streak</small>' : ''));
-    } else if (war) {
-      war.hidden = true;                 // private war log: no war numbers to show
-    }
-    box.hidden = false;
-  }
-  if (!window.fetch) return;
-  fetch('clan-stats.json', { cache: 'no-cache' })   // no-cache: always check for a newer copy
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(fill)
-    .catch(function(){});
-})();
-</script>
+<!-- Fills the stats and last-10-wars row from clan-stats.json, and defines
+     copyClanTagBtn(). Shared with coc-home.html. -->
+<script src="coc-clan-clock.js" defer></script>
+
+<!-- FAQ: native <details>/<summary> accordion -- no script needed, works
+     with the keyboard, and the answers stay in the page text (search
+     engines read them). Header uses the same small-caps label as "Live
+     events". Answers written with Adrian, Sep 2026. -->
+<section class="t18-faq" aria-labelledby="t18-faq-label">
+  <div class="cc-label-row">
+    <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
+  </div>
+  <div class="t18-faq-list">
+    <details class="t18-faq-item">
+      <summary>How do I copy a base into my game?</summary>
+      <p>Tap <b>Copy Layout</b> under any base. Clash of Clans opens with the layout loaded, so just save it to one of your layout slots.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Why won&rsquo;t the Copy Layout link open the game?</summary>
+      <p>Apps like Discord, Facebook and Messenger open links in their own built-in browser, which can&rsquo;t launch the game. Tap the <b>&#8942;</b> menu, choose <b>Open in Chrome</b> (or your usual browser), then tap Copy Layout again.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Not on Town Hall 18 yet? Can I still use these?</summary>
+      <p>Yes, if you&rsquo;re Town Hall 17. Base links work one Town Hall level up or down, and anything you haven&rsquo;t unlocked yet is simply left out. Any further than that and the link won&rsquo;t copy.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Are these bases good for war, CWL or trophy pushing?</summary>
+      <p>Yes. We choose quality over quantity. We only post bases that have proven themselves, so every layout here is built to hold up in war, CWL and on the ladder.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>How do I join Ascendere?</summary>
+      <p>Join our <b>Global Chat</b> and let us know you&rsquo;re interested. We&rsquo;ll reply and set you up with a quick tryout. We pick a base, you attack it, and a clean three-star earns your spot. You&rsquo;ll need <b>Town Hall 11</b> or higher.</p>
+    </details>
+  </div>
+</section>
 
 </div>
 
@@ -2222,17 +1950,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script>
-// Clan card's "Join Our Clan" pill: copies the clan tag off data-copy and
-// flashes green. (The layout cards' copy-to-clipboard is gone -- their
-// "Copy Layout" is a plain link to the in-game base now.)
-function copyClanTagBtn(btn){
-  var tag = btn.dataset.copy;
-  navigator.clipboard.writeText(tag).then(function(){
-    btn.classList.add('copied');
-    setTimeout(function(){ btn.classList.remove('copied'); }, 1200);
-  });
-}
-
+// (The clan card's copyClanTagBtn() moved to coc-clan-clock.js, Sep 2026.)
 (function initLayoutLikes(){
   const firebaseConfig = {
     apiKey: "AIzaSyAa8B5rIP0Y9w9jBN_mzKzkFW3xMdI9wgo",

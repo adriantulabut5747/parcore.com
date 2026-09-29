@@ -91,9 +91,15 @@ body {height: 100vh; background: var(--bg-main); color: var(--text-main); displa
 }
 /* Bases grid */
 .grid-container {margin-top: 0px;}
+/* Film grain (same look as th18-layouts): a tiny inline-SVG noise tile laid on
+   top of the background. Its average shade is set to match this dark
+   background, so it adds texture without making the page lighter.
+   Strength = the rect opacity (0.5) and the slope (0.5) in the SVG. */
 .coc-content {
   flex: 1 0 auto;
-background: linear-gradient(180deg, #131212 0%, #171717 100%);
+background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='-0.178'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='-0.178'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='-0.178'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E") 0 0 / 220px 220px,
+  linear-gradient(180deg, #131212 0%, #171717 100%);
 
 }
 

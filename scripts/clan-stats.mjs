@@ -25,42 +25,43 @@ const key = process.env.COC_API_KEY;
 if (!key) { console.error('COC_API_KEY is not set'); process.exit(1); }
 const headers = { Authorization: 'Bearer ' + key, Accept: 'application/json' };
 
-// Our win streak, the way the clan counts it: wins since the last LOSS.
-// Draws don't break it (they're skipped, not counted), and neither do
-// war-log entries without a result (CWL summaries). Newest war first.
-// The game's own warWinStreak is only the fallback if the log can't be read.
-function streakSkippingDraws(log) {
-  if (!log || !Array.isArray(log.items)) return null;
-  let streak = 0;
-  for (const war of log.items) {
-    if (war.result === 'lose') return streak;
-    if (war.result === 'win') streak++;
-  }
-  return streak;          // no loss anywhere in the log: every win it holds
-}
-
-const [clanRes, logRes] = await Promise.all([
+// Clan info + war log, asked for at the same time.
+const [res, logRes] = await Promise.all([
   fetch(API, { headers }),
-  fetch(API + '/warlog?limit=100', { headers })
+  fetch(API + '/warlog?limit=20', { headers })
 ]);
-if (!clanRes.ok) { console.error('Clash API answered ' + clanRes.status); process.exit(1); }
-const c = await clanRes.json();
+if (!res.ok) { console.error('Clash API answered ' + res.status); process.exit(1); }
+const c = await res.json();
 const log = logRes.ok ? await logRes.json() : null;
 
+// Last 10 finished wars, newest first, as W / D / L. War-log entries with
+// no result (CWL summaries) are skipped.
+const CODE = { win: 'W', tie: 'D', lose: 'L' };
+const recentWars = (log && Array.isArray(log.items) ? log.items : [])
+  .map(w => CODE[w.result]).filter(Boolean).slice(0, 10);
+
+// The streak is the game's own warWinStreak, so the card matches what
+// players see in-game. (A self-computed "wins since the last loss, draws
+// skipped" count was tried -- 36 vs the game's 33 in Sep 2026 -- and
+// dropped so the two never disagree.)
 const stats = {
   level: c.clanLevel,
   members: c.members,
   maxMembers: 50,
   warLogPublic: !!c.isWarLogPublic,
   warWins: c.warWins,
-  warWinStreak: streakSkippingDraws(log) ?? c.warWinStreak
+  warTies: c.warTies,
+  warLosses: c.warLosses,
+  warWinStreak: c.warWinStreak,
+  recentWars
 };
 
-// Only rewrite the file when a number actually changed, so the Action
+// Only rewrite the file when something actually changed, so the Action
 // doesn't make a new commit (and a new Pages deploy) every 30 minutes.
+// Compared as JSON so the recentWars list counts too.
 let previous = null;
 try { previous = JSON.parse(await readFile(OUT, 'utf8')); } catch {}
-const same = previous && Object.keys(stats).every(k => previous[k] === stats[k]);
+const same = previous && Object.keys(stats).every(k => JSON.stringify(previous[k]) === JSON.stringify(stats[k]));
 if (same) {
   console.log('No change:', JSON.stringify(stats));
 } else {
