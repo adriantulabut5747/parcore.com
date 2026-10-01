@@ -17609,3 +17609,130 @@ body.mc-rp .cf-card:focus-visible {
     transform: none;
   }
 }
+
+/* ---- KEYCAP BUTTONS (Sep 2026) ------------------------------------------
+   The Minecraft pages' buttons take the site-wide keycap look (11layout.css,
+   "KEYCAP BUTTONS"; tokens --key-face / --key-face-hover / --key-edge /
+   --flat-hover live there). Only the SURFACE changes -- fill, border colour,
+   shadow, text colour. Each button keeps its own size, corners, font and
+   case, so nothing on the page moves. Three kinds:
+     on/off groups ... flat near-black; the ACTIVE one a raised keycap
+                       (filter pills, seed page numbers)
+     actions ......... a raised keycap at rest, lighter on hover, sinks on
+                       press (copy / download / view / search, slider arrows)
+     links ........... flat near-black, a step lighter on hover
+   "body[class*="mc-"]" matches every page's body class (mc-home, mc-rp, ...) and has the
+   same weight as the per-page "body.mc-rp .x" rules above, so these win
+   by coming last. Borders go transparent rather than 0 to keep sizes. */
+:root {
+  --key-pressed: 0 0 0 #08090a, inset 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+/* On/off groups */
+body[class*="mc-"] .rp-pill,
+body[class*="mc-"] .seed-page-btn,
+body[class*="mc-"] .seed-page-arrow,
+body[class*="mc-"] .useful-link-pill,
+body[class*="mc-"] .cf-source-group-label {
+  background: rgba(11, 11, 12, 0.8);
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  transition: background 0.2s, color 0.2s;
+}
+body[class*="mc-"] .rp-pill:hover,
+body[class*="mc-"] .seed-page-btn:hover,
+body[class*="mc-"] .seed-page-arrow:hover,
+body[class*="mc-"] .useful-link-pill:hover,
+body[class*="mc-"] .cf-source-group-label:hover {
+  background: var(--flat-hover);
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+body[class*="mc-"] .rp-pill.active,
+body[class*="mc-"] .seed-page-btn.active {
+  background: var(--key-face);
+  border-color: transparent;
+  box-shadow: var(--key-edge);
+  color: var(--text-main);
+}
+body[class*="mc-"] .rp-pill.active:hover,
+body[class*="mc-"] .seed-page-btn.active:hover {
+  background: var(--key-face-hover);
+}
+/* Seeds pagination: its numbers were built as bare text (thin padding,
+   22px apart), so the keycap made tall slivers. Same geometry as the TH
+   pages' page numbers instead -- 36px squares, 8px corners, 8px apart --
+   and the prev / next arrows carry no box at all, like the TH "Next". */
+body[class*="mc-"] .seed-pagination-nums {
+  gap: 8px;
+  padding: 0 10px;
+}
+body[class*="mc-"] .seed-page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+}
+body[class*="mc-"] .seed-page-arrow,
+body[class*="mc-"] .seed-page-arrow:hover {
+  width: 36px;
+  height: 36px;
+  background: none;
+  box-shadow: none;
+}
+body[class*="mc-"] .seed-page-arrow:hover {
+  color: var(--text-main);
+}
+/* The keycap now marks the current page, so the red underline goes. */
+body[class*="mc-"] .seed-page-btn.active::after {
+  background: transparent;
+}
+
+/* Actions (and the slider arrows): raised at rest */
+body[class*="mc-"] .seed-copy-btn,
+body[class*="mc-"] .mc-drop-btn,
+body[class*="mc-"] .mc-copy-full,
+body[class*="mc-"] .mc-pack-copy,
+body[class*="mc-"] .skin-search-btn,
+body[class*="mc-"] .hcpc-dl-btn,
+body[class*="mc-"] .hcpc-dl-split,
+body[class*="mc-"] .hcpc-copy-btn,
+body[class*="mc-"] .cf-view-all,
+body[class*="mc-"] .cf-arrow,
+body[class*="mc-"] .hcpc-arrow {
+  background: var(--key-face);
+  border-color: transparent;
+  box-shadow: var(--key-edge);
+  color: var(--text-secondary);
+  transition: background 0.2s, color 0.2s, box-shadow 0.1s, transform 0.1s;
+}
+body[class*="mc-"] .seed-copy-btn:hover,
+body[class*="mc-"] .mc-drop-btn:hover,
+body[class*="mc-"] .mc-copy-full:hover,
+body[class*="mc-"] .mc-pack-copy:hover,
+body[class*="mc-"] .skin-search-btn:hover,
+body[class*="mc-"] .hcpc-dl-btn:hover,
+body[class*="mc-"] .hcpc-dl-split:hover,
+body[class*="mc-"] .hcpc-copy-btn:hover,
+body[class*="mc-"] .cf-view-all:hover,
+body[class*="mc-"] .cf-arrow:hover,
+body[class*="mc-"] .hcpc-arrow:hover {
+  background: var(--key-face-hover);
+  border-color: transparent;
+  color: var(--text-main);
+}
+body[class*="mc-"] .seed-copy-btn:active,
+body[class*="mc-"] .mc-drop-btn:active,
+body[class*="mc-"] .mc-copy-full:active,
+body[class*="mc-"] .mc-pack-copy:active,
+body[class*="mc-"] .skin-search-btn:active,
+body[class*="mc-"] .hcpc-dl-btn:active,
+body[class*="mc-"] .hcpc-dl-split:active,
+body[class*="mc-"] .hcpc-copy-btn:active,
+body[class*="mc-"] .cf-view-all:active,
+body[class*="mc-"] .cf-arrow:active,
+body[class*="mc-"] .hcpc-arrow:active {
+  box-shadow: var(--key-pressed);
+  transform: translateY(2px);
+}

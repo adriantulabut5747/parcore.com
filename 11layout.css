@@ -2388,3 +2388,84 @@ controls there. */
     scrollbar-gutter: stable;
   }
 }
+
+/* ---- KEYCAP BUTTONS: secondary top bar + active sidebar row -------------
+   Site-wide since Sep 2026 (tried on th18-layouts first). The top bar's
+   chips (.dsn-chip: TH chips, hwr categories, Minecraft sections...) and
+   its hub links (.stb-hub-link: Home / Layouts / Armies / Guides...) wear
+   the Clash pages' Layouts / Army / Guides tab styling: flat near-black at
+   rest, a step lighter on hover, and the ACTIVE one a raised keycap (--key-
+   face + a hard 3px --key-edge) that lightens on hover. Oxanium caps at
+   10.5px / 700 / 1px tracking -- the tabs' own compact size -- because the bar
+   is only 40px tall. The active sidebar row takes the same keycap; the
+   other rows, its font and the red accent bar stay as they were.
+   Tokens: same values as th-layouts.css's (which the TH pages' tabs and
+   card buttons use) -- change both together. Selectors are prefixed with
+   .secondary-top-bar / .sidebar so they outrank the plain chip rules above
+   and any page stylesheet loaded after this file. */
+:root {
+  --key-face: linear-gradient(180deg, #26282e, #1b1c21);
+  --key-face-hover: linear-gradient(180deg, #31343b, #24262b);
+  --key-edge: 0 3px 0 #08090a, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --flat-hover: #1e1f23;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip,
+.secondary-top-bar .stb-hub-nav .stb-hub-link {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  box-shadow: none;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700; /* 700, not the tabs' 800: at this size 800 read too wide */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: background 0.2s, color 0.2s;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip:hover,
+.secondary-top-bar .stb-hub-nav .stb-hub-link:hover {
+  background: var(--flat-hover);
+  color: var(--text-secondary);
+}
+/* Top-bar active key: a touch lighter than --key-face (#26282e -> #1b1c21),
+   about 3 shades, so it lifts a little off the bar. Deliberately subtle. */
+.secondary-top-bar .stb-dsn-wrap .dsn-chip.active,
+.secondary-top-bar .stb-hub-nav .stb-hub-link.active {
+  border-radius: 8px;
+  background: linear-gradient(180deg, #292b31, #1e1f24);
+  color: var(--text-main);
+  box-shadow: var(--key-edge);
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip.active:hover,
+.secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover {
+  background: linear-gradient(180deg, #34373e, #27292e);
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip:focus-visible,
+.secondary-top-bar .stb-hub-nav .stb-hub-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.sidebar a.active,
+.sidebar .games-container .game.active,
+.sidebar .triple-a-list .triple-a-game.active {
+  border-radius: 8px;
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--text-main);
+}
+.sidebar a.active:hover,
+.sidebar .games-container .game.active:hover,
+.sidebar .triple-a-list .triple-a-game.active:hover {
+  background: var(--key-face-hover);
+}
+/* Top box (Parchrome / Web Resources): the same keycap, a touch darker
+   (about 3 shades, same edge), so it sits a little clearer on that
+   panel's lighter --sb-raised (#16161a). Deliberately subtle. */
+.sidebar .top-box a.active {
+  background: linear-gradient(180deg, #232429, #18191c);
+}
+.sidebar .top-box a.active:hover {
+  background: linear-gradient(180deg, #2c2e34, #202226);
+}

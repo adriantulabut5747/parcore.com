@@ -56,6 +56,91 @@
   transform: scale(1.035);
 }
 
+/* ARMY CARD (thNN-army.html) -- the layout card with a name row on top:
+   Legend I / II / III badge for the top 3 (th-layouts.js RANK_ICONS),
+   then the army's name. Sora, like the rest of the page text. The row
+   sits in the card's padding, 10px above the image. */
+.army-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin: 0 2px 10px;
+}
+.army-rank {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+.army-name {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #e6e7ea;
+}
+/* "#1" / "#2" / "#3" after the name: the same red pill as the desktop
+   page pill (.t18-page), so the rank reads at a glance. */
+.army-rank-tag {
+  flex: none;
+  padding: 4px 8px 3px;
+  border: 1px solid rgba(224, 99, 99, 0.45);
+  border-radius: 999px;
+  background: rgba(194, 59, 59, 0.14);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: #e06363;
+}
+/* Pen, top-right: opens this army in the army maker to edit it
+   (th-layouts.js armyCardHtml). Same key face as the card's heart / share
+   buttons, pushed to the row's right end. */
+.army-edit {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  border-radius: 8px;
+  background: var(--key-face);
+  box-shadow: var(--key-soft);
+  color: #8b9099;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.army-edit:hover {
+  background: var(--key-face-hover);
+  color: var(--text-main);
+}
+.army-edit:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-soft-pressed);
+}
+.army-edit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.army-edit .bar-ico {
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 970px) {
+  .army-name {
+    font-size: 14px;
+  }
+}
+
 /* Corner chrome: badge top-right, clan banner top-left. Same height,
    radius, fill and hairline so the two read as one set. */
 .image-badge,
@@ -377,6 +462,27 @@
 .share-panel .bar-ico {
   width: 16px;
   height: 16px;
+}
+/* App logos (Simple Icons): filled, in each brand's colour. X is white,
+   not its official black, which would vanish on this dark panel. */
+.share-panel .sp-brand {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  stroke: none;
+}
+.sp-facebook {
+  color: #0866ff;
+}
+.sp-x {
+  color: #fff;
+}
+.sp-reddit {
+  color: #ff4500;
+}
+.sp-whatsapp {
+  color: #25d366;
 }
 .share-panel .sp-copy.copied {
   color: #8fe0ac;
@@ -732,21 +838,8 @@
   opacity: 0;
 }
 
-/* Trial: give the active TH chip in the dsn-chip strip the same
-   rounded-corner + bezel look as the Copy Layout button. Note the
-   button doesn't actually use a CSS `border` -- what reads as a rim in
-   the screenshot is its outer box-shadow (0 4px 14px black) plus the
-   lighter top of its own gradient fill, so that's copied here too,
-   alongside overriding 11layout.css's ".stb-dsn-wrap .dsn-chip" 16px
-   radius (same specificity, wins on source order since this page's
-   <style> loads after that file). Page-scoped, not a 11layout.css
-   edit -- that file's chip strip is shared by all 14 pages. */
-.dsn-chip.active,
-.stb-dsn-wrap .dsn-chip.active {
-  border-radius: 9px;
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-}
+/* (The old "active TH chip like Copy Layout" trial that stood here was
+   replaced by the site-wide keycap style at the end of 11layout.css.) */
 
 /* stb-hub-link icons: outline/fill pair like #bottomNav's .bn-item
    icons, same toggle mechanism (.bn-item .bn-ico-fill{display:none} /
@@ -779,9 +872,15 @@
    homewebresources.html -- its label renders in Sora because the inner
    .secondary-content-desktop span sets it, even though hwr-css.css puts
    Oxanium on the wrapper. Two classes to outrank 11layout.css's mobile
-   ".secondary-content { font-family:'Oxanium' }". */
-.secondary-top-bar .secondary-content {
+   ".secondary-content { font-family:'Oxanium' }". The "*" covers the
+   phone "/ Page 1/2" span (#stbPage): 1coclayouts.css puts Oxanium on
+   every element ("* { font-family: oxanium }"), so a child span doesn't
+   inherit the Sora above -- it has to be set on it directly. */
+.secondary-top-bar .secondary-content,
+.secondary-top-bar .secondary-content * {
   font-family: 'Sora', sans-serif;
+}
+.secondary-top-bar .secondary-content {
   font-weight: 500;
 }
 
@@ -790,19 +889,8 @@
    in PAGE SPACING below. */
 
 /* ---- FAQ (under the clan card) ----------------------------------------
-   Look: coc-clan-clock.css (shared with coc-home.html). Only this page's
-   spacing is here. Gap above: 64 (a section break) -- set here in full,
-   because it merges with the clan card's 34px bottom margin (adjacent
-   margins collapse to the bigger one); below: 34 + .coc-content's 30px
-   padding = 64. */
-.t18-faq {
-  margin: 64px 0 34px;
-}
-@media (max-width: 970px) {
-  .t18-faq {
-    margin: 0 0 48px;
-  } /* the clan card's 48px bottom margin is the gap above */
-}
+   Look: coc-clan-clock.css (shared with coc-home.html). Its spacing is in
+   PAGE SPACING below, with the other sections. */
 
 /* ---- PAGE SPACING ------------------------------------------------------
    One vertical rhythm for the whole page, three steps:
@@ -818,9 +906,14 @@
      nav -> first row of bases ............ 32 / 24
      between rows of bases ................ 30 / 32 (unchanged)
      last row -> page numbers ............. 28 / 24  (they belong to the grid)
-     page numbers -> Clash Clock .......... 64 / 48  (section break)
-     clock cards -> clan card ............. 12 / 10  (same as between clock cards)
-     clan card -> footer .................. 64 / 48  (section break)      */
+     page numbers -> Live events .......... 96 / 72  (section break)
+     Live events -> clan card -> FAQ ...... 96 / 72  (section breaks)
+     last section -> footer ............... 64 / 48
+   Sep 2026: the three bottom sections were 64 / 48 (phones: only 20
+   between Live events and the clan card) and read as one block, so the
+   breaks grew. No divider lines -- the space and each section's small
+   caps label do the separating. The rules don't depend on the order, so
+   the sections can be rearranged without touching this block.                          */
 .whats-up {
   margin-bottom: 0;
 }
@@ -834,12 +927,21 @@
 .pagination-wrap {
   margin: 28px 0 0;
 }
-.cc-section {
-  margin: 64px 0 0;
+.cc-section,
+.t18-faq {
+  margin: 96px 0 0;
 }
+/* 96 + 46: on desktop the Wall Breaker pokes 46px out of the card's top
+   edge, so the visible gap above his head matches the other breaks. */
 .clan-card {
-  margin: 64px 0 34px;
-} /* 64: the Wall Breaker pokes ~45px out of the card's top edge, so this keeps his head clear of the event tags above. + .coc-content's 30px bottom padding = 64 below */
+  margin: 142px 0 0;
+}
+/* Whichever section comes last: 34 + .coc-content's 30px bottom padding
+   = 64 to the footer. last-of-type, not last-child: the clan card's
+   <script> tag comes after it, so it's never the last child. */
+.coc-content > section:last-of-type {
+  margin-bottom: 34px;
+}
 /* Desktop spacing, one scale (8 / 16 / 24 / 32 / 64). Things that belong
    together sit closer: the tabs control the grid, so tabs -> grid (16) is
    tighter than hero -> tabs (32); cards 24 apart both ways; grid ->
@@ -864,12 +966,16 @@
   .pagination-wrap {
     margin: 24px 0 0;
   }
-  .cc-section {
-    margin: 48px 0 0;
-  }
+  /* Phones: the Wall Breaker stays inside the card, so no extra room. */
+  .cc-section,
+  .t18-faq,
   .clan-card {
-    margin: 20px 0 48px;
-  } /* mobile .coc-content has no bottom padding */
+    margin: 72px 0 0;
+  }
+  /* mobile .coc-content has no bottom padding */
+  .coc-content > section:last-of-type {
+    margin-bottom: 48px;
+  }
 }
 
 /* Hide page until fully loaded */
@@ -998,6 +1104,33 @@ html.loaded {
   color: var(--t18-text);
   text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
 }
+/* Page pill (#t18Page): "PAGE 1/2" on its own line above the title
+   (inside .t18-head, which stacks it over the title). Filled by the
+   script; stays hidden when the TH has one page. */
+.t18-page {
+  align-self: flex-start;
+  padding: 5px 10px 4px;
+  border: 1px solid rgba(224, 99, 99, 0.45);
+  border-radius: 999px;
+  background: rgba(194, 59, 59, 0.14);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #e06363;
+}
+.t18-page[hidden] {
+  display: none;
+}
+/* Desktop only: phones already show "/ Page 1/2" in the secondary top
+   bar (#stbPage), and the pill made the phone hero taller. */
+@media (max-width: 970px) {
+  .t18-page {
+    display: none;
+  }
+}
 /* Red word, no glow: it used to carry a pulsing red text-shadow. */
 .t18-title em {
   font-style: normal;
@@ -1101,11 +1234,13 @@ html.loaded {
   }
 }
 
-/* Title row: just the two-line title now (the Revenge Tower art was removed). */
+/* Title block: the page pill (#t18Page) stacked over the two-line title
+   (the Revenge Tower art that sat beside it was removed). */
 .t18-head {
   display: flex;
-  align-items: center;
-  gap: 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   margin-bottom: 20px;
 }
 .t18-head .t18-title {
@@ -1284,12 +1419,14 @@ html.loaded {
    the base screenshots are the only colour. (History: blue-grey
    #282c53 -> #151617 until Sep 2026; a dark red #3a1d21 was tried before
    that.) The hairline is an inset shadow, not a border, so it adds no
-   size. Set here and in the base .discord-card rule + its phone override. */
+   size. Set here and in the base .discord-card rule + its phone override.
+   Sep 2026: hairline halved (8% -> 4% white, hover 14% -> 8%) so the
+   card edge is quieter than the hero's and the screenshot leads. */
 .coc-content .discord-card {
   background: #121316;
   box-shadow:
     0 6px 18px rgba(0, 0, 0, 0.35),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   transition:
     box-shadow 0.25s ease,
     transform 0.25s ease;
@@ -1297,7 +1434,7 @@ html.loaded {
 .coc-content .discord-card:hover {
   box-shadow:
     0 12px 28px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 /* CC popover + share menu in the same material */

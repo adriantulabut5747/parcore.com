@@ -1,404 +1,752 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AC | Parcore</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parcore | Clash of Clans</title>
 
-<!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="icons/home.jpg">
-<link rel="shortcut icon" href="icons/home.jpg">
-<link rel="apple-touch-icon" href="icons/home.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Oxanium -->
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet" />
+    <!-- Teko Russo Orbitron Sora -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-<link rel="stylesheet" href="1cocarmy.css">
+    <link rel="icon" href="icons/home.jpg" />
+    <link rel="shortcut icon" href="icons/home.jpg" />
+    <link rel="apple-touch-icon" href="icons/home.jpg" />
 
+    <meta property="og:title" content="TH16 Army Comps | Parchrome" />
+    <meta property="og:description" content="Copy the best TH16 Clash of Clans army comps straight into your game." />
+    <meta property="og:url" content="https://parchrome.netlify.app/th16-army.html" />
+    <meta property="og:type" content="website" />
 
-<!-- Oxanium -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="11layout.css" />
+    <link rel="stylesheet" href="1coclayouts.css" />
+    <!-- Live events + official clan card, shared with coc-home.html -->
+    <link rel="stylesheet" href="coc-clan-clock.css" />
 
+    <!-- Look + behaviour shared by every Town Hall layouts page -->
+    <link rel="stylesheet" href="th-layouts.css" />
+  </head>
+  <body>
+    <!-- Shared ember gradient for the liked flame. -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="heartActiveFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffd36b" />
+          <stop offset=".55" stop-color="#ff8a3d" />
+          <stop offset="1" stop-color="#e2531f" />
+        </linearGradient>
+      </defs>
+    </svg>
 
-
-
-<style>
- .discord-card {
-  background: linear-gradient( 90deg,  rgba(242, 88, 88, 0.18), rgba(25, 26, 27, 0.5));
-  border-radius: 10px;
-  padding: 16px;
-  max-width: 850px;
-  margin:  auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);}
-    
-.army-tag 
-  {background-color: #771901;
- /* box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);*/
-}
-  
- 
-    
-</style>
-
-
-</head>
-<body>
-  
-  <div id="page-loader">
-  <div class="parchrome-fade">
-    <div class="parchrome-ring"></div>
-  </div>
-  <span class="parchrome-label">Parchrome</span>
-</div>
-
-
-
-
-<!-- Top Nav -->
-<div class="top-bar">
-  <div class="top-bar-left-avatar"></div>
-  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-  <div class="top-bar-title">
-    <div class="topbar-logo">
-      <img src="icons/home.jpg" alt="">
-    </div> Parchrome</div>
-
-<!-- Search button -->
-<button id="search-btn" onclick="openSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
-  <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
-    <!-- Magnifying glass -->
-    <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
-    <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-  </svg>
-  <span id="close-icon" style="display:none; font-size: 1.5rem; color: white;">✖</span></button>
-<!-- Overlay -->
-<div id="search-overlay">
-  <!-- Close button -->
-  <button id="search-close-btn">✖</button>
-  <!-- Search input -->
-  <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
-  <!-- Search results -->
-  <div id="search-results"></div></div></div>
-
-<!-- Secondary Top Bar -->
-<div class="secondary-top-bar" id="secondary-top-bar">
-  <div class="secondary-left">
- <img src="clashofclans/th16army/th16-army.webp" alt="TH16 Icon" class="th-icon">
-    <div class="secondary-content">
-      Townhall 16 Army Setup
+    <div id="page-loader">
+      <div class="parchrome-fade">
+        <div class="parchrome-ring"></div>
+      </div>
+      <span class="parchrome-label">Parchrome</span>
     </div>
-  </div>
 
+    <!-- Top Nav -->
+    <div class="top-bar">
+      <div class="top-bar-left-avatar"></div>
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="top-bar-title">
+        <div class="topbar-logo">
+          <img src="icons/home.jpg" alt="" />
+        </div>
+        <a href="home.html">Parchrome</a>
+      </div>
 
-  
- 
-  <div class="help-container">
-    <div class="help-button" onclick="toggleHelp(event)">
-      <svg width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" fill="none" xmlns="http://www.w3.org/2000/svg"
-       stroke="#c2c2c2"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" 
-       stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 5.5C5.5 4.11929 6.61929 3 8 3C9.38071 3 
-        10.5 4.11929 10.5 5.5C10.5 6.88071 9.38071 8 8 8H7V11H8C11.0376 11 13.5 8.53757 13.5 5.5C13.5 2.46243 11.0376
-         0 8 0C4.96243 0 2.5 2.46243 2.5 5.5H5.5Z" fill="#bebebe"></path> <path d="M10 13H7V16H10V13Z" fill="#bebebe"></path> </g></svg>
-         </div>
-    <div class="help-popup" id="help-popup">
-      <strong>Info</strong> <ul> <br> 
-  <li>🛡️ Tap the clan banner to view recommended CC</li><br>
-  <li>⚠️ Downloads may not work inside Facebook or Messenger.
-Please open this page in Chrome for the best experience.</li><br>
-<li>📋 AC Clan Tag: <span id="clan-tag" class="copy-tag">#2GYPGPJP9</span></li><br></ul>
-<div id="copy-msg" style="position:absolute; top:-30px; right:0; background:#242424;
- color:white; padding:8px 16px; border-radius:4px; display:none; font-size:20px;">Clan Tag Copied!</div>   </div>
+      <!-- Search button -->
+      <button
+        id="search-btn"
+        onclick="toggleSearch()"
+        style="background: transparent; border: none; padding: 0; cursor: pointer; right: 15px; position: fixed; margin-top: 2px"
+      >
+        <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+          <!-- Magnifying glass -->
+          <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none" />
+          <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span id="close-icon">✖</span>
+      </button>
+      <!-- Overlay -->
+      <div id="search-overlay">
+        <div id="search-input-wrap">
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Find your next game..."
+            oninput="searchItems()"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+          <button type="button" id="search-input-clear" aria-label="Clear search" style="display: none">✖</button>
+        </div>
+        <!-- Search results -->
+        <div id="search-results"></div>
+        <div id="search-view-more" class="hero-search-viewmore" style="display: none">Loading more…</div>
+      </div>
+    </div>
 
-  <div class="help-container2">
-    <a class="help-button2" href="home.html">
-  <svg fill="#bebebe" width="15px" height="15px" viewBox="-3.2 -3.2 22.40 22.40" xmlns="http://www.w3.org/2000/svg" stroke="#bebebe">
-    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-    <g id="SVGRepo_iconCarrier"> <path d="M12.207 9H5V7h7.136L11.05 5.914 12.464 4.5 16 8.036l-3.536 3.535-1.414-1.414L12.207 9zM10 
-       4H8V2H2v12h6v-2h2v4H0V0h10v4z" fill-rule="evenodd"></path> </g></svg>
-       </a>
-  </div>
-</div></div>
+    <!-- Secondary Top Bar -->
+    <div class="secondary-top-bar" id="secondary-top-bar">
+      <div class="secondary-left">
+        <img src="icons/th16icon.webp" alt="TH16 Icon" class="th-icon" />
+        <div class="secondary-content">Townhall 16 Army Comps<span class="stb-page" id="stbPage"></span></div>
+      </div>
 
+      <div class="stb-divider" aria-hidden="true"></div>
 
+      <!-- dsn-chip strip: Town Halls TH18→TH8, built from coc-nav-data.json.
+       No more dropdown -- each chip links straight to that TH's layouts
+       page. Markup/behavior mirrors hwr's .stb-dsn-wrap (11layout.css/js),
+       same as coc-home.html. -->
+      <div class="stb-dsn-wrap" id="stbDsnWrap">
+        <button class="dsn-scroll-btn dsn-scroll-left" id="dsnScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
+        <button class="dsn-scroll-btn dsn-scroll-right" id="dsnScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
 
+      <!-- Divider between the two strips -- caps off the dsn-chip row before
+       the stb-hub-link row begins, same as hwr's reference layout. -->
+      <div class="stb-divider-end" aria-hidden="true"></div>
 
-
+      <!-- stb-hub-link strip: Home / Layouts / Armies / Guides, built from
+       coc-nav-data.json's primaryNav. data-hub-nav="off" opts this out of
+       11layout.js's hwr-only hub-nav builder (initHubNav), which would
+       otherwise overwrite it with hwr's own Home/Bookmarks/etc. -->
+      <div class="stb-hub-nav" id="stbHubNav" data-hub-nav="off">
+        <button class="dsn-scroll-btn dsn-scroll-left" id="hubScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+        <button class="dsn-scroll-btn dsn-scroll-right" id="hubScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
 
     <!-- Main -->
     <div class="main">
       <div class="sidebar" id="sidebar">
-    <!-- Top Box -->
-    <div class="top-box" id="top-box"></div>
-    <!-- Games list -->
-    <div class="games-container" id="games-container"></div>
-    <!-- Triple A Games -->
-  <div class="triple-a-container">
-      <div class="triple-a-header" onclick="toggleTripleA()">
-        <img  src="icons/controllericon.png" class="tripleimg">
-        Triple A Games <span class="arrow">></span>
+        <!-- Top Box -->
+        <div class="top-box" id="top-box"></div>
+        <!-- Games list -->
+        <div class="games-container" id="games-container"></div>
+        <!-- Triple A Games -->
+        <div class="triple-a-container">
+          <div class="triple-a-header" id="triple-a-header" onclick="toggleTripleA()"></div>
+          <div class="triple-a-list" id="triple-a-list"></div>
+        </div>
       </div>
-      <div class="triple-a-list" id="triple-a-list"></div> </div></div>
 
+      <div class="coc-main">
+        <div class="coc-content">
+          <!-- PAGE HERO ("Hanging tags" mockup, tags brought inside): one
+            card holding everything. Left: the Orbitron headline with one
+            red word, "Did you know?", then the pinned event tags. Right:
+            the Revenge Tower standing on its own like a trophy, with its
+            badge, name and one line under it. Styles: the TH18 COC-HOME
+            THEME block in th-layouts.css. -->
+          <section class="t18-hero" aria-labelledby="t18-title">
+            <div class="t18-hero-copy">
+              <div class="t18-head">
+                <!-- #t18Page: "PAGE 1/2" pill above the title, desktop only
+                  (phones have "/ Page 1/2" in the secondary top bar).
+                  th-layouts.js fills it; hidden when the TH has one page. -->
+                <span class="t18-page" id="t18Page" hidden></span>
+                <h1 class="t18-title" id="t18-title">
+                  TH16 army<br />
+                  <em>comps</em>
+                </h1>
+              </div>
+              <!-- DID YOU KNOW? -- sits where the intro sentence (.t18-sub) used
+                to be, in that sentence's colour and type. Facts live in coc-dyk.json (edit that file,
+                not this markup). th-layouts.js shuffles them on every
+                visit and fades to the next one on its own. Hidden until the
+                JSON loads, so a failed fetch leaves no empty label behind. -->
+              <div class="t18-dyk" id="t18-dyk" role="button" tabindex="0" hidden>
+                <span class="t18-dyk-label">Did you know?</span>
+                <div class="t18-dyk-stage"></div>
+              </div>
+            </div>
 
-  <div class="coc-main" >
+            <!-- EVENTS -- all six clan events on the card: event icon | name
+              over countdown. coc-events.js fills [data-timer] and sets
+              .is-live / .is-upcoming on each link: counting to an end = red
+              "ends 1d 3h" and a red dot on the icon, not started = grey
+              "starts 4d 4h" and a grey dot (the words are CSS). Each jumps to
+              Live events. Desktop: 2 per row; as many rows (2 or 3) as fit
+              beside the text, the rest hidden -- set by th-layouts.js.
+              Phones: ONE compact card beside the title, starting on Raid
+              Weekend, with small prev / next buttons either side (no
+              auto-rotate). -->
+            <ul class="t18-events" aria-label="Clan events">
+              <li class="t18-ev-navli t18-ev-navli--prev">
+                <button type="button" class="t18-ev-nav" data-step="-1" aria-label="Previous event">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M14.5 6l-6 6 6 6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </li>
+              <li>
+                <a class="t18-event" href="#events-section" data-event="raid"
+                  ><span class="t18-event-icon"><img src="clashofclans/coctools/raidmedals2.webp" alt="" decoding="async" /></span
+                  ><span class="t18-event-text"
+                    ><span class="t18-event-name">Raid Weekend</span> <b class="t18-event-time" data-timer>--</b></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a class="t18-event" href="#events-section" data-event="cwl"
+                  ><span class="t18-event-icon"><img src="clashofclans/coctools/cwl2.webp" alt="" decoding="async" /></span
+                  ><span class="t18-event-text"
+                    ><span class="t18-event-name">CWL</span> <b class="t18-event-time" data-timer>--</b></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a class="t18-event" href="#events-section" data-event="clangames"
+                  ><span class="t18-event-icon"><img src="clashofclans/coctools/clangames2.webp" alt="" decoding="async" /></span
+                  ><span class="t18-event-text"
+                    ><span class="t18-event-name">Clan Games</span> <b class="t18-event-time" data-timer>--</b></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a class="t18-event" href="#events-section" data-event="trader"
+                  ><span class="t18-event-icon"><img src="clashofclans/coctools/trader2.webp" alt="" decoding="async" /></span
+                  ><span class="t18-event-text"
+                    ><span class="t18-event-name">Trader Shop</span> <b class="t18-event-time" data-timer>--</b></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a class="t18-event" href="#events-section" data-event="season"
+                  ><span class="t18-event-icon"><img src="clashofclans/coctools/battlepass.webp" alt="" decoding="async" /></span
+                  ><span class="t18-event-text"
+                    ><span class="t18-event-name">Battle Pass</span> <b class="t18-event-time" data-timer>--</b></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a class="t18-event" href="#events-section" data-event="legend"
+                  ><span class="t18-event-icon"><img src="clashofclans/coctools/legend-league.png" alt="" decoding="async" /></span
+                  ><span class="t18-event-text"
+                    ><span class="t18-event-name">Legend League</span> <b class="t18-event-time" data-timer>--</b></span
+                  ></a
+                >
+              </li>
+              <li class="t18-ev-navli t18-ev-navli--next">
+                <button type="button" class="t18-ev-nav" data-step="1" aria-label="Next event">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M9.5 6l6 6-6 6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </section>
 
-     <div class="coc-content">
+          <!-- First Layer -->
+          <div class="first-layer" data-role="first-layer"></div>
 
-      <div class="whats-up">
-  <img src="icons/electroboots.webp" alt="TH18" class="whats-new-icon">
-  <div class="whats-new-text"><span class="desktop-text">
-    <div class="whats-up-strong">RC Charge <span style="font-size: 10px; color: #8b8a8a;">(spirit walk)</span></div>
-- This strategy combines Invisibility spells and the Royal Champion, letting her charge deep into the base to destroy key
- defenses and sets up a funnel for the main troops, then return with a Recall Potion.
-    
+          <!-- Second Layer -->
+          <div class="second-layer-container" id="second-layer-container">
+            <div class="second-layer" id="second-layer" data-role="second-layer"></div>
+          </div>
+          <!-- Scroll line for the Town Hall strip (mobile): a full-width hairline
+       that doubles as the divider, with a brighter segment showing which
+       part of the strip is in view. Driven by th-layouts.js. -->
+          <div class="th-rail" id="th-rail" aria-hidden="true"><span></span></div>
 
-   </span>
-  <span class="mobile-text">
-     <div class="whats-up-strong">RC Charge <span style="font-size: 10px; color: #8b8a8a;">(spirit walk)</span></div>
-    - This strategy combines the Invisibility spell with the Royal Champion, letting her charge deep 
-     into the base to destroy key defenses.
-    </span></div>
-  </div> 
-    <!-- First Layer -->
-    <div class="first-layer">
-      <button onclick="location.href='th16-layouts.html'">Layouts</button>
-      <button  class="active" onclick="location.href='th16-army.html'">Army</button>
-      <button onclick="location.href='coctools.html'">Guides</button>
+          <!-- Army grid: empty here -- th-layouts.js builds one card per army
+         in th16-army.json (edit that file to add or change an army). -->
+          <div class="grid-container" data-armies="th16-army.json"></div>
+
+          <!-- Page numbers: built by th-layouts.js (Prev / 1 2 / Next, 10 bases a
+         page, ?page=2 in the address). Hidden when a TH has one page. -->
+          <nav class="pagination-wrap" aria-label="Army pages" hidden>
+            <div class="pagination" id="layout-pages"></div>
+          </nav>
+
+          <!-- CLASH CLOCK -- same cards as coc-home.html's Clash Clock (copied
+       markup; coc-events.js fills the data-* hooks and flags live events).
+       id kept: coc-events.js still looks up #events-section. -->
+          <section class="cc-section" id="events-section" aria-labelledby="cc-label">
+            <!-- Small list header (grouped-list pattern), not a big title: tells
+         the reader a new section starts after the page numbers. -->
+            <div class="cc-label-row">
+              <h2 class="cc-label" id="cc-label">Live events</h2>
+              <span class="cc-label-note">Your local time</span>
+            </div>
+            <!-- The six events as pinned tags (same material and starts/ends
+         wording as the banner's tags), each with its event icon in the
+         Clash Tools tile. Replaced the old six boxed cards. Not links --
+         this IS the events section. coc-events.js fills them. -->
+            <ul class="t18-clock" aria-label="Clan events">
+              <li class="t18-tag t18-clock-tag" data-event="raid">
+                <span class="cc-event-icon"
+                  ><img src="clashofclans/coctools/raidmedals2.webp" alt="" loading="lazy" decoding="async" /></span
+                ><span class="t18-clock-text"
+                  ><span class="t18-tag-name">Raid Weekend</span> <b class="t18-tag-time" data-timer>--</b></span
+                >
+              </li>
+              <li class="t18-tag t18-clock-tag" data-event="cwl">
+                <span class="cc-event-icon"><img src="clashofclans/coctools/cwl2.webp" alt="" loading="lazy" decoding="async" /></span
+                ><span class="t18-clock-text"
+                  ><span class="t18-tag-name">Clan War League</span> <b class="t18-tag-time" data-timer>--</b></span
+                >
+              </li>
+              <li class="t18-tag t18-clock-tag" data-event="clangames">
+                <span class="cc-event-icon"><img src="clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async" /></span
+                ><span class="t18-clock-text"><span class="t18-tag-name">Clan Games</span> <b class="t18-tag-time" data-timer>--</b></span>
+              </li>
+              <li class="t18-tag t18-clock-tag" data-event="trader">
+                <span class="cc-event-icon"><img src="clashofclans/coctools/trader2.webp" alt="" loading="lazy" decoding="async" /></span
+                ><span class="t18-clock-text"><span class="t18-tag-name">Trader Shop</span> <b class="t18-tag-time" data-timer>--</b></span>
+              </li>
+              <li class="t18-tag t18-clock-tag" data-event="season">
+                <span class="cc-event-icon"><img src="clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async" /></span
+                ><span class="t18-clock-text"
+                  ><span class="t18-tag-name" data-name="short">Battle Pass</span> <b class="t18-tag-time" data-timer>--</b></span
+                >
+              </li>
+              <li class="t18-tag t18-clock-tag" data-event="legend">
+                <span class="cc-event-icon"
+                  ><img src="clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async" /></span
+                ><span class="t18-clock-text"
+                  ><span class="t18-tag-name">Legend League</span> <b class="t18-tag-time" data-timer>--</b></span
+                >
+              </li>
+            </ul>
+          </section>
+
+          <!-- Official clan card: the title and two buttons, nothing else. "Join Our
+     Clan" copies the clan tag (copyClanTagBtn, which turns it green for a
+     moment) and shows the tag it copies; "Join Global Chat" opens the
+     in-game chat. Styles: coc-clan-clock.css; script: coc-clan-clock.js
+     (both shared with coc-home.html -- keep this markup in step with its copy).
+     (Simplified Sep 2026: the logo tile, "Clan tag" / "Connect with me"
+     labels, the separate tag chip -- it did the same job as the Join
+     button -- and the paragraph were removed.) -->
+          <section class="clan-card" aria-labelledby="clan-title">
+            <div class="clan-body">
+              <h2 class="clan-title" id="clan-title">Play with <em>Ascendere</em></h2>
+              <!-- Logo + the two buttons. -->
+              <div class="clan-actions">
+                <span class="clan-logo"><img src="icons/aclogonobg-cropped.png" alt="Ascendere" loading="lazy" decoding="async" /></span>
+                <div class="clan-action-row">
+                  <button
+                    type="button"
+                    class="download-btn icon-copy"
+                    onclick="copyClanTagBtn(this)"
+                    title="Copy the clan tag"
+                    data-copy="#2GYPGPJP9"
+                  >
+                    <span class="clan-btn-label">Join <span class="clan-sm-hide">Our </span>Clan</span>
+                    <span class="clan-btn-tag">#2GYPGPJP9</span>
+                  </button>
+                  <span class="t18-vh" id="clanCopyStatus" aria-live="polite"></span>
+                  <a
+                    class="download-btn icon-globe"
+                    href="https://link.clashofclans.com/en/?action=OpenGlobalChat&chatId=P46a9cfc5f81340b1b43363b9a30316fb"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Opens the global chat in Clash of Clans"
+                    ><span><span class="clan-sm-hide">Join </span>Global Chat</span></a
+                  >
+                </div>
+              </div>
+              <!-- Clan stats, under the buttons. Filled by the script below from
+         clan-stats.json, which a GitHub Action refreshes every 30 minutes
+         (.github/workflows/clan-stats.yml -> scripts/clan-stats.mjs).
+         Hidden until the numbers load, so a missing file just leaves the
+         card as title + buttons. War wins only shows if the clan's war log
+         is public. -->
+              <dl class="clan-stats" id="clanStats" hidden>
+                <div class="clan-stat">
+                  <dt>Members</dt>
+                  <dd data-stat="members"></dd>
+                </div>
+                <div class="clan-stat">
+                  <dt>Clan level</dt>
+                  <dd data-stat="level"></dd>
+                </div>
+                <div class="clan-stat" data-stat-box="war">
+                  <dt>War record</dt>
+                  <dd data-stat="record"></dd>
+                </div>
+                <div class="clan-stat" data-stat-box="streak">
+                  <dt>Win streak</dt>
+                  <dd data-stat="streak"></dd>
+                </div>
+              </dl>
+              <!-- Last 10 wars (W / D / L, newest on the left) and when the numbers
+         last changed. Hidden until loaded. -->
+              <div class="clan-form" id="clanForm" hidden>
+                <span class="clan-form-label">Last 10 wars</span>
+                <ol class="clan-wars" id="clanWars" aria-label="Last 10 war results, newest first"></ol>
+                <span class="clan-updated" id="clanUpdated"></span>
+              </div>
+            </div>
+
+            <div class="clan-art" aria-hidden="true">
+              <img src="clashofclans/coctools/wallbreaker-tight.png" alt="" loading="lazy" decoding="async" />
+            </div>
+          </section>
+          <!-- Fills the stats and last-10-wars row from clan-stats.json, and defines
+     copyClanTagBtn(). Shared with coc-home.html. -->
+          <script src="coc-clan-clock.js" defer></script>
+
+          <!-- FAQ: native <details>/<summary> accordion -- no script needed, works
+     with the keyboard, and the answers stay in the page text (search
+     engines read them). Header uses the same small-caps label as "Live
+     events". Army answers drafted Sep 2026, for Adrian to review. -->
+          <section class="t18-faq" aria-labelledby="t18-faq-label">
+            <div class="cc-label-row">
+              <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
+            </div>
+            <div class="t18-faq-list">
+              <details class="t18-faq-item">
+                <summary>How do I copy an army into my game?</summary>
+                <p>
+                  Tap <b>Copy Army</b> under any army. Clash of Clans opens with the troops, spells, heroes and Clan Castle already filled
+                  in, so just save it to one of your army slots.
+                </p>
+              </details>
+              <details class="t18-faq-item">
+                <summary>Why won&rsquo;t the Copy Army link open the game?</summary>
+                <p>
+                  Apps like Discord, Facebook and Messenger open links in their own built-in browser, which can&rsquo;t launch the game. Tap
+                  the <b>&#8942;</b> menu, choose <b>Open in Chrome</b> (or your usual browser), then tap Copy Army again.
+                </p>
+              </details>
+              <details class="t18-faq-item">
+                <summary>What do the Legend I, II and III badges mean?</summary>
+                <p>
+                  They mark our three strongest armies right now: Legend I is our top pick, then Legend II and Legend III. It&rsquo;s our
+                  ranking, not the league the army was used in.
+                </p>
+              </details>
+              <details class="t18-faq-item">
+                <summary>Are these armies good for war, CWL and ranked?</summary>
+                <p>
+                  Yes. Every army here is one we&rsquo;ve used in war, CWL and ranked battles. Practise a new one in a friendly challenge
+                  first, because the same army can fail if the spells and heroes go in at the wrong time.
+                </p>
+              </details>
+              <details class="t18-faq-item">
+                <summary>How do I join Ascendere?</summary>
+                <p>
+                  Join our <b>Global Chat</b> and let us know you&rsquo;re interested. We&rsquo;ll reply and set you up with a quick tryout.
+                  We pick a base, you attack it, and a clean three-star earns your spot. You&rsquo;ll need <b>Town Hall 11</b> or higher.
+                </p>
+              </details>
+            </div>
+          </section>
+        </div>
+
+        <footer class="pf-footer">
+          <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+          <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+          <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+          <div class="pf-footer-divider"></div>
+
+          <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+          <div class="pf-footer-divider"></div>
+
+          <div class="pf-footer-bottom">
+            <div class="pf-footer-legal" id="pfFooterLegal"></div>
+          </div>
+
+          <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+          <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+        </footer>
+      </div>
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+      <!-- More Menu Modal (bottom sheet) -->
+      <div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+        <div class="more-sheet" onclick="event.stopPropagation()">
+          <div class="more-sheet-scroll">
+            <div class="more-sheet-top">
+              <div class="more-sheet-handle"></div>
+              <div class="more-sheet-header">
+                <span class="more-sheet-title">Clash of Clans Contents</span>
+                <button class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="more-list">
+              <div class="th-cols">
+                <div class="th-col">
+                  <div class="th-col-head">Layouts</div>
+                  <div class="th-mini-grid" data-role="more-layouts-grid"></div>
+                </div>
+                <div class="th-col">
+                  <div class="th-col-head">Armies</div>
+                  <div class="th-mini-grid" data-role="more-armies-grid"></div>
+                </div>
+              </div>
+
+              <div class="more-acc open" data-acc="guides">
+                <div class="more-acc-toggle more-acc-static">
+                  <span class="more-acc-title">Guides</span>
+                </div>
+                <div class="more-acc-panel">
+                  <div class="more-acc-inner">
+                    <div class="more-guides-list" data-role="more-guides-list"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav (mobile) -->
+      <div class="bn-bar" id="bottomNav" data-hub-nav="off">
+        <a href="coc-home.html" class="bn-item" data-role="bn-home">
+          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.5 3.2L17.5 5.6V11.4C17.5 15.8 14.6 19.2 10.5 21.2C6.4 19.2 3.5 15.8 3.5 11.4V5.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 3.2V21.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.8 10.7L21 2.5M18.6 4.9H21.2M18.6 4.9V2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.5 3.2L3.5 5.6V11.4C3.5 15.8 6.4 19.2 10.5 21.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g opacity="0.55"><path d="M10.5 3.2L17.5 5.6V11.4C17.5 15.8 14.6 19.2 10.5 21.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M12.8 10.7L21 2.5M18.6 4.9H21.2M18.6 4.9V2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="th16-layouts.html" class="bn-item" data-role="bn-layouts">
+          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M3 6.5L9 3.5l6 3 6-3v14l-6 3-6-3-6 3z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path d="M9 3.5v14M15 6.5v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity="0.55">
+              <path
+                d="M3 6.5L7.6 4.2V18.2L3 20.5Z"
+                fill="currentColor"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M16.4 5.8L21 3.5V17.5L16.4 19.8Z"
+                fill="currentColor"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </g>
+            <path
+              d="M10.4 4.2L13.6 5.8V19.8L10.4 18.2Z"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Layouts</span>
+        </a>
+
+        <div class="bn-more-wrap" id="bnMoreWrap">
+          <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke: #7d7f85 !important">
+              <rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+              <rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+              <rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+              <rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            </svg>
+          </button>
+          <div class="bn-more-spacer"></div>
+          <span class="bn-more-label">More</span>
+        </div>
+
+        <a href="th16-army.html" class="bn-item" data-role="bn-armies">
+          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M14.5 17.5L3 6V3h3l11.5 11.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M14.5 6.5L18 3h3v3l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity="0.55">
+              <path
+                d="M14.5 6.5L18 3h3v3l-3.5 3.5Z"
+                fill="currentColor"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M5 14l4 4M7 17l-3 3M3 19l2 2"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </g>
+            <path
+              d="M14.5 17.5L3 6V3h3l11.5 11.5Z"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M13 19l6-6M16 16l4 4M19 21l2-2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Armies</span>
+        </a>
+        <a href="coctools.html" class="bn-item" data-role="bn-guides">
+          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M9 16v-.6c0-1.1-.6-2-1.5-2.8A6 6 0 1 1 16.5 12.6c-.9.8-1.5 1.7-1.5 2.8V16Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path d="M9.2 18.8h5.6M10.4 21.2h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M9 16v-.6c0-1.1-.6-2-1.5-2.8A6 6 0 1 1 16.5 12.6c-.9.8-1.5 1.7-1.5 2.8V16Z"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              opacity="0.55"
+            />
+            <path d="M12 6a2.6 2.6 0 0 1 2.6 2.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M9.2 18.8h5.6M10.4 21.2h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span>Guides</span>
+        </a>
+      </div>
+
+      <!-- Palette Lightbox (zoomable image viewer) -->
+      <button id="pal-lb-close" onclick="closePalette()">✕</button>
+      <div id="pal-lightbox">
+        <div id="pal-lb-inner" onclick="event.stopPropagation()">
+          <img id="pal-lb-img" src="" alt="" />
+        </div>
+      </div>
     </div>
-
-    
-     <!-- Second Layer -->
-  <div class="second-layer-container" id="second-layer-container">
-  <div class="second-layer" id="second-layer">
-<button data-th="TH-18" onclick="goToTH('th18-army.html', this)"><img src="icons/th18icon.png">18</button>
-<button data-th="TH-17"  onclick="goToTH('th17-army.html', this)"><img src="icons/th17icon.webp">17</button>
-<button data-th="TH-16"   class="active" onclick="goToTH('th16-army.html', this)"><img src="icons/th16icon.webp">16</button>
-<button data-th="TH-15"  onclick="goToTH('th15-army.html', this)"><img src="icons/th15icon.webp">15</button>
-<button data-th="TH-14" onclick="goToTH('th14-army.html', this)"><img src="icons/th14icon.webp">14</button>
-<button data-th="TH-13"  onclick="goToTH('th13-army.html', this)"><img src="icons/th13icon.webp">13</button>
-<button data-th="TH-12" onclick="goToTH('th12-army.html', this)"><img src="icons/th12icon.webp">12</button>
-<button data-th="TH-11" onclick="goToTH('th11-army.html', this)"><img src="icons/th11icon.webp">11</button>
-<button data-th="TH-10" onclick="goToTH('th10-army.html', this)"><img src="icons/th10icon.webp">10</button>
-<button data-th="TH-9" onclick="goToTH('th9-army.html', this)"><img src="icons/th9icon.webp">9</button>
-<button data-th="TH-8" onclick="goToTH('th8-army.html', this)"><img src="icons/th8icon.webp">8</button>
- </div>
-</div>
-
-
-
-
-    
-
-
-
-<div class="army-divider">
-  <div class="army-divider-line"></div>
-</div>
-
-    <!-- Bases Grid -->
-    <div class="grid-container">
-          
-
-
-
-    <!-- RR Valk RC Walk -->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-rank rank-1">🏆</span><span class="army-tag">TH16</span>
-
-    <span class="army-title">Rootrider RC Charge  
-    </span> </div> <img src="clashofclans/th16army/th16-rrrc.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h0p4e8_14-1p3e17_20-2p8e34_24-4p10e12_40i4x84-1x75-2x1-1x135d1x53-1x9u7x12-1x97-6x110-5x7-1x58-2x82-2x6-4x10-1x1-1x23-1x87-1x75-1x91s2x70-5x35-1x2
-    " target="_blank">Copy Army</a></div>
-
-     <!-- Fireball Furance Yeti -->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-rank rank-2">🥈</span> <span class="army-tag">TH16</span>
-    <span class="army-title">Fireball Furance Yeti
-    </span> </div> <img src="clashofclans/th16army/th16-fireball2.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h0p10e14_8-1p9e39_48-2p3e24_22-4p4e13_6i1x147-1x92-1x62-1x58d1x9-1x98u3x1-3x10-1x23-2x58-4x53-4x150-2x82-1x28-4x57-1x5-5x7-1x75-1x91-1x87s4x35-2x10-1x53-1x2-1x5
-    " target="_blank">Copy Army</a></div>
-
-
-
-     <!-- Dragons RC Walk-->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-rank rank-3">🥉</span><span class="army-tag">TH16</span>
-    <span class="army-title">Dragons RC Charge
-    </span> </div> <img src="clashofclans/th16army/th16-dragonsrc.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h1p9e48_17-2m1p2e4_34-4p10e12_40-6p4e49_43i4x84-1x10-1x75-1x91d3x120u11x8-2x23-1x6-4x10-4x57-1x28-1x58-1x1-2x82-1x87-1x91-1x75s10x35-1x10
-    " target="_blank">Copy Army</a></div>
-
-
-
-
-
-     <!-- Fireball Rocket Balloons -->
-    <div class="armybox discord-card"> <div class="army-header"><span class="army-tag">TH16</span>
-    <span class="army-title">Fireball Rocket Balloons
-     </div> <img src="clashofclans/th16army/th16-fireball.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h0p4e14_8-1p9e39_48-2p2e24_22-4p10e13_6i4x84-1x10-2x62d1x9-2x120u4x1-1x6-4x10-1x58-1x23-3x82-2x28-20x57-3x5-5x7-1x75-1x91-1x87s2x10-4x35-2x2-1x5
-    " target="_blank">Copy Army</a></div>
-
-
-
-
-
-
-     <!-- Dragons Yeti Clone  -->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-tag">TH16</span>
-    <span class="army-title">Dragons Clone Bomb
-    <span style="color: #727272;">(w king)</span></span> </div> <img src="clashofclans/th16army/th16-dragons.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h0p4e14_8-1p9e20_17-2m1p8e24_4-4p10e13_6i1x52-1x62-2x5-2x53d2x120-1x5u14x8-4x5-2x82-1x28-1x52-1x62-1x87s3x16-1x2
-    " target="_blank">Copy Army</a></div>
-
-
-     <!-- Dragons Yeti Clone  -->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-tag">TH16</span>
-    <span class="army-title">Dragons Clone Bomb
-    <span style="color: #727272;">(w mp)</span></span> </div> <img src="clashofclans/th16army/th16-dragons2.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h6p4e42_35-1p9e48_17-2m1p8e24_4-4p10e13_6i2x53-1x52-1x62-2x5d2x120-1x5u13x8-4x5-2x82-1x28-2x23-1x52-1x62-1x87s3x16-1x2
-    " target="_blank">Copy Army</a></div>
-
-
-     <!-- Dragons Mass Totem -->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-tag">TH16</span>
-    <span class="army-title">Dragons Mass Totem
-    </span> </div> <img src="clashofclans/th16army/th16-dragonstotem.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h6p4e43_35-1p9e48_17-2m1p8e24_4-4p10e13_40i4x84-1x10-1x75d1x2-1x9u13x8-4x57-2x82-2x28-1x91-1x62-1x52s10x120-1x5
-    " target="_blank">Copy Army</a></div>
-
-
-    
-
-
-     <!-- Noah's Ark -->
-    <div class="armybox discord-card"> <div class="army-header"> <span class="army-tag">TH16</span>
-    <span class="army-title">Noah's Ark
- </span> </div> <img src="clashofclans/th16army/th16-Noah.jpg" alt="TH16 Dragon Army"
-    class="army-image zoomable"
-    loading="lazy"><a class="download-btn" href="
-https://link.clashofclans.com/en?action=CopyArmy&army=h0p10e14_8-1p9e39_48-2p2e24_22-4p4e13_6i1x62-1x91-1x147-1x58d1x98-1x9u1x1-1x0-1x2-1x10-1x4-1x6-1x3-1x11-1x24-1x15-1x22-1x97-1x53-1x110-1x95-1x123-1x58-1x150-1x23-1x82-2x28-3x57-2x5-5x7-1x75-1x91-1x87s4x35-2x10-1x53-1x2-1x5
-    " target="_blank">Copy Army</a></div>
-
-    
-
-<div class="army-divider">
-  <div class="army-divider-line"></div>
-</div>
-
-   
-  </div>
-
-
-   <!-- Pagination 
-
-  <div class="pagination">
-  <a href="th17-layouts.html" class="page active">1</a>
-  <a href="th17-layouts2.html" class="page">2</a>
-  <a href="th17-layouts2.html" class="next">Next &raquo;</a>
-  </div>-->
-
-<!-- Quick Links -->
-<div class="quick-links">
-   <a href="th16-layouts.html">TH-17 Layouts</a>
-  <a href="th17-layouts.html">TH-17 Layouts</a>
-  <a href="th17-army.html">TH-17 Army Setup</a>
-<a href="coctools.html">CoC Guides</a></div>
-</div>
-
-<!-- Combined Clan Box -->
-<div class="clan-box">
-  <img src="icons/aclogonb.png" alt="Ascendere Clan" class="clan-box-img">
-  <div class="clan-box-content">
-    <div class="clan-box-title">Become a Clan Member</div>
-    <div class="clan-box-text">
-      Visit our official clan <strong>Ascendere</strong><br>
-      Clan Tag: <span id="ascendere-clan-tag" class="clan-tag-click">#2GYPGPJP9</span>
-    </div>
-    <div class="whats-new-text" style="margin-top:12px;">
-Ascendere brings you top-quality Clash of Clans bases, exclusively for the AC fam!
- We post only top-tier layouts, perfect for CWL and ranked battles, making sure every layout helps you stay ahead in wars and regular gameplay.
-  We carefully choose the best among the best to ensure every base is top-notch. Thank you for supporting our community, 
-  your dedication keeps Ascendere growing and inspires us to bring you even more premium contents.    </div>
-  </div>
-</div>
-
-    
-     <footer class="site-footer">
-  <div class="footer-icons">
-   <!-- Facebook -->
-    <a href="#" aria-label="Facebook" class="footer-icon">
-     <svg viewBox="0 0 24 24">
-          <path d="M22 12a10 10 0 10-11.5 9.9v-7h-2.4V12h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2 .2 2  
-          .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.3V12h2.5l-.4 2.9h-2.1v7A10 10 0 0022 12z"/></svg></a>
-   <!-- TikTok -->
-    <a href="https://discord.gg/rfntEJ5w" target="_blank" aria-label="TikTok" class="footer-icon">
-    <svg viewBox="0 0 24 24">
-          <path d="M20 4a16 16 0 00-4-1l-.2.4a14 14 0 00-7.6 0L8 3A16 16 0 004 
-           4C1 9 1 14 2 19a16 16 0 004.8 2.4l1-1.6a10 10 0 01-1.6-.8c.1 0 .2-.1.3-.2a12 12 0 0011 0c.1.1.2.1.3.2-.5.3-1 .6-1.6.8l1 1.6A16 16 0 0022 19c1-5 1-10-2-15zM9.5 15.5c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8zm5 0c-.9 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.6.8 1.5 1.8c0 1-.6 1.8-1.5 1.8z"/>
-        </svg></a>
-   <!-- Discord -->
-    <a href="#" target="_blank" aria-label="Discord">
-    <svg viewBox="0 0 24 24">
-          <path d="M2 6l10 7 10-7v12H2V6zm10  
-          5L2 6h20l-10 5z"/></svg></a>
-    </div>
-  <div class="footer-text">
-    © 2025 Parchrome. All Rights Reserved.
-  </div></footer>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<meta name="viewport"
-  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-
-
-
-  
-<script src="thz-script.js"></script>
-
-
-
-<div id="imageZoom" class="image-zoom" onclick="closeZoom()">
-  <img id="zoomedImg" src="">
-</div>
-
-
-
-</body>
+    <!-- /.main: was never closed, so the browser closed it at the end of the body;
+     closed here to match (the More sheet, bottom nav and viewer above sit
+     inside it, as they always have). -->
+    <script src="11layout.js" defer></script>
+    <script src="thz-script.js"></script>
+    <script src="coc-events.js"></script>
+
+    <!-- ============================================================
+     FIREBASE (LAYOUT LIKES)
+     Same project home.html's feedback form already uses
+     (parchrome-feedback), different collection ("layoutLikes") so the
+     two features don't collide. One doc per page: layoutLikes/th16-army,
+     with a single "counts" map field keyed by each card's data-layout-id
+     (th16-1, th16-2, ...) -- one read on page load fetches every count
+     on the page instead of one read per card.
+
+     >>> REQUIRES a Firestore rule allowing this. Console > Firestore
+     Database > Rules, add (next to whatever already allows the
+     "feedback" collection):
+
+       match /layoutLikes/{doc} {
+         allow read: if true;
+         allow write: if request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['counts']);
+       }
+
+     That still lets anyone write (there's no login system on this site
+     to check against), but restricts it to touching only the counts
+     map -- nobody can use this hole to overwrite other fields or other
+     documents. Like-once-per-browser is enforced client-side below via
+     localStorage, which stops accidental double-likes but not someone
+     clearing site data or using another browser -- there's no way to
+     enforce real one-per-person without actual user accounts.
+     ============================================================ -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <!-- Everything this page does: hero, top bar, cards, likes, share. -->
+    <script src="th-layouts.js" defer></script>
+  </body>
 </html>

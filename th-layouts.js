@@ -277,6 +277,10 @@
     'scroll',
     function () {
       if (rail.classList.contains('is-done')) return;
+      // thz-script.js positions the strip on page load (keeps the tapped
+      // chip in view / centres the current TH) -- that isn't the visitor
+      // scrolling, so it doesn't count as "seen".
+      if (box._autoScrollAt && Date.now() - box._autoScrollAt < 1000) return;
       clearTimeout(idle);
       idle = setTimeout(function () {
         rail.classList.add('is-done');
@@ -324,8 +328,8 @@
   var HUB_ICONS = {
     home: {
       outline:
-        '<path d="M3 11h18v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 11V5h11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-3.5a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11V8.5M21 11V8.5M6.5 5V3M10.2 5V3M13.8 5V3M17.5 5V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      fill: '<path d="M3 11h18v9a1 1 0 0 1-1 1h-6v-3.5a2 2 0 0 0-4 0V21H4a1 1 0 0 1-1-1z" fill="currentColor" stroke="none"/><path d="M6.5 5h11v6h-11z" fill="currentColor" opacity="0.55" stroke="none"/><path d="M3 11V8.5M21 11V8.5M6.5 5V3M10.2 5V3M13.8 5V3M17.5 5V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+        '<path d="M10.5 3.2L17.5 5.6V11.4C17.5 15.8 14.6 19.2 10.5 21.2C6.4 19.2 3.5 15.8 3.5 11.4V5.6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 3.2V21.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.8 10.7L21 2.5M18.6 4.9H21.2M18.6 4.9V2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      fill: '<path d="M10.5 3.2L3.5 5.6V11.4C3.5 15.8 6.4 19.2 10.5 21.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g opacity="0.55"><path d="M10.5 3.2L17.5 5.6V11.4C17.5 15.8 14.6 19.2 10.5 21.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M12.8 10.7L21 2.5M18.6 4.9H21.2M18.6 4.9V2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
     },
     // Icon set v5 (two-tone): Home = a castle (your Clash home base),
     // Layouts = a folded map, Armies = crossed swords, Guides = a light bulb
@@ -382,14 +386,43 @@
     })
     .then(function (data) {
       // dsn-chip: TH18 -> TH8. Active when the current page is either that
-      // TH's layouts or army page (activeOn covers both).
-      if (dsnScroll && Array.isArray(data.townhalls)) {
+      // TH's layouts or army page (activeOn covers both). On an army page
+      // the chips go to each TH's army page, like the chip row under the
+      // hero (thz-script.js's buildSecondLayer).
+      // Guides pages (coctools*.html): the chip row switches between the
+      // guides instead of Town Halls, the same as the strip under the hero.
+      var guide = (data.guides || []).find(function (g) {
+        return (g.activeOn || []).map(normalize).indexOf(currentPage) !== -1;
+      });
+      if (dsnScroll && guide) {
+        dsnScroll.innerHTML = data.guides
+          .map(function (g) {
+            return (
+              '<a href="' +
+              g.href +
+              '" class="dsn-chip' +
+              (g === guide ? ' active' : '') +
+              '">' +
+              '<img src="' +
+              g.icon +
+              '" alt="" class="dsn-chip-icon">' +
+              '<span>' +
+              g.label +
+              '</span></a>'
+            );
+          })
+          .join('');
+        if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
+      } else if (dsnScroll && Array.isArray(data.townhalls)) {
+        var onArmy = data.townhalls.some(function (t) {
+          return normalize(t.armyHref) === currentPage;
+        });
         dsnScroll.innerHTML = data.townhalls
           .map(function (th) {
             var isActive = (th.activeOn || []).map(normalize).indexOf(currentPage) !== -1;
             return (
               '<a href="' +
-              th.layoutHref +
+              (onArmy ? th.armyHref : th.layoutHref) +
               '" class="dsn-chip' +
               (isActive ? ' active' : '') +
               '">' +
@@ -419,7 +452,8 @@
             var icon = HUB_ICONS[key];
             if (!item || !icon) return '';
             var href = hrefFor[key] || item.href;
-            var isActive = normalize(href) === currentPage;
+            // Guides stays lit on all four guides pages, not just the first.
+            var isActive = normalize(href) === currentPage || (key === 'guides' && !!guide);
             return (
               '<a href="' +
               href +
@@ -456,10 +490,20 @@
 // secondary top bar shows "Townhall 18 Layouts / Page 1/2" (#stbPage). A
 // shared link to a base on another page (#base-th18-14) opens that page.
 // Likes, CC popups and share are wired up once every card exists.
+// Army pages (thNN-army.html) use the same builder: their grid has
+// data-armies="thNN-army.json" instead, with an "armies" list, and each
+// card gets a name row on top (armyCardHtml) and no CC button -- the army
+// screenshot already shows the CC troops.
 (function layoutCards() {
-  var grid = document.querySelector('.grid-container[data-layouts]');
+  var grid = document.querySelector('.grid-container[data-layouts], .grid-container[data-armies]');
   if (!grid || !window.fetch) return;
+  var ARMY = grid.hasAttribute('data-armies');
+  var SRC = grid.getAttribute(ARMY ? 'data-armies' : 'data-layouts');
   var PAGE_SIZE = 10;
+  // Top-3 armies ("rank": 1-3 in the JSON) wear the Legend League I / II /
+  // III badge beside their name.
+  var RANK_ICONS = { 1: 'icons/Legend_League_I.webp', 2: 'icons/Legend_League_II.webp', 3: 'icons/Legend_League_III.webp' };
+  var RANK_NAMES = { 1: 'Legend I', 2: 'Legend II', 3: 'Legend III' };
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -468,6 +512,14 @@
     '<svg viewBox="0 0 24 24" class="like-heart" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>';
   var SHARE =
     '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>';
+  // Pen (Lucide "pencil-line", ISC licence): the army card's "edit in the
+  // army maker" link, top-right of the card.
+  var PEN =
+    '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  // Town Halls the army maker (coc-armymaker.html) supports -- keep in step
+  // with enabledTh in coc-army-data.json. Army cards on these TH pages get
+  // the pen; add a TH here when the maker gets it.
+  var MAKER_TH = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
   // Template tag: builds the string, then drops the whitespace between tags.
   function tidy(strings) {
     var out = strings[0];
@@ -498,14 +550,53 @@
       </div>`;
   }
 
-  fetch(grid.getAttribute('data-layouts'))
+  // Army card: the layout card plus a name row above the image (with the
+  // rank badge for the top 3), Copy Army instead of Copy Layout, no CC.
+  function armyCardHtml(page, a) {
+    var id = 'th' + page.th + '-' + a.id;
+    // Badge for the Clash look, "#1" pill for the rank itself: at 28px the
+    // badge's own I / II / III numeral is too small to read.
+    var ranked = !!RANK_ICONS[a.rank];
+    var badge = ranked
+      ? `<img class="army-rank" src="${RANK_ICONS[a.rank]}" alt="" title="${RANK_NAMES[a.rank]}" width="28" height="28" onerror="this.remove()">`
+      : '';
+    var tag = ranked ? `<span class="army-rank-tag" title="Rank ${a.rank}">#${a.rank}</span>` : '';
+    // Pen: opens the army maker with this army already in it. The maker
+    // reads the army from its address (?army=...), so the link just carries
+    // this card's army code over -- nothing to copy or paste.
+    var code = '';
+    try {
+      code = new URL(a.link).searchParams.get('army') || '';
+    } catch (e) {}
+    var edit =
+      code && MAKER_TH.indexOf(page.th) !== -1
+        ? `<a class="army-edit" href="coc-armymaker.html?th=${page.th}&amp;army=${encodeURIComponent(code)}" aria-label="Edit ${esc(a.name)} in the army maker" title="Edit in the army maker">${PEN}</a>`
+        : '';
+    return tidy`
+      <div class="discord-card army-card" id="army-${id}">
+        <div class="army-head">${badge}<h3 class="army-name">${esc(a.name)}</h3>${tag}${edit}</div>
+        <div class="card-media">
+          <img src="${esc(page.imageDir + a.image)}" alt="TH${page.th} ${esc(a.name)} army" class="zoomable" loading="lazy" onclick="openPalette(this)">
+        </div>
+        <div class="action-row card-bar">
+          <button type="button" class="corner-like" data-layout-id="${id}" aria-pressed="false" aria-label="Like this army" title="Like this army">${HEART}<span class="like-count" data-layout-count hidden>0</span></button>
+          <a class="layout-link" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer" title="Open this army in Clash of Clans">Copy Army</a>
+          <button type="button" class="card-share" data-share="army-${id}" aria-label="Share this army" title="Share this army">${SHARE}</button>
+        </div>
+      </div>`;
+  }
+
+  fetch(SRC)
     .then((r) => r.json())
     .then(function (page) {
-      grid.innerHTML = (page.bases || []).map((b) => cardHtml(page, b)).join('');
+      grid.innerHTML = ARMY
+        ? (page.armies || []).map((a) => armyCardHtml(page, a)).join('')
+        : (page.bases || []).map((b) => cardHtml(page, b)).join('');
       var cards = [].slice.call(grid.children);
       var pages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
       var nav = document.getElementById('layout-pages');
       var crumb = document.getElementById('stbPage');
+      var heroPage = document.getElementById('t18Page'); // pill above the hero title
       var current = 0;
 
       function pageFromUrl() {
@@ -543,6 +634,10 @@
           nav.parentElement.hidden = pages < 2;
         }
         if (crumb) crumb.textContent = pages > 1 ? 'Page ' + n + '/' + pages : '';
+        if (heroPage && pages > 1) {
+          heroPage.textContent = 'Page ' + n + '/' + pages;
+          heroPage.hidden = false;
+        }
       }
       // Desktop scrolls .coc-main, phones scroll the page itself: reset
       // both. Instant, not smooth -- the cards have already changed.
@@ -587,17 +682,20 @@
       show(pageFromUrl());
 
       // Like counts: one Firestore doc per page, named after the file
-      // (layoutLikes/th18-layouts), keyed by each card's data-layout-id.
-      initLayoutLikes('th' + page.th + '-layouts');
-      initCcPopups();
-      initCardShare('TH' + page.th + ' base layout on Parchrome', showCard);
+      // (layoutLikes/th18-layouts, layoutLikes/th18-army), keyed by each
+      // card's data-layout-id -- so army and layout likes never mix.
+      initLayoutLikes('th' + page.th + (ARMY ? '-army' : '-layouts'), ARMY ? 'army' : 'base');
+      if (!ARMY) initCcPopups();
+      initCardShare(ARMY ? 'TH' + page.th + ' army comp on Parchrome' : 'TH' + page.th + ' base layout on Parchrome', showCard);
     })
     .catch(function (err) {
-      console.error('Layout cards: failed to load ' + grid.getAttribute('data-layouts'), err);
+      console.error('Layout cards: failed to load ' + SRC, err);
     });
 })();
 
-function initLayoutLikes(pageId) {
+// noun: 'base' or 'army', for the button's label ("Like this army").
+function initLayoutLikes(pageId, noun) {
+  noun = noun || 'base';
   const firebaseConfig = {
     apiKey: 'AIzaSyAa8B5rIP0Y9w9jBN_mzKzkFW3xMdI9wgo',
     authDomain: 'parchrome-feedback.firebaseapp.com',
@@ -645,7 +743,7 @@ function initLayoutLikes(pageId) {
     el.textContent = n.toLocaleString('en-US');
     el.hidden = n <= 0;
     const liked = btn.classList.contains('is-liked');
-    const label = (liked ? 'Unlike this base' : 'Like this base') + (n > 0 ? ' (' + n + (n === 1 ? ' like)' : ' likes)') : '');
+    const label = (liked ? 'Unlike this ' : 'Like this ') + noun + (n > 0 ? ' (' + n + (n === 1 ? ' like)' : ' likes)') : '');
     btn.setAttribute('aria-label', label);
     btn.title = label;
     btn.dataset.count = n;
@@ -744,20 +842,44 @@ function initCcPopups() {
   });
 }
 
-// Share button on each layout card. Shares this page with the card's id on
-// the end (e.g. th18-layouts.html#base-th18-3) so the link brings people to
-// Parchrome, not straight into the game.
+// Share button on each card. Shares the card's GAME link -- the same
+// link.clashofclans.com link its Copy Layout / Copy Army button opens -- so
+// the person receiving it loads the base or army in one tap (Adrian's call,
+// Sep 2026; it used to share this page with #base-th18-3 on the end).
+// Known trade-off: game links can't open inside Facebook / Messenger /
+// Discord's built-in browsers (see the FAQ), and the preview is Supercell's.
 //  - Touch devices: the phone's own share sheet (navigator.share), which
 //    lists whatever apps that person has.
 //  - Desktop (or no share sheet): one small panel with Copy link and four
 //    share links. Discord has no web share link, so "Copy link" covers it.
+// Old #base-/#army- page links still work: highlight() below handles them.
 function initCardShare(title, showCard) {
   var btns = document.querySelectorAll('.card-share[data-share]');
   if (!btns.length) return;
 
+  // App logos: Simple Icons (simpleicons.org, CC0) paths, filled in each
+  // brand's colour via .sp-brand in th-layouts.css.
+  function brand(name, d) {
+    return '<svg viewBox="0 0 24 24" class="sp-brand sp-' + name + '" aria-hidden="true"><path d="' + d + '"/></svg>';
+  }
   var ICONS = {
     link: '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
-    out: '<svg viewBox="0 0 24 24" class="bar-ico" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>',
+    facebook: brand(
+      'facebook',
+      'M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z',
+    ),
+    x: brand(
+      'x',
+      'M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z',
+    ),
+    reddit: brand(
+      'reddit',
+      'M12 0C5.373 0 0 5.373 0 12c0 3.314 1.343 6.314 3.515 8.485l-2.286 2.286C.775 23.225 1.097 24 1.738 24H12c6.627 0 12-5.373 12-12S18.627 0 12 0Zm4.388 3.199c1.104 0 1.999.895 1.999 1.999 0 1.105-.895 2-1.999 2-.946 0-1.739-.657-1.947-1.539v.002c-1.147.162-2.032 1.15-2.032 2.341v.007c1.776.067 3.4.567 4.686 1.363.473-.363 1.064-.58 1.707-.58 1.547 0 2.802 1.254 2.802 2.802 0 1.117-.655 2.081-1.601 2.531-.088 3.256-3.637 5.876-7.997 5.876-4.361 0-7.905-2.617-7.998-5.87-.954-.447-1.614-1.415-1.614-2.538 0-1.548 1.255-2.802 2.803-2.802.645 0 1.239.218 1.712.585 1.275-.79 2.881-1.291 4.64-1.365v-.01c0-1.663 1.263-3.034 2.88-3.207.188-.911.993-1.595 1.959-1.595Zm-8.085 8.376c-.784 0-1.459.78-1.506 1.797-.047 1.016.64 1.429 1.426 1.429.786 0 1.371-.369 1.418-1.385.047-1.017-.553-1.841-1.338-1.841Zm7.406 0c-.786 0-1.385.824-1.338 1.841.047 1.017.634 1.385 1.418 1.385.785 0 1.473-.413 1.426-1.429-.046-1.017-.721-1.797-1.506-1.797Zm-3.703 4.013c-.974 0-1.907.048-2.77.135-.147.015-.241.168-.183.305.483 1.154 1.622 1.964 2.953 1.964 1.33 0 2.47-.81 2.953-1.964.057-.137-.037-.29-.184-.305-.863-.087-1.795-.135-2.769-.135Z',
+    ),
+    whatsapp: brand(
+      'whatsapp',
+      'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z',
+    ),
   };
   var panel = document.createElement('div');
   panel.className = 'share-panel';
@@ -768,23 +890,24 @@ function initCardShare(title, showCard) {
     ICONS.link +
     '<span>Copy link</span></button><hr>' +
     '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="facebook">' +
-    ICONS.out +
+    ICONS.facebook +
     'Facebook</a>' +
     '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="x">' +
-    ICONS.out +
+    ICONS.x +
     'X</a>' +
     '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="reddit">' +
-    ICONS.out +
+    ICONS.reddit +
     'Reddit</a>' +
     '<a role="menuitem" target="_blank" rel="noopener noreferrer" data-to="whatsapp">' +
-    ICONS.out +
+    ICONS.whatsapp +
     'WhatsApp</a>';
   var copyBtn = panel.querySelector('.sp-copy');
   var openBtn = null;
   var TITLE = title;
 
-  function urlFor(id) {
-    return location.origin + location.pathname + '#' + id;
+  // The card's game link: the href of its Copy Layout / Copy Army button.
+  function gameLink(btn) {
+    return btn.closest('.discord-card').querySelector('.layout-link').href;
   }
   function close() {
     panel.hidden = true;
@@ -794,7 +917,7 @@ function initCardShare(title, showCard) {
     }
   }
   function open(btn) {
-    var url = urlFor(btn.dataset.share),
+    var url = gameLink(btn),
       u = encodeURIComponent(url),
       t = encodeURIComponent(TITLE);
     var to = {
@@ -828,7 +951,7 @@ function initCardShare(title, showCard) {
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       if (touch && navigator.share) {
-        navigator.share({ title: TITLE, url: urlFor(btn.dataset.share) }).catch(function () {});
+        navigator.share({ title: TITLE, url: gameLink(btn) }).catch(function () {});
         return;
       }
       if (openBtn === btn) close();
@@ -839,21 +962,42 @@ function initCardShare(title, showCard) {
     });
   });
 
+  // Copies silently, no popup. navigator.clipboard only exists on https://
+  // (and localhost); on a plain http:// address -- e.g. testing from a
+  // phone at 192.168.x.x -- it's missing, so fall back to the older
+  // select-a-hidden-textarea + execCommand('copy'), which works anywhere.
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length); // iOS ignores select() alone
+    var ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch (e) {}
+    ta.remove();
+    return ok;
+  }
   copyBtn.addEventListener('click', function () {
     var url = copyBtn.dataset.url;
-    function done() {
-      copyBtn.classList.add('copied');
-      copyBtn.querySelector('span').textContent = 'Link copied';
-      setTimeout(close, 900);
+    function done(ok) {
+      copyBtn.classList.toggle('copied', ok);
+      copyBtn.querySelector('span').textContent = ok ? 'Link copied' : "Couldn't copy";
+      setTimeout(close, ok ? 900 : 1600);
     }
-    if (navigator.clipboard)
-      navigator.clipboard
-        .writeText(url)
-        .then(done)
-        .catch(function () {
-          prompt('Copy this link:', url);
-        });
-    else prompt('Copy this link:', url);
+    if (navigator.clipboard && window.isSecureContext)
+      navigator.clipboard.writeText(url).then(
+        function () {
+          done(true);
+        },
+        function () {
+          done(legacyCopy(url));
+        },
+      );
+    else done(legacyCopy(url));
   });
   panel.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -871,7 +1015,7 @@ function initCardShare(title, showCard) {
   // Arriving on a shared link: bring that base into view and let it glow.
   function highlight() {
     var id = decodeURIComponent(location.hash.slice(1));
-    if (!/^base-/.test(id)) return;
+    if (!/^(base|army)-/.test(id)) return;
     var card = document.getElementById(id);
     if (!card) return;
     if (card.hidden) showCard(card); // a base on another page
