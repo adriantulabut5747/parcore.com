@@ -34,8 +34,7 @@
     <link rel="shortcut icon" href="/icons/home.jpg" />
     <link rel="apple-touch-icon" href="/icons/home.jpg" />
 
-
-    <link rel="stylesheet" href="/11layout.css" />
+    <link rel="stylesheet" href="/11layout.css?v=20261005c" />
     <link rel="stylesheet" href="/1coclayouts.css" />
     <!-- Live events + official clan card, shared with /coc/ -->
     <link rel="stylesheet" href="/coc-clan-clock.css" />
@@ -46,8 +45,9 @@
     <link rel="stylesheet" href="/coc-armymaker.css" />
     <link rel="stylesheet" href="/coc-guides.css" />
     <link rel="stylesheet" href="/coc-help.css" />
-  <link rel="stylesheet" href="/coc-more.css" />
-</head>
+    <link rel="stylesheet" href="/coc-more.css" />
+  <link rel="stylesheet" href="/coc-hub-menus.css" />
+  </head>
   <body>
     <!-- Shared ember gradient for the liked flame. -->
     <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
@@ -146,6 +146,7 @@
       <!-- Divider between the two strips -- caps off the dsn-chip row before
        the stb-hub-link row begins, same as hwr's reference layout. -->
       <div class="stb-divider-end" aria-hidden="true"></div>
+
 
       <!-- stb-hub-link strip: Home / Layouts / Armies / Guides, built from
        coc-nav-data.json's primaryNav. data-hub-nav="off" opts this out of
@@ -321,32 +322,92 @@
                   Pick your walls&rsquo; current level, the level you want, and how many walls. The cost updates as you go.
                 </p>
               </div>
+              <!-- Share: the phone's share sheet, or copies the link on desktop.
+                   The link is the page's own address, which always holds the
+                   current inputs (?from=9&to=12&n=200&gp=20&ev=50). -->
+              <button type="button" class="am-btn wl-share" id="wallShare" aria-live="polite">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" /></svg
+                ><span>Share</span>
+              </button>
             </header>
             <div class="am-part gd-part">
+              <!-- Wall calculator (redesigned Oct 2026). Two scrolling rows of all
+                   19 walls: the top row picks the current level, the bottom one the
+                   target. Each wall is a radio button (arrow keys move along a row);
+                   coc-guides.js builds the rows, greys out targets at or below the
+                   current level, joins the walls you'll pay for into one strip, and
+                   keeps the inputs in the address so the page can be shared.
+                   Styles: "Wall calculator" in coc-guides.css. -->
               <form class="gd-wall" id="wallCalc" autocomplete="off">
-                <label class="gd-field">
-                  <span class="gd-field-label">Current level</span>
-                  <select class="gd-input" id="wallFrom"></select>
-                </label>
-                <label class="gd-field">
-                  <span class="gd-field-label">Target level</span>
-                  <select class="gd-input" id="wallTo"></select>
-                </label>
-                <div class="gd-field">
-                  <span class="gd-field-label" id="wallCountLabel">Number of walls</span>
-                  <div class="gd-stepper">
-                    <button type="button" class="am-btn gd-step" data-step="-1" aria-label="One wall fewer">&minus;</button>
-                    <input
-                      class="gd-input"
-                      id="wallCount"
-                      type="number"
-                      min="1"
-                      max="325"
-                      value="50"
-                      inputmode="numeric"
-                      aria-labelledby="wallCountLabel"
-                    />
-                    <button type="button" class="am-btn gd-step" data-step="1" aria-label="One wall more">+</button>
+                <div class="wl-rows">
+                  <fieldset class="wl-row-set">
+                    <legend class="wl-row-head">
+                      <span class="gd-field-label">Current level</span><b class="wl-row-pick" id="wallFromPick"></b>
+                    </legend>
+                    <div class="wl-row" id="wallFrom" data-name="wallFrom"></div>
+                  </fieldset>
+                  <fieldset class="wl-row-set is-target">
+                    <legend class="wl-row-head">
+                      <span class="gd-field-label">Target level</span><b class="wl-row-pick" id="wallToPick"></b
+                      ><span class="wl-row-th" id="wallToTh"></span>
+                    </legend>
+                    <div class="wl-row" id="wallTo" data-name="wallTo"></div>
+                  </fieldset>
+                </div>
+                <div class="wl-opts">
+                  <div class="gd-field">
+                    <span class="gd-field-label" id="wallCountLabel">Number of walls</span>
+                    <div class="gd-stepper">
+                      <button type="button" class="am-btn gd-step" data-step="-1" aria-label="One wall fewer">&minus;</button>
+                      <input
+                        class="gd-input"
+                        id="wallCount"
+                        type="number"
+                        min="1"
+                        max="325"
+                        value="50"
+                        inputmode="numeric"
+                        aria-labelledby="wallCountLabel"
+                      />
+                      <button type="button" class="am-btn gd-step" data-step="1" aria-label="One wall more">+</button>
+                    </div>
+                    <div class="wl-quick" aria-label="Quick wall counts">
+                      <button type="button" class="am-btn wl-chip" data-count="25">25</button>
+                      <button type="button" class="am-btn wl-chip" data-count="50">50</button>
+                      <button type="button" class="am-btn wl-chip" data-count="100">100</button>
+                      <button type="button" class="am-btn wl-chip" data-count="325">All 325</button>
+                    </div>
+                  </div>
+                  <!-- Discounts: the Gold Pass Builder Boost (10/15/20%) and a
+                       Hammer Jam event (50%). They multiply, they don't add: the
+                       event halves the price, then the Gold Pass comes off what's
+                       left (50% + 20% = 60% off). #wallDisc explains it live. -->
+                  <div class="wl-disc">
+                    <fieldset class="gd-field wl-gp">
+                      <legend class="gd-field-label">
+                        <img src="/clashofclans/coctools/walls/builder-boost.webp" alt="" width="16" height="16" />Gold Pass
+                      </legend>
+                      <div class="wl-seg">
+                        <label><input type="radio" name="wallGp" value="0" checked /><span>Off</span></label>
+                        <label><input type="radio" name="wallGp" value="10" /><span>10%</span></label>
+                        <label><input type="radio" name="wallGp" value="15" /><span>15%</span></label>
+                        <label><input type="radio" name="wallGp" value="20" /><span>20%</span></label>
+                      </div>
+                    </fieldset>
+                    <fieldset class="gd-field wl-gp wl-ev">
+                      <legend class="gd-field-label">
+                        <img src="/clashofclans/coctools/walls/hammer-jam.webp" alt="" width="16" height="16" />Hammer Jam event
+                      </legend>
+                      <div class="wl-seg wl-seg-2">
+                        <label><input type="radio" name="wallEv" value="0" checked /><span>Off</span></label>
+                        <label><input type="radio" name="wallEv" value="50" /><span>50% off</span></label>
+                      </div>
+                    </fieldset>
+                    <p class="wl-disc-note" id="wallDisc" aria-live="polite"></p>
                   </div>
                 </div>
               </form>
@@ -379,8 +440,24 @@
                 <details class="t18-faq-item">
                   <summary>What about Wall Rings?</summary>
                   <p>
-                    Each Wall Ring upgrades one wall by one level, whatever the cost, which makes them best spent on the most expensive
-                    levels.
+                    Wall Rings replace the gold or elixir for one wall&rsquo;s upgrade. You need one ring per million of the cost, rounded
+                    up: one up to level 12, then 2 for levels 13 and 14, up to 10 for level 19. The Gold Pass doesn&rsquo;t lower the number
+                    of rings.
+                  </p>
+                </details>
+                <details class="t18-faq-item">
+                  <summary>Does the Gold Pass make walls cheaper?</summary>
+                  <p>
+                    Yes. The Builder Boost from the season challenges lowers wall costs by 10%, 15% or 20%, depending on how far into the
+                    season you are. Pick your boost above and the totals update.
+                  </p>
+                </details>
+                <details class="t18-faq-item">
+                  <summary>How do Hammer Jam and the Gold Pass add up?</summary>
+                  <p>
+                    They multiply, so 50% and 20% make 60% off, not 70%. Hammer Jam halves the price first, then the Gold Pass takes 20% off
+                    what&rsquo;s left: a 10M wall drops to 5M, then to 4M. Not every Hammer Jam has covered walls, so check that the wall
+                    price in game shows the discount before you spend.
                   </p>
                 </details>
               </div>
@@ -415,7 +492,8 @@
                 >
               </li>
               <li class="t18-tag t18-clock-tag" data-event="clangames">
-                <span class="cc-event-icon"><img src="/clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async" /></span
+                <span class="cc-event-icon"
+                  ><img src="/clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async" /></span
                 ><span class="t18-clock-text"><span class="t18-tag-name">Clan Games</span> <b class="t18-tag-time" data-timer>--</b></span>
               </li>
               <li class="t18-tag t18-clock-tag" data-event="trader">
@@ -423,7 +501,8 @@
                 ><span class="t18-clock-text"><span class="t18-tag-name">Trader Shop</span> <b class="t18-tag-time" data-timer>--</b></span>
               </li>
               <li class="t18-tag t18-clock-tag" data-event="season">
-                <span class="cc-event-icon"><img src="/clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async" /></span
+                <span class="cc-event-icon"
+                  ><img src="/clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async" /></span
                 ><span class="t18-clock-text"
                   ><span class="t18-tag-name" data-name="short">Battle Pass</span> <b class="t18-tag-time" data-timer>--</b></span
                 >
@@ -495,12 +574,31 @@
                 <div class="mx-head">
                   <h3 class="mx-label" id="mxThLabel">Town Halls</h3>
                   <div class="mx-seg" role="tablist" aria-label="Show Town Halls for">
-                    <button type="button" class="mx-tab" role="tab" id="mxTabLayouts" aria-controls="mxPanelLayouts" aria-selected="true">Layouts</button>
-                    <button type="button" class="mx-tab" role="tab" id="mxTabArmies" aria-controls="mxPanelArmies" aria-selected="false" tabindex="-1">Armies</button>
+                    <button type="button" class="mx-tab" role="tab" id="mxTabLayouts" aria-controls="mxPanelLayouts" aria-selected="true">
+                      Layouts
+                    </button>
+                    <button
+                      type="button"
+                      class="mx-tab"
+                      role="tab"
+                      id="mxTabArmies"
+                      aria-controls="mxPanelArmies"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Armies
+                    </button>
                   </div>
                 </div>
                 <div class="mx-grid" id="mxPanelLayouts" role="tabpanel" aria-labelledby="mxTabLayouts" data-role="more-layouts-grid"></div>
-                <div class="mx-grid" id="mxPanelArmies" role="tabpanel" aria-labelledby="mxTabArmies" hidden data-role="more-armies-grid"></div>
+                <div
+                  class="mx-grid"
+                  id="mxPanelArmies"
+                  role="tabpanel"
+                  aria-labelledby="mxTabArmies"
+                  hidden
+                  data-role="more-armies-grid"
+                ></div>
               </section>
               <section class="mx-sec" aria-labelledby="mxToolsLabel">
                 <div class="mx-head">
@@ -516,8 +614,8 @@
       <!-- Bottom Nav (mobile) -->
       <div class="bn-bar" id="bottomNav" data-hub-nav="off">
         <a href="/coc/" class="bn-item" data-role="bn-home">
-          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M10 20.5v-3.6a2 2 0 0 1 4 0v3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M12 8.5V3.2l3.8 1.5L12 6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><mask id="bnHomeCut"><rect width="24" height="24" fill="#fff" /><path d="M10.2 21.5v-4.6a1.8 1.8 0 0 1 3.6 0v4.6Z" fill="#000" /></mask></defs><path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#bnHomeCut)" /><path d="M12 8.5V3.2l3.8 1.5L12 6.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55" /></svg>
+          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><mask id="bnHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#bnHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/></svg>
           <span>Home</span>
         </a>
         <a href="/coc/town-hall-18/layouts" class="bn-item" data-role="bn-layouts">
@@ -629,8 +727,76 @@
           <span>Armies</span>
         </a>
         <a href="/coc/tools/" class="bn-item" data-role="bn-guides">
-          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><rect x="3.2" y="7.4" width="17.6" height="12.6" rx="1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M3.2 12.6h6.3M14.5 12.6h6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><rect x="9.5" y="11.1" width="5" height="3.1" rx="0.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M5 7.4h14a1.8 1.8 0 0 1 1.8 1.8v2.2H3.2V9.2A1.8 1.8 0 0 1 5 7.4Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55" /><path d="M3.2 14h17.6v4.2a1.8 1.8 0 0 1-1.8 1.8H5a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><rect x="9.6" y="11" width="4.8" height="4" rx="0.8" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <rect
+              x="3.2"
+              y="7.4"
+              width="17.6"
+              height="12.6"
+              rx="1.8"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path d="M3.2 12.6h6.3M14.5 12.6h6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <rect
+              x="9.5"
+              y="11.1"
+              width="5"
+              height="3.1"
+              rx="0.8"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M5 7.4h14a1.8 1.8 0 0 1 1.8 1.8v2.2H3.2V9.2A1.8 1.8 0 0 1 5 7.4Z"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              opacity="0.55"
+            />
+            <path
+              d="M3.2 14h17.6v4.2a1.8 1.8 0 0 1-1.8 1.8H5a1.8 1.8 0 0 1-1.8-1.8Z"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <rect
+              x="9.6"
+              y="11"
+              width="4.8"
+              height="4"
+              rx="0.8"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
           <span>Tools</span>
         </a>
       </div>
@@ -646,15 +812,16 @@
     <!-- /.main: was never closed, so the browser closed it at the end of the body;
      closed here to match (the More sheet, bottom nav and viewer above sit
      inside it, as they always have). -->
-    <script src="/11layout.js" defer></script>
-    <script src="/thz-script.js"></script>
+    <script src="/11layout.js?v=20261005c" defer></script>
+    <script src="/thz-script.js?v=20261005f"></script>
     <script src="/coc-events.js"></script>
 
     <!-- Hero ("Did you know?", event tags) and the secondary top bar. -->
-    <script src="/th-layouts.js" defer></script>
+    <script src="/th-layouts.js?v=20261005d" defer></script>
     <!-- This guide's content: built from its JSON file. -->
     <script src="/coc-guides.js" defer></script>
     <script src="/coc-help.js" defer></script>
-  <script src="/coc-more.js" defer></script>
-</body>
+    <script src="/coc-more.js" defer></script>
+  <script src="/coc-hub-menus.js" defer></script>
+  </body>
 </html>

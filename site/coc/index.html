@@ -15,7 +15,7 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css">
+<link rel="stylesheet" href="/11layout.css?v=20261005c">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
 <link rel="stylesheet" href="/coc-clan-clock.css">
 
@@ -382,6 +382,7 @@ margin: auto;
 </script>
   <link rel="stylesheet" href="/coc-help.css" />
   <link rel="stylesheet" href="/coc-more.css" />
+  <link rel="stylesheet" href="/coc-hub-menus.css" />
 </head>
 <body>
 
@@ -1908,17 +1909,21 @@ function warModalEscHandler(e) {
    Pinning the width makes the height the side that gives: the card keeps
    its column's width and just gets taller than 21:9 at the floor. */
 @media (min-width: 971px) and (max-width: 1399px) {
-  .th-card { width: 100%; min-width: 0; min-height: 150px; }
+  /* Oct 2026: 3:1 (was 21:9) -- shorter cards, he asked for less height. */
+  .th-card { width: 100%; min-width: 0; min-height: 132px; aspect-ratio: 3 / 1; }
 }
 
 @media (min-width: 1400px) {
   .layouts-list { grid-template-columns: repeat(4, 1fr); }
   /* Doubled class to beat .th-card's own aspect-ratio (21:9) above. 16:9 is the
      screenshots' native ratio, so the wide cards show the full base. */
+  /* Oct 2026: shorter on request -- wide 12:5 (was 16:9, the screenshots'
+     own ratio, so the top and bottom of the base now crop a little) and
+     small 16:10 (was 4:3). */
   .th-card.th-card--wide {
     grid-column: span 2;
-    aspect-ratio: 16 / 9;
-    padding: 24px;
+    aspect-ratio: 12 / 5;
+    padding: 22px;
   }
   .th-card--wide .th-icon { width: 72px; height: 72px; }
   .th-card--wide .th-foot { gap: 18px; }
@@ -1930,7 +1935,7 @@ function warModalEscHandler(e) {
   /* The small cards are ~210px wide, so the footer scales down to fit.
      4:3 rather than 16:10: at 16:10 they were ~130px tall and the text
      stack covered most of the base. */
-  .th-card:not(.th-card--wide) { padding: 14px; aspect-ratio: 4 / 3; }
+  .th-card:not(.th-card--wide) { padding: 14px; aspect-ratio: 16 / 10; }
   .th-card:not(.th-card--wide) .th-icon { width: 50px; height: 50px; }
   .th-card:not(.th-card--wide) .th-foot { gap: 10px; }
   .th-card:not(.th-card--wide) .th-label { font-size: 9px; letter-spacing: 1.5px; }
@@ -1939,25 +1944,132 @@ function warModalEscHandler(e) {
   .th-card:not(.th-card--wide) .th-arrow { width: 11px; height: 11px; }
 }
 
-/* 1 per row on mobile. 21:9 instead of 16:10 keeps each full-width card
-   short, so the 10 of them stacked aren't a wall of scroll. */
+/* TH8 has no bases yet: its card ("Coming soon") is a phone-only filler
+   that makes the 2-per-row grid come out even. On desktop it would be the
+   odd card out, so it's hidden there. */
+.th-card--soon { display: none; }
+
+/* PHONES (Oct 2026, his pick): TH18 is the one card with art -- a short
+   full-width banner. Every other Town Hall is a plain button, two per row:
+   icon, "TH17", the layout count, an arrow. No screenshot, no scrim --
+   on a phone the art was too small to read and made the list a long scroll. */
 @media (max-width: 970px) {
   .layouts-list {
     margin: 10px 5% 0 5%;
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
   .th-card {
-    aspect-ratio: 21 / 9;
-    padding: 14px;
+    aspect-ratio: auto;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
   }
-  .th-card .th-icon { width: 50px; height: 50px; }
-  .th-card .th-foot { gap: 12px; }
-  .th-card .th-label { font-size: 9px; letter-spacing: 1.5px; }
-  .th-card .th-name { font-size: 20px; margin: 2px 0 4px; }
-  .th-card .th-count { font-size: 11px; }
-  .th-card .th-arrow { width: 11px; height: 11px; }
-  .th-card .th-tag { top: 12px; left: 12px; font-size: 8.5px; padding: 3px 8px; }
+  .th-card:hover { transform: none; box-shadow: none; }
+
+  /* TH18 banner */
+  .th-card.th-card--feat {
+    grid-column: 1 / -1;
+    height: 116px;
+    padding: 12px 14px;
+  }
+  .th-card--feat .th-icon { width: 48px; height: 48px; }
+  .th-card--feat .th-foot { gap: 12px; }
+  .th-card--feat .th-label { font-size: 9px; letter-spacing: 1.5px; }
+  .th-card--feat .th-name { font-size: 20px; margin: 2px 0 4px; }
+  .th-card--feat .th-count { font-size: 11px; }
+  .th-card--feat .th-arrow { width: 11px; height: 11px; }
+  .th-card--feat .th-tag { top: 10px; left: 12px; font-size: 8.5px; padding: 3px 8px; }
+
+  /* The two-per-row buttons: the base screenshot stays as the background
+     (his pick), under a scrim that's darkest on the left where the icon and
+     text sit, so "TH17" stays readable over busy art. */
+  .th-card:not(.th-card--feat) {
+    flex-direction: row;
+    align-items: center;
+    min-height: 64px;
+    padding: 8px 12px 8px 8px;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: #141519;
+  }
+  .th-card:not(.th-card--feat)::after {
+    background: linear-gradient(90deg,
+      rgba(8, 8, 10, 0.88) 0%,
+      rgba(8, 8, 10, 0.62) 55%,
+      rgba(8, 8, 10, 0.35) 100%);
+  }
+  .th-card:not(.th-card--feat):active {
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: scale(0.98);
+  }
+  .th-card:not(.th-card--feat):active .th-bg { filter: brightness(1.05) saturate(1.1); }
+  .th-card:not(.th-card--feat) .th-foot { flex: 1; min-width: 0; gap: 10px; }
+  .th-card:not(.th-card--feat) .th-icon {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  }
+  .th-card:not(.th-card--feat) .th-meta { flex: 1; }
+  .th-card:not(.th-card--feat) .th-label { display: none; }
+  .th-card:not(.th-card--feat) .th-name {
+    font-size: 16px;
+    margin: 0 0 3px;
+  }
+  .th-card:not(.th-card--feat) .th-name::before { content: "TH"; }
+  .th-card:not(.th-card--feat) .th-count {
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .th-card:not(.th-card--feat) .th-arrow { width: 12px; height: 12px; }
+
+  .th-card--soon { display: flex; }
+  .th-card--soon .th-icon { opacity: 0.55; }
+  .th-card--soon .th-name { color: rgba(255, 255, 255, 0.6); }
+}
+
+/* ── CLASH TOOLS ──────────────────────────────────
+   Same cards as the Town Hall grid; only the differences live here.
+   Names are words ("Army Maker"), not TH numbers, so they're set a step
+   smaller and cut off with an ellipsis instead of overflowing. The
+   screenshots are of dark UI, so they get a touch more light than base art. */
+.tools-title-box { margin-top: 72px; }
+.tool-card .th-bg { filter: brightness(1) saturate(1.05); }
+.tool-card .th-meta { min-width: 0; }
+.tool-card .th-name {
+  font-size: 18px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tool-card.th-card--feat .th-name { font-size: 24px; }
+.tool-card .th-count > span { overflow: hidden; text-overflow: ellipsis; }
+
+/* Mid-size desktops (2 columns): Player Tracker takes the whole first row,
+   then the six tools fill three rows of two. */
+@media (min-width: 971px) and (max-width: 1399px) {
+  .tool-card--hero { grid-column: 1 / -1; aspect-ratio: 4 / 1; }
+}
+@media (min-width: 1400px) {
+  .tool-card.th-card--feat .th-name { font-size: 30px; }
+  /* The small cards are ~210px wide here: a smaller name, and the one-line
+     description gives way (the name says enough at this size). */
+  .tool-card:not(.th-card--feat) .th-name { font-family: 'Oxanium', sans-serif; font-size: 16px; font-weight: 800; margin: 0 0 4px; }
+  .tool-card:not(.th-card--feat) .th-icon { width: 44px; height: 44px; }
+  .tool-card:not(.th-card--feat) .th-count { font-size: 10.5px; }
+}
+@media (max-width: 970px) {
+  .tools-title-box { margin-top: 48px; }
+  /* The phone buttons put "TH" before the number -- not on tools. */
+  .tool-card:not(.th-card--feat) .th-name::before { content: none; }
+  .tool-card:not(.th-card--feat) .th-name {
+    font-family: 'Oxanium', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+  .tool-card:not(.th-card--feat) .th-icon { width: 34px; height: 34px; }
+  .tool-card:not(.th-card--feat) .th-count { font-size: 10.5px; }
+  .tool-card.th-card--feat .th-name { font-size: 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2113,9 +2225,11 @@ function warModalEscHandler(e) {
 
       <!-- Whole tile is the link (so it's an <a>, nothing interactive
            inside). TH18 and TH17 get .th-card--wide -- they span two
-           columns on wide screens (see .layouts-list). -->
+           columns on wide screens (see .layouts-list). TH18 also gets
+           .th-card--feat: on phones it's the one full-width card with art,
+           the rest turn into plain two-per-row buttons. -->
 
-      <a class="th-card th-card--wide" href="/coc/town-hall-18/layouts">
+      <a class="th-card th-card--wide th-card--feat" href="/coc/town-hall-18/layouts">
         <img class="th-bg" src="/clashofclans/th18layouts/compressed-th18-3_watermarked-compresso.jpg" alt="" loading="lazy" decoding="async">
         <span class="th-tag">Latest</span>
         <div class="th-foot">
@@ -2232,6 +2346,116 @@ function warModalEscHandler(e) {
             <span class="th-label">Town Hall</span>
             <span class="th-name">9</span>
             <span class="th-count"><span data-count-from="/th9-layouts.json">30 layouts</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <!-- TH8: no bases yet, so no count file, and its art is borrowed from
+           TH9 (th9-12 -- not th9-4, which the TH9 card uses) until TH8 has
+           screenshots of its own. Phones only (.th-card--soon is hidden on
+           desktop) -- it evens out the two-per-row grid there. -->
+      <a class="th-card th-card--soon" href="/coc/town-hall-8/layouts">
+        <img class="th-bg" src="/clashofclans/th9layouts/th9-12_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/icons/th8icon.webp" alt="">
+          <div class="th-meta">
+            <span class="th-label">Town Hall</span>
+            <span class="th-name">8</span>
+            <span class="th-count"><span>Coming soon</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- CLASH TOOLS (Oct 2026): our own tools, in the same card language as
+         Featured Townhalls above (.th-card), plus .tool-card for the bits that
+         differ (word names instead of TH numbers). Player Tracker is the big
+         card (.th-card--wide/--feat, like TH18) and is coming soon -- it links
+         to /coc/tools/player-tracker. Card backgrounds are screenshots of each
+         tool's own page, in clashofclans/coctools/previews/tool-*.webp. -->
+    <div class="layouts-title-box tools-title-box">
+      <div class="layouts-title">Clash tools</div>
+      <div class="layouts-subtitle">Calculators and guides we built for Clash. They open right here on the site.</div>
+    </div>
+
+    <div class="layouts-list tools-list">
+
+      <a class="th-card th-card--wide th-card--feat tool-card tool-card--hero" href="/coc/tools/player-tracker">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-player-tracker.webp" alt="" loading="lazy" decoding="async">
+        <span class="th-tag">Coming soon</span>
+        <div class="th-foot">
+          <img class="th-icon" src="/clashofclans/coctools/legend-league.png" alt="">
+          <div class="th-meta">
+            <span class="th-label">New tool</span>
+            <span class="th-name">Player tracker</span>
+            <span class="th-count"><span>In the works</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <a class="th-card tool-card" href="/coc/tools/">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-websites.webp" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/icons/coctoolsicon.png" alt="">
+          <div class="th-meta">
+            <span class="th-name">Websites</span>
+            <span class="th-count"><span>Trackers and planners we use</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <a class="th-card tool-card" href="/coc/tools/slang">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-glossary.webp" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/icons/Book_of_Everything.webp" alt="">
+          <div class="th-meta">
+            <span class="th-name">Glossary</span>
+            <span class="th-count"><span>Clash slang, explained</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <a class="th-card tool-card" href="/coc/tools/army-maker">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-army-maker.webp" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/clashofclans/coctools/army-camp.webp" alt="">
+          <div class="th-meta">
+            <span class="th-name">Army Maker</span>
+            <span class="th-count"><span>Build an army, share the link</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <a class="th-card tool-card" href="/coc/tools/equipment">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-equipment.webp" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/icons/fireball.webp" alt="">
+          <div class="th-meta">
+            <span class="th-name">Equipments</span>
+            <span class="th-count"><span>Every hero item, every level</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <a class="th-card tool-card" href="/coc/tools/damage-calculator">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-damage-calculator.webp" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/clashofclans/buildings/cannon/15.webp" alt="">
+          <div class="th-meta">
+            <span class="th-name">Damage Calc.</span>
+            <span class="th-count"><span>Which spells take it down</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </a>
+
+      <a class="th-card tool-card" href="/coc/tools/walls">
+        <img class="th-bg" src="/clashofclans/coctools/previews/tool-walls.webp" alt="" loading="lazy" decoding="async">
+        <div class="th-foot">
+          <img class="th-icon" src="/clashofclans/coctools/th17-wall.webp" alt="">
+          <div class="th-meta">
+            <span class="th-name">Wall Calc.</span>
+            <span class="th-count"><span>Gold to max your walls</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </div>
         </div>
       </a>
@@ -2735,7 +2959,7 @@ function warModalEscHandler(e) {
 
 
  <div class="layouts-title-box" style="margin-top: 90px; margin-bottom: 30px;">
-  <div class="layouts-title">Popular Clash tools</div>
+  <div class="layouts-title">Sites we use</div>
   <div class="layouts-subtitle">Free sites we use to track, plan and test. Each one opens in a new tab.</div>
  </div>
 
@@ -3040,7 +3264,7 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js" defer></script>
+<script src="/11layout.js?v=20261005c" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
@@ -4218,8 +4442,8 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
 <!-- Bottom Nav (mobile) -->
 <div class="bn-bar" id="bottomNav" data-hub-nav="off">
   <a href="/coc/" class="bn-item">
-    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M10 20.5v-3.6a2 2 0 0 1 4 0v3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M12 8.5V3.2l3.8 1.5L12 6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><mask id="bnHomeCut"><rect width="24" height="24" fill="#fff" /><path d="M10.2 21.5v-4.6a1.8 1.8 0 0 1 3.6 0v4.6Z" fill="#000" /></mask></defs><path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#bnHomeCut)" /><path d="M12 8.5V3.2l3.8 1.5L12 6.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55" /></svg>
+    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><mask id="bnHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#bnHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/></svg>
     <span>Home</span>
   </a>
   <a href="/coc/town-hall-18/layouts" class="bn-item">
@@ -4449,8 +4673,8 @@ function cocPagePath(u) {
       // .icon images). Keep the two HUB_ICONS tables in sync.
       var HUB_ICONS = {
         home: {
-          outline: '<path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 20.5v-3.6a2 2 0 0 1 4 0v3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8.5V3.2l3.8 1.5L12 6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-          fill: '<defs><mask id="hubHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.2 21.5v-4.6a1.8 1.8 0 0 1 3.6 0v4.6Z" fill="#000"/></mask></defs><path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#hubHomeCut)"/><path d="M12 8.5V3.2l3.8 1.5L12 6.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>'
+          outline: '<path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+          fill: '<defs><mask id="hubHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#hubHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/>'
         },
         // Icon set v3: Home = a castle, Layouts = a folded map, Guides = an
         // open book, in the Armies swords' 1.8 line weight; active = filled. Filled pieces carry stroke="none" because the nav CSS
@@ -4489,5 +4713,6 @@ function cocPagePath(u) {
 </script>
   <script src="/coc-help.js" defer></script>
   <script src="/coc-more.js" defer></script>
+  <script src="/coc-hub-menus.js" defer></script>
 </body>
 </html>

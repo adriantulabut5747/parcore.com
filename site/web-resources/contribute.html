@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="/11layout.css">
+  <link rel="stylesheet" href="/11layout.css?v=20261005c">
   <link rel="stylesheet" href="/hwr-css.css">
   <style>
       /* ==================== CONTRIBUTE PAGE — SUBMISSION CARD (cw-*) ====================
@@ -385,9 +385,44 @@
    defined in hwr-css.css — these two rules only add what that generic
    version doesn't need to know about: real favicon <img>s instead of
    inline <svg> stroke icons, and the one-off highlight pulse. */
-      .hero-tags .hero-tag-icon {
-        object-fit: contain;
-        background: #fff;
+      /* Chips (Oct 2026): text only, flat tiles in the top bar's language --
+   the white favicon discs were the loudest thing in the hero, and eleven
+   of them made two busy rows. The line above says what a chip does
+   (pre-selects that category in the form below), so it's an instruction
+   in sentence case, not an uppercase kicker. */
+      body .hero-tags-label {
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+        color: #9a9ea4;
+      }
+
+      body .hero-tags {
+        gap: 6px;
+      }
+
+      body .hero-tags .hero-tag {
+        padding: 7px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(22, 23, 26, 0.85);
+        font-family: 'Oxanium', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #a3a7ae;
+      }
+
+      body .hero-tags a.hero-tag:hover {
+        background: #24262b;
+        color: #fff;
+      }
+
+      body .hero-tags a.hero-tag:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.35);
+        outline-offset: 2px;
       }
 
       @keyframes cwJumpHighlight {
@@ -412,8 +447,8 @@
    dark badge from the 4th row on. */
       .cw-leaderboard {
         margin: 20px 15% 20px 15%;
-        border-radius: 20px;
-        padding: 10px 30px;
+        border-radius: 14px;
+        padding: 6px 26px;
         background:
           linear-gradient(90deg, #141414 0%, #1a1a1a 55%, #141414 100%) padding-box,
           radial-gradient(130% 160% at 0% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box,
@@ -423,10 +458,28 @@
       }
 
       .cw-leaderboard-row {
+        position: relative;
         display: flex;
         align-items: center;
         gap: 16px;
         padding: 14px 0;
+      }
+
+      /* Share bar (Oct 2026): each row's divider doubles as a measure -- a
+   red segment along the row's foot, as long as that member's count
+   relative to the leader (--share, set by the small script under the
+   list). Says "10 vs 3 vs 1" at a glance without another chart. Starts
+   after the rank badge so it lines up with the names. */
+      .cw-leaderboard-row::after {
+        content: "";
+        position: absolute;
+        left: 46px;
+        bottom: -1px;
+        width: calc((100% - 46px) * var(--share, 0));
+        height: 1px;
+        background: linear-gradient(90deg, rgba(194, 59, 59, 0.75), rgba(194, 59, 59, 0.35));
+        pointer-events: none;
+        z-index: 1; /* above the next row's divider, which paints later */
       }
 
       .cw-leaderboard-row+.cw-leaderboard-row {
@@ -453,7 +506,6 @@
         background: rgba(232, 193, 74, 0.16);
         border-color: rgba(232, 193, 74, 0.55);
         color: #e8c14a;
-        box-shadow: 0 0 12px rgba(232, 193, 74, 0.25);
       }
 
       .cw-leaderboard-row:nth-child(2) .cw-leaderboard-rank {
@@ -480,28 +532,27 @@
         white-space: nowrap;
       }
 
+      /* Plain figure + quiet word, right-aligned (was a red pill on every
+   row -- the same colour four times said nothing, and the red now lives
+   in the share bar where it measures something). */
       .cw-leaderboard-count {
         flex-shrink: 0;
         display: inline-flex;
         align-items: baseline;
-        gap: 5px;
-        padding: 5px 14px;
-        border-radius: 20px;
-        background: rgba(194, 59, 59, 0.12);
-        border: 1px solid rgba(194, 59, 59, 0.3);
+        gap: 6px;
         color: #fff;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 13px;
+        font-family: 'Oxanium', sans-serif;
+        font-size: 16px;
         font-weight: 800;
+        font-variant-numeric: tabular-nums;
       }
 
       .cw-leaderboard-count-label {
         font-family: 'Sora', sans-serif;
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.4px;
-        text-transform: uppercase;
-        color: #d97b7b;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #8b8e94;
+        text-transform: lowercase;
       }
 
       @media (max-width: 970px) {
@@ -540,7 +591,7 @@
   <link rel="apple-touch-icon" href="/icons/home.jpg">
 
 
-  <script src="/11layout.js" defer></script>
+  <script src="/11layout.js?v=20261005c" defer></script>
   <script src="/hwr-bookmarks.js" defer></script>
 
 
@@ -1077,13 +1128,7 @@
             <span class="hero-stat-strip-text" id="heroStatStripText">Loading stats&hellip;</span>
           </p>
           <div class="hero-tags-wrap">
-            <span class="hero-tags-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z" />
-                <circle cx="7" cy="7" r="0.5" fill="currentColor" />
-              </svg>
-              Quick-pick a category
-            </span>
+            <span class="hero-tags-label">Pick a category to start a submission</span>
             <div class="hero-tags" id="heroTags"><!-- populated from hwr-categories.json --></div>
           </div>
         </div>
@@ -1185,13 +1230,7 @@
      that part, just keep them in descending order. -->
             <div class="layouts-title-box" id="cwLeaderboardTitle">
               <div class="layouts-title-row">
-                <div class="layouts-title">
-                  <svg class="layouts-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z" />
-                    <path d="M7 5H4a1 1 0 0 0-1 1 4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1 4 4 0 0 1-4 4" />
-                  </svg>
-                  <span>Top Contributors</span>
-                </div>
+                <div class="layouts-title">Top Contributors</div>
                 <div class="layouts-title-actions">
                   <span class="layouts-count">4 contributors</span>
                 </div>
@@ -1221,6 +1260,19 @@
                 <span class="cw-leaderboard-count">1 <span class="cw-leaderboard-count-label">Contribution</span></span>
               </div>
             </div>
+            <script>
+              // Share bars: each row's --share = its count / the leader's.
+              (function () {
+                var rows = document.querySelectorAll('.cw-leaderboard-row');
+                var counts = [].map.call(rows, function (r) {
+                  return parseInt((r.querySelector('.cw-leaderboard-count') || {}).textContent, 10) || 0;
+                });
+                var top = Math.max.apply(null, counts.concat(1));
+                rows.forEach(function (r, i) {
+                  r.style.setProperty('--share', (counts[i] / top).toFixed(3));
+                });
+              })();
+            </script>
 
             <!-- About card — reused as-is (same classes, same copy) from
      /web-resources/ai-tools purely as decoration below the form; see that file's
@@ -1334,7 +1386,6 @@
                   var html = '';
                   items.forEach(function(item) {
                     html += '<a href="#cwSubmitCard" class="hero-tag" data-category="' + item.name + '">' +
-                      '<img class="hero-tag-icon" src="' + item.icon + '" alt="">' +
                       item.name + '</a>';
                   });
                   wrap.innerHTML = html;

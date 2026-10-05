@@ -965,31 +965,38 @@ if (document.readyState === 'loading') {
     return 'layouts'; // sensible default (e.g. guides pages that still show the strip)
   }
 
-  // ---- Phone breadcrumb (secondary top bar) ----
-  // One trail on every CoC page, built from coc-nav-data.json:
-  //   COC > Layouts > TH18 > Page 1 of 3    COC > Armies > TH13 > Page 1 of 1
-  //   COC > Tools > Army Maker              COC > Tools > Damage Calculator
+  // ---- Breadcrumb (secondary top bar, phones AND desktop since Oct 2026) ----
+  // One trail on every CoC page except Clash home, built from coc-nav-data.json:
+  //   Clash of Clans > TH18 Layouts > Page 1 of 3   (phones: "COC > ...")
+  //   Clash of Clans > Army Maker
   // The page step waits for th-layouts.js to know the page count: it
   // fills [data-crumb-page], and also keeps the text on <html
   // data-page-label>, read here in case it got there first. A Town Hall
-  // with no bases yet (no pages at all) never gets one. Desktop keeps the
-  // page's own title; phones swap it for the trail (th-layouts.css, PHONE
-  // BREADCRUMB).
+  // with no bases yet (no pages at all) never gets one. The trail replaces
+  // the page's own title at every width (th-layouts.css, BREADCRUMB).
   function buildCrumbs(data) {
     var box = document.querySelector('.secondary-left .secondary-content');
     if (!box || box.querySelector('.stb-crumbs')) return;
     var nav = data.primaryNav || {};
     var trail = null;
+    // Only steps that are real pages (Oct 2026): there's no "all layouts" or
+    // "all armies" page, so no "Layouts" / "Armies" step -- the Town Hall
+    // and the section are one step ("TH13 Layouts"). Same for tools: /coc/tools/
+    // is the Websites page, not a tools index, so no "Tools" step either.
     data.townhalls.forEach(function (th) {
-      if (currentPage === cocPagePath(th.layoutHref)) trail = [{ text: 'Layouts', href: nav.layouts && nav.layouts.href }, { text: th.label }];
-      if (currentPage === cocPagePath(th.armyHref)) trail = [{ text: 'Armies', href: nav.armies && nav.armies.href }, { text: th.label }];
+      if (currentPage === cocPagePath(th.layoutHref)) trail = [{ text: th.label + ' Layouts', href: th.layoutHref }];
+      if (currentPage === cocPagePath(th.armyHref)) trail = [{ text: th.label + ' Armies', href: th.armyHref }];
     });
     var paged = !!trail;
-    data.guides.forEach(function (g) {
-      if (isActive(g.activeOn)) trail = [{ text: 'Tools', href: nav.guides && nav.guides.href }, { text: g.name || g.label }];
+    data.guides.concat(data.upcoming || []).forEach(function (g) {
+      if (isActive(g.activeOn)) trail = [{ text: g.name || g.label, href: g.href }];
     });
     if (!trail) return;
-    trail.unshift({ text: 'COC', href: nav.home && nav.home.href });
+    // Desktop has the room for the full name; phones keep "COC" (Oct 2026).
+    trail.unshift({
+      html: '<span class="stb-crumb-long">Clash of Clans</span><span class="stb-crumb-short">COC</span>',
+      href: nav.home && nav.home.href,
+    });
 
     // The desktop title: wrap its loose text so phones can hide it.
     [].slice.call(box.childNodes).forEach(function (n) {
@@ -1003,11 +1010,15 @@ if (document.readyState === 'loading') {
     if (old) old.remove();
 
     var sep = '<span class="stb-crumb-sep" aria-hidden="true">›</span>';
+    // Every step is a link (Oct 2026, his ask): Clash of Clans -> Clash home,
+    // "TH13 Layouts" -> that Town Hall's page 1, the tool -> its page, and
+    // "Page 2 of 4" -> this page (its address is read at click time, so it
+    // follows ?page= changes).
     var html = trail
       .map(function (c, i) {
         var last = i === trail.length - 1 && !paged;
-        if (c.href && i < trail.length - 1) return '<a href="' + c.href + '">' + c.text + '</a>';
-        return '<span' + (last ? ' aria-current="page"' : '') + '>' + c.text + '</span>';
+        var label = c.html || c.text;
+        return '<a href="' + c.href + '"' + (last ? ' aria-current="page"' : '') + '>' + label + '</a>';
       })
       .join(sep);
     if (paged) {
@@ -1017,13 +1028,21 @@ if (document.readyState === 'loading') {
         (txt ? '' : ' hidden') +
         '>' +
         sep +
-        '<span data-crumb-page aria-current="page">' +
+        '<a href="' +
+        location.pathname +
+        location.search +
+        '" data-crumb-page aria-current="page">' +
         txt +
-        '</span></span>';
+        '</a></span>';
     }
     var crumbs = el('nav', 'stb-crumbs');
     crumbs.setAttribute('aria-label', 'Breadcrumb');
     crumbs.innerHTML = html;
+    var pageLink = crumbs.querySelector('[data-crumb-page]');
+    if (pageLink)
+      pageLink.addEventListener('click', function () {
+        pageLink.href = location.pathname + location.search;
+      });
     box.appendChild(crumbs);
     box.classList.add('has-crumbs');
   }
@@ -1045,7 +1064,17 @@ if (document.readyState === 'loading') {
         img.src = g.icon;
         img.alt = '';
         btn.appendChild(img);
-        btn.appendChild(document.createTextNode(g.label));
+        // Full name ("Damage Calculator") while the strip fits; the short
+        // label ("Damage Calc.") once it has to scroll -- fitStripLabels
+        // swaps them.
+        if (g.name && g.name !== g.label) {
+          var full = el('span', 'lbl-full');
+          full.textContent = g.name;
+          var short = el('span', 'lbl-short');
+          short.textContent = g.label;
+          btn.appendChild(full);
+          btn.appendChild(short);
+        } else btn.appendChild(document.createTextNode(g.label));
         btn.addEventListener('click', function () {
           if (typeof window.goToTH === 'function') window.goToTH(g.href, btn);
           else location.href = g.href;
@@ -1083,6 +1112,26 @@ if (document.readyState === 'loading') {
     return frag;
   }
 
+  // Tools strip: full names when every chip fits, short ones (.is-tight)
+  // when the strip would have to scroll sideways (phones, narrow windows).
+  // It measures with the full names showing, then decides; both happen in
+  // the same frame, so nothing flickers. Re-checked when the strip resizes
+  // and when the chip icons finish loading (they change the widths).
+  function fitStripLabels() {
+    var box = document.getElementById('second-layer-container');
+    if (!box || !box.querySelector('.lbl-full')) return;
+    function fit() {
+      box.classList.remove('is-tight');
+      if (box.scrollWidth > box.clientWidth + 1) box.classList.add('is-tight');
+    }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(box);
+    box.querySelectorAll('img').forEach(function (img) {
+      if (!img.complete) img.addEventListener('load', fit);
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }
+
   function init(data) {
     fillByRole('layouts-grid', function () {
       return buildLayoutsGrid(data.townhalls, 'dsn-mini');
@@ -1110,6 +1159,7 @@ if (document.readyState === 'loading') {
     fillByRole('second-layer', function () {
       return buildSecondLayer(data);
     });
+    fitStripLabels();
 
     // The secondary top bar's left icon matches the lit button in the strip
     // above: that TH's icon on a layouts page, its barracks on an army

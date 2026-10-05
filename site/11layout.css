@@ -1242,9 +1242,81 @@ body {
   margin: 14px 0 0;
 }
 
+/* "Back to top": phones only. 11layout.js wraps the label + icons in
+   .pf-footer-head and puts the button on their right. Deliberately quiet:
+   a plain label and a hairline ring around the arrow, so it reads as part
+   of the footer rather than another button competing with the page. */
+.pf-footer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.pf-to-top {
+  display: none;
+}
+
 @media (max-width: 970px) {
   .pf-footer {
     padding: 30px 5% 120px;
+  }
+
+  .pf-to-top {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px; /* full tap target; the ring is smaller */
+    margin-right: -4px;
+    padding: 0 4px 0 8px;
+    border: 0;
+    background: none;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+  }
+  .pf-to-top-ring {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 50%;
+    color: var(--text-main);
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+  .pf-to-top svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pf-to-top:active {
+    color: var(--text-main);
+  }
+  .pf-to-top:active .pf-to-top-ring {
+    border-color: rgba(255, 255, 255, 0.32);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .pf-to-top:active svg {
+    transform: translateY(-2px);
+  }
+  .pf-to-top:focus-visible {
+    outline: none;
+  }
+  .pf-to-top:focus-visible .pf-to-top-ring {
+    box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #8b9099;
   }
 
   .pf-footer-links {
@@ -2414,39 +2486,116 @@ controls there. */
   padding: 6px 12px;
   border: 0;
   border-radius: 8px;
-  background: rgba(11, 11, 12, 0.8);
+  background: #16171a;
   box-shadow: none;
   font-family: 'Oxanium', sans-serif;
   font-size: 10.5px;
   font-weight: 700; /* 700, not the tabs' 800: at this size 800 read too wide */
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: #8f949c;
   transition: background 0.2s, color 0.2s;
 }
 .secondary-top-bar .stb-dsn-wrap .dsn-chip:hover,
-.secondary-top-bar .stb-hub-nav .stb-hub-link:hover {
-  background: var(--flat-hover);
-  color: var(--text-secondary);
+.secondary-top-bar .stb-hub-nav .stb-hub-link:hover,
+.secondary-top-bar .stb-hub-nav .stb-hub-link.is-open {
+  background: #1e2024;
+  color: var(--text-main);
 }
-/* Top-bar active key: a touch lighter than --key-face (#26282e -> #1b1c21),
-   about 3 shades, so it lifts a little off the bar. Deliberately subtle. */
+/* Oct 2026 (picked on the Clash bar, then made site-wide): every inactive
+   chip and hub link is a FLAT tile -- #16171a, no highlight, no edge -- and
+   the page you're on is the only RAISED key, a step brighter than the
+   sidebar's. Flat vs raised is what says where you are; when every chip
+   was a key nothing stood out. Rejected along the way: near-black pills
+   (too dark), bare text, a grey wash, all-keycaps ("confusing"). */
 .secondary-top-bar .stb-dsn-wrap .dsn-chip.active,
 .secondary-top-bar .stb-hub-nav .stb-hub-link.active {
   border-radius: 8px;
-  background: linear-gradient(180deg, #292b31, #1e1f24);
-  color: var(--text-main);
-  box-shadow: var(--key-edge);
+  background: linear-gradient(180deg, #30333a, #24262b);
+  color: #fff;
+  box-shadow:
+    0 3px 0 #08090a,
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 .secondary-top-bar .stb-dsn-wrap .dsn-chip.active:hover,
 .secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover {
-  background: linear-gradient(180deg, #34373e, #27292e);
+  background: linear-gradient(180deg, #373a42, #2a2c32);
+}
+/* Chip icons: dimmed on the flat chips, full colour on hover and on the
+   raised one, so the colourful category logos don't outshout the key. */
+.secondary-top-bar .stb-dsn-wrap .dsn-chip .dsn-chip-icon {
+  opacity: 0.5;
+  filter: saturate(0.6);
+  transition: opacity 0.2s, filter 0.2s;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip:hover .dsn-chip-icon,
+.secondary-top-bar .stb-dsn-wrap .dsn-chip.active .dsn-chip-icon {
+  opacity: 1;
+  filter: none;
 }
 .secondary-top-bar .stb-dsn-wrap .dsn-chip:focus-visible,
 .secondary-top-bar .stb-hub-nav .stb-hub-link:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.35);
   outline-offset: 2px;
 }
+/* ---- Scroll arrows on the top-bar strips (site-wide) ---------------
+   Oct 2026: the dark ringed circles were the heaviest thing on a bar whose
+   chips are now flat. The arrow is just a chevron sitting where the strip
+   fades out -- the fade says "more this way", the chevron says "tap to
+   go". Hover gives the chips' own faint wash. Both edges fade while both
+   arrows are showing (the base rules only faded one side at a time). */
+.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn,
+.secondary-top-bar .stb-hub-nav .dsn-scroll-btn {
+  width: 24px;
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #8b9099;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn:hover,
+.secondary-top-bar .stb-hub-nav .dsn-scroll-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main, #eff2f5);
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn:active,
+.secondary-top-bar .stb-hub-nav .dsn-scroll-btn:active {
+  transform: translateY(-50%) scale(0.9);
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn:focus-visible,
+.secondary-top-bar .stb-hub-nav .dsn-scroll-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 1px;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn svg,
+.secondary-top-bar .stb-hub-nav .dsn-scroll-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn svg path,
+.secondary-top-bar .stb-hub-nav .dsn-scroll-btn svg path {
+  stroke-width: 2.2;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-categories-scroll:not(.no-arrow-left):not(.no-arrow-right),
+.secondary-top-bar .stb-hub-nav .dsn-categories-scroll:not(.no-arrow-left):not(.no-arrow-right) {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, transparent 22px, #000 52px, #000 calc(100% - 52px), transparent calc(100% - 22px));
+  mask-image: linear-gradient(90deg, transparent 0, transparent 22px, #000 52px, #000 calc(100% - 52px), transparent calc(100% - 22px));
+}
+/* Same clear-under-the-arrow fade when only one arrow is showing. */
+.secondary-top-bar .stb-dsn-wrap .dsn-categories-scroll.no-arrow-left:not(.no-arrow-right),
+.secondary-top-bar .stb-hub-nav .dsn-categories-scroll.no-arrow-left:not(.no-arrow-right) {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 52px), transparent calc(100% - 22px));
+  mask-image: linear-gradient(90deg, #000 calc(100% - 52px), transparent calc(100% - 22px));
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-categories-scroll.no-arrow-right:not(.no-arrow-left),
+.secondary-top-bar .stb-hub-nav .dsn-categories-scroll.no-arrow-right:not(.no-arrow-left) {
+  -webkit-mask-image: linear-gradient(90deg, transparent 22px, #000 52px);
+  mask-image: linear-gradient(90deg, transparent 22px, #000 52px);
+}
+
 .sidebar a.active,
 .sidebar .games-container .game.active,
 .sidebar .triple-a-list .triple-a-game.active {
@@ -2490,5 +2639,80 @@ controls there. */
     background: rgba(22, 22, 26, 0.88);
     -webkit-backdrop-filter: blur(14px) saturate(118%);
     backdrop-filter: blur(14px) saturate(118%);
+  }
+}
+
+/* BREADCRUMB -- one trail on every CoC page except Clash home
+   (thz-script.js buildCrumbs): "Clash of Clans > TH18 Layouts > Page 1 of 3",
+   "Clash of Clans > Army Maker". Phones and desktop since Oct 2026
+   (was phones only); it replaces the page title in the secondary top bar.
+   The first step reads "Clash of Clans" on desktop, "COC" on phones. One grey
+   for every step -- the current page isn't highlighted -- with the arrows a
+   step darker. */
+.secondary-content.has-crumbs > :not(.stb-crumbs) {
+  display: none;
+}
+.stb-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--text-muted, #949ba4);
+}
+.stb-crumbs a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.stb-crumb-sep {
+  color: #6d7178;
+}
+.stb-crumb-page {
+  display: contents;
+}
+.stb-crumb-page[hidden] {
+  display: none;
+}
+.stb-crumb-short {
+  display: none;
+}
+@media (max-width: 970px) {
+  .stb-crumb-long {
+    display: none;
+  }
+  .stb-crumb-short {
+    display: inline;
+  }
+}
+
+/* Hover = underline plus a slight lift in grey (#949ba4 -> #c3c7ce) --
+   not white, so the trail stays quiet. */
+.stb-crumbs a {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.stb-crumbs a:hover,
+.stb-crumbs a:focus-visible {
+  color: #c3c7ce;
+  text-decoration: underline;
+}
+/* Web Resources (11layout.js buildHwrCrumbs): the trail sits BESIDE the
+   title link, not inside it, so it swaps at the .secondary-left level.
+   Desktop only -- phones keep "Web Resources / <section>" from the
+   scroll-spy. */
+.secondary-left > .stb-crumbs {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+}
+@media (min-width: 971px) {
+  .secondary-left.has-crumbs > .secondary-content {
+    display: none;
+  }
+}
+@media (max-width: 970px) {
+  .secondary-left > .stb-crumbs {
+    display: none;
   }
 }

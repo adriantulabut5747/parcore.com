@@ -648,14 +648,486 @@ select.gd-input {
 }
 
 /* ---- Wall calculator ------------------------------------------------------------------- */
+/* Two rows: the level route (current wall -> target wall, as cards with the
+   wall's art), then the wall count and the Gold Pass switch side by side.
+   The result under it: one total panel (gold + elixir coins, the number,
+   what the Gold Pass saved) with the per-wall and Wall Ring facts. */
 .gd-wall {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.2fr;
-  gap: 12px;
+  gap: 20px;
 }
 .gd-field {
   display: grid;
   gap: 6px;
+  min-width: 0;
+}
+/* Two rows of all 19 walls (Current, then Target), each scrolling
+   sideways. A tile is a radio's label: the wall's art over its level.
+   The picked one is the raised key. In the Target row, walls at or below
+   the current level are greyed out, and the walls you'll pay for join
+   into one strip with a red rail along the bottom -- a built wall line. */
+.wl-rows {
+  display: grid;
+  gap: 16px;
+}
+.wl-row-set {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.wl-row-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  width: 100%;
+  padding: 0 2px;
+  margin-bottom: 6px;
+}
+.wl-row-pick {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #eff2f5;
+}
+.wl-row-th {
+  margin-left: auto;
+  font-family: 'Sora', sans-serif;
+  font-size: 11.5px;
+  color: #a7abb3;
+}
+.wl-row {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 8px;
+  padding: 6px 4px 10px;
+  border: 1px solid #23252a;
+  border-radius: 12px;
+  background: #0e0f12;
+  scrollbar-width: thin;
+  scrollbar-color: #2e3036 transparent;
+}
+.wl-row::-webkit-scrollbar {
+  height: 6px;
+}
+.wl-row::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #2e3036;
+}
+/* Edge fades on whichever side has more walls (.more-l / .more-r, set by
+   coc-guides.js). */
+.wl-row-set.more-r .wl-row {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+}
+.wl-row-set.more-l .wl-row {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent);
+}
+.wl-row-set.more-l.more-r .wl-row {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
+.wl-tile {
+  position: relative;
+  flex: none;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  width: 60px;
+  padding: 7px 0 8px;
+  border-radius: 10px;
+  scroll-snap-align: center;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.15s ease;
+}
+.wl-tile input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wl-tile img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.5));
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wl-tile-n {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b9099;
+  font-variant-numeric: tabular-nums;
+}
+@media (hover: hover) {
+  .wl-tile:hover img {
+    transform: translateY(-3px);
+  }
+  .wl-tile:hover .wl-tile-n {
+    color: #d5d8de;
+  }
+}
+.wl-tile:has(input:checked) {
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+}
+.wl-tile:has(input:checked) img {
+  transform: translateY(-3px) scale(1.08);
+}
+.wl-tile:has(input:checked) .wl-tile-n {
+  color: #fff;
+}
+.wl-tile:has(input:focus-visible) {
+  outline: 2px solid #8b9099;
+  outline-offset: -2px;
+}
+/* Current row: walls below yours are already built -- a little quieter.
+   19 can't be a current level (nothing to upgrade to). */
+.wl-tile.is-done {
+  opacity: 0.55;
+}
+.wl-tile.is-max,
+.wl-tile.is-off {
+  opacity: 0.22;
+  cursor: not-allowed;
+}
+.wl-tile.is-off img,
+.wl-tile.is-max img {
+  filter: grayscale(1);
+}
+/* Target row: the path. Tiles sit edge to edge, so the tint and the rail
+   run unbroken from the first wall you'll pay for to the target. */
+.wl-tile.is-path {
+  border-radius: 0;
+  background: rgba(194, 59, 59, 0.1);
+}
+.wl-tile.is-path::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: #c23b3b;
+}
+.wl-tile:not(.is-path) + .wl-tile.is-path {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.wl-tile:not(.is-path) + .wl-tile.is-path::after {
+  left: 6px;
+  border-radius: 3px 0 0 3px;
+}
+.wl-tile.is-path.is-end {
+  border-radius: 0 10px 10px 0;
+  background: var(--key-face);
+}
+.wl-tile.is-path.is-end::after {
+  right: 6px;
+  border-radius: 0 3px 3px 0;
+}
+.wl-tile:not(.is-path) + .wl-tile.is-path.is-end {
+  border-radius: 10px;
+}
+.wl-tile.is-path .wl-tile-n {
+  color: #e7c3c3;
+}
+.wl-tile.is-path.is-end .wl-tile-n {
+  color: #fff;
+}
+.wl-opts {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.wl-quick {
+  display: flex;
+  gap: 6px;
+}
+.wl-chip {
+  flex: 1;
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+.wl-chip[aria-pressed='true'] {
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--text-main, #eff2f5);
+}
+/* Gold Pass: a fieldset of four radios drawn as one segmented bar; the
+   checked one is the raised key, in gold once a discount is on. */
+.wl-gp {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.wl-gp legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin-bottom: 6px;
+}
+.wl-gp legend img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+.wl-seg {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #2a2c31;
+  border-radius: 10px;
+  background: #0e0f12;
+}
+.wl-seg label {
+  position: relative;
+}
+.wl-seg input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wl-seg span {
+  display: grid;
+  place-items: center;
+  height: 32px;
+  border-radius: 7px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--am-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+@media (hover: hover) {
+  .wl-seg span:hover {
+    color: #c8cbcd;
+    background: #1a1b1f;
+  }
+}
+.wl-seg input:checked + span {
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--text-main, #eff2f5);
+}
+.wl-seg input:not([value='0']):checked + span {
+  background: linear-gradient(#3a2f12, #2a220d);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 214, 102, 0.25),
+    0 2px 0 #171207;
+  color: #ffd66b;
+}
+.wl-seg input:focus-visible + span {
+  outline: 2px solid #8b9099;
+  outline-offset: 2px;
+}
+.wl-seg-2 {
+  grid-template-columns: 1fr 1fr;
+}
+/* Discounts: Gold Pass and Hammer Jam stacked, then one live line that
+   explains how they combine (#wallDisc, written by coc-guides.js). */
+.wl-disc {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.wl-disc-note {
+  margin: 0 2px;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a7abb3;
+}
+.wl-disc-note b {
+  font-weight: 600;
+  color: #d5d8de;
+}
+.wl-disc-note.is-on b {
+  color: #ffd66b;
+}
+.wl-share {
+  flex: none;
+  min-width: 96px;
+}
+/* The army maker's header stacks on phones; this one keeps Share at the
+   top right instead of a full-width bar. */
+.am-head:has(.wl-share) {
+  flex-direction: row;
+  align-items: flex-start;
+}
+.wl-share svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Result */
+.wl-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+.wl-total {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: 18px 20px;
+  background: radial-gradient(90% 120% at 0% 0%, rgba(255, 200, 70, 0.08), transparent 65%);
+}
+.wl-total-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.wl-coins {
+  display: flex;
+}
+.wl-coins img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+}
+.wl-coins img + img {
+  margin-left: -10px;
+}
+.wl-total-v {
+  font-family: 'Orbitron', 'Oxanium', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.wl-total-full {
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  color: #a7abb3;
+  font-variant-numeric: tabular-nums;
+}
+.wl-save {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 214, 107, 0.12);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd66b;
+}
+.wl-facts {
+  display: grid;
+  align-content: center;
+  margin: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+.wl-facts > div {
+  display: grid;
+  gap: 4px;
+  padding: 14px 18px;
+}
+.wl-facts > div + div {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.wl-facts dt {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--am-muted);
+}
+.wl-facts dd {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #eff2f5;
+  font-variant-numeric: tabular-nums;
+}
+.wl-facts dd img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+.wl-facts small {
+  font-family: 'Sora', sans-serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: #8b9099;
+}
+.wl-notes {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 20px 12px;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #b4b8bf;
+}
+.wl-notes li {
+  position: relative;
+  padding-left: 14px;
+}
+.wl-notes li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e06363;
+}
+.wl-sub-gp {
+  margin-left: 6px;
+  color: #d9b45a;
+}
+.wl-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.wl-step img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+.gd-table-wall td {
+  vertical-align: middle;
+}
+.gd-table-wall s {
+  display: block;
+  font-size: 10.5px;
+  color: #6d7178;
 }
 .gd-field-label {
   font-family: 'Oxanium', sans-serif;
@@ -759,17 +1231,61 @@ select.gd-input {
   .gd-stat-v {
     font-size: 17px;
   }
+  /* Wall calculator: smaller wall tiles, everything stacks. */
   .gd-wall {
+    gap: 18px;
+  }
+  .wl-tile {
+    width: 52px;
+  }
+  .wl-share {
+    min-width: 0;
+    min-height: 34px;
+    padding: 0 12px;
+  }
+  .wl-tile img {
+    width: 40px;
+    height: 40px;
+  }
+  .wl-opts {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .wl-result {
+    grid-template-columns: 1fr;
+  }
+  .wl-total {
+    padding: 16px;
+  }
+  .wl-total-v {
+    font-size: 32px;
+  }
+  .wl-facts {
     grid-template-columns: 1fr 1fr;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .gd-wall .gd-field:last-child {
-    grid-column: 1 / -1;
+  .wl-facts > div {
+    padding: 12px 16px;
   }
-  .gd-stats-4 {
-    grid-template-columns: repeat(3, 1fr);
+  .wl-facts > div + div {
+    border-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .gd-stat-main {
-    grid-column: 1 / -1;
+  .wl-facts dd {
+    font-size: 16px;
+  }
+  .wl-notes {
+    padding: 10px 16px 12px;
+  }
+  .gd-table-wall th,
+  .gd-table-wall td {
+    padding: 7px 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wl-tile img {
+    transition: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {

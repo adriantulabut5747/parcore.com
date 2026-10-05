@@ -708,8 +708,9 @@
   }
   /* Heroes go last when stacked: troops, spells / siege, clan castle,
      then heroes (his pick, Oct 2026). Only the look moves -- the markup
-     keeps heroes first, so desktop's left column is untouched. */
-  .as-heroes {
+     keeps heroes first, so desktop's left column is untouched. Cards
+     only: the army maker (.is-stack) keeps heroes on top. */
+  .army-sheet:not(.is-stack) .as-heroes {
     order: 1;
   }
   .as-hero-row {
@@ -811,9 +812,6 @@
   gap: 14px;
   --as-tile: 40px;
   --as-gap: 5px;
-}
-.army-sheet.is-stack .as-heroes {
-  order: 1; /* heroes last, as on phone cards */
 }
 .army-sheet.is-stack .as-hero-row {
   flex: none;
@@ -1015,7 +1013,6 @@
   .army-sheet.is-stack .as-heroes {
     display: flex;
     flex-direction: column;
-    order: 0; /* back in the left column */
   }
   .army-sheet.is-stack .as-hero-row {
     flex: 1;
@@ -1652,36 +1649,11 @@
   }
 }
 
-/* .second-layer is the TH8-TH18 switcher strip -- thz-script.js fills
-   it from the same data every other TH page relies on for its ONLY
-   TH switcher. This page also has the secondary top bar's own
-   dsn-chip TH row (11layout.css/js, added when this page got that
-   redesign), so past 970px there are two identical TH switchers
-   stacked on screen. Hide the older one here, desktop only -- other
-   TH pages don't have the secondary-top-bar version, so this can't
-   touch them (page-scoped override, not a shared-file change), and
-   mobile still needs it since the secondary top bar's chip row is
-   replaced by the bottom sheet nav down there. */
-@media (min-width: 971px) {
-  .second-layer-container {
-    display: none;
-  }
-  /* The strip's hairline stays as a divider between the tabs and the
-     content (Oct 2026): 24 above and below (the bottom margin collapses
-     with the content's own 16), and brighter than the phone line so it
-     reads on its own. .coc-content prefix: the base .th-rail rules
-     below come later in the file and would otherwise win. Its scroll
-     thumb goes, since there's no strip above it to scroll. */
-  .coc-content .th-rail {
-    margin: 24px 0;
-  }
-  .coc-content .th-rail::before {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  .th-rail span {
-    display: none;
-  }
-}
+/* .second-layer is the TH8-TH18 switcher strip (or the tools strip on a
+   Tools page) -- thz-script.js fills it. It used to be hidden past 970px
+   because the secondary top bar has its own copy of the TH row; since
+   Oct 2026 desktop shows both on purpose (his pick), the same as phones. */
+
 /* Town Hall strip scroll line (mobile). The native scrollbar is hidden
    -- phones ignore scrollbar styling anyway -- and this line takes its
    place: a hairline across the full width (the divider) plus a lighter
@@ -2956,45 +2928,8 @@ html.loaded {
   }
 }
 
-/* PHONE BREADCRUMB -- one trail on every CoC page (thz-script.js
-   buildCrumbs): "COC > Layouts > TH18 > Page 1 of 3", "COC > Armies >
-   TH13 > Page 1 of 1", "COC > Tools > Army Maker". Phones only: it replaces the page title in
-   the secondary top bar. One grey for every step -- the current page isn't
-   highlighted -- with the arrows a step darker. */
-.stb-crumbs {
-  display: none;
-}
-@media (max-width: 970px) {
-  .secondary-content.has-crumbs > :not(.stb-crumbs) {
-    display: none;
-  }
-  .stb-crumbs {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    color: var(--text-muted, #949ba4);
-  }
-  .stb-crumbs a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .stb-crumbs a:hover,
-  .stb-crumbs a:focus-visible {
-    color: var(--text-main, #eff2f5);
-  }
-  .stb-crumb-sep {
-    color: #6d7178;
-  }
-  .stb-crumb-page {
-    display: contents;
-  }
-  .stb-crumb-page[hidden] {
-    display: none;
-  }
-}
+/* BREADCRUMB (.stb-crumbs): moved to 11layout.css in Oct 2026 so Web
+   Resources shares it. thz-script.js buildCrumbs still builds the CoC trail. */
 
 /* ---- Coming soon (a Town Hall with no bases yet, e.g. TH8) ----------------
    Takes the place of the bases grid and page numbers. Clan-card material
@@ -3139,3 +3074,72 @@ html.loaded {
 /* The Live band (.t18-band, the red events band above the footer) moved to
    coc-clan-clock.css, Oct 2026, so /coc/ (which does not load this
    file) can use it too. */
+
+/* =======================================================================
+   SPACING + CARD ALIGNMENT (Oct 2026) -- one rhythm for the head of every
+   Town Hall page, same on desktop and phones:
+     tabs (Layouts / Army / Tools) --10px--> Town Hall strip --12px--> rail
+     --24px--> cards
+   8px between tabs and between strip chips. Placed last so it settles the
+   older per-breakpoint rules above.
+   ======================================================================= */
+.coc-content .first-layer {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.coc-content .second-layer {
+  gap: 8px;
+}
+.coc-content .th-rail {
+  margin-top: 12px;
+}
+.coc-content > .grid-container {
+  margin-top: 24px;
+}
+
+/* Cards in a row are the same height and line up at the top. The base
+   .discord-card rule centres a card with margin:auto -- in this grid that
+   also centred it vertically, so a shorter card floated down instead of
+   stretching to its neighbour. margin-block:0 lets the row stretch it; the
+   button bar is pushed to the bottom, so the buttons line up too. */
+.coc-content .grid-container > .discord-card {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Pagination hides the other pages' cards with [hidden]. The display:flex
+   above outranks the plain .discord-card[hidden] rule, so without this
+   every page showed all the cards at once. */
+.coc-content .grid-container > .discord-card[hidden] {
+  display: none;
+}
+.coc-content .grid-container > .discord-card > .card-bar,
+.coc-content .grid-container > .discord-card > .sk-bar {
+  margin-top: auto;
+}
+.coc-content .grid-container > .discord-card > .card-media {
+  flex: none;
+}
+/* ...and the gap above the buttons, now that margin-top is "auto": the
+   12px the bar used to have, kept as padding on the picture. */
+.coc-content .grid-container > .discord-card > .card-media {
+  margin-bottom: 12px;
+}
+
+/* Army rows: the 3px scrollbar they were drawn with. Chrome ignores the
+   ::-webkit-scrollbar styling as soon as scrollbar-width is set (11layout.css
+   sets "thin" on everything), and drew its own ~11px bar -- the grey line
+   under long troop rows, which also made those cards taller. So
+   scrollbar-width goes back to auto where ::-webkit-scrollbar works
+   (Chrome, Edge, Safari); Firefox keeps "thin". */
+@supports selector(::-webkit-scrollbar) {
+  .as-row {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+}
+.as-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+

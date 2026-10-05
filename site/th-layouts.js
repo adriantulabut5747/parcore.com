@@ -336,10 +336,11 @@ function cocPagePath(u) {
   var HUB_ICONS = {
     home: {
       outline:
-        '<path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 20.5v-3.6a2 2 0 0 1 4 0v3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8.5V3.2l3.8 1.5L12 6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      fill: '<defs><mask id="hubHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.2 21.5v-4.6a1.8 1.8 0 0 1 3.6 0v4.6Z" fill="#000"/></mask></defs><path d="M4 20.5V8.5h3v2h3v-2h4v2h3v-2h3v12Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#hubHomeCut)"/><path d="M12 8.5V3.2l3.8 1.5L12 6.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>',
+        '<path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+      fill: '<defs><mask id="hubHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#hubHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/>',
     },
-    // Icon set v5 (two-tone): Home = a castle (your Clash home base),
+    // Icon set v5 (two-tone): Home = a house (was a castle with a flag until
+    // Oct 2026 -- it read as "fort", not "home"),
     // Layouts = a folded map, Armies = crossed swords, Guides = a light bulb
     // (tips), all at a 1.8 line weight. Active = filled in two tones: the
     // main part solid white, a secondary part at 55% (reads as light grey) --
@@ -388,6 +389,26 @@ function cocPagePath(u) {
   document.addEventListener('parchome:coc-nav-ready', iconFirstLayer);
   iconFirstLayer();
 
+  // Tools chip row: .is-tight (short labels) only when the full names
+  // would make the row scroll sideways. Measured with the full names
+  // showing, decided in the same frame; re-checked on resize and once the
+  // chip icons and fonts have loaded. Same rule as the strip under the hero
+  // (thz-script.js fitStripLabels).
+  function fitLabels(box) {
+    if (!box.querySelector('.lbl-full')) return;
+    function fit() {
+      box.classList.remove('is-tight');
+      if (box.scrollWidth > box.clientWidth + 1) box.classList.add('is-tight');
+      if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
+    }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(box);
+    box.querySelectorAll('img').forEach(function (img) {
+      if (!img.complete) img.addEventListener('load', fit);
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }
+
   fetch('/coc-nav-data.json')
     .then(function (res) {
       return res.json();
@@ -414,12 +435,16 @@ function cocPagePath(u) {
               '<img src="' +
               g.icon +
               '" alt="" class="dsn-chip-icon">' +
-              '<span>' +
-              g.label +
-              '</span></a>'
+              // Full name ("Damage Calculator") while the row fits, the short
+              // label ("Damage Calc.") once it has to scroll -- fitLabels below.
+              (g.name && g.name !== g.label
+                ? '<span class="lbl-full">' + g.name + '</span><span class="lbl-short">' + g.label + '</span>'
+                : '<span>' + g.label + '</span>') +
+              '</a>'
             );
           })
           .join('');
+        fitLabels(dsnScroll);
         if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
       } else if (dsnScroll && Array.isArray(data.townhalls)) {
         var onArmy = data.townhalls.some(function (t) {
@@ -466,6 +491,8 @@ function cocPagePath(u) {
             return (
               '<a href="' +
               href +
+              '" data-hub="' +
+              key +
               '" class="stb-hub-link' +
               (isActive ? ' active' : '') +
               '">' +
@@ -487,6 +514,7 @@ function cocPagePath(u) {
     .catch(function (err) {
       console.error('COC secondary top bar nav failed to load:', err);
     });
+
 })();
 
 // ARMY SHEET -- an army drawn from its Copy Army link (army= code), shared
@@ -1106,9 +1134,16 @@ function cocPagePath(u) {
     grid.setAttribute('aria-busy', 'true');
   }
 
-  Promise.all([fetch(SRC).then((r) => r.json()), unitData])
+  // cache: 'no-cache' -- the browser checks for a newer copy every time
+  // (cheap: an unchanged file comes back as "not modified"). A copy saved
+  // before the Oct 2026 folder move had imageDir "clashofclans/th13layouts/"
+  // with no leading "/", which from /coc/town-hall-13/ points at a folder
+  // that doesn't exist -- every base image 404'd. The imageDir fix below
+  // covers any such copy still around.
+  Promise.all([fetch(SRC, { cache: 'no-cache' }).then((r) => r.json()), unitData])
     .then((res) => res[0])
     .then(function (page) {
+      if (page.imageDir && !/^(\/|https?:)/.test(page.imageDir)) page.imageDir = '/' + page.imageDir;
       grid.removeAttribute('aria-busy');
       grid.innerHTML = ARMY
         ? (page.armies || []).map((a) => armyCardHtml(page, a)).join('')

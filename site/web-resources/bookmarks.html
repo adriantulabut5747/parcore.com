@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="/11layout.css">
+  <link rel="stylesheet" href="/11layout.css?v=20261005c">
   <link rel="stylesheet" href="/hwr-css.css">
   <meta charset="UTF-8">
 
@@ -28,7 +28,7 @@
   <link rel="apple-touch-icon" href="/icons/home.jpg">
 
 
-  <script src="/11layout.js" defer></script>
+  <script src="/11layout.js?v=20261005c" defer></script>
   <script src="/hwr-bookmarks.js" defer></script>
 
   <!-- Page-only styles for the box-one "Your Bookmarks" box. Everything
@@ -1023,10 +1023,18 @@
             <div class="lib-panel">
             <div class="bk-body">
             <div class="bk-note">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             <span id="bkNoteText">Your bookmarks are stored in <b>this browser only</b>. Clearing site data, switching browser, or opening the site on your phone will not carry them over.</span>
             </div>
 
+            <!-- Two jobs, two columns (Oct 2026): taking a copy out, and
+                 bringing one back in. Same split as the library panel on
+                 /web-resources/. Button ids are unchanged, so the wiring
+                 script below didn't need to know. -->
+            <div class="bk-split">
+            <div class="bk-col">
+            <h3 class="bk-h">Back up</h3>
+            <p class="bk-hint">Download a file, or copy a code you can paste on another device.</p>
             <div class="bk-actions">
             <button type="button" class="bk-btn is-primary" id="bkExport">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M21 21H3"/></svg>
@@ -1036,20 +1044,29 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             Copy as code
             </button>
+            </div>
+            </div>
+
+            <div class="bk-col">
+            <h3 class="bk-h">Restore</h3>
+            <p class="bk-hint">Load a backup file, or paste a backup code. Bookmarks you already have are kept.</p>
+            <div class="bk-actions">
             <button type="button" class="bk-btn" id="bkImportFile">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M21 21H3"/></svg>
             Restore from file
             </button>
             <input type="file" id="bkFileInput" accept="application/json,.json,.txt" hidden>
-            <span class="bk-status" id="bkStatus"></span>
+            </div>
+            <div class="bk-paste">
+            <textarea id="bkPasteInput" placeholder="Paste a backup code here" spellcheck="false" aria-label="Backup code"></textarea>
+            <div class="bk-paste-row">
+            <button type="button" class="bk-btn" id="bkPasteRestore" disabled>Restore from code</button>
+            </div>
+            </div>
+            </div>
             </div>
 
-            <div class="bk-paste">
-            <textarea id="bkPasteInput" placeholder="…or paste a backup code here to restore it" spellcheck="false"></textarea>
-            <div class="bk-paste-row">
-            <button type="button" class="bk-btn" id="bkPasteRestore">Restore from code</button>
-            </div>
-            </div>
+            <p class="bk-status" id="bkStatus" role="status" aria-live="polite"></p>
             </div>
             </div>
             </div>
@@ -1389,26 +1406,53 @@
    A wide spotlight rather than another list: it's one item, and it earns
    the horizontal space the old box wasted. */
 /* BACKUP ------------------------------------------------------------ */
-.bk-body{ padding: 4px 18px 18px 18px; }
+.bk-body{ padding: 0; }
 
+/* Oct 2026: a quiet strip across the top of the panel, not a red alert
+   box -- it's information (where bookmarks live), not an error, and red
+   on a brand-new visitor's empty page read as "something's wrong". */
 .bk-note{
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 12px 13px;
-  border-radius: 10px;
-  background: rgba(194,59,59,0.055);
-  border: 1px solid rgba(194,59,59,0.2);
-  font-size: 11.5px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #1a1a1c;
+  background: rgba(255,255,255,0.015);
+  font-size: 12px;
   line-height: 1.55;
   color: #9a9ca0;
-  margin-bottom: 14px;
 }
 
-.bk-note svg{ width: 15px; height: 15px; flex-shrink: 0; color: #c96a6a; margin-top: 1px; }
+.bk-note svg{ width: 15px; height: 15px; flex-shrink: 0; color: #8a8d93; margin-top: 2px; }
 .bk-note b{ color: #d6d7da; font-weight: 600; }
 
+/* Back up | Restore, hairline between, like .lib-split on /web-resources/. */
+.bk-split{ display: grid; grid-template-columns: 1fr 1fr; }
+.bk-col{ padding: 18px 20px 20px; min-width: 0; }
+.bk-col + .bk-col{ border-left: 1px solid #1a1a1c; }
+
+.bk-h{
+  margin: 0 0 6px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #d7d8db;
+}
+
+.bk-hint{
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #8b8e94;
+  max-width: 46ch;
+}
+
 .bk-actions{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/* Buttons share a row while they fit and go full width when they wrap,
+   so a narrow column never ends up with a ragged stack. */
+.bk-col .bk-btn{ flex: 1 1 auto; justify-content: center; }
 
 .bk-btn{
   display: inline-flex;
@@ -1440,12 +1484,21 @@
 
 .bk-btn.is-primary:hover{ background: rgba(194,59,59,0.17); border-color: rgba(194,59,59,0.6); color: #fff; }
 
-.bk-btn:disabled{ opacity: 0.4; cursor: not-allowed; transform: none; }
+/* Disabled reads as plainly unavailable -- no faded red on the primary,
+   which looked like a broken colour rather than an off switch. */
+.bk-btn:disabled,
+.bk-btn.is-primary:disabled{
+  background: transparent;
+  border-color: #1f1f22;
+  color: #4d5055;
+  cursor: not-allowed;
+  transform: none;
+}
 
 .bk-btn:focus-visible{ outline: 2px solid rgba(194,59,59,0.6); outline-offset: 2px; }
 
 /* Paste-a-code path, for moving between devices without a file. */
-.bk-paste{ margin-top: 13px; }
+.bk-paste{ margin-top: 12px; }
 
 .bk-paste textarea{
   width: 100%;
@@ -1456,18 +1509,22 @@
   border-radius: 10px;
   border: 1px solid #232326;
   background: #0c0c0d;
+  caret-color: #c23b3b;
   color: #c9cbcf;
   font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
   font-size: 11px;
   line-height: 1.5;
 }
 
-.bk-paste textarea::placeholder{ color: #4e5055; }
+.bk-paste textarea::placeholder{ color: #686b71; }
 .bk-paste textarea:focus{ outline: none; border-color: #38383e; }
 
 .bk-paste-row{ display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 
 .bk-status{
+  margin: 0;
+  padding: 12px 20px;
+  border-top: 1px solid #1a1a1c;
   font-family: 'Oxanium', sans-serif;
   font-size: 11px;
   font-weight: 600;
@@ -1475,6 +1532,7 @@
   color: #7d7f84;
 }
 
+.bk-status:empty{ display: none; }
 .bk-status.is-ok{ color: #7fb87f; }
 .bk-status.is-err{ color: #d97a7a; }
 
@@ -1503,7 +1561,11 @@
   .pick-name{ font-size: 16px; }
   .pick-open{ width: 100%; justify-content: center; }
 
-  .bk-body{ padding: 2px 14px 15px 14px; }
+  .bk-note{ padding: 12px 14px; }
+  .bk-split{ grid-template-columns: 1fr; }
+  .bk-col{ padding: 15px 14px 16px; }
+  .bk-col + .bk-col{ border-left: none; border-top: 1px solid #1a1a1c; }
+  .bk-status{ padding: 11px 14px; }
   .bk-actions .bk-btn{ flex: 1 1 auto; justify-content: center; }
 }
 </style>
@@ -1631,6 +1693,11 @@
         if(!text){ say('Paste a backup code first.', 'err'); return; }
         applyImport(text);
         pasteInput.value = '';
+        pasteBtn.disabled = true;
+      });
+      // Only clickable once there's something to restore.
+      pasteInput.addEventListener('input', function(){
+        pasteBtn.disabled = !pasteInput.value.trim();
       });
     }
 
@@ -2175,6 +2242,13 @@
         break;
       }
     }
+
+    // Stretch the panel to the visible column. Its #0D0D0D fill is a shade
+    // darker than box-two's; on the category pages the panel is taller than
+    // the screen so that never shows, but here it ended short and the
+    // lighter column showed under it as a block that moved while scrolling.
+    var main = document.querySelector('.coc-main');
+    panel.style.minHeight = main ? Math.max(0, main.clientHeight - STICKY_TOP) + 'px' : '';
 
     if(window.HwrIcons){
       window.HwrIcons.watchAll(grid, '.b3-discover-badge img',
