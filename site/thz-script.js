@@ -760,6 +760,16 @@ if (document.readyState === 'loading') {
     return Array.isArray(activeOn) && activeOn.map(cocPagePath).indexOf(currentPage) !== -1;
   }
 
+  // Is this page one of a tool's pages? Its activeOn list, or anything under
+  // its activePrefix (the Player Tracker owns every /coc/player/<TAG>).
+  function onTool(g) {
+    return isActive(g.activeOn) || (!!g.activePrefix && currentPage.indexOf(g.activePrefix) === 0);
+  }
+  // On any tool page (live or upcoming), the Tools links light up.
+  function inTools(data) {
+    return data.guides.concat(data.upcoming || []).some(onTool);
+  }
+
   function el(tag, className) {
     var e = document.createElement(tag);
     if (className) e.className = className;
@@ -854,9 +864,7 @@ if (document.readyState === 'loading') {
       data.townhalls.find(function (t) {
         return isActive(t.activeOn);
       }) || null;
-    var activeGuide = data.guides.some(function (g) {
-      return isActive(g.activeOn);
-    });
+    var activeGuide = inTools(data);
     var onHome = currentPage === cocPagePath(data.primaryNav.home.href);
     var nav = data.primaryNav;
 
@@ -920,9 +928,7 @@ if (document.readyState === 'loading') {
       data.townhalls.find(function (t) {
         return isActive(t.activeOn);
       }) || null;
-    var activeGuide = data.guides.some(function (g) {
-      return isActive(g.activeOn);
-    });
+    var activeGuide = inTools(data);
     var nav = data.primaryNav;
 
     var tabs = [
@@ -995,8 +1001,7 @@ if (document.readyState === 'loading') {
     // own a whole address range ("activePrefix": the Player Tracker owns every
     // /coc/player/<TAG> profile). Both are set in coc-nav-data.json.
     data.guides.concat(data.upcoming || []).forEach(function (g) {
-      var here = isActive(g.activeOn) || (g.activePrefix && currentPage.indexOf(g.activePrefix) === 0);
-      if (here) trail = (g.crumbParent ? [g.crumbParent] : []).concat({ text: g.name || g.label, href: g.href });
+      if (onTool(g)) trail = (g.crumbParent ? [g.crumbParent] : []).concat({ text: g.name || g.label, href: g.href });
     });
     if (!trail) return;
     // Desktop has the room for the full name; phones keep "COC" (Oct 2026).

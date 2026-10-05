@@ -314,7 +314,7 @@
       ['War stars', num(p.warStars)],
       ['Attack wins this season', num(p.attackWins)],
       ['Defense wins this season', num(p.defenseWins)],
-      ['Donated / received this season', num(p.donations) + ' / ' + num(p.donationsReceived)],
+      ['Donations this season', num(p.donations) + ' <i>given</i> &middot; ' + num(p.donationsReceived) + ' <i>received</i>'],
       ['Capital gold given', num(p.clanCapitalContributions)],
     ]);
 

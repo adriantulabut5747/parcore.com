@@ -3,7 +3,10 @@
 // "x/index.html" count as the same page.
 function cocPagePath(u) {
   var p = new URL(String(u || ''), location.origin + '/').pathname.toLowerCase();
-  return p.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1');
+  return p
+    .replace(/\.html$/, '')
+    .replace(/\/index$/, '/')
+    .replace(/(.)\/$/, '$1');
 }
 
 /* =======================================================================
@@ -420,8 +423,12 @@ function cocPagePath(u) {
       // hero (thz-script.js's buildSecondLayer).
       // Guides pages (coctools*.html): the chip row switches between the
       // guides instead of Town Halls, the same as the strip under the hero.
+      // A tool also owns everything under its activePrefix (the Player
+      // Tracker owns every /coc/player/<TAG> profile).
       var guide = (data.guides || []).find(function (g) {
-        return (g.activeOn || []).map(normalize).indexOf(currentPage) !== -1;
+        return (
+          (g.activeOn || []).map(normalize).indexOf(currentPage) !== -1 || (!!g.activePrefix && currentPage.indexOf(g.activePrefix) === 0)
+        );
       });
       if (dsnScroll && guide) {
         dsnScroll.innerHTML = data.guides
@@ -514,7 +521,6 @@ function cocPagePath(u) {
     .catch(function (err) {
       console.error('COC secondary top bar nav failed to load:', err);
     });
-
 })();
 
 // ARMY SHEET -- an army drawn from its Copy Army link (army= code), shared
