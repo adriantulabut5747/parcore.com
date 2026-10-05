@@ -1233,6 +1233,297 @@
       });
   }
 
+  /* --------------------------------------------------------------- history */
+  // Tracked clans' history, written every 15 minutes by scripts/track.mjs
+  // (GitHub Actions) into Firestore project parchrome-tracker. Read here
+  // straight from Firestore's REST API -- public, read-only data, no SDK.
+  // Visitors can write exactly two things (see the rules in the Firebase
+  // console): start tracking a clan, and refresh when it was last viewed.
+  var FS = 'https://firestore.googleapis.com/v1/projects/parchrome-tracker/databases/(default)/documents';
+  var FS_NAME = 'projects/parchrome-tracker/databases/(default)/documents';
+
+  // Firestore REST values -> plain JS
+  function fsVal(v) {
+    if ('stringValue' in v) return v.stringValue;
+    if ('integerValue' in v) return +v.integerValue;
+    if ('doubleValue' in v) return v.doubleValue;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('timestampValue' in v) return new Date(v.timestampValue);
+    if ('mapValue' in v) return fsFields(v.mapValue.fields);
+    if ('arrayValue' in v) return (v.arrayValue.values || []).map(fsVal);
+    return null;
+  }
+  function fsFields(f) {
+    var o = {};
+    Object.keys(f || {}).forEach(function (k) {
+      o[k] = fsVal(f[k]);
+    });
+    return o;
+  }
+  // A document, or null when it doesn't exist.
+  function fsGet(path) {
+    return fetch(FS + '/' + path).then(function (r) {
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error('other');
+      return r.json().then(function (d) {
+        return fsFields(d.fields);
+      });
+    });
+  }
+  // Newest first: the `limit` latest docs of parent/collection, by `field`.
+  function fsLatest(parent, collection, field, limit) {
+    return fetch(FS + '/' + parent + ':runQuery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        structuredQuery: {
+          from: [{ collectionId: collection }],
+          orderBy: [{ field: { fieldPath: field }, direction: 'DESCENDING' }],
+          limit: limit,
+        },
+      }),
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error('other');
+        return r.json();
+      })
+      .then(function (rows) {
+        return rows
+          .filter(function (r) {
+            return r.document;
+          })
+          .map(function (r) {
+            var d = fsFields(r.document.fields);
+            d.id = r.document.name.split('/').pop();
+            return d;
+          });
+      });
+  }
+  // Set addedAt / lastViewed to the server's clock (the rules demand it).
+  // create: the doc must not exist yet; otherwise only lastViewed is touched.
+  function fsTrack(tag, create) {
+    var fields = create ? ['addedAt', 'lastViewed'] : ['lastViewed'];
+    var write = {
+      update: { name: FS_NAME + '/trackedClans/' + tag, fields: {} },
+      updateTransforms: fields.map(function (f) {
+        return { fieldPath: f, setToServerValue: 'REQUEST_TIME' };
+      }),
+      currentDocument: { exists: !create },
+    };
+    if (!create) write.updateMask = { fieldPaths: [] };
+    return fetch(FS + ':commit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ writes: [write] }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error('other');
+    });
+  }
+
+  function shortDate(d) {
+    return d
+      ? d.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
+        })
+      : '';
+  }
+  function whenText(d) {
+    var min = Math.round((Date.now() - d) / 60000);
+    if (min < 60) return min <= 1 ? 'just now' : min + ' min ago';
+    if (min < 1440) return Math.round(min / 60) + 'h ago';
+    return shortDate(d) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
+  // The header's track control: a button, or "Tracked since ...". Opening a
+  // tracked clan's page keeps it tracked (lastViewed, once a day per device).
+  function initTrack(box, tag, onTracked) {
+    fsGet('trackedClans/' + tag)
+      .then(function (doc) {
+        if (doc) {
+          showTracked(doc.addedAt);
+          var seenKey = 'pt-seen-' + tag;
+          var today = new Date().toISOString().slice(0, 10);
+          var seen;
+          try {
+            seen = localStorage.getItem(seenKey);
+          } catch (e) {}
+          if (seen !== today)
+            fsTrack(tag, false).then(function () {
+              try {
+                localStorage.setItem(seenKey, today);
+              } catch (e) {}
+            });
+          return;
+        }
+        box.innerHTML =
+          '<button type="button" class="th-soon-btn th-soon-btn--primary pt-track-btn">Track this clan</button>' +
+          '<span class="pt-track-note">Records member changes and every war from now on.</span>';
+        box.querySelector('button').addEventListener('click', function (e) {
+          var btn = e.currentTarget;
+          btn.disabled = true;
+          btn.textContent = 'Starting…';
+          fsTrack(tag, true).then(
+            function () {
+              showTracked(new Date());
+              onTracked();
+            },
+            function () {
+              btn.disabled = false;
+              btn.textContent = 'Track this clan';
+              box.querySelector('.pt-track-note').textContent = 'That didn’t work. Check your connection and try again.';
+            },
+          );
+        });
+      })
+      .catch(function () {
+        box.innerHTML = '';
+      });
+    function showTracked(since) {
+      box.innerHTML =
+        '<span class="pt-track-on"><i aria-hidden="true"></i>Tracked' + (since ? ' since ' + shortDate(since) : '') + '</span>';
+    }
+  }
+
+  var EVENT_TEXT = {
+    join: function (e) {
+      return 'joined the clan' + (e.th ? ' <i>TH' + e.th + '</i>' : '');
+    },
+    leave: function () {
+      return 'left the clan';
+    },
+    role: function (e) {
+      var up = ROLE_RANK[e.to] > ROLE_RANK[e.from];
+      return (up ? 'was promoted to ' : 'was demoted to ') + roleName(e.to);
+    },
+    name: function (e) {
+      return 'changed name from <i>' + esc(e.from) + '</i>';
+    },
+    th: function (e) {
+      return 'upgraded to Town Hall ' + e.to;
+    },
+  };
+  var ROLE_RANK = { member: 0, admin: 1, coLeader: 2, leader: 3 };
+
+  function loadHistory(box, c, data) {
+    var tag = c.tag.slice(1);
+    box.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading history&hellip;</div>';
+    fsGet('trackedClans/' + tag)
+      .then(function (tracked) {
+        if (!tracked) {
+          box.innerHTML =
+            '<section class="pt-group pt-hist-off"><div class="pt-group-head"><h3>No history yet</h3></div>' +
+            '<p class="pt-empty">History starts once a clan is tracked: every 15 minutes Parchrome records who joins or leaves, promotions and name changes, and every war attack, so they stay here after the war ends. Use <b>Track this clan</b> at the top of the page.</p></section>';
+          return;
+        }
+        return Promise.all([fsLatest('clans/' + tag, 'events', 't', 60), fsLatest('clans/' + tag, 'wars', 'end', 40)]).then(function (r) {
+          var events = r[0];
+          var wars = r[1].map(function (d) {
+            try {
+              d.war = JSON.parse(d.json);
+            } catch (e) {
+              d.war = null;
+            }
+            return d;
+          });
+          var since = 'Recording since ' + shortDate(tracked.addedAt) + '. Checked every 15 minutes.';
+          box.innerHTML =
+            '<p class="pt-war-kind">' +
+            since +
+            '</p>' +
+            '<section class="pt-group"><div class="pt-group-head"><h3>Member changes</h3><span>' +
+            events.length +
+            (events.length === 60 ? '+' : '') +
+            '</span></div>' +
+            (events.length
+              ? '<ul class="pt-events">' +
+                events
+                  .map(function (e) {
+                    return (
+                      '<li class="is-' +
+                      e.type +
+                      '"><span class="pt-ev-dot" aria-hidden="true"></span><span class="pt-ev-text"><a href="' +
+                      playerHref(String(e.tag).slice(1)) +
+                      '">' +
+                      esc(e.name) +
+                      '</a> ' +
+                      (EVENT_TEXT[e.type] ? EVENT_TEXT[e.type](e) : '') +
+                      '</span><time datetime="' +
+                      e.t.toISOString() +
+                      '">' +
+                      whenText(e.t) +
+                      '</time></li>'
+                    );
+                  })
+                  .join('') +
+                '</ul>'
+              : '<p class="pt-empty">No changes yet. Joins, leaves, promotions and name changes show up here as they happen.</p>') +
+            '</section>' +
+            '<section class="pt-group"><div class="pt-group-head"><h3>Recorded wars</h3><span>' +
+            wars.length +
+            '</span></div>' +
+            (wars.length
+              ? '<ul class="pt-wars pt-wars--rec">' +
+                wars
+                  .map(function (d, i) {
+                    var w = d.war;
+                    if (!w) return '';
+                    var s = sides(w, c.tag);
+                    var res = w.state === 'warEnded' ? outcome(s[0], s[1]) : w.state === 'inWar' ? 'live' : 'prep';
+                    return (
+                      '<li><button type="button" class="pt-war is-' +
+                      (res === 'lose' ? 'lose' : res === 'tie' ? 'tie' : res === 'win' ? 'win' : 'cwl') +
+                      '" data-war="' +
+                      i +
+                      '" aria-expanded="false"><span class="pt-war-res">' +
+                      { win: 'Win', lose: 'Loss', tie: 'Draw', live: 'Live', prep: 'Prep' }[res] +
+                      '</span><span class="pt-war-opp"><img src="' +
+                      s[1].badgeUrls.small +
+                      '" alt="" width="32" height="32" loading="lazy" /><span><b>' +
+                      esc(s[1].name) +
+                      '</b><span>' +
+                      (d.kind === 'cwl' ? 'CWL &middot; ' : '') +
+                      w.teamSize +
+                      ' v ' +
+                      w.teamSize +
+                      '</span></span></span><span class="pt-war-score"><b>' +
+                      s[0].stars +
+                      ' <i>&ndash;</i> ' +
+                      s[1].stars +
+                      '</b><span>' +
+                      s[0].destructionPercentage.toFixed(1) +
+                      '% &ndash; ' +
+                      s[1].destructionPercentage.toFixed(1) +
+                      '%</span></span><span class="pt-war-date">' +
+                      shortDate(d.end) +
+                      '</span></button><div class="pt-war-open" hidden></div></li>'
+                    );
+                  })
+                  .join('') +
+                '</ul>'
+              : '<p class="pt-empty">No wars recorded yet. The next war or CWL day this clan fights is saved here with every attack.</p>') +
+            '</section>';
+          // tap a war to see every attack in it
+          box.querySelectorAll('button[data-war]').forEach(function (b) {
+            b.addEventListener('click', function () {
+              var open = b.nextElementSibling;
+              var show = open.hidden;
+              if (show && !open.firstChild) {
+                open.innerHTML = warView(wars[+b.dataset.war].war, c.tag, data);
+                wireWarSides(open);
+              }
+              open.hidden = !show;
+              b.setAttribute('aria-expanded', show);
+            });
+          });
+        });
+      })
+      .catch(function () {
+        box.innerHTML = '<p class="pt-empty">The history couldn&rsquo;t be loaded. Reload the page to try again.</p>';
+      });
+  }
+
   function renderClan(c, log, data, root) {
     var tag = c.tag.slice(1);
     var members = (c.memberList || []).slice().sort(function (a, b) {
@@ -1268,6 +1559,7 @@
       (labels ? '<span class="pt-labels">' + labels + '</span>' : '') +
       '</p>' +
       (where ? '<p class="pt-clan">' + where + '</p>' : '') +
+      '<div class="pt-track" id="ptTrack"></div>' +
       '</div>' +
       (league ? '<div class="pt-league"><span>' + esc(league.name) + '</span><i>War league</i></div>' : '') +
       (c.description ? '<p class="pt-desc">' + esc(c.description) + '</p>' : '') +
@@ -1297,12 +1589,14 @@
       '<div class="pt-tabs" role="tablist" aria-label="Clan sections">' +
       '<button type="button" role="tab" id="ptTabMembers" aria-controls="ptPanelMembers" aria-selected="true">Members</button>' +
       '<button type="button" role="tab" id="ptTabWar" aria-controls="ptPanelWar" aria-selected="false" tabindex="-1">War</button>' +
+      '<button type="button" role="tab" id="ptTabHist" aria-controls="ptPanelHist" aria-selected="false" tabindex="-1">History</button>' +
       '<button type="button" role="tab" id="ptTabWars" aria-controls="ptPanelWars" aria-selected="false" tabindex="-1">War log</button>' +
       '</div>' +
       '<div class="pt-panel" id="ptPanelMembers" role="tabpanel" aria-labelledby="ptTabMembers">' +
       (members.length ? membersTable(members, data) : '<p class="pt-empty">This clan has no members.</p>') +
       '</div>' +
       '<div class="pt-panel" id="ptPanelWar" role="tabpanel" aria-labelledby="ptTabWar" hidden></div>' +
+      '<div class="pt-panel" id="ptPanelHist" role="tabpanel" aria-labelledby="ptTabHist" hidden></div>' +
       '<div class="pt-panel" id="ptPanelWars" role="tabpanel" aria-labelledby="ptTabWars" hidden>' +
       warLog(log) +
       '</div>' +
@@ -1319,6 +1613,20 @@
     }
     warTab.addEventListener('click', openWar);
     if (location.hash === '#war') warTab.click();
+    // History, like War, loads on first open; tracking from the header
+    // reloads it if it's already showing.
+    var histTab = root.querySelector('#ptTabHist');
+    var histBox = root.querySelector('#ptPanelHist');
+    var histLoaded = false;
+    histTab.addEventListener('click', function () {
+      if (histLoaded) return;
+      histLoaded = true;
+      loadHistory(histBox, c, data);
+    });
+    if (location.hash === '#history') histTab.click();
+    initTrack(root.querySelector('#ptTrack'), c.tag.slice(1), function () {
+      if (histLoaded) loadHistory(histBox, c, data);
+    });
   }
 
   function loadClan(root, tag) {
