@@ -139,6 +139,13 @@
         next.focus();
       });
     });
+    // "Search another player / clan" on the profile and clan pages land here
+    // with ?mode=player|clan: open in that mode, cursor in the field.
+    var want = new URLSearchParams(location.search).get('mode');
+    if (want === 'player' || want === 'clan') {
+      setMode(want);
+      input.focus();
+    }
 
     function showMsg(html) {
       msg.innerHTML = html;
@@ -503,6 +510,7 @@
     });
 
     root.innerHTML =
+      searchAgain('player') +
       '<header class="pt-head">' +
       '<div class="pt-th">' +
       (icon ? '<img src="' + icon + '" alt="" width="88" height="88" />' : '') +
@@ -578,6 +586,17 @@
         }, 1600);
       });
     });
+  }
+
+  // Above the profile / clan header: back to the search, in the same mode.
+  function searchAgain(what) {
+    return (
+      '<div class="pt-bar"><a class="pt-again" href="/coc/tools/player-tracker?mode=' +
+      what +
+      '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>Search another ' +
+      what +
+      '</a></div>'
+    );
   }
 
   function roleName(r) {
@@ -1542,6 +1561,7 @@
     var league = c.warLeague && c.warLeague.id !== 48000000 ? c.warLeague : null; // 48000000 = "Unranked"
 
     root.innerHTML =
+      searchAgain('clan') +
       '<header class="pt-head pt-head--clan">' +
       '<div class="pt-th"><img src="' +
       c.badgeUrls.large +
