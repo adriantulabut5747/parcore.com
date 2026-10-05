@@ -296,8 +296,10 @@
   function tile(u, idx, extraClass, el) {
     el = el || 'li';
     var info = idx[(u.village === 'builderBase' ? 'bb:' : '') + key(u.name)];
-    var maxed = u.level >= u.maxLevel;
-    var label = u.name + ', level ' + u.level + ' of ' + u.maxLevel + (maxed ? ' (max)' : '');
+    // u.cap = this Town Hall's max (setCaps); else the game's overall max
+    var top = u.cap || u.maxLevel;
+    var maxed = u.level >= top;
+    var label = u.name + ', level ' + u.level + ' of ' + top + (u.cap ? ' for this Town Hall' : '') + (maxed ? ', maxed' : '');
     return (
       '<' +
       el +
@@ -324,7 +326,7 @@
   function tileGroup(title, units, idx) {
     if (!units.length) return '';
     var maxed = units.filter(function (u) {
-      return u.level >= u.maxLevel;
+      return u.level >= (u.cap || u.maxLevel);
     }).length;
     return (
       '<section class="pt-group"><div class="pt-group-head"><h3>' +
@@ -364,7 +366,7 @@
             '</b><span>Level ' +
             h.level +
             ' of ' +
-            h.maxLevel +
+            (h.cap || h.maxLevel) +
             '</span>' +
             (gear ? '<ul class="pt-tiles pt-gear" aria-label="Equipped">' + gear + '</ul>' : '') +
             '</div></li>'
@@ -403,8 +405,134 @@
     return '<span class="pt-stars" role="img" aria-label="' + n + ' of 3 stars">' + s + '</span>';
   }
 
-  function renderProfile(p, data, root) {
+  /* -------------------------------------------------------------- progress */
+  // Town Hall progress and the rushed check, from coc-max-levels.json (max
+  // level of every unit at each Town Hall, built from the wiki by
+  // scripts/build-max-levels.py -- re-run after balance patches).
+  // - progress: levels done out of the levels this Town Hall allows, per group
+  // - rushed: how far below the PREVIOUS Town Hall's max (the usual rule)
+  var maxData = null;
+  var PROGRESS_GROUPS = [
+    ['heroes', 'Heroes'],
+    ['equipment', 'Equipment'],
+    ['pets', 'Pets'],
+    ['troops', 'Troops'],
+    ['spells', 'Spells'],
+    ['sieges', 'Sieges'],
+  ];
+
+  function homeUnits(p) {
+    var list = [];
+    p.troops.concat(p.heroes, p.heroEquipment, p.spells).forEach(function (u) {
+      if (u.village === 'home') list.push(u);
+    });
+    p.heroes.forEach(function (h) {
+      (h.equipment || []).forEach(function (e) {
+        list.push(e); // the equipped copies, so their tiles get the cap too
+      });
+    });
+    return list;
+  }
+
+  // Give each home unit its cap for this Town Hall (u.cap); tiles and hero
+  // cards then count "maxed" against it instead of the game's overall max.
+  function setCaps(p, maxTable) {
+    var table = maxTable && maxTable.th[p.townHallLevel];
+    if (!table) return;
+    var caps = {};
+    Object.keys(table).forEach(function (n) {
+      caps[key(n)] = table[n];
+    });
+    homeUnits(p).forEach(function (u) {
+      if (caps[key(u.name)]) u.cap = caps[key(u.name)];
+    });
+  }
+
+  function progress(p, idx, maxTable) {
+    var th = p.townHallLevel;
+    var now = maxTable && maxTable.th[th];
+    if (!now) return null;
+    var prev = maxTable.th[th - 1];
+    var have = {};
+    homeUnits(p).forEach(function (u) {
+      have[key(u.name)] = Math.max(have[key(u.name)] || 0, u.level);
+    });
+    var rows = {};
+    var total = { done: 0, need: 0 };
+    var miss = 0;
+    var prevNeed = 0;
+    Object.keys(now).forEach(function (name) {
+      var k = key(name);
+      var info = idx[k];
+      if (!info) return;
+      // Equipment: only items the player owns -- many come from past events
+      // and can't be had any more, so unowned ones would make 100% impossible.
+      var equip = info.group === 'equipment';
+      if (equip && !have[k]) return;
+      var cap = now[name];
+      var lvl = Math.min(have[k] || 0, cap); // not unlocked yet counts as 0
+      var r = (rows[info.group] = rows[info.group] || { done: 0, need: 0 });
+      r.done += lvl;
+      r.need += cap;
+      total.done += lvl;
+      total.need += cap;
+      // Rushed leaves equipment out (ore-limited, not builder/lab-limited).
+      if (prev && prev[name] && !equip) {
+        prevNeed += prev[name];
+        miss += Math.max(0, prev[name] - (have[k] || 0));
+      }
+    });
+    return { th: th, rows: rows, total: total, rushed: prev && prevNeed ? miss / prevNeed : null };
+  }
+
+  function progressBox(pr) {
+    // floor, so 99.6% never reads as a finished 100%
+    function row(label, r, cls) {
+      var left = r.need - r.done;
+      return (
+        '<li' +
+        (cls ? ' class="' + cls + '"' : '') +
+        '><span class="pt-pg-name">' +
+        label +
+        '</span><span class="pt-pg-bar" aria-hidden="true"><i style="width:' +
+        ((r.done / r.need) * 100).toFixed(1) +
+        '%"></i></span><b>' +
+        Math.floor((r.done / r.need) * 100) +
+        '%</b><span class="pt-pg-left">' +
+        (left ? num(left) + ' left' : 'Maxed') +
+        '</span></li>'
+      );
+    }
+    var verdict = '';
+    if (pr.rushed !== null) {
+      var pct = Math.ceil(pr.rushed * 100);
+      verdict =
+        pr.rushed === 0 ? '<span class="pt-verdict is-ok">Not rushed</span>' : '<span class="pt-verdict">Rushed ' + pct + '%</span>';
+    }
+    return (
+      '<section class="pt-group pt-progress"><div class="pt-group-head"><h3>Town Hall ' +
+      pr.th +
+      ' progress</h3>' +
+      verdict +
+      '</div><ul class="pt-pg">' +
+      row('Overall', pr.total, 'is-total') +
+      PROGRESS_GROUPS.filter(function (g) {
+        return pr.rows[g[0]];
+      })
+        .map(function (g) {
+          return row(g[1], pr.rows[g[0]]);
+        })
+        .join('') +
+      '</ul><p class="pt-pg-note">' +
+      (pr.rushed !== null ? 'Rushed means heroes, pets, troops, spells or sieges below the Town Hall ' + (pr.th - 1) + ' max. ' : '') +
+      'Equipment counts the items this player owns. &ldquo;Left&rdquo; is every level still to upgrade to this Town Hall&rsquo;s max.</p></section>'
+    );
+  }
+
+  function renderProfile(p, data, maxTable, root) {
     var idx = indexArmy(data);
+    setCaps(p, maxTable);
+    var pr = progress(p, idx, maxTable);
     var home = function (u) {
       return u.village === 'home';
     };
@@ -545,6 +673,7 @@
       '<button type="button" role="tab" id="ptTabAch" aria-controls="ptPanelAch" aria-selected="false" tabindex="-1">Achievements</button>' +
       '</div>' +
       '<div class="pt-panel" id="ptPanelHome" role="tabpanel" aria-labelledby="ptTabHome">' +
+      (pr ? progressBox(pr) : '') +
       heroHtml +
       tileGroup('Hero equipment', p.heroEquipment.filter(home), idx) +
       tileGroup('Pets', homeTroops.filter(inGroup('pets')), idx) +
@@ -569,7 +698,7 @@
       '<div class="pt-panel" id="ptPanelAch" role="tabpanel" aria-labelledby="ptTabAch" hidden>' +
       achievements +
       '</div>' +
-      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. A red level means that unit is at the game&rsquo;s max level.</p>';
+      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. A red level means that unit is maxed for this Town Hall.</p>';
 
     wireTabs(root);
     wireCopy(root);
@@ -665,11 +794,22 @@
       fetch('/coc-army-data.json').then(function (r) {
         return r.json();
       });
-    Promise.all([api('type=player&tag=' + tag), armyData])
+    // The max-level table is optional: without it the page still works, just
+    // without the progress box (and "maxed" falls back to the game's max).
+    maxData =
+      maxData ||
+      fetch('/coc-max-levels.json')
+        .then(function (r) {
+          return r.ok ? r.json() : null;
+        })
+        .catch(function () {
+          return null;
+        });
+    Promise.all([api('type=player&tag=' + tag), armyData, maxData])
       .then(function (r) {
         var p = r[0];
         document.title = p.name + ' (TH' + p.townHallLevel + ') | Player Tracker | Parchrome';
-        renderProfile(p, r[1], root);
+        renderProfile(p, r[1], r[2], root);
         if (window.setCrumbName) window.setCrumbName(p.name);
         saveRecent({ kind: 'player', tag: tag, name: p.name, th: p.townHallLevel, icon: thIcon(p.townHallLevel, r[1]) });
       })

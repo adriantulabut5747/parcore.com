@@ -84,9 +84,10 @@ because tracking just started ("recording since <date>").
 
 ## Open issues
 
-- **Rushed %** needs a max-level table per TH for every troop/hero/equipment, and it must be
-  updated every balance patch. Source: the Clash of Clans wiki (Adrian's pick), copied into a
-  JSON per TH by hand.
+- **Rushed % (built Oct 5).** `site/coc-max-levels.json` = max level of every home unit per TH,
+  built from the wiki by `python scripts/build-max-levels.py`. **Re-run it after every balance
+  patch** and commit the JSON. Rushed = heroes/pets/troops/spells/sieges below the previous TH's
+  max; equipment counts owned items only (event items can't all be had).
 - **Moving to Vercel (planned).** Write the function in the Web-standard Request→Response
   style so it runs on both hosts with a thin wrapper. Run the history poller on GitHub Actions
   (like clan-stats.yml), not as a host cron: Vercel's free Hobby plan only allows daily crons.
