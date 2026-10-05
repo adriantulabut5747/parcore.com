@@ -1,0 +1,950 @@
+/* =======================================================================
+   ARMY MAKER (/coc/tools/army-maker) -- the builder's look.
+   Loaded after th-layouts.css and 11layout.css, whose tokens it reuses
+   (--key-face, --key-edge, --flat-hover, --text-main ...).
+
+   ONE BUTTON STYLE for everything clickable that isn't a unit tile: the
+   secondary top bar's chips / the Layouts-Army-Guides tabs (11layout.css
+   "KEYCAP BUTTONS", th-layouts.css ".first-layer button"). Flat near-black
+   at rest, a step lighter on hover, and a raised keycap when it's the
+   selected one -- the open tab, your Town Hall, the Warden's air mode --
+   or the main action (Open in game). Oxanium caps. If that style changes
+   there, change .am-btn here too.
+
+   1coclayouts.css puts Oxanium on every element, so Sora is set
+   explicitly wherever it's wanted.
+   ======================================================================= */
+
+/* ---- The box ----------------------------------------------------------------
+   The whole tool sits in one panel with its own, lighter background so it
+   reads as one separate thing on the page. Inside: the header (title,
+   Town Hall, Paste link), then Pick units and Your army -- side by side
+   when the box is wide enough (@container below), stacked otherwise. */
+.am {
+  container-type: inline-size;
+  --am-tile: #1f2025;
+  --am-text: var(--text-main, #eff2f5);
+  --am-muted: #8b9099;
+  --am-faint: #6d7178;
+  --am-line: rgba(255, 255, 255, 0.07);
+  margin-top: 32px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #18191d 0%, #141518 100%);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.85);
+}
+.am-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Header: title + one line of how-to on the left; on the right the two
+   things that set the army up -- the Town Hall and Paste link. */
+.am-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.am-title {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--am-text);
+}
+.am-intro {
+  margin: 4px 0 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--am-muted);
+}
+.am-ths {
+  position: relative;
+  flex: none;
+}
+
+/* ---- Phone-only nav -----------------------------------------------------------
+   The Layouts / Army / Guides tabs (under the hero) and the breadcrumb in
+   the secondary top bar (Clash of Clans > Armies > Army maker) only show on
+   phones -- see the Phones block. Desktop has the top bar's own links.
+   Scoped with :has(#armyMaker): the guides pages load this file for its
+   box and button styles, and keep their tabs on desktop. */
+.coc-content:has(> #armyMaker) > .first-layer {
+  display: none;
+}
+/* Desktop: the phone strip's divider line goes too -- with no tabs above
+   it, it would be a stray hairline over the box. */
+@media (min-width: 971px) {
+  .coc-content:has(> #armyMaker) > .th-rail {
+    display: none;
+  }
+}
+.am-stb-crumbs {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.am-stb-crumbs a {
+  color: var(--text-muted, #949ba4);
+  text-decoration: none;
+}
+.am-stb-crumbs a:hover,
+.am-stb-crumbs a:focus-visible {
+  color: var(--text-main, #eff2f5);
+}
+.am-stb-sep {
+  color: var(--am-faint, #6d7178);
+}
+/* The current page reads like the rest of the trail -- no highlight. */
+.am-stb-crumbs [aria-current] {
+  color: var(--text-muted, #949ba4);
+}
+
+/* ---- Drop-downs: Town Hall list + share menu ---------------------------------
+   Same panel as the layout cards' share panel (.share-panel, th-layouts.css). */
+.am-pop {
+  position: absolute;
+  z-index: 50;
+  width: 230px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(20, 21, 26, 0.97);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.am-pop[hidden] {
+  display: none;
+}
+.am-pop a,
+.am-pop button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #d5d8de;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+.am-pop a:hover,
+.am-pop button:hover,
+.am-pop a:focus-visible,
+.am-pop button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  outline: none;
+}
+.am-pop hr {
+  height: 1px;
+  margin: 4px 6px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+.am-pop .sp-brand {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+.am-pop .copied {
+  color: #8fe0ac;
+}
+/* Town Hall list: drops down under the chip, right-aligned with it. */
+.am-th-menu {
+  top: calc(100% + 8px);
+  right: 0;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+}
+.am-th-opt img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.am-th-opt span {
+  flex: 1;
+}
+.am-th-opt.is-on {
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: #fff;
+}
+.am-th-opt[aria-disabled='true'] {
+  color: var(--am-faint);
+}
+.am-th-opt em {
+  padding: 2px 7px;
+  border: 1px solid #3a3d44;
+  border-radius: 999px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--am-faint);
+}
+/* Share menu: opens upward from the Share button. */
+.am-share {
+  position: relative;
+  display: grid;
+}
+.am-share-menu {
+  bottom: calc(100% + 8px);
+  left: 0;
+}
+
+.am-head-tools {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+/* Narrow box: the title gets the full width, the Town Hall and Paste
+   link sit on their own row under it. */
+@container (max-width: 560px) {
+  .am-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .am-head-tools > * {
+    flex: 1;
+  }
+  .am-head-tools .am-th,
+  .am-paste-btn {
+    width: 100%;
+  }
+  /* The chip sits at the left edge here, so the list opens from its left
+     edge to the right (right-aligned, it ran off the screen's left side). */
+  .am-th-menu {
+    left: 0;
+    right: auto;
+    max-width: calc(100cqi - 2px);
+  }
+}
+.am-paste-btn {
+  height: 40px;
+  padding: 0 14px;
+}
+
+/* Paste link's field, under the header (hidden until it's opened). */
+.am-import {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.am-import[hidden] {
+  display: none;
+}
+
+/* Parts: Your army on top (full width: on a wide box the sheet puts the
+   heroes on the left and the troops beside them, like the army cards),
+   then Pick units, split by a hairline. Your army always shows, even
+   empty -- heroes are added from its empty slots. */
+.am-part {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--am-line);
+}
+.am-part-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.am-part-title {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--am-text);
+}
+.am-part-note {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  color: var(--am-faint);
+}
+.am-part-note[hidden],
+.am-part[hidden] {
+  display: none;
+}
+
+/* ---- Buttons: the one style ---------------------------------------------- */
+.am-btn,
+.am-tab,
+.am-th,
+.am-mode,
+.am-picker-remove,
+.am-picker-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  box-shadow: none;
+  color: var(--text-muted, #949ba4);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.am-btn:hover,
+.am-tab:hover,
+.am-th:hover,
+.am-mode:hover,
+.am-picker-remove:hover,
+.am-picker-close:hover {
+  background: var(--flat-hover, #1e1f23);
+  color: var(--text-secondary, #c8cbcd);
+}
+.am-btn:active,
+.am-tab:active,
+.am-mode:active,
+.am-picker-remove:active {
+  transform: translateY(1px);
+}
+/* Selected / main action: the raised keycap. */
+.am-btn-main,
+.am-tab.active,
+.am-th[aria-pressed='true'] {
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--text-main, #eff2f5);
+}
+.am-btn-main:hover,
+.am-tab.active:hover,
+.am-th[aria-pressed='true']:hover {
+  background: var(--key-face-hover);
+  color: var(--text-main, #eff2f5);
+}
+.am-btn-main:active,
+.am-tab.active:active {
+  transform: translateY(2px);
+  box-shadow: var(--key-pressed);
+}
+.am-btn:focus-visible,
+.am-tab:focus-visible,
+.am-th:focus-visible,
+.am-mode:focus-visible,
+.am-picker-remove:focus-visible,
+.am-picker-close:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.am-btn:disabled,
+.am-btn[aria-disabled='true'],
+.am-mode:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+.am-ico {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Feedback states: "Copied!" goes green, Clear's "Tap again" goes red. */
+.am-btn.is-done {
+  color: #8fe0ac;
+}
+.am-btn[data-act='clear'].is-armed {
+  color: #e06363;
+}
+
+/* Town Hall chip: the icon, "TH18" and a ▾ so it reads as a drop-down.
+   Raised (keycap) like every selected thing; the ▾ flips while it's open. */
+.am-th {
+  gap: 6px;
+  padding: 0 10px;
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--text-main, #eff2f5);
+}
+.am-th:hover {
+  background: var(--key-face-hover);
+  color: var(--text-main, #eff2f5);
+}
+.am-chev {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+.am-th[aria-expanded='true'] .am-chev {
+  transform: rotate(180deg);
+}
+.am-th img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* ---- 1. Your army ----------------------------------------------------------- */
+/* The army sheet itself is styled in th-layouts.css (ARMY SHEET), shared
+   with the army cards so the two always match. */
+.am-list {
+  margin-top: 14px;
+}
+.am-empty {
+  display: block;
+  padding: 18px 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  color: var(--am-faint);
+  text-align: center;
+}
+/* "Clan castle" in full on desktop, "CC" on phones (tab + meter). */
+.am-short {
+  display: none;
+}
+b.is-over {
+  color: #e06363 !important;
+}
+/* A dark groove that fills with light grey (red if over). */
+
+/* What to do with the army, under it: Open in game is the main action
+   (full width), then Copy army link, Share and Clear in one row. */
+.am-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.am-actions .am-btn {
+  min-width: 0;
+  gap: 6px;
+  padding: 0 8px;
+  letter-spacing: 1px;
+}
+.am-actions .am-btn-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.am-btn-main {
+  grid-column: 1 / -1;
+}
+/* Room for all four on one line (a wide box): Open in game first, the
+   rest beside it. Narrower boxes keep the two-line arrangement above. */
+@container (min-width: 700px) {
+  .am-actions {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .am-actions .am-btn-main {
+    grid-column: auto;
+  }
+}
+
+/* ---- Pick units -------------------------------------------------------------- */
+.am-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+/* Tab: name on top, what's used below ("340/352"). */
+.am-tab {
+  flex-direction: column;
+  gap: 3px;
+  min-height: 52px;
+  padding: 6px 4px;
+}
+.am-tab-meter {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  color: var(--am-faint);
+  font-variant-numeric: tabular-nums;
+}
+.am-tab-meter b {
+  color: inherit;
+}
+.am-tab.active .am-tab-meter {
+  color: var(--am-muted);
+}
+.am-tab.active .am-tab-meter b {
+  color: var(--am-text);
+}
+
+.am-panel {
+  margin-top: 18px;
+}
+.am-group + .am-group {
+  margin-top: 22px;
+}
+.am-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 2px 10px;
+}
+.am-group-title {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--am-muted);
+}
+.am-group-meter {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--am-faint);
+  font-variant-numeric: tabular-nums;
+}
+.am-group-meter b {
+  color: var(--am-text);
+}
+.am-note {
+  margin: 0 2px 14px;
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--am-muted);
+}
+
+/* Unit tiles: just the unit's picture. The number in red is how many are
+   in the army; a light ring marks the ones you've picked. */
+.am-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+.am-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  /* the army cards' tile: one raised grey, a dark hairline round it */
+  background: #1b1d22;
+  box-shadow: 0 0 0 1px #0a0b0d;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    opacity 0.15s ease,
+    filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the card tile's light inner rim; brighter on a picked unit */
+.am-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.13);
+  pointer-events: none;
+  transition: box-shadow 0.15s ease-out;
+}
+.am-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.am-tile:hover {
+  filter: brightness(1.1);
+}
+.am-tile:active {
+  transform: scale(0.95);
+  transition-duration: 0s;
+}
+.am-tile:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+.am-tile.is-on::after {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+/* Can't be added right now (no room, super limit...): dimmed but still
+   tappable, so the tap explains why. */
+.am-tile.is-full:not(.is-on) {
+  opacity: 0.3;
+  filter: grayscale(0.7);
+}
+/* How many are in the army: the army cards' "x5" chip, top-left; red on
+   super troops, as on the cards. */
+.am-count {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 1;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(10, 11, 13, 0.78);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+  pointer-events: none;
+}
+.am-count:not(:empty)::before {
+  content: '×';
+}
+.am-tile.is-super .am-count {
+  background: #c23b3b;
+}
+.am-count:empty {
+  display: none;
+}
+/* Equipment in the pet / equipment picker: blue common, purple epic, the
+   same tones as the army cards. */
+.am-opt.am-common {
+  background: radial-gradient(120% 90% at 50% 0%, #2f5c9c 0%, #1b3560 60%, #142645 100%);
+}
+.am-opt.am-epic {
+  background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f2068 60%, #2c1649 100%);
+}
+
+/* Warden mode box: says it in words -- a small "Mode" over "Ground" / "Air". */
+.am-mode {
+  flex-direction: column;
+  gap: 1px;
+  min-width: 72px;
+  padding: 0 12px;
+}
+.am-mode-k {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--am-faint);
+}
+.am-mode-v {
+  color: var(--text-main, #eff2f5);
+}
+
+/* Pet / equipment picker: opens under the hero row that asked for it. */
+/* ---- Picker modal --------------------------------------------------------------
+   A hero, or a hero's pet / equipment: opened from the army sheet. Centred
+   over a dimmed page; on phones it rises from the bottom as a sheet. */
+.am-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050; /* above the phone bottom bar (.bn-bar, 9999) */
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(5, 6, 8, 0.72);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: am-fade 0.18s ease-out;
+}
+.am-modal[hidden] {
+  display: none;
+}
+.am-modal-box {
+  width: min(520px, 100%);
+  max-height: min(80vh, 640px);
+  overflow-y: auto;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: #16171b;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9);
+  animation: am-rise 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.am-modal-title {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--am-text);
+}
+.am-modal-note {
+  margin: -2px 0 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--am-faint);
+}
+/* Options: picture with the name under it. */
+.am-modal .am-grid-sm {
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 10px;
+}
+.am-modal .am-opt {
+  aspect-ratio: auto;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 6px;
+}
+.am-modal .am-opt img {
+  aspect-ratio: 1;
+  height: auto;
+}
+.am-opt-name {
+  padding: 4px 4px 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 10.5px;
+  line-height: 1.25;
+  color: #c9ccd1;
+  text-align: center;
+}
+.am-modal-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.am-modal-foot .am-picker-remove {
+  margin-top: 0;
+}
+html.am-modal-open {
+  overflow: hidden;
+}
+@keyframes am-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes am-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+@media (max-width: 640px) {
+  .am-modal {
+    align-items: end;
+    padding: 0;
+  }
+  .am-modal-box {
+    width: 100%;
+    max-height: 78vh;
+    border-radius: 18px 18px 0 0;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  .am-modal .am-grid-sm {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.am-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--am-text);
+}
+.am-picker-close {
+  min-height: 32px;
+  width: 32px;
+  padding: 0;
+  font-size: 18px;
+}
+.am-grid-sm {
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+}
+.am-opt.is-taken {
+  opacity: 0.4;
+}
+.am-picker-remove {
+  margin-top: 12px;
+}
+
+/* ---- Paste link field ----------------------------------------------------------- */
+.am-import-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #2a2c31;
+  border-radius: 8px;
+  background: #0e0f12;
+  color: #d5d8de;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+}
+.am-import-input::placeholder {
+  color: var(--am-faint);
+}
+.am-import-input:focus {
+  outline: none;
+  border-color: #5a5e66;
+}
+
+/* ---- Messages ------------------------------------------------------------------
+   "Only 2 super troops at a time", "Army loaded": pinned to the bottom of
+   the screen so they show wherever you've scrolled. The script sets left
+   to the box's centre. */
+.am-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 10000; /* over the bottom nav */
+  max-width: min(420px, calc(100% - 32px));
+  margin: 0;
+  padding: 9px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(20, 21, 26, 0.97);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #e6e7ea;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+  pointer-events: none;
+}
+.am-toast.is-on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---- Phones ------------------------------------------------------------------ */
+@media (max-width: 970px) {
+  .am {
+    margin-top: 24px;
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+  .am-title {
+    font-size: 17px;
+  }
+  .am-intro {
+    font-size: 12.5px;
+  }
+  .am-part {
+    margin-top: 18px;
+    padding-top: 18px;
+  }
+  .am-btn,
+  .am-tab,
+  .am-th,
+  .am-mode,
+  .am-picker-remove {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+  }
+  .am-long {
+    display: none;
+  }
+  .am-short {
+    display: inline;
+  }
+  /* The Layouts / Army / Guides tabs are back on phones (under the hero). */
+  .coc-content:has(> #armyMaker) > .first-layer {
+    display: flex;
+  }
+  /* Secondary top bar: the breadcrumb takes the page name's place. */
+  .am-stb-title {
+    display: none;
+  }
+  .am-stb-crumbs {
+    display: inline-flex;
+  }
+  .am-btn {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .am-tab {
+    padding: 6px 2px;
+  }
+  .am-tab-meter {
+    font-size: 10px;
+  }
+  /* 7 tiles a row on phones. */
+  .am-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  /* The pet / equipment picker keeps its smaller tiles. */
+  .am-grid-sm {
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  }
+  /* Icons only in the slots on phones -- names don't fit three to a row. */
+  /* ...but the Warden's mode box keeps its words. */
+  .am-mode {
+    min-width: 64px;
+    padding: 0 10px;
+  }
+  .am-toast {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)); /* above the bottom nav */
+  }
+  body:has(#bottomNav.bn-hidden) .am-toast {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .am-tile,
+  .am-btn,
+  .am-toast {
+    transition: none;
+  }
+}
+
+/* ---- Live in Clash band ------------------------------------------------------
+   The red "Live in Clash right now" band above the footer (styled in
+   coc-clan-clock.css, same as the other Clash pages). On the other pages a
+   FAQ sits between the content and the band; here it follows the maker box
+   straight away, so it gets its own gap -- room for the Dragon Warden that
+   pokes out of its top edge, too. (#id beats the band's margin: 0.) */
+#events-section.t18-band {
+  margin-top: 96px;
+}
+@media (max-width: 970px) {
+  #events-section.t18-band {
+    margin-top: 72px;
+  }
+}

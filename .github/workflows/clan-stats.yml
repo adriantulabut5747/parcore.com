@@ -29,7 +29,7 @@ jobs:
         with:
           sparse-checkout: |
             scripts
-            clan-stats.json
+            site/clan-stats.json
           sparse-checkout-cone-mode: false
 
       - uses: actions/setup-node@v4
@@ -44,12 +44,12 @@ jobs:
       - name: Commit if changed
         run: |
           # git status (not git diff) also sees the file if it's brand new
-          if [ -z "$(git status --porcelain -- clan-stats.json)" ]; then
+          if [ -z "$(git status --porcelain -- site/clan-stats.json)" ]; then
             echo "No change."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add clan-stats.json
+          git add site/clan-stats.json
           git commit -m "Update clan stats"
           git push

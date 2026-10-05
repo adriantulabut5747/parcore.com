@@ -1,0 +1,189 @@
+/* =======================================================================
+   MORE SHEET BODY -- every CoC page (redesigned Oct 2026).
+   The sheet itself and its "Clash of Clans Contents" header are unchanged
+   (1coclayouts.css; /coc/'s own copy). This is the body only:
+
+   - Town Halls: each TH once, as a chip (icon + "TH18"), four across.
+     A Layouts / Armies segmented switch above decides where the tiles
+     lead (coc-more.js). The old body listed every TH twice, in two
+     columns of "TH18 Layouts" / "TH18 Armies" rows.
+   - Tools: the guide pages as two-across chips, same states.
+
+   Tiles are built by thz-script.js (classes .mx-th / .mx-tool), or written
+   into /coc/ directly. New class names on purpose: the old
+   .th-mini / .more-row carry pseudo-element frames and arrows in the
+   shared CSS that would otherwise have to be undone one by one.
+   ======================================================================= */
+
+.more-list.mx {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 6px 2px 4px;
+}
+
+.mx-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.mx-label {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #8b9099;
+}
+
+/* Segmented switch: a recessed track; the selected side is a raised key
+   (the Copy Layout key face), the other is plain text. */
+.mx-seg {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #0e0e10;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.mx-tab {
+  min-width: 78px;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #8b9099;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.mx-tab[aria-selected='true'] {
+  background: linear-gradient(180deg, #2a2c32, #1d1e23);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+.mx-tab:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 1px;
+}
+
+/* Tiles = the Town Hall chips under the hero (.second-layer buttons,
+   th-layouts.css "Layouts / Army / Tools tabs + Town Hall chips"): flat
+   near-black at rest, a step lighter on hover, and the page you're on is
+   the raised keycap -- top-lit face + a hard 3px dark edge -- a step
+   lighter again on hover. Values written out (not the --key-* tokens):
+   /coc/ doesn't load the file that defines them. The row gap
+   leaves room for the active chip's 3px edge. */
+.mx-grid,
+.mx-tools {
+  display: grid;
+  gap: 10px 8px;
+}
+.mx-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.mx-tools {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.mx-grid[hidden] {
+  display: none;
+}
+.mx-th,
+.mx-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 42px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  color: #949ba4;
+  text-decoration: none;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.mx-th {
+  justify-content: center;
+}
+.mx-th:hover,
+.mx-tool:hover {
+  background: #1e1f23;
+  color: #c8cbcd;
+}
+.mx-th.active,
+.mx-tool.active {
+  background: linear-gradient(180deg, #26282e, #1b1c21);
+  box-shadow:
+    0 3px 0 #08090a,
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: #eff2f5;
+}
+.mx-th.active:hover,
+.mx-tool.active:hover {
+  background: linear-gradient(180deg, #31343b, #24262b);
+}
+.mx-th:focus-visible,
+.mx-tool:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+.mx-th img,
+.mx-tool-ico img {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.mx-th span {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.mx-th.active span {
+  font-weight: 800;
+}
+/* Tools: icon + name, left-aligned (names are longer than "TH18"). */
+.mx-tool-ico {
+  display: contents;
+}
+.mx-tool-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.mx-tool.active .mx-tool-name {
+  font-weight: 800;
+}
+
+/* Very narrow phones: 3 TH tiles across. */
+@media (max-width: 340px) {
+  .mx-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

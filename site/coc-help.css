@@ -1,0 +1,359 @@
+/* =======================================================================
+   COC HELP BUTTON + MODAL -- every CoC page (coc-*, coctools*, thNN-*).
+   coc-help.js builds the markup into the secondary top bar; this file is
+   its look.
+
+   The BUTTON, the DIVIDER beside it, the dimmed backdrop and the panel
+   shell are copied from homewebresources' info button (hwr-css.css:
+   .stb-mobile-actions, .stb-icon-btn, .stb-dd-overlay, .stb-info-dropdown*;
+   11layout.css: .stb-divider) with the same values, so the two halves of
+   the site share one control. Differences, and why:
+   - The divider is .stb-help-divider (desktop only, like hwr's), kept
+     separate from .stb-divider so this file owns its spacing.
+   - The divider sits INSIDE .stb-mobile-actions: on phones the bar is
+     space-between with only the title showing, so a separate divider
+     would float in the middle instead of beside the button.
+   - CoC pages have no <header>, so the "keep both top bars sharp above
+     the backdrop" lift uses body:has(...) instead of header:has(...).
+   - The panel's CONTENT is new (help for copying bases), and the panel
+     takes the CoC card surface (#121316) instead of hwr's #181818.
+   ======================================================================= */
+
+.stb-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stb-help-divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 10px 0 6px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.2) 80%, transparent 100%);
+}
+
+.stb-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+  color: #9a9a9a;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 0;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.stb-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: #9a9a9a;
+  flex-shrink: 0;
+}
+.stb-icon-btn:active {
+  background: #2c2c2c;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.stb-icon-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+/* Phones: no divider -- the button sits alone at the bar's right end. */
+@media (max-width: 970px) {
+  .stb-help-divider {
+    display: none;
+  }
+}
+
+@media (min-width: 971px) {
+  .stb-help-divider {
+    margin: 0 16px;
+  }
+  .stb-icon-btn {
+    width: 24px;
+    height: 24px;
+  }
+  .stb-icon-btn svg {
+    width: 13px;
+    height: 13px;
+    stroke-width: 2.2;
+  }
+}
+
+/* Backdrop: dims and softly blurs the page (and the bottom nav) while the
+   panel is open; the two top bars are lifted above it so they stay sharp,
+   except while the phone sidebar drawer is open (it must stay on top). */
+.stb-dd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99985;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+.stb-dd-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0s;
+}
+body:has(.stb-dd-overlay.open) .top-bar {
+  z-index: 99990;
+}
+body:not(.sidebar-open):has(.stb-dd-overlay.open) .secondary-top-bar {
+  z-index: 99990;
+}
+
+.stb-info-dropdown-wrap {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 61;
+}
+.stb-info-dropdown-wrap .stb-icon-btn[aria-expanded='true'] {
+  color: #d4d4d4;
+  background: #2c2c2c;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.stb-info-dropdown-wrap .stb-icon-btn[aria-expanded='true'] svg {
+  stroke: #d4d4d4;
+}
+
+/* Panel shell: hwr's .stb-info-dropdown (detached to <body> and placed
+   under the button by the script), on the CoC card surface. */
+.stb-info-dropdown {
+  position: fixed;
+  top: calc(100% + 10px);
+  right: -4px;
+  z-index: 99990;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: #121316;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0.18s;
+}
+.stb-info-dropdown.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ---- Content -----------------------------------------------------------
+   A title, then three fixes as rows split by hairlines (the same divided
+   list as the FAQ and the event board), each led by a small icon tile,
+   and a full-width Global Chat button at the foot. Type: Orbitron caps
+   for the title (as hwr's heading), Sora for reading, Oxanium caps for
+   the button (as Copy Layout). */
+.cch-head {
+  padding: 18px 18px 14px;
+}
+.cch-title {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #f1f2f4;
+}
+.cch-sub {
+  margin: 6px 0 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8b9099;
+}
+.cch-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.cch-item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 18px;
+}
+.cch-item + .cch-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.cch-ico {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #c9ccd2;
+}
+.cch-ico svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* The main fix gets the site red, so it reads first. */
+.cch-item.is-key .cch-ico {
+  color: #ff8a80;
+  background: rgba(194, 59, 59, 0.12);
+  border-color: rgba(194, 59, 59, 0.3);
+}
+.cch-item h4 {
+  margin: 4px 0 5px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #f1f2f4;
+}
+.cch-item p {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a7a9ac;
+}
+.cch-item p b {
+  color: #e6e7ea;
+  font-weight: 600;
+}
+/* hwr's .stb-info-dd-chip: a word + glyph kept together as one nowrap unit. */
+.cch-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #f1f2f4;
+  font-weight: 700;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+/* "Join our clan": an optional invite, not a fix -- set apart from the
+   list on a faintly raised strip, led by the Ascendere logo. */
+.cch-clan {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 18px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+}
+.cch-logo {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #141519;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.cch-logo img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+.cch-clan h4 {
+  margin: 4px 0 5px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #f1f2f4;
+}
+.cch-clan p {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a7a9ac;
+}
+.cch-foot {
+  padding: 2px 18px 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.cch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #26282e, #1b1c21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 10px -4px rgba(0, 0, 0, 0.45);
+  color: #c9ccd2;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.cch-btn:hover {
+  background: linear-gradient(180deg, #31343b, #24262b);
+  color: #fff;
+}
+.cch-btn:active {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+.cch-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+.cch-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stb-dd-overlay,
+  .stb-info-dropdown {
+    transition: none;
+  }
+}

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Dashboard — Parchrome</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   Same color palette as the main Parchrome site, so this page
+   feels consistent with /.
+   ============================================================ */
+:root {
+  --bg-main: #202225;
+  --bg-box: #161616;
+  --bg-box-active: #303135;
+  --accent: #c22d2d;
+  --text-main: #eff2f5;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Oxanium', sans-serif; }
+body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; padding: 30px 5%; }
+
+/* ---- Header ---- */
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.dash-title {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #c0c9d4, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dash-sub { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+/* ---- Stat summary chips ---- */
+.stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat-chip {
+  background: var(--bg-box);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 10px 18px;
+  text-align: center;
+  min-width: 90px;
+}
+.stat-chip .num { font-size: 22px; font-weight: 800; color: #fff; }
+.stat-chip .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+
+/* ---- Filter tabs ---- */
+.filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-btn {
+  background: var(--bg-box);
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.filter-btn:hover { background: #1f1f20; color: var(--text-secondary); }
+.filter-btn.active {
+  background: linear-gradient(to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+  color: #fff;
+}
+
+/* ---- Feedback list ---- */
+.feedback-list { display: flex; flex-direction: column; gap: 12px; }
+
+.feedback-card {
+  background: var(--bg-box);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.fc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.fc-type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  color: #fff;
+}
+.fc-type.suggestion { background: linear-gradient(90deg, #232323, #3a3a3a); }
+.fc-type.bug { background: linear-gradient(90deg, #5f0808, #ad0000); }
+.fc-type.rating { background: linear-gradient(90deg, #2b0707, #5f0808); }
+.fc-type.hwr { background: linear-gradient(90deg, #1a2f5f, #2d4fad); }
+.fc-type.valorant { background: linear-gradient(90deg, #4a1a5f, #8a2dad); }
+
+.fc-stars { font-size: 14px; letter-spacing: 2px; color: #e0302f; }
+.fc-time { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+.fc-message { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; }
+.fc-message.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fc-message.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+.fc-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.fc-toggle {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color .15s ease;
+}
+.fc-toggle:hover { color: var(--text-secondary); }
+.fc-toggle.is-shown { display: inline-flex; }
+.fc-toggle svg { width: 12px; height: 12px; stroke: currentColor; transition: transform .2s ease; }
+.fc-toggle.is-open svg { transform: rotate(180deg); }
+.fc-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color .15s ease;
+}
+.fc-copy-btn:hover { color: var(--text-secondary); }
+.fc-copy-btn svg { width: 12px; height: 12px; stroke: currentColor; }
+.fc-copy-btn.is-copied { color: #6fcf7f; }
+.fc-email { font-size: 12px; color: var(--text-muted); }
+.fc-email a { color: #8aa0ff; text-decoration: none; }
+.fc-email a:hover { text-decoration: underline; }
+
+/* ---- Empty / loading states ---- */
+.dash-status { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
+.dash-status.error { color: #ff6b6b; }
+
+@media (max-width: 700px) {
+  body { padding: 20px 5%; }
+
+  .dash-header { gap: 18px; }
+
+  /* Stat chips — a flex-wrap grid instead of 5-in-a-row squeezed
+     flat, since flex:1 + min-width:0 was letting long labels like
+     "SUGGESTIONS" get clipped by overflow instead of wrapping or
+     shrinking cleanly. Fixed 3-per-row basis keeps every chip a
+     consistent, comfortable size regardless of how many exist. */
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+  .stat-chip {
+    flex: 0 1 calc(33.333% - 6px);
+    min-width: 0;
+    padding: 10px 6px;
+  }
+  .stat-chip .num { font-size: 18px; }
+  .stat-chip .lbl {
+    font-size: 9px;
+    letter-spacing: 0.3px;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  /* Filter row — horizontal scroll instead of wrapping into a messy
+     multi-row cluster of pill buttons; feels more like a native
+     mobile tab bar and keeps every option reachable in one line. */
+  .filter-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    margin-left: -5%;
+    margin-right: -5%;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .stat-chip { flex-basis: calc(50% - 4px); }
+}
+</style>
+</head>
+<body>
+
+<div class="dash-header">
+  <div>
+    <div class="dash-title">Feedback Dashboard</div>
+    <div class="dash-sub">Live submissions from the Parchrome feedback form</div>
+  </div>
+  <div class="stats-row" id="statsRow">
+    <div class="stat-chip"><div class="num" id="statTotal">—</div><div class="lbl">Total</div></div>
+    <div class="stat-chip"><div class="num" id="statSuggestion">—</div><div class="lbl">Suggestions</div></div>
+    <div class="stat-chip"><div class="num" id="statBug">—</div><div class="lbl">Bugs</div></div>
+    <div class="stat-chip"><div class="num" id="statRating">—</div><div class="lbl">Ratings</div></div>
+    <div class="stat-chip"><div class="num" id="statHwr">—</div><div class="lbl">HWR</div></div>
+    <div class="stat-chip"><div class="num" id="statVal">—</div><div class="lbl">Valorant</div></div>
+  </div>
+</div>
+
+<div class="filter-row">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="suggestion">Suggestions</button>
+  <button class="filter-btn" data-filter="bug">Bugs</button>
+  <button class="filter-btn" data-filter="rating">Ratings</button>
+  <button class="filter-btn" data-filter="hwr">HWR</button>
+  <button class="filter-btn" data-filter="valorant">Valorant</button>
+</div>
+
+<div class="feedback-list" id="feedbackList">
+  <div class="dash-status">Loading feedback...</div>
+</div>
+
+<!-- ============================================================
+     FIREBASE — same project/config as /'s feedback form.
+     ============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script type="module">
+  // Third project — the Valorant tracker's search-log dashboard
+  // (/admin/searches), pulled in via the modular SDK since that's what
+  // that project's own config already used, instead of mixing it into
+  // the compat app below. Fetched once on load (matches /admin/searches's
+  // own one-shot getDocs behavior) and handed off to the shared
+  // window-level state the compat script manages.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const valFirebaseConfig = {
+    apiKey: "AIzaSyCo88EeZQQW17cXSB97UXz0tuZbB_CgWMo",
+    authDomain: "trackervalorant-42e14.firebaseapp.com",
+    projectId: "trackervalorant-42e14",
+    storageBucket: "trackervalorant-42e14.firebasestorage.app",
+    messagingSenderId: "1058942511167",
+    appId: "1:1058942511167:web:0c921d734162d881df708a"
+  };
+
+  const valApp = initializeApp(valFirebaseConfig, "valApp");
+  const valDb = getFirestore(valApp);
+
+  async function loadValorantLogs() {
+    try {
+      const q = query(collection(valDb, 'searches'), orderBy('timestamp', 'desc'), limit(500));
+      const snap = await getDocs(q);
+      window.__valorantSubmissions = snap.docs.map(d => {
+        const r = d.data();
+        const tagPart = r.tag ? '#' + r.tag : '';
+        const regionPart = r.region ? ' (' + String(r.region).toUpperCase() + ')' : '';
+        return {
+          type: 'valorant',
+          message: 'Searched: ' + (r.name || '—') + tagPart + regionPart,
+          createdAt: r.timestamp || null,
+          email: null,
+          rating: null
+        };
+      });
+      window.__onValorantLoaded && window.__onValorantLoaded();
+    } catch (err) {
+      console.error('Valorant Firestore read error:', err);
+    }
+  }
+
+  loadValorantLogs();
+  window.__reloadValorantLogs = loadValorantLogs;
+</script>
+<script>
+  // Primary project — Parchrome's own feedback form.
+  const firebaseConfig = {
+    apiKey: "AIzaSyAa8B5rIP0Y9w9jBN_mzKzkFW3xMdI9wgo",
+    authDomain: "parchrome-feedback.firebaseapp.com",
+    projectId: "parchrome-feedback",
+    storageBucket: "parchrome-feedback.firebasestorage.app",
+    messagingSenderId: "546895020356",
+    appId: "1:546895020356:web:f145067c0b71dde2341711"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Second project — hwr-ai's "Submit a Site" form (web-resources-suggestions).
+  // Initialized as a named secondary app since it's a separate Firebase
+  // project from the one above; each needs its own firebase.firestore()
+  // bound to its own app instance instead of sharing the default one.
+  const hwrFirebaseConfig = {
+    apiKey: "AIzaSyCdnRWE_asKaFD0MGmsWN6BnamohYEtdbg",
+    authDomain: "web-resources-suggestions.firebaseapp.com",
+    projectId: "web-resources-suggestions",
+    storageBucket: "web-resources-suggestions.firebasestorage.app",
+    messagingSenderId: "535893034287",
+    appId: "1:535893034287:web:27cc77db8d301d51efcdda"
+  };
+  const hwrApp = firebase.initializeApp(hwrFirebaseConfig, "hwrApp");
+  const hwrDb = hwrApp.firestore();
+
+  let allFeedback = [];
+  let hwrSubmissions = [];
+  let currentFilter = 'all';
+
+  const listEl = document.getElementById('feedbackList');
+
+  function timeAgo(date) {
+    if (!date) return '';
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    const units = [
+      ['year', 31536000], ['month', 2592000], ['day', 86400],
+      ['hour', 3600], ['minute', 60]
+    ];
+    for (const [name, secs] of units) {
+      const val = Math.floor(seconds / secs);
+      if (val >= 1) return `${val} ${name}${val > 1 ? 's' : ''} ago`;
+    }
+    return 'just now';
+  }
+
+  function renderStars(rating) {
+    if (!rating) return '';
+    return '<span class="fc-stars">' + '★'.repeat(rating) + '☆'.repeat(5 - rating) + '</span>';
+  }
+
+  function render() {
+    const filtered = currentFilter === 'all'
+      ? allFeedback
+      : allFeedback.filter(f => f.type === currentFilter);
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div class="dash-status">No feedback yet in this category.</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map((f, i) => {
+      const created = f.createdAt ? f.createdAt.toDate() : null;
+      return `
+        <div class="feedback-card">
+          <div class="fc-top">
+            <span class="fc-type ${f.type}">${f.type}</span>
+            ${renderStars(f.rating)}
+            <span class="fc-time">${created ? timeAgo(created) : 'pending...'}</span>
+          </div>
+          ${f.message ? `<div class="fc-message is-clamped" id="fc-msg-${i}">${escapeHtml(f.message)}</div>` : ''}
+          ${f.message ? `
+          <div class="fc-actions">
+            <button type="button" class="fc-toggle" data-target="fc-msg-${i}">
+              <span class="fc-toggle-label">View more</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <button type="button" class="fc-copy-btn" data-target="fc-msg-${i}">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+              <span class="fc-copy-label">Copy</span>
+            </button>
+          </div>` : ''}
+          ${f.email ? `<div class="fc-email">From: <a href="mailto:${escapeHtml(f.email)}">${escapeHtml(f.email)}</a></div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    checkOverflow();
+  }
+
+  // After the DOM has real layout, check which messages actually spill
+  // past 3 lines and only reveal the "View more" arrow for those —
+  // short messages don't get a pointless toggle button.
+  function checkOverflow() {
+    listEl.querySelectorAll('.fc-message.is-clamped').forEach(el => {
+      if (el.scrollHeight > el.clientHeight + 1) {
+        const btn = listEl.querySelector(`.fc-toggle[data-target="${el.id}"]`);
+        if (btn) btn.classList.add('is-shown');
+      }
+    });
+  }
+
+  listEl.addEventListener('click', (e) => {
+    const toggleBtn = e.target.closest('.fc-toggle');
+    if (toggleBtn) {
+      const msgEl = document.getElementById(toggleBtn.dataset.target);
+      if (!msgEl) return;
+      const expanded = msgEl.classList.toggle('is-expanded');
+      msgEl.classList.toggle('is-clamped', !expanded);
+      toggleBtn.classList.toggle('is-open', expanded);
+      toggleBtn.querySelector('.fc-toggle-label').textContent = expanded ? 'View less' : 'View more';
+      return;
+    }
+
+    const copyBtn = e.target.closest('.fc-copy-btn');
+    if (copyBtn) {
+      const msgEl = document.getElementById(copyBtn.dataset.target);
+      if (!msgEl) return;
+      navigator.clipboard.writeText(msgEl.innerText).then(() => {
+        copyBtn.classList.add('is-copied');
+        copyBtn.querySelector('.fc-copy-label').textContent = 'Copied';
+        setTimeout(() => {
+          copyBtn.classList.remove('is-copied');
+          copyBtn.querySelector('.fc-copy-label').textContent = 'Copy';
+        }, 1500);
+      }).catch(err => console.error('Copy failed:', err));
+    }
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function updateStats() {
+    document.getElementById('statTotal').textContent = allFeedback.length;
+    document.getElementById('statSuggestion').textContent = allFeedback.filter(f => f.type === 'suggestion').length;
+    document.getElementById('statBug').textContent = allFeedback.filter(f => f.type === 'bug').length;
+    document.getElementById('statRating').textContent = allFeedback.filter(f => f.type === 'rating').length;
+    document.getElementById('statHwr').textContent = allFeedback.filter(f => f.type === 'hwr').length;
+    document.getElementById('statVal').textContent = allFeedback.filter(f => f.type === 'valorant').length;
+  }
+
+  let parchromeFeedback = [];
+
+  function combineAndRender() {
+    allFeedback = parchromeFeedback
+      .concat(hwrSubmissions)
+      .concat(window.__valorantSubmissions || [])
+      .sort((a, b) => {
+        const at = a.createdAt ? a.createdAt.toMillis() : 0;
+        const bt = b.createdAt ? b.createdAt.toMillis() : 0;
+        return bt - at;
+      });
+    updateStats();
+    render();
+  }
+
+  // Called by the separate <script type="module"> block above once its
+  // one-shot getDocs() fetch of the Valorant tracker's "searches"
+  // collection resolves (that project uses the modular SDK, loaded
+  // independently of the compat SDK this script relies on).
+  window.__onValorantLoaded = combineAndRender;
+
+  // Live-updating listener: new submissions appear here instantly, no refresh needed.
+  db.collection('feedback').orderBy('createdAt', 'desc')
+    .onSnapshot((snapshot) => {
+      parchromeFeedback = snapshot.docs.map(doc => doc.data());
+      combineAndRender();
+    }, (error) => {
+      console.error('Firestore read error:', error);
+      listEl.innerHTML = '<div class="dash-status error">Could not load feedback. Check Firestore rules allow reads, or check the console for details.</div>';
+    });
+
+  // Second listener: hwr-ai's "siteSubmissions" collection, mapped into
+  // the same shape the cards above already know how to render (type,
+  // message, createdAt) so no changes are needed to render()/renderStars().
+  hwrDb.collection('siteSubmissions').orderBy('submittedAt', 'desc')
+    .onSnapshot((snapshot) => {
+      hwrSubmissions = snapshot.docs.map(doc => {
+        const d = doc.data();
+        return {
+          type: 'hwr',
+          message: 'Suggested site: ' + (d.website || '') + (d.ign ? ' — from ' + d.ign : ''),
+          createdAt: d.submittedAt || null,
+          email: null,
+          rating: null
+        };
+      });
+      combineAndRender();
+    }, (error) => {
+      console.error('HWR Firestore read error:', error);
+    });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+</script>
+
+</body>
+</html>

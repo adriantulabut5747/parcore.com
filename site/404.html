@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Netlify serves this file for every address that has no page, at that
+     address (e.g. /valorant/quiz). So every path below starts with "/" --
+     a relative "/icons/x.png" would break one folder deep. -->
+<title>Page under construction | Parchrome</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ground: #0f0f10;
+  --raised: #16161a;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --red: #c23b3b;
+  --red-bright: #e25555;
+  --red-wash: rgba(194, 59, 59, 0.14);
+  --text: #eff2f5;
+  --text-2: #c8cbcd;
+  --muted: #949ba4;
+  --display: 'Oxanium', system-ui, sans-serif;
+  --body: 'Sora', system-ui, sans-serif;
+  --mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --sweep: 3.6s;
+}
+
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--ground);
+  color: var(--text);
+  font: 400 15px/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+::selection { background: var(--red); color: #fff; }
+input { caret-color: var(--red-bright); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--red-bright); outline-offset: 3px; border-radius: 6px; }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--ground); }
+::-webkit-scrollbar-thumb { background: #2a2b30; border-radius: 10px; border: 2px solid var(--ground); }
+
+/* ---------- top bar: same height and brand as the rest of the site ---------- */
+.topbar {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--line);
+  background: var(--ground);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font: 700 18px/1 var(--display);
+  letter-spacing: 0.01em;
+}
+.brand img { width: 26px; height: 26px; border-radius: 6px; object-fit: cover; }
+
+/* ---------- queue screen ---------- */
+.queue {
+  flex: 1;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 72px) clamp(16px, 4vw, 40px) 48px;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+  align-content: start; /* queue grows to fill the screen; don't spread that height between rows */
+}
+
+/* radar */
+.radar-wrap { position: sticky; top: 32px; }
+.radar {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(194, 59, 59, 0.07), transparent 62%),
+    var(--raised);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.8), inset 0 0 0 1px var(--line);
+  overflow: hidden;
+  isolation: isolate;
+}
+.radar svg.grid { position: absolute; inset: 0; width: 100%; height: 100%; }
+.radar svg.grid circle, .radar svg.grid line { fill: none; stroke: var(--line-strong); stroke-width: 0.35; }
+.radar svg.grid .tick { stroke: var(--line); }
+.sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(194, 59, 59, 0) 0deg, rgba(194, 59, 59, 0) 290deg, rgba(194, 59, 59, 0.38) 359deg, rgba(226, 85, 85, 0.9) 360deg);
+  animation: spin var(--sweep) linear infinite;
+  z-index: 1;
+}
+.radar.found .sweep { animation-duration: calc(var(--sweep) * 1.6); opacity: 0.55; transition: opacity 0.8s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.radar::after {
+  /* the "no match" beat: one ring out from the centre, then the slow sweep takes over */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--red-bright);
+  opacity: 0;
+  transform: scale(0.05);
+  z-index: 2;
+  pointer-events: none;
+}
+.radar.resolving::after { animation: resolve 0.9s var(--ease-out) forwards; }
+@keyframes resolve {
+  0% { opacity: 0.8; transform: scale(0.05); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.you {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 10px; height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px rgba(239, 242, 245, 0.12);
+  z-index: 3;
+}
+
+/* blips: one per lobby, placed by JS at polar coords; each lights when the sweep passes it */
+.blip {
+  position: absolute;
+  width: 34px; height: 34px;
+  margin: -17px 0 0 -17px;
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.radar.found .blip { opacity: 1; transform: scale(1); }
+.blip img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--ground), 0 0 0 3px rgba(255, 255, 255, 0.22);
+  filter: grayscale(0.35);
+  transition: filter 0.3s, box-shadow 0.3s;
+}
+.blip::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--red-bright);
+  opacity: 0;
+  animation: ping var(--sweep) var(--ease-out) infinite;
+  animation-delay: var(--delay, 0s);
+  animation-play-state: paused;
+}
+.radar.found .blip::after { animation-play-state: running; animation-duration: calc(var(--sweep) * 1.6); }
+@keyframes ping {
+  0% { opacity: 0.9; transform: scale(0.85); }
+  35% { opacity: 0; transform: scale(1.5); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+.blip.lit img { filter: none; box-shadow: 0 0 0 2px var(--ground), 0 0 0 3.5px var(--red-bright); }
+
+
+/* status column */
+.status h1 {
+  margin: 0;
+  font: 700 clamp(30px, 4.4vw, 52px)/1.04 var(--display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.status h1 .state { display: block; transition: color 0.4s; }
+.queue.found .status h1 .state { color: var(--red-bright); }
+.path {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font: 600 clamp(19px, 2.4vw, 28px)/1.25 var(--mono);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.elapsed {
+  margin: 12px 0 0;
+  font: 500 13px/1 var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.elapsed b { color: var(--text-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.note {
+  margin: 18px 0 0;
+  max-width: 46ch;
+  color: var(--text-2);
+  font-size: 16px;
+  min-height: 3.2em;
+}
+
+/* the three queue steps tick from waiting -> done */
+.steps[hidden] { display: none; }
+.steps { list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 10px; }
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  transition: color 0.3s;
+}
+.steps li::before {
+  content: '';
+  flex: none;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.steps li.on { color: var(--text-2); }
+.steps li.on::before { animation: blink 0.9s steps(2, start) infinite; background: var(--text-2); box-shadow: none; }
+.steps li.done { color: var(--text-2); }
+.steps li.done::before { background: var(--text-2); box-shadow: none; }
+@keyframes blink { to { opacity: 0.2; } }
+
+/* lobbies */
+.lobbies {
+  margin-top: 40px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.queue.found .lobbies { opacity: 1; transform: none; }
+.lobbies-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.lobbies-head h2 { margin: 0; font: 700 20px/1.2 var(--display); letter-spacing: 0.01em; }
+.lobbies-head span { color: var(--muted); font-size: 13px; }
+.lobby-list { list-style: none; margin: 0; padding: 0; }
+.lobby {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 10px;
+  margin: 0 -10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.lobby + .lobby { margin-top: 2px; }
+.lobby img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+.lobby strong { display: block; font: 600 16px/1.25 var(--display); letter-spacing: 0.01em; }
+.lobby small { display: block; margin-top: 2px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.join {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font: 600 13px/1 var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.join svg { width: 14px; height: 14px; transition: transform 0.25s var(--ease-out); }
+.lobby:hover, .lobby:focus-visible { background: var(--raised); }
+.lobby:hover .join, .lobby:focus-visible .join { background: var(--red); color: #fff; box-shadow: none; }
+.lobby:hover .join svg, .lobby:focus-visible .join svg { transform: translateX(2px); }
+
+/* find a page: searches the same index as the site search */
+.find { margin-top: 28px; }
+.find label { display: block; font: 600 14px/1 var(--display); letter-spacing: 0.02em; color: var(--text-2); margin-bottom: 10px; }
+.find-box { position: relative; }
+.find-box svg { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; margin-top: -8px; color: var(--muted); pointer-events: none; }
+.find input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px 0 40px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--text);
+  font: 400 15px var(--body);
+  transition: box-shadow 0.2s;
+}
+.find input::placeholder { color: var(--muted); }
+.find input:focus { outline: none; box-shadow: inset 0 0 0 1.5px var(--red); }
+.find-empty { margin: 12px 0 0; color: var(--muted); font-size: 14px; }
+
+.foot {
+  padding: 18px 16px 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--line);
+}
+.foot a { color: var(--text-2); text-underline-offset: 3px; }
+
+/* ---------- phones ---------- */
+@media (max-width: 760px) {
+  .queue { grid-template-columns: 1fr; gap: 28px; padding-top: 24px; }
+  .radar-wrap { position: static; }
+  .radar { max-width: 220px; }
+  .blip { width: 26px; height: 26px; margin: -13px 0 0 -13px; }
+  .status { text-align: left; }
+  .lobbies { margin-top: 28px; }
+  .lobby { padding: 12px 8px; margin: 0 -8px; }
+  .join span { display: none; }
+  .join { padding: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep { animation: none; opacity: 0.4; }
+  .blip::after, .radar::after { display: none; }
+  .steps li.on::before { animation: none; }
+  .lobbies, .blip { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="/"><img src="/icons/home.jpg" alt="">Parchrome</a>
+</header>
+
+<main class="queue" id="queue">
+  <div class="radar-wrap" aria-hidden="true">
+    <div class="radar" id="radar">
+      <svg class="grid" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="16"/>
+        <circle cx="50" cy="50" r="32"/>
+        <circle cx="50" cy="50" r="48"/>
+        <line x1="50" y1="2" x2="50" y2="98"/>
+        <line x1="2" y1="50" x2="98" y2="50"/>
+        <line class="tick" x1="16" y1="16" x2="84" y2="84"/>
+        <line class="tick" x1="84" y1="16" x2="16" y2="84"/>
+      </svg>
+      <div class="sweep"></div>
+      <div class="you"></div>
+    </div>
+  </div>
+
+  <section class="status">
+    <h1><span class="state" id="state">Searching for</span> <code class="path" id="path">/</code></h1>
+    <p class="elapsed"><span id="elapsedLabel">Search time</span> <b id="timer">00:00</b></p>
+    <p class="note" id="note" aria-live="polite">Looking for this page on Parchrome.</p>
+
+    <ol class="steps" id="steps">
+      <li>Checking the address</li>
+      <li>Looking through every section</li>
+      <li>Finding a page</li>
+    </ol>
+
+    <div class="lobbies" id="lobbies">
+      <div class="lobbies-head">
+        <h2>Open lobbies</h2>
+        <span>Live on Parchrome now</span>
+      </div>
+      <ul class="lobby-list" id="lobbyList">
+        <li><a class="lobby" href="/coc/" data-blip="0">
+          <img src="/icons/cocicon.jpg" alt="">
+          <span><strong>Clash of Clans</strong><small>Base layouts and army comps for TH8 to TH18</small></span>
+          <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </a></li>
+        <li><a class="lobby" href="/minecraft/java/" data-blip="1">
+          <img src="/icons/minecraft.png" alt="">
+          <span><strong>Minecraft Java</strong><small>Mods, shaders, resource packs, seeds and commands</small></span>
+          <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </a></li>
+        <li><a class="lobby" href="/valorant/" data-blip="2">
+          <img src="/icons/valorant.png" alt="">
+          <span><strong>Valorant</strong><small>Player search and a crosshair maker</small></span>
+          <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </a></li>
+        <li><a class="lobby" href="/web-resources/" data-blip="3">
+          <img src="/icons/webicon.png" alt="">
+          <span><strong>Web Resources</strong><small>Free sites for anime, movies, music, games and AI tools</small></span>
+          <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </a></li>
+        <li><a class="lobby" href="/" data-blip="4">
+          <img src="/icons/home.jpg" alt="">
+          <span><strong>Parchrome home</strong><small>Every game and section in one place</small></span>
+          <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </a></li>
+      </ul>
+
+      <form class="find" id="find" role="search" onsubmit="return false">
+        <label for="findInput">Or find a page</label>
+        <div class="find-box">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.8"/><path d="M10.6 10.6 14 14"/></svg>
+          <input id="findInput" type="search" placeholder="Try &quot;anime&quot;, &quot;TH17&quot; or &quot;shaders&quot;" autocomplete="off">
+        </div>
+        <p class="find-empty" id="findEmpty" hidden>Nothing matches that yet.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  Think this page should exist? <a href="mailto:wildparchrome@gmail.com">Email Parchrome</a>
+</footer>
+
+<script>
+(function () {
+  var queue = document.getElementById('queue');
+  var radar = document.getElementById('radar');
+  var stateEl = document.getElementById('state');
+  var note = document.getElementById('note');
+  var steps = document.querySelectorAll('#steps li');
+  var timerEl = document.getElementById('timer');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Show the address they asked for, shortened in the middle if it's huge.
+  var path = decodeURIComponent(location.pathname + location.search);
+  if (path.length > 60) path = path.slice(0, 34) + '…' + path.slice(-22);
+  document.getElementById('path').textContent = path;
+
+  // One blip on the radar per lobby. Angles are spread round the dial; the
+  // ping delay matches the moment the sweep (which starts at 12 o'clock and
+  // turns clockwise) passes that angle, so each blip lights as it's swept.
+  var lobbies = document.querySelectorAll('.lobby');
+  var spots = [[38, 30], [110, 40], [200, 26], [258, 40], [322, 18]]; // [degrees, % from centre]
+  var sweepSecs = 3.6 * 1.6;
+  var blips = [];
+  lobbies.forEach(function (a, i) {
+    var s = spots[i % spots.length];
+    var rad = (s[0] - 90) * Math.PI / 180;
+    var b = document.createElement('div');
+    b.className = 'blip';
+    b.style.left = (50 + Math.cos(rad) * s[1]) + '%';
+    b.style.top = (50 + Math.sin(rad) * s[1]) + '%';
+    b.style.setProperty('--delay', (s[0] / 360 * sweepSecs) + 's');
+    b.style.transitionDelay = (0.12 * i) + 's';
+    var img = a.querySelector('img');
+    b.innerHTML = '<img src="' + img.getAttribute('src') + '" alt="">';
+    radar.appendChild(b);
+    blips.push(b);
+  });
+  // Listen on the list, not each row: the search box below rebuilds the rows,
+  // and per-row listeners would be lost with them.
+  function light(e, on) {
+    var a = e.target.closest && e.target.closest('.lobby[data-blip]');
+    if (a && blips[a.dataset.blip]) blips[a.dataset.blip].classList.toggle('lit', on);
+  }
+  var listEl = document.getElementById('lobbyList');
+  listEl.addEventListener('mouseover', function (e) { light(e, true); });
+  listEl.addEventListener('mouseout', function (e) { light(e, false); });
+  listEl.addEventListener('focusin', function (e) { light(e, true); });
+  listEl.addEventListener('focusout', function (e) { light(e, false); });
+
+  // Queue timer.
+  var start = Date.now();
+  var timer = setInterval(function () {
+    var s = Math.floor((Date.now() - start) / 1000);
+    timerEl.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }, 250);
+
+  // Search steps, then the result. Reduced motion skips straight to it.
+  function step(i) {
+    steps.forEach(function (li, j) {
+      li.className = j < i ? 'done' : j === i ? 'on' : '';
+    });
+  }
+  function found() {
+    clearInterval(timer);
+    steps[0].parentNode.hidden = true; // the result line says it all; no "Finding a page" left hanging
+    document.getElementById('elapsedLabel').textContent = reduced ? 'Search ended' : 'Search ended after';
+    if (reduced) timerEl.textContent = '';
+    radar.classList.add('resolving');
+    stateEl.textContent = 'No match for';
+    note.textContent = 'This page is still under construction. Pick an open lobby while it’s being built.';
+    queue.classList.add('found');
+    radar.classList.add('found');
+  }
+  if (reduced) {
+    found();
+  } else {
+    step(0);
+    setTimeout(function () { step(1); }, 700);
+    setTimeout(function () { step(2); }, 1500);
+    setTimeout(found, 2400);
+  }
+
+  // "Find a page": same index the site search uses, loaded on first focus.
+  var input = document.getElementById('findInput');
+  var list = document.getElementById('lobbyList');
+  var empty = document.getElementById('findEmpty');
+  var original = list.innerHTML;
+  var index = null;
+  function load() {
+    if (index) return Promise.resolve(index);
+    return fetch('/herosearch.json').then(function (r) { return r.json(); })
+      .then(function (d) { index = d; return d; })
+      .catch(function () { index = []; return index; });
+  }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function abs(u) { return /^(https?:|\/)/.test(u) ? u : '/' + u; }
+  input.addEventListener('focus', load);
+  input.addEventListener('input', function () {
+    var q = input.value.trim().toLowerCase();
+    if (!q) { list.innerHTML = original; empty.hidden = true; return; }
+    load().then(function (items) {
+      var hits = items.filter(function (it) {
+        return (it.name + ' ' + (it.sub || '') + ' ' + (it.keywords || []).join(' ')).toLowerCase().indexOf(q) !== -1;
+      }).slice(0, 6);
+      empty.hidden = hits.length > 0;
+      list.innerHTML = hits.map(function (it) {
+        return '<li><a class="lobby" href="' + esc(abs(it.link)) + '">' +
+          '<img src="' + esc(abs(it.icon || it.image || '/icons/home.jpg')) + '" alt="">' +
+          '<span><strong>' + esc(it.name) + '</strong><small>' + esc(it.sub || 'Parchrome') + '</small></span>' +
+          '<span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>' +
+          '</a></li>';
+      }).join('');
+    });
+  });
+})();
+</script>
+</body>
+</html>

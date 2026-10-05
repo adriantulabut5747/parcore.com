@@ -19,7 +19,7 @@
 import { writeFile, readFile } from 'node:fs/promises';
 
 const API = 'https://cocproxy.royaleapi.dev/v1/clans/%232GYPGPJP9';   // "#2GYPGPJP9"
-const OUT = new URL('../clan-stats.json', import.meta.url);
+const OUT = new URL('../site/clan-stats.json', import.meta.url);
 
 const key = process.env.COC_API_KEY;
 if (!key) { console.error('COC_API_KEY is not set'); process.exit(1); }

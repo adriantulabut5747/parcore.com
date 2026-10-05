@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="/11layout.css">
+  <link rel="stylesheet" href="/hwr-css.css">
+  <style>
+      /* ==================== CONTRIBUTE PAGE — SUBMISSION CARD (cw-*) ====================
+   Purpose-built card for /web-resources/contribute's box-one. Same Firebase
+   collection and general dark/red visual language as .stb-info-inner's
+   submit form (/web-resources/ai-tools), but deliberately its own component set
+   (badge-style preview panel instead of a photo hero, pill button,
+   icon-led field labels) so the two don't read as a reskin of each
+   other. The .stb-info-inner/.stb-about-inner "About" card is reused
+   as-is directly below this one on the contribute page — see markup. */
+      .cw-submit-card {
+        position: relative;
+        margin: 20px 15% 20px 15%;
+        border-radius: 20px;
+        padding: 0;
+        background:
+          linear-gradient(90deg, #141414 0%, #1a1a1a 55%, #141414 100%) padding-box,
+          radial-gradient(130% 160% at 0% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box,
+          radial-gradient(130% 160% at 100% 100%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box;
+        border: 1px solid transparent;
+        box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      }
+
+      /* Left-hand preview panel — starts as a neutral "awaiting selection"
+   badge, then swaps in the chosen category's real favicon (from
+   hwr-categories.json) inside a glowing ring once the <select>
+   changes. Pure decoration/feedback; the <select> itself remains the
+   source of truth for the submitted value. */
+      .cw-submit-visual {
+        flex: 0 0 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 40px 24px;
+        text-align: center;
+        position: relative;
+        background: radial-gradient(120% 120% at 50% 30%, rgba(194, 59, 59, 0.12), transparent 65%);
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .cw-submit-visual-badge {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #1c1c1c, #111);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 6px rgba(194, 59, 59, 0.08), 0 10px 24px rgba(0, 0, 0, 0.4);
+        transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        overflow: hidden;
+      }
+
+      .cw-submit-card.has-category .cw-submit-visual-badge {
+        border-color: rgba(194, 59, 59, 0.5);
+        box-shadow: 0 0 0 6px rgba(194, 59, 59, 0.18), 0 10px 26px rgba(194, 59, 59, 0.2);
+      }
+
+      .cw-submit-visual-badge svg {
+        width: 34px;
+        height: 34px;
+        stroke: #6b6e72;
+        transition: stroke 0.25s ease;
+      }
+
+      .cw-submit-card.has-category .cw-submit-visual-badge svg {
+        display: none;
+      }
+
+      .cw-submit-visual-icon {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+      }
+
+      .cw-submit-card.has-category .cw-submit-visual-icon {
+        display: block;
+      }
+
+      .cw-submit-visual-eyebrow {
+        font-family: 'Sora', sans-serif;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: #6b6e72;
+      }
+
+      .cw-submit-visual-label {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: #9a9da1;
+        transition: color 0.2s ease;
+        line-height: 1.35;
+        max-width: 160px;
+      }
+
+      .cw-submit-card.has-category .cw-submit-visual-label {
+        color: #f0f0f0;
+      }
+
+      .cw-submit-body {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 34px 40px 34px 34px;
+      }
+
+      .cw-submit-eyebrow {
+        display: inline-block;
+        margin-bottom: 10px;
+        font-family: 'Sora', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        color: #c23b3b;
+      }
+
+      .cw-submit-heading {
+        margin: 0 0 12px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(20px, 2.4vw, 27px);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #fff;
+        line-height: 1.2;
+      }
+
+      .cw-submit-accent {
+        color: #c23b3b;
+      }
+
+      .cw-submit-lead {
+        margin: 0 0 24px;
+        max-width: 460px;
+        font-family: 'Sora', sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #b7bbc0;
+      }
+
+      .cw-submit-form {
+        max-width: 420px;
+      }
+
+      .cw-field {
+        margin-bottom: 16px;
+      }
+
+      .cw-field-label-row {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .cw-field-label {
+        font-family: 'Sora', sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #d0d2d5;
+      }
+
+      .cw-field-hint {
+        font-family: 'Sora', sans-serif;
+        font-size: 11.5px;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        color: #6b6e72;
+      }
+
+      /* Select — appearance:none + custom chevron, same base fill/glow
+   treatment as .stb-form-input but a flatter, always-visible label
+   above the control (rather than a floating label) since a <select>
+   has no meaningful ":placeholder-shown" state to hook into. */
+      .cw-select-wrap {
+        position: relative;
+      }
+
+      .cw-select {
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding: 14px 40px 14px 16px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background:
+          linear-gradient(#131212, #131212) padding-box,
+          radial-gradient(130% 160% at 0% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box,
+          radial-gradient(130% 160% at 100% 100%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box;
+        color: #f0f0f0;
+        font-family: 'Sora', sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        outline: none;
+        transition: box-shadow 0.2s ease;
+      }
+
+      .cw-select:focus {
+        box-shadow: 0 0 0 1px rgba(194, 59, 59, 0.55) inset;
+      }
+
+      .cw-select:invalid {
+        color: #8a8d92;
+      }
+
+      .cw-select option {
+        background: #1c1c1e;
+        color: #eee;
+      }
+
+      .cw-select-chevron {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        stroke: #8a8d92;
+        pointer-events: none;
+        transition: stroke 0.2s ease;
+      }
+
+      .cw-select:focus~.cw-select-chevron {
+        stroke: #d97b7b;
+      }
+
+      .cw-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 21px 16px 9px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background:
+          linear-gradient(#131212, #131212) padding-box,
+          radial-gradient(130% 160% at 0% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box,
+          radial-gradient(130% 160% at 100% 100%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box;
+        color: #f0f0f0;
+        font-family: 'Sora', sans-serif;
+        font-size: 14px;
+        outline: none;
+        transition: box-shadow 0.2s ease;
+      }
+
+      .cw-input:focus {
+        box-shadow: 0 0 0 1px rgba(194, 59, 59, 0.55) inset;
+      }
+
+      .cw-input-label {
+        position: absolute;
+        left: 17px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: 'Sora', sans-serif;
+        font-size: 14px;
+        color: #8a8d92;
+        pointer-events: none;
+        transition: top 0.16s ease, transform 0.16s ease, font-size 0.16s ease, color 0.16s ease;
+      }
+
+      .cw-input-field {
+        position: relative;
+      }
+
+      .cw-input:focus+.cw-input-label,
+      .cw-input:not(:placeholder-shown)+.cw-input-label {
+        top: 11px;
+        transform: translateY(0);
+        font-size: 10.5px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #9a9da1;
+      }
+
+      .cw-input:focus+.cw-input-label {
+        color: #d97b7b;
+      }
+
+      .cw-input:focus+.cw-input-label .cw-field-hint,
+      .cw-input:not(:placeholder-shown)+.cw-input-label .cw-field-hint {
+        display: none;
+      }
+
+      /* Pill-shaped gradient button — visually distinct from .stb-submit-btn's
+   flat rectangle, so the two forms don't look like reskins. */
+      .cw-submit-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px 28px;
+        border: none;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #d64545, #8f1f1f);
+        color: #fff;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        cursor: pointer;
+        box-shadow: 0 8px 18px rgba(194, 59, 59, 0.25);
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cw-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px rgba(194, 59, 59, 0.35);
+      }
+
+      .cw-submit-btn:disabled {
+        opacity: 0.6;
+        cursor: default;
+        transform: none;
+        box-shadow: 0 8px 18px rgba(194, 59, 59, 0.25);
+      }
+
+      .cw-submit-btn svg {
+        width: 15px;
+        height: 15px;
+        stroke: #fff;
+      }
+
+      .cw-submit-msg {
+        margin: 10px 0 0;
+        min-height: 16px;
+        font-family: 'Sora', sans-serif;
+        font-size: 12.5px;
+        color: #7fbf8f;
+      }
+
+      .cw-submit-msg.is-error {
+        color: #e07a7a;
+      }
+
+      @media (max-width: 970px) {
+        .cw-submit-card {
+          margin-left: 5%;
+          margin-right: 5%;
+          flex-direction: column;
+        }
+
+        .cw-submit-visual {
+          flex: none;
+          width: 100%;
+          padding: 28px 20px;
+          border-right: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .cw-submit-body {
+          padding: 26px 20px;
+        }
+
+        .cw-submit-form,
+        .cw-submit-lead {
+          max-width: none;
+        }
+      }
+
+      /* CONTRIBUTE PAGE HERO — supports the hero-tags category chips + the
+   jump animation triggered when one is clicked (see the module script
+   near the bottom of box-one, initHeroCategoryChips/initHeroStats).
+   .hero-tag/.hero-tag-icon/.hero-tags-label themselves are already
+   defined in hwr-css.css — these two rules only add what that generic
+   version doesn't need to know about: real favicon <img>s instead of
+   inline <svg> stroke icons, and the one-off highlight pulse. */
+      .hero-tags .hero-tag-icon {
+        object-fit: contain;
+        background: #fff;
+      }
+
+      @keyframes cwJumpHighlight {
+        0% {
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(194, 59, 59, 0.55);
+        }
+
+        100% {
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), 0 0 0 14px rgba(194, 59, 59, 0);
+        }
+      }
+
+      .cw-submit-card.cw-jump-highlight {
+        animation: cwJumpHighlight 1.2s ease-out;
+      }
+
+      /* LEADERBOARD — sits right under the submit card, above the About
+   card. Same card fill/corner-glow language as .cw-submit-card, kept
+   as a plain hand-edited list (see the HTML comment above the markup)
+   rather than anything Firestore-driven. Rank badge is gold/silver/
+   bronze for the top 3 via :nth-child, then falls back to a neutral
+   dark badge from the 4th row on. */
+      .cw-leaderboard {
+        margin: 20px 15% 20px 15%;
+        border-radius: 20px;
+        padding: 10px 30px;
+        background:
+          linear-gradient(90deg, #141414 0%, #1a1a1a 55%, #141414 100%) padding-box,
+          radial-gradient(130% 160% at 0% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box,
+          radial-gradient(130% 160% at 100% 100%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 58%) border-box;
+        border: 1px solid transparent;
+        box-sizing: border-box;
+      }
+
+      .cw-leaderboard-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 0;
+      }
+
+      .cw-leaderboard-row+.cw-leaderboard-row {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .cw-leaderboard-rank {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #1c1c1c;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #9a9da1;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12.5px;
+        font-weight: 800;
+      }
+
+      .cw-leaderboard-row:nth-child(1) .cw-leaderboard-rank {
+        background: rgba(232, 193, 74, 0.16);
+        border-color: rgba(232, 193, 74, 0.55);
+        color: #e8c14a;
+        box-shadow: 0 0 12px rgba(232, 193, 74, 0.25);
+      }
+
+      .cw-leaderboard-row:nth-child(2) .cw-leaderboard-rank {
+        background: rgba(201, 206, 212, 0.14);
+        border-color: rgba(201, 206, 212, 0.5);
+        color: #c9ced4;
+      }
+
+      .cw-leaderboard-row:nth-child(3) .cw-leaderboard-rank {
+        background: rgba(205, 127, 50, 0.16);
+        border-color: rgba(205, 127, 50, 0.5);
+        color: #cd7f32;
+      }
+
+      .cw-leaderboard-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-family: 'Sora', sans-serif;
+        font-size: 14.5px;
+        font-weight: 600;
+        color: #f0f0f0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .cw-leaderboard-count {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 5px;
+        padding: 5px 14px;
+        border-radius: 20px;
+        background: rgba(194, 59, 59, 0.12);
+        border: 1px solid rgba(194, 59, 59, 0.3);
+        color: #fff;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .cw-leaderboard-count-label {
+        font-family: 'Sora', sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        color: #d97b7b;
+      }
+
+      @media (max-width: 970px) {
+        .cw-leaderboard {
+          margin-left: 5%;
+          margin-right: 5%;
+          padding: 6px 18px;
+        }
+
+        .cw-leaderboard-name {
+          font-size: 13.5px;
+        }
+      }
+  </style>
+  <meta charset="UTF-8">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Parchrome | Contribute</title>
+
+  <!-- Preload the hero background image: it's the page's Largest
+     Contentful Paint (LCP) element, so the browser should start
+     fetching it immediately instead of discovering it late, after
+     parsing CSS down to the .hero-bg-img rule. fetchpriority="high"
+     (also set on the <img> tag itself, below) reinforces that. -->
+
+  <!-- Google Fonts: Inter, Oxanium, Orbitron, Sora combined into a single
+     stylesheet request instead of 4 separate ones (was 4 round trips
+     to fonts.googleapis.com before any of this text could render). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="/icons/home.jpg">
+  <link rel="shortcut icon" href="/icons/home.jpg">
+  <link rel="apple-touch-icon" href="/icons/home.jpg">
+
+
+  <script src="/11layout.js" defer></script>
+  <script src="/hwr-bookmarks.js" defer></script>
+
+
+
+</head>
+
+<body>
+
+  <div id="page-loader">
+    <!-- Primary top bar: hamburger (left) · centered logo · search icon (right) -->
+    <div class="pl-topbar">
+      <div class="pl-shimmer pl-hamburger"></div>
+      <div class="pl-shimmer pl-logo"></div>
+      <div class="pl-shimmer pl-topbar-icon"></div>
+    </div>
+    <!-- Secondary top bar: page icon+label · category chip row · info icon -->
+    <div class="pl-subbar">
+      <div class="pl-shimmer pl-subbar-icon"></div>
+      <div class="pl-shimmer pl-subbar-label"></div>
+      <div class="pl-subbar-divider"></div>
+      <div class="pl-subbar-chips">
+        <div class="pl-shimmer pl-chip" style="width:70px"></div>
+        <div class="pl-shimmer pl-chip" style="width:58px"></div>
+        <div class="pl-shimmer pl-chip" style="width:84px"></div>
+        <div class="pl-shimmer pl-chip" style="width:62px"></div>
+        <div class="pl-shimmer pl-chip" style="width:68px"></div>
+        <div class="pl-shimmer pl-chip" style="width:54px"></div>
+        <div class="pl-shimmer pl-chip" style="width:74px"></div>
+      </div>
+      <div class="pl-subbar-divider"></div>
+      <div class="pl-shimmer pl-subbar-icon"></div>
+    </div>
+
+    <div class="pl-body">
+      <!-- Left sidebar: Main Lobby / Web Resources / games list / Triple A -->
+      <div class="pl-sidebar">
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:60%"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-active">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:75%"></div>
+        </div>
+        <div class="pl-sb-divider"></div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:80%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:65%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:70%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:60%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:75%"></div>
+        </div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-sb-icon"></div>
+          <div class="pl-shimmer pl-row" style="width:55%"></div>
+        </div>
+        <div class="pl-sb-divider"></div>
+        <div class="pl-sb-item">
+          <div class="pl-shimmer pl-row" style="width:65%"></div>
+          <div class="pl-shimmer pl-sb-chevron"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-sub">
+          <div class="pl-shimmer pl-sb-icon-sm"></div>
+          <div class="pl-shimmer pl-row" style="width:70%"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-sub">
+          <div class="pl-shimmer pl-sb-icon-sm"></div>
+          <div class="pl-shimmer pl-row" style="width:55%"></div>
+        </div>
+        <div class="pl-sb-item pl-sb-sub">
+          <div class="pl-shimmer pl-sb-icon-sm"></div>
+          <div class="pl-shimmer pl-row" style="width:65%"></div>
+        </div>
+      </div>
+
+      <!-- Main column: hero banner / TOC card / search bar / result rows -->
+      <div class="pl-content">
+        <div class="pl-hero">
+          <div class="pl-shimmer pl-hero-tag"></div>
+          <div class="pl-shimmer pl-hero-title"></div>
+          <div class="pl-shimmer pl-hero-title" style="width:55%"></div>
+          <div class="pl-shimmer pl-hero-sub"></div>
+          <div class="pl-hero-pills">
+            <div class="pl-shimmer pl-pill" style="width:110px"></div>
+            <div class="pl-shimmer pl-pill" style="width:130px"></div>
+            <div class="pl-shimmer pl-pill" style="width:120px"></div>
+            <div class="pl-shimmer pl-pill" style="width:100px"></div>
+          </div>
+        </div>
+
+        <div class="pl-shimmer pl-section-label"></div>
+        <div class="pl-toc">
+          <div class="pl-toc-head-row">
+            <div class="pl-shimmer pl-toc-icon"></div>
+            <div class="pl-shimmer pl-row" style="width:130px"></div>
+            <div class="pl-shimmer pl-row pl-toc-badge" style="width:60px"></div>
+          </div>
+          <div class="pl-toc-grid">
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:70%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:55%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:65%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:50%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:60%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:45%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:58%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:40%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:52%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+            <div class="pl-toc-row">
+              <div class="pl-shimmer pl-row" style="width:35%"></div>
+              <div class="pl-shimmer pl-row" style="width:18px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pl-shimmer pl-searchbar"></div>
+
+        <div class="pl-list">
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:45%"></div>
+              <div class="pl-shimmer pl-row" style="width:75%; height:10px;"></div>
+            </div>
+          </div>
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:38%"></div>
+              <div class="pl-shimmer pl-row" style="width:65%; height:10px;"></div>
+            </div>
+          </div>
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:50%"></div>
+              <div class="pl-shimmer pl-row" style="width:70%; height:10px;"></div>
+            </div>
+          </div>
+          <div class="pl-list-item">
+            <div class="pl-shimmer pl-list-icon"></div>
+            <div class="pl-list-lines">
+              <div class="pl-shimmer pl-row" style="width:42%"></div>
+              <div class="pl-shimmer pl-row" style="width:60%; height:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Discover More sticky panel (wide desktop only) -->
+      <div class="pl-discover">
+        <div class="pl-shimmer pl-discover-label"></div>
+        <div class="pl-discover-card"></div>
+        <div class="pl-discover-card"></div>
+        <div class="pl-discover-card"></div>
+      </div>
+    </div>
+
+    <!-- Mobile bottom nav: Home / Music / More / Gaming / Movies -->
+    <div class="pl-bottomnav">
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon pl-bn-icon-mid"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+      <div class="pl-bn-item">
+        <div class="pl-shimmer pl-bn-icon"></div>
+        <div class="pl-shimmer pl-bn-label"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <header>
+    <!-- Top Nav -->
+    <div class="top-bar">
+      <div class="top-bar-left-avatar"></div>
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <a class="top-bar-title" href="/">
+        <div class="topbar-logo">
+          <img src="/icons/home.jpg" alt="">
+        </div> Parchrome
+      </a>
+
+      <!-- Search button -->
+      <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
+        <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+          <!-- Magnifying glass -->
+          <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none" />
+          <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span id="close-icon">✖</span>
+      </button>
+    </div>
+    <!-- Overlay — moved out of .top-bar: .top-bar has `transform` +
+         `will-change: transform` (for its scroll auto-hide), which makes
+         it a containing block for position:fixed descendants. Being
+         nested inside it was cropping the modal down to .top-bar's own
+         52px height instead of covering the full viewport. Living here,
+         directly in <header>, it's fixed relative to the viewport again. -->
+    <div id="search-overlay">
+      <!-- Search input -->
+      <div id="search-input-wrap">
+        <input type="search" id="search-input" placeholder="Find your next game..." oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+        <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+      </div>
+      <!-- Search results -->
+      <div id="search-results"></div>
+      <div id="search-view-more" class="hero-search-viewmore" style="display:none;">Loading more…</div>
+    </div>
+
+
+    <!-- Secondary Top Bar -->
+    <div class="secondary-top-bar" id="secondary-top-bar">
+      <div class="secondary-left">
+        <img src="/icons/webicon.png" alt="TH10 Icon" class="th-icon" id="secondaryTopIcon">
+        <a href="/web-resources/" class="secondary-content" id="secondaryContentLink">
+          <span class="secondary-content-desktop">Web Resources</span>
+          <span class="secondary-content-mobile" id="secondaryContentMobile">
+            <span id="scMobileText">Web Resources</span>
+
+            <span id="scMobileGroup"></span>
+          </span>
+        </a>
+      </div>
+
+
+      <div class="stb-divider" aria-hidden="true"></div>
+
+      <!-- Desktop-only: the category chips, same three-part strip as the
+           hub nav below -- left arrow + #dsnCategoriesScroll + right arrow.
+           Chips are injected by hwr-js.js's renderCategoryNav() from
+           hwr-categories.json; the arrows are wired by initDsnCategoriesScroll()
+           and only exist while the strip actually overflows. -->
+      <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Categories">
+        <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"><!-- populated from hwr-categories.json --></div>
+        <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </nav>
+
+      <!-- Desktop-only divider — separates "Web Resources" chip-scroller
+       from the info button on the right, same treatment .stb-divider
+       gives elsewhere in this bar. -->
+      <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+
+      <!-- Desktop-only: Web Resources hub navigation. Identical markup on
+           every hwr page now: left arrow + #stbHubNavScroll strip + right
+           arrow, with the links themselves populated by 11layout.js's
+           initHubNav() from hwr-categories.json's "hubNav" key -- edit that
+           file to add/remove/rename/re-icon destinations and every page
+           follows. Active state is real per-page tracking (whichever entry's
+           "link" matches the current page), never hardcoded. The arrows are
+           wired by hwr-js.js's initStbHubNavScroll() and only exist while the
+           strip actually overflows -- .is-hidden is display:none, so when
+           they're not needed they take up no room at all. Hidden below 971px
+           since .bn-bar already covers that width. -->
+      <nav class="stb-hub-nav" id="stbHubNav" aria-label="Web Resources navigation">
+        <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"><!-- populated from hwr-categories.json --></div>
+        <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </nav>
+
+      <div class="stb-divider" aria-hidden="true"></div>
+
+      <!-- Info ("i") button — the only place the bookmarking explainer
+       lives on the page now. .stb-mobile-actions is the last flex
+       child in .secondary-top-bar (space-between), so this sits on
+       the right at every width. -->
+      <div class="stb-mobile-actions" id="stbMobileActions">
+        <div class="stb-info-dropdown-wrap" id="stbInfoDropdownWrap">
+          <button type="button" class="stb-icon-btn" id="stbInfoBtn" aria-label="Info" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9.25" />
+              <line x1="12" y1="11" x2="12" y2="16.5" stroke-width="2.4" />
+              <circle cx="12" cy="7.6" r="1.3" fill="currentColor" stroke="none" />
+            </svg>
+          </button>
+          <div class="stb-info-dropdown" id="stbInfoDropdown" role="dialog" aria-hidden="true">
+            <div class="stb-info-dd-badge">
+              <svg class="stb-info-dd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3h12v18l-6-4.5L6 21V3z" />
+              </svg>
+            </div>
+            <h3 class="stb-info-dd-heading">Saving your Favorite Sites</h3>
+            <p class="stb-info-dd-text">
+              See a site you like? Tap the <span class="stb-info-dd-chip"><svg class="stb-info-dd-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 3h12v18l-6-4.5L6 21V3z" />
+                </svg><strong>bookmark button</strong></span> on it.
+            </p>
+            <p class="stb-info-dd-text">
+              It gets saved! Go back to the <span class="stb-info-dd-chip"><img class="stb-info-dd-icon-inline" src="/icons/webicon.png" alt=""><strong>Web Resources Home</strong></span> to see all your saved sites in one box.
+            </p>
+          </div>
+        </div>
+
+        <!-- Browse Settings dropdown — same controls/markup as box-three
+         (the desktop-sidebar panel, ≥1401px), just wrapped in this
+         popup instead of sitting inline. Reuses box-three's .b3-card
+         markup wholesale (see the dual-scoped ".box-three .b3-*,
+         .stb-settings-dropdown .b3-*" rules above) rather than a
+         separate set of dropdown-only styles, so there's exactly one
+         version of this panel's look to maintain. Every control here
+         just proxies a click/change to its sidebar counterpart (see
+         initStbSettingsDropdown below) so both stay perfectly in sync
+         no matter which one is used, on any width. -->
+        <div class="stb-settings-dropdown-wrap" id="stbSettingsDropdownWrap">
+          <button type="button" class="stb-icon-btn" id="stbSettingsBtn" aria-label="Browse settings" aria-haspopup="true" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="1.9" />
+              <circle cx="12" cy="12" r="1.9" />
+              <circle cx="12" cy="19" r="1.9" />
+            </svg>
+          </button>
+          <div class="stb-settings-dropdown" id="stbSettingsDropdown" role="dialog" aria-hidden="true">
+
+            <!-- "Bookmarks" card — mobile-only mirror of box-two's
+             "Recently Bookmarked" card (reads window.HwrBookmarks the
+             same way), but WITHOUT that card's adaptive vh-based row
+             count. This dropdown already scrolls internally and has no
+             sticky-panel height budget to fill, so it just always shows
+             a fixed 3-item preview (min and max, never more, never
+             fewer once there are 3+ saved) instead of growing/shrinking
+             with viewport height. Placed first, above "Browse Settings",
+             so saved sites are the first thing tapped in here. Populated
+             by initStbSettingsBookmarks below. -->
+            <div class="b3-card b3-bookmarks-card" id="stbSettingsBookmarksSection">
+              <div class="b3-toc-head">
+                <span class="b3-toc-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                  </svg>
+                </span>
+                <span class="b3-toc-title">Bookmarks</span>
+                <span class="b3-toc-total" id="stbSettingsBookmarksTotal">0 saved</span>
+              </div>
+              <div class="stb-toc-grid b3-toc-grid" id="stbSettingsBookmarksGrid"><!-- populated by initStbSettingsBookmarks() --></div>
+              <p class="b3-bookmarks-empty" id="stbSettingsBookmarksEmpty">No bookmarks yet — tap the bookmark icon on any tool to save it here.</p>
+              <button type="button" class="b3-bookmarks-viewall" id="stbSettingsBookmarksViewAll" style="display:none;" title="Takes you back to the lobby, filtered to your saved sites">View All Saved</button>
+            </div>
+
+            <div class="b3-card b3-controls-card">
+              <div class="b3-controls-label">Browse Settings</div>
+
+              <div class="b3-controls-row">
+                <div class="b3-view-toggle" role="group" aria-label="Layout">
+                  <button type="button" class="b3-view-btn" id="settingsViewListBtn" title="List view — one row per tool">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6" />
+                      <line x1="4" y1="12" x2="20" y2="12" />
+                      <line x1="4" y1="18" x2="20" y2="18" />
+                    </svg>
+                  </button>
+                  <button type="button" class="b3-view-btn" id="settingsViewBoxBtn" title="Box view — compact grid">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+                      <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+                      <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+                      <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="sort-order-wrap b3-sort-wrap">
+                  <select class="sort-order-select b3-sort-select" id="settingsSortSelect" aria-label="Sort order">
+                    <option value="default">Featured</option>
+                    <option value="az">A–Z</option>
+                    <option value="za">Z–A</option>
+                  </select>
+                  <svg class="sort-order-chevron b3-sort-chevron" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="b3-filter-row">
+                <button type="button" class="b3-filter-chip" id="settingsBookmarkToggle" role="switch" aria-checked="false" title="Show just the sites you've saved">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                  </svg>
+                  Saved Only
+                </button>
+                <button type="button" class="b3-filter-chip" id="settingsFlatToggle" role="switch" aria-checked="false" title="Show every tool together, no section headers">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="7" x2="21" y2="7" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="17" x2="21" y2="17" />
+                  </svg>
+                  Merge
+                </button>
+              </div>
+            </div>
+
+            <!-- "On This Page" table of contents — same per-page sections
+             data (hwr-categories.json → sections[<this file>]) as the
+             desktop sidebar's nav-chip list and box-three's own copy,
+             just rendered as .stb-toc-card rows here instead. Hidden
+             until the PAGE SECTIONS script below finds sections for
+             this page; a page with none simply never shows it. Rows
+             are populated (and the scroll-spy "you are here"
+             highlight applies to them automatically, since they
+             share .stb-toc-card with every other TOC on the page)
+             further down this file. -->
+            <div class="b3-card b3-toc-card" id="stbSettingsTocSection" style="display:none;">
+              <div class="b3-toc-head">
+                <span class="b3-toc-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="6" x2="20" y2="6" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="18" x2="14" y2="18" />
+                  </svg>
+                </span>
+                <span class="b3-toc-title">On This Page</span>
+                <span class="b3-toc-total" id="stbSettingsTocTotal">0 items</span>
+              </div>
+              <div class="stb-toc-grid b3-toc-grid" id="stbSettingsTocGrid"><!-- populated from hwr-categories.json --></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stb-dd-overlay" id="stbDdOverlay" aria-hidden="true"></div>
+  </header>
+
+
+  <!-- Main -->
+  <div class="main">
+
+    <div class="sidebar" id="sidebar">
+      <!-- Top Box -->
+      <div class="top-box" id="top-box"></div>
+      <!-- Games list -->
+      <div class="games-container" id="games-container"></div>
+      <!-- Triple A Games -->
+      <div class="triple-a-container">
+        <div class="triple-a-header" onclick="toggleTripleA()">
+          <img src="/icons/controllericon.png" class="tripleimg">
+          Triple A Games <span class="arrow">></span>
+        </div>
+        <div class="triple-a-list" id="triple-a-list"></div>
+      </div>
+    </div>
+
+
+    <div class="coc-main" id="main-content" role="main">
+
+
+      <div class="hero-section">
+        <img class="hero-bg-img" src="https://i.pinimg.com/736x/29/9a/54/299a5472e41588bb852ffc904b6e7bb4.jpg" alt="" fetchpriority="high">
+        <div class="hero-bg-overlay" aria-hidden="true"></div>
+        <div class="hero-content">
+          <span class="hero-kicker"><span class="hero-kicker-dot"></span>Parchrome &middot; Web Resources</span>
+          <h1 class="hero-title" id="heroTitle"><span id="heroTitleText"><span class="hero-title-accent">Contribute a</span> <span class="hero-title-collection">Site</span></span></h1>
+          <!-- This page has no entry in hwr-categories.json's "sections", so
+       the rotating per-category stat strip + the 4 hardcoded streaming/
+       cartoon hero-tags (both leftover from the template every other
+       hwr-*.html page shares) never had anything real to show here.
+       Replaced with content that's actually about THIS page: a live
+       "X submitted so far / Y live on the list" stat (initHeroStats,
+       in the module script further down) and a set of category
+       quick-pick chips sourced from hwr-categories.json (initHeroCategoryChips)
+       that jump straight to the form below and pre-select that
+       category — see CONTRIBUTE PAGE HERO comment in <head> for the
+       matching CSS. -->
+          <p class="hero-stat-strip" id="heroStatStrip">
+            <span class="hero-stat-strip-dot" aria-hidden="true"></span>
+            <span class="hero-stat-strip-text" id="heroStatStripText">Loading stats&hellip;</span>
+          </p>
+          <div class="hero-tags-wrap">
+            <span class="hero-tags-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z" />
+                <circle cx="7" cy="7" r="0.5" fill="currentColor" />
+              </svg>
+              Quick-pick a category
+            </span>
+            <div class="hero-tags" id="heroTags"><!-- populated from hwr-categories.json --></div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <div class="coc-content">
+
+
+        <!-- Bases Grid -->
+
+
+        <!-- Single shared fetch of hwr-categories.json — every script on this
+     page that needs it (page-sections TOC/content below, the desktop
+     category strip, and the mobile page-label swap further down)
+     reuses this ONE promise instead of each firing its own request. -->
+
+        <div class="box-container">
+          <div class="box-one">
+
+            <!-- Contribution card — this page's own submit-a-site component.
+     Shares the same Firebase project/collection as the "Know a Site
+     We're Missing?" card on /web-resources/ai-tools (see the inline module script
+     below), but is its own set of classes (cw-*, styled in the <style>
+     block in <head> rather than hwr-css.css) with a different layout
+     (badge-style preview panel instead of a photo hero, pill button,
+     icon-led labels) so it doesn't read as a reskin of that card. The
+     one addition this version has that the other doesn't: a required
+     Category field, populated live from hwr-categories.json
+     (window.HwrCategoriesPromise, the same shared fetch every other
+     script on this page already reuses) instead of being hardcoded —
+     add/remove/rename a category there and this list updates on its
+     own. -->
+            <div class="cw-submit-card" id="cwSubmitCard">
+              <div class="cw-submit-visual">
+                <div class="cw-submit-visual-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  <img class="cw-submit-visual-icon" id="cwVisualIcon" src="" alt="">
+                </div>
+                <span class="cw-submit-visual-eyebrow">Preview</span>
+                <span class="cw-submit-visual-label" id="cwVisualLabel">Pick a category to preview it here</span>
+              </div>
+
+              <div class="cw-submit-body">
+                <span class="cw-submit-eyebrow">Contribute a Resource</span>
+                <h1 class="cw-submit-heading">Know a Site <span class="cw-submit-accent">We're Missing?</span></h1>
+                <p class="cw-submit-lead">
+                  Found something worth adding to the list? Fill this out and we'll take a look before it goes live.
+                </p>
+
+                <form class="cw-submit-form" id="cwSubmitForm" novalidate>
+                  <div class="cw-field">
+                    <div class="cw-field-label-row">
+                      <label class="cw-field-label" for="cwCategorySelect">Category</label>
+                      <span class="cw-field-hint">— where does this site best belong?</span>
+                    </div>
+                    <div class="cw-select-wrap">
+                      <select class="cw-select" id="cwCategorySelect" name="category" required>
+                        <option value="" disabled selected>Select a category&hellip;</option>
+                      </select>
+                      <svg class="cw-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="cw-field cw-input-field">
+                    <input type="text" class="cw-input" id="cwWebsiteInput" name="website" placeholder=" " autocomplete="off" required>
+                    <label class="cw-input-label" for="cwWebsiteInput">Website URL <span class="cw-field-hint">(e.g. discord.com)</span></label>
+                  </div>
+
+                  <div class="cw-field cw-input-field">
+                    <input type="text" class="cw-input" id="cwIgnInput" name="ign" placeholder=" " autocomplete="off">
+                    <label class="cw-input-label" for="cwIgnInput">Name or IGN <span class="cw-field-hint">(optional)</span></label>
+                  </div>
+
+                  <button type="submit" class="cw-submit-btn">
+                    <span>Submit Contribution</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </button>
+                  <p class="cw-submit-msg" id="cwSubmitMsg" aria-live="polite"></p>
+                </form>
+              </div>
+            </div>
+
+            <!-- LEADERBOARD — hard-coded on purpose (not read from Firestore):
+     only meant to be edited by hand, so each row below is a plain,
+     manually-authored entry rather than something rendered from a
+     query. To update it: add/remove/edit a .cw-leaderboard-row below
+     and adjust the "N contributors" count in .layouts-count to match.
+     Top 3 rows get a gold/silver/bronze rank badge automatically via
+     .cw-leaderboard-row:nth-child(1/2/3) — no per-row class needed for
+     that part, just keep them in descending order. -->
+            <div class="layouts-title-box" id="cwLeaderboardTitle">
+              <div class="layouts-title-row">
+                <div class="layouts-title">
+                  <svg class="layouts-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z" />
+                    <path d="M7 5H4a1 1 0 0 0-1 1 4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1 4 4 0 0 1-4 4" />
+                  </svg>
+                  <span>Top Contributors</span>
+                </div>
+                <div class="layouts-title-actions">
+                  <span class="layouts-count">4 contributors</span>
+                </div>
+              </div>
+              <div class="layouts-subtitle">Community members with the most accepted site submissions.</div>
+            </div>
+
+            <div class="cw-leaderboard">
+              <div class="cw-leaderboard-row">
+                <span class="cw-leaderboard-rank">1</span>
+                <span class="cw-leaderboard-name">smurffette</span>
+                <span class="cw-leaderboard-count">10 <span class="cw-leaderboard-count-label">Contributions</span></span>
+              </div>
+              <div class="cw-leaderboard-row">
+                <span class="cw-leaderboard-rank">2</span>
+                <span class="cw-leaderboard-name">akilis</span>
+                <span class="cw-leaderboard-count">3 <span class="cw-leaderboard-count-label">Contributions</span></span>
+              </div>
+              <div class="cw-leaderboard-row">
+                <span class="cw-leaderboard-rank">3</span>
+                <span class="cw-leaderboard-name">mcgregor</span>
+                <span class="cw-leaderboard-count">1 <span class="cw-leaderboard-count-label">Contribution</span></span>
+              </div>
+              <div class="cw-leaderboard-row">
+                <span class="cw-leaderboard-rank">4</span>
+                <span class="cw-leaderboard-name">jj</span>
+                <span class="cw-leaderboard-count">1 <span class="cw-leaderboard-count-label">Contribution</span></span>
+              </div>
+            </div>
+
+            <!-- About card — reused as-is (same classes, same copy) from
+     /web-resources/ai-tools purely as decoration below the form; see that file's
+     comment for why the content reads in Tom's own voice. -->
+            <div class="stb-info-inner stb-about-inner">
+              <div class="stb-info-text">
+                <span class="stb-about-eyebrow">A Word From Tom</span>
+                <h2 class="stb-info-heading">Whatever Works, <span class="stb-info-accent">Gets Linked</span></h2>
+                <p class="stb-info-simple">
+                  You won't find me holding back a good resource just because it competes with me. What's useful gets linked, simple as that.
+                </p>
+                <ul class="stb-about-highlights">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    <span>Every tool on this list is reviewed and tested by me personally before it earns a place here</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    <span>The moment something stops delivering, it's removed. No exceptions, no favors owed</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    <span>No one pays for a spot on this list. Every listing here has earned its position</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <script type="module">
+              import {
+                initializeApp
+              } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+              import {
+                getFirestore,
+                collection,
+                addDoc,
+                serverTimestamp,
+                getCountFromServer
+              } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+              // Same Firebase project as the submit card on /web-resources/ai-tools.
+              const firebaseConfig = {
+                apiKey: "AIzaSyCdnRWE_asKaFD0MGmsWN6BnamohYEtdbg",
+                authDomain: "web-resources-suggestions.firebaseapp.com",
+                projectId: "web-resources-suggestions",
+                storageBucket: "web-resources-suggestions.firebasestorage.app",
+                messagingSenderId: "535893034287",
+                appId: "1:535893034287:web:27cc77db8d301d51efcdda"
+              };
+
+              var app = initializeApp(firebaseConfig);
+              var db = getFirestore(app);
+
+              // HERO STAT STRIP — replaces the per-category rotating stat this
+              // template normally shows (dead on this page, since hwr-categories.json
+              // has no "sections" entry for /web-resources/contribute and it never fires).
+              // Two real counts instead: how many submissions have come in via the
+              // form below (a cheap aggregate count query, not a full doc read),
+              // and how many sites are actually live right now, read off the same
+              // window.HwrWebsitesPromise every other page already uses for its own
+              // counts (a flat array of every site across every category, so its
+              // .length is the sitewide total).
+              (function initHeroStats() {
+                var textEl = document.getElementById('heroStatStripText');
+                if (!textEl) return;
+
+                Promise.all([
+                  getCountFromServer(collection(db, 'siteSubmissions')).then(function(snap) {
+                    return snap.data().count;
+                  }).catch(function() {
+                    return null;
+                  }),
+                  (window.HwrWebsitesPromise || Promise.resolve(null)).then(function(data) {
+                    return Array.isArray(data) ? data.length : null;
+                  }).catch(function() {
+                    return null;
+                  })
+                ]).then(function(results) {
+                  var submitted = results[0];
+                  var live = results[1];
+                  if (submitted === null && live === null) {
+                    textEl.textContent = 'Every submission gets a real look before it goes live.';
+                    return;
+                  }
+                  var parts = [];
+                  if (submitted !== null) parts.push('<strong>' + submitted + '</strong> site' + (submitted === 1 ? '' : 's') + ' submitted so far');
+                  if (live !== null) parts.push('<strong>' + live + '</strong> live on the list');
+                  textEl.innerHTML = parts.join(' &middot; ');
+                });
+              })();
+
+              // HERO CATEGORY CHIPS — replaces the 4 hardcoded streaming/cartoon
+              // tags this template normally shows (also dead here, same reason as
+              // the stat strip above). Built from the same hwr-categories.json
+              // fetch the Category <select> below uses, so the two never drift out
+              // of sync. Clicking a chip scrolls to the form and pre-selects that
+              // category, turning what used to be decorative dead weight into a
+              // shortcut for the form directly below it.
+              (function initHeroCategoryChips() {
+                var wrap = document.getElementById('heroTags');
+                if (!wrap || !window.HwrCategoriesPromise) return;
+
+                window.HwrCategoriesPromise.then(function(data) {
+                  var items = data.categories || [];
+                  var html = '';
+                  items.forEach(function(item) {
+                    html += '<a href="#cwSubmitCard" class="hero-tag" data-category="' + item.name + '">' +
+                      '<img class="hero-tag-icon" src="' + item.icon + '" alt="">' +
+                      item.name + '</a>';
+                  });
+                  wrap.innerHTML = html;
+
+                  wrap.addEventListener('click', function(e) {
+                    var link = e.target.closest('.hero-tag');
+                    if (!link) return;
+                    e.preventDefault();
+
+                    var select = document.getElementById('cwCategorySelect');
+                    var card = document.getElementById('cwSubmitCard');
+                    if (select) {
+                      select.value = link.getAttribute('data-category');
+                      select.dispatchEvent(new Event('change'));
+                    }
+                    if (card) {
+                      card.scrollIntoView({
+                        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                        block: 'center'
+                      });
+                      card.classList.add('cw-jump-highlight');
+                      setTimeout(function() {
+                        card.classList.remove('cw-jump-highlight');
+                      }, 1200);
+                    }
+                  });
+                }).catch(function(err) {
+                  console.error('Failed to load hwr-categories.json', err);
+                });
+              })();
+
+              // Populate the Category <select> from hwr-categories.json, reusing
+              // the page's single shared fetch (window.HwrCategoriesPromise, set
+              // up in hwr-js.js) instead of firing a private one here. Each
+              // <option> carries the category's icon + page link as data
+              // attributes so the preview badge (initCategoryPreview below) and
+              // the Firestore payload (initSubmitForm further down) can both
+              // read them straight off the selected option.
+              (function initCategorySelect() {
+                var select = document.getElementById('cwCategorySelect');
+                if (!select || !window.HwrCategoriesPromise) return;
+
+                window.HwrCategoriesPromise.then(function(data) {
+                  var items = data.categories || [];
+                  var html = '<option value="" disabled selected>Select a category&hellip;</option>';
+                  items.forEach(function(item) {
+                    html += '<option value="' + item.name + '" data-icon="' + item.icon + '" data-link="' + item.link + '">' + item.name + '</option>';
+                  });
+                  select.innerHTML = html;
+                }).catch(function(err) {
+                  console.error('Failed to load hwr-categories.json', err);
+                  select.innerHTML = '<option value="" disabled selected>Couldn\u2019t load categories</option>';
+                });
+              })();
+
+              // Swaps the left-hand preview badge to the selected category's
+              // real favicon/name once a choice is made — purely visual
+              // feedback, the <select> stays the source of truth for what
+              // actually gets submitted.
+              (function initCategoryPreview() {
+                var card = document.getElementById('cwSubmitCard');
+                var select = document.getElementById('cwCategorySelect');
+                var icon = document.getElementById('cwVisualIcon');
+                var label = document.getElementById('cwVisualLabel');
+                if (!card || !select || !icon || !label) return;
+
+                select.addEventListener('change', function() {
+                  var opt = select.options[select.selectedIndex];
+                  if (!opt || !opt.value) {
+                    card.classList.remove('has-category');
+                    label.textContent = 'Pick a category to preview it here';
+                    return;
+                  }
+                  icon.src = opt.getAttribute('data-icon') || '';
+                  icon.alt = opt.value;
+                  label.textContent = opt.value;
+                  card.classList.add('has-category');
+                });
+              })();
+
+              (function initSubmitForm() {
+                var form = document.getElementById('cwSubmitForm');
+                if (!form) return;
+                var msg = document.getElementById('cwSubmitMsg');
+                var categorySelect = document.getElementById('cwCategorySelect');
+                var siteInput = document.getElementById('cwWebsiteInput');
+                var ignInput = document.getElementById('cwIgnInput');
+                var submitBtn = form.querySelector('.cw-submit-btn');
+
+                form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  var categoryOpt = categorySelect.options[categorySelect.selectedIndex];
+                  var category = categorySelect.value;
+                  var site = siteInput.value.trim();
+                  var ign = ignInput.value.trim();
+
+                  if (!category) {
+                    msg.classList.add('is-error');
+                    msg.textContent = 'Please choose a category first.';
+                    categorySelect.focus();
+                    return;
+                  }
+
+                  if (!site) {
+                    msg.classList.add('is-error');
+                    msg.textContent = 'Please enter a website URL first.';
+                    siteInput.focus();
+                    return;
+                  }
+
+                  msg.classList.remove('is-error');
+                  msg.textContent = 'Submitting\u2026';
+                  submitBtn.disabled = true;
+
+                  addDoc(collection(db, 'siteSubmissions'), {
+                    website: site,
+                    ign: ign || null,
+                    category: category,
+                    categoryIcon: (categoryOpt && categoryOpt.getAttribute('data-icon')) || null,
+                    submittedAt: serverTimestamp()
+                  }).then(function() {
+                    msg.classList.remove('is-error');
+                    msg.textContent = 'Thanks! We\u2019ll take a look at ' + site + '.';
+                    form.reset();
+                    document.getElementById('cwSubmitCard').classList.remove('has-category');
+                    document.getElementById('cwVisualLabel').textContent = 'Pick a category to preview it here';
+                  }).catch(function(err) {
+                    console.error('Firestore submission failed:', err);
+                    msg.classList.add('is-error');
+                    msg.textContent = 'Something went wrong. Please try again in a moment.';
+                  }).finally(function() {
+                    submitBtn.disabled = false;
+                  });
+                });
+              })();
+            </script>
+
+          </div>
+
+          <div class="box-two">
+
+            <div class="box-three" id="boxThreePanel">
+
+              <div class="b3-card b3-controls-card">
+                <div class="b3-controls-label">Browse Settings</div>
+
+                <div class="b3-controls-row">
+                  <div class="b3-view-toggle" role="group" aria-label="Layout">
+                    <button type="button" class="b3-view-btn" id="sbTwoViewListBtn" title="List view — one row per tool">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="4" y1="18" x2="20" y2="18" />
+                      </svg>
+                    </button>
+                    <button type="button" class="b3-view-btn" id="sbTwoViewBoxBtn" title="Box view — compact grid">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+                        <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+                        <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+                        <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="sort-order-wrap b3-sort-wrap">
+                    <select class="sort-order-select b3-sort-select" id="sbTwoSortSelect" aria-label="Sort order">
+                      <option value="default">Featured</option>
+                      <option value="az">A–Z</option>
+                      <option value="za">Z–A</option>
+                    </select>
+                    <svg class="sort-order-chevron b3-sort-chevron" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="b3-filter-row">
+                  <button type="button" class="b3-filter-chip" id="sbTwoBookmarkToggle" role="switch" aria-checked="false" title="Show just the sites you've saved">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                    </svg>
+                    Saved Only
+                  </button>
+                  <button type="button" class="b3-filter-chip" id="sbTwoFlatToggle" role="switch" aria-checked="false" title="Show every tool together, no section headers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="3" y1="7" x2="21" y2="7" />
+                      <line x1="3" y1="12" x2="21" y2="12" />
+                      <line x1="3" y1="17" x2="21" y2="17" />
+                    </svg>
+                    Merge
+                  </button>
+                </div>
+              </div>
+
+              <!-- "On This Page" card — bordered like .web-item, dotted-leader
+           rows like a printed table of contents. Hidden via inline
+           style until PAGE SECTIONS/initBoxThreePanel populate it. -->
+              <div class="b3-card b3-toc-card" id="sbTwoTocSection" style="display:none;">
+                <div class="b3-toc-head">
+                  <span class="b3-toc-badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6" />
+                      <line x1="4" y1="12" x2="20" y2="12" />
+                      <line x1="4" y1="18" x2="14" y2="18" />
+                    </svg>
+                  </span>
+                  <span class="b3-toc-title">On This Page</span>
+                  <span class="b3-toc-total" id="sbTwoTocTotal">0 items</span>
+                </div>
+                <div class="stb-toc-grid b3-toc-grid" id="sbTwoTocGrid"><!-- populated from hwr-categories.json --></div>
+              </div>
+
+              <!-- "Recently Bookmarked" card — reads window.HwrBookmarks
+           (hwr-bookmarks.js) directly, most-recently-saved first.
+           Populated/kept in sync by initBoxThreeBookmarks() below. -->
+              <div class="b3-card b3-bookmarks-card" id="sbTwoBookmarksSection">
+                <div class="b3-toc-head">
+                  <span class="b3-toc-badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+                    </svg>
+                  </span>
+                  <span class="b3-toc-title">Bookmarks</span>
+                  <span class="b3-toc-total" id="sbTwoBookmarksTotal">0 saved</span>
+                </div>
+                <div class="stb-toc-grid b3-toc-grid" id="sbTwoBookmarksGrid"><!-- populated by initBoxThreeBookmarks() --></div>
+                <p class="b3-bookmarks-empty" id="sbTwoBookmarksEmpty">No bookmarks yet — tap the bookmark icon on any tool to save it here.</p>
+                <button type="button" class="b3-bookmarks-viewall" id="sbTwoBookmarksViewAll" style="display:none;" title="Takes you back to the lobby, filtered to your saved sites">View All Saved</button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+
+
+        <!-- CARD LIST — populated from websites.json -->
+        <!-- data-default-cat: set per page, e.g. "anime" on /web-resources/anime -->
+
+
+
+      </div>
+
+
+      <footer class="pf-footer">
+
+        <!-- Socials, legal links, copyright, and disclaimer are all rendered
+        from 11footer.json at runtime -- edit that file to change any of
+        them (including social links) without touching this HTML. -->
+        <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+        <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+        <div class="pf-footer-divider"></div>
+
+        <!-- Web Resources links -- populated at runtime from hwr-categories.json
+        via window.HwrCategoriesPromise (same shared fetch the dsn-chip nav
+        uses), so this list stays in sync with the site nav automatically. -->
+        <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+        <div class="pf-footer-divider"></div>
+
+        <div class="pf-footer-bottom">
+          <div class="pf-footer-legal" id="pfFooterLegal"></div>
+        </div>
+
+        <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+        <!-- Copyright moved to its own last line, below the disclaimer,
+        instead of sharing the legal-links row -- so it reads as the
+        final line of the footer rather than sitting up top next to
+        Terms/Privacy/etc. -->
+        <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+
+      </footer>
+    </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+
+    <div id="imageZoom" class="image-zoom" onclick="closeZoom()">
+      <img id="zoomedImg" src="">
+    </div>
+
+
+    <!-- More Menu Modal (mobile) -->
+    <div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+      <div class="more-sheet" onclick="event.stopPropagation()">
+        <div class="more-sheet-scroll">
+          <div class="more-sheet-top">
+            <div class="more-sheet-handle"></div>
+            <div class="more-sheet-header">
+              <span class="more-sheet-title">Web Resources</span>
+              <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="more-list">
+            <div class="more-section-title">Categories</div>
+            <div class="th-mini-grid" id="thMiniGrid"><!-- populated from hwr-categories.json --></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav (mobile). The .bn-item links themselves are populated
+     by 11layout.js's initHubNav() from hwr-categories.json's "hubNav"
+     key, inserted around #bnMoreWrap (first half before it, rest after).
+     Active state is real per-page tracking now, not hardcoded — so
+     nothing here lights up as active on this page (/web-resources/anime isn't
+     one of the hub destinations). -->
+    <div class="bn-bar" id="bottomNav">
+      <div class="bn-more-wrap" id="bnMoreWrap">
+        <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;">
+            <rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            <rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            <rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+            <rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8" />
+          </svg>
+        </button>
+        <div class="bn-more-spacer"></div>
+        <span class="bn-more-label">More</span>
+      </div>
+    </div>
+
+
+    <!-- Mobile secondary-content: swap the "Web Resources" label for the
+     current page's own name + icon (sourced from hwr-categories.json),
+     matched against the current filename. Desktop keeps the static
+     "Web Resources" link and never runs this. -->
+
+    <!-- Fix: kill the stray gap between the search/filter pills and the
+     category grid below — several elements in that chain had their own
+     margins (search wrap, pill outer, the empty wsite-list placeholder),
+     which stacked up into extra space. Zeroing them out and giving the
+     grid one deliberate, controlled top spacing instead. -->
+
+  <script src="/hwr-js.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,3131 @@
+/* =======================================================================
+   TOWN HALL LAYOUTS PAGES (thNN-layouts.html) -- shared styles.
+   Loaded after 11layout.css, 1coclayouts.css and coc-clan-clock.css, so
+   the rules here win ties with theirs (several blocks below exist only to
+   override 1coclayouts.css -- their comments say so).
+   Moved out of /coc/town-hall-18/layouts's inline <style>s, Sep 2026; the four
+   blocks are kept in their original order, one after the other.
+   ======================================================================= */
+
+/* ============================================================
+   LAYOUT CARD -- one design for every card. Built from the sixth
+   exploration variant (centred action row, generous card padding)
+   with the frame/mat dropped so the screenshot runs full-bleed, and
+   the TH badge back on the image itself. The CC recommendation is
+   not printed on the card: it lives behind the clan banner toggle
+   top-left, as a popup, so the card stays quiet until asked.
+   Palette is the page's near-monochrome greys -- the card is the hero's
+   dark grey surface -- plus the muted red reserved for the liked heart
+   and the cc-popup accent border.
+   ============================================================ */
+
+.discord-card {
+  padding: 12px 12px 14px;
+  background: #121316; /* the hero's surface (--t18-surface) */
+  max-width: 850px;
+  margin: auto;
+}
+
+/* .fullscreen-image used to carry overflow:hidden and the hover zoom
+   while also containing the action row, so it clipped the buttons'
+   shadows. The clip and radius belong to the image box alone. */
+.fullscreen-image {
+  overflow: visible;
+  border-radius: 0;
+}
+.fullscreen-image::after {
+  display: none;
+}
+.fullscreen-image:hover img {
+  transform: none;
+}
+/* 6px, not 10: nested inside the card's 16px corners with 12px of
+   padding, the inner corner should be about outer minus padding so the
+   two curves run parallel. 10px read as puffy against the card edge. */
+.card-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+.card-media img.zoomable {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.card-media:hover img.zoomable {
+  transform: scale(1.035);
+}
+
+/* ARMY CARD (thNN-army.html) -- the layout card with a name row on top:
+   Legend I / II / III badge for the top 3 (th-layouts.js RANK_ICONS),
+   then the army's name. Sora, like the rest of the page text. The row
+   sits in the card's padding, 10px above the image. */
+.army-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin: 0 2px 10px;
+}
+.army-rank {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+.army-name {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #e6e7ea;
+}
+/* "#1" / "#2" / "#3" after the name: the same red pill as the desktop
+   page pill (.t18-page), so the rank reads at a glance. */
+.army-rank-tag {
+  flex: none;
+  padding: 4px 8px 3px;
+  border: 1px solid rgba(224, 99, 99, 0.45);
+  border-radius: 999px;
+  background: rgba(194, 59, 59, 0.14);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: #e06363;
+}
+/* Pen, top-right: opens this army in the army maker to edit it
+   (th-layouts.js armyCardHtml). Same key face as the card's heart / share
+   buttons, pushed to the row's right end. */
+.army-edit {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  border-radius: 8px;
+  background: var(--key-face);
+  box-shadow: var(--key-soft);
+  color: #8b9099;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.army-edit:hover {
+  background: var(--key-face-hover);
+  color: var(--text-main);
+}
+.army-edit:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-soft-pressed);
+}
+.army-edit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.army-edit .bar-ico {
+  width: 16px;
+  height: 16px;
+}
+
+/* ARMY SHEET -- the army drawn from its Copy Army link (th-layouts.js
+   sheetHtml), in place of the old screenshot. Laid out like the in-game
+   army screen at every size: heroes on the left (4 in a row), troops /
+   spells + siege / clan castle stacked on the right.
+   It sits straight on the card's own #121316 -- no panel of its own --
+   and uses one raised grey for every tile, so the only colour on the
+   card comes from the unit art itself.
+   Sizes follow the card's own width (container units, cqi), not the
+   screen's, so a 340px phone card and a 730px tablet card are the same
+   picture at different scales -- about 190px tall on a phone. The hero
+   column stretches to the units column's height. */
+.army-card:has(.has-sheet) {
+  width: 100%; /* the card is centred with margin:auto, so it sizes to its content; a container-query box has none */
+}
+/* .has-sheet: whatever holds a sheet -- the card's picture frame, or the
+   army maker's "Your army" box. Sizes inside follow its width (cqi).
+   (.card-media.has-sheet keeps the card's own .card-media rules from
+   winning.) */
+.has-sheet,
+.card-media.has-sheet {
+  container-type: inline-size;
+  overflow: visible;
+  border-radius: 0;
+  --as-raise: #1b1d22;
+  --as-raise-2: #202329;
+  --as-red: #e06363; /* the rank pill's red (.army-rank-tag): used numbers, Warden mode, the named tile */
+}
+.army-sheet {
+  --as-tile: clamp(28px, 8cqi, 42px);
+  --as-gap: clamp(3px, 0.9cqi, 6px);
+  display: grid;
+  grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  gap: clamp(10px, 3cqi, 18px);
+}
+.as-units {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(6px, 2cqi, 12px);
+  min-width: 0;
+}
+/* Group heading: name left, used/max right. On hover / tap the name
+   swaps for the unit's (.is-name), so it reads brighter. */
+.as-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 15px;
+  margin: 0 1px 4px;
+}
+/* Icon + label. The icons are the game's header pictures, redrawn as
+   muted grey line icons so they don't add colour. */
+.as-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.as-ico {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  fill: none;
+  color: #6d7178; /* the castle's flag and the ram's head are filled with it */
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.as-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(11px, 2.8cqi, 12px);
+  font-weight: 500;
+  line-height: 15px;
+  color: var(--t18-muted, #9ea3ab);
+}
+.as-label.is-name {
+  color: #f2f3f5;
+}
+.as-cap {
+  flex: none;
+  font-family: 'Oxanium', sans-serif;
+  font-size: clamp(11px, 2.8cqi, 12px);
+  font-weight: 600;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+  color: #8b9099;
+}
+.as-cap b {
+  font-weight: 700;
+  color: var(--as-red);
+}
+
+/* Heroes: one column per hero slot of this Town Hall (--slots), so every
+   card's portraits are the same size; unused slots show an empty frame.
+   The column fills the units column's height: the portrait takes what
+   the equipment under it leaves. */
+.as-heroes {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.as-hero-row {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--slots, 4), minmax(0, 1fr));
+  gap: var(--as-gap);
+}
+.as-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--as-gap);
+  min-width: 0;
+}
+.as-portrait {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 7px;
+  /* a soft light behind the head, falling off to the tile grey */
+  background: radial-gradient(130% 75% at 50% 26%, #2c2f37 0%, #1d1f24 55%, #16181b 100%);
+  --ht: 0.63; /* head size (3 eye-spacings), as a share of the portrait's width */
+  --ey: 0.7; /* eye line, in portrait widths from the top */
+}
+/* The hero render, sized and placed from its face (th-layouts.js
+   HERO_FACE: --fx / --fy eyes, --hh head height, all fractions of the
+   image), so every hero's head is the same size with the eyes on the
+   same line, centred. Margins in % are of the portrait's width, which is
+   what lets one formula work at every card size. */
+.as-portrait > .as-art {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  max-width: none;
+  width: calc(var(--ht) / var(--hh) * 100%);
+  height: auto;
+  margin-left: calc(var(--fx) * var(--ht) / var(--hh) * -100%);
+  margin-top: calc(var(--ey) * 100% - var(--fy) * var(--ht) / var(--hh) * 100%);
+}
+/* Shade over the art: dark from the bottom (so the pet strip and its
+   edges sit in shadow, not on a bright body) and a faint light on the
+   upper middle. Above the hero, under the pet, banner and mode icon. */
+.as-portrait::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
+    linear-gradient(0deg, rgba(9, 10, 12, 0.96) 0%, rgba(9, 10, 12, 0.7) 26%, rgba(9, 10, 12, 0) 56%);
+  pointer-events: none;
+}
+.as-portrait > .as-pet,
+.as-portrait > .as-banner,
+.as-portrait > .as-mode {
+  z-index: 2;
+}
+.as-portrait::after {
+  z-index: 3;
+}
+.as-empty .as-portrait {
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.as-empty .as-portrait::before {
+  display: none;
+}
+/* The hero's own banner, top-left, like the flag over its Hero Hall. */
+.as-banner {
+  position: absolute;
+  top: 0;
+  left: 3px;
+  width: 30%;
+  max-width: 24px;
+  height: auto;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+/* Grand Warden's air / ground mode, from the link's "m1": a boot or a
+   wing in the top-right corner, where the game puts its boot. */
+.as-mode {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: clamp(15px, 4.2cqi, 20px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(224, 99, 99, 0.45);
+  border-radius: 5px;
+  background: rgba(38, 14, 15, 0.9);
+  color: var(--as-red);
+}
+.as-mode svg {
+  width: 72%;
+  height: 72%;
+  fill: currentColor;
+}
+/* Pet: a wide strip across the bottom of the portrait, like in-game,
+   with the pet zoomed in to fill it. */
+.as-portrait .as-pet {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  width: auto;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(18, 19, 22, 0.88);
+}
+.as-portrait .as-pet > img {
+  object-fit: cover;
+  object-position: var(--pf, 50% 35%); /* the pet's face, th-layouts.js PET_FOCUS */
+  transform: scale(1.25);
+  transform-origin: var(--pf, 50% 35%);
+}
+/* Equipment: the two pieces side by side under the portrait, like
+   in-game -- small on a phone card, but it leaves the portrait the
+   height (stacked, they outgrew the hero art). */
+.as-gear {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--as-gap);
+}
+.as-gear .as-tile {
+  width: auto;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 4px;
+}
+/* The phone-only copy of the pet (th-layouts.js heroCol). */
+.as-gear .as-pet-side {
+  display: none;
+}
+/* Equipment rarity, as in-game: blue for common, purple for epic. */
+/* Deep tones with a lit top edge, so the rarity reads but the icon, not
+   its background, is what the eye lands on. */
+.as-gear .as-common {
+  background: radial-gradient(120% 90% at 50% 0%, #2f5c9c 0%, #1b3560 60%, #142645 100%);
+}
+.as-gear .as-epic {
+  background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f2068 60%, #2c1649 100%);
+}
+
+/* Tiles: one grey for troops, spells, pets and equipment alike. */
+.as-tile {
+  position: relative;
+  flex: none;
+  display: block;
+  width: var(--as-tile);
+  height: var(--as-tile);
+  border-radius: 6px;
+  background: var(--as-raise);
+  /* a dark hairline round every tile, so neighbours read as separate cards */
+  box-shadow: 0 0 0 1px #0a0b0d;
+}
+.as-tile > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.as-n {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  padding: 0 3px;
+  border-radius: 4px;
+  background: rgba(10, 11, 13, 0.75);
+  font-family: 'Oxanium', sans-serif;
+  font-size: clamp(10px, 2.3cqi, 11px);
+  font-weight: 700;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+
+/* The tile (or portrait) whose name is showing in the heading: a red
+   ring, drawn on top of the art so the picture can't cover it. */
+.as-tile::after,
+.as-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* a light inner edge: the card's rim */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.13);
+  transition: box-shadow 0.15s ease-out;
+  pointer-events: none;
+}
+.as-tile.is-on::after,
+.as-portrait.is-on::after {
+  box-shadow: inset 0 0 0 1.5px var(--as-red);
+}
+
+/* A row that doesn't fit scrolls sideways (every screen size), with a
+   thin scrollbar so mouse users can see there's more, and a fade on the
+   side that has more (.more-l / .more-r, set by th-layouts.js). The
+   padding / negative margin keep the scrollbar from adding height. */
+.as-row {
+  display: flex;
+  isolation: isolate;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 5px;
+  margin-bottom: -5px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+.as-row::-webkit-scrollbar {
+  height: 3px;
+}
+.as-row::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.as-row.more-r {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+}
+.as-row.more-l {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px);
+  mask-image: linear-gradient(90deg, transparent, #000 24px);
+}
+.as-row.more-l.more-r {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+
+/* Tiles overlap a little, each one sitting over the right edge of the
+   one before (in-game look), with a soft shadow on its left edge so the
+   seam reads. The 4px matches OVERLAP in th-layouts.js. */
+.as-row > .as-tile + .as-tile {
+  margin-left: -4px;
+  box-shadow:
+    0 0 0 1px #0a0b0d,
+    -3px 0 6px rgba(0, 0, 0, 0.7);
+}
+/* Empty places (th-layouts.js fillRow): a darker box than the card,
+   under the units so the last unit's edge stays on top. */
+.as-row > .as-tile.as-ph {
+  z-index: -1;
+  background: #0c0d0f;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+.as-ph::after {
+  display: none;
+}
+
+/* Super troops: the count chip turns red, so they stand out at a
+   glance without adding anything to the tile. */
+.as-tile.is-super .as-n {
+  background: #c23b3b;
+}
+
+/* LOADING SKELETON (.is-skel): the sheet's layout with grey blocks that
+   shimmer while the armies load. One soft highlight sweeps across each
+   block; no motion for people who ask for less. */
+.sk {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(100deg, #1a1c20 30%, #25282e 50%, #1a1c20 70%) 0 0 / 300% 100%;
+  animation: sk-sweep 1.5s ease-in-out infinite;
+}
+@keyframes sk-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk {
+    animation: none;
+  }
+}
+.sk-line {
+  height: 11px;
+  max-width: 100%;
+  margin: 2px 0;
+  border-radius: 4px;
+}
+.sk-dot {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+.sk-name {
+  width: 46%;
+  height: 15px;
+}
+/* Layout cards size to their content (margin:auto); a skeleton has none,
+   so it takes the full column instead of shrinking to a sliver. */
+.discord-card.is-skel-card {
+  width: 100%;
+}
+/* a base layout's screenshot (they're 1920x1200) */
+.sk-shot {
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+}
+.sk-bar {
+  height: 40px;
+  margin-top: 14px;
+  border-radius: 10px;
+}
+.army-sheet.is-skel .as-row {
+  overflow: hidden;
+}
+.army-sheet.is-skel .as-tile.sk {
+  box-shadow: 0 0 0 1px #0a0b0d;
+}
+.army-sheet.is-skel .as-tile.sk::after {
+  display: none;
+}
+.army-sheet.is-skel .as-portrait.sk {
+  /* the empty-hero rules (background: none) would otherwise win */
+  background: linear-gradient(100deg, #1a1c20 30%, #25282e 50%, #1a1c20 70%) 0 0 / 300% 100%;
+  box-shadow: none;
+}
+.army-sheet.is-skel .as-portrait.sk::before,
+.army-sheet.is-skel .as-portrait.sk::after {
+  display: none;
+}
+.army-sheet.is-skel .as-hero.as-empty {
+  box-shadow: none;
+}
+.is-skel-card .army-head {
+  align-items: center;
+}
+.sk-fail {
+  grid-column: 1 / -1;
+  padding: 40px 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: #8b9099;
+  text-align: center;
+}
+
+/* EDIT MODE (army maker, .is-edit): the same sheet, but every box is a
+   button -- a unit removes one, a hero's portrait removes the hero, a pet
+   or equipment box opens its picker, the Warden's corner icon switches
+   air / ground. Hovering shows the red ring and the name, as on the cards. */
+.army-sheet button.as-tile,
+.army-sheet button.as-portrait,
+.army-sheet button.as-mode {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.army-sheet.is-edit [data-sheet] {
+  cursor: pointer;
+}
+.army-sheet.is-edit .as-portrait[data-sheet]:focus-visible,
+.army-sheet button.as-tile:focus-visible,
+.army-sheet button.as-mode:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 1px;
+}
+@media (hover: hover) {
+  .army-sheet button.as-tile:hover {
+    filter: brightness(1.12);
+  }
+}
+.army-sheet button.as-tile:active {
+  transform: scale(0.95);
+}
+/* An empty pet / equipment slot, or an empty hero slot: a dark box with a
+   "+", the same tone as the empty places in the unit rows. */
+.army-sheet .as-tile.as-open {
+  background: #0c0d0f;
+}
+.as-tile.as-open .as-plus {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+/* The empty pet band inside the portrait (wide, side-by-side sheets;
+   stacked ones show the pet in the column beside the portrait). */
+.army-sheet .as-portrait .as-pet.as-open {
+  background: rgba(12, 13, 15, 0.82);
+}
+.as-plus {
+  width: 46%;
+  max-width: 18px;
+  height: auto;
+  aspect-ratio: 1;
+  fill: none;
+  stroke: #6d7178;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.as-hero.as-empty button.as-portrait {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.as-hero.as-empty button.as-portrait::before {
+  display: none;
+}
+@media (hover: hover) {
+  .as-hero.as-empty button.as-portrait:hover .as-plus,
+  .army-sheet .as-tile.as-open:hover .as-plus {
+    stroke: #c9ccd1;
+  }
+}
+
+/* Clan castle row: each kind (troops / spells / siege) starts a little
+   apart from the one before. */
+.as-cc .as-row > .as-kind:not(:first-child) {
+  margin-left: 6px;
+}
+
+/* Spells beside siege: spells take the room, siege sizes to its tiles
+   (and scrolls if it must). */
+.as-pair {
+  display: flex;
+  gap: clamp(8px, 2.4cqi, 12px);
+  min-width: 0;
+}
+.as-pair > .as-group {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.as-pair > .as-group:first-child {
+  flex: 1 1 0; /* width from the pair, not its tiles, so empty places can fill it */
+}
+.as-pair > .as-sieges {
+  flex: none;
+}
+
+/* PHONES: heroes on top, units below. Side by side, a ~340px phone card
+   left 35px portraits, 15px equipment and 9px text -- too small to read.
+   Stacked, each gets the card's full width. Decided by the screen, not
+   the card: desktop's two-per-row cards are as narrow as a phone's but
+   keep heroes on the left. */
+@media (max-width: 640px) {
+  .army-card:has(.has-sheet) {
+    /* a little more width: 6px into the page gutter each side, and a
+       slimmer card padding */
+    width: calc(100% + 12px);
+    max-width: none;
+    margin-inline: -6px;
+    padding-inline: 9px;
+  }
+  .army-sheet {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    --as-tile: 40px;
+    --as-gap: 5px;
+  }
+  .as-hero-row {
+    flex: none;
+  }
+  /* Each hero is one short card: a thin portrait on the left, and on its
+     right a column of the pet and the two equipment pieces, stacked. The
+     column's three squares set the card's height (about 100px on a 390px
+     phone), and the portrait stretches to match. */
+  .as-hero-row {
+    gap: 6px;
+    /* always a quarter of the row, so a TH9 card's two heroes are the
+       same size as a TH18 card's four (not half the card each) */
+    grid-template-columns: repeat(var(--slots, 4), calc((100% - 18px) / 4));
+    justify-content: start;
+  }
+  .as-hero {
+    flex-direction: row;
+    gap: 3px;
+    padding: 3px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #101114;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.07),
+      0 4px 10px rgba(0, 0, 0, 0.35);
+  }
+  .as-hero.as-empty {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    background: none;
+    min-height: 100px;
+  }
+  .as-portrait {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 7px;
+    --ht: 0.67; /* thin portrait: the head fills most of its width */
+    --ey: 0.9;
+  }
+  /* no pet band over the portrait here, so a lighter fade at its foot */
+  .as-portrait::before {
+    background:
+      radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
+      linear-gradient(0deg, rgba(9, 10, 12, 0.6) 0%, rgba(9, 10, 12, 0) 40%);
+  }
+  .as-portrait .as-pet {
+    display: none;
+  }
+  .as-gear {
+    flex: none;
+    width: 40%;
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 3px;
+  }
+  .as-gear .as-pet-side {
+    display: block;
+    background: #1d1f24;
+  }
+  .as-gear .as-tile {
+    border-radius: 6px;
+  }
+  .as-banner {
+    left: 3px;
+    width: 34%;
+  }
+  .as-mode {
+    top: 2px;
+    right: 2px;
+    width: 16px;
+  }
+  .as-head {
+    margin-bottom: 6px;
+  }
+  .as-label,
+  .as-cap {
+    font-size: 12.5px;
+  }
+  .as-ico {
+    width: 14px;
+    height: 14px;
+  }
+  .as-n {
+    font-size: 11px;
+  }
+  .as-units {
+    gap: 12px;
+  }
+}
+
+/* STACKED (the army maker, .is-stack): the phone arrangement at every
+   width -- heroes on top as short cards (portrait + pet / equipment
+   column), troops / spells / clan castle below. Same rules as the PHONES
+   block above, scoped to the class. On a wide box the hero row is capped
+   so the four cards stay card-sized. */
+.army-sheet.is-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  --as-tile: 40px;
+  --as-gap: 5px;
+}
+.army-sheet.is-stack .as-hero-row {
+  flex: none;
+}
+.army-sheet.is-stack .as-hero-row {
+  gap: 6px;
+  /* always a quarter of the row, so a TH9 card's two heroes are the
+       same size as a TH18 card's four (not half the card each) */
+  grid-template-columns: repeat(var(--slots, 4), calc((100% - 18px) / 4));
+  justify-content: start;
+}
+.army-sheet.is-stack .as-hero {
+  flex-direction: row;
+  gap: 3px;
+  padding: 3px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #101114;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 4px 10px rgba(0, 0, 0, 0.35);
+}
+.army-sheet.is-stack .as-hero.as-empty {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  background: none;
+  min-height: 100px;
+}
+.army-sheet.is-stack .as-portrait {
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 7px;
+  --ht: 0.67; /* thin portrait: the head fills most of its width */
+  --ey: 0.9;
+}
+.army-sheet.is-stack .as-portrait::before {
+  background:
+    radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
+    linear-gradient(0deg, rgba(9, 10, 12, 0.6) 0%, rgba(9, 10, 12, 0) 40%);
+}
+.army-sheet.is-stack .as-portrait .as-pet {
+  display: none;
+}
+.army-sheet.is-stack .as-gear {
+  flex: none;
+  width: 40%;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 3px;
+}
+.army-sheet.is-stack .as-gear .as-pet-side {
+  display: block;
+  background: #1d1f24;
+}
+.army-sheet.is-stack .as-gear .as-tile {
+  border-radius: 6px;
+}
+.army-sheet.is-stack .as-banner {
+  left: 3px;
+  width: 34%;
+}
+.army-sheet.is-stack .as-mode {
+  top: 2px;
+  right: 2px;
+  width: 16px;
+}
+.army-sheet.is-stack .as-head {
+  margin-bottom: 6px;
+}
+.army-sheet.is-stack .as-label,
+.army-sheet.is-stack .as-cap {
+  font-size: 12.5px;
+}
+.army-sheet.is-stack .as-ico {
+  width: 14px;
+  height: 14px;
+}
+.army-sheet.is-stack .as-n {
+  font-size: 11px;
+}
+.army-sheet.is-stack .as-units {
+  gap: 12px;
+}
+.army-sheet.is-stack .as-hero-row {
+  max-width: 380px; /* four panels, ~88px each */
+}
+/* Unit boxes in the maker: the same size as the Pick units tiles below
+   (57px; cards use 33-42px) -- you tap them here. */
+.army-sheet.is-stack {
+  --as-tile: 57px;
+}
+/* Phones: the same size as the Pick units tiles there (7 to a row, 6px
+   gaps) -- the sheet's box is the same width as that grid. */
+@media (max-width: 640px) {
+  .army-sheet.is-stack {
+    --as-tile: calc((100cqi - 36px) / 7);
+  }
+}
+/* Maker: each hero is one tall panel, like the in-game army screen --
+   the hero's art fills it from the top, the pet sits in a rounded box
+   set into the lower part of the art, and the two equipment pieces sit
+   in a row at the foot, all inside the same panel. */
+.army-sheet.is-stack .as-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 5px;
+  overflow: hidden;
+  border-radius: 10px;
+  /* the panel: a soft light behind the head, falling off to the tile grey */
+  background: radial-gradient(140% 55% at 50% 22%, #2c2f37 0%, #1b1d22 60%, #141518 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+  aspect-ratio: 10 / 29; /* tall, like the game's hero panel: room for the body */
+}
+.army-sheet.is-stack .as-portrait {
+  flex: 1 1 auto;
+  min-height: 0;
+  aspect-ratio: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  --ht: 0.5;
+  --ey: 0.78;
+}
+/* a gentle fade at the art's foot, so the pet box and equipment sit on it */
+.army-sheet.is-stack .as-portrait::before {
+  background:
+    radial-gradient(80% 40% at 50% 26%, rgba(255, 255, 255, 0.06), transparent 70%),
+    linear-gradient(0deg, rgba(14, 15, 18, 0.9) 0%, rgba(14, 15, 18, 0.35) 22%, rgba(14, 15, 18, 0) 42%);
+}
+/* the pet: a rounded box inset into the bottom of the art */
+.army-sheet.is-stack .as-portrait .as-pet {
+  display: block;
+  left: 5px;
+  right: 5px;
+  bottom: 5px; /* same inset as the sides */
+  width: auto;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 7px;
+  background: rgba(16, 17, 21, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.army-sheet.is-stack .as-portrait .as-pet > img {
+  transform: none;
+}
+.army-sheet.is-stack .as-portrait .as-pet.as-open {
+  background: rgba(16, 17, 21, 0.62);
+}
+/* equipment: two squares at the foot of the panel */
+.army-sheet.is-stack .as-gear {
+  flex: none;
+  width: auto;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 0 5px;
+}
+.army-sheet.is-stack .as-gear .as-tile {
+  border-radius: 6px;
+}
+.army-sheet.is-stack .as-gear .as-pet-side {
+  display: none;
+}
+.army-sheet.is-stack .as-banner {
+  top: 0;
+  left: 5px;
+  width: 26%;
+  max-width: 24px;
+}
+.army-sheet.is-stack .as-mode {
+  top: 4px;
+  right: 4px;
+}
+/* An empty hero slot: the panel's outline with a "+". */
+.army-sheet.is-stack .as-hero.as-empty {
+  min-height: 0;
+  padding: 0;
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.army-sheet.is-stack .as-hero.as-empty .as-portrait {
+  height: 100%;
+}
+/* Maker in a wide box (760px+, decided by the box, not the screen):
+   heroes on the left, troops / spells / clan castle on the right, like
+   the game. The hero panels stretch to the units' height. Narrower boxes
+   keep heroes on top. */
+@container (min-width: 760px) {
+  .army-sheet.is-stack {
+    display: grid;
+    /* a slim hero column (four ~83px panels), the rest for the units */
+    grid-template-columns: 350px minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+  .army-sheet.is-stack .as-heroes {
+    display: flex;
+    flex-direction: column;
+  }
+  .army-sheet.is-stack .as-hero-row {
+    flex: 1;
+    max-width: none;
+  }
+  .army-sheet.is-stack .as-hero {
+    aspect-ratio: 10 / 29;
+  }
+}
+@media (max-width: 970px) {
+  .army-name {
+    font-size: 14px;
+  }
+}
+
+/* Corner chrome: badge top-right, clan banner top-left. Same height,
+   radius, fill and hairline so the two read as one set. */
+.image-badge,
+.image-logo {
+  top: 10px;
+  height: 32px;
+  border-radius: 8px;
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+/* TH badge: a solid royal-blue chip instead of the old washed-out
+   translucent navy. Smaller (26px) so it labels the image without
+   competing with it; a vertical blue gradient with a light top edge
+   gives it a slight raised, game-UI feel, and the soft blue glow keeps
+   it readable over bright or busy screenshots. */
+.image-badge {
+  display: inline-flex;
+  align-items: center;
+  left: auto;
+  right: 10px;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(10, 20, 70, 0.6);
+  background: linear-gradient(180deg, #5b86f2 0%, #3a5fd6 52%, #2b47b3 100%);
+  border: 1px solid rgba(160, 185, 255, 0.55);
+  box-shadow:
+    0 2px 8px rgba(20, 35, 110, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+.image-logo {
+  width: 32px;
+  left: 10px;
+  right: auto;
+  background: rgba(16, 16, 20, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.image-logo:hover,
+.image-logo:focus-visible {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.image-logo img {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border-radius: 5px;
+}
+.cc-popup {
+  top: 44px;
+  left: 8px;
+}
+
+/* Action bar (study 01, "Action bar", from the card studies): one row
+   under the screenshot -- like on the left, Copy Layout as the one big
+   button, share on the right. Same pill material as before for the
+   main button; like and share are quieter ghost buttons so they don't
+   compete with it.
+   - Like: heart with the count beside it (Facebook-style), nothing at 0.
+     Saves to the same Firebase counts as before.
+   - Copy Layout: the base's in-game link (opens Clash on a phone).
+   - Share: the phone's own share sheet on touch devices; on desktop a
+     small panel (Copy link + Facebook / X / Reddit / WhatsApp). It shares
+     this page with the base's id on the end (#base-th18-3), and a visitor
+     arriving on that link is scrolled to the base and sees it glow.
+   CC: the small TH icon on the image's top-left (.th-cc) opens the
+   card's .cc-popup (script under the grid). */
+
+/* TH icon, top-left of the screenshot. No chip behind it -- just the
+   icon with a stacked drop-shadow so it lifts off any artwork. It
+   doubles as the button for that base's recommended CC. */
+.th-cc {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 6;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
+}
+.th-cc img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55));
+}
+.th-cc:hover,
+.th-cc[aria-expanded='true'] {
+  transform: scale(1.1);
+}
+.th-cc:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* A compact cluster in the middle of the card: heart, Copy Layout,
+   share, side by side. The middle column is only as wide as the
+   button (`auto`, not 1fr) and `justify-content:center` centres the
+   whole group, so heart and share sit right beside Copy instead of out
+   on the card edges. Heart and share keep equal fixed columns (68px --
+   room for the heart plus a count up to "1,204"), so Copy Layout stays
+   dead centre whatever the count is. */
+.action-row.card-bar {
+  --bar-h: 34px;
+  display: grid;
+  grid-template-columns: 68px auto 68px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+/* "Ghost" buttons (picked from 5 trial variations): no fill, no shadow,
+   no border -- the row stays out of the way of the screenshot. The
+   boxes are still there (same height and tap area), just invisible
+   until hovered, when a faint fill shows what's clickable. Hierarchy
+   comes from contrast alone: Copy Layout's label is lighter (#c9ccd2)
+   than the muted grey heart and share (#8b9099). */
+.corner-like,
+.card-share,
+.layout-link {
+  box-sizing: border-box;
+  height: var(--bar-h);
+  border-radius: 8px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+/* Heart and share: same key face + soft shadow as Copy Layout, so the
+   three read as one row of buttons. */
+.corner-like,
+.card-share {
+  background: var(--key-face);
+  box-shadow: var(--key-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 0 8px;
+  color: #8b9099;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.corner-like:hover,
+.card-share:hover,
+.card-share[aria-expanded='true'] {
+  background: var(--key-face-hover);
+  color: var(--text-main);
+}
+.corner-like:active,
+.card-share:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-soft-pressed);
+  transition-duration: 0s;
+}
+.corner-like:focus-visible,
+.card-share:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.corner-like:disabled {
+  cursor: progress;
+}
+
+.like-heart,
+.bar-ico {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.like-heart {
+  transition:
+    fill 0.15s ease,
+    stroke 0.15s ease;
+}
+/* The "like" is a flame ("this base is hot"), not a heart. Unliked: a
+   grey outline like the share icon. Liked: filled with an ember ramp
+   (amber -> orange, #heartActiveFill at the top of the body) with a
+   soft warm glow -- the one warm accent on the card, and only once the
+   visitor has lit it. Icon: Lucide "flame" (ISC licence). */
+.corner-like.is-liked {
+  color: #fff;
+}
+.corner-like.is-liked .like-heart {
+  fill: url(#heartActiveFill);
+  stroke: #ffb26b;
+  filter: drop-shadow(0 0 5px rgba(255, 138, 61, 0.45));
+}
+.like-count {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.corner-like.just-liked .like-heart {
+  animation: like-pop 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.layout-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 170px; /* a fixed, comfortable width -- not stretched to the card */
+  padding: 0 24px;
+  color: #c9ccd2; /* a step lighter than heart/share: the primary */
+  font-family: 'Oxanium', sans-serif;
+  font-weight: var(--ghost-font-weight);
+  font-size: var(--ghost-font-size);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  /* Keycap face (see --key-* tokens) but with a soft, natural shadow
+     instead of the hard 3px dark edge: a light top edge, a 1px contact
+     shadow and a faint blur under it. Hover is one step lighter; a press
+     sinks it 1px. */
+  background: var(--key-face);
+  border: 0;
+  box-shadow: var(--key-soft);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+.layout-link:hover {
+  background: var(--key-face-hover);
+  color: var(--text-main);
+}
+.layout-link:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-soft-pressed);
+  transition-duration: 0s;
+}
+.layout-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+
+/* Share panel (desktop). One panel, moved into whichever card opened it. */
+.share-panel {
+  position: absolute;
+  right: 12px;
+  bottom: 62px;
+  z-index: 20;
+  width: 220px;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(20, 21, 26, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.share-panel[hidden] {
+  display: none;
+}
+.share-panel a,
+.share-panel button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #d5d8de;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+.share-panel a:hover,
+.share-panel button:hover,
+.share-panel a:focus-visible,
+.share-panel button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  outline: none;
+}
+.share-panel .bar-ico {
+  width: 16px;
+  height: 16px;
+}
+/* App logos (Simple Icons): filled, in each brand's colour. X is white,
+   not its official black, which would vanish on this dark panel. */
+.share-panel .sp-brand {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  stroke: none;
+}
+.sp-facebook {
+  color: #0866ff;
+}
+.sp-x {
+  color: #fff;
+}
+.sp-reddit {
+  color: #ff4500;
+}
+.sp-whatsapp {
+  color: #25d366;
+}
+.share-panel .sp-copy.copied {
+  color: #8fe0ac;
+}
+.share-panel hr {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 6px;
+}
+
+/* A visitor arriving on a shared link: the base glows twice. */
+.discord-card.is-target {
+  animation: base-glow 1.6s ease-in-out 2;
+}
+@keyframes base-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.35),
+      0 0 0 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.35),
+      0 0 0 2px rgba(255, 255, 255, 0.45);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .corner-like.just-liked .like-heart,
+  .discord-card.is-target {
+    animation: none;
+  }
+  .discord-card.is-target {
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.35),
+      0 0 0 2px rgba(255, 255, 255, 0.45);
+  }
+}
+
+/* GHOST BUTTON TOKENS -- taken from /coc/'s .ch-btn.ch-btn-ghost
+   (font size + weight from .ch-btn, fill + border from .ch-btn-ghost),
+   WITHOUT its hard white offset shadow. Defined once here so any button
+   on this page can reuse them: var(--ghost-bg) etc. If coc-home's
+   ghost button changes, update these four (and the 10.5px phone size). */
+:root {
+  --ghost-font-size: 11.5px; /* 10.5px on phones, like coc-home */
+  --ghost-font-weight: 800;
+  --ghost-bg: #15161a;
+  --ghost-border: #3a3d44;
+  --ghost-border-hover: #5a5e66; /* coc-home's ghost hover border */
+  /* KEYCAP (button lab #6): a raised key -- a top-lit gradient face, a
+     hairline of light on its top edge, and a hard 3px dark edge under it.
+     Used for the ACTIVE tab / Town Hall chip and for every Copy Layout
+     and clan button. Inactive tabs/chips stay flat near-black. Each
+     hover is simply one step lighter than the state it's on -- never
+     white:  flat #0b0b0c -> flat hover #1e1f23 -> key -> key hover.  */
+  --key-face: linear-gradient(180deg, #26282e, #1b1c21);
+  --key-face-hover: linear-gradient(180deg, #31343b, #24262b);
+  --key-edge: 0 3px 0 #08090a, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --key-pressed: 0 0 0 #08090a, inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  --flat-hover: #1e1f23;
+  /* The card buttons (heart, Copy Layout, share) use the key face with a
+     SOFT shadow instead of the hard 3px edge: light top edge, 1px contact
+     shadow, faint blur. Pressed = sunk 1px. */
+  --key-soft: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 10px -4px rgba(0, 0, 0, 0.45);
+  --key-soft-pressed: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+@media (max-width: 970px) {
+  :root {
+    --ghost-font-size: 10.5px;
+  }
+}
+
+/* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: the clan card's .download-btn pills (.clan-action-row, icon-copy, icon-globe). */
+
+@media (max-width: 970px) {
+  /* More air on phones: cards 32px apart (was 20), same inner padding
+     as desktop (was 10/10/12), 12px from screenshot to buttons. */
+  .grid-container {
+    gap: 32px;
+  }
+  .discord-card {
+    padding: 12px 12px 14px;
+    background: #121316;
+  }
+  .image-badge,
+  .image-logo {
+    height: 28px;
+    top: 8px;
+  }
+  .image-badge {
+    height: 24px;
+    padding: 0 8px;
+    font-size: 10px;
+    right: 8px;
+  }
+  .image-logo {
+    width: 28px;
+    left: 8px;
+  }
+  .image-logo img {
+    width: 19px;
+    height: 19px;
+  }
+  .cc-popup {
+    top: 40px;
+    left: 8px;
+  }
+  .th-cc {
+    width: 26px;
+    height: 26px;
+  }
+  .action-row {
+    margin-top: 10px;
+  }
+  /* Phones: a smaller cluster so all three fit comfortably on narrow
+     screens (a 360px phone has ~316px inside the card; this row is ~264px). */
+  .action-row.card-bar {
+    --bar-h: 34px;
+    grid-template-columns: 54px auto 54px;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .corner-like,
+  .card-share {
+    padding: 0 6px;
+    gap: 5px;
+    font-size: 12px;
+  }
+  .like-heart,
+  .bar-ico {
+    width: 16px;
+    height: 16px;
+  }
+  .layout-link {
+    min-width: 140px;
+    padding: 0 16px;
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* ---- Secondary top bar redesign (matches /coc/) ----
+   1coclayouts.css likely defines .stb-divider / .th-icon already (same
+   role /coc/'s own inline copies used to play before its
+   redesign) -- .stb-divider-end is new, so it needs a definition
+   somewhere, and this page's own <style> (loaded after 1coclayouts.css)
+   is the right place per the "don't edit shared files" rule. */
+.stb-divider-end {
+  width: 1px;
+  height: 24px;
+  margin: 0 16px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.2) 80%, transparent 100%);
+}
+@media (max-width: 970px) {
+  .stb-divider-end {
+    display: none !important;
+  }
+}
+
+/* th-icon override, same values as /coc/, in case 1coclayouts.css
+   ships the old 32px/20px sizing (like 11layout.css does). */
+.th-icon {
+  width: 22px;
+  height: 22px;
+}
+@media (max-width: 970px) {
+  .th-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Secondary top bar: 1coclayouts.css loads after 11layout.css, so its
+   unconditional .secondary-top-bar rule (right:0, width:calc(...),
+   plus its own >=971px background) beats both fixes 11layout.css
+   already has for this bar. Two separate problems, both re-declared
+   here since this page's own <style> loads after both files:
+
+   1) Colour -- 1coclayouts.css's >=971px media query sets the old
+      olive gradient (#1b1c18 -> #252621), overriding 11layout.css's
+      flat rgba(22,22,26,0.88) + blur that coc-home actually shows.
+      coc-home never hits this because it doesn't load 1coclayouts.css
+      at all. Re-assert 11layout.css's colour so this page matches. */
+@media (min-width: 971px) {
+  .secondary-top-bar {
+    background: rgba(22, 22, 26, 0.88);
+    -webkit-backdrop-filter: blur(14px) saturate(118%);
+    backdrop-filter: blur(14px) saturate(118%);
+  }
+}
+
+/* 2) Scrollbar overlap -- 11layout.css insets the bar by --scrollbar-w
+   so it stops at .coc-main's content edge instead of running under the
+   scrollbar, but only at >=971px: real phones use overlay scrollbars
+   that reserve no width, so insetting there would leave a bare 10px
+   gap. A desktop browser window resized down to phone width still has
+   a classic, space-reserving scrollbar though (that's how this was
+   caught). No width or pointer gate any more: --scrollbar-w is MEASURED
+   by the script at the end of <head> (0 where scrollbars float over the
+   page, as on real phones), so the inset is always exactly right. The
+   old pointer:fine gate skipped Chrome's DevTools phone mode, which
+   reports a touch screen but still draws a 10px scrollbar. */
+.top-bar,
+.secondary-top-bar {
+  right: var(--scrollbar-w, 0px);
+  width: auto;
+}
+@media (min-width: 971px) {
+  .coc-main {
+    scrollbar-gutter: stable;
+  }
+} /* phones: .coc-main doesn't scroll, so no gutter */
+
+/* EXPERIMENT (th18 only): the inset above is exactly as wide as
+   --scrollbar-w (10px, matched to 11layout.css's ::-webkit-scrollbar
+   width further down that file) -- that's what makes the corner notch
+   read as "too big". Narrowing the actual scrollbar shrinks the gap
+   with it, instead of leaving the bars inset by more than the
+   scrollbar actually needs. Page-scoped since ::-webkit-scrollbar
+   isn't a class selector -- can't limit it to one element, only to
+   this page's stylesheet. */
+/* --scrollbar-w is no longer guessed here: every element also gets
+   `scrollbar-width: thin` (11layout.css), and current Chrome then IGNORES
+   ::-webkit-scrollbar, so the real bar was ~10px while this said 6px --
+   the bars covered the other 4px. The script at the end of <head>
+   measures .coc-main's actual scrollbar and sets the variable itself. */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  border-width: 1px;
+}
+
+/* ---- .whats-up spacing ----
+   Measured: on desktop the box sat 82px under the secondary bar but
+   only 44px above the tabs (24px margin + .first-layer's 20px), so it
+   floated away from the nav. .coc-main's padding-top is
+   calc(100px + topbar) in 1coclayouts.css = 140px against 88px of
+   bars; 90px here + .coc-content's 30px puts the box 32px under the
+   bar, and margin-bottom 12px + 20px makes it 32px above the tabs.
+   Inside: the 60px icon top-aligned against an 82px text block left
+   a gap beneath it -- centred now. Body text is capped so a line
+   stays around 100 characters instead of running the full 1150px. */
+@media (min-width: 971px) {
+  .coc-main {
+    padding-top: calc(var(--topbar-height, 40px) + 48px + 2px);
+  }
+  /* Desktop side insets match /coc/'s page column: 12% each
+     side (coc-home sets it as `margin: 0 12%` on each section; same
+     resulting width). Change one page -> change the other. Phones keep
+     1coclayouts.css's 10px sides on purpose -- coc-home's 5% made the
+     base cards too small. */
+  .coc-content {
+    padding-left: 12%;
+    padding-right: 12%;
+  }
+}
+.whats-up {
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
+}
+.whats-new-text {
+  max-width: 100ch;
+}
+.whats-up-strong {
+  margin-bottom: 6px;
+}
+@media (max-width: 970px) {
+  .whats-up {
+    gap: 14px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+}
+
+/* .second-layer is the TH8-TH18 switcher strip -- thz-script.js fills
+   it from the same data every other TH page relies on for its ONLY
+   TH switcher. This page also has the secondary top bar's own
+   dsn-chip TH row (11layout.css/js, added when this page got that
+   redesign), so past 970px there are two identical TH switchers
+   stacked on screen. Hide the older one here, desktop only -- other
+   TH pages don't have the secondary-top-bar version, so this can't
+   touch them (page-scoped override, not a shared-file change), and
+   mobile still needs it since the secondary top bar's chip row is
+   replaced by the bottom sheet nav down there. */
+@media (min-width: 971px) {
+  .second-layer-container {
+    display: none;
+  }
+  /* The strip's hairline stays as a divider between the tabs and the
+     content (Oct 2026): 24 above and below (the bottom margin collapses
+     with the content's own 16), and brighter than the phone line so it
+     reads on its own. .coc-content prefix: the base .th-rail rules
+     below come later in the file and would otherwise win. Its scroll
+     thumb goes, since there's no strip above it to scroll. */
+  .coc-content .th-rail {
+    margin: 24px 0;
+  }
+  .coc-content .th-rail::before {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .th-rail span {
+    display: none;
+  }
+}
+/* Town Hall strip scroll line (mobile). The native scrollbar is hidden
+   -- phones ignore scrollbar styling anyway -- and this line takes its
+   place: a hairline across the full width (the divider) plus a lighter
+   2px segment sized and placed like a scrollbar thumb. */
+.second-layer-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+/* A swipe that starts on the Town Hall strip only scrolls the strip
+   sideways: touch-action:pan-x hands vertical drags to nothing, so the
+   page can't move and a downward drag can't trigger pull-to-refresh;
+   overscroll-behavior stops hitting the strip's end from chaining into
+   the page or the browser's back-swipe. Same for the desktop top-bar
+   chip strips. */
+.second-layer-container,
+.dsn-categories-scroll {
+  touch-action: pan-x;
+  overscroll-behavior: contain;
+}
+.second-layer-container::-webkit-scrollbar {
+  display: none;
+}
+.th-rail {
+  position: relative;
+  height: 2px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.th-rail::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.04);
+}
+.th-rail span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 2px;
+  width: 0;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.11); /* fainter than before (.18) */
+  will-change: transform;
+  transition: opacity 0.6s ease;
+}
+.th-rail.is-static span {
+  display: none;
+}
+/* Once the visitor has scrolled the strip they know it scrolls: the thumb
+   fades out and stays gone (remembered in localStorage, so it doesn't come
+   back on the next visit). The hairline stays -- it's also the divider. */
+.th-rail.is-done span {
+  opacity: 0;
+}
+
+/* (The old "active TH chip like Copy Layout" trial that stood here was
+   replaced by the site-wide keycap style at the end of 11layout.css.) */
+
+/* Secondary top bar chip icons (Town Halls; Guides on coctools): 18px,
+   up from 11layout.css's 14px. Set here, not in 11layout.css, because
+   that file also styles the hwr pages' chips. /coc/ has the same
+   rule in its own copy. */
+.stb-dsn-wrap .dsn-chip-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* stb-hub-link icons: outline/fill pair like #bottomNav's .bn-item
+   icons, same toggle mechanism (.bn-item .bn-ico-fill{display:none} /
+   .active swaps them) since .stb-hub-link's existing single-svg
+   fill:none->currentColor toggle (11layout.css) assumes hwr's plus-icon
+   shape, not a second, purpose-drawn filled icon. */
+/* Bottom nav labels in Sora, sentence case ("Home", not "HOME").
+   1coclayouts.css sets Oxanium caps for every TH page; this overrides it
+   here only (/coc/ has the same change in its own copy). */
+.bn-item,
+.bn-more-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.stb-hub-link .hub-ico-fill {
+  display: none;
+}
+.stb-hub-link.active .hub-ico {
+  display: none;
+}
+.stb-hub-link.active .hub-ico-fill {
+  display: block;
+}
+
+/* Page label ("Townhall 18 Layouts") in Sora 500, matching
+   /web-resources/ -- its label renders in Sora because the inner
+   .secondary-content-desktop span sets it, even though hwr-css.css puts
+   Oxanium on the wrapper. Two classes to outrank 11layout.css's mobile
+   ".secondary-content { font-family:'Oxanium' }". The "*" covers the
+   phone "/ Page 1/2" span (#stbPage): 1coclayouts.css puts Oxanium on
+   every element ("* { font-family: oxanium }"), so a child span doesn't
+   inherit the Sora above -- it has to be set on it directly. */
+.secondary-top-bar .secondary-content,
+.secondary-top-bar .secondary-content * {
+  font-family: 'Sora', sans-serif;
+}
+.secondary-top-bar .secondary-content {
+  font-weight: 500;
+}
+
+/* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: the Live events section (.cc-section, the tags) and the official
+   clan card (.clan-card), including their phone rules. Page spacing for both is
+   in PAGE SPACING below. */
+
+/* ---- FAQ (under the clan card) ----------------------------------------
+   Look: coc-clan-clock.css (shared with /coc/). Its spacing is in
+   PAGE SPACING below, with the other sections. */
+
+/* ---- PAGE SPACING ------------------------------------------------------
+   One vertical rhythm for the whole page, three steps:
+     inside a group ........ 12 desktop / 10 mobile
+     parts of a section .... 16-32      / 12-24
+     between sections ...... 64         / 48
+   Everything that sets a vertical gap between blocks is overridden here
+   (1coclayouts.css and the older rules above had grown to 20/36/46/44/
+   16/75 with no pattern), so change spacing in this block only.
+     intro (Revenge Tower) -> tabs ........ 16 / 12
+     tabs -> TH strip (mobile) ............ 10
+     TH strip -> scroll line (mobile) ..... 12
+     nav -> first row of bases ............ 32 / 24
+     between rows of bases ................ 30 / 32 (unchanged)
+     last row -> page numbers ............. 28 / 24  (they belong to the grid)
+     page numbers -> Live events .......... 96 / 72  (section break)
+     Live events -> clan card -> FAQ ...... 96 / 72  (section breaks)
+     last section -> footer ............... 64 / 48
+   Sep 2026: the three bottom sections were 64 / 48 (phones: only 20
+   between Live events and the clan card) and read as one block, so the
+   breaks grew. No divider lines -- the space and each section's small
+   caps label do the separating. The rules don't depend on the order, so
+   the sections can be rearranged without touching this block.                          */
+.whats-up {
+  margin-bottom: 0;
+}
+.first-layer {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+.coc-content > .grid-container {
+  margin-top: 32px;
+}
+/* Layout grids (TH layouts pages, [data-layouts]; the army grids keep
+   their own columns): two cards per row whenever both get at least
+   340px -- the room the screenshot and the heart / Copy Layout / share
+   row need -- else one. So tablets and wide windows get 2, phones and
+   narrow windows 1, decided by the grid's width, not a device list.
+   max(340px, half minus the gap) caps it at 2 on very wide screens;
+   auto-fill (not auto-fit) keeps a lone last card at half width.
+   Outranks 1coclayouts.css's one-column rules for <=1200px / <=968px. */
+.coc-content > .grid-container[data-layouts] {
+  grid-template-columns: repeat(auto-fill, minmax(max(340px, calc((100% - 32px) / 2)), 1fr));
+}
+.pagination-wrap {
+  margin: 28px 0 0;
+}
+.cc-section,
+.t18-faq {
+  margin: 96px 0 0;
+}
+/* 96 + 46: on desktop the Wall Breaker pokes 46px out of the card's top
+   edge, so the visible gap above his head matches the other breaks. */
+.clan-card {
+  margin: 142px 0 0;
+}
+/* Clan card v2: 64 + 47 -- the King clears the card's top edge by 47px,
+   so his head sits 64px under the page numbers (was 96; Oct 2026). */
+.ac-card {
+  margin: 111px 0 0;
+}
+/* Whichever section comes last: 34 + .coc-content's 30px bottom padding
+   = 64 to the footer. last-of-type, not last-child: the clan card's
+   <script> tag comes after it, so it's never the last child. Not the
+   hero: on th18 the lower sections sit inside .t18-lower, which left the
+   hero as the last section and pushed the tabs 48px down on phones. */
+.coc-content > section:last-of-type:not(.t18-hero) {
+  margin-bottom: 34px;
+}
+/* Desktop spacing, one scale (8 / 16 / 24 / 32 / 64). Things that belong
+   together sit closer: the tabs control the grid, so tabs -> grid (16) is
+   tighter than hero -> tabs (32); cards 24 apart both ways; grid ->
+   page numbers 48 (Oct 2026: was 24 -- the numbers read as part of the
+   last row); section breaks stay 64. */
+@media (min-width: 971px) {
+  .coc-content > .grid-container {
+    margin-top: 16px;
+    gap: 24px;
+  }
+  .pagination-wrap {
+    margin-top: 48px;
+  }
+}
+@media (max-width: 970px) {
+  .first-layer {
+    margin-top: 12px;
+    margin-bottom: 10px;
+  }
+  .coc-content > .grid-container {
+    margin-top: 24px;
+  }
+  .pagination-wrap {
+    margin: 40px 0 0;
+  }
+  /* Phones: the Wall Breaker stays inside the card, so no extra room. */
+  .cc-section,
+  .t18-faq,
+  .clan-card {
+    margin: 72px 0 0;
+  }
+  /* Clan card v2. Phones: the King stands inside the card (no pop-out).
+     Tablets (~768px) get the wide card, where he clears the top by ~30px,
+     so 80 leaves ~50 there and 80 on phones. */
+  .ac-card {
+    margin: 80px 0 0;
+  }
+  /* mobile .coc-content has no bottom padding */
+  .coc-content > section:last-of-type:not(.t18-hero) {
+    margin-bottom: 48px;
+  }
+}
+
+/* Hide page until fully loaded */
+html {
+  visibility: hidden;
+}
+
+html.loaded {
+  visibility: visible;
+}
+
+/* =======================================================================
+   TH18 COC-HOME THEME -- /coc/town-hall-18/layouts restyled to match
+   /coc/: its kicker (mono caps + pulsing red dots), Orbitron
+   headline with one red word, stats row, hero card with a red badge,
+   and its button materials (dark ghost with a hard offset
+   shadow; red primary with a dark-red offset shadow). Red is the one
+   accent; the old blue card gradient is replaced by a very faint red.
+   The layout cards' and their three buttons' layouts are untouched --
+   only colours, type and icons change there.
+   Scoped to .coc-content, loaded last in <head>, so the top bar,
+   secondary top bar, sidebar and bottom nav keep their own styles.
+   ======================================================================= */
+.coc-content {
+  --t18-red: #c23b3b;
+  --t18-red-2: #d04747;
+  --t18-red-deep: #5a1616;
+  --t18-surface: #121316;
+  --t18-surface-2: #15161a;
+  --t18-line: rgba(255, 255, 255, 0.08);
+  --t18-line-2: #2a2c30;
+  --t18-text: #f2f3f5;
+  --t18-muted: #9ea3ab;
+  --t18-faint: #6d7178;
+  /* a whisper of red light at the top of the page, like coc-home's hero */
+  background: radial-gradient(1100px 460px at 22% 0%, rgba(194, 59, 59, 0.07), rgba(194, 59, 59, 0) 70%);
+}
+
+/* ---- Hero ------------------------------------------------------------
+   One card, two columns: the copy (Revenge Tower art | two-line title,
+   then "Did you know?") and, on the right, the six clan events, 2 x 3.
+   Red and dark grey only: one red wash from the bottom-left over the
+   #121316 card. */
+.t18-hero {
+  position: relative;
+  isolation: isolate; /* keeps the star layer behind the content */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'copy events';
+  align-items: center;
+  column-gap: 32px;
+  row-gap: 18px;
+  padding: 28px 32px;
+  margin-top: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--t18-line);
+  background:
+    radial-gradient(70% 90% at 0% 100%, rgba(194, 59, 59, 0.09), rgba(194, 59, 59, 0) 70%),
+    radial-gradient(60% 70% at 18% 0%, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 70%), var(--t18-surface);
+}
+/* Starfield (hero): a sparse scatter of tiny points, mostly
+   warm white with a couple of faint red ones, denser on the left. A layer
+   of radial-gradient dots, not an image. The pattern is a 240px-tall tile
+   repeated down the card and scrolled up by exactly one tile per 60s, so
+   the stars drift upward (~4px/s) in a seamless loop, while the opacity
+   twinkle breathes on top. Reduced-motion users get still stars. */
+.t18-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(1.5px 1.5px at 6% 22%, rgba(255, 244, 228, 0.75), transparent),
+    radial-gradient(1px 1px at 13% 74%, rgba(255, 244, 228, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 21% 90%, rgba(255, 214, 176, 0.55), transparent),
+    radial-gradient(1px 1px at 28% 12%, rgba(255, 244, 228, 0.45), transparent),
+    radial-gradient(2px 2px at 34% 64%, rgba(224, 99, 99, 0.45), transparent),
+    radial-gradient(1px 1px at 40% 30%, rgba(255, 244, 228, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 46% 86%, rgba(255, 244, 228, 0.35), transparent),
+    radial-gradient(1px 1px at 52% 16%, rgba(255, 214, 176, 0.35), transparent),
+    radial-gradient(1px 1px at 3% 58%, rgba(255, 244, 228, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 17% 46%, rgba(255, 244, 228, 0.3), transparent),
+    radial-gradient(1px 1px at 58% 70%, rgba(224, 99, 99, 0.35), transparent),
+    radial-gradient(1px 1px at 63% 8%, rgba(255, 244, 228, 0.25), transparent);
+  background-size: 100% 240px;
+  background-repeat: repeat-y;
+  animation:
+    t18-twinkle 6s ease-in-out infinite alternate,
+    t18-drift 60s linear infinite;
+}
+@keyframes t18-twinkle {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes t18-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 -240px;
+  }
+}
+
+.t18-hero-copy {
+  grid-area: copy;
+  align-self: center;
+}
+/* The whole title in Orbitron ("TH18 BASE" was Oxanium on phones until Sep 2026). One line on
+   desktop -- sized off the copy column's width (cqi, see the 971px+ rule)
+   so it never overflows beside the events -- two lines on phones. */
+.t18-title {
+  margin: 0 0 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(28px, 2.9vw, 44px);
+  white-space: nowrap;
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: var(--t18-text);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+/* Page pill (#t18Page): "PAGE 1/2" on its own line above the title
+   (inside .t18-head, which stacks it over the title). Filled by the
+   script; stays hidden when the TH has one page. */
+.t18-page {
+  align-self: flex-start;
+  padding: 5px 10px 4px;
+  border: 1px solid rgba(224, 99, 99, 0.45);
+  border-radius: 999px;
+  background: rgba(194, 59, 59, 0.14);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #e06363;
+}
+.t18-page[hidden] {
+  display: none;
+}
+/* Desktop only: phones already show "/ Page 1/2" in the secondary top
+   bar (#stbPage), and the pill made the phone hero taller. */
+@media (max-width: 970px) {
+  .t18-page {
+    display: none;
+  }
+}
+/* Red word, no glow: it used to carry a pulsing red text-shadow. */
+.t18-title em {
+  font-style: normal;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--t18-red);
+}
+/* Hero copy is just the title and this line now -- the red-dot label
+   line above the title and the Layouts / Flames / Pages stats row were
+   removed, so the sentence is the last thing in the block (no bottom
+   margin). */
+/* DID YOU KNOW? -- replaces the old intro sentence (.t18-sub) directly
+   under the title, and the fact text takes that sentence's colour and
+   type (Sora 15px / 1.65, #c9ccd2; 13.5px on phones). The small label
+   stays red (#e06363 -- the accent #c23b3b is only ~3.9:1 on this
+   background, too faint at 10px; this is ~5.4:1). No top margin: the
+   title's own bottom margin is the gap. */
+.t18-dyk {
+  margin-top: 0;
+  max-width: 52ch;
+}
+.t18-dyk[hidden] {
+  display: none;
+}
+.t18-dyk-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #787575; /* red, lighter than the accent: #c23b3b is ~3.9:1 here, too faint at 10px; this is ~5.4:1 */
+}
+.t18-dyk-stage {
+  display: grid;
+}
+/* The fact box is a button: click / tap / Enter for another fact. */
+.t18-dyk {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 6px;
+}
+.t18-dyk:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 6px;
+}
+/* Two lines at most. The facts in coc-dyk.json are written to fit in
+   two; the clamp is the safety net -- a longer one ends in "..." instead
+   of growing the card. */
+.t18-dyk-fact {
+  grid-area: 1 / 1; /* all facts stacked in one cell */
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #c9ccd2;
+  opacity: 0;
+  transform: translateY(3px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease; /* leaving: quick */
+}
+/* Arriving: waits for the old fact to finish fading, then rises in -- the
+   two never overlap (they share one grid cell). */
+.t18-dyk-fact.is-on {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.35s ease 0.22s,
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.22s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .t18-dyk-fact,
+  .t18-dyk-fact.is-on {
+    transition: none;
+    transform: none;
+  }
+  .t18-hero::before {
+    animation: none;
+  }
+}
+@media (max-width: 970px) {
+  .t18-dyk-fact {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+}
+/* Narrow phones: the box is too narrow for a two-full-line fact, so allow
+   three instead of cutting it off with "...". */
+@media (max-width: 499px) {
+  .t18-dyk-fact {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
+
+/* Title block: the page pill (#t18Page) stacked over the two-line title
+   (the Revenge Tower art that sat beside it was removed). */
+.t18-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.t18-head .t18-title {
+  margin: 0;
+}
+
+/* ---- Banner events (right column) ------------------------------------
+   Six small cards, 2 x 3, one per event: the event's icon in a tile on
+   the left, its name over the countdown on the right. A hairline
+   separates the block from the copy. A running event (or an always-on
+   one, counting to its end) gets a red LIVE tag on its icon; one that's
+   only counting down to its start gets nothing. Times are grey either
+   way. Cards lift a shade on hover. */
+.t18-events {
+  grid-area: events;
+  display: grid;
+  grid-template-columns: repeat(2, 176px);
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 0 28px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  list-style: none;
+}
+.t18-event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 8px;
+  border-radius: 12px;
+  background: #141519; /* dark grey-black, solid: the stars don't show through */
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.t18-event:hover {
+  background: #1a1b20;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.t18-event:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 2px;
+}
+.t18-event-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #1a1b1f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.t18-event-icon img {
+  width: 23px;
+  height: 23px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+/* Running events (anything coc-events.js hasn't marked .is-upcoming): a
+   solid LIVE tag on the icon's bottom edge, like a live stream's profile
+   picture (the icon's own border stays grey -- a red edge was tried and
+   removed). The tag's red gently brightens and dims.
+   Upcoming events get nothing -- no dot, no tag. (Replaced the old red /
+   grey corner dot, Sep 2026; picked from 4 previews.) */
+.t18-event:not(.is-upcoming) .t18-event-icon::after {
+  content: 'LIVE';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  padding: 2px 4px 1px;
+  border-radius: 3px;
+  background: #d04747;
+  box-shadow: 0 0 0 2px #141519; /* the card's colour: cuts the tag out of the icon's edge */
+  font:
+    800 7px/1 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.8px;
+  color: #fff;
+  animation: t18-live 2s ease-in-out infinite;
+}
+@keyframes t18-live {
+  0%,
+  100% {
+    background: #d04747;
+  }
+  50% {
+    background: #ff5a4f;
+  }
+}
+.t18-event-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.t18-event-name {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #c9ccd2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.t18-event:hover .t18-event-name {
+  color: #fff;
+}
+.t18-event-time {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  color: #8b9099; /* grey, running or not -- the LIVE tag shows which are running */
+  white-space: nowrap;
+}
+.t18-event-time::before {
+  content: 'ends ';
+  font-weight: 700;
+}
+.t18-event.is-upcoming .t18-event-time {
+  color: #8b9099;
+}
+.t18-event.is-upcoming .t18-event-time::before {
+  content: 'starts ';
+}
+.t18-event-time span {
+  margin-left: 1px;
+  font-size: 0.82em;
+}
+
+/* Prev / next buttons exist for phones only. */
+.t18-ev-navli {
+  display: none;
+}
+/* Desktop: cards that don't fit the rows beside the text (set by script). */
+@media (min-width: 971px) {
+  .t18-events > li.is-over {
+    display: none;
+  }
+}
+/* Desktop title: one line, sized off the copy column so it can't overflow. */
+@media (min-width: 971px) {
+  .t18-hero-copy {
+    container-type: inline-size;
+  }
+  /* desktop: the whole title in Orbitron (phones keep "TH18 BASE" in Oxanium) */
+  .t18-title {
+    font-size: clamp(24px, 8.4cqi, 44px);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    letter-spacing: -1px;
+  }
+  .t18-title br {
+    display: none;
+  }
+}
+
+/* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: .t18-tag, .t18-tag-time and .t18-vh. */
+
+/* Tabs, Town Hall chips, page numbers and all buttons keep the site's
+   grey materials (1coclayouts.css / the rules above) -- no red states. */
+
+/* ---- Layout cards: colours only -------------------------------------- */
+/* Card background: the hero's dark grey surface (#121316) with the same
+   8%-white hairline, so hero, cards and clan card read as one family and
+   the base screenshots are the only colour. (History: blue-grey
+   #282c53 -> #151617 until Sep 2026; a dark red #3a1d21 was tried before
+   that.) The hairline is an inset shadow, not a border, so it adds no
+   size. Set here and in the base .discord-card rule + its phone override.
+   Sep 2026: hairline halved (8% -> 4% white, hover 14% -> 8%) so the
+   card edge is quieter than the hero's and the screenshot leads. */
+.coc-content .discord-card {
+  background: #121316;
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+.coc-content .discord-card:hover {
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* CC popover (redesigned Oct 2026): a small panel in the card material,
+   no red top stripe, no bulleted list. A header ("Clan Castle" /
+   "Recommended"), then one row per troop split by hairlines -- the same
+   divided-list pattern as the FAQ and the event board: the troop's
+   picture in a small tile, its name, and the count ("x3") in tabular
+   numbers on the right. Rows come from ccRows() in th-layouts.js. */
+.coc-content .cc-popup {
+  width: 228px;
+  padding: 0;
+  overflow: hidden;
+  background: #15161a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
+  color: #dcddde;
+}
+.coc-content .ccp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.coc-content .ccp-title {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #f1f2f4;
+}
+.coc-content .ccp-note {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #6d7178;
+}
+.coc-content .cc-popup .ccp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.coc-content .cc-popup .ccp-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 14px;
+  color: #e6e7ea;
+}
+.coc-content .cc-popup .ccp-list li + li {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.coc-content .ccp-ico {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.coc-content .ccp-ico img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+.coc-content .ccp-name {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.coc-content .ccp-qty {
+  flex-shrink: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #f1f2f4;
+}
+.coc-content .ccp-qty span {
+  margin-right: 1px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6d7178;
+}
+.coc-content .cc-popup .ccp-empty {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  color: #8b9099;
+}
+
+/* Share menu in the same material */
+.coc-content .share-panel {
+  background: #15161a;
+  border: 1px solid #3a3d44;
+  border-radius: 8px;
+}
+
+/* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: the Live events label and the clan card's red glow + title. */
+/* ---- Spacing for the head --------------------------------------------
+   Card -> tabs 20px (14 on phones). */
+.coc-content .first-layer {
+  margin-top: 20px;
+}
+@media (min-width: 971px) {
+  .coc-content .first-layer {
+    margin-top: 32px;
+  }
+} /* desktop: hero -> tabs on the spacing scale (see ".clan-card" block) */
+
+/* ---- Page numbers --------------------------------------------------------
+   Simplified from 1coclayouts.css's boxed pill (shared with the other TH
+   pages, so overridden here): no container, just the buttons, in the same
+   states as the tabs -- flat near-black numbers, a step lighter on hover,
+   the current page is the raised key. "Next" is plain caps text. */
+.coc-content .pagination {
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.coc-content .pagination a {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  color: var(--text-muted);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12.5px;
+  font-weight: 800;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.coc-content .pagination a:hover {
+  background: var(--flat-hover);
+  color: var(--text-secondary);
+  transform: none;
+}
+.coc-content .pagination a.active {
+  background: var(--key-face);
+  color: var(--text-main);
+  box-shadow: var(--key-edge);
+}
+.coc-content .pagination a.active:hover {
+  background: var(--key-face-hover);
+}
+.coc-content .pagination a.next {
+  margin-left: 2px;
+  padding: 0 8px;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  font-size: 11px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+.coc-content .pagination a.next:hover {
+  background: none;
+  color: var(--text-main);
+}
+
+/* ---- Layouts / Army / Guides tabs + Town Hall chips --------------------
+   One set of states for both rows: flat near-black at rest (1coclayouts.css's
+   own fill), a step lighter on hover, and the ACTIVE one is a raised keycap
+   (--key-* tokens) that gets a step lighter again on hover. Oxanium caps,
+   with the secondary top bar's own icons in front of each tab label --
+   outline normally, filled on the active tab, like the top bar. The icons
+   are added by the nav script at the bottom of the page (HUB_ICONS). */
+.coc-content .first-layer button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  border: 0;
+  box-shadow: none;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.coc-content .first-layer button:hover,
+.coc-content .second-layer button:hover {
+  background: var(--flat-hover);
+  color: var(--text-secondary);
+}
+.coc-content .first-layer button.active,
+.coc-content .second-layer button.active {
+  background: var(--key-face);
+  color: var(--text-main);
+  box-shadow: var(--key-edge);
+}
+.coc-content .first-layer button.active {
+  font-weight: 800;
+}
+.coc-content .first-layer button.active:hover,
+.coc-content .second-layer button.active:hover {
+  background: var(--key-face-hover);
+}
+/* Room for the active chip's 3px key edge inside the strip's scroll box
+   (overflow-x:auto clips anything that hangs below it). */
+.coc-content .second-layer {
+  padding-bottom: 4px;
+}
+.coc-content .first-layer button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.fl-ico,
+.fl-ico-fill {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.fl-ico-fill {
+  display: none;
+}
+.first-layer button.active .fl-ico {
+  display: none;
+}
+.first-layer button.active .fl-ico-fill {
+  display: block;
+}
+
+/* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: the Clash Clock tags (.t18-clock). */
+
+@media (min-width: 1351px) and (max-width: 1519px) {
+  .t18-events {
+    grid-template-columns: repeat(2, 164px);
+  }
+  .t18-dyk-fact {
+    font-size: 14px;
+  } /* with the narrower cards, keeps every fact to 2 lines */
+}
+/* Wide screens: the text column stops at 560px (the one-line title at its
+   44px max is ~530px; the fact box is 52ch, ~481px) and the event cards
+   stretch into the rest, instead of a dead gap opening between the text and
+   the events. The events column's minimum is its content (auto), so on
+   narrower screens the TEXT column gives way, never the cards' 176px
+   floor. Cards stop at 300px on very wide screens; the block then sits
+   right, where it always was. */
+@media (min-width: 1440px) {
+  .t18-hero {
+    grid-template-columns: minmax(0, 560px) minmax(auto, 1fr);
+  }
+  .t18-events {
+    grid-template-columns: repeat(2, minmax(176px, 300px));
+    justify-self: end;
+  }
+}
+/* 1350px and down: there's no room beside the text, so the events move
+   under it -- still 2 per row, 2 rows (4 cards) -- and the hairline goes. */
+@media (max-width: 1350px) {
+  .t18-hero {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'copy' 'events';
+    row-gap: 18px;
+  }
+  .t18-events {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0;
+    border-left: 0;
+  }
+}
+@media (max-width: 1180px) {
+  .t18-hero {
+    padding: 22px 26px 20px;
+  }
+}
+/* ---- Phone hero ------------------------------------------------------
+   Same card, compact:
+     row 1: two-line title | [‹] one event card [›]
+     row 2: "Did you know?" + the fact, full width
+   .t18-hero-copy steps aside (display:contents) so the title and the fact
+   box can sit in the card's grid directly. */
+@media (max-width: 970px) {
+  .t18-hero {
+    container-type: inline-size; /* title/tower size off the card's width (cqi) */
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head events'
+      'dyk  dyk';
+    column-gap: 10px;
+    row-gap: 14px;
+    padding: 18px 16px;
+    margin-top: 22px; /* clear air under the fixed top bars */
+    border-radius: 14px;
+  }
+  .t18-hero-copy {
+    display: contents;
+  }
+  .t18-head {
+    grid-area: head;
+    align-self: center;
+    gap: 10px;
+    margin: 0;
+  }
+  .t18-dyk {
+    grid-area: dyk;
+  }
+  /* sized off the card so "TH18 BASE" still fits beside the event card on a 360px phone */
+  .t18-title {
+    font-size: clamp(17px, 6cqi, 24px);
+  }
+  .t18-dyk-label {
+    margin-bottom: 4px;
+    font-size: 10.5px;
+  }
+  /* One compact card at a time, prev / next either side. All six cards
+     share the middle cell (so it's as wide as the widest and never jumps);
+     only .is-current shows. The leaving card fades out, the next slides in. */
+  .t18-events {
+    display: grid;
+    grid-template-columns: auto minmax(0, auto) auto;
+    align-items: center;
+    column-gap: 2px;
+    padding: 0;
+    border-left: 0;
+    align-self: center;
+  }
+  .t18-ev-navli {
+    display: block;
+    grid-row: 1;
+  }
+  .t18-ev-navli--prev {
+    grid-column: 1;
+  }
+  .t18-ev-navli--next {
+    grid-column: 3;
+  }
+  .t18-events > li:not(.t18-ev-navli) {
+    grid-column: 2;
+    grid-row: 1;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(8px);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      visibility 0s linear 0.18s;
+  }
+  .t18-events > li.is-current {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 0.25s ease 0.1s,
+      transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s,
+      visibility 0s;
+  }
+  /* the buttons: just a grey chevron, no box -- brighter when pressed */
+  .t18-ev-nav {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: #5a5e66;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .t18-ev-nav svg {
+    width: 15px;
+    height: 15px;
+  }
+  .t18-ev-nav:hover,
+  .t18-ev-nav:active {
+    color: #c9ccd2;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .t18-ev-nav:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 1px;
+  }
+  .t18-event {
+    gap: 8px;
+    padding: 5px 10px 5px 5px;
+    border-radius: 10px;
+  }
+  .t18-event-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+  }
+  .t18-event-icon img {
+    width: 18px;
+    height: 18px;
+  }
+  .t18-event:not(.is-upcoming) .t18-event-icon::after {
+    bottom: -5px;
+    padding: 2px 3px 1px;
+    font-size: 6px;
+  }
+  .t18-event-text {
+    gap: 4px;
+  }
+  .t18-event-name {
+    font-size: 10px;
+    letter-spacing: 0.6px;
+  }
+  .t18-event-time {
+    font-size: 11px;
+  }
+  .coc-content .first-layer {
+    margin-top: 14px;
+    gap: 8px;
+  }
+  .coc-content .first-layer button {
+    min-height: 38px;
+    gap: 6px;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+  }
+  .fl-ico,
+  .fl-ico-fill {
+    width: 14px;
+    height: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t18-event .t18-event-icon::after {
+    animation: none;
+  }
+}
+
+/* ---- Background grain --------------------------------------------------
+   A very faint film-grain texture over the page background, so the flat
+   dark gradient doesn't read as plain digital black. The grain is a tiny
+   inline SVG (feTurbulence noise, greyscale, contrast-boosted, 220px tile)
+   laid over .coc-main's own gradient at 8% -- a background LAYER, not an
+   element, so nothing is added to the page and stacking is untouched.
+   Solid surfaces (hero, cards) cover it; it shows only around them.
+   The gradient under it was darkened (23 -> 16 top, 12 -> 4 bottom) to
+   cancel the lift the 8% grain adds, so the page is as dark as before:
+   measured 16.8 vs 16.9 near the top, 13.2 vs 13.5 lower down.
+   Strength: the rect's opacity in the SVG (0.08). */
+.coc-main {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(16, 16, 16), rgb(4, 4, 4));
+  background-size:
+    220px 220px,
+    auto;
+  background-blend-mode: normal, normal;
+}
+
+/* ---- Space above the hero = space below it ---------------------------
+   .coc-main's top padding now equals the fixed bars exactly, .coc-content
+   adds nothing on top, and the hero's own margin is the whole gap -- the
+   same as hero -> tabs: 32px on desktop, 14px on phones. */
+@media (min-width: 971px) {
+  .coc-main {
+    padding-top: calc(var(--topbar-height, 40px) + 48px);
+  } /* top bar + secondary bar */
+  .coc-content {
+    padding-top: 0;
+  }
+  .coc-content .t18-hero {
+    margin-top: 32px;
+  }
+}
+@media (max-width: 970px) {
+  .coc-main {
+    padding-top: calc(var(--topbar-height, 52px) + 38px);
+  } /* top bar + secondary bar */
+  .coc-content {
+    padding-top: 0;
+  }
+  .coc-content .t18-hero {
+    margin-top: 14px;
+  }
+}
+
+/* ---- Phones scroll the whole page, like homewebresources ----------------
+   The bug: below 971px .coc-main was the scroll container (body is
+   height:100vh + overflow:hidden), and the fixed top bars sit over any
+   scrollbar INSIDE the page -- so its top was always covered. homewebres
+   lets body grow and scroll instead: then the scrollbar is the browser
+   window's own, which fixed bars can never cover (they stop at its edge on
+   their own). Same here. The scroll lock that used to rely on .coc-main
+   (sidebar / More sheet / search) is replaced by the script below, which
+   pins the page in place while one of those is open. Desktop unchanged. */
+@media (max-width: 970px) {
+  body {
+    height: auto;
+    overflow: auto;
+  }
+  /* The More sheet's lock (html.no-scroll) also sets body height:100%,
+     which shrinks the page to one screen and snaps the scroll position to
+     0 before it can be saved -- closing the sheet then jumped to the top.
+     Keep the real height; the script pins the page instead. (:root only
+     raises specificity over the older rule.) */
+  html.no-scroll:root body {
+    height: auto;
+  }
+}
+
+/* ---- Pages (one HTML file per Town Hall, Sep 2026) ---------------------
+   th-layouts.js shows 10 bases at a time and hides the rest ([hidden]);
+   the page numbers under the grid (#layout-pages) are built by it too, and
+   the whole row stays hidden when a TH has only one page. "Prev" mirrors
+   the existing "Next" styling above. */
+.discord-card[hidden],
+.pagination-wrap[hidden] {
+  display: none;
+}
+.coc-content .pagination a.prev {
+  margin-right: 2px;
+  padding: 0 8px;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  font-size: 11px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+.coc-content .pagination a.prev:hover {
+  background: none;
+  color: var(--text-main);
+}
+.pagination a.prev svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  transition: transform 0.18s ease;
+}
+.pagination a.prev:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Phone breadcrumb: "Townhall 18 Layouts / Page 1/2" in the secondary top
+   bar -- the same treatment as the HWR pages' #scMobileGroup (hwr-css.css):
+   0.9em, regular weight after the title's 500, and a grey "/" drawn by
+   ::before so the script only sets the text. Empty (one-page TH) = hidden.
+   Desktop: not shown. */
+.stb-page {
+  display: none;
+}
+@media (max-width: 970px) {
+  .stb-page {
+    display: inline;
+    font-size: 0.9em;
+    font-weight: 400;
+  }
+  .stb-page:empty {
+    display: none;
+  }
+  .stb-page::before {
+    content: '/';
+    margin: 0 6px;
+    color: #6f6f6f;
+    font-weight: 400;
+  }
+}
+
+/* PHONE BREADCRUMB -- one trail on every CoC page (thz-script.js
+   buildCrumbs): "COC > Layouts > TH18 > Page 1 of 3", "COC > Armies >
+   TH13 > Page 1 of 1", "COC > Tools > Army Maker". Phones only: it replaces the page title in
+   the secondary top bar. One grey for every step -- the current page isn't
+   highlighted -- with the arrows a step darker. */
+.stb-crumbs {
+  display: none;
+}
+@media (max-width: 970px) {
+  .secondary-content.has-crumbs > :not(.stb-crumbs) {
+    display: none;
+  }
+  .stb-crumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: var(--text-muted, #949ba4);
+  }
+  .stb-crumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .stb-crumbs a:hover,
+  .stb-crumbs a:focus-visible {
+    color: var(--text-main, #eff2f5);
+  }
+  .stb-crumb-sep {
+    color: #6d7178;
+  }
+  .stb-crumb-page {
+    display: contents;
+  }
+  .stb-crumb-page[hidden] {
+    display: none;
+  }
+}
+
+/* ---- Coming soon (a Town Hall with no bases yet, e.g. TH8) ----------------
+   Takes the place of the bases grid and page numbers. Clan-card material
+   (#121316, faint red glow, hairline border); construction icon in the
+   event-icon tile; Orbitron title with one red phrase; two buttons -- the
+   keycap for the main way on (the next Town Hall's layouts) and the ghost
+   style for the army page. */
+.th-soon {
+  margin-top: 16px;
+  padding: 48px 32px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: radial-gradient(60% 90% at 50% 0%, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0) 70%), #121316;
+  text-align: center;
+}
+.th-soon-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: #1a1b1f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e06363;
+}
+.th-soon-icon svg {
+  width: 28px;
+  height: 28px;
+}
+.th-soon-title {
+  margin: 0 0 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  text-transform: uppercase;
+  color: #f1f2f4;
+}
+.th-soon-title em {
+  font-style: normal;
+  font-family: 'Orbitron', sans-serif;
+  color: #c23b3b;
+  text-shadow: 0 0 18px rgba(194, 59, 59, 0.4);
+}
+.th-soon-text {
+  max-width: 52ch;
+  margin: 0 auto;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #a9aeb6;
+}
+.th-soon-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+.th-soon-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: var(--ghost-bg);
+  border: 1px solid var(--ghost-border);
+  color: #c9ccd2;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+.th-soon-btn:hover {
+  border-color: var(--ghost-border-hover);
+  color: #fff;
+}
+.th-soon-btn--primary {
+  background: var(--key-face);
+  border-color: transparent;
+  box-shadow: var(--key-edge);
+  color: var(--text-main);
+}
+.th-soon-btn--primary:hover {
+  background: var(--key-face-hover);
+  border-color: transparent;
+}
+.th-soon-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+@media (max-width: 970px) {
+  .th-soon {
+    margin-top: 24px;
+    padding: 32px 20px;
+  }
+  .th-soon-title {
+    font-size: 18px;
+  }
+  .th-soon-text {
+    font-size: 13px;
+  }
+}
+
+/* NEW tag: top-right of a base image, set per base with "new": true in
+   thNN-layouts.json. The page's red accent (--t18-red). */
+.new-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: #c23b3b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* ---- Lower sections (TH layouts / army / tools pages) ---------------------------------
+   The clan card and FAQ, in a plain wrapper on the page's own background.
+   It used to be a full-width stone panel with a hairline top edge and the
+   live events at its top; flattened Oct 2026 when the events moved to the
+   red band. Its bottom padding (room for the Warden's head) is set in the
+   Live band block below. */
+.t18-lower {
+  position: relative;
+}
+
+/* The Live band (.t18-band, the red events band above the footer) moved to
+   coc-clan-clock.css, Oct 2026, so /coc/ (which does not load this
+   file) can use it too. */

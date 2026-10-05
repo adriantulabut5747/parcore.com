@@ -1,0 +1,1171 @@
+/* =======================================================================
+   DAMAGE CALCULATOR (/coc/tools/damage-calculator). Loaded after
+   th-layouts.css and coc-armymaker.css and built from their parts, so it
+   reads as the same series as the layouts / army pages:
+   - both boxes are the army maker's .am; buttons, tabs and the Town Hall
+     chip are its keycaps (.am-btn, .am-tab, .am-th);
+   - attack pictures are the army cards' tiles (.as-tile + .as-n chip);
+   - colour is the series' near-monochrome greys plus its one red. Damage
+     is drawn in steps of that red; DESTROYED is a red ink stamp.
+
+   Layout: desktop (>1150px) docks "Your attack" beside the board, sticky.
+   971-1150px stacks the two boxes. Phones (<=970px) turn "Your attack"
+   into a tray above the bottom nav that opens as a sheet.
+   ======================================================================= */
+
+/* Phones: the Layouts / Army / Tools tabs come back under the hero, and the
+   secondary top bar shows the breadcrumb instead of the title. */
+.coc-content:has(> #damageCalc) > .first-layer {
+  display: none;
+}
+@media (min-width: 971px) {
+  .coc-content:has(> #damageCalc) > .th-rail {
+    display: none;
+  }
+}
+
+.dc {
+  --dc-red: #e06363;
+  --dc-ink: #ef6461;
+  --dc-card: #121316;
+  --dc-raise: #1b1d22;
+  --dc-edge: rgba(255, 255, 255, 0.06);
+  --dc-text: #eff2f5;
+  --dc-muted: #9ea3ab;
+  --dc-faint: #767b84;
+  --dc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 32px;
+  font-variant-numeric: tabular-nums;
+}
+/* The Town Hall chip sits at the right of both box headings, so its list
+   opens leftward from the chip's right edge -- coc-armymaker.css flips it
+   the other way in narrow boxes, where its own chip is on the left. */
+.dc .am-th-menu {
+  left: auto;
+  right: 0;
+  max-width: calc(100vw - 32px);
+}
+.dc .am {
+  margin-top: 0;
+}
+.dc ::selection {
+  background: rgba(224, 99, 99, 0.35);
+  color: #fff;
+}
+.dc svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- Shared: box heading -------------------------------------------------------- */
+.dc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.dc-title {
+  margin: 0;
+  font:
+    700 18px/1.25 'Sora',
+    sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--dc-text);
+}
+.dc-intro {
+  margin: 4px 0 0;
+  max-width: 46ch;
+  font:
+    12.5px/1.5 'Sora',
+    sans-serif;
+  color: var(--dc-muted);
+}
+
+/* ---- Steppers: − value + -------------------------------------------------------- */
+.dc-step {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 2px;
+  border-radius: 9px;
+  background: rgba(11, 11, 12, 0.85);
+}
+.dc-step button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: var(--key-face);
+  box-shadow: var(--key-soft);
+  color: #c8cbcd;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.dc-step button svg {
+  width: 13px;
+  height: 13px;
+}
+.dc-step button:hover {
+  background: var(--key-face-hover);
+  color: #fff;
+}
+.dc-step button:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-soft-pressed);
+}
+.dc-step button:disabled {
+  background: none;
+  box-shadow: none;
+  color: #3b3e44;
+  cursor: default;
+  transform: none;
+}
+.dc-step output {
+  min-width: 40px;
+  padding: 0 6px;
+  text-align: center;
+  font:
+    700 12px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--dc-text);
+}
+.dc button:focus-visible,
+.dc input:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+
+/* ======================================================================
+   1. YOUR ATTACK
+   ====================================================================== */
+.dc-attack {
+  padding: 20px;
+}
+.dc-tray {
+  display: none;
+}
+.dc-kit {
+  margin-top: 16px;
+}
+.dc-kit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Unused: a slim row -- tile, name, what one does, and a +. */
+.dc-kit-row {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
+}
+.dc-kit-row:first-child {
+  border-top: 0;
+}
+.dc-kit-tile.as-tile {
+  width: 38px;
+  height: 38px;
+  transition: transform 0.2s var(--dc-ease);
+}
+.dc-kit-row:not(.is-on) .dc-kit-tile img {
+  filter: saturate(0.35) brightness(0.72);
+  transition: filter 0.2s ease;
+}
+.dc-kit-row:not(.is-on):hover .dc-kit-tile img {
+  filter: none;
+}
+.dc-kit-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dc-kit-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font:
+    600 13.5px/1.3 'Sora',
+    sans-serif;
+  color: #e6e7ea;
+}
+.dc-kit-row:not(.is-on) .dc-kit-name {
+  color: #c6c9ce;
+}
+.dc-kit-hero {
+  font:
+    500 11px/1.4 'Sora',
+    sans-serif;
+  color: var(--dc-faint);
+}
+.dc-kit-brief {
+  font:
+    600 12px 'Oxanium',
+    sans-serif;
+  color: var(--dc-faint);
+}
+.dc-add {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--key-face);
+  box-shadow: var(--key-soft);
+  color: #c8cbcd;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.dc-add:hover {
+  background: var(--key-face-hover);
+  color: #fff;
+}
+.dc-add:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-soft-pressed);
+}
+
+/* Used: the row opens -- bigger tile with its count chip, the count
+   stepper, the damage line, then the level. A lifted strip, not a card. */
+.dc-kit-row.is-on {
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  grid-template-areas:
+    'tile text count'
+    'tile dmg dmg'
+    '. lvl lvl';
+  row-gap: 6px;
+  margin: 4px -10px;
+  padding: 12px 10px;
+  border-top-color: transparent;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.dc-kit-row.is-on + .dc-kit-row {
+  border-top-color: transparent;
+}
+.dc-kit-row.is-on .dc-kit-tile {
+  grid-area: tile;
+  align-self: start;
+  width: 48px;
+  height: 48px;
+}
+.dc-kit-row.is-on .dc-kit-text {
+  grid-area: text;
+}
+.dc-kit-row.is-on .dc-step-count {
+  grid-area: count;
+}
+.dc-step-count button {
+  width: 32px;
+  height: 32px;
+}
+.dc-step-count output {
+  min-width: 32px;
+  font-size: 15px;
+}
+.dc-kit-dmg {
+  grid-area: dmg;
+  font:
+    600 12px/1.4 'Oxanium',
+    sans-serif;
+  color: var(--dc-muted);
+}
+.dc-kit-dmg b {
+  margin-right: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #f4f5f7;
+}
+.dc-kit-dmg i {
+  font-style: normal;
+  color: #4a4e55;
+}
+.dc-step-level {
+  grid-area: lvl;
+  justify-self: start;
+}
+.dc-step-level button {
+  width: 24px;
+  height: 24px;
+}
+.dc-step-level output {
+  font-size: 11px;
+  color: var(--dc-muted);
+}
+.dc-kit-tile.is-bump {
+  animation: dcBump 0.24s var(--dc-ease);
+}
+.dc-kit-tile .as-n {
+  font-size: 11px;
+}
+
+.dc-locked {
+  margin: 12px 0 0;
+  font:
+    12px/1.5 'Sora',
+    sans-serif;
+  color: var(--dc-faint);
+}
+.dc-locked span {
+  font:
+    700 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.04em;
+  color: var(--dc-muted);
+}
+.dc-locked[hidden] {
+  display: none;
+}
+
+.dc-attack-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
+}
+.dc-tally {
+  margin: 0;
+  font:
+    600 12.5px 'Oxanium',
+    sans-serif;
+  color: var(--dc-muted);
+}
+.dc-tally b {
+  margin-right: 2px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--dc-red);
+}
+.dc-clear {
+  min-height: 34px;
+  padding: 0 14px;
+}
+.dc-clear[hidden] {
+  display: none;
+}
+
+/* ======================================================================
+   2. TARGETS
+   ====================================================================== */
+.dc-targets {
+  padding: 20px;
+}
+.dc-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+/* The row scrolls sideways, and a scroll box clips whatever sits outside
+   it -- including the selected tab's 3px keycap edge underneath. The
+   padding gives that edge room; the negative margin keeps the spacing. */
+.dc-cats {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  margin: -2px -2px -6px;
+  scrollbar-width: none;
+}
+.dc-cats::-webkit-scrollbar {
+  display: none;
+}
+.dc-cats .am-tab {
+  flex: none;
+  flex-direction: row;
+  min-height: 36px;
+  padding: 0 13px;
+}
+.dc-find {
+  display: flex;
+  gap: 8px;
+}
+.dc-search {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  color: var(--dc-text);
+  caret-color: var(--dc-red);
+  font:
+    13px 'Sora',
+    sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.dc-search::placeholder {
+  color: var(--dc-faint);
+}
+.dc-search:focus {
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.dc-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  color: var(--text-muted, #949ba4);
+  font:
+    800 11px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.dc-sort:hover {
+  background: var(--flat-hover, #1e1f23);
+  color: #c8cbcd;
+}
+.dc-sort[aria-pressed='true'] {
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--dc-text);
+}
+.dc-sort[aria-pressed='true'] svg {
+  color: var(--dc-red);
+}
+.dc-sort:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.dc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+  gap: 12px;
+}
+.dc-skel {
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  background: linear-gradient(100deg, #141518 30%, #1a1b1f 50%, #141518 70%) 0 0 / 300% 100%;
+  animation: dcSkel 1.4s linear infinite;
+}
+
+/* ---- Target card ------------------------------------------------------------------ */
+.dc-card {
+  container-type: inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 7px 7px 0;
+  border: 1px solid var(--dc-edge);
+  border-radius: 14px;
+  background: var(--dc-card);
+  transition: border-color 0.3s ease;
+}
+/* The picture: the building standing on a lit patch of floor, with a soft
+   contact shadow under it, so every model sits at the same scale. */
+.dc-pic {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 9px;
+  background: radial-gradient(62% 52% at 50% 60%, #2a2d34 0%, #1b1d22 70%, #17181c 100%);
+}
+.dc-pic::before {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 9%;
+  height: 16%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), transparent);
+}
+.dc-pic > img {
+  position: absolute;
+  inset: 6% 12% 11%;
+  width: 76%;
+  height: 83%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4));
+  transition: filter 0.35s ease;
+}
+.dc-card.is-hero .dc-pic {
+  background: #1b1d22;
+}
+.dc-card.is-hero .dc-pic::before {
+  display: none;
+}
+.dc-card.is-hero .dc-pic > img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+  filter: none;
+}
+
+/* Level pill, bottom-left on the picture. Tap it and it turns into a
+   stepper in the same spot. */
+.dc-lv {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  padding: 0 5px 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  background: rgba(12, 13, 15, 0.86);
+  color: #e6e7ea;
+  font:
+    700 11px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.dc-lv svg {
+  width: 12px;
+  height: 12px;
+  color: var(--dc-faint);
+}
+.dc-lv:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(30, 32, 37, 0.95);
+}
+.dc-lv:disabled {
+  padding-right: 8px;
+  cursor: default;
+}
+.dc-lv:disabled:hover {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(12, 13, 15, 0.86);
+}
+.dc-lv-step {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  z-index: 4;
+  justify-content: space-between;
+  background: #0c0d0f;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+  animation: dcPop 0.18s var(--dc-ease);
+}
+.dc-card.is-open .dc-lv {
+  display: none;
+}
+
+/* The text half is one button: it flips the picture to the breakdown. */
+.dc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin: 0;
+  padding: 9px 3px 11px;
+  border: 0;
+  border-radius: 0 0 12px 12px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dc-info:focus-visible {
+  outline-offset: -2px;
+}
+.dc-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  font:
+    600 13px/1.3 'Sora',
+    sans-serif;
+  color: #e6e7ea;
+}
+.dc-info-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: #4d5158;
+  transition: color 0.15s ease;
+}
+.dc-info-ico svg {
+  width: 14px;
+  height: 14px;
+}
+.dc-info:hover .dc-info-ico,
+.dc-card.is-open .dc-info-ico {
+  color: var(--dc-muted);
+}
+.dc-hp {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'Oxanium', sans-serif;
+}
+.dc-hp b {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: #f4f5f7;
+  transition: color 0.3s ease;
+}
+.dc-hp span {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--dc-faint);
+}
+/* Health bar: what's left in light grey, then one red step per attack,
+   split by hairlines so you can see who did what. */
+.dc-meter {
+  display: flex;
+  gap: 1px;
+  height: 6px;
+  margin: 6px 0 2px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #0b0c0e;
+}
+.dc-meter i,
+.dc-meter s {
+  flex: none;
+  width: var(--w);
+  transition: width 0.32s var(--dc-ease);
+}
+.dc-meter i {
+  background: #e3e5e9;
+}
+.dc-meter s {
+  background: var(--c);
+}
+.dc-st {
+  font:
+    500 11.5px/1.4 'Sora',
+    sans-serif;
+  color: var(--dc-muted);
+}
+
+/* Breakdown: over the picture, same size, so opening it never shifts the
+   grid. */
+.dc-bd {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 9px 10px;
+  overflow-y: auto;
+  background: rgba(12, 13, 16, 0.96);
+  animation: dcFade 0.16s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.dc-bd ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dc-bd li {
+  display: grid;
+  grid-template-columns: 6px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  font:
+    500 10.5px/1.25 'Sora',
+    sans-serif;
+  color: #d5d8de;
+}
+.dc-bd-sw {
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.dc-bd-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dc-bd-val {
+  font:
+    700 11px 'Oxanium',
+    sans-serif;
+  color: #f2f3f5;
+}
+.dc-bd li.is-empty {
+  display: block;
+  line-height: 1.45;
+  color: var(--dc-faint);
+}
+.dc-bd li.is-blocked {
+  color: var(--dc-faint);
+}
+.dc-bd li.is-blocked .dc-bd-sw {
+  background: #2c2f35;
+}
+.dc-bd li.is-blocked .dc-bd-val {
+  font-weight: 600;
+  color: var(--dc-faint);
+}
+.dc-bd-total {
+  display: flex;
+  justify-content: space-between;
+  margin: auto 0 0;
+  padding-top: 7px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font:
+    600 11px 'Sora',
+    sans-serif;
+  color: var(--dc-muted);
+}
+.dc-bd-total b {
+  font:
+    700 13px 'Oxanium',
+    sans-serif;
+  color: var(--dc-red);
+}
+
+/* ---- Destroyed: the strike stamp ---------------------------------------------------
+   The building stays in colour, a step darker, with a red ink stamp across
+   it. The card's edge and the zero go red; the status says how much was
+   to spare. The stamp only presses in when a card goes down while you
+   watch (.is-fresh) -- never on load, a filter change or a Town Hall swap. */
+.dc-card.is-dead {
+  border-color: rgba(224, 99, 99, 0.42);
+  background: linear-gradient(180deg, rgba(224, 99, 99, 0.08), rgba(224, 99, 99, 0) 55%), var(--dc-card);
+}
+.dc-card.is-dead .dc-pic > img {
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4)) brightness(0.74) saturate(0.85);
+}
+.dc-card.is-dead .dc-hp b {
+  color: var(--dc-red);
+}
+.dc-card.is-dead .dc-st {
+  color: #d98c86;
+}
+.dc-stamp {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 1;
+  transform: translate(-50%, -50%) rotate(-9deg);
+  pointer-events: none;
+}
+.dc-stamp span {
+  display: block;
+  padding: 0.42em 0.8em 0.36em;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  outline: 1px solid currentColor;
+  outline-offset: -5px;
+  background: rgba(16, 17, 20, 0.62);
+  color: var(--dc-ink);
+  font:
+    800 clamp(10px, 7.6cqi, 15px) / 1 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.dc-card.is-fresh .dc-stamp {
+  animation: dcStamp 0.42s var(--dc-ease) both;
+}
+.dc-card.is-fresh .dc-pic > img {
+  animation: dcThud 0.34s ease-out 0.1s;
+}
+.dc-card.is-fresh {
+  animation: dcEdge 0.9s ease-out;
+}
+.dc-card.is-open .dc-stamp {
+  display: none;
+}
+
+/* Your attack can't touch it at all. */
+.dc-card.is-immune .dc-pic > img {
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4)) saturate(0.45) brightness(0.6);
+}
+.dc-card.is-immune .dc-st {
+  color: var(--dc-faint);
+}
+
+.dc-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 36px 12px;
+  text-align: center;
+  font:
+    13px/1.5 'Sora',
+    sans-serif;
+  color: var(--dc-muted);
+}
+.dc-foot {
+  max-width: 78ch;
+  margin: 18px 2px 0;
+  font:
+    11.5px/1.65 'Sora',
+    sans-serif;
+  color: var(--dc-faint);
+}
+.dc-scrim {
+  display: none;
+}
+
+/* ---- Motion ----------------------------------------------------------------------- */
+@keyframes dcStamp {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translate(-50%, -50%) rotate(-17deg) scale(1.9);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(-50%, -50%) rotate(-8deg) scale(0.93);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-9deg) scale(1);
+  }
+}
+@keyframes dcThud {
+  40% {
+    transform: translateY(2px) scale(0.982);
+  }
+}
+@keyframes dcEdge {
+  0% {
+    border-color: var(--dc-red);
+    box-shadow: 0 0 0 1px rgba(224, 99, 99, 0.5);
+  }
+}
+@keyframes dcBump {
+  45% {
+    transform: scale(1.12);
+  }
+}
+@keyframes dcPop {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes dcFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes dcSkel {
+  to {
+    background-position: -300% 0;
+  }
+}
+
+/* ======================================================================
+   LAYOUT
+   ====================================================================== */
+/* Desktop: the attack docks beside the board and stays in view while the
+   board scrolls (the page scrolls inside .coc-main, under the two fixed
+   bars -- hence the top offset). */
+@media (min-width: 1151px) {
+  .dc {
+    display: grid;
+    grid-template-columns: minmax(300px, 336px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .dc-attack {
+    /* .coc-main already pads 88px under the two fixed bars, and sticky's
+       top counts from inside that padding -- so 16px is the gap under the
+       bars. Height: the screen minus the bars and a 16px gap above and
+       below, so the box is as tall as the window allows. */
+    position: sticky;
+    top: 16px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  }
+  .dc-intro {
+    max-width: 30ch;
+  }
+  .dc-targets .dc-intro {
+    max-width: 52ch;
+  }
+  .dc-attack-body,
+  .dc-attack-inner {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+  .dc-attack-foot {
+    margin-top: auto;
+  }
+  .dc-locked {
+    margin-bottom: 16px;
+  }
+}
+
+/* Narrow desktop / tablet: one box above the other. */
+@media (max-width: 1150px) {
+  .dc-attack {
+    margin-bottom: 16px;
+  }
+  .dc-kit-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    column-gap: 24px;
+  }
+  .dc-kit-row:nth-child(2) {
+    border-top: 0;
+  }
+}
+
+/* Phones: "Your attack" becomes a tray docked above the bottom nav. Tap it
+   and the box rises as a sheet over a scrim; the board scrolls under it. */
+@media (max-width: 970px) {
+  .coc-content:has(> #damageCalc) > .first-layer {
+    display: flex;
+  }
+  .am-stb-title {
+    display: none;
+  }
+  .am-stb-crumbs {
+    display: inline-flex;
+  }
+
+  .dc-attack {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background: #17181c;
+    box-shadow: 0 -10px 36px -8px rgba(0, 0, 0, 0.85);
+    transition: bottom 0.3s ease;
+  }
+  /* The bottom nav slides away on scroll; the tray follows it down. */
+  body:has(.bn-bar.bn-hidden) .dc-attack {
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .dc-tray {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 58px;
+    padding: 0 12px 0 14px;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dc-tray-label {
+    flex: none;
+    font:
+      700 13px 'Sora',
+      sans-serif;
+    color: var(--dc-text);
+  }
+  .dc-tray-tiles {
+    display: flex;
+    flex: 1;
+    gap: 5px;
+    min-width: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 18px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 18px), transparent);
+  }
+  .dc-tray-tiles .as-tile {
+    width: 34px;
+    height: 34px;
+  }
+  .dc-tray-tiles .as-n {
+    font-size: 10px;
+  }
+  .dc-tray-empty {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font:
+      12.5px 'Sora',
+      sans-serif;
+    color: var(--dc-faint);
+  }
+  .dc-tray-score {
+    flex: none;
+    font:
+      600 12px 'Oxanium',
+      sans-serif;
+    color: var(--dc-muted);
+  }
+  .dc-tray-score b {
+    font-size: 17px;
+    color: var(--dc-red);
+  }
+  .dc-tray-chev {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--key-face);
+    box-shadow: var(--key-soft);
+    color: #c8cbcd;
+    transition: transform 0.3s var(--dc-ease);
+  }
+  .dc.is-sheet .dc-tray-chev {
+    transform: rotate(180deg);
+  }
+  .dc-attack-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.34s var(--dc-ease);
+  }
+  .dc.is-sheet .dc-attack-body {
+    grid-template-rows: 1fr;
+  }
+  .dc-attack-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .dc.is-sheet .dc-attack-inner {
+    max-height: calc(78vh - 58px);
+    padding: 4px 16px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .dc.is-sheet .dc-head {
+    align-items: center;
+    padding-top: 12px;
+  }
+  /* The tray already says \"Your attack\" above it. */
+  .dc.is-sheet .dc-attack .dc-title {
+    display: none;
+  }
+  .dc.is-sheet .dc-attack .dc-intro {
+    margin: 0;
+  }
+  .dc-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 899;
+    display: block;
+    background: rgba(5, 6, 8, 0.6);
+    animation: dcFade 0.2s ease-out;
+  }
+  .dc-scrim[hidden] {
+    display: none;
+  }
+  html.dc-lock,
+  html.dc-lock body {
+    overflow: hidden;
+  }
+  .dc-kit-list {
+    display: block;
+  }
+  .dc-kit-row:nth-child(2) {
+    border-top: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
+  }
+
+  /* Bigger touch targets: 40px+ on every control a thumb reaches for. */
+  .dc-add,
+  .dc-step-count button {
+    width: 40px;
+    height: 40px;
+  }
+  .dc-step-level button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .dc-targets {
+    margin-bottom: 92px;
+    padding: 16px 12px;
+  }
+  .dc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .dc-card {
+    padding: 6px 6px 0;
+    border-radius: 12px;
+  }
+  .dc-hp b {
+    font-size: 19px;
+  }
+  .dc-lv {
+    height: 30px;
+    padding: 0 7px 0 9px;
+  }
+  .dc-lv-step button {
+    width: 34px;
+    height: 34px;
+  }
+  .dc-info {
+    padding: 8px 2px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dc *,
+  .dc *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}

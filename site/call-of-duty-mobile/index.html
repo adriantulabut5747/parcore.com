@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AC | CODM Loadouts</title>
+
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+
+<!-- Oxanium -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+
+      <link rel="stylesheet" href="/11layout.css">
+
+<style>
+
+  body { visibility: hidden; }
+    #page-loader { position: fixed; inset: 0; background: #0f0f10; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; z-index: 999999; gap: 16px; visibility: visible; opacity: 1; transition: opacity 0.4s ease;}
+    #page-loader.hidden { opacity: 0; pointer-events: none; }
+    .parchrome-fade { opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
+    .parchrome-ring { width: 44px; height: 44px; border-radius: 50%;
+      border: 3px solid #2a2a2a; border-top: 3px solid #9f0000; animation: parchrome-spin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;}
+    .parchrome-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #555; font-family: sans-serif;
+      opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
+    @keyframes parchrome-spin { to { transform: rotate(360deg); } }
+    @keyframes parchrome-fadein { to { opacity: 1; } }
+    html.loaded body { visibility: visible; }
+
+  @media (max-width: 970px) {.discord-card { background: linear-gradient( 90deg,  rgba(240, 34, 34, 0.2), rgba(25, 26, 27, 0.5));}}
+
+ /* Hide page until fully loaded */
+  html {
+    visibility: hidden;
+  }
+
+  html.loaded {
+    visibility: visible;
+  }
+
+:root {
+  --bg-main: #202225;
+  --bg-tertiary: #0f0f10;
+  --bg-sidebar: #0f0f10;
+  --bg-hover: #202122;
+  --bg-box: #161616;
+  --bg-box-active: #303135;
+  --accent:#c22d2d;
+  --text-main: #eff2f5;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+}
+
+/* Reset */
+* {margin: 0; padding: 0; box-sizing: border-box; font-family: 'oxanium', sans-serif;}
+body {height: 100vh; background: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; overflow: hidden; }
+*{scrollbar-width: thin; /* Firefox */  scrollbar-color: #2f3136 #121318;}
+.icon {width:18px; height:18px; stroke:var(--text-muted); stroke-width:2; fill:none; flex-shrink:0;}
+
+/* Main body content */
+.coc-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow-y: auto;
+ 
+}
+
+.whats-up { display: flex; align-items: flex-start; gap: 16px; background: linear-gradient(
+ 90deg, rgba(17, 17, 17, 1), rgba(32, 32, 32, 0.5));
+
+            padding: 18px 20px; border-radius: 12px; margin-bottom: 12px; }
+.whats-up-icon { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+.whats-new-text { color: #a1a1a1; font-size: 20px; line-height: 1.6; font-weight: 300;}
+.mobile-text { display: none; }
+
+/* First layer buttons */
+.first-layer {display:flex; gap:10px; margin-bottom:10px; width:100%; margin-top: 20px;}
+.first-layer button {flex:1; padding:10px; border:none; border-radius:6px;  background: rgba(11, 11, 12, 0.8);
+  color:var(--text-muted); cursor:pointer; transition:background 0.2s; font-size:15px; font-weight:500;}
+.first-layer button.active, .first-layer button:hover {background:var(--bg-hover); color: var(--text-secondary);}
+.first-layer button.active{ background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+/* Second layer horizontal scroll */
+.second-layer-container {
+  position: relative;
+  overflow-x: auto;
+  margin-bottom: 0px;
+  width: 100%;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #565656 #161618;}
+.second-layer {display: flex; gap: 8px; padding: 4px 0; } 
+
+.second-layer button img {
+  width: 25px;        /* 🔥 bigger */
+  height: 25px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.second-layer button {
+  display: inline-flex;          /* key fix */
+  align-items: center;           /* vertical alignment */
+  gap: 3px;                      /* space between icon & text */
+  margin-bottom: 0px;
+  position: relative;
+  flex: 0 0 auto;
+  padding: 2px 16px;
+  border: none;
+  border-radius: 8px;
+  margin-right: px;
+  background: rgba(11, 11, 12, 0.8);
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.second-layer button.active, .second-layer button:hover {background:var(--bg-hover); color:var(--text-secondary);}
+.second-layer::-webkit-scrollbar {display:none;}
+.second-layer {-ms-overflow-style:none; scrollbar-width:none;}
+.second-layer button.active { background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+.discord-card{
+ 
+ box-shadow: 0 4px 12px rgba(0,0,0,10);
+} 
+
+/* Bases grid */
+.grid-container {margin-top: 40px;}
+
+.fullscreen-image {position: relative; width: 100%; text-align: center; margin: 0 auto; margin-bottom: 10px;  overflow: hidden; 
+ }
+
+.fullscreen-image img {width: 100%; height: auto; border-radius: 10px; box-shadow: 0 5px 12px rgba(0,0,0,0.4);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;}
+
+.fullscreen-image:hover img {
+  transform: scale(1.04); /* very subtle */
+}
+
+.army-divider {
+  display: flex;
+  align-items: center;
+  margin-top: 8px ;
+  margin-bottom:10px;
+}
+
+.army-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(209, 209, 209, 0.5), rgba(255,255,255,0));
+}
+
+.download-btn {
+    margin-top: 14px;
+    padding: 10px 26px;
+
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-shadow:0 6px 14px rgba(0, 0, 0, 0.35),inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+     background: linear-gradient( 180deg,  rgba(27, 31, 42, 1) 0%,  rgba(35, 37, 44, 1) 100%);
+  border: 2px solid rgba(255,255,255,0.6);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    color: #fff;
+    
+  }
+.download-btn:hover {
+      border: 1px solid #5865f2;
+       background: linear-gradient( 180deg,  rgb(42, 48, 63) 0%,  rgba(35, 37, 44, 1) 100%);
+
+    --accent: #5865f2;
+    filter: brightness(1.08);
+
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);}
+.download-btn:active {
+   
+    box-shadow:0 4px 10px rgba(0, 0, 0, 0.35),inset 0 2px 6px rgba(0, 0, 0, 0.25);
+   }
+
+ /* Time Stamp Thingy */
+.image-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #082a5a;   
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 5;
+    letter-spacing: 1px;}
+.image-logo {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    cursor: pointer;}
+.image-logo img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: brightness(1.1);
+    border-radius: 50px;
+    margin-top: 25px;
+    margin-left: 25px;}
+
+/* Zoom lightbox now lives on the Gunsmith page (see saved-sections.html) */
+
+/* Popup box */
+.cc-popup {
+  position: absolute;
+  top: 34px;
+  left: 28px;
+  width: 200px;
+  background: #1e1f22;
+  border: 1px solid #2f3136;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #dcddde;
+  display: none;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);}
+.cc-popup strong { display: block; margin-bottom: 6px; color: #f2f3f5;}
+.cc-popup ul { padding-left: 16px; margin: 0;}
+.cc-popup li { margin-bottom: 4px;}
+
+/* Global scrollbar (Chrome, Edge, Safari) */
+::-webkit-scrollbar { width: 10px;}
+::-webkit-scrollbar-track { background: #121318; /* dark background */}
+::-webkit-scrollbar-thumb { background: #2f3136;   border-radius: 10px; border: 2px solid #121318; }
+::-webkit-scrollbar-thumb:hover { background: #3a3d43;}
+* { scrollbar-width: thin; scrollbar-color: #2f3136 #121318;/* Firefox */}
+
+.whats-up-strong{font-weight: 900 ; font-size: 16px;}
+
+.coc-content {
+  flex: 1 0 auto;
+background: linear-gradient(180deg, #131212 0%, #171717 100%);
+
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0;}
+  to { transform: scale(1);  opacity: 1;}}
+
+.site-footer {
+    flex-shrink: 0;
+    width: 100%;
+    background: linear-gradient(180deg, #0f0f10, #0b0b0c);
+    border-top: 1px solid #2f3136;
+    padding: 18px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;}
+.footer-icons { display: flex; gap: 12px; justify-content: center; align-items: center;}
+.footer-icons a {
+    width: 38px;
+    height: 38px;
+    background: #161616;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background 0.2s ease;}
+.footer-icons a:hover { transform: translateY(-2px);background: #202225;}
+.footer-icons svg { width: 20px; height: 20px; fill: white;}
+.footer-text {font-size: 12px;color: var(--text-muted);letter-spacing: 0.4px;}
+
+.pagination { display: flex; justify-content: center; gap: 8px; margin: 10px 0; flex-wrap: wrap; margin-top: 0px; margin-bottom: 40px; margin-top: 20px;}
+.pagination a {
+    padding: 8px 14px;
+    border-radius: 6px;
+    background: var(--bg-box);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;}
+.pagination a:hover { background: var(--bg-hover); color: var(--text-main);}
+.pagination a.active {background: var(--bg-box-active);  color: var(--text-main);  font-weight: 600;}
+.pagination a.next {font-weight: 500;}
+
+.quick-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 20px 0 10px 0;}
+.quick-links a {
+    padding: 10px 18px;
+    background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 2px 6px #0b0b0c;
+    transition: background 0.2s, color 0.2s;}
+.quick-links a:hover {background-color: #283449; color: var(--text-main); cursor: pointer;}
+
+.whats-new {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: linear-gradient(90deg, #1b1c18, #252621);
+    padding: 16px 18px;
+    border-radius: 10px;
+    margin-bottom: 10px; /* space before footer */}
+.whats-new-icon { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; object-fit: contain; }
+.whats-new-text { color: var(--text-secondary); font-size: 12px; line-height: 1.5;}
+
+.image-badge, .image-logo { pointer-events: auto;}
+.fullscreen-image img { pointer-events: auto;}
+
+html, body { touch-action: pan-x pan-y; overscroll-behavior: contain;}
+* { -webkit-tap-highlight-color: transparent;}
+
+.clan-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+background: linear-gradient(
+    180deg, 
+    rgba(27, 31, 42, 0.7) 0%, 
+    rgba(18, 19, 24, 0.7) 100%
+);
+  border-radius: 10px;
+  padding: 16px;
+  max-width: 90%;
+  margin: 0px auto;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  margin-bottom: 30px;
+}
+
+.clan-box-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.clan-box-content {
+  flex: 1;
+}
+
+.clan-box-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.clan-box-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e0e0e0;
+}
+
+.clan-tag-click {
+  cursor: pointer;      /* shows pointer on hover */
+  text-decoration: underline; /* adds underline */
+   color: #7d85a8;           /* optional: make it white or whatever fits your theme */
+}
+.clan-tag-click:hover {
+  color: #556dd8;       /* optional: change color on hover */
+}
+
+.result-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  object-fit: contain;
+  
+}
+
+/* Mobile responsive */
+@media (max-width: 970px){
+  .quick-links a{font-size: 14px; }
+  .image-logo img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      filter: brightness(1.1);
+      border-radius: 50px;
+      margin-top: 2px;
+      margin-left: 2px;}
+  .site-footer{padding-bottom: 100px; padding-top: 50px;}
+  .footer-text{font-size: 9px;}
+  .download-btn {
+      margin-top: 14px;
+      padding: 10px 20px;
+      font-size: -2px;
+
+    }
+      .download-btn {
+    margin-top: 14px;
+    padding: 10px 20px;
+    border-radius: 8px;
+      }
+  .fullscreen-image{width: 100%; margin-bottom: 30px;}
+  .second-layer-container {margin-bottom: 0px;}
+  .pagination {font-size: 12px;}
+  .discord-card {  background: linear-gradient(
+    90deg,
+    rgba(43, 61, 158, 0.18),
+    rgba(47, 49, 54, 0)
+  );}
+
+  .desktop-text { display: none; }
+  .mobile-text { display: inline; }
+
+  .whats-new-text{font-size:  10.2px;}  
+  .fullscreen-image {position: relative; width: 100%; text-align: center; margin: 0 auto; margin-bottom: 10px; }
+  .clan-box-img { width: 80px; height: 80px; border-radius: 10px;}
+  .clan-box{margin-left: 25px; margin-right: 25px;}
+  .clan-box-text{font-size: 12.5px;}
+}
+
+@media (min-width:969px) { 
+   .whats-new-text{font-size: 16px;}
+  .whats-up-strong{font-size: 20px;}
+
+  .second-layer button{padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; }
+  .search-input{top: 0px;}
+  .search-overlay {top: 0px;}
+  .second-layer button img{width: 28px; height: 28px;}
+  .second-layer button {padding-left: 25px; padding-right: 25px;}
+}
+
+.search-close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none;
+  font-size: 1.8rem; color: #fff; cursor: pointer; z-index: 10000; transition: transform 0.2s;}
+.search-close-btn:hover {transform: rotate(90deg);}
+
+/* ============================================================
+   TOP-BAR SEARCH — upgraded to match /'s version.
+   Icon morph (magnifying glass <-> ✖), fg-card style results grid
+   fed by herosearch.json, clear button, body scroll lock, and
+   mobile back-button support (handled in the JS further down).
+   ============================================================ */
+
+/* Locks the page from scrolling behind the search modal while it's
+   open. Covers both scroll contexts this site can use: .coc-main is
+   the real scroll container on desktop, while a separate mobile rule
+   switches scrolling to `body` directly. */
+body.search-modal-open {
+  overflow: hidden !important;
+}
+body.search-modal-open .coc-main {
+  overflow: hidden !important;
+}
+
+#search-close-btn { position: fixed; top: 7px; right: 18px; font-size: 1.5rem; color: white;
+  background: none; border: none; cursor: pointer; z-index: 10000; /* above overlay */}
+#search-close-btn:hover { transform: rotate(90deg); transition: transform 0.2s;}
+
+/* View More button, reused as .hero-search-viewmore in / */
+.hero-search-viewmore {
+  display: block;
+  margin: 32px auto 50px;
+  padding: 10px 28px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.hero-search-viewmore:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border-color: rgba(255,255,255,0.24);
+}
+
+/* ---- fg-card box design (Popular Topics / hero search style) ---- */
+.fg-card {
+  flex: 0 0 33.3333%;
+  max-width: 33.3333%;
+  box-sizing: border-box;
+  padding: 0 10px;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+.fg-img-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16/10;
+  background: #1a1a1a;
+}
+.fg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s cubic-bezier(.25,.8,.25,1), filter .3s ease;
+  filter: brightness(0.88) contrast(1.05);
+}
+.fg-card:hover .fg-img {
+  transform: scale(1.07);
+  filter: brightness(1.05) contrast(1.05);
+}
+.fg-img-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.75) 100%);
+  pointer-events: none;
+}
+.fg-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  color: #fff;
+  z-index: 3;
+}
+.fg-tag-new { background: linear-gradient(90deg, #2b0707, #5f0808); }
+.fg-tag-hot { background: linear-gradient(90deg, #ad0000, #ff3b3b); }
+.fg-icon-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #161616;
+  border: 2px solid rgba(255,255,255,0.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 3;
+  transition: transform .3s ease, border-color .3s ease;
+}
+.fg-icon-badge img { width: 100%; height: 100%; object-fit: cover; }
+.fg-card:hover .fg-icon-badge { transform: scale(1.08); border-color: rgba(255,255,255,0.4); }
+.fg-info { padding: 12px 4px 4px; }
+.fg-title {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ffffff, #cfd6ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 3px;
+}
+.fg-sub { font-size: 13px; color: #8a8d93; font-weight: 500; }
+
+.coc-main{
+background-color: #181A1C;
+  font-family: 'Segoe UI', sans-serif;}
+
+</style>
+
+</head>
+<body>
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo">
+      <img src="/icons/home.jpg" alt="">
+    </div> Parchrome</div>
+
+<!-- Search button -->
+<button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
+  <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+    <!-- Magnifying glass -->
+    <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+    <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+  <span id="close-icon">✖</span>
+</button>
+<!-- Overlay -->
+<div id="search-overlay">
+  <!-- Search input -->
+  <div id="search-input-wrap">
+    <input type="search" id="search-input" placeholder="Find your next game..." oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+    <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+  </div>
+  <!-- Search results -->
+  <div id="search-results"></div>
+  <button type="button" id="search-view-more" class="hero-search-viewmore" style="display:none;">View More</button>
+</div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/codm.png  " alt="TH10 Icon" class="th-icon">
+    <div class="secondary-content">
+      Call of Duty Mobile
+    </div>
+  </div>
+
+</div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="sidebar" id="sidebar">
+    <!-- Top Box -->
+    <div class="top-box" id="top-box"></div>
+    <!-- Games list -->
+    <div class="games-container" id="games-container"></div>
+    <!-- Triple A Games -->
+  <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img  src="/icons/controllericon.png" class="tripleimg">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div> </div></div>
+
+  <div class="coc-main" >
+
+<div class="codm-hero">
+  <div class="codm-hero-bg" role="img" aria-label="Call of Duty Mobile — Ghost"></div>
+  <div class="codm-hero-overlay">
+    <div class="codm-hero-content">
+      <h1 class="codm-hero-title"><em>Call of Duty</em><br>Mobile</h1>
+    </div>
+  </div>
+</div>
+
+<style>
+.codm-hero{
+  position:relative;
+  min-width:100%;
+  min-height:455px;
+  max-height:420px;
+  overflow:hidden;
+  flex:0 0 auto;
+  background:#0c0c0d;
+  margin-top: 45px;
+}
+.codm-hero-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  background-image:url('https://i.pinimg.com/736x/f5/d6/1d/f5d61d6d2f2541b4661a9840940909b1.jpg');
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:center 15%;
+  filter:saturate(1.1) contrast(1.05);
+  z-index:1;
+}
+/* On mobile this gets overridden with an explicit oversized background-size below,
+   which guarantees both left-right AND up-down panning always work — with plain
+   "cover", the crop math only leaves room to pan in ONE direction depending on
+   how the image's shape compares to the box's shape (that's why the vertical
+   number seemed to do nothing before: there was zero vertical room to pan through). */
+/* fallback look when no image is supplied yet */
+.codm-hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(194,45,45,0.16), transparent 55%),
+    linear-gradient(135deg, #150404 0%, #0c0c0d 55%, #050505 100%);
+  z-index:0;
+}
+.codm-hero-overlay{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  padding-left:6%;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 45%);
+}
+/* Fade the very bottom of the hero into the same dark tone the battle pass
+   widget uses, so the two sections blend into one continuous surface
+   instead of meeting at a hard edge. */
+.codm-hero::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:180px;
+  z-index:3;
+  pointer-events:none;
+  background:linear-gradient(to bottom, rgba(18,18,19,0) 0%, rgba(18,18,19,0.75) 60%, #121213 100%);
+}
+
+.codm-hero-content{
+  position:relative;
+  z-index:3;
+  max-width:640px;
+  color:#fff;
+  animation:codmFadeInUp .8s ease forwards;
+  margin-top: 50px;
+}
+.codm-hero-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:#ff5555;
+  margin-bottom:14px;
+}
+.codm-hero-eyebrow::before{
+  content:"";
+  width:22px;
+  height:2px;
+  background:#c22d2d;
+  display:inline-block;
+}
+.codm-hero-title{
+  font-size:clamp(40px,6vw,72px);
+  font-weight:900;
+  line-height:1.02;
+  text-transform:uppercase;
+  margin-bottom:18px;
+  background:linear-gradient(90deg,#ffffff,#e6dede,#c9c4c4);
+  background-clip:text;
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:2px 4px 10px rgba(0,0,0,0.5);
+  margin-left: 25%;
+  max-width: 100%;
+  min-width: 100%;
+}
+.codm-hero-title em{
+  font-style:normal;
+  background:linear-gradient(90deg,#be1b1b,#a70e0e);
+  background-clip:text;
+  -webkit-background-clip:text;
+}
+.codm-hero-tagline{
+  font-size:clamp(14px,1.2vw,17px);
+  line-height:1.6;
+  color:#c8c8c8;
+  max-width:520px;
+  text-shadow:0 1px 3px rgba(0,0,0,0.6);
+}
+
+@keyframes codmFadeInUp{
+  0%{opacity:0; transform:translateY(18px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+  @media (max-width:970px){
+  .codm-hero-title{margin-left: 0%;}
+  .codm-hero{min-height:350px; max-height:350px; margin-top: 50px;}
+  .codm-hero-overlay{
+    padding-left:6%;
+    padding-right:6%;
+    justify-content:center;
+    text-align:center;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.35)),
+      linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.2) 45%, rgba(0,0,0,0.92) 100%);
+  }
+  .codm-hero-content{max-width:100%; margin:60px auto 0 auto;}
+  .codm-hero-eyebrow{justify-content:center;}
+  .codm-hero-tagline{max-width:100%; margin:0 auto;}
+.codm-hero-bg{
+  background-position:20% 0%;
+}
+}
+</style>
+
+<!-- TOPIC NAV -->
+<div class="topic-nav-wrap">
+  <div class="topic-nav" id="topicNav">
+    <a href="/call-of-duty-mobile/" class="topic-nav-btn topic-nav-home active" aria-label="Home">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg>
+    </a>
+    <a href="/call-of-duty-mobile/attachments" class="topic-nav-btn"> Attachments</a>
+    <a href="/call-of-duty-mobile/loadouts" class="topic-nav-btn">Loadouts</a>
+    <a href="/codm-bot-checker.html" class="topic-nav-btn">Bot Checker</a>
+    <a href="/codm-tools.html" class="topic-nav-btn">Tools</a>
+    <a href="/codm-color-codes.html" class="topic-nav-btn">Color Codes</a>
+    <a href="/codm-sensitivity.html" class="topic-nav-btn">Sensitivity</a>
+  </div>
+</div>
+
+<style>
+.topic-nav-wrap{
+  width:100%;
+  background:#141416;
+  border-bottom:1px solid #26262a;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+.topic-nav{
+  display:flex;
+  gap:8px;
+  max-width:100%;
+  padding:12px 15%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  flex-shrink:0;
+}
+.topic-nav::-webkit-scrollbar{ display:none; }
+.topic-nav-btn{
+  flex-shrink:0;
+  padding:10px 20px;
+  border-radius:8px;
+  background:transparent;
+  border:1px solid transparent;
+  color:var(--text-muted);
+  font-size:12.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.6px;
+  font-family:'Oxanium',sans-serif;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.topic-nav-btn:hover{
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  border-color:#26262a;
+}
+.topic-nav-btn.active{
+  background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+  color: var(--text-main); font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4); color:#fff;
+  box-shadow:0 3px 10px rgba(35, 35, 35, 0.35);
+  border:none;
+}
+.topic-nav-home{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 12px;
+  margin-right:6px;
+  border-right:1px solid #26262a;
+  border-radius:8px 0 8px 8px;
+}
+@media (max-width: 970px){
+  .topic-nav{ padding:12px 5%; }
+}
+</style>
+
+<script>
+// Highlight the current page's nav button (currentPage is defined further down by the site's normalizePage script)
+document.addEventListener('DOMContentLoaded', function(){
+  var page = normalizePage(window.location.pathname);
+  document.querySelectorAll('.topic-nav-btn').forEach(function(btn){
+    var href = normalizePage(btn.getAttribute('href'));
+    if (href === page) {
+      document.querySelectorAll('.topic-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  });
+});
+</script>
+
+<!-- BATTLE PASS COUNTDOWN WIDGET -->
+<div class="bp-widget" id="bp-widget">
+  <svg class="bp-watermark" width="140" height="140" viewBox="0 0 236 256" fill="currentColor">
+    <path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/>
+    <path d="M108,35 L94,62 L207,256 L236,256 Z"/>
+  </svg>
+  <div class="bp-widget-left">
+    <div class="bp-widget-label">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Current Battlepass
+    </div>
+    <div class="bp-widget-season" id="bp-season-name">Season 6 — Take Your Heart</div>
+    <div class="bp-widget-sub">Battle Pass resets when Season 7 begins </div>
+  </div>
+  <div class="bp-widget-right">
+    <div class="bp-countdown" id="bp-countdown">
+      <div class="bp-time-block"><span class="bp-num" id="bp-days">--</span><span class="bp-unit">Days</span></div>
+      <div class="bp-time-block"><span class="bp-num" id="bp-hours">--</span><span class="bp-unit">Hrs</span></div>
+      <div class="bp-time-block"><span class="bp-num" id="bp-mins">--</span><span class="bp-unit">Min</span></div>
+      <div class="bp-time-block"><span class="bp-num" id="bp-secs">--</span><span class="bp-unit">Sec</span></div>
+    </div>
+  </div>
+</div>
+
+<style>
+.bp-widget{
+  position:relative;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  background:
+    linear-gradient(180deg, #121213 0%, rgba(22,22,23,0.7) 40px, rgba(15,15,16,0.85) 100%);
+  border:none;
+  border-radius:0;
+  padding:40px 15% 20px 15%;
+  flex-wrap:wrap;
+}
+.bp-watermark{
+  position:absolute;
+  right:11%;
+  top:50%;
+  transform:translateY(-50%);
+  color:rgba(255, 255, 255, 0.023);
+  pointer-events:none;
+  width: 80px;
+  z-index:0;
+}
+.bp-widget-left, .bp-widget-right{ position:relative; z-index:1; }
+.bp-widget-label{
+  display:flex; align-items:center; gap:6px;
+  font-size:11px; text-transform:uppercase; letter-spacing:2px;
+  color:var(--text-muted); font-weight:600; margin-bottom:4px;
+}
+.bp-widget-season{
+  font-size:19px; font-weight:700; color:var(--text-main);
+}
+.bp-widget-sub{
+  font-size:12px; color:#676565; margin-top:3px;
+}
+.bp-widget-right{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+.bp-countdown{ display:flex; gap:10px; }
+.bp-time-block{
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px;
+  padding:8px 12px;
+  min-width:52px;
+}
+.bp-num{ font-size:22px; font-weight:800; color:var(--accent); font-family:'Oxanium', sans-serif; line-height:1; }
+.bp-unit{ font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-top:4px; }
+.bp-widget-target{ font-size:11px; color:var(--text-muted); }
+
+@media (max-width: 600px){
+  .bp-widget{ flex-direction:column; align-items:flex-start;   padding:30px 5% 0px 5%;
+ }
+  .bp-widget-right{ align-items:flex-start; width:100%; }
+  .bp-countdown{ width:100%; justify-content:space-between; }
+  .bp-time-block{ min-width:0; flex:1; }
+  .bp-watermark{ width:90px; height:90px; right:12px; top:16px; transform:none; }
+}
+</style>
+
+<script>
+// ===== BATTLE PASS COUNTDOWN =====
+// The exact reset TIMESTAMP is not published anywhere as structured data (no API,
+// official or fan-made, exposes it) so that stays a manually-set fallback below —
+// clearly labeled, and easy to update once Activision confirms the next date.
+// The SEASON NAME, however, we pull live from Activision's own blog RSS feed,
+// so at least that part is never hand-typed and always reflects their latest post.
+(function(){
+  const FALLBACK_SEASON_NAME = 'Season 6 — Take Your Heart';
+  // Unconfirmed estimate based on the typical ~5-week CODM season cadence.
+  // Update the moment Activision publishes the real Season 7 date.
+  // Back-calculated from the actual in-game countdown reported on the Garena PH build
+  // (29 days 9 hours remaining as of 2026-07-07), which lines up with CODM's usual
+  // "5PM PT" reset pattern. Activision Global's official date may still shift slightly.
+  const SEASON_RESET_UTC = new Date('2026-08-05T17:00:00-07:00'); // 5PM PDT ≈ Aug 6, 8AM PH time
+
+  const seasonNameEl = document.getElementById('bp-season-name');
+  const targetLabelEl = document.getElementById('bp-target-label');
+  const daysEl = document.getElementById('bp-days');
+  const hoursEl = document.getElementById('bp-hours');
+  const minsEl = document.getElementById('bp-mins');
+  const secsEl = document.getElementById('bp-secs');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  // Live-fetch the newest CODM season post title from Activision's official blog RSS.
+  // Uses a free JSON-ified RSS proxy (no API key) since browsers can't parse raw RSS/CORS directly.
+  async function loadLiveSeasonName(){
+    try {
+      const feedUrl = 'mobilehttps://www.callofduty.com/site/callofduty/blog/rss?category=';
+      const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedUrl));
+      if (!res.ok) throw new Error('bad response');
+      const data = await res.json();
+      const latest = data.items && data.items.find(item => /season/i.test(item.title));
+      if (latest && latest.title){
+        seasonNameEl.textContent = latest.title.replace(/^Introducing\s+/i, '').trim();
+      } else {
+        seasonNameEl.textContent = FALLBACK_SEASON_NAME;
+      }
+    } catch (err) {
+      seasonNameEl.textContent = FALLBACK_SEASON_NAME;
+    }
+  }
+
+  function tick(){
+    const now = new Date();
+    let diff = SEASON_RESET_UTC - now;
+
+    if (diff <= 0) {
+      daysEl.textContent = '00';
+      hoursEl.textContent = '00';
+      minsEl.textContent = '00';
+      secsEl.textContent = '00';
+      targetLabelEl.textContent = 'Season reset is live!';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff / (1000*60*60)) % 24);
+    const mins = Math.floor((diff / (1000*60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+
+    daysEl.textContent = pad(days);
+    hoursEl.textContent = pad(hours);
+    minsEl.textContent = pad(mins);
+    secsEl.textContent = pad(secs);
+  }
+
+  loadLiveSeasonName();
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+<!-- ESPORTS CHAMPIONSHIP HUB — vred.jpg is a fixed-height section BACKGROUND behind just the
+     widget card, fading down to coc-main's own colour. The search/filter/grid content lives
+     OUTSIDE this wrapper (further below) so it always sits on the flat page background,
+     no matter how tall the grid gets — that decoupling is what was causing the visible
+     line/pattern before (the fade was being stretched to fit the grid's variable height,
+     so on a short grid it never finished fading before the image peeked through). -->
+<div class="champ-section-bg">
+<div class="champ-widget">
+  <div class="champ-header">
+    <div class="champ-title">
+      <svg width="16" height="16" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+      <span class="champ-dot"></span>
+      World Championship 2026
+    </div>
+    <div class="champ-prize"><span class="champ-prize-amount">$500,000</span> Prize Pool · 16 Teams · Nov 2026</div>
+  </div>
+
+  <div class="champ-body">
+    <div class="champ-next-label">Next Event</div>
+    <div class="champ-next-name" id="champNextName">—</div>
+    <div class="champ-countdown" id="champCountdown">
+      <div class="champ-time-block"><span class="champ-num" id="champ-days">--</span><span class="champ-unit">Days</span></div>
+      <div class="champ-time-block"><span class="champ-num" id="champ-hours">--</span><span class="champ-unit">Hrs</span></div>
+      <div class="champ-time-block"><span class="champ-num" id="champ-mins">--</span><span class="champ-unit">Min</span></div>
+      <div class="champ-time-block"><span class="champ-num" id="champ-secs">--</span><span class="champ-unit">Sec</span></div>
+    </div>
+  </div>
+
+  <div class="champ-timeline" id="champTimeline"></div>
+</div>
+</div>
+
+<style>
+.champ-section-bg{
+  position:relative;
+  width:100%;
+  min-height:450px;
+  padding:50px 0 0px 0;
+  background-color:#181A1C;
+  overflow:hidden;
+}
+.champ-section-bg::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:url('/minecrafticons/vred.jpg');
+  background-repeat:no-repeat;
+  background-size:100% 600px;
+  background-position:top center;
+  filter:brightness(0.45) saturate(1.05);
+}
+.champ-section-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none; 
+  background:linear-gradient(to bottom,
+    #121213 0px,
+    transparent 100px,
+    transparent 300px,
+    #181A1C 460px,
+    #181A1C 100%);
+}
+.champ-section-bg .champ-widget{ position:relative; z-index:1; }
+.champ-widget{
+  position:relative;
+  flex-shrink:0;
+  background:#141416;
+  border:1px solid #26262a;
+  padding:22px 26px;
+  margin:0 15% 20px 15%;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.35);
+  overflow:hidden;
+}
+.champ-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  filter:blur(6px) brightness(0.5) saturate(0.9);
+  transform:scale(1.1);
+  z-index:0;
+}
+.champ-widget::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg, rgba(10,10,11,0.95) 0%, rgba(14,14,15,0.65) 45%, rgba(14,14,15,0.25) 100%);
+  z-index:0;
+}
+.champ-header, .champ-body, .champ-timeline{ position:relative; z-index:1; }
+.champ-header{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.champ-title{ display:flex; align-items:center; gap:8px; font-size:15px; font-weight:800; color:var(--text-main); letter-spacing:0.3px; }
+.champ-title svg{ color:#c22d2d; flex-shrink:0; }
+.champ-dot{ width:7px; height:7px; border-radius:50%; background:#c22d2d; box-shadow:0 0 6px rgba(194,45,45,0.6); flex-shrink:0; }
+.champ-prize{ font-size:11.5px; color:var(--text-muted); font-weight:600; }
+.champ-prize-amount{ color:#4caf82; font-weight:700; }
+
+.champ-body{ margin-bottom:18px; }
+.champ-next-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); font-weight:700; margin-bottom:4px; }
+.champ-next-name{ font-size:17px; font-weight:700; color:var(--text-main); margin-bottom:10px; }
+.champ-countdown{ display:flex; gap:10px; }
+.champ-time-block{
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  padding:8px 12px;
+  min-width:52px;
+  backdrop-filter:blur(2px);
+}
+.champ-num{ font-size:20px; font-weight:800; color:#9a9da1; font-family:'Oxanium', sans-serif; line-height:1; }
+.champ-unit{ font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-top:4px; }
+
+.champ-timeline{ display:flex; flex-direction:column; gap:0; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; }
+.champ-stage{
+  display:flex; align-items:center; gap:10px; padding:6px 0; font-size:12.5px;
+}
+.champ-stage-dot{ width:7px; height:7px; border-radius:50%; background:#4a4a4e; flex-shrink:0; }
+.champ-stage.done .champ-stage-dot{ background:#4caf50; }
+.champ-stage.active .champ-stage-dot{ background:#c22d2d; box-shadow:0 0 6px rgba(194,45,45,0.6); }
+.champ-stage-name{ color:var(--text-secondary); flex:1; }
+.champ-stage.done .champ-stage-name{ color:var(--text-muted); text-decoration:line-through; text-decoration-color:#3a3a3a; }
+.champ-stage.active .champ-stage-name{ color:var(--text-main); font-weight:700; }
+.champ-stage-date{ color:var(--text-muted); font-size:11px; flex-shrink:0; }
+
+@media (max-width: 970px){
+  .champ-widget{ margin:0 5% 20px 5%; }
+  .champ-widget::after{
+    background:linear-gradient(180deg, rgba(10,10,11,0.95) 0%, rgba(14,14,15,0.6) 45%, rgba(14,14,15,0.25) 100%);
+  }
+}
+@media (max-width: 600px){
+  .champ-widget{ padding:16px; }
+  .champ-countdown{ width:100%; }
+  .champ-time-block{ min-width:0; flex:1; }
+}
+</style>
+
+<script>
+// ===== ESPORTS CHAMPIONSHIP HUB =====
+// No free live-scores API exists for CODM esports, so this tracks the official
+// 2026 World Championship schedule and counts down to whichever stage is next.
+// Update dates here whenever Activision/CODM esports confirms new ones.
+// Source: callofduty.com/mobile/esports
+(function(){
+  const STAGES = [
+    { name: 'Summer Split Open Qualifiers', start: '2026-05-29T00:00:00-07:00', end: '2026-07-05T23:59:00-07:00' },
+    { name: 'Points Major (Summer Invitational)', start: '2026-07-10T00:00:00-07:00', end: '2026-07-19T23:59:00-07:00' },
+    { name: 'Fall Split Open Qualifiers', start: '2026-08-01T00:00:00-07:00', end: '2026-09-13T23:59:00-07:00' },
+    { name: 'Regional Championship (Fall Invitational)', start: '2026-09-20T00:00:00-07:00', end: '2026-09-27T23:59:00-07:00' },
+    { name: 'World Championship Finals', start: '2026-11-01T00:00:00-07:00', end: '2026-11-15T23:59:00-07:00' }
+  ];
+
+  const nextNameEl = document.getElementById('champNextName');
+  const daysEl = document.getElementById('champ-days');
+  const hoursEl = document.getElementById('champ-hours');
+  const minsEl = document.getElementById('champ-mins');
+  const secsEl = document.getElementById('champ-secs');
+  const timelineEl = document.getElementById('champTimeline');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function renderTimeline(now){
+    timelineEl.innerHTML = '';
+    STAGES.forEach(stage => {
+      const start = new Date(stage.start);
+      const end = new Date(stage.end);
+      let status = 'upcoming';
+      if (now > end) status = 'done';
+      else if (now >= start && now <= end) status = 'active';
+
+      const row = document.createElement('div');
+      row.className = 'champ-stage ' + status;
+      const dateLabel = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      row.innerHTML = `
+        <span class="champ-stage-dot"></span>
+        <span class="champ-stage-name">${stage.name}</span>
+        <span class="champ-stage-date">${dateLabel}</span>`;
+      timelineEl.appendChild(row);
+    });
+  }
+
+  function getNextTarget(now){
+    // find the next stage that hasn't ended yet
+    for (const stage of STAGES){
+      const end = new Date(stage.end);
+      if (now <= end) return stage;
+    }
+    return null;
+  }
+
+  function tick(){
+    const now = new Date();
+    const target = getNextTarget(now);
+
+    if (!target){
+      nextNameEl.textContent = '2026 season complete';
+      daysEl.textContent = '00'; hoursEl.textContent = '00'; minsEl.textContent = '00'; secsEl.textContent = '00';
+      renderTimeline(now);
+      return;
+    }
+
+    const start = new Date(target.start);
+    const end = new Date(target.end);
+    const isLive = now >= start && now <= end;
+    const diff = isLive ? (end - now) : (start - now);
+
+    nextNameEl.textContent = target.name + (isLive ? ' — LIVE NOW' : '');
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff / (1000*60*60)) % 24);
+    const mins = Math.floor((diff / (1000*60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+
+    daysEl.textContent = pad(Math.max(days,0));
+    hoursEl.textContent = pad(Math.max(hours,0));
+    minsEl.textContent = pad(Math.max(mins,0));
+    secsEl.textContent = pad(Math.max(secs,0));
+
+    renderTimeline(now);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+<!-- FEATURED CODM CONTENTS -->
+<style>
+.layouts-title-box {
+  margin: 0px 15% 15px 15%;
+  border-radius: 0;
+  padding: 12px 20px 12px 0;
+  text-align: center;
+  background: transparent;
+  border-bottom: 1px solid #2a2a2a;
+  position: relative;
+}
+.layouts-title-box::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 2px;
+  background: linear-gradient(90deg, #d40000, #7b1515);
+}
+.layouts-title {
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #c0c9d4, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@media (max-width: 900px){
+.layouts-title-box {
+  margin: 0px 5% 15px 5%;
+}}
+</style>
+
+<div class="layouts-title-box">
+  <div class="layouts-title">Featured CODM Contents</div>
+</div>
+
+<div class="content-grid">
+  <a href="/call-of-duty-mobile/attachments" class="content-card">
+    <div class="content-card-img">  <img src="/callofdutymobile-icons/uss9.jpg" alt="Loadouts">
+      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    </div>
+    <div class="content-card-body">
+      <div class="content-card-name">Gunsmith Attachments</div>
+      <div class="content-card-desc">Top picked Attachments used for tournaments</div>
+    </div>
+  </a>
+
+  <a href="/call-of-duty-mobile/loadouts" class="content-card">
+    <div class="content-card-img">  
+
+      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    </div>
+    <div class="content-card-body">
+      <div class="content-card-name">MP/BR Loadouts</div>
+      <div class="content-card-desc">Complete class setups — perks, lethals, and gear combos.</div>
+    </div>
+  </a>
+
+  <a href="/codm-bot-checker.html" class="content-card">
+    <div class="content-card-img">
+      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    </div>
+    <div class="content-card-body">
+      <div class="content-card-name">Bot Checker</div>
+      <div class="content-card-desc">Check if a player name matches a known CODM bot.</div>
+    </div>
+  </a>
+
+  <a href="/codm-tools.html" class="content-card">
+    <div class="content-card-img">
+      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    </div>
+    <div class="content-card-body">
+      <div class="content-card-name">Web Tools</div>
+      <div class="content-card-desc">Community tools and utilities for CODM players.</div>
+    </div>
+  </a>
+
+  <a href="/codm-color-codes.html" class="content-card">
+    <div class="content-card-img">
+      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    </div>
+    <div class="content-card-body">
+      <div class="content-card-name">Graphic Color Codes</div>
+      <div class="content-card-desc">In-game name color codes to customize your username.</div>
+    </div>
+  </a>
+
+  <a href="/codm-sensitivity.html" class="content-card">
+    <div class="content-card-img">
+      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    </div>
+    <div class="content-card-body">
+      <div class="content-card-name">Preset Sensitivity</div>
+      <div class="content-card-desc">Recommended sensitivity settings by playstyle and device.</div>
+    </div>
+  </a>
+</div>
+
+<style>
+.content-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+  margin:0 15% 40px 15%;
+}
+.content-card{
+  display:block;
+  text-decoration:none;
+  background:#141416;
+  border:1px solid #26262a;
+  border-radius:12px;
+  overflow:hidden;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.content-card:hover{
+  transform:translateY(-3px);
+  border-color:#3a3a3a;
+  box-shadow:0 10px 24px rgba(0,0,0,0.4);
+}
+.content-card-img{
+  width:100%;
+  aspect-ratio:16/9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0f0f10;
+  color:rgba(255,255,255,0.08);
+  overflow:hidden;
+}
+.content-card-img img{
+  width:100%;
+  height:110%;
+  object-fit:cover;
+}
+.content-card-body{ padding:14px 16px 16px 16px; }
+.content-card-name{ font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:4px; }
+.content-card-desc{ font-size:12px; color:var(--text-muted); line-height:1.5; }
+
+@media (max-width: 970px){
+  .content-grid{ grid-template-columns:1fr; gap:18px; margin:0 5% 40px 5%; }
+}
+@media (min-width: 601px) and (max-width: 970px){
+  .content-grid{ grid-template-columns:repeat(2,1fr); }
+}
+</style>
+
+   <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+</div>  </div>
+
+<script src="/11layout.js"></script>
+
+<script>
+  
+//NORMALIZER (REMOVES THE .HTML)
+
+// Sidebar elementssssssssssssssssssssssssssssssssssssss
+
+// LOAD CONTROL (ADDED ONLY)
+
+// YOUR ORIGINAL FETCH (MODIFIED ONLY SLIGHTLY: moved into function wrapper)
+
+// 3 BOXES FUNCTION
+
+  // TOGGLE TRIPLE A
+  function toggleTripleA() {
+    const header = document.querySelector('.triple-a-header');
+    const list = document.getElementById('triple-a-list');
+    const isOpen = header.classList.contains('open');
+    if (isOpen) {
+      header.classList.remove('open');
+      header.classList.add('closed');
+      list.style.display = 'none';
+    } else {
+      header.classList.remove('closed');
+      header.classList.add('open');
+      list.style.display = 'flex';}}
+
+// TOGGLE SIDEBAR
+
+//auto clicks the hamburger when on desktop mode 
+
+  document.addEventListener('DOMContentLoaded', handleDesktopSidebar);// run on load
+  window.addEventListener('resize', handleDesktopSidebar);// run on resize (important when rotating / resizing window)
+
+//DOM LOADER
+document.addEventListener('DOMContentLoaded', () => {
+const header = document.querySelector('.triple-a-header');
+const list = document.getElementById('triple-a-list');
+  header.classList.add('open'); // arrow points down
+  list.style.display = 'flex';  // list visible
+});
+
+// SECONDARY TOP BAR AUTO TOP
+
+// SCROLLS TO TOP WHEN 2ND TOP BAR HIT
+document.querySelector('.secondary-top-bar').addEventListener('click', scrollToTop);
+
+//HELP POPUP
+
+
+// PAGE LOADER — fires when everything (images, fonts, scripts) is done
+window.addEventListener("load", () => {
+  document.documentElement.classList.add("loaded");
+  const loader = document.getElementById('page-loader');
+  loader.classList.add('hidden');
+  setTimeout(() => loader.remove(), 400);
+});
+
+// TOP-BAR SEARCH OVERLAY (upgraded to match /)
+// Uses herosearch.json and renders fg-card style result boxes.
+
+fetch('/herosearch.json')
+  .then(res => res.json())
+  .then(data => {
+    topSearchItems = data;
+    topSearchIsLoaded = true;
+  })
+  .catch(err => console.error('Top-bar search data failed to load:', err));
+
+// Fisher-Yates shuffle — avoids the bias a naive sort-by-random can introduce.
+
+// Renders a single result as an fg-card — same box design used by
+// Popular Topics / /'s hero search results.
+
+// Main search function — called on every keystroke and when the
+// overlay first opens (with an empty query, showing a random sample).
+
+// Defined at the top level (not nested inside DOMContentLoaded) so the
+// button's click handler can actually find it.
+ // tracks whether we've pushed a history entry for the open modal
+
+// `fromPopstate` is true when triggered by the back button itself —
+// in that case the browser is already consuming the history entry, so
+// we must NOT call history.back() again.
+
+// The button's onclick — opens if closed, closes if already open,
+// same toggle behavior as the hamburger button on the sidebar.
+
+// Mobile back button / gesture support: closes the modal instead of
+// leaving the page, if the modal happens to be open when it fires.
+window.addEventListener('popstate', () => {
+  if (searchoverlay && searchoverlay.style.display === 'block') {
+    closeSearch(true);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  searchoverlay = document.getElementById('search-overlay');
+  resultsContainer = document.getElementById('search-results');
+  searchinput = document.getElementById('search-input');
+  searchIcon = document.getElementById('search-icon');
+  topSearchViewMoreBtn = document.getElementById('search-view-more');
+  searchInputClearBtn = document.getElementById('search-input-clear');
+
+  // NOTE: the button itself already handles clicks via
+  // onclick="toggleSearch()" in the HTML — no separate listener needed.
+  searchoverlay.addEventListener('click', e => {
+    if (e.target === searchoverlay) closeSearch();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  topSearchViewMoreBtn.addEventListener('click', () => {
+    topSearchVisibleCount += TOP_SEARCH_LOAD_MORE_COUNT;
+    renderTopSearchVisible();
+  });
+
+  searchInputClearBtn.addEventListener('click', () => {
+    searchinput.value = '';
+    searchItems();
+    searchinput.focus();
+  });
+});
+
+// Skeleton for sidebar when not loaded
+      function showSkeletons(container, count) {
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'skeleton-item';
+    div.innerHTML = `
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-text"></div>`;
+    container.appendChild(div);
+  }
+}
+
+history.scrollRestoration = 'manual';
+
+var scrollKey = 'scrollPos_' + location.pathname;
+var cocMain = document.querySelector('.coc-main');
+
+// Save on scroll inside .coc-main
+cocMain.addEventListener('scroll', function() {
+  sessionStorage.setItem(scrollKey, cocMain.scrollTop);
+});
+
+// Restore on back navigation
+window.addEventListener('pageshow', function() {
+  var saved = sessionStorage.getItem(scrollKey);
+  if (saved) {
+    setTimeout(function() {
+      cocMain.scrollTop = parseInt(saved);
+    }, 100);
+  }
+});
+</script>
+
+<style>
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+#page-loader {
+  display: flex; /* restored */
+}
+
+#page-loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.parchrome-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #2a2a2a;
+  border-top: 3px solid #9f0000;
+  animation: parchrome-spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.parchrome-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #555;
+  font-family: 'Oxanium', sans-serif;
+}
+
+@keyframes parchrome-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+
+
+/* ============================================================
+   NOTHING BEHIND THE BARS BUT THE PAGE ITSELF
+   ============================================================
+   .main used to carry margin-top:52px to clear the fixed top bar, so
+   .coc-main -- the scroller, and the thing that paints the page -- began at
+   y=52. The mobile secondary bar is only 38px tall, so the moment it lifted
+   into the top bar's slot on scroll, y=38..52 was a strip of bare <body>
+   between the bar and the content. The scroller now starts at the top of the
+   viewport and gives that 52px back as padding, so content sits exactly
+   where it did before and there is no seam whatever the bars do.
+
+   The sidebar took its offset from .main's margin, so it carries it itself
+   at desktop widths; on mobile it is a fixed drawer with its own top:52px
+   and never depended on it. */
+.main{ margin-top: 0; }
+.coc-main{ padding-top: var(--topbar-height, 52px); }
+@media (min-width: 971px){
+  .sidebar{ margin-top: var(--topbar-height, 40px); }
+}
+</style>
+
+</body>
+</html>

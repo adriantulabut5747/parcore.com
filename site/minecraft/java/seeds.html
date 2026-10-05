@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AC | Parcore</title>
+<meta name="description" content="Browse the best Minecraft Vanilla worlds, shaders, resource packs, commands and more — curated by the Parchrome community.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/mc-java.html">
+<meta property="og:title" content="Minecraft Vanilla — Parchrome">
+<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
+<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css">
+<link rel="stylesheet" href="/mc-java.css">
+
+
+</head>
+<body class="mc-seeds">  
+
+  
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/minecrafticons/seeds.png" alt="TH10 Icon" class="th-icon" loading="lazy" decoding="async">
+    <div class="secondary-content">
+          <!-- Desktop shows just the section name; mobile adds the hardcoded
+               "you are here" crumb. Structure mirrors the HWR bar so the two
+               read identically, but the group is static here rather than
+               driven by a scroll-spy. -->
+          <span class="secondary-content-desktop">Minecraft Java</span>
+          <span class="secondary-content-mobile">
+            <span class="sc-mobile-text">Minecraft Java</span>
+            <span class="sc-mobile-group">Seeds</span>
+          </span>
+        </div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <!-- hwr's own strip markup, ids and all: 11layout.js wires the arrows by
+       these ids, and the CSS deciding how the two strips share the bar is
+       keyed to these wrappers. Sections left, editions right, both filled
+       from mc-contents.json by the nav script below. -->
+  <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+  <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+  <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
+       from hwr-categories.json on the hwr pages. This bar holds the Minecraft
+       editions instead, so it opts out of being rebuilt. -->
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+
+
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" loading="lazy" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <!-- HERO v2 — see the "HERO v2" block in mc-java.css. The edition wordmark
+         swaps per edition (Bedrock / Story / Dungeons logos are already in
+         minecrafticons/); the live version pills keep the hvs-* ids so the Mojang
+         piston-meta fetch in mc-java.js drives them unchanged. -->
+    <div class="hero-section hero-v2">
+      <img class="hero-video" src="/minecrafticons/minecarftearth.jpg" alt="" fetchpriority="high" decoding="async">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <div class="hero-eyebrow"><span class="hero-eyebrow-lead">Play more</span><span class="hero-eyebrow-sep">&middot;</span><span class="hero-eyebrow-em">Search less</span></div>
+          <h1 class="hero-title"><img src="/minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft" alt="Minecraft"></h1>
+          <p class="hero-tagline">The best worlds start with one number. Copy a seed, paste it in, and spawn exactly where the screenshots were taken.</p>
+          <div class="hero-live" id="hero-version-strip">
+            <span class="hero-live-item">
+              <span class="hero-live-dot"></span>
+              <span class="hero-live-label">Release</span>
+              <span class="hero-live-version" id="hvs-release-version">—</span>
+              <span class="hero-live-updated" id="hvs-release-updated">loading…</span>
+            </span>
+            <span class="hero-live-item">
+              <span class="hero-live-dot"></span>
+              <span class="hero-live-label">Snapshot</span>
+              <span class="hero-live-version" id="hvs-snapshot-version">—</span>
+              <span class="hero-live-updated" id="hvs-snapshot-updated">loading…</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="coc-content">
+      <div class="top-vignette"></div>
+
+      <!-- MOBILE NAV -->
+      <div class="mc-mobile-nav">
+        <div class="mc-mobile-nav-header">
+          <div class="mc-mobile-nav-line"></div>
+          <div class="mc-mobile-nav-title">Discover Categories</div>
+          <div class="mc-mobile-nav-line"></div>
+        </div>
+        <!-- items rendered from mc-contents.json -->
+      </div>
+      <div class="mc-dirt-fade"></div>
+
+      <!-- WRAPPER -->
+      <div class="mc-content-wrapper">
+        <!-- LEFT: all sections -->
+        <div class="mc-col" style="flex:1; min-width:0; padding-bottom:100px;">
+
+<!-- ── SEED CARD STYLES ── -->
+<!-- ── LIGHTBOX + PALETTE STYLES ── -->
+
+<!-- MAPS -->
+<div class="cf-section">
+  <div class="cf-section-header">
+    <div class="cf-section-title-row">
+    <div class="cf-section-title">Map & Seed Tools</div>
+    </div>
+    <div class="cf-section-subtitle">Preview terrain before you generate.</div>
+  </div>
+
+
+  <div class="tools-grid">
+
+    <a class="tool-tile" href="https://www.seedmap.app/seed/?seed=-417261638594580622&edition=java&dimension=0&centerX=90.33936813494532&centerZ=10.478064305915067" target="_blank">
+      <div class="tool-tile-thumb">
+        <img class="thumb-img" src="/minecrafticons/seedmap.jpg" alt="Seed Map" loading="lazy" decoding="async">
+        <div class="tool-tile-thumb-overlay"></div>
+      </div>
+      <div class="tool-tile-body">
+        <div class="tool-tile-name">Seed Map</div>
+        <div class="tool-tile-desc">Preview seeds in full 3D before loading into the world</div>
+        <div class="tool-tile-tag">
+          <img src="https://www.google.com/s2/favicons?domain=seedmap.app&sz=32" alt="" loading="lazy" decoding="async">
+          seedmap.app
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-tile" href="https://www.chunkbase.com/apps/seed-map#seed=2055796538&platform=java_26_2&dimension=overworld&x=-112&z=-137&zoom=0.53" target="_blank">
+      <div class="tool-tile-thumb">
+        <img class="thumb-img" src="/minecrafticons/chunkbase.jpg" alt="Chunkbase" loading="lazy" decoding="async">
+        <div class="tool-tile-thumb-overlay"></div>
+      </div>
+      <div class="tool-tile-body">
+        <div class="tool-tile-name">Chunkbase</div>
+        <div class="tool-tile-desc">Structures, ores, slime chunks — the most complete seed map</div>
+        <div class="tool-tile-tag">
+          <img src="https://www.google.com/s2/favicons?domain=chunkbase.com&sz=32" alt="" loading="lazy" decoding="async">
+          chunkbase.com
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-tile" href="https://ezseed.net/#seed=69420025940101313&x=0&z=0&s=1&ed=java-26.2&view=3d" target="_blank">
+      <div class="tool-tile-thumb">
+        <img class="thumb-img" src="/minecrafticons/ezseed.jpg" alt="EzSeed" loading="lazy" decoding="async">
+        <div class="tool-tile-thumb-overlay"></div>
+      </div>
+      <div class="tool-tile-body">
+        <div class="tool-tile-name">EzSeed 3D Viewer</div>
+        <div class="tool-tile-desc">Walk terrain in real time with a live 3D camera</div>
+        <div class="tool-tile-tag">
+          <img src="https://www.google.com/s2/favicons?domain=ezseed.net&sz=32" alt="" loading="lazy" decoding="async">
+          ezseed.net
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-tile" href="https://mcseedmap.net/26.2.0-Java/69420025940101313#x=23&z=-3&l=-1.3" target="_blank">
+      <div class="tool-tile-thumb">
+        <img class="thumb-img" src="/minecrafticons/mcseedmap.jpg" alt="MC Seed Map" loading="lazy" decoding="async">
+        <div class="tool-tile-thumb-overlay"></div>
+      </div>
+      <div class="tool-tile-body">
+        <div class="tool-tile-name">MC Seed Map</div>
+        <div class="tool-tile-desc">Elevation shading reveals terrain shape at a glance</div>
+        <div class="tool-tile-tag">
+          <img src="https://www.google.com/s2/favicons?domain=mcseedmap.net&sz=32" alt="" loading="lazy" decoding="async">
+          mcseedmap.net
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ── SECTION HEADER ── -->
+<div class="cf-section-header" id="seeds-section-header">
+  <div class="cf-section-title-row">
+  <div class="cf-section-title">
+
+    Top Picked Seeds
+  </div>
+  </div>
+  <div class="cf-section-subtitle">Spawns and features worth starting on.</div>
+</div>
+
+<!-- ── SEED SEARCH ── -->
+<div class="seed-search-wrap">
+  <div class="seed-search-box">
+    <svg class="seed-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <circle cx="10" cy="10" r="6.5"></circle>
+      <line x1="15" y1="15" x2="20.5" y2="20.5"></line>
+    </svg>
+    <input type="text" id="seedSearch" class="seed-search-input" placeholder="Search seeds by name..." oninput="filterSeeds()">
+    <button id="seedSearchClear" class="seed-search-clear" onclick="clearSeedSearch()" style="display:none;" aria-label="Clear search">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <line x1="5" y1="5" x2="19" y2="19"></line>
+        <line x1="19" y1="5" x2="5" y2="19"></line>
+      </svg>
+    </button>
+  </div>
+  <!-- PAGINATION (TOP) -- shares the search row instead of sitting in its
+       own bar; a control doesn't need a card of its own. -->
+  <div class="seed-pagination-controls seed-pagination-inline" id="seed-pagination-top">
+    <button class="seed-page-arrow" id="pg-prev-top" onclick="seedChangePage(-1)" disabled aria-label="Previous page">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 6 9 12 15 18"></polyline>
+      </svg>
+    </button>
+    <div class="seed-pagination-nums">
+      <button class="seed-page-btn active" id="pg-1-top" onclick="seedGoToPage(1)">1</button>
+      <button class="seed-page-btn" id="pg-2-top" onclick="seedGoToPage(2)">2</button>
+      <button class="seed-page-btn" id="pg-3-top" onclick="seedGoToPage(3)">3</button>
+    </div>
+    <button class="seed-page-arrow" id="pg-next-top" onclick="seedChangePage(1)" aria-label="Next page">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 6 15 12 9 18"></polyline>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div id="seedNoResults" class="seed-no-results" style="display:none;">No seeds match your search.</div>
+
+
+<!-- ── SEED 1 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc1-slider">
+      <img id="sc1-img" src="/minecrafticons/javaseeds/s1a-compresso.jpg" alt="All Biome Continent" fetchpriority="high" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">1</div><span class="seed-card-title">All Biome Continent</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc1',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc1',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc1-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A complete survival seed with every biome and endless terrain variety all in 1000 blocks radius</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-417261638594580622</span>
+        <span class="seed-copy-feedback" id="sc1-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-417261638594580622" data-fb="sc1-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 2 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc2-slider">
+      <img id="sc2-img" src="/minecrafticons/javaseeds/s2a-compresso.jpg" alt="Hidden Blossom Village" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">2</div><span class="seed-card-title">Hidden Blossom Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc2',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc2',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc2-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a cherry blossom grove with a village nestled among the blossom trees.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">69420025940101313</span>
+        <span class="seed-copy-feedback" id="sc2-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="69420025940101313" data-fb="sc2-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 3 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc3-slider">
+      <img id="sc3-img" src="/minecrafticons/javaseeds/s3a-compresso.jpg" alt="Village &amp; Pillage" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">3</div><span class="seed-card-title">Village &amp; Pillage</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc3',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc3',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc3-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Village and Woodland Mansion on the same island near spawn.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">616431086521619877</span>
+        <span class="seed-copy-feedback" id="sc3-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="616431086521619877" data-fb="sc3-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 4 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc4-slider">
+      <img id="sc4-img" src="/minecrafticons/javaseeds/s4a-compresso.jpg" alt="Sky Cliff Village" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">4</div><span class="seed-card-title">Sky Cliff Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc4',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc4',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc4-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A village split between a riverside cliff and the ocean below.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">616431086521619877</span>
+        <span class="seed-copy-feedback" id="sc4-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="616431086521619877" data-fb="sc4-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 5 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc5-slider">
+      <img id="sc5-img" src="/minecrafticons/javaseeds/s5a-compresso.jpg" alt="Cherry Lake Sanctuary" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">5</div><span class="seed-card-title">Cherry Lake Sanctuary</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc5',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc5',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc5-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">X:12,000 Z:1,380 features a cherry blossom grove with a middle lake, perfect for a hardcore world</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">1691256543523180978</span>
+        <span class="seed-copy-feedback" id="sc5-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="1691256543523180978" data-fb="sc5-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 6 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc6-slider">
+      <img id="sc6-img" src="/minecrafticons/javaseeds/s6a-compresso.jpg" alt="Sakura Lakeside Village" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">6</div><span class="seed-card-title">Sakura Lakeside Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc6',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc6',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc6-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a cherry blossom grove village, with a lakeside and dock-style wooden roads.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">9064150133272194</span>
+        <span class="seed-copy-feedback" id="sc6-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="9064150133272194" data-fb="sc6-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 7 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc7-slider">
+      <img id="sc7-img" src="/minecrafticons/javaseeds/s7a-compresso.jpg" alt="Mountain Blossom River" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">7</div><span class="seed-card-title">Mountain Blossom River</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc7',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc7',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc7-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Scenic mountain lake surrounded by winding rivers and vibrant cherry blossom landscapes.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-417261638594580622</span>
+        <span class="seed-copy-feedback" id="sc7-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-417261638594580622" data-fb="sc7-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 8 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc8-slider">
+      <img id="sc8-img" src="/minecrafticons/javaseeds/s8a-compresso.jpg" alt="The Jungle Oasis" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">8</div><span class="seed-card-title">The Jungle Oasis</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc8',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc8',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc8-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A jungle spawn featuring a desert oasis and a central lake, perfect for egyp style builds</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-640074097040031353</span>
+        <span class="seed-copy-feedback" id="sc8-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-640074097040031353" data-fb="sc8-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 9 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc9-slider">
+      <img id="sc9-img" src="/minecrafticons/javaseeds/s9a-compresso.jpg" alt="Illusioner's Training Island" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">9</div><span class="seed-card-title">Illusioner's Training Island</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc9',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc9',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc9-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn near a pillager outpost on a magical frozen cliff island that feels like an Illusioner's tower.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">6942699783490145785</span>
+        <span class="seed-copy-feedback" id="sc9-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="6942699783490145785" data-fb="sc9-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 10 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc10-slider">
+      <img id="sc10-img" src="/minecrafticons/javaseeds/s10a-compresso.jpg" alt="Cherry Village Trio" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">10</div><span class="seed-card-title">Cherry Village Trio</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc10',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc10',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc10-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn directly in a village with a cherry blossom grove nearby and two more villages close to spawn.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-1821424574292533963</span>
+        <span class="seed-copy-feedback" id="sc10-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-1821424574292533963" data-fb="sc10-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 11 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc11-slider">
+      <img id="sc11-img" src="/minecrafticons/javaseeds/s11a-compresso.jpg" alt="Twin Forest Grove" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">11</div><span class="seed-card-title">Twin Forest Grove</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc11',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc11',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc11-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a grove split between a dense oak forest and a cherry blossom grove.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">4459605219549419</span>
+        <span class="seed-copy-feedback" id="sc11-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="4459605219549419" data-fb="sc11-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 12 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc12-slider">
+      <img id="sc12-img" src="/minecrafticons/javaseeds/s12a-compresso.jpg" alt="Quad Village Lake" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">12</div><span class="seed-card-title">Quad Village Lake</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc12',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc12',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc12-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in four villages surrounding a central lake.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-3361685360695458093</span>
+        <span class="seed-copy-feedback" id="sc12-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-3361685360695458093" data-fb="sc12-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 13 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc13-slider">
+      <img id="sc13-img" src="/minecrafticons/javaseeds/s13a-compresso.jpg" alt="Five Wood Grove" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">13</div><span class="seed-card-title">Five Wood Grove</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc13',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc13',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc13-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn in a massive grove with a central lake and five different wood types inside.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">8888892703318892214</span>
+        <span class="seed-copy-feedback" id="sc13-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="8888892703318892214" data-fb="sc13-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 14 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc14-slider">
+      <img id="sc14-img" src="/minecrafticons/javaseeds/s14a-compresso.jpg" alt="Builder's Dream Valley" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">14</div><span class="seed-card-title">Builder's Dream Valley</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc14',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc14',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc14-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn beside a massive C-shaped mountain connected to a cherry grove filled with lakes and rivers.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">28225322</span>
+        <span class="seed-copy-feedback" id="sc14-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="28225322" data-fb="sc14-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 15 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc15-slider">
+      <img id="sc15-img" src="/minecrafticons/javaseeds/s15a-compresso.jpg" alt="Isolated Acacia Island" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">15</div><span class="seed-card-title">Isolated Acacia Island</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc15',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc15',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc15-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn on a isolated acacia island with no mainland for over 1,000 blocks.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">8608349212852601365</span>
+        <span class="seed-copy-feedback" id="sc15-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="8608349212852601365" data-fb="sc15-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 16 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc16-slider">
+      <img id="sc16-img" src="/minecrafticons/javaseeds/s16a-compresso.jpg" alt="Perfect Castle Spot" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">16</div><span class="seed-card-title">Perfect Castle Spot</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc16',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc16',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc16-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A perfect castle build site featuring a lake in the center and massive mountains as a backdrop.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">34970160616342911</span>
+        <span class="seed-copy-feedback" id="sc16-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="34970160616342911" data-fb="sc16-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 17 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc17-slider">
+      <img id="sc17-img" src="/minecrafticons/javaseeds/s17a-compresso.jpg" alt="SkyBlock Village" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">17</div><span class="seed-card-title">SkyBlock Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc17',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc17',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc17-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Literally Spawn on a skyblock village with everything you need to start.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-214726972146453730</span>
+        <span class="seed-copy-feedback" id="sc17-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-214726972146453730" data-fb="sc17-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 18 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc18-slider">
+      <img id="sc18-img" src="/minecrafticons/javaseeds/s18a-compresso.jpg" alt="Survival Cherry Island" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">18</div><span class="seed-card-title">Survival Cherry Island</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc18',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc18',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc18-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn on an isolated island with a cherry trees at its center and horses roaming nearby.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-214726972146453730</span>
+        <span class="seed-copy-feedback" id="sc18-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-214726972146453730" data-fb="sc18-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 19 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc19-slider">
+      <img id="sc19-img" src="/minecrafticons/javaseeds/s19a-compresso.jpg" alt="Private Island Estate" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">19</div><span class="seed-card-title">Private Island Estate</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc19',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc19',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc19-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn near a chain of connected islands featuring a woodland mansion and a separate village island.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">8080581786688460796</span>
+        <span class="seed-copy-feedback" id="sc19-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="8080581786688460796" data-fb="sc19-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 20 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc20-slider">
+      <img id="sc20-img" src="/minecrafticons/javaseeds/s20a-compresso.jpg" alt="Snow Ring Village" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">20</div><span class="seed-card-title">Snow Ring Village</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc20',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc20',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc20-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A village spawn overlooking a circular snowy grove that shelters a second village.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-4880760388041619186</span>
+        <span class="seed-copy-feedback" id="sc20-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-4880760388041619186" data-fb="sc20-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 21 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc21-slider">
+      <img id="sc21-img" src="/minecrafticons/javaseeds/s21a-compresso.jpg" alt="Couple's Paradise Seed" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">21</div><span class="seed-card-title">Couple's Paradise Seed</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc21',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc21',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc21-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn between two perfect circular groves, one cherry blossom and one meadow.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-2098004362385192995</span>
+        <span class="seed-copy-feedback" id="sc21-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-2098004362385192995" data-fb="sc21-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 22 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc22-slider">
+      <img id="sc22-img" src="/minecrafticons/javaseeds/s22a-compresso.jpg" alt="Four Village Isle" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">22</div><span class="seed-card-title">Four Village Isle</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc22',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc22',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc22-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn on an island with four villages, each featuring a different biome style.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">-8127986865150663286</span>
+        <span class="seed-copy-feedback" id="sc22-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="-8127986865150663286" data-fb="sc22-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 23 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc23-slider">
+      <img id="sc23-img" src="/minecrafticons/javaseeds/s23a-compresso.jpg" alt="The Heart Of The Grove" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">23</div><span class="seed-card-title">The Heart Of The Grove</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc23',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc23',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc23-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">A rare village nestled between a circular grove and a central mountain.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">100000381628293346</span>
+        <span class="seed-copy-feedback" id="sc23-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="100000381628293346" data-fb="sc23-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── SEED 24 ── -->
+<div class="seed-card-wrap">
+  <div class="seed-card">
+    <div class="seed-card-slider" id="sc24-slider">
+      <img id="sc24-img" src="/minecrafticons/javaseeds/s24a-compresso.jpg" alt="The Heart Of The Grove" decoding="async" onclick="openPalette(this)" loading="lazy" decoding="async">
+      <div class="seed-slider-overlay"></div>
+      <div class="seed-slider-top"><div class="seed-card-num">24</div><span class="seed-card-title">The Mountain Lagoon</span></div>
+      <button class="seed-slider-arrow left" onclick="seedSlideNav('sc24',-1)">&#8249;</button>
+      <button class="seed-slider-arrow right" onclick="seedSlideNav('sc24',1)">&#8250;</button>
+      <div class="seed-slider-dots" id="sc24-dots">
+        <button class="seed-dot active"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+        <button class="seed-dot"></button>
+      </div>
+    </div>
+    <div class="seed-card-body">
+      <p class="seed-card-desc">Spawn near a massive island with a water-filled crater surrounded by towering mountains and a mountainside village.</p>
+      <div class="seed-row">
+        <span class="seed-row-label">Seed</span><div class="seed-row-divider"></div>
+        <span class="seed-row-value">2055796538</span>
+        <span class="seed-copy-feedback" id="sc24-fb">Copied!</span>
+        <button class="seed-copy-btn" data-seed="2055796538" data-fb="sc24-fb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span class="seed-copy-btn-text">Copy seed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PAGINATION ── -->
+<div class="seed-pagination seed-pagination-controls">
+  <button class="seed-page-arrow" id="pg-prev" onclick="seedChangePage(-1)" disabled aria-label="Previous page">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 6 9 12 15 18"></polyline>
+    </svg>
+  </button>
+  <div class="seed-pagination-nums">
+    <button class="seed-page-btn active" id="pg-1" onclick="seedGoToPage(1)">1</button>
+    <button class="seed-page-btn" id="pg-2" onclick="seedGoToPage(2)">2</button>
+    <button class="seed-page-btn" id="pg-3" onclick="seedGoToPage(3)">3</button>
+  </div>
+  <button class="seed-page-arrow" id="pg-next" onclick="seedChangePage(1)" aria-label="Next page">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 6 15 12 9 18"></polyline>
+    </svg>
+  </button>
+</div>
+
+<!-- ── MAIN SCRIPT ── -->
+
+          
+
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="mc-right-sidebar">
+          <div class="mc-right-sidebar-inner" id="rightSidebar">
+
+
+            <!-- Box 2: adaptive -- live Java version status (same
+                 piston-meta feed as the hero strip, its own independent
+                 fetch) plus a vertical "Browse Categories" card list --
+                 one card per other MC page, background image = that
+                 page's own hero photo, count fit to however much
+                 height is actually free (mcFitSidebarCategories in
+                 mc-java.js). The earlier On This Page / Continue
+                 Browsing widgets are still fully implemented
+                 (mcInitSidebarJumpNav / mcInitSidebarRecent) but not
+                 mounted here for now -- three adaptive-height widgets
+                 stacked in one box fights the category list for the
+                 exact space it needs to size itself against; add their
+                 markup back below the divider if you want them
+                 alongside this instead of in place of it. -->
+            <div class="mc-sidebar-panel">
+              <div class="mc-sb-cat-title">Latest Release</div>
+              <div class="mc-sb-version">
+                <div class="mc-sb-version-row">
+                  <span class="mc-sb-version-dot"></span>
+                  <span class="mc-sb-version-label">Release</span>
+                  <span class="mc-sb-version-num" id="mcsb-release-version">—</span>
+                  <span class="mc-sb-version-updated" id="mcsb-release-updated"></span>
+                </div>
+                <div class="mc-sb-version-row">
+                  <span class="mc-sb-version-dot is-snapshot"></span>
+                  <span class="mc-sb-version-label">Snapshot</span>
+                  <span class="mc-sb-version-num" id="mcsb-snapshot-version">—</span>
+                  <span class="mc-sb-version-updated" id="mcsb-snapshot-updated"></span>
+                </div>
+              </div>
+
+              <div class="mc-sb-divider"></div>
+
+              <div class="mc-sb-cat">
+                <div class="mc-sb-cat-title">Browse Categories</div>
+                <div class="mc-sb-cat-list" id="mcsbCatList"></div>
+              </div>
+            </div>
+            <!-- Box 1: HCPC feature -- a card holding the photo, not a
+                 card made of the photo. Links out to /minecraft/java/hcpc,
+                 which doesn't exist yet. Sizing/look: mc-java.css, the
+                 "RIGHT SIDEBAR -- TWO BOXES" block. -->
+            <!-- Latest Mojang patch note. Rendered by mcInitVersionFeed() in
+                 mc-java.js; "View more" opens #vtModal with the full feed. -->
+            <div class="mc-sidebar-ad-box">
+              <div class="vt-sb-head">
+                <div class="mc-sb-cat-title">From Mojang</div>
+                <button type="button" class="vt-sb-more" onclick="openVtFeed()">View more</button>
+              </div>
+              <div class="vt-sb-latest" id="vt-sb-latest">
+                <div class="vt-feed-skel"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      
+      </div>
+
+      
+
+      <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- PALETTE LIGHTBOX (seed screenshot zoom/pan + prev/next through that
+     seed's own slider images) -- this block went missing from the page
+     at some point (mc-seeds-old.html still has it), which is why
+     clicking a seed image did nothing: openPalette() had nowhere to
+     write the zoomed image to. CSS already existed for this
+     (body.mc-seeds #pal-lightbox etc. in mc-java.css); only the markup
+     was gone. -->
+<button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+<button id="pal-lb-prev" onclick="palLightboxNav(-1)">&#8249;</button>
+<button id="pal-lb-next" onclick="palLightboxNav(1)">&#8250;</button>
+<div id="pal-lightbox" onclick="closePalette()">
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" alt="" loading="lazy" decoding="async">
+  </div>
+  <div id="pal-lb-bar">
+    <div id="pal-lb-title"></div>
+    <div id="pal-lb-count"></div>
+  </div>
+</div>
+
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+        <div class="more-sheet-title">Minecraft</div>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"><!-- rendered from mc-contents.json --></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+</div>
+
+<script src="/11layout.js"></script>
+
+<script src="/mc-java.js"></script>
+<!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
+<div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
+  <div class="vt-modal-panel" onclick="event.stopPropagation()">
+    <div class="vt-modal-head">
+      <div>
+        <div class="vt-modal-title">Recent Updates</div>
+        <div class="vt-modal-sub">Official Java patch notes from Mojang</div>
+      </div>
+      <button type="button" class="vt-modal-close" onclick="closeVtFeed()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="vt-modal-body">
+      <div class="vt-feed-list" id="vt-modal-list">
+        <div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

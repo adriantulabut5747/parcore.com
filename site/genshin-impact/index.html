@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genshin Impact | Parchrome</title>
+
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+
+<!-- Oxanium -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+
+      <link rel="stylesheet" href="/11layout.css">
+
+<style>
+
+  body { visibility: hidden; }
+    #page-loader { position: fixed; inset: 0; background: #0f0f10; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; z-index: 999999; gap: 16px; visibility: visible; opacity: 1; transition: opacity 0.4s ease;}
+    #page-loader.hidden { opacity: 0; pointer-events: none; }
+    .parchrome-fade { opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
+    .parchrome-ring { width: 44px; height: 44px; border-radius: 50%;
+      border: 3px solid #2a2a2a; border-top: 3px solid #9f0000; animation: parchrome-spin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;}
+    .parchrome-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #555; font-family: sans-serif;
+      opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
+    @keyframes parchrome-spin { to { transform: rotate(360deg); } }
+    @keyframes parchrome-fadein { to { opacity: 1; } }
+    html.loaded body { visibility: visible; }
+
+  @media (max-width: 970px) {.discord-card { background: linear-gradient( 90deg,  rgba(240, 34, 34, 0.2), rgba(25, 26, 27, 0.5));}}
+
+ /* Hide page until fully loaded */
+  html {
+    visibility: hidden;
+  }
+
+  html.loaded {
+    visibility: visible;
+  }
+
+:root {
+  --bg-main: #202225;
+  --bg-tertiary: #0f0f10;
+  --bg-sidebar: #0f0f10;
+  --bg-hover: #202122;
+  --bg-box: #161616;
+  --bg-box-active: #303135;
+  --accent:#c22d2d;
+  --text-main: #eff2f5;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+}
+
+/* Reset */
+* {margin: 0; padding: 0; box-sizing: border-box; font-family: 'oxanium', sans-serif;}
+body {height: 100vh; background: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; overflow: hidden; }
+*{scrollbar-width: thin; /* Firefox */  scrollbar-color: #2f3136 #121318;}
+.icon {width:18px; height:18px; stroke:var(--text-muted); stroke-width:2; fill:none; flex-shrink:0;}
+
+/* Main body content */
+.coc-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.page-bg{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;   /* fallback for browsers without svh support */
+  height: 100svh;  /* stable/small viewport height — doesn't grow when the mobile URL bar hides on scroll */
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(8,10,16,.6) 0%, rgba(8,10,16,.8) 100%),
+    url('');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.whats-up { display: flex; align-items: flex-start; gap: 16px; background: linear-gradient(
+ 90deg, rgba(17, 17, 17, 1), rgba(32, 32, 32, 0.5));
+
+            padding: 18px 20px; border-radius: 12px; margin-bottom: 12px; }
+.whats-up-icon { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+.whats-new-text { color: #a1a1a1; font-size: 20px; line-height: 1.6; font-weight: 300;}
+.mobile-text { display: none; }
+
+/* First layer buttons */
+.first-layer {display:flex; gap:10px; margin-bottom:10px; width:100%; margin-top: 20px;}
+.first-layer button {flex:1; padding:10px; border:none; border-radius:6px;  background: rgba(11, 11, 12, 0.8);
+  color:var(--text-muted); cursor:pointer; transition:background 0.2s; font-size:15px; font-weight:500;}
+.first-layer button.active, .first-layer button:hover {background:var(--bg-hover); color: var(--text-secondary);}
+.first-layer button.active{ background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+/* Second layer horizontal scroll */
+.second-layer-container {
+  position: relative;
+  overflow-x: auto;
+  margin-bottom: 0px;
+  width: 100%;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #565656 #161618;}
+.second-layer {display: flex; gap: 8px; padding: 4px 0; } 
+
+.second-layer button img {
+  width: 25px;        /* 🔥 bigger */
+  height: 25px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.second-layer button {
+  display: inline-flex;          /* key fix */
+  align-items: center;           /* vertical alignment */
+  gap: 3px;                      /* space between icon & text */
+  margin-bottom: 0px;
+  position: relative;
+  flex: 0 0 auto;
+  padding: 2px 16px;
+  border: none;
+  border-radius: 8px;
+  margin-right: px;
+  background: rgba(11, 11, 12, 0.8);
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.second-layer button.active, .second-layer button:hover {background:var(--bg-hover); color:var(--text-secondary);}
+.second-layer::-webkit-scrollbar {display:none;}
+.second-layer {-ms-overflow-style:none; scrollbar-width:none;}
+.second-layer button.active { background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+                              color: var(--text-main); font-weight: 600;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+.discord-card{
+ 
+ box-shadow: 0 4px 12px rgba(0,0,0,10);
+} 
+
+/* Bases grid */
+.grid-container {margin-top: 40px;}
+
+.fullscreen-image {position: relative; width: 100%; text-align: center; margin: 0 auto; margin-bottom: 10px;  overflow: hidden; 
+ }
+
+.fullscreen-image img {width: 100%; height: auto; border-radius: 10px; box-shadow: 0 5px 12px rgba(0,0,0,0.4);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;}
+
+.fullscreen-image:hover img {
+  transform: scale(1.04); /* very subtle */
+}
+
+.army-divider {
+  display: flex;
+  align-items: center;
+  margin-top: 8px ;
+  margin-bottom:10px;
+}
+
+.army-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(209, 209, 209, 0.5), rgba(255,255,255,0));
+}
+
+.download-btn {
+    margin-top: 14px;
+    padding: 10px 26px;
+
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-shadow:0 6px 14px rgba(0, 0, 0, 0.35),inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+     background: linear-gradient( 180deg,  rgba(27, 31, 42, 1) 0%,  rgba(35, 37, 44, 1) 100%);
+  border: 2px solid rgba(255,255,255,0.6);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    color: #fff;
+    
+  }
+.download-btn:hover {
+      border: 1px solid #5865f2;
+       background: linear-gradient( 180deg,  rgb(42, 48, 63) 0%,  rgba(35, 37, 44, 1) 100%);
+
+    --accent: #5865f2;
+    filter: brightness(1.08);
+
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);}
+.download-btn:active {
+   
+    box-shadow:0 4px 10px rgba(0, 0, 0, 0.35),inset 0 2px 6px rgba(0, 0, 0, 0.25);
+   }
+
+ /* Time Stamp Thingy */
+.image-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #082a5a;   
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 5;
+    letter-spacing: 1px;}
+.image-logo {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    cursor: pointer;}
+.image-logo img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: brightness(1.1);
+    border-radius: 50px;
+    margin-top: 25px;
+    margin-left: 25px;}
+
+/* Fixes Zoom Thingy */
+.image-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); display: none;
+    align-items: center;justify-content: center;z-index: 9999;}
+.image-modal img { max-width: 92%; max-height: 92%;
+    border-radius: 12px; box-shadow: 0 0 30px rgba(0,0,0,0.8); animation: zoomIn 0.2s ease;}
+body.no-zoom {
+    overflow: hidden; touch-action: none;}
+.image-zoom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;}
+.image-zoom img { max-width: 95%; max-height: 95%; border-radius: 12px;}
+
+/* Popup box */
+.cc-popup {
+  position: absolute;
+  top: 34px;
+  left: 28px;
+  width: 200px;
+  background: #1e1f22;
+  border: 1px solid #2f3136;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #dcddde;
+  display: none;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);}
+.cc-popup strong { display: block; margin-bottom: 6px; color: #f2f3f5;}
+.cc-popup ul { padding-left: 16px; margin: 0;}
+.cc-popup li { margin-bottom: 4px;}
+
+/* Global scrollbar (Chrome, Edge, Safari) */
+::-webkit-scrollbar { width: 10px;}
+::-webkit-scrollbar-track { background: #121318; /* dark background */}
+::-webkit-scrollbar-thumb { background: #2f3136;   border-radius: 10px; border: 2px solid #121318; }
+::-webkit-scrollbar-thumb:hover { background: #3a3d43;}
+* { scrollbar-width: thin; scrollbar-color: #2f3136 #121318;/* Firefox */}
+
+.whats-up-strong{font-weight: 900 ; font-size: 16px;}
+
+.coc-content {
+  flex: 1 0 auto;
+background: linear-gradient(180deg, rgba(19,18,18,.55) 0%, rgba(23,23,23,.75) 100%);
+
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0;}
+  to { transform: scale(1);  opacity: 1;}}
+
+.site-footer {
+    flex-shrink: 0;
+    width: 100%;
+    background: linear-gradient(180deg, #0f0f10, #0b0b0c);
+    border-top: 1px solid #2f3136;
+    padding: 18px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;}
+.footer-icons { display: flex; gap: 12px; justify-content: center; align-items: center;}
+.footer-icons a {
+    width: 38px;
+    height: 38px;
+    background: #161616;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background 0.2s ease;}
+.footer-icons a:hover { transform: translateY(-2px);background: #202225;}
+.footer-icons svg { width: 20px; height: 20px; fill: white;}
+.footer-text {font-size: 12px;color: var(--text-muted);letter-spacing: 0.4px;}
+
+.pagination { display: flex; justify-content: center; gap: 8px; margin: 10px 0; flex-wrap: wrap; margin-top: 0px; margin-bottom: 40px; margin-top: 20px;}
+.pagination a {
+    padding: 8px 14px;
+    border-radius: 6px;
+    background: var(--bg-box);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;}
+.pagination a:hover { background: var(--bg-hover); color: var(--text-main);}
+.pagination a.active {background: var(--bg-box-active);  color: var(--text-main);  font-weight: 600;}
+.pagination a.next {font-weight: 500;}
+
+.quick-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 20px 0 10px 0;}
+.quick-links a {
+    padding: 10px 18px;
+    background: linear-gradient( to bottom, #3f434c 0%, #2c3038 45%, #1a1d24 100%);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 2px 6px #0b0b0c;
+    transition: background 0.2s, color 0.2s;}
+.quick-links a:hover {background-color: #283449; color: var(--text-main); cursor: pointer;}
+
+.whats-new {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: linear-gradient(90deg, #1b1c18, #252621);
+    padding: 16px 18px;
+    border-radius: 10px;
+    margin-bottom: 10px; /* space before footer */}
+.whats-new-icon { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; object-fit: contain; }
+.whats-new-text { color: var(--text-secondary); font-size: 12px; line-height: 1.5;}
+
+.zoomable {cursor: pointer; transition: transform 0.15s ease;}
+.image-badge, .image-logo { pointer-events: auto;}
+.fullscreen-image img { pointer-events: auto;}
+.image-zoom img { max-width: 95%; max-height: 95%; width: auto; cursor: grab;}
+.image-zoom { touch-action: none;}
+
+html, body { touch-action: pan-x pan-y; overscroll-behavior: contain;}
+* { -webkit-tap-highlight-color: transparent;}
+
+.clan-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+background: linear-gradient(
+    180deg, 
+    rgba(27, 31, 42, 0.7) 0%, 
+    rgba(18, 19, 24, 0.7) 100%
+);
+  border-radius: 10px;
+  padding: 16px;
+  max-width: 90%;
+  margin: 0px auto;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  margin-bottom: 30px;
+}
+
+.clan-box-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.clan-box-content {
+  flex: 1;
+}
+
+.clan-box-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.clan-box-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e0e0e0;
+}
+
+.clan-tag-click {
+  cursor: pointer;      /* shows pointer on hover */
+  text-decoration: underline; /* adds underline */
+   color: #7d85a8;           /* optional: make it white or whatever fits your theme */
+}
+.clan-tag-click:hover {
+  color: #556dd8;       /* optional: change color on hover */
+}
+
+.result-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  object-fit: contain;
+  
+}
+.view-more {
+  padding: 8px 12px;
+  color: #ccc;
+  cursor: pointer;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.2s;
+}
+.view-more:hover {
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Mobile responsive */
+@media (max-width: 970px){
+  .quick-links a{font-size: 14px; }
+  .image-logo img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      filter: brightness(1.1);
+      border-radius: 50px;
+      margin-top: 2px;
+      margin-left: 2px;}
+  .site-footer{padding-bottom: 100px; padding-top: 50px;}
+  .footer-text{font-size: 9px;}
+  .download-btn {
+      margin-top: 14px;
+      padding: 10px 20px;
+      font-size: -2px;
+
+    }
+      .download-btn {
+    margin-top: 14px;
+    padding: 10px 20px;
+    border-radius: 8px;
+      }
+  .fullscreen-image{width: 100%; margin-bottom: 30px;}
+  .second-layer-container {margin-bottom: 0px;}
+  .pagination {font-size: 12px;}
+  .discord-card {  background: linear-gradient(
+    90deg,
+    rgba(43, 61, 158, 0.18),
+    rgba(47, 49, 54, 0)
+  );}
+
+  .desktop-text { display: none; }
+  .mobile-text { display: inline; }
+
+  .whats-new-text{font-size:  10.2px;}  
+  .fullscreen-image {position: relative; width: 100%; text-align: center; margin: 0 auto; margin-bottom: 10px; }
+  .clan-box-img { width: 80px; height: 80px; border-radius: 10px;}
+  .clan-box{margin-left: 25px; margin-right: 25px;}
+  .clan-box-text{font-size: 12.5px;}
+}
+
+@media (min-width:969px) { 
+   .whats-new-text{font-size: 16px;}
+  .whats-up-strong{font-size: 20px;}
+
+  .second-layer button{padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; }
+  .search-input{top: 0px;}
+  .search-overlay {top: 0px;}
+  .second-layer button img{width: 28px; height: 28px;}
+  .second-layer button {padding-left: 25px; padding-right: 25px;}
+}
+
+.search-close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none;
+  font-size: 1.8rem; color: #fff; cursor: pointer; z-index: 10000; transition: transform 0.2s;}
+.search-close-btn:hover {transform: rotate(90deg);}
+.search-result-item { background: rgba(255, 255, 255, 5.1); color: #ffffff; padding: 12px 16px;
+  border-radius: 6px; text-decoration: none; transition: background 0.2s;}
+.search-result-item:hover { background: rgba(255, 255, 255, 0.25);}
+#search-close-btn { position: absolute; top: 7px; right: 18px; font-size: 1.5rem; color: white;
+  background: none; border: none; cursor: pointer; z-index: 10000; /* above overlay */}
+#search-close-btn:hover { transform: rotate(90deg); transition: transform 0.2s;}
+.search-result-item { background: rgba(255, 255, 255, 0.1); color: #ffffff; padding: 12px 16px;
+  border-radius: 6px; text-decoration: none; transition: background 0.2s;}
+.search-result-item:hover { background: rgba(255, 255, 255, 0.25);}
+
+.coc-main{
+  font-family: 'Segoe UI', sans-serif;}
+
+</style>
+
+</head>
+<body>
+
+<div class="page-bg"></div>
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo">
+      <img src="/icons/home.jpg" alt="">
+    </div> Parchrome</div>
+
+<!-- Search button -->
+<button id="search-btn" onclick="openSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right: 15px; position: fixed; margin-top: 2px;">
+  <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+    <!-- Magnifying glass -->
+    <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+    <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+  <span id="close-icon" style="display:none; font-size: 1.5rem; color: white;">✖</span></button>
+<!-- Overlay -->
+<div id="search-overlay">
+  <!-- Close button -->
+  <button id="search-close-btn">✖</button>
+  <!-- Search input -->
+  <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+  <!-- Search results -->
+  <div id="search-results"></div></div></div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/genshin.jpg" alt="Genshin Impact" class="th-icon">
+    <div class="secondary-content">
+      Genshin Impact
+    </div>
+  </div>
+
+</div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="sidebar" id="sidebar">
+    <!-- Top Box -->
+    <div class="top-box" id="top-box"></div>
+    <!-- Games list -->
+    <div class="games-container" id="games-container"></div>
+    <!-- Triple A Games -->
+  <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img  src="/icons/controllericon.png" class="tripleimg">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div> </div></div>
+
+  <div class="coc-main" >
+
+  <div class="hero-section">
+<img class="hero-video" src="/genshin-impact-icons/songofthewelkinmoon.png" alt="Genshin Impact">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 class="hero-title">Traveler's <em>Toolkit</em></h1>
+        <p class="hero-tagline">still workin on this site, come back soon! the banners and infos below are accurate tho.</p>
+
+<style>.hero-video {
+  width: 90%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%; /* adjust this */
+    transform: scaleX(1);
+
+}
+
+.hero-title em {
+   font-style:normal;
+  background:linear-gradient(90deg,#ff4d4d,#9f0000);
+  background-clip:text;
+  -webkit-background-clip:text;
+  color:transparent;
+
+}
+
+</style>
+   </div>  </div> </div>
+
+<style>
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  min-width: 100%;
+ 
+/* full viewport */
+  min-height: 450px;
+  max-height: 500px;
+  overflow: hidden;
+  flex: 0 0 auto;               
+   box-shadow: none;
+   text-align: center;
+background-color: #2b2b35;
+}
+
+.hero-section::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:120px;
+  background:linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,.55) 55%, rgba(10,10,10,.92) 100%);
+  pointer-events:none; z-index:3;
+}
+
+/* the image */
+.hero-video {
+margin: auto;
+  width: 100%;
+      display: flex;
+  z-index: 1;
+}
+/* Overlay with gradient */
+.hero-overlay {
+  
+  position: absolute;
+  inset: 0;                        /* shorthand for top:0; bottom:0; left:0; right:0 */
+  display: flex;
+  align-items: center;             /* vertical centering */
+  padding-left: 5%;                /* left spacing for text */
+ background: 
+  linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8)), /* top to bottom */
+  linear-gradient(to top, rgba(0,0,0,0.2), rgba(0,0,0,0.5)),    /* bottom to top (new) */
+  linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,2) 100%); /* left to right */
+
+  background-blend-mode: overlay;
+
+  z-index: 2;
+}
+
+/* Content */
+.hero-content {
+  max-width: 800px;
+  text-align: left;
+  color: #fff;
+  animation: fadeInUp 1s ease forwards;  /* subtle fade-in */
+  margin-left: 3%;
+  margin-top: 120px;
+}
+
+/* Headline */
+.hero-title {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  margin-bottom: 16px;
+  line-height: 1.0;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #f8f8f8, #d6cece, #b7b6b6);
+  background-clip: text;             /* standard property */
+  -webkit-background-clip: text;     /* optional for older WebKit */
+  color: transparent;
+  width: 100%;
+  /* Text shadow for contrast over video */
+  text-shadow: 2px 4px 8px rgba(0,0,0,0.4);
+}
+
+/* Tagline */
+.hero-tagline {
+  font-size: clamp(16px, 1.2vw, 20px);
+  opacity: 0.9;
+  margin-bottom: 32px;
+  color: #c8c8c8;
+  line-height: 1.5;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* Button */
+.hero-button {
+    display: inline-flex;           /* aligns SVG and text horizontally */
+  align-items: center;            /* vertically center them */
+  gap: 10px;      
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #fff;
+ background: linear-gradient( 180deg,  rgb(125, 8, 8) 0%,  rgb(47, 1, 1) 100%);
+  border: 2px solid rgba(241, 40, 40, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;}
+.hero-button:hover {
+  background: linear-gradient(90deg, #d50606, #8a1e1e, #000000); /* reverse gradient */
+  transform: scale(1.08);
+  border-color: #580000;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+}
+
+/* Fade-in animation for hero text */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 970px){
+
+  .hero-overlay {
+    flex-direction: column;   /* stack content vertically */
+    justify-content: center;  /* vertical centering */
+    align-items: center;      /* horizontal centering */
+    padding-left: 0;          /* remove desktop left padding */
+    padding-right: 0;
+    text-align: center;       /* center text inside hero-content */
+    padding-left: 5%;
+    padding-right: 5%;
+      background: 
+    /* Top to bottom fade */
+    linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.2)),
+    /* Left to right fade (90°) */
+    linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.9) 100%);
+    /* Optional diagonal for corner shadows */
+  background-blend-mode: overlay;
+  }
+
+  /* Hero content max width for small screens */
+  .hero-content {
+    max-width: 100%;           /* allow some horizontal padding */
+    margin-left: 0;           /* remove desktop left margin */
+    text-align: center;       /* force center text */
+    margin-bottom: 150px;
+  }
+ .hero-video {  height: 100%; align-content: center; justify-content: center; width: 100%; 
+  object-fit: cover;
+  object-position: center 100%; margin-top: 44px;
+}
+  /* Hero button */
+  .hero-button {
+    margin: 0 auto;           /* center button */
+    display: inline-flex;     /* keep SVG + text inline */
+    justify-content: center;
+    align-items: center;      /* vertically center icon + text */
+
+  }
+
+  /* Headline font adjustment for small screens */
+  .hero-title {
+    font-size: clamp(22px, 8vw, 20px);
+    line-height: 1.2;
+  background: linear-gradient(360deg, #8a7f7f, #ffffff, #faf4f4);
+  text-shadow: #0d0d0d;
+  background-clip: text;             /* standard property */
+  -webkit-background-clip: text;     /* optional for older WebKit */
+  color: transparent;
+  text-shadow: 2px 4px 8px rgba(0,0,0,0.4);
+  margin-bottom: 0px;
+    margin-top: 70px;
+
+    filter: drop-shadow(5 px 4px 8px rgba(0,0,0,1.5));
+}
+
+  /* Tagline font adjustment for small screens */
+  .hero-tagline {
+    font-size: clamp(14px, 3vw, 10px);
+    margin-bottom: 5px;
+  }
+
+    .hero-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;                  /* full viewport */
+  min-height: 200px;
+  max-height: 200px;
+  overflow: hidden;
+  
+}
+.hero-button{padding: 8px 12px; font-size: 12px;}
+
+.hideonphone {display: none;}
+}
+
+@media (min-width: 968px){.hideonpc {display: none;}}
+
+</style>
+     <div class="coc-content">
+
+<div class="hero-tabs" id="heroTabs">
+  <button class="hero-tab-btn active" data-tab="events" type="button"><span class="tab-diamond"></span>Events</button>
+  <button class="hero-tab-btn" data-tab="guides" type="button"><span class="tab-diamond"></span>Guides</button>
+  <button class="hero-tab-btn" data-tab="gallery" type="button"><span class="tab-diamond"></span>Gallery</button>
+</div>
+
+<div class="hero-tab-panel active" data-panel="events">
+
+<div class="events-grid">
+
+  <div class="events-col-main">
+    <div class="panel-card" id="bannersPanel">
+      <div class="panel-card-header">
+        <span class="panel-icon"><img width="28px" src="/genshin-impact-icons/wish.webp" alt=""></span>
+        <span class="panel-title">Current Banners</span>
+        <span class="panel-sub" id="bannersStatusLabel">Live from HoYoLab</span>
+      </div>
+      <div class="banners-list" id="bannersList">
+        <div class="banners-status">Loading current banners…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="events-col-side">
+
+    <div class="panel-card" id="abyssPanel">
+      <div class="panel-card-header">
+        <span class="panel-icon abyss-panel-icon"><img src="/genshin-impact-icons/abyss.webp" alt=""></span>
+        <span class="panel-title">Spiral Abyss</span>
+        <span class="abyss-tracked-label">Tracked real time</span>
+      </div>
+
+      <div class="abyss-list-desktop" id="abyssListDesktop"></div>
+    </div>
+
+    <div class="panel-card" id="codesPanel">
+      <div class="panel-card-header">
+        <span class="panel-icon"><img style="width: 25px;" src="/genshin-impact-icons/redeemcodesicon.webp" alt=""></span>
+        <span class="panel-title">Active Redeem Codes</span>
+        <span class="panel-sub" id="codesStatusLabel">Tap to copy</span>
+      </div>
+      <div class="codes-list" id="codesList">
+        <div class="codes-status">Loading current codes…</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="events-bottom">
+  <div class="panel-card" id="genshinEventsPanel">
+    <div class="panel-card-header">
+      <span class="panel-icon">🗓️</span>
+      <span class="panel-title">Current Events</span>
+      <span class="panel-sub" id="eventsStatusLabel">Live from HoYoLab</span>
+    </div>
+    <div class="events-feed" id="eventsFeed">
+      <div class="banners-status">Loading current events…</div>
+    </div>
+  </div>
+</div>
+
+<style>
+
+/* ===== Genshin Impact page — resource cards ===== */
+.gi-toolbar{display:flex; flex-direction:column; gap:14px; margin:34px 15% 26px 15%;}
+.gi-search-wrap{position:relative;}
+.gi-search-icon{position:absolute; left:14px; top:50%; transform:translateY(-50%); pointer-events:none;}
+.gi-search-input{width:100%; box-sizing:border-box; background:#161616; border:1px solid #232324; border-radius:10px;
+  padding:12px 16px 12px 40px; font-size:13px; color:#eee; font-family:'Oxanium',sans-serif; outline:none;
+  transition:border-color .15s, background .15s;}
+.gi-search-input::placeholder{color:#5a5a5a;}
+.gi-search-input:focus{border-color:#3a3a3a; background:#1c1c1e;}
+
+.gi-pill-row{display:flex; gap:8px; flex-wrap:wrap;}
+.gi-pill{display:inline-flex; align-items:center; padding:7px 14px; border-radius:8px; background:#161616;
+  border:1px solid #232324; color:#8a8d91; font-size:10px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase;
+  cursor:pointer; transition:all .15s; font-family:'Oxanium',sans-serif; user-select:none;}
+.gi-pill::before{content:""; width:6px; height:6px; border-radius:50%; margin-right:7px; background:#444; flex-shrink:0;}
+.gi-pill:hover{background:#1c1c1e; border-color:#333; color:#ccc;}
+.gi-pill.active{background:#26262a; border-color:rgba(255,255,255,.22); color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.gi-pill.active[data-cat="map"]::before{background:#57d9c4;}
+.gi-pill.active[data-cat="banners"]::before{background:#b28dff;}
+.gi-pill.active[data-cat="builds"]::before{background:#7ecbea;}
+.gi-pill.active[data-cat="abyss"]::before{background:#9b6bff;}
+.gi-pill.active[data-cat="guides"]::before{background:#f2934d;}
+.gi-pill.active[data-cat="database"]::before{background:#f4cf5c;}
+.gi-pill.active[data-cat="community"]::before{background:#4cc9f0;}
+.gi-pill.active[data-cat="all"]::before{background:var(--accent);}
+
+.gi-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:32px 24px; margin:0 15% 10px 15%;}
+
+.gi-card{display:flex; flex-direction:column; text-decoration:none; color:inherit; background:#141415;
+  border:1px solid #232324; border-radius:14px; overflow:hidden;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;}
+.gi-card:hover{transform:translateY(-4px); border-color:#3a3a3a; box-shadow:0 12px 26px rgba(0,0,0,.45);}
+
+.gi-card-photo{position:relative; width:100%; aspect-ratio:16/10; background:#1c1c1e; overflow:visible;}
+.gi-card-photo img.gi-shot{width:100%; height:100%; object-fit:cover; object-position:top; display:block; transition:transform .35s ease;}
+.gi-card:hover .gi-card-photo img.gi-shot{transform:scale(1.06);}
+.gi-card-photo::after{content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(10,10,11,.92) 100%);}
+
+.gi-card-tag{position:absolute; top:10px; left:10px; z-index:2; font-size:9px; font-weight:800; letter-spacing:1.2px;
+  text-transform:uppercase; padding:4px 9px; border-radius:5px; color:#0a0a0a;}
+.gi-card-tag.cat-map{background:#57d9c4;}
+.gi-card-tag.cat-banners{background:#b28dff;}
+.gi-card-tag.cat-builds{background:#7ecbea;}
+.gi-card-tag.cat-abyss{background:#9b6bff; color:#fff;}
+.gi-card-tag.cat-guides{background:#f2934d;}
+.gi-card-tag.cat-database{background:#f4cf5c;}
+.gi-card-tag.cat-community{background:#4cc9f0;}
+
+.gi-card-favicon{position:absolute; z-index:3; bottom:-18px; left:16px; width:38px; height:38px; border-radius:50%;
+  background:#101010; border:3px solid #141415; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,.5); overflow:hidden;}
+.gi-card-favicon img{width:20px; height:20px; object-fit:contain;}
+
+.gi-card-body{padding:28px 16px 18px 16px; display:flex; flex-direction:column; gap:6px; flex:1;}
+.gi-card-title{font-size:15px; font-weight:700; color:#fff;}
+.gi-card-desc{font-size:12.5px; line-height:1.55; color:#949ba4;}
+
+.gi-no-results{display:none; text-align:center; color:#666; font-size:13px; font-family:'Oxanium',sans-serif; padding:30px 0;}
+
+.gi-note{margin:26px 15% 0 15%; font-size:11.5px; color:#5a5d63; line-height:1.6;}
+
+@media (max-width: 970px){
+  .gi-toolbar{margin:24px 5% 20px 5%;}
+  .gi-grid{grid-template-columns:1fr; gap:20px; margin:0 5% 10px 5%;}
+  .gi-note{margin:22px 5% 0 5%;}
+  .clan-box{margin-top:20px;}
+
+  .gi-pill-row{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;           /* Firefox */
+    -ms-overflow-style:none;        /* old Edge/IE */
+    padding-bottom:2px;
+  }
+  .gi-pill-row::-webkit-scrollbar{ display:none; }  /* Chrome/Safari */
+  .gi-pill{ flex-shrink:0; }
+}
+
+/* ===== Events Hub: shared dashboard shell ===== */
+.events-grid{
+  display:grid; grid-template-columns:1.6fr 1fr; gap:16px; align-items:stretch;
+  padding:16px 8% 28px 8%; box-sizing:border-box;
+}
+.events-col-main, .events-col-side{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+
+.panel-card{
+  position:relative; overflow:hidden;
+  background:linear-gradient(180deg, rgba(32, 33, 36, 0.75) 0%, rgba(20, 21, 23, 0.9) 100%);
+  border:1px solid rgba(112, 112, 112, 0.35); border-radius:14px; padding:16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+  animation:panelFadeIn .5s ease both;
+}
+
+#bannersPanel{ animation-delay:.02s; }
+#abyssPanel{ animation-delay:.1s; }
+#codesPanel{ animation-delay:.18s; }
+
+.panel-card-header{ display:flex; align-items:center; gap:9px; margin-bottom:12px; flex-wrap:wrap; }
+.panel-icon{
+  flex-shrink:0; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:13px; 
+}
+.panel-title{ font-family:'Oxanium',sans-serif; font-weight:800; font-size:14.5px; color:#fff; letter-spacing:.2px; }
+.panel-sub{ margin-left:auto; font-size:10.5px; color:#9a9a9f; font-weight:600; }
+.panel-sub-text{ font-size:11px; color:#9a9a9f; margin:-6px 0 12px 0; }
+
+/* ===== Spiral Abyss panel ===== */
+.abyss-panel-icon{ overflow:hidden; padding:0; background:none; border:none; }
+.abyss-panel-icon img{ width:100%; height:100%; object-fit:cover; border-radius:8px; display:block; }
+.abyss-tracked-label{ margin-left:auto; font-size:10.5px; color:#7a7a7f; font-weight:600; white-space:nowrap; }
+
+/* Mobile-default: 3 simple cards side by side */
+.abyss-list-desktop{ display:flex; gap:8px; }
+.abyss-region-row{
+  position:relative; flex:1 1 0; min-width:0;
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
+  padding:12px 6px 10px; background:#141415; border:1px solid #232324; border-radius:10px;
+  border-top:2px solid #2c2c2f;
+}
+.abyss-region-info{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; width:100%; }
+.abyss-region-name{ font-family:'Oxanium',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:.4px; text-transform:uppercase; color:#e4e4ea; }
+.abyss-region-sub{ font-size:9px; color:#7a7a7f; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+.abyss-region-countdown{ display:flex; flex-direction:column; align-items:center; gap:1px; }
+.abyss-countdown-label{ font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#7a7a7f; }
+.abyss-countdown-value{ font-size:13px; font-weight:800; color:#d8d8dc; font-family:'Oxanium',sans-serif; white-space:nowrap; }
+.abyss-region-countdown.ending-soon .abyss-countdown-label{ color:#c98a8a; }
+.abyss-region-countdown.ending-soon .abyss-countdown-value{ color:#ff8f8f; }
+
+@media (min-width: 971px){
+  /* Desktop: revert to a stacked vertical list */
+  .abyss-list-desktop{ flex-direction:column; gap:0; }
+  .abyss-region-row{
+    flex-direction:row; align-items:center; justify-content:space-between; text-align:left; gap:14px;
+    padding:10px 0; background:none; border:none; border-top:1px solid #1e1f28; border-radius:0;
+  }
+  .abyss-region-row:first-child{ border-top:none; padding-top:0; }
+  .abyss-region-info{ align-items:flex-start; width:auto; }
+  .abyss-region-countdown{ align-items:flex-end; flex-shrink:0; }
+}
+
+/* ===== Active Redeem Codes: chip design ===== */
+.codes-list{display:flex; flex-direction:column; gap:8px;}
+.code-row{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:#242424; border:1px solid #242427; border-radius:10px; padding:10px 12px; cursor:pointer;
+  transition:border-color .15s, background .15s, transform .15s;
+}
+.code-row:hover{ border-color:#4a4a4e; background:#19191b; transform:translateY(-1px); }
+.code-row:active{ transform:translateY(0) scale(.99); }
+.code-info{display:flex; align-items:center; gap:10px; min-width:0;}
+.code-text{display:flex; flex-direction:column; gap:2px; min-width:0;}
+.code-name{font-family:'Oxanium',monospace; font-weight:800; letter-spacing:.5px; color:#fff; font-size:13.5px;}
+.code-rewards{font-size:11.5px; color:#949ba4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.code-copy-btn{flex-shrink:0; display:flex; align-items:center; gap:6px; background:#1e1e21; border:1px solid #3a3a3e; color:#d4d4d8; font-size:10.5px;
+  font-weight:800; letter-spacing:.6px; text-transform:uppercase; padding:7px 12px; border-radius:7px;
+  pointer-events:none; transition:background .15s,border-color .15s,color .15s;}
+.code-copy-icon{width:13px; height:13px; flex-shrink:0;}
+.code-row:hover .code-copy-btn{background:#2a2a2e; border-color:#54545a;}
+.code-copy-btn.copied{background:#1d2d24; border-color:#3a6b4f; color:#7fe0a8;}
+.codes-status{font-size:12.5px; color:#9a9a9f; padding:6px 2px;}
+.codes-fallback-notice{
+  font-size:11px; color:#c9a86a; padding:6px 10px; margin-bottom:8px;
+  background:#1d1a12; border:1px solid #3d331d; border-radius:6px;
+}
+.banners-retry-btn{
+  margin-top:8px; background:#1c1c1e; border:1px solid #2f3033; color:#d8d8dc;
+  font-size:11px; font-weight:700; letter-spacing:.3px; padding:7px 14px; border-radius:7px;
+  cursor:pointer; transition:background .15s, border-color .15s;
+}
+.banners-retry-btn:hover{ background:#242426; border-color:#3a3a3e; }
+.codes-status a{color:#e0e0e0; text-decoration:underline;}
+
+@media (max-width: 970px){
+  .codes-list{
+    flex-direction:row; flex-wrap:nowrap; overflow-x:auto; gap:10px;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none;
+  }
+  .codes-list::-webkit-scrollbar{ display:none; }
+  .code-row{
+    flex-shrink:0; flex-direction:column; align-items:flex-start; justify-content:flex-start;
+    width:148px; gap:6px; position:relative; padding:12px 30px 12px 12px;
+  }
+  .code-info{ flex-direction:column; align-items:flex-start; gap:4px; }
+  .code-info::before{ position:absolute; top:10px; right:32px; }
+  .code-rewards{
+    white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .code-copy-btn{
+    position:absolute; top:8px; right:8px; padding:0; width:20px; height:20px; font-size:0;
+    display:flex; align-items:center; justify-content:center; border-radius:5px;
+  }
+  .code-copy-btn::before{ content:'⧉'; font-size:11px; line-height:1; }
+  .codes-status{ white-space:normal; padding:6px 5%; }
+}
+
+/* ===== Current Banners: rich cards ===== */
+.banners-list{display:flex; flex-direction:column; gap:12px;}
+.banner-card{
+  position:relative; background:linear-gradient(160deg, rgba(255,255,255,.03), rgba(0,0,0,0) 40%), #17171a;
+  border:1px solid #262629; border-radius:12px; padding:16px 16px 18px 16px;
+  display:flex; flex-direction:column; gap:10px;
+  box-shadow:0 4px 14px rgba(0,0,0,.3);
+  transition:transform .15s, border-color .15s, box-shadow .15s;
+}
+.banner-card::before{
+  content:''; position:absolute; top:0; left:14px; right:14px; height:2px; border-radius:2px;
+  background:linear-gradient(90deg, transparent, #55575e, transparent);
+  opacity:.85;
+}
+.banner-card:hover{ transform:translateY(-2px); border-color:#3a3a3e; box-shadow:0 10px 24px rgba(0,0,0,.4); }
+.banner-card.rarity-5{ box-shadow:0 0 0 1px rgba(201,168,106,.14), 0 8px 20px rgba(0,0,0,.4); }
+
+.banner-card-top{display:flex; align-items:center; justify-content:space-between; gap:14px;}
+.banner-name-wrap{ display:flex; align-items:center; gap:8px; min-width:0; flex:1; }
+.banner-name{
+  font-family:'Oxanium',sans-serif; font-weight:800; color:#fff; font-size:14.5px; letter-spacing:.3px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;
+}
+.banner-version{
+  flex-shrink:0; font-size:10px; font-weight:700; color:#aaa;
+  background:#1d1d1f; border:1px solid #303033; padding:2px 8px; border-radius:6px;
+}
+.banner-countdown{
+  flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; gap:1px;
+}
+.banner-countdown-label{
+  font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#7a7a7f;
+}
+.banner-countdown-value{
+  font-size:13.5px; font-weight:800; color:#d3b06a; font-family:'Oxanium',sans-serif; white-space:nowrap;
+}
+.banner-countdown.ending-soon .banner-countdown-label{ color:#c98a8a; }
+.banner-countdown.ending-soon .banner-countdown-value{ color:#ff9d9d; animation:pulseSoon 1.6s ease-in-out infinite; }
+.banner-countdown.ended .banner-countdown-value{ color:#777; }
+@keyframes pulseSoon{ 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
+
+.banner-chars-label{ font-size:9.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#7a7a7f; }
+.banner-chars{display:flex; flex-wrap:wrap; gap:10px;}
+.banner-char{
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  width:76px; text-align:center;
+}
+.banner-char-portrait{
+  width:76px; height:76px; border-radius:12px; overflow:hidden; position:relative;
+  background:#1b1b1c; box-shadow:0 3px 8px rgba(0,0,0,.4); transition:transform .15s;
+}
+.banner-char:hover .banner-char-portrait{ transform:scale(1.05); }
+.banner-char-portrait img{width:100%; height:100%; object-fit:cover; display:block;}
+.banner-char.r5 .banner-char-portrait{ box-shadow:0 0 0 2px #a3873f, 0 0 10px rgba(201,168,106,.3); background:linear-gradient(160deg,#2a2419,#1b1b1c); }
+.banner-char.r4 .banner-char-portrait{ box-shadow:0 0 0 2px #7a4fae, 0 0 10px rgba(178,120,255,.3); background:linear-gradient(160deg,#2c1f3a,#1b1b1c); }
+.banner-char-rarity{font-size:9.5px; font-weight:800; letter-spacing:.5px;}
+.banner-char.r5 .banner-char-rarity{color:#d3b06a;}
+.banner-char.r4 .banner-char-rarity{color:#c9a2ff;}
+.banner-char-name{
+  font-size:11px; color:#e0e0e0; font-weight:600; line-height:1.3; width:100%;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  min-height:2.6em;
+}
+.banners-status{font-size:12.5px; color:#8a8a8f; padding:6px 2px;}
+.banners-status a{color:#e0e0e0; text-decoration:underline;}
+
+/* ===== Current Events: big feed cards ===== */
+.events-bottom{ padding:0 8% 28px 8%; box-sizing:border-box; }
+.events-feed{ display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; align-items:start; }
+.event-card{
+  position:relative; border-radius:14px; overflow:hidden;
+  border:1px solid #262629; background:#17171a;
+  box-shadow:0 4px 14px rgba(0,0,0,.3);
+  display:flex; flex-direction:column;
+  transition:transform .15s, border-color .15s, box-shadow .15s;
+}
+.event-card:hover{ transform:translateY(-2px); border-color:#3a3a3e; box-shadow:0 12px 28px rgba(0,0,0,.45); }
+.event-card-image-wrap{
+  position:relative; width:100%; aspect-ratio:16/9; background:#1b1b1c; overflow:hidden; flex-shrink:0;
+}
+.event-card-image-wrap img{ width:100%; height:100%; object-fit:cover; background:#101012; display:block; }
+.event-card-image-wrap.no-image{
+  background:linear-gradient(135deg,#1c1c1e 0%,#232326 60%,#1a1a1c 100%);
+}
+.event-card-image-wrap.no-image::after{
+  content:'✦'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:26px; color:#3a3a3e;
+}
+.event-card-overlay{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 70%, rgba(0,0,0,.92) 100%);
+  display:flex; flex-direction:column; justify-content:flex-end; padding:12px 14px;
+}
+.event-card-title{
+  font-family:'Oxanium',sans-serif; font-weight:800; color:#fff; font-size:14.5px; letter-spacing:.2px;
+  overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.event-card-meta-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:5px; }
+.event-card-countdown{ display:flex; flex-direction:column; align-items:flex-end; gap:1px; flex-shrink:0; }
+.event-card-countdown-label{ font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#c9c9cf; }
+.event-card-countdown-value{ font-size:12px; font-weight:800; color:#d3b06a; font-family:'Oxanium',sans-serif; white-space:nowrap; }
+.event-card-countdown.ending-soon .event-card-countdown-label{ color:#e0b3b3; }
+.event-card-countdown.ending-soon .event-card-countdown-value{ color:#ff9d9d; animation:pulseSoon 1.6s ease-in-out infinite; }
+.event-card-countdown.ended .event-card-countdown-value{ color:#999; }
+
+/* Card body: description + read more button */
+.event-card-body{
+  display:flex; flex-direction:column; gap:10px; padding:12px 14px 14px 14px; flex:1;
+}
+.event-card-desc{
+  font-size:10px; line-height:1.5; color:#9a9a9f;
+  overflow:hidden; text-overflow:ellipsis;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+  margin:0; flex:1;
+}
+@media (max-width: 1200px) and (min-width: 971px){
+  .events-feed{ grid-template-columns:repeat(2, 1fr); }
+}
+
+@media (max-width: 970px){
+  .events-bottom{ padding:0 3% 24px 3%; }
+  .events-feed{ grid-template-columns:1fr; gap:16px; }
+  .event-card-image-wrap{ aspect-ratio:2.4/1; }
+  .event-card-title{ font-size:14.5px; }
+  .event-card-desc{ font-size:10.5px; }
+}
+
+/* ===== Hero tabs (Events / Guides / Gallery) ===== */
+.hero-tabs{
+  display:flex; align-items:center; gap:14px; padding:17px 8%; box-sizing:border-box;
+  width: 100%; background:linear-gradient(180deg, rgba(10,10,10,.92) 0%, rgba(10,10,10,.75) 100%);
+  position:relative;
+}
+.hero-tab-btn{
+  position:relative; flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 30px 14px 30px; border-radius:10px;
+  background:linear-gradient(180deg, rgba(24,22,20,.6) 0%, rgba(14,13,12,.4) 100%);
+  border:1px solid rgba(201,168,106,.14);
+  color:#8a8578; font-size:12.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase;
+  cursor:pointer; transition:background .2s ease, color .2s ease, transform .15s ease;
+  font-family:'Oxanium', sans-serif; overflow:hidden;
+}
+.hero-tab-btn::before{
+  content:''; position:absolute; top:0; left:50%; width:0; height:2px; transform:translateX(-50%);
+  background:linear-gradient(90deg, transparent, #e0be7c, transparent); transition:width .25s ease;
+}
+.hero-tab-btn .tab-diamond{
+  width:6px; height:6px; flex-shrink:0; background:#5a5648; transform:rotate(45deg);
+  transition:background .2s ease, box-shadow .2s ease;
+}
+.hero-tab-btn:hover{ color:#d8cdb0; background:linear-gradient(180deg, rgba(34,30,24,.7) 0%, rgba(18,17,15,.5) 100%); }
+.hero-tab-btn:hover .tab-diamond{ background:#c9a86a; }
+.hero-tab-btn.active{
+  color:#f3e3bb;
+  background:linear-gradient(180deg, rgba(58,46,24,.55) 0%, rgba(20,18,15,.75) 100%);
+  border-color:rgba(224,190,124,.45);
+  box-shadow:0 -2px 14px rgba(201,168,106,.12), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.hero-tab-btn.active::before{ width:70%; }
+.hero-tab-btn.active .tab-diamond{
+  background:#e0be7c; box-shadow:0 0 8px rgba(224,190,124,.8);
+}
+.hero-tabs::after{
+  content:''; position:absolute; left:8%; right:8%; bottom:0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(224,190,124,.3), transparent);
+}
+.hero-tab-panel{ display:none; }
+.hero-tab-panel.active{ display:block; }
+
+@media (max-width: 970px){
+  .hero-tabs{ padding:14px 5%; gap:6px; }
+  .hero-tab-btn{ flex:1 1 0; padding:12px 0; font-size:11px; letter-spacing:.8px; gap:6px; }
+  .events-grid{ grid-template-columns:1fr; padding:16px 2% 24px 2%; gap:14px; }
+  .events-col-main, .events-col-side{ display:contents; }
+  #abyssPanel{ order:1; }
+  #bannersPanel{ order:2; }
+  #codesPanel{ order:3; }
+
+  .banner-chars{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .banner-char{ width:auto; }
+  .banner-char-portrait{ width:100%; height:auto; aspect-ratio:1/1; }
+}
+
+</style>
+
+</div><!-- /panel events -->
+
+<div class="hero-tab-panel" data-panel="gallery">
+
+<div class="clan-box">
+  <img class="clan-box-img" src="/icons/genshin.jpg" alt="Genshin Impact">
+  <div class="clan-box-content">
+    <div class="clan-box-title">Teyvat, Curated</div>
+    <div class="clan-box-text">
+      We don't host guides ourselves — we point you to the community tools actually worth your time: the interactive map
+      for exploration and farming routes, live banner tracking, artifact/build optimizers, and Spiral Abyss strategy
+      that gets updated every rotation.
+    </div>
+  </div>
+</div>
+
+</div><!-- /panel gallery -->
+
+  <style>
+
+.layouts-title-box {
+  margin: 5px 15% 20px 15%;
+  border-radius: 0;
+  padding: 12px 20px;
+  text-align: center;
+  background: transparent;
+  border-bottom: 1px solid #2a2a2a;
+  position: relative;
+  margin-top: 40px; 
+}
+.layouts-title-box::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 2px;
+  background: #9f0000;
+}
+.layouts-title {
+  font-size: clamp(18px, 2vw, 30px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #c0c9d4, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (max-width: 970px) {
+     .layouts-title-box {margin-left: 5%; margin-right:5%; margin-bottom: 0px; margin-top: 20px;
+    }
+  .layouts-title-box::after{width: 70px;}
+  
+  }
+
+  </style>
+
+<div class="hero-tab-panel" data-panel="guides">
+
+<div class="gi-toolbar">
+  <div class="gi-search-wrap">
+    <svg class="gi-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"></circle><line x1="15" y1="15" x2="20.5" y2="20.5"></line></svg>
+    <input type="text" id="giSearch" class="gi-search-input" placeholder="Search tools, e.g. artifacts, abyss, banners..." oninput="giFilter()">
+  </div>
+  <div class="gi-pill-row" id="giPills">
+    <button class="gi-pill active" data-cat="all">All</button>
+    <button class="gi-pill" data-cat="map">Map &amp; Farming</button>
+    <button class="gi-pill" data-cat="banners">Banners</button>
+    <button class="gi-pill" data-cat="builds">Builds</button>
+    <button class="gi-pill" data-cat="abyss">Abyss</button>
+    <button class="gi-pill" data-cat="guides">Guides</button>
+    <button class="gi-pill" data-cat="database">Database</button>
+    <button class="gi-pill" data-cat="community">Community</button>
+  </div>
+</div>
+
+<div class="gi-grid" id="giGrid">
+
+  <a class="gi-card" href="https://act.hoyolab.com/ys/app/interactive-map/index.html" target="_blank" rel="noopener" data-cat="map" data-name="teyvat interactive map hoyolab chest puzzle material farming route explore">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://act.hoyolab.com/ys/app/interactive-map/index.html" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-map">Map</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=hoyolab.com&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Teyvat Interactive Map</div>
+      <div class="gi-card-desc">Official world map for every chest, puzzle, and material node — plus one-tap ascension material farming routes.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://genshin.hoyoverse.com/en/news" target="_blank" rel="noopener" data-cat="banners" data-name="current upcoming banners wish event official news hoyoverse">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://genshin.hoyoverse.com/en/news" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-banners">Banners</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=genshin.hoyoverse.com&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Current &amp; Upcoming Banners</div>
+      <div class="gi-card-desc">Official news hub confirming who's running in the current Event Wish and what's lined up next patch.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://paimon.moe/" target="_blank" rel="noopener" data-cat="builds" data-name="paimon.moe wish tracker build planner farming calendar talent domain">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://paimon.moe/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-builds">Builds</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=paimon.moe&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Paimon.moe</div>
+      <div class="gi-card-desc">Wish history tracker, character build planner, and a talent/weekly-boss farming calendar in one dashboard.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://frzyc.github.io/genshin-optimizer/" target="_blank" rel="noopener" data-cat="builds" data-name="genshin optimizer artifact scanner best build calculator">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://frzyc.github.io/genshin-optimizer/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-builds">Builds</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=frzyc.github.io&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Genshin Optimizer</div>
+      <div class="gi-card-desc">Scans your artifact inventory and calculates the mathematically best build for any character you own.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://spiralabyss.org/" target="_blank" rel="noopener" data-cat="abyss" data-name="spiral abyss teams floor strategy rotation">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://spiralabyss.org/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-abyss">Abyss</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=spiralabyss.org&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Spiral Abyss</div>
+      <div class="gi-card-desc">Floor-by-floor Abyss team compositions and clear strategies, refreshed with every rotation.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://keqingmains.com/" target="_blank" rel="noopener" data-cat="guides" data-name="keqingmains theorycrafting tier list character guides">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://keqingmains.com/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-guides">Guides</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=keqingmains.com&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">KeqingMains</div>
+      <div class="gi-card-desc">Deep-dive character theorycrafting, build guides, and tier lists from a long-running community wiki.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://gensh.honeyhunterworld.com/?lang=EN" target="_blank" rel="noopener" data-cat="database" data-name="honey impact database wiki characters weapons upcoming">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://gensh.honeyhunterworld.com/?lang=EN" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-database">Database</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=honeyhunterworld.com&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Honey Impact</div>
+      <div class="gi-card-desc">Full database of every character, weapon, and artifact set — including unreleased upcoming content.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://akasha.cv/" target="_blank" rel="noopener" data-cat="builds" data-name="akasha system leaderboard damage ranking build">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://akasha.cv/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-builds">Builds</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=akasha.cv&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Akasha System</div>
+      <div class="gi-card-desc">Damage leaderboard that ranks your character builds against every other submitted player build.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://enka.network/" target="_blank" rel="noopener" data-cat="community" data-name="enka network profile showcase uid viewer">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://enka.network/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-community">Community</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=enka.network&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">Enka.Network</div>
+      <div class="gi-card-desc">Look up any player by UID to inspect their live in-game character showcase and stats.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://shinshin.moe/" target="_blank" rel="noopener" data-cat="community" data-name="shinshin.moe build card generator screenshot">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://shinshin.moe/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-community">Community</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=shinshin.moe&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">ShinShin.moe</div>
+      <div class="gi-card-desc">Turns your in-game character screenshots into a clean, shareable build card in a few clicks.</div>
+    </div>
+  </a>
+
+  <a class="gi-card" href="https://www.hoyolab.com/" target="_blank" rel="noopener" data-cat="community" data-name="hoyolab community codes events check-in official">
+    <div class="gi-card-photo">
+      <img class="gi-shot" src="https://image.thum.io/get/width/700/crop/440/noanimate/https://www.hoyolab.com/" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="gi-card-tag cat-community">Community</span>
+      <span class="gi-card-favicon"><img src="https://www.google.com/s2/favicons?domain=hoyolab.com&sz=64" alt=""></span>
+    </div>
+    <div class="gi-card-body">
+      <div class="gi-card-title">HoYoLAB</div>
+      <div class="gi-card-desc">Official community hub for events, daily check-in rewards, redemption codes, and traveler news.</div>
+    </div>
+  </a>
+
+</div>
+
+<div class="gi-no-results" id="giNoResults">No tools match your search.</div>
+
+<div class="gi-note">Card previews load live from each site. Redeem codes and banner details change often — always double-check in-game.</div>
+
+</div><!-- /panel guides -->
+
+<script src="/11layout.js"></script>
+
+<script>
+(function(){
+  var pills = document.querySelectorAll('#giPills .gi-pill');
+  var searchInput = document.getElementById('giSearch');
+  var cards = document.querySelectorAll('#giGrid .gi-card');
+  var noResults = document.getElementById('giNoResults');
+  var activeCat = 'all';
+
+  pills.forEach(function(p){
+    p.addEventListener('click', function(){
+      pills.forEach(function(x){ x.classList.remove('active'); });
+      p.classList.add('active');
+      activeCat = p.dataset.cat;
+      giFilter();
+    });
+  });
+
+  window.giFilter = function(){
+    var q = (searchInput.value || '').toLowerCase().trim();
+    var visible = 0;
+    cards.forEach(function(c){
+      var matchesCat = activeCat === 'all' || c.dataset.cat === activeCat;
+      var matchesSearch = !q || c.dataset.name.indexOf(q) !== -1;
+      if(matchesCat && matchesSearch){
+        c.style.display = '';
+        visible++;
+      } else {
+        c.style.display = 'none';
+      }
+    });
+    noResults.style.display = visible === 0 ? 'block' : 'none';
+  };
+})();
+
+// ===== Hero tabs (Events / Guides / Gallery) =====
+(function(){
+  var tabsEl = document.getElementById('heroTabs');
+  if (!tabsEl) return;
+  var buttons = Array.prototype.slice.call(tabsEl.querySelectorAll('.hero-tab-btn'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.hero-tab-panel'));
+
+  function activate(tab){
+    buttons.forEach(function(b){ b.classList.toggle('active', b.dataset.tab === tab); });
+    panels.forEach(function(p){ p.classList.toggle('active', p.dataset.panel === tab); });
+  }
+
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){ activate(btn.dataset.tab); });
+  });
+})();
+
+// ===== Active Redeem Codes widget =====
+(function(){
+  var listEl = document.getElementById('codesList');
+  if (!listEl) return;
+
+  // Last-known-good snapshot, used only if the live API is unreachable.
+  // Update this occasionally from https://genshin.hoyoverse.com/en/gift or a codes tracker.
+  var FALLBACK_CODES = [
+    { code: 'GENSHINGIFT',  rewards: ['Primogems x50', "Hero's Wit x3"] },
+    { code: 'LEGEDILJKSGM', rewards: ['Primogems x60', "Adventurer's Experience x5"] },
+    { code: 'PFY1S40I88T9', rewards: ['Primogems x60', "Adventurer's Experience x5"] },
+    { code: 'EZSB8889C2BZ', rewards: ['Mora x10000', "Adventurer's Experience x10", 'Fine Enhancement Ore x5'] }
+  ];
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function renderCodes(codes, isFallback){
+    var statusLabel = document.getElementById('codesStatusLabel');
+    if (statusLabel) statusLabel.textContent = isFallback ? 'Cached list' : 'Tap to copy';
+
+    if (!codes || !codes.length) {
+      listEl.innerHTML = '<div class="codes-status">No active codes right now — check back soon.</div>';
+      return;
+    }
+    listEl.innerHTML = '';
+
+    if (isFallback) {
+      var notice = document.createElement('div');
+      notice.className = 'codes-status codes-fallback-notice';
+      notice.textContent = "Live codes unavailable right now — showing a cached list. Double-check before redeeming.";
+      listEl.appendChild(notice);
+    }
+
+    codes.forEach(function(entry){
+      var row = document.createElement('div');
+      row.className = 'code-row';
+      row.setAttribute('role', 'button');
+      row.tabIndex = 0;
+      row.setAttribute('aria-label', 'Copy code ' + entry.code);
+
+      var info = document.createElement('div');
+      info.className = 'code-info';
+      var textWrap = document.createElement('div');
+      textWrap.className = 'code-text';
+      var nameEl = document.createElement('div');
+      nameEl.className = 'code-name';
+      nameEl.textContent = entry.code;
+      var rewardsEl = document.createElement('div');
+      rewardsEl.className = 'code-rewards';
+      rewardsEl.textContent = (entry.rewards || []).join(', ');
+      textWrap.appendChild(nameEl);
+      textWrap.appendChild(rewardsEl);
+      info.appendChild(textWrap);
+
+      var btn = document.createElement('button');
+      btn.className = 'code-copy-btn';
+      btn.type = 'button';
+      btn.tabIndex = -1;
+      btn.textContent = 'Copy';
+
+      function doCopy(){
+        var code = entry.code;
+        var done = function(){
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(code).then(done).catch(function(){
+            fallbackCopy(code); done();
+          });
+        } else {
+          fallbackCopy(code); done();
+        }
+      }
+
+      row.addEventListener('click', doCopy);
+      row.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doCopy(); }
+      });
+
+      row.appendChild(info);
+      row.appendChild(btn);
+      listEl.appendChild(row);
+    });
+  }
+
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  function useFallback(){
+    renderCodes(FALLBACK_CODES, true);
+    var retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.className = 'banners-retry-btn';
+    retryBtn.textContent = 'Try live codes again';
+    retryBtn.addEventListener('click', function(){
+      var statusLabel = document.getElementById('codesStatusLabel');
+      if (statusLabel) statusLabel.textContent = 'Loading…';
+      listEl.innerHTML = '<div class="codes-status">Loading current codes…</div>';
+      loadCodes();
+    });
+    listEl.appendChild(retryBtn);
+  }
+
+  function loadCodes(){
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timeoutId = setTimeout(function(){ if (controller) controller.abort(); }, 8000);
+
+    fetch('https://api.ennead.cc/mihoyo/genshin/codes', controller ? { signal: controller.signal } : {})
+      .then(function(res){
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error('Bad response: ' + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        if (data && data.active && data.active.length) {
+          renderCodes(data.active, false);
+        } else {
+          useFallback();
+        }
+      })
+      .catch(function(err){
+        console.error('Redeem codes fetch failed, using fallback list:', err);
+        useFallback();
+      });
+  }
+
+  loadCodes();
+})();
+
+// ===== Spiral Abyss Reset (all regions shown at once, mobile + desktop) =====
+(function(){
+  var desktopListEl = document.getElementById('abyssListDesktop');
+  if (!desktopListEl) return;
+
+  var servers = [
+    { name: 'Asia',    offset: 8,  sub: 'incl. TW / HK / MO' },
+    { name: 'America', offset: -5, sub: 'NA server' },
+    { name: 'Europe',  offset: 1,  sub: 'EU server' }
+  ];
+
+  // Given a server's UTC offset in hours, returns the UTC timestamp (ms)
+  // of the next Abyss reset (1st or 16th of the month, 04:00 local server time).
+  function nextResetUTC(offsetHours){
+    var offsetMs = offsetHours * 3600000;
+    var localNow = new Date(Date.now() + offsetMs); // fields read via getUTC* = local server time
+    var y = localNow.getUTCFullYear();
+    var m = localNow.getUTCMonth();
+    var nowLocalMs = localNow.getTime();
+
+    var candidates = [
+      Date.UTC(y, m, 1, 4, 0, 0),
+      Date.UTC(y, m, 16, 4, 0, 0),
+      Date.UTC(y, m + 1, 1, 4, 0, 0)
+    ];
+    var next = candidates.filter(function(c){ return c > nowLocalMs; })
+                          .sort(function(a, b){ return a - b; })[0];
+    return next - offsetMs; // convert back to real UTC timestamp
+  }
+
+  function formatRemaining(msRemaining){
+    if (msRemaining <= 0) return { label: 'Status', value: 'Resetting…', cls: 'ending-soon' };
+    var totalSeconds = Math.floor(msRemaining / 1000);
+    var days = Math.floor(totalSeconds / 86400);
+    var hours = Math.floor((totalSeconds % 86400) / 3600);
+    var mins = Math.floor((totalSeconds % 3600) / 60);
+    var secs = totalSeconds % 60;
+    var value;
+    if (days > 0) {
+      value = days + 'd ' + hours + 'h';
+    } else if (hours > 0) {
+      value = hours + 'h ' + mins + 'm';
+    } else {
+      value = mins + 'm ' + secs + 's';
+    }
+    var cls = (totalSeconds <= 3600) ? 'ending-soon' : '';
+    var label = cls ? 'Resetting soon' : 'Next reset';
+    return { label: label, value: value, cls: cls };
+  }
+
+  // Build the desktop rows once
+  var desktopRows = [];
+  if (desktopListEl) {
+    desktopRows = servers.map(function(server){
+      var row = document.createElement('div');
+      row.className = 'abyss-region-row';
+
+      var info = document.createElement('div');
+      info.className = 'abyss-region-info';
+      var nameEl = document.createElement('div');
+      nameEl.className = 'abyss-region-name';
+      nameEl.textContent = server.name;
+      var subEl = document.createElement('div');
+      subEl.className = 'abyss-region-sub';
+      subEl.textContent = server.sub;
+      subEl.title = server.sub;
+      info.appendChild(nameEl);
+      info.appendChild(subEl);
+
+      var countdownWrap = document.createElement('div');
+      countdownWrap.className = 'abyss-region-countdown';
+      var cdLabel = document.createElement('div');
+      cdLabel.className = 'abyss-countdown-label';
+      cdLabel.textContent = 'Loading';
+      var cdValue = document.createElement('div');
+      cdValue.className = 'abyss-countdown-value';
+      cdValue.textContent = '…';
+      countdownWrap.appendChild(cdLabel);
+      countdownWrap.appendChild(cdValue);
+
+      row.appendChild(info);
+      row.appendChild(countdownWrap);
+      desktopListEl.appendChild(row);
+      return { server: server, labelEl: cdLabel, valueEl: cdValue, wrapEl: countdownWrap };
+    });
+  }
+
+  function tick(){
+    desktopRows.forEach(function(r){
+      var rem = nextResetUTC(r.server.offset) - Date.now();
+      var res = formatRemaining(rem);
+      r.labelEl.textContent = res.label;
+      r.valueEl.textContent = res.value;
+      r.wrapEl.className = 'abyss-region-countdown' + (res.cls ? ' ' + res.cls : '');
+    });
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// ===== Current Banners widget =====
+(function(){
+  var listEl = document.getElementById('bannersList');
+  if (!listEl) return;
+
+  var countdownTimers = []; // { el, endTime }
+  var tickInterval = null;
+
+  function formatCountdown(msRemaining){
+    if (msRemaining <= 0) return { label: 'Status', value: 'Ended', cls: 'ended' };
+    var totalSeconds = Math.floor(msRemaining / 1000);
+    var days = Math.floor(totalSeconds / 86400);
+    var hours = Math.floor((totalSeconds % 86400) / 3600);
+    var mins = Math.floor((totalSeconds % 3600) / 60);
+    var value;
+    if (days > 0) {
+      value = days + 'd ' + hours + 'h';
+    } else if (hours > 0) {
+      value = hours + 'h ' + mins + 'm';
+    } else {
+      value = mins + 'm';
+    }
+    var cls = (totalSeconds <= 86400) ? 'ending-soon' : '';
+    var label = cls ? 'Ending soon' : 'Ends in';
+    return { label: label, value: value, cls: cls };
+  }
+
+  function tickCountdowns(){
+    var now = Date.now();
+    countdownTimers.forEach(function(t){
+      var remaining = t.endTime - now;
+      var result = formatCountdown(remaining);
+      t.labelEl.textContent = result.label;
+      t.valueEl.textContent = result.value;
+      t.el.className = 'banner-countdown' + (result.cls ? ' ' + result.cls : '');
+
+      if (t.fillEl) {
+        var cycleLength = t.endTime - t.startTime;
+        var elapsed = now - t.startTime;
+        var pct = cycleLength > 0 ? Math.min(100, Math.max(0, (elapsed / cycleLength) * 100)) : 100;
+        t.fillEl.style.width = pct + '%';
+        t.fillEl.className = 'banner-progress-fill' + (result.cls ? ' ' + result.cls : '');
+      }
+    });
+  }
+
+  function renderBanners(banners){
+    var statusLabel = document.getElementById('bannersStatusLabel');
+    if (statusLabel) statusLabel.textContent = 'Live from HoYoLab';
+
+    if (!banners || !banners.length) {
+      listEl.innerHTML = '<div class="banners-status">No active banners right now — check back soon.</div>';
+      return;
+    }
+    listEl.innerHTML = '';
+    countdownTimers = [];
+    if (tickInterval) clearInterval(tickInterval);
+
+    var now = Date.now();
+    // Only show banners that haven't ended yet, soonest-ending first
+    var active = banners.filter(function(b){ return (b.end_time * 1000) > now; });
+    active.sort(function(a, b){ return a.end_time - b.end_time; });
+
+    if (!active.length) {
+      listEl.innerHTML = '<div class="banners-status">No active banners right now — check back soon.</div>';
+      return;
+    }
+
+    active.forEach(function(banner){
+      var card = document.createElement('div');
+      card.className = 'banner-card';
+
+      var top = document.createElement('div');
+      top.className = 'banner-card-top';
+
+      var nameWrap = document.createElement('div');
+      nameWrap.className = 'banner-name-wrap';
+      var nameEl = document.createElement('span');
+      nameEl.className = 'banner-name';
+      nameEl.textContent = banner.name || 'Event Wish';
+      nameEl.title = banner.name || 'Event Wish';
+      nameWrap.appendChild(nameEl);
+      if (banner.version) {
+        var verEl = document.createElement('span');
+        verEl.className = 'banner-version';
+        verEl.textContent = 'v' + banner.version;
+        nameWrap.appendChild(verEl);
+      }
+
+      var countdownEl = document.createElement('span');
+      countdownEl.className = 'banner-countdown';
+      var cdLabel = document.createElement('span');
+      cdLabel.className = 'banner-countdown-label';
+      cdLabel.textContent = 'Loading';
+      var cdValue = document.createElement('span');
+      cdValue.className = 'banner-countdown-value';
+      cdValue.textContent = '…';
+      countdownEl.appendChild(cdLabel);
+      countdownEl.appendChild(cdValue);
+
+      top.appendChild(nameWrap);
+      top.appendChild(countdownEl);
+      card.appendChild(top);
+
+      var featured = (banner.characters || []).concat(banner.weapons || []);
+      featured.sort(function(a, b){ return (b.rarity || 0) - (a.rarity || 0); });
+      if (featured.some(function(c){ return (c.rarity || 0) >= 5; })) {
+        card.classList.add('rarity-5');
+      }
+      if (featured.length) {
+        var charsLabel = document.createElement('div');
+        charsLabel.className = 'banner-chars-label';
+        charsLabel.textContent = 'Featured';
+        card.appendChild(charsLabel);
+
+        var charsRow = document.createElement('div');
+        charsRow.className = 'banner-chars';
+        featured.forEach(function(c){
+          var rarity = c.rarity || 4;
+          var chip = document.createElement('div');
+          chip.className = 'banner-char r' + rarity;
+
+          var portrait = document.createElement('div');
+          portrait.className = 'banner-char-portrait';
+          if (c.icon) {
+            var img = document.createElement('img');
+            img.src = c.icon;
+            img.alt = c.name || '';
+            img.loading = 'lazy';
+            portrait.appendChild(img);
+          }
+          chip.appendChild(portrait);
+
+          var rarityEl = document.createElement('div');
+          rarityEl.className = 'banner-char-rarity';
+          rarityEl.textContent = rarity + '★';
+          chip.appendChild(rarityEl);
+
+          var nm = document.createElement('div');
+          nm.className = 'banner-char-name';
+          nm.textContent = c.name || '';
+          nm.title = c.name || '';
+          chip.appendChild(nm);
+
+          charsRow.appendChild(chip);
+        });
+        card.appendChild(charsRow);
+      }
+
+      var progress = document.createElement('div');
+      progress.className = 'banner-progress';
+      var progressFill = document.createElement('div');
+      progressFill.className = 'banner-progress-fill';
+      progress.appendChild(progressFill);
+      card.appendChild(progress);
+
+      listEl.appendChild(card);
+      countdownTimers.push({
+        el: countdownEl,
+        labelEl: cdLabel,
+        valueEl: cdValue,
+        fillEl: progressFill,
+        startTime: (banner.start_time ? banner.start_time * 1000 : now),
+        endTime: banner.end_time * 1000
+      });
+    });
+
+    tickCountdowns();
+    tickInterval = setInterval(tickCountdowns, 30000);
+  }
+
+  function showBannersError(){
+    var statusLabel = document.getElementById('bannersStatusLabel');
+    if (statusLabel) statusLabel.textContent = 'Currently unavailable';
+
+    listEl.innerHTML = '';
+    var notice = document.createElement('div');
+    notice.className = 'banners-status';
+    notice.innerHTML = "Couldn't load live banner data right now. " +
+      '<a href="https://genshin.hoyoverse.com/en/news" target="_blank" rel="noopener">Check the official news page</a> instead.';
+    listEl.appendChild(notice);
+
+    var retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.className = 'banners-retry-btn';
+    retryBtn.textContent = 'Try again';
+    retryBtn.addEventListener('click', function(){
+      if (statusLabel) statusLabel.textContent = 'Loading…';
+      listEl.innerHTML = '<div class="banners-status">Loading current banners…</div>';
+      loadBanners();
+    });
+    listEl.appendChild(retryBtn);
+  }
+
+  function loadBanners(){
+    var bannerController = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var bannerTimeoutId = setTimeout(function(){ if (bannerController) bannerController.abort(); }, 8000);
+
+    fetch('https://api.ennead.cc/mihoyo/genshin/calendar', bannerController ? { signal: bannerController.signal } : {})
+      .then(function(res){
+        clearTimeout(bannerTimeoutId);
+        if (!res.ok) throw new Error('Bad response: ' + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        renderBanners(data && data.banners);
+      })
+      .catch(function(err){
+        console.error('Banners fetch failed:', err);
+        showBannersError();
+      });
+  }
+
+  loadBanners();
+})();
+
+// ===== Current Events feed (big cards with images) =====
+(function(){
+  var listEl = document.getElementById('eventsFeed');
+  if (!listEl) return;
+
+  var eventCountdownTimers = []; // { labelEl, valueEl, wrapEl, endTime }
+  var eventTickInterval = null;
+
+  function formatEventCountdown(msRemaining){
+    if (msRemaining <= 0) return { label: 'Status', value: 'Ended', cls: 'ended' };
+    var totalSeconds = Math.floor(msRemaining / 1000);
+    var days = Math.floor(totalSeconds / 86400);
+    var hours = Math.floor((totalSeconds % 86400) / 3600);
+    var mins = Math.floor((totalSeconds % 3600) / 60);
+    var value;
+    if (days > 0) {
+      value = days + 'd ' + hours + 'h';
+    } else if (hours > 0) {
+      value = hours + 'h ' + mins + 'm';
+    } else {
+      value = mins + 'm';
+    }
+    var cls = (totalSeconds <= 86400) ? 'ending-soon' : '';
+    var label = cls ? 'Ending soon' : 'Ends in';
+    return { label: label, value: value, cls: cls };
+  }
+
+  function tickEventCountdowns(){
+    var now = Date.now();
+    eventCountdownTimers.forEach(function(t){
+      var result = formatEventCountdown(t.endTime - now);
+      t.labelEl.textContent = result.label;
+      t.valueEl.textContent = result.value;
+      t.wrapEl.className = 'event-card-countdown' + (result.cls ? ' ' + result.cls : '');
+    });
+  }
+
+  // Different upstream fields have been seen for the event image across
+  // API versions — check every plausible key so real images show up.
+  function pickEventImage(ev, newsImageLookup){
+    var direct = ev.image_url || ev.banner || ev.image || ev.icon || ev.cover || ev.poster || null;
+    if (direct) return direct;
+    if (newsImageLookup) return findNewsImageForEvent(pickEventName(ev), newsImageLookup);
+    return null;
+  }
+  function pickEventName(ev){
+    return ev.name || ev.title || 'Event';
+  }
+  function pickEventDesc(ev){
+    return ev.description || ev.desc || '';
+  }
+
+  function normalizeTitle(str){
+    return String(str || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+
+  // The calendar endpoint's events sometimes lack an image; HoYoLab's news
+  // feed almost always has one for the matching announcement. Match by
+  // normalized title overlap (either direction) to find the right banner.
+  function findNewsImageForEvent(eventName, newsList){
+    var target = normalizeTitle(eventName);
+    if (!target) return null;
+    for (var i = 0; i < newsList.length; i++) {
+      var newsTitle = normalizeTitle(newsList[i].title);
+      if (!newsTitle) continue;
+      if (newsTitle.indexOf(target) !== -1 || target.indexOf(newsTitle) !== -1) {
+        return newsList[i].banner || null;
+      }
+    }
+    // Fall back to a looser word-overlap match if no direct substring match found.
+    var targetWords = target.split(' ').filter(function(w){ return w.length > 3; });
+    if (!targetWords.length) return null;
+    var best = null, bestScore = 0;
+    newsList.forEach(function(n){
+      var newsTitle = normalizeTitle(n.title);
+      var score = targetWords.filter(function(w){ return newsTitle.indexOf(w) !== -1; }).length;
+      if (score > bestScore) { bestScore = score; best = n; }
+    });
+    return (best && bestScore >= 2) ? (best.banner || null) : null;
+  }
+
+  function renderEvents(events, newsImageLookup){
+    var statusLabel = document.getElementById('eventsStatusLabel');
+    if (statusLabel) statusLabel.textContent = 'Live from HoYoLab';
+
+    if (!events || !events.length) {
+      listEl.innerHTML = '<div class="banners-status">No active events right now — check back soon.</div>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    eventCountdownTimers = [];
+    if (eventTickInterval) clearInterval(eventTickInterval);
+
+    var now = Date.now();
+    var active = events.filter(function(ev){ return !ev.end_time || (ev.end_time * 1000) > now; });
+
+    // Skip anything we don't have a real image for — a card with no photo
+    // isn't worth showing in this feed.
+    active = active.filter(function(ev){
+      var hasImage = !!pickEventImage(ev, newsImageLookup);
+      if (!hasImage) {
+        console.info('[Current Events] skipping "' + pickEventName(ev) + '" — no image available.');
+      }
+      return hasImage;
+    });
+
+    // Explicitly hide the "Ley Line Overflow" event card.
+    active = active.filter(function(ev){
+      return pickEventName(ev).trim().toLowerCase() !== 'ley line overflow';
+    });
+
+    active.sort(function(a, b){ return (a.end_time || Infinity) - (b.end_time || Infinity); });
+
+    if (!active.length) {
+      listEl.innerHTML = '<div class="banners-status">No active events right now — check back soon.</div>';
+      return;
+    }
+
+    active.forEach(function(ev){
+      var card = document.createElement('div');
+      card.className = 'event-card';
+
+      var imgWrap = document.createElement('div');
+      imgWrap.className = 'event-card-image-wrap';
+      var imgUrl = pickEventImage(ev, newsImageLookup);
+      var img = document.createElement('img');
+      img.src = imgUrl;
+      img.alt = pickEventName(ev);
+      img.loading = 'lazy';
+      img.onerror = function(){
+        // Image URL turned out broken once loaded — pull the whole card
+        // rather than leaving a blank placeholder in the grid.
+        console.warn('[Current Events] image failed to load for "' + pickEventName(ev) + '", removing card:', imgUrl);
+        card.remove();
+      };
+      imgWrap.appendChild(img);
+
+      var overlay = document.createElement('div');
+      overlay.className = 'event-card-overlay';
+
+      var titleEl = document.createElement('div');
+      titleEl.className = 'event-card-title';
+      titleEl.textContent = pickEventName(ev);
+      titleEl.title = pickEventName(ev);
+      overlay.appendChild(titleEl);
+
+      if (ev.end_time) {
+        var metaRow = document.createElement('div');
+        metaRow.className = 'event-card-meta-row';
+
+        var countdownWrap = document.createElement('div');
+        countdownWrap.className = 'event-card-countdown';
+        var cdLabel = document.createElement('div');
+        cdLabel.className = 'event-card-countdown-label';
+        cdLabel.textContent = 'Loading';
+        var cdValue = document.createElement('div');
+        cdValue.className = 'event-card-countdown-value';
+        cdValue.textContent = '…';
+        countdownWrap.appendChild(cdLabel);
+        countdownWrap.appendChild(cdValue);
+        metaRow.appendChild(countdownWrap);
+        overlay.appendChild(metaRow);
+
+        eventCountdownTimers.push({
+          labelEl: cdLabel, valueEl: cdValue, wrapEl: countdownWrap,
+          endTime: ev.end_time * 1000
+        });
+      }
+
+      imgWrap.appendChild(overlay);
+      card.appendChild(imgWrap);
+
+      var desc = pickEventDesc(ev);
+      if (desc) {
+        var body = document.createElement('div');
+        body.className = 'event-card-body';
+        var descEl = document.createElement('div');
+        descEl.className = 'event-card-desc';
+        descEl.textContent = desc;
+        body.appendChild(descEl);
+        card.appendChild(body);
+      }
+
+      listEl.appendChild(card);
+    });
+
+    tickEventCountdowns();
+    eventTickInterval = setInterval(tickEventCountdowns, 30000);
+  }
+
+  function showEventsError(){
+    var statusLabel = document.getElementById('eventsStatusLabel');
+    if (statusLabel) statusLabel.textContent = 'Currently unavailable';
+
+    listEl.innerHTML = '';
+    var notice = document.createElement('div');
+    notice.className = 'banners-status';
+    notice.innerHTML = "Couldn't load live event data right now. " +
+      '<a href="https://genshin.hoyoverse.com/en/news" target="_blank" rel="noopener">Check the official news page</a> instead.';
+    listEl.appendChild(notice);
+
+    var retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.className = 'banners-retry-btn';
+    retryBtn.textContent = 'Try again';
+    retryBtn.addEventListener('click', function(){
+      if (statusLabel) statusLabel.textContent = 'Loading…';
+      listEl.innerHTML = '<div class="banners-status">Loading current events…</div>';
+      loadEvents();
+    });
+    listEl.appendChild(retryBtn);
+  }
+
+  // Any news post that doesn't already correspond to a calendar event gets
+  // folded in as its own card too — this is how we guarantee "all" events
+  // show, not just the ones the calendar endpoint happens to list.
+  function mergeNewsIntoEvents(calendarEvents, newsList){
+    var events = (calendarEvents || []).slice();
+    var existingNames = events.map(function(e){ return normalizeTitle(pickEventName(e)); });
+
+    newsList.forEach(function(n){
+      var newsTitle = normalizeTitle(n.title);
+      if (!newsTitle) return;
+      var alreadyCovered = existingNames.some(function(name){
+        return name && (name.indexOf(newsTitle) !== -1 || newsTitle.indexOf(name) !== -1);
+      });
+      if (alreadyCovered) return;
+
+      events.push({
+        name: n.title,
+        description: n.description,
+        banner: n.banner,
+        url: n.url,
+        end_time: null
+      });
+    });
+
+    return events;
+  }
+
+  function loadEvents(){
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timeoutId = setTimeout(function(){ if (controller) controller.abort(); }, 8000);
+
+    var calendarPromise = fetch('https://api.ennead.cc/mihoyo/genshin/calendar', controller ? { signal: controller.signal } : {})
+      .then(function(res){
+        if (!res.ok) throw new Error('Bad response: ' + res.status);
+        return res.json();
+      });
+
+    // Best-effort: if the news endpoint fails or times out, we still render
+    // using calendar data alone.
+    var newsPromise = fetch('https://api.ennead.cc/mihoyo/genshin/news/events')
+      .then(function(res){ return res.ok ? res.json() : []; })
+      .catch(function(){ return []; });
+
+    Promise.all([calendarPromise, newsPromise])
+      .then(function(results){
+        clearTimeout(timeoutId);
+        var calendarData = results[0];
+        var newsList = Array.isArray(results[1]) ? results[1] : [];
+        var merged = mergeNewsIntoEvents(calendarData && calendarData.events, newsList);
+        renderEvents(merged, newsList);
+      })
+      .catch(function(err){
+        clearTimeout(timeoutId);
+        console.error('Events fetch failed:', err);
+        showEventsError();
+      });
+  }
+
+  loadEvents();
+})();
+</script>
+     </div>
+
+ <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+</div>
+</div>
+
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<script>
+  
+// NORMALIZER: a link/address -> the page it means, as a full path.
+// Full path, not just the last part: /coc/town-hall-18/layouts and
+// /coc/town-hall-17/layouts both end in "layouts". "x.html", "x" and
+// "x/index.html" all count as the same page. Relative links resolve from
+// the site root, which is how the nav JSON writes them.
+function normalizePage(url) {
+  if (url == null) return "";
+  var p = new URL(String(url).trim(), location.origin + '/').pathname.toLowerCase();
+  return p.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1');}
+const currentPage = normalizePage(window.location.pathname);
+
+// Sidebar elementssssssssssssssssssssssssssssssssssssss
+
+const topBox = document.getElementById('top-box');
+const gamesContainer = document.getElementById('games-container');
+const tripleAList = document.getElementById('triple-a-list');
+
+// LOAD CONTROL (ADDED ONLY)
+let sidebarLoaded = false;
+let sidebarDataCache = null;
+
+// YOUR ORIGINAL FETCH (MODIFIED ONLY SLIGHTLY: moved into function wrapper)
+function loadSidebarData() {
+  if (sidebarLoaded) return Promise.resolve(sidebarDataCache);
+
+  return fetch('/sidebar.json')
+    .then(res => res.json())
+    .then(data => {
+      sidebarLoaded = true;
+      sidebarDataCache = data;
+      return data;
+    })
+    .catch(err => console.error("Sidebar load error:", err));
+}
+
+// 3 BOXES FUNCTION
+function buildSidebarFromJSON(data) {
+
+  // TOP BOX
+  data.topBox.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.link;
+    a.className = 'top-box-item';
+    const isActive =
+      normalizePage(item.link) === currentPage ||
+      item.activeOn?.map(normalizePage).includes(currentPage);
+    if (isActive) {
+      a.classList.add('active'); }
+    a.innerHTML = `
+      <img src="${item.icon}" class="topbox-icon"
+          onerror="this.style.display='none'">
+      <span>${item.name}</span>`;
+    topBox.appendChild(a);});
+
+  // TOP GAMES
+  data.games.forEach(game => {
+    const a = document.createElement('a');
+    a.href = game.link;
+    a.className = 'game';
+    if (
+      normalizePage(game.link) === currentPage ||
+      (game.activeOn?.map(normalizePage).includes(currentPage))) {
+      a.classList.add('active');}
+    a.innerHTML = `
+      <img src="${game.icon}" class="sidebar-icon" alt="">
+      <span>${game.name}</span> `;
+    gamesContainer.appendChild(a);});
+
+  // TRIPLE A GAMES
+  data.tripleA.forEach(game => {
+    const a = document.createElement('a');
+    a.href = game.link || "#";
+    a.className = 'triple-a-game';
+    a.innerHTML = `
+    <img src="${game.icon}" class="sidebar-icon" alt="">
+    <span>${game.name}</span> `;
+    tripleAList.appendChild(a);});}
+
+  // TOGGLE TRIPLE A
+  function toggleTripleA() {
+    const header = document.querySelector('.triple-a-header');
+    const list = document.getElementById('triple-a-list');
+    const isOpen = header.classList.contains('open');
+    if (isOpen) {
+      header.classList.remove('open');
+      header.classList.add('closed');
+      list.style.display = 'none';
+    } else {
+      header.classList.remove('closed');
+      header.classList.add('open');
+      list.style.display = 'flex';}}
+
+// TOGGLE SIDEBAR
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const burger = document.getElementById('hamburger');
+  sidebar.classList.toggle('active');
+  burger.classList.toggle('active');
+  // Lazy load JSON when opened first time
+  if (sidebar.classList.contains('active') && !sidebarLoaded) {
+    loadSidebarData().then(data => {
+      if (!data) return;
+      buildSidebarFromJSON(data);
+    });}}
+
+//auto clicks the hamburger when on desktop mode 
+function handleDesktopSidebar() {
+  const isDesktop = window.matchMedia("(min-width: 971px)").matches;
+  const sidebar = document.getElementById('sidebar');
+  // Only auto-open if desktop AND sidebar is not already active
+  if (isDesktop && !sidebar.classList.contains('active')) {
+  document.getElementById('hamburger').click();}}
+  document.addEventListener('DOMContentLoaded', handleDesktopSidebar);// run on load
+  window.addEventListener('resize', handleDesktopSidebar);// run on resize (important when rotating / resizing window)
+
+//DOM LOADER
+document.addEventListener('DOMContentLoaded', () => {
+const header = document.querySelector('.triple-a-header');
+const list = document.getElementById('triple-a-list');
+  header.classList.add('open'); // arrow points down
+  list.style.display = 'flex';  // list visible
+});
+
+// SECONDARY TOP BAR AUTO TOP
+function scrollToTop() {
+  const main = document.querySelector('.coc-main');
+  main.scrollTo({ top: 0, behavior: 'smooth' });}
+
+// SCROLLS TO TOP WHEN 2ND TOP BAR HIT
+document.querySelector('.secondary-top-bar').addEventListener('click', scrollToTop);
+
+//HELP POPUP
+function toggleHelp(event) {
+  event.stopPropagation(); // prevent closing immediately
+  const popup = document.getElementById('help-popup');
+  popup.style.display = popup.style.display === 'block' ? 'none' : 'block';}
+
+// PAGE LOADER — fires when everything (images, fonts, scripts) is done
+window.addEventListener("load", () => {
+  document.documentElement.classList.add("loaded");
+  const loader = document.getElementById('page-loader');
+  loader.classList.add('hidden');
+  setTimeout(() => loader.remove(), 400);
+});
+
+// SEARCH SYSTEM
+let SearchItemList = [];
+let searchoverlay;
+let closeBtn;
+let searchinput;
+let searchIcon;
+let resultsContainer;
+let isLoaded = false;
+// Fetch JSON on page load
+fetch('/searchitemstorage.json')
+  .then(res => res.json())
+  .then(data => {
+    SearchItemList = data;
+    isLoaded = true;
+  });
+
+document.addEventListener('DOMContentLoaded', function () {
+  searchoverlay = document.getElementById('search-overlay');
+  closeBtn = document.getElementById('search-close-btn');
+  resultsContainer = document.getElementById('search-results');
+  searchinput = document.getElementById('search-input');
+  searchIcon = document.getElementById('search-icon');
+
+  // OPEN overlay
+function openSearch() {
+    searchoverlay.style.display = 'block';
+    searchinput.focus();
+    if (!searchinput.value) searchItems();  }
+      if (!isLoaded) {
+    searchItems(); // fallback or loading state
+  } else {
+    searchItems();
+  }
+
+  // CLOSE overlay
+function closeSearch() {
+  searchinput.value = '';
+  resultsContainer.innerHTML = '';
+  searchoverlay.style.display = 'none';  }
+  closeBtn.addEventListener('click', closeSearch);
+  // Click outside to close
+  searchoverlay.addEventListener('click', e => {
+    if (e.target === searchoverlay) closeSearch();
+  });
+  // ESC key to close
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSearch(); });
+  });
+
+// 🔀 Shuffle function
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]]; }
+  return copy;}
+
+//Main search function
+function searchItems() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const resultsContainer = document.getElementById('search-results');
+  resultsContainer.innerHTML = '';
+  let filtered;
+  if (!query) {
+    filtered = shuffleArray(SearchItemList).slice(0, 7);} 
+  else {
+    filtered = SearchItemList.filter(item => {
+  if (item.name.toLowerCase().includes(query)) return true;
+      if (
+        item.keywords &&
+        item.keywords.some(k => k.toLowerCase().includes(query))
+      ) return true;
+      return false;});
+
+  // No results
+  if (filtered.length === 0) {
+      resultsContainer.innerHTML = `<div style="padding:10px;">No results found</div>`;
+      return;}}
+
+// Limit results
+const limitedResults = query ? filtered.slice(0, 7) : filtered;
+
+// Render results
+limitedResults.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.link;
+    a.className = 'search-result-item';
+    if (item.icon) {
+    a.innerHTML = `<img src="${item.icon}" class="result-icon" alt=""> ${item.name}`;
+    } else { a.textContent = item.name; }
+    resultsContainer.appendChild(a);});
+
+// View more button
+if (query && filtered.length > 10) {
+    const viewMore = document.createElement('div');
+    viewMore.textContent = "View More...";
+    viewMore.className = "view-more";
+    viewMore.addEventListener('click', () => {
+      resultsContainer.innerHTML = '';
+      filtered.forEach(item => {
+      const a = document.createElement('a');
+      a.href = item.link;
+      a.className = 'search-result-item';
+      if (item.icon) {
+      a.innerHTML = `<img src="${item.icon}" class="result-icon" alt=""> ${item.name}`;
+      } else {  a.textContent = item.name; }
+      resultsContainer.appendChild(a); });
+      });
+      resultsContainer.appendChild(viewMore); }}
+
+// Skeleton for sidebar when not loaded
+      function showSkeletons(container, count) {
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'skeleton-item';
+    div.innerHTML = `
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-text"></div>`;
+    container.appendChild(div);
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const burger = document.getElementById('hamburger');
+  sidebar.classList.toggle('active');
+  burger.classList.toggle('active');
+
+  if (sidebar.classList.contains('active') && !sidebarLoaded) {
+    // show skeletons immediately
+    showSkeletons(topBox, 3);
+    showSkeletons(gamesContainer, 5);
+    showSkeletons(tripleAList, 4);
+
+    loadSidebarData().then(data => {
+      // wipe skeletons then build real content
+      topBox.innerHTML = '';
+      gamesContainer.innerHTML = '';
+      tripleAList.innerHTML = '';
+      if (!data) return;
+      buildSidebarFromJSON(data);
+    });
+  }
+}
+
+history.scrollRestoration = 'manual';
+
+var scrollKey = 'scrollPos_' + location.pathname;
+var cocMain = document.querySelector('.coc-main');
+
+// Save on scroll inside .coc-main
+cocMain.addEventListener('scroll', function() {
+  sessionStorage.setItem(scrollKey, cocMain.scrollTop);
+});
+
+// Restore on back navigation
+window.addEventListener('pageshow', function() {
+  var saved = sessionStorage.getItem(scrollKey);
+  if (saved) {
+    setTimeout(function() {
+      cocMain.scrollTop = parseInt(saved);
+    }, 100);
+  }
+});
+</script>
+
+<div id="imageZoom" class="image-zoom" onclick="closeZoom()">
+  <img id="zoomedImg" src="">
+</div>
+
+<style>
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+#page-loader {
+  display: flex; /* restored */
+}
+
+#page-loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.parchrome-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #2a2a2a;
+  border-top: 3px solid #9f0000;
+  animation: parchrome-spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.parchrome-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #555;
+  font-family: 'Oxanium', sans-serif;
+}
+
+@keyframes parchrome-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+
+
+/* ============================================================
+   NOTHING BEHIND THE BARS BUT THE PAGE ITSELF
+   ============================================================
+   .main used to carry margin-top:52px to clear the fixed top bar, so
+   .coc-main -- the scroller, and the thing that paints the page -- began at
+   y=52. The mobile secondary bar is only 38px tall, so the moment it lifted
+   into the top bar's slot on scroll, y=38..52 was a strip of bare <body>
+   between the bar and the content. The scroller now starts at the top of the
+   viewport and gives that 52px back as padding, so content sits exactly
+   where it did before and there is no seam whatever the bars do.
+
+   The sidebar took its offset from .main's margin, so it carries it itself
+   at desktop widths; on mobile it is a fixed drawer with its own top:52px
+   and never depended on it. */
+.main{ margin-top: 0; }
+.coc-main{ padding-top: var(--topbar-height, 52px); }
+@media (min-width: 971px){
+  .sidebar{ margin-top: var(--topbar-height, 40px); }
+}
+</style>
+
+</body>
+</html>

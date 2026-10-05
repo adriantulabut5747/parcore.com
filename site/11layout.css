@@ -1,0 +1,2494 @@
+/* PARCHROME LOADER */
+body { visibility: hidden; }
+#page-loader { position: fixed; inset: 0; background: radial-gradient(circle at center, #1a1a1c 0%, #0f0f10 70%); display: flex; flex-direction: column; align-items: center;
+    justify-content: center; z-index: 999999; gap: 16px; visibility: visible; opacity: 1; transition: opacity 0.4s ease;}
+#page-loader.hidden { opacity: 0; pointer-events: none; }
+.parchrome-fade { opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
+.parchrome-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #555; font-family: sans-serif;
+  opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
+  @keyframes parchrome-fadein { to { opacity: 1; } }
+
+/* PARCHROME LOADER — box shuffle (from Uiverse.io by Nawsome, adapted) */
+
+/* Force-hides any leftover .parchrome-ring markup still sitting in
+   individual HTML files' inline <style> blocks, so it never paints
+   before 11layout.js swaps it for .parchrome-loader below. */
+#page-loader .parchrome-ring { display: none !important; }
+
+.parchrome-loader {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+@media (min-width: 971px) {
+  .parchrome-loader {
+    transform: scale(1.4);
+  }
+  #page-loader {
+    gap: 32px;
+  }
+  .parchrome-label {
+    font-size: 14px;
+  }
+}
+
+.parchrome-loader__box {
+  float: left;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
+.parchrome-loader__box:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.45);
+  /* One continuous gradient across the full 72x72 cluster: every box
+     samples the slice of the same 72x72 image that corresponds to its
+     resting grid cell (background-position is relative to the box's
+     own coordinate system, so this stays put even while the box's
+     `transform` animates it around during the shuffle). */
+  background-image: linear-gradient(135deg, #3a1414 0%, #c23b3b 100%);
+  background-size: 72px 72px;
+}
+
+/* Row 0 (top): boxes 1,2,3 */
+.parchrome-loader__box:nth-child(1):before { background-position: 0px 0px; }
+.parchrome-loader__box:nth-child(2):before { background-position: -26px 0px; }
+.parchrome-loader__box:nth-child(3):before { background-position: -52px 0px; }
+/* Row 1 (middle): boxes 4,5,6 */
+.parchrome-loader__box:nth-child(4):before { background-position: 0px -26px; }
+.parchrome-loader__box:nth-child(5):before { background-position: -26px -26px; }
+.parchrome-loader__box:nth-child(6):before { background-position: -52px -26px; }
+/* Row 2 (bottom): boxes 7,8,9 */
+.parchrome-loader__box:nth-child(7):before { background-position: 0px -52px; }
+.parchrome-loader__box:nth-child(8):before { background-position: -26px -52px; }
+.parchrome-loader__box:nth-child(9):before { background-position: -52px -52px; }
+
+.parchrome-loader__box:nth-child(3n) {
+  margin-right: 0;
+  margin-bottom: 6px;
+}
+
+.parchrome-loader__box:nth-child(1):before, .parchrome-loader__box:nth-child(4):before {
+  margin-left: 26px;
+}
+
+.parchrome-loader__box:nth-child(3):before {
+  margin-top: 52px;
+}
+
+.parchrome-loader__box:last-child {
+  margin-bottom: 0;
+}
+
+@keyframes parchromeMoveBox-1 {
+  9.0909090909% { transform: translate(-26px, 0); }
+  18.1818181818% { transform: translate(0px, 0); }
+  27.2727272727% { transform: translate(0px, 0); }
+  36.3636363636% { transform: translate(26px, 0); }
+  45.4545454545% { transform: translate(26px, 26px); }
+  54.5454545455% { transform: translate(26px, 26px); }
+  63.6363636364% { transform: translate(26px, 26px); }
+  72.7272727273% { transform: translate(26px, 0px); }
+  81.8181818182% { transform: translate(0px, 0px); }
+  90.9090909091% { transform: translate(-26px, 0px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(1) { animation: parchromeMoveBox-1 4s infinite; }
+
+@keyframes parchromeMoveBox-2 {
+  9.0909090909% { transform: translate(0, 0); }
+  18.1818181818% { transform: translate(26px, 0); }
+  27.2727272727% { transform: translate(0px, 0); }
+  36.3636363636% { transform: translate(26px, 0); }
+  45.4545454545% { transform: translate(26px, 26px); }
+  54.5454545455% { transform: translate(26px, 26px); }
+  63.6363636364% { transform: translate(26px, 26px); }
+  72.7272727273% { transform: translate(26px, 26px); }
+  81.8181818182% { transform: translate(0px, 26px); }
+  90.9090909091% { transform: translate(0px, 26px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(2) { animation: parchromeMoveBox-2 4s infinite; }
+
+@keyframes parchromeMoveBox-3 {
+  9.0909090909% { transform: translate(-26px, 0); }
+  18.1818181818% { transform: translate(-26px, 0); }
+  27.2727272727% { transform: translate(0px, 0); }
+  36.3636363636% { transform: translate(-26px, 0); }
+  45.4545454545% { transform: translate(-26px, 0); }
+  54.5454545455% { transform: translate(-26px, 0); }
+  63.6363636364% { transform: translate(-26px, 0); }
+  72.7272727273% { transform: translate(-26px, 0); }
+  81.8181818182% { transform: translate(-26px, -26px); }
+  90.9090909091% { transform: translate(0px, -26px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(3) { animation: parchromeMoveBox-3 4s infinite; }
+
+@keyframes parchromeMoveBox-4 {
+  9.0909090909% { transform: translate(-26px, 0); }
+  18.1818181818% { transform: translate(-26px, 0); }
+  27.2727272727% { transform: translate(-26px, -26px); }
+  36.3636363636% { transform: translate(0px, -26px); }
+  45.4545454545% { transform: translate(0px, 0px); }
+  54.5454545455% { transform: translate(0px, -26px); }
+  63.6363636364% { transform: translate(0px, -26px); }
+  72.7272727273% { transform: translate(0px, -26px); }
+  81.8181818182% { transform: translate(-26px, -26px); }
+  90.9090909091% { transform: translate(-26px, 0px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(4) { animation: parchromeMoveBox-4 4s infinite; }
+
+@keyframes parchromeMoveBox-5 {
+  9.0909090909% { transform: translate(0, 0); }
+  18.1818181818% { transform: translate(0, 0); }
+  27.2727272727% { transform: translate(0, 0); }
+  36.3636363636% { transform: translate(26px, 0); }
+  45.4545454545% { transform: translate(26px, 0); }
+  54.5454545455% { transform: translate(26px, 0); }
+  63.6363636364% { transform: translate(26px, 0); }
+  72.7272727273% { transform: translate(26px, 0); }
+  81.8181818182% { transform: translate(26px, -26px); }
+  90.9090909091% { transform: translate(0px, -26px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(5) { animation: parchromeMoveBox-5 4s infinite; }
+
+@keyframes parchromeMoveBox-6 {
+  9.0909090909% { transform: translate(0, 0); }
+  18.1818181818% { transform: translate(-26px, 0); }
+  27.2727272727% { transform: translate(-26px, 0); }
+  36.3636363636% { transform: translate(0px, 0); }
+  45.4545454545% { transform: translate(0px, 0); }
+  54.5454545455% { transform: translate(0px, 0); }
+  63.6363636364% { transform: translate(0px, 0); }
+  72.7272727273% { transform: translate(0px, 26px); }
+  81.8181818182% { transform: translate(-26px, 26px); }
+  90.9090909091% { transform: translate(-26px, 0px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(6) { animation: parchromeMoveBox-6 4s infinite; }
+
+@keyframes parchromeMoveBox-7 {
+  9.0909090909% { transform: translate(26px, 0); }
+  18.1818181818% { transform: translate(26px, 0); }
+  27.2727272727% { transform: translate(26px, 0); }
+  36.3636363636% { transform: translate(0px, 0); }
+  45.4545454545% { transform: translate(0px, -26px); }
+  54.5454545455% { transform: translate(26px, -26px); }
+  63.6363636364% { transform: translate(0px, -26px); }
+  72.7272727273% { transform: translate(0px, -26px); }
+  81.8181818182% { transform: translate(0px, 0px); }
+  90.9090909091% { transform: translate(26px, 0px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(7) { animation: parchromeMoveBox-7 4s infinite; }
+
+@keyframes parchromeMoveBox-8 {
+  9.0909090909% { transform: translate(0, 0); }
+  18.1818181818% { transform: translate(-26px, 0); }
+  27.2727272727% { transform: translate(-26px, -26px); }
+  36.3636363636% { transform: translate(0px, -26px); }
+  45.4545454545% { transform: translate(0px, -26px); }
+  54.5454545455% { transform: translate(0px, -26px); }
+  63.6363636364% { transform: translate(0px, -26px); }
+  72.7272727273% { transform: translate(0px, -26px); }
+  81.8181818182% { transform: translate(26px, -26px); }
+  90.9090909091% { transform: translate(26px, 0px); }
+  100% { transform: translate(0px, 0px); }
+}
+.parchrome-loader__box:nth-child(8) { animation: parchromeMoveBox-8 4s infinite; }
+
+@keyframes parchromeMoveBox-9 {
+  9.0909090909% { transform: translate(-26px, 0); }
+  18.1818181818% { transform: translate(-26px, 0); }
+  27.2727272727% { transform: translate(0px, 0); }
+  36.3636363636% { transform: translate(-26px, 0); }
+  45.4545454545% { transform: translate(0px, 0); }
+  54.5454545455% { transform: translate(0px, 0); }
+  63.6363636364% { transform: translate(-26px, 0); }
+  72.7272727273% { transform: translate(-26px, 0); }
+  81.8181818182% { transform: translate(-52px, 0); }
+  90.9090909091% { transform: translate(-26px, 0); }
+  100% { transform: translate(0px, 0); }
+}
+.parchrome-loader__box:nth-child(9) { animation: parchromeMoveBox-9 4s infinite; }
+ html.loaded body { visibility: visible; }
+
+ 
+/* ============================================================
+   11layout.css — SHARED SIDEBAR STYLES
+   Used by every page that includes the sidebar (hamburger, top-box,
+   games list, triple-a list). Edit here once, applies everywhere.
+   ============================================================ */
+
+:root {
+  --bg-main: #202225;
+  --bg-tertiary: #0f0f10;
+  --bg-sidebar: #0f0f10;
+  --bg-hover: #202122;
+  --bg-box: #161616;
+  --bg-box-active: #303135;
+  --accent:#c23b3b;
+  --text-main: #eff2f5;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+
+  /* Chrome surface tokens. Declared on :root rather than .sidebar because
+     the secondary top bar uses them too and is not a descendant of the
+     sidebar, so it could never have inherited them from there. */
+  --sb-base:    #0f0f10;
+  --sb-raised:  #16161a;
+  --sb-line:    rgba(255,255,255,0.09);
+  --sb-hover:   rgba(255,255,255,0.055);
+  /* 0.48, not the 0.32 this started at. Section labels are 10px, and at
+     0.32 they measured 2.92:1 against both surfaces -- WCAG AA wants 4.5:1
+     for small text. 0.45 is the threshold; 0.48 gives ~4.98:1 on both. */
+  --sb-label:   rgba(255,255,255,0.48);
+  --sb-accent:  rgb(194,59,59);
+  --sb-inset:   16px;
+  --sb-radius:  8px;
+
+  /* Width of .coc-main's scrollbar. The fixed bars are inset by this so
+     they stop at the scroll container's content edge instead of running
+     over its scrollbar -- see the .top-bar/.secondary-top-bar rule. Keep in
+     step with the ::-webkit-scrollbar width set further down this file. */
+  --scrollbar-w: 10px;
+
+  --sidebar-width: max(260px, 18%);
+  --sidebar-min-width: 260px;
+
+  /* Height of .top-bar — kept in sync with the desktop override below
+     so .secondary-top-bar.stb-raised (11layout.css) can translate up
+     by exactly this much instead of animating "top", which is what
+     caused the gap between the two bars mid-scroll. */
+  --topbar-height: 52px;
+
+  /* Responsive type/icon scale used inside the sidebar. */
+  --sidebar-font-lg: clamp(16px, 1.1vw, 21px);   /* top-box items, games, triple-a header */
+  --sidebar-font-sm: clamp(14px, 0.85vw, 17px);  /* triple-a game rows */
+  --sidebar-icon-lg: clamp(26px, 2vw, 35px);     /* topbox / game / triple-a icons */
+}
+
+/* Global scrollbar (Chrome, Edge, Safari) */
+::-webkit-scrollbar { width: 10px;}
+::-webkit-scrollbar-track { background: #121318; /* dark background */}
+::-webkit-scrollbar-thumb { background: #2f3136;   border-radius: 10px; border: 2px solid #121318; }
+::-webkit-scrollbar-thumb:hover { background: #3a3d43;}
+* { scrollbar-width: thin; scrollbar-color: #2f3136 #121318;/* Firefox */}
+
+/* Main */
+.main {
+  flex: 1 1 auto;
+  display: flex;
+  overflow: hidden;
+  margin-top: 52px; /* push below top-bar */}
+
+/* Hamburger */
+.hamburger {
+  width: 26px;
+  height: 20px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-left: 8px;}
+.hamburger span {
+  height: 2px;
+  width: 100%;
+  background: var(--text-main);
+  border-radius: 2px;
+  transition: all 0.25s ease;}
+.hamburger.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
+
+/* Divider after GAMES list */
+.sidebar .games-container::after {
+  content: "";
+  display: block;
+  height: 1px;
+  width: calc(100% - 32px);
+  margin: 12px auto;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0)
+  );
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-min-width);
+  background: var(--bg-sidebar);
+  padding: 1px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  transition: transform 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px); /* full height minus topbar */
+  border-right: 1px solid rgba(255,255,255,0.06);}
+.sidebar > * { flex-shrink: 0; } /* Global scrollbar (Chrome, Edge, Safari) */
+/* Thin, near-invisible at rest — the track matches the sidebar bg so
+   there's no boxed-in look, and the thumb only brightens on hover so
+   it reads as a scroll affordance instead of a permanent UI stripe.
+   The 1px border-right above (not the scrollbar) is what marks the
+   sidebar/content boundary now, so this can stay this quiet. */
+.sidebar,
+.sidebar * {
+    font-family: 'Oxanium', sans-serif;
+  }
+.sidebar::-webkit-scrollbar {width: 5px;}
+.sidebar::-webkit-scrollbar-track {background: transparent;}
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; border: none; }
+.sidebar::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,0.22);}
+/* Active background + accent bar now live in one place: the "== SIDEBAR ==" block
+   further down (search --sb-inset). Kept here only as the anchor comment so a
+   future search for ".active" on this file still lands near the real rule instead
+   of finding nothing. */
+.sidebar a {text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;}
+.sidebar-icon,.tripleimg {
+    width: var(--sidebar-icon-lg);
+    height: var(--sidebar-icon-lg);
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px #1e1f22;}
+.game:hover .sidebar-icon,
+.triple-a-game:hover .sidebar-icon ,.tripleimg:hover{
+    box-shadow: 0 0 0 2px var(--accent);}
+
+/* Top box */
+.top-box {display:flex; flex-direction:column; gap:12px; padding:16px 12px; background-color:#171716ee; margin-bottom:14px;
+   transition:background 0.25s ease; color:var(--text-secondary);}
+.top-box-item {display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:6px; cursor:pointer;
+   font-size:var(--sidebar-font-lg); color:var(--text-secondary); margin-left: 5px; font-family: 'oxanium'; font-weight: 500;}
+.top-box-item:hover {background:var(--bg-hover); color:var(--text-main);}
+.topbox-icon {width: var(--sidebar-icon-lg); height: var(--sidebar-icon-lg); object-fit: cover; border-radius: 8px; margin-right: 0px;}
+
+/* Games list */
+.games-container .game {
+    padding: 10px 10px;
+    font-size: var(--sidebar-font-lg);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: calc(100% - 32px);
+    box-sizing: border-box;
+    margin-left: 18px;
+    font-family: 'Oxanium', sans-serif;
+    font-weight: 500;}
+.games-container .game:last-child {margin-bottom:0; }
+.games-container .game:hover { background: var(--bg-hover); color: var(--text-main);  }
+
+/* Triple A Games */
+.triple-a-container {margin-top:20px; padding:0; color:var(--text-secondary);}
+
+.triple-a-header {
+    transition: background 0.2s;
+    padding: 10px 10px;
+    font-size: var(--sidebar-font-lg);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: calc(100% - 32px);
+    box-sizing: border-box;
+    margin-left: 18px;
+    font-family: 'Oxanium', sans-serif;
+    font-weight: 500;}
+.triple-a-header:hover {background:var(--bg-hover); color:var(--text-main);}
+.triple-a-header .arrow {display: inline-flex; align-items: center; justify-content: center; margin-left: 2px; transition: transform 0.25s ease;}
+.triple-a-header .arrow svg {width: 16px; height: 16px; stroke: currentColor; flex-shrink: 0;}
+.triple-a-header.open .arrow {transform: rotate(90deg);}
+.triple-a-header.closed .arrow {transform: rotate(0deg);}
+.triple-a-list {display: flex;   /* open by default */flex-direction: column; flex-direction:column; margin-top:1px; gap:4px; padding:0;}
+.triple-a-list .triple-a-game {
+    padding: 10px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: var(--sidebar-font-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: calc(92% - 20px);
+    box-sizing: border-box;
+    margin: 0 10px 8px 25px;
+    font-family: 'Oxanium', sans-serif;
+    font-weight: 500;}
+.triple-a-list .triple-a-game:hover {background:var(--bg-hover); color:var(--text-main);}
+
+/* Mobile responsive */
+@media (max-width: 970px){
+  .hamburger { display: flex; }
+  .sidebar {
+      position: fixed;
+      top: 52px;      /* start below top bar */
+      left: 0;
+      bottom: 0;      /* full height */
+      width: 300px;
+      transform: translateX(-100%);
+      z-index: 15;
+      display: flex;
+      flex-direction: column;}
+  .sidebar.active { transform: translateX(0); }
+  .games-container{font-size: 16px;}
+  .top-box{ font-size: 16px;}
+  .top-box-item{font-size: 16px;}
+  .triple-a-header { font-size: 18px;}
+  .triple-a-list { font-size: 14px;}
+  .games-container .game { font-size: 16px;}
+
+  /* Dimmed backdrop behind the mobile sidebar (created dynamically
+     by getSidebarOverlay() in 11layout.js). Sits above page content
+     but below the sidebar (z-index 15) and top bar (z-index 20), so
+     the hamburger stays usable to close it. */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 14;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Locks the page from scrolling behind the sidebar while it's open
+     on mobile. Same two-context pattern as body.search-modal-open:
+     .coc-main is the real scroll container on desktop, while mobile
+     can scroll `body` directly. */
+  body.sidebar-open {
+    overflow: hidden !important;
+  }
+  body.sidebar-open .coc-main {
+    overflow: hidden !important;
+  }
+}
+
+@media (min-width:969px) {
+  .hamburger {display:none;}
+  /* Extra safety net alongside the JS cleanup in handleDesktopSidebar():
+     never show the backdrop on desktop widths. */
+  .sidebar-overlay { display: none !important; }
+}
+
+/* Desktop sidebar sizing — width + font/icon scale only. */
+@media (min-width: 971px) {
+  :root {
+    --sidebar-width: max(245px, 16%);
+    --sidebar-min-width: 245px;
+    --sidebar-font-lg: clamp(14px, 0.95vw, 18px);
+    --sidebar-font-sm: clamp(12px, 0.78vw, 14px);
+    --sidebar-icon-lg: clamp(24px, 1.75vw, 30px);
+  }
+}
+
+/* ============================================================
+   TOP BAR (primary) — SHARED
+   ============================================================ */
+.top-bar {
+  height: 52px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid #0d0d0d;
+  position: fixed;        
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 20;              
+  padding: 5px;
+  transform: translateY(0);
+  transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;}
+/* top-bar-title is an <a> here (links back to /) — reset
+   link defaults so it keeps looking exactly like the plain div it
+   used to be. */
+    .top-bar-title {
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+/* Auto-hide on scroll (mobile/app-style) — same pattern as .bn-bar's
+   .bn-hidden on the bottom nav (see 11layout.js "TOP BAR AUTO-HIDE ON
+   SCROLL"): slides the bar up out of view on scroll-down, and a
+   quicker transition back in on scroll-up. */
+.top-bar.tb-hidden {
+  transform: translateY(-100%);
+  transition: transform .32s cubic-bezier(0.4, 0, 1, 1);
+}
+.top-bar-left-avatar {width:30px; height:30px; border-radius:50%; background:var(--accent); margin-right:10px; display:none;}
+.top-bar-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;}
+
+.top-bar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;}
+
+.top-bar-title {font-family: 'Oxanium'; position:absolute; left:50%; transform:translateX(-50%); font-size:17px; font-weight:600; display:flex; align-items:center; gap:8px; ;}
+.top-bar-title a {text-decoration: none; color: white;}
+.topbar-logo {width:24px; height:24px; border-radius:4px; overflow:hidden; background-color: var(--bg-box);}
+.topbar-logo img {width:100%; height:100%; object-fit:cover;}
+.top-bar-avatar {margin-left:auto; width:30px; height:30px; border-radius:50%; background:var(--accent); margin-right: 5px;}
+
+/* Desktop top bar — shortened to 40px, contents scaled to fit.
+   Mobile keeps the original 52px bar untouched. Placed after the
+   base rules above so it wins the cascade without needing !important. */
+@media (min-width: 971px) {
+  :root { --topbar-height: 40px; }
+  .top-bar { height: 40px; }
+  .main { margin-top: 40px; }
+  .sidebar { height: calc(100vh - 40px); }
+
+  .top-bar-title { font-size: 15px; gap: 7px; }
+  .topbar-logo { width: 21px; height: 21px; }
+  .top-bar-avatar { width: 26px; height: 26px; }
+}
+
+/* Keep the (always-visible, desktop/tablet) left sidebar sharp while
+   .stb-dd-overlay is open, same as .top-bar/.secondary-top-bar already
+   are (see hwr-css.css, ~z-index:99990 boost). On desktop the sidebar
+   is just a plain static flex child of .main with no position of its
+   own, so it never gets a stacking context and always paints BELOW any
+   position:fixed element — z-index alone can't fix that, it needs
+   `position` first. Scoped to ≥971px only: below that the sidebar is
+   its own off-canvas drawer (position:fixed, z-index:15) with separate
+   overlay handling it shouldn't inherit this from. */
+@media (min-width: 971px) {
+  .sidebar {
+    position: relative;
+  }
+
+  body:has(.stb-dd-overlay.open) .sidebar {
+    z-index: 99990;
+  }
+}
+
+/* ============================================================
+   SECONDARY TOP BAR — SHARED
+   ============================================================ */
+
+.secondary-top-bar {
+  position: fixed;
+  top: 52px;
+  left: var(--sidebar-width);
+  right: 0;
+  width: calc(100% - var(--sidebar-width));
+  height: 48px;
+  /* Was linear-gradient(90deg, #1b1c18ee, #25262182): olive-tinted (green
+     minus blue measured a consistent +4/+5 on every page) and only 51%
+     opaque at its right end, so the bar's colour was really whatever hero
+     image sat behind it -- the same element measured 54 mid-bar on
+     hwr-manga against 32 on coc-home, a 70% swing between pages.
+
+     Flat, opaque and neutral now, reusing the sidebar's raised surface so
+     the bar and the sidebar's top group read as one continuous chrome layer
+     around the content, rather than two near-but-not-equal surfaces (27 vs
+     22) at different temperatures. */
+  background: var(--sb-raised);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  z-index: 15;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  color: #b3b3b3;
+  font-weight: 500;
+  font-size: 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  transform: translateY(0);
+  transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Takes over the primary .top-bar's spot at the very top of the screen
+   once that bar has scrolled out of view — toggled alongside
+   .top-bar.tb-hidden by the same "TOP BAR AUTO-HIDE ON SCROLL" block
+   in 11layout.js. Translating by -100% of --topbar-height (rather than
+   animating "top" down to 0) keeps this on the same transform-based,
+   compositor-only animation as .top-bar.tb-hidden, so the two bars
+   move in exact lockstep with no gap opening up between them
+   mid-scroll — animating "top" instead forces a layout recalculation
+   every frame, which is what caused that gap. */
+.secondary-top-bar.stb-raised {
+  transform: translateY(calc(-1 * var(--topbar-height)));
+  transition: transform .32s cubic-bezier(0.4, 0, 1, 1);
+}
+  
+.secondary-top-bar .secondary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Was a plain flex item with no min-width — its default min-width:auto
+     let long "Movies / Discovery & Recommendations"-style content push
+     past the row instead of shrinking to leave room for the info/menu
+     icons on the right. flex:1 1 auto + min-width:0 let it actually
+     shrink; the ellipsis on .secondary-content below (and its own
+     min-width:0) is what turns that shrinkage into a clean truncation
+     instead of the text just getting clipped by the row edge. */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The icon never shrinks — only the text next to it should give up
+   space when the row runs out of room. */
+.secondary-top-bar .secondary-left .th-icon {
+  flex-shrink: 0;
+}
+
+/* Same "long title truncates with an ellipsis instead of overflowing"
+   treatment used on the on-page TOC rows — this is the actual text
+   link ("Movies / Discovery & Recommendations") that was running past
+   the row and getting cut off mid-word under the info/menu icons. */
+.secondary-top-bar .secondary-content {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 971px){
+  .secondary-top-bar {
+    top: 40px;
+    /* This is the declaration that actually governs desktop -- it overrides
+       the base rule above, so changing that one alone does nothing here.
+       Same reasoning as there: the old #1b1c18 -> #252621 was olive (green
+       minus blue = +4 on both stops) against a neutral sidebar and a red
+       accent, and its left-to-right ramp answered to nothing in the layout. */
+    background: var(--sb-raised);
+  }
+  /* 14px was competing with the nav chips beside it; the page title should
+     sit under them in the hierarchy, not level with them. */
+  .secondary-top-bar .secondary-content {
+    font-size: 12.5px;
+  }
+}
+
+.th-icon {
+  width: 32px; /* adjust size */
+  height: 32px;
+  object-fit: contain;
+  margin-left: 10px;
+  margin-right: 0px;border-radius: 30%;}
+
+.help-button2 {
+  width: 28px;
+  height: 28px;
+  background: #1f1f1f;
+  color: var(--text-main);
+  font-weight: bold;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 5px;
+  user-select: none;
+  position: relative; /* add this */
+  right: 0px;
+}
+
+.help-button2:hover,.help-button:hover{
+    background: #434343;
+    border: 1px solid rgb(92, 91, 91)
+}
+
+.help-popup {
+  position: absolute;
+  top: 20px; /* below the button */
+  right: 0;
+  width: 220px;
+  background: #1e1f22;
+  border: 1px solid #2f3136;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #dcddde;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  margin-right: 15px;
+  margin-top: 0px;}
+.help-popup ul {padding-left: 16px;margin: 0;top: 36px;  /* below the button */}
+.help-popup li {margin-bottom: 4px;}
+.help-container {position: relative; display: flex;}
+
+/* Mobile responsive — top bar / secondary top bar */
+@media (max-width: 970px){
+  .secondary-top-bar {
+      left: 0;
+      width: 100%;                /* full width on mobile */
+      padding: 0 10px;
+      height: 38px;
+      justify-content: space-between;  /* keeps left and right separated */
+      font-size: 12px;}
+
+  .secondary-left {gap: 6px;}
+  .th-icon { width: 20px; height: 20px; margin-left: 0px;}
+  .secondary-content { font-size: 13px; font-family: 'Oxanium';}
+  .help-button { width: 28px; height: 28px;}
+}
+
+/* ============================================================
+   TOP-BAR SEARCH MODAL — SHARED
+   Icon morph (magnifying glass <-> ✖), fg-card style results grid
+   fed by herosearch.json, clear button, body scroll lock, and
+   mobile back-button support (handled in 11layout.js).
+   ============================================================ */
+@media (min-width:969px) {
+  .search-input{top: 0px;}
+  .search-overlay {top: 0px;}
+}
+
+.search-close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none;
+  font-size: 1.8rem; color: #fff; cursor: pointer; z-index: 10000; transition: transform 0.2s;}
+.search-close-btn:hover {transform: rotate(90deg);}
+
+/* Locks the page from scrolling behind the search modal while it's
+   open. Covers both scroll contexts this site can use: .coc-main is
+   the real scroll container on desktop, while a separate mobile rule
+   switches scrolling to `body` directly. */
+body.search-modal-open {
+  overflow: hidden !important;
+}
+body.search-modal-open .coc-main {
+  overflow: hidden !important;
+}
+
+/* Search button icon morph — magnifying glass rotates/fades out and
+   the ✖ rotates/fades in, same pattern language as the hamburger's
+   animated 3-line-to-X transform. Toggled by .active on #search-btn. */
+#search-btn {
+  position: relative;
+  width: 25px;
+  height: 25px;
+}
+#search-btn #search-icon,
+#search-btn #close-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#search-btn #close-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #fff;
+  opacity: 0;
+  transform: rotate(-45deg) scale(0.6);
+  pointer-events: none;
+}
+#search-btn #search-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+#search-btn.active #search-icon {
+  opacity: 0;
+  transform: rotate(45deg) scale(0.6);
+}
+#search-btn.active #close-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+@media (min-width: 971px) {
+  #search-btn { width: 21px; height: 21px; }
+  #search-btn #search-icon,
+  #search-btn #close-icon { width: 21px; height: 21px; }
+  #search-icon { width: 21px; height: 21px; }
+  #search-btn #close-icon { font-size: 1.2rem; }
+}
+
+/* Sits below the top bar and fills everything under it. This used to be
+   `top:0; height:100%` pushed down with `margin-top:52px`, which left the
+   bottom 52px of the overlay hanging past the bottom of the screen — the
+   last of the results were unreachable. Offsetting with `top` and taking
+   the same amount back off the height keeps it exactly within the viewport,
+   and --topbar-height already carries the 52px/40px split so the separate
+   desktop override is no longer needed. */
+#search-overlay { position: fixed;  top: var(--topbar-height);  left: 0; width: 100%;
+  height: calc(100% - var(--topbar-height));
+  background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none;  z-index: 9999;
+  overflow-y: auto; padding: 20px 20px 50px; box-sizing: border-box;}
+
+/* The search box is type="search" rather than type="text" so Android's
+   autofill service treats it as a search field and stops offering its
+   password/card/address bar above the keyboard (verified on device). The
+   trade-off is that a search input draws its own native clear button, which
+   would sit beside the custom #search-input-clear and show two X's — so it
+   is suppressed here. */
+#search-input::-webkit-search-cancel-button,
+#search-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* Wraps the input + its clear (X) button. */
+#search-input-wrap {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto 30px auto;
+}
+#search-input-wrap::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 18px;
+  width: 18px; height: 18px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a8d93' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='6.5'/%3E%3Cline x1='15' y1='15' x2='20.5' y2='20.5'/%3E%3C/svg%3E") no-repeat center / contain;
+  pointer-events: none;
+}
+#search-input {
+  width: 100%; max-width: 100%;
+  padding: 13px 44px 13px 46px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 1.05rem; font-weight: 500;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  outline: none; margin: 0; display: block;
+  background: rgba(255,255,255,0.045);
+  backdrop-filter: blur(10px);
+  color: #f2f3f5;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+#search-input::placeholder { color: #8a8d93; font-weight: 400; }
+#search-input:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+}
+#search-input:focus {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(155,32,48,0.65);
+  box-shadow: 0 0 0 3px rgba(155,32,48,0.22), 0 6px 20px rgba(0,0,0,0.4);
+}
+#search-input-clear {
+  position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
+  width: 24px; height: 24px; border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+  font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.2s ease, color 0.2s ease;
+}
+#search-input-clear:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+/* Results grid — fg-card boxes (same design as Popular Topics /
+   /'s hero search) instead of the old plain link list. */
+#search-results {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Search results use their own fg-card look (scoped to #search-results so
+   the shared .fg-card design used by Popular Topics elsewhere on the page
+   isn't affected): top-left icon badge, plain white title, no tag ribbon. */
+#search-results .fg-card { box-sizing: border-box; text-decoration: none; display: block; color: inherit; position: relative; flex: unset; max-width: 100%; width: 100%; padding: 0; }
+#search-results .fg-img-wrap { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 16/10; background: #1a1a1a; }
+#search-results .fg-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.25,.8,.25,1), filter .3s ease; filter: brightness(0.88) contrast(1.05); }
+#search-results .fg-card:hover .fg-img { transform: scale(1.07); filter: brightness(1.05) contrast(1.05); }
+#search-results .fg-img-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.9) 100%); pointer-events: none; }
+#search-results .fg-icon-badge { position: absolute; top: 10px; left: 10px; bottom: auto; width: 34px; height: 34px; border-radius: 50%; background: #161616; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; overflow: hidden; z-index: 3; transition: transform .3s ease, border-color .3s ease; }
+#search-results .fg-icon-badge img { width: 100%; height: 100%; object-fit: cover; }
+#search-results .fg-card:hover .fg-icon-badge { transform: scale(1.08); border-color: rgba(255,255,255,0.4); }
+#search-results .fg-info { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 14px 14px 12px; }
+#search-results .fg-title { font-size: 16px; font-weight: 700; color: #fff; background: none; -webkit-background-clip: initial; background-clip: initial; margin-bottom: 3px; text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+#search-results .fg-sub { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; }
+
+@media (max-width: 970px) {
+  #search-results { grid-template-columns: 1fr; max-width: 480px; gap: 10px; }
+  #search-input-wrap { max-width: 480px; width: 100%; }
+  #search-overlay { padding-bottom: 100px; }
+
+  /* Compact horizontal card: big image as background, gray overlay
+     fading left -> right, small icon badge on top, title/sub to its right. */
+  #search-results .fg-card {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 80px;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  #search-results .fg-img-wrap {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: unset;
+    border-radius: 12px;
+    z-index: 0;
+  }
+  #search-results .fg-img-shade {
+    background: linear-gradient(90deg, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.75) 45%, rgba(12,12,14,0.25) 100%);
+  }
+  #search-results .fg-icon-badge {
+    top: 50%;
+    bottom: auto;
+    left: 12px;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    z-index: 2;
+  }
+  #search-results .fg-card:hover .fg-icon-badge { transform: translateY(-50%) scale(1.08); }
+  #search-results .fg-info {
+    position: relative;
+    z-index: 2;
+    padding: 0 14px 0 0;
+    margin-left: 68px;
+    min-width: 0;
+  }
+  #search-results .fg-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #search-results .fg-sub { font-size: 12px; }
+}
+
+/* View More sentinel — auto-loads on scroll now instead of a click button */
+.hero-search-viewmore {
+  display: block; margin: 20px auto 40px; padding: 8px;
+  text-align: center;
+  color: #8a8d93; font-family: 'Oxanium', sans-serif; font-size: 13px; font-weight: 600;
+  letter-spacing: 0.5px; opacity: 0.8;
+}
+
+.result-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  object-fit: contain;
+  
+}
+
+.view-more {
+  padding: 8px 12px;
+  color: #ccc;
+  cursor: pointer;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.skeleton-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  margin-bottom: 12px;
+  width: calc(100% - 32px);
+  margin-left: 18px;
+  border-radius: 6px;
+  background: #1a1a1a;
+  animation: shimmer 1.2s infinite linear;
+  background: linear-gradient(
+    90deg,
+    #1a1a1a 25%,
+    #252525 50%,
+    #1a1a1a 75%
+  );
+  background-size: 200% 100%;
+}
+
+.skeleton-icon {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  flex-shrink: 0;
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: 4px;
+  background: #2a2a2a;
+  flex: 1;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+
+@keyframes slideUpBar {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+/* ============================================================
+   PULL TO REFRESH (mobile) — gray circle badge with a red arrow
+   icon inside that appears when you pull down past the very top
+   of the page. The arrow rotates as you pull (the rotation is
+   applied inline by 11layout.js, straight to #ptr-indicator, so
+   the whole badge — circle + arrow — turns together), flips to
+   point the other way once you've pulled far enough to trigger a
+   reload, then spins continuously while the refresh is in
+   flight. Touch/gesture logic lives in 11layout.js — this only
+   handles how it looks. Hidden entirely on desktop.
+   ============================================================ */
+#ptr-indicator{
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  border-radius: 50%;
+  background: #1c1c1c; /* darker gray, matches the site's icon-frame/bookmark-btn circles */
+  border: 1px solid rgba(255,255,255,0.1); /* gives it a proper "circled" ring, same language as .web-icon-wrap / .web-bookmark-btn */
+  box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-60px) rotate(0deg);
+  pointer-events: none;
+  z-index: 100000;
+  transition: opacity .15s ease, background-color .15s ease, border-color .15s ease;
+}
+#ptr-indicator svg{
+  width: 16px;
+  height: 16px;
+  color: var(--accent); /* red arrow (brand accent) instead of white */
+  transition: transform .15s ease;
+}
+#ptr-indicator.ptr-visible{ opacity: 1; }
+#ptr-indicator.ptr-ready{ background: #262626; border-color: rgba(255,255,255,0.18); }
+#ptr-indicator.ptr-loading svg{
+  animation: ptr-spin 0.7s linear infinite;
+}
+@keyframes ptr-spin{ to { transform: rotate(360deg); } }
+@media (min-width: 971px){
+  #ptr-indicator{ display: none; }
+}
+
+/* ============================================================
+   SITE FOOTER (.pf-footer) — SHARED
+   ============================================================
+   Moved here from hwr-css.css so every page can use the same footer
+   instead of it being hwr-only. Content is data-driven: socials, legal
+   links, copyright and disclaimer come from 11footer.json, and the link
+   row mirrors the sidebar (sidebar.json's topBox + games, minus tripleA).
+   The builder lives in 11layout.js. hwr pages load this file too, so they
+   keep the footer they already had. */
+/* ---- Flat, Supercell-inspired footer: solid black, no gradient,
+     no border-top, so it continues cleanly from the body above
+     instead of showing a seam. ---- */
+.pf-footer {
+  background: #0a0a0a;
+  padding: 32px 12% 48px;
+}
+
+/* ---- "Follow us on" label + plain (no button-bg) social icons ---- */
+.pf-footer-social-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin: 0 0 12px;
+}
+
+.pf-footer-social {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.pf-footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.pf-footer-social a:hover {
+  opacity: 0.7;
+}
+
+.pf-footer-social svg {
+  width: 18px;
+  height: 18px;
+  fill: #fff;
+}
+
+/* Accounts that aren't live yet — kept visually uniform with the
+ rest of the row, just not interactive/clickable. */
+.pf-footer-social a.pf-social-disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.pf-footer-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 20px 0;
+}
+
+/* ---- Web Resources links: populated at runtime from the shared
+     hwr-categories.json fetch (window.HwrCategoriesPromise), the
+     same data source the dsn-chip nav uses. On desktop these sit
+     in a single flowing row; on mobile they stack, one per line,
+     to match the reference layout. ---- */
+.pf-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+}
+
+.pf-footer-links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.pf-footer-links a:hover {
+  color: var(--text-muted);
+}
+
+/* ---- Bottom row: legal links + copyright ---- */
+.pf-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.pf-footer-legal {
+  display: flex;
+  gap: 20px;
+}
+
+.pf-footer-legal a {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.pf-footer-legal a:hover {
+  color: var(--text-main);
+}
+
+.pf-footer-copyright {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 10px 0 0;
+}
+
+/* ---- Small disclaimer line — not a real legal page yet, just a
+     short "we don't own this stuff" note for professionalism
+     until a proper Terms of Service page is built. ---- */
+.pf-footer-disclaimer {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #5c5c5c;
+  max-width: 640px;
+  margin: 14px 0 0;
+}
+
+@media (max-width: 970px) {
+  .pf-footer {
+    padding: 30px 5% 120px;
+  }
+
+  .pf-footer-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+  }
+
+  .pf-footer-links a {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: normal;
+  }
+
+  .pf-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .pf-footer-disclaimer {
+    font-size: 10px;
+  }
+}
+
+/* Tablet tier: once box-two collapses and stacks below box-one
+ (the 1400px sidebar breakpoint), the stacked content uses 15%
+ side margins, not the ~12% used above 1400px (which comes from
+ box-one's 15% margin inside its own ~79%-wide column). Match
+ that 15% here so the footer keeps lining up with the stacked
+ cards, right up until the 970px tier takes over at 5%. */
+@media (min-width: 971px) and (max-width: 1400px) {
+  .pf-footer {
+    padding: 32px 15% 48px;
+  }
+}
+
+/* ============================================================
+   HORIZONTAL SCROLL ARROWS — SHARED
+   ============================================================
+   Moved here from hwr-css.css. Paired with initHScrollArrows() in
+   11layout.js. */
+     .dsn-scroll-btn {
+       position: absolute;
+       top: 50%;
+       transform: translateY(-50%);
+       width: 26px;
+       height: 26px;
+       border-radius: 50%;
+       border: 1px solid rgba(255, 255, 255, 0.08);
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       background: rgba(20, 20, 22, 0.55);
+       color: rgba(255, 255, 255, 0.55);
+       opacity: 1;
+       cursor: pointer;
+       z-index: 5;
+       transition: opacity .2s ease, background .15s ease, color .15s ease;
+     }
+
+     .dsn-scroll-btn:hover {
+       background: rgba(30, 30, 33, 0.8);
+       color: #fff;
+     }
+
+     .dsn-scroll-btn:active {
+       transform: translateY(-50%) scale(0.92);
+     }
+
+     .dsn-scroll-btn svg {
+       width: 13px;
+       height: 13px;
+       stroke: currentColor;
+     }
+
+     .dsn-scroll-left {
+       left: 2px;
+     }
+
+     .dsn-scroll-right {
+       right: 2px;
+     }
+
+     /* Not needed = not there. These arrows used to stay put at 25%
+opacity, which still reserved their gutter (and the matching edge
+fade) on a strip that had nothing to scroll. Taken out of the box
+model entirely now; .no-arrow-left/.no-arrow-right below reclaim
+the gutter + fade on whichever side lost its arrow. Both are
+toggled together by initHScrollArrows() (hwr-js.js). */
+     .dsn-scroll-btn.is-hidden {
+       display: none;
+     }
+
+     .dsn-categories-scroll.no-arrow-left {
+       padding-left: 0;
+     }
+
+     .dsn-categories-scroll.no-arrow-right {
+       padding-right: 0;
+     }
+
+     /* Edge fades follow the arrows: a side only keeps its fade while
+something is still scrolled off past it. */
+     .dsn-categories-scroll.no-arrow-left:not(.no-arrow-right) {
+       -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
+       mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
+     }
+
+     .dsn-categories-scroll.no-arrow-right:not(.no-arrow-left) {
+       -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
+       mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
+     }
+
+     .dsn-categories-scroll.no-arrow-left.no-arrow-right {
+       -webkit-mask-image: none;
+       mask-image: none;
+     }
+
+/* ============================================================
+   NAV CHIPS — SHARED
+   ============================================================
+   Moved here from hwr-css.css. Used by hwr's category strip and by the
+   secondary top bar on every section, so a chip looks the same everywhere.
+   Active state is the brand red on purpose: these are content tabs (they
+   change what is on the page), not nav links that leave it. */
+     .dsn-chip {
+       flex-shrink: 0;
+       display: inline-flex;
+       align-items: center;
+       gap: 7px;
+       padding: 6px 14px;
+       border-radius: 1px;
+       background: rgba(255, 255, 255, 0.03);
+       border: 1px solid rgba(255, 255, 255, 0.07);
+       text-decoration: none;
+       color: var(--text-muted);
+       font-family: 'Sora', sans-serif;
+       font-size: 12px;
+       font-weight: 600;
+       letter-spacing: 0.2px;
+       white-space: nowrap;
+       transition: background .15s, color .15s, border-color .15s;
+     }
+
+     .dsn-chip:hover {
+       background: rgba(255, 255, 255, 0.08);
+       color: var(--text-secondary);
+       border-color: rgba(255, 255, 255, 0.14);
+     }
+
+     /* Active chip uses the same neutral white treatment .stb-hub-link uses, so
+everything active in the bar reads the same way. It was a brand-red accent
+to mark content tabs as distinct from nav links, but with two strips in one
+bar that put two different reds side by side — these are content tabs
+(switch what's on the page), not nav links (leave the page), so
+the active one should read as "you are here" with its own
+visual language rather than looking like a clone of the nav
+buttons beside it. */
+     .dsn-chip.active {
+       background: rgba(255, 255, 255, 0.1);
+       color: #fff;
+       border-color: rgba(255, 255, 255, 0.18);
+     }
+
+     .dsn-chip-icon {
+       width: 16px;
+       height: 16px;
+       border-radius: 4px;
+       object-fit: contain;
+       opacity: 0.45;
+       transition: filter .25s ease, opacity .25s ease;
+     }
+
+     .dsn-chip:hover .dsn-chip-icon,
+     .dsn-chip.active .dsn-chip-icon {
+       filter: grayscale(0);
+       opacity: 1;
+     }
+
+/* Same tightening hwr applies inside .stb-dsn-wrap — a chip sitting in the
+   secondary top bar has less height to work with than one in a bar of its
+   own, so it loses a little padding and type size. */
+
+/* ============================================================
+   MORE SHEET — ROWS + DROPDOWNS (shared)
+   ============================================================
+   Moved here from hwr-css.css. Each row is a destination with its own
+   sub-sections folded underneath: .th-mini-wrap holds a .th-mini-toggle
+   (the link plus a chevron button) and a .th-mini-dropdown of
+   .stb-toc-card items. The row for the page you are on starts open.
+   Toggled by toggleThMiniDropdown() in 11layout.js. */
+       .th-mini-grid {
+         display: flex;
+         flex-direction: column;
+         margin-bottom: 6px;
+         border-radius: 12px;
+         border: 1px solid rgba(255, 255, 255, 0.06);
+         background: rgba(255, 255, 255, 0.015);
+         overflow: hidden;
+       }
+
+       .th-mini {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         padding: 11px 12px;
+         background: transparent;
+         text-decoration: none;
+         transition: background .15s;
+       }
+
+       .th-mini:not(:first-child),
+       .th-mini-wrap:not(:first-child) {
+         border-top: 1px solid rgba(255, 255, 255, 0.055);
+       }
+
+       .th-mini:hover {
+         background: rgba(255, 255, 255, 0.035);
+       }
+
+       .th-mini:active {
+         background: rgba(255, 255, 255, 0.055);
+       }
+
+       .th-mini img {
+         width: 34px;
+         height: 34px;
+         padding: 7px;
+         box-sizing: border-box;
+         object-fit: contain;
+         border-radius: 9px;
+         background: rgba(255, 255, 255, 0.04);
+         border: 1px solid rgba(255, 255, 255, 0.07);
+         flex-shrink: 0;
+       }
+
+       .th-mini span {
+         font-family: 'Sora', sans-serif;
+         font-size: 13.5px;
+         font-weight: 600;
+         letter-spacing: 0.1px;
+         line-height: 1.2;
+         color: #c8cbcd;
+         flex: 1;
+         min-width: 0;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+       }
+
+       .th-mini-chevron {
+         width: 14px;
+         height: 14px;
+         flex-shrink: 0;
+         color: #54565b;
+         transition: transform .15s, color .15s;
+       }
+
+       .th-mini:hover .th-mini-chevron {
+         color: #8d9096;
+         transform: translateX(2px);
+       }
+
+       /* active state — a clean neutral highlight (no color), so it reads
+as "selected" without introducing another color into the sheet. */
+       .th-mini.active {
+         background: rgba(255, 255, 255, 0.05);
+       }
+
+       .th-mini.active span {
+         color: #fff;
+         font-weight: 700;
+       }
+
+       .th-mini.active img {
+         background: rgba(255, 255, 255, 0.07);
+         border-color: rgba(255, 255, 255, 0.18);
+       }
+
+       .th-mini.active .th-mini-chevron {
+         color: #c8cbcd;
+       }
+
+       /* Categories WITH a dropdown (has on-page sections defined) get
+split into two independent tap targets instead of one row that only
+toggles: .th-mini-link (icon + label) is a real <a> that navigates
+straight to that category's page, and .th-mini-chevron-btn is a
+separate <button> that opens/closes the dropdown — tapping the left
+side of the row no longer requires going through the dropdown to
+get there. .th-mini-link reuses .th-mini's own row styling (icon,
+label, hover/active) via the shared "th-mini" class, so nothing
+above needed to change for it. .th-mini-toggle (the row wrapping
+both) is just their flex container now, not a <button> itself —
+width:100% is all it needs. */
+       .th-mini-toggle {
+         display: flex;
+         align-items: stretch;
+         width: 100%;
+       }
+
+       .th-mini-link {
+         flex: 1 1 auto;
+         min-width: 0;
+       }
+
+       .th-mini-chevron-btn {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         flex-shrink: 0;
+         width: 44px;
+         border: none;
+         background: transparent;
+         padding: 0;
+         margin: 0;
+         cursor: pointer;
+         -webkit-appearance: none;
+         appearance: none;
+         transition: background .15s;
+       }
+
+       .th-mini-chevron-btn:hover {
+         background: rgba(255, 255, 255, 0.035);
+       }
+
+       .th-mini-chevron-btn:active {
+         background: rgba(255, 255, 255, 0.055);
+       }
+
+       .th-mini-chevron-btn:hover .th-mini-chevron {
+         color: #8d9096;
+       }
+
+       /* Current-page row — reuses .th-mini.active's existing look for
+  the label side; this covers just the chevron, which now lives in
+  its own sibling button instead of being a descendant of
+  .th-mini(.active) like it is on plain link rows. */
+       .th-mini-toggle.active .th-mini-chevron {
+         color: #c8cbcd;
+       }
+
+       /* Chevron button had its own transparent background, so on the
+  active (current-page) row it sat as a visibly darker patch next
+  to .th-mini-link's lighter rgba(255,255,255,0.05) fill. Match it
+  here so the whole row reads as one continuous bar. */
+       .th-mini-toggle.active .th-mini-chevron-btn {
+         background: rgba(255, 255, 255, 0.05);
+       }
+
+       .th-mini-toggle.active .th-mini-chevron-btn:hover {
+         background: rgba(255, 255, 255, 0.07);
+       }
+
+       .th-mini-toggle.active .th-mini-chevron-btn:active {
+         background: rgba(255, 255, 255, 0.09);
+       }
+
+       /* Open by default for the current page; rotates the chevron down
+  instead of the sideways "navigate away" slide plain link rows get,
+  since .th-mini-chevron is no longer a descendant of .th-mini here
+  (that slide rule can't reach it either way). */
+       .th-mini-wrap.open .th-mini-toggle .th-mini-chevron {
+         transform: rotate(90deg);
+       }
+
+       .th-mini-wrap.open .th-mini-chevron-btn:hover .th-mini-chevron {
+         transform: rotate(90deg) translateX(2px);
+       }
+
+       /* Dropdown panel — this page's own "On this page" sections, nested
+directly under its category row. Pure-CSS accordion (grid-template-
+rows 0fr → 1fr) so it animates open/closed without measuring
+heights in JS. */
+       .th-mini-dropdown {
+         display: grid;
+         grid-template-rows: 0fr;
+         transition: grid-template-rows .25s ease;
+       }
+
+       .th-mini-wrap.open .th-mini-dropdown {
+         grid-template-rows: 1fr;
+       }
+
+       .th-mini-dropdown-inner {
+         overflow: hidden;
+       }
+
+   .stb-toc-grid {
+     display: flex;
+     flex-direction: column;
+     padding-bottom: 6px;
+   }
+
+   .stb-toc-card {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     padding: 9px 10px;
+     margin: 0;
+     background: transparent;
+     border: none;
+     border-left: 2px solid transparent;
+     border-radius: 7px;
+     text-decoration: none;
+     min-width: 0;
+     transition: background .15s ease, border-color .15s ease;
+   }
+
+   .stb-toc-card:hover {
+     background: rgba(255, 255, 255, 0.04);
+   }
+
+   .stb-toc-card:active {
+     background: rgba(255, 255, 255, 0.06);
+   }
+
+   .stb-toc-icon {
+     flex-shrink: 0;
+     width: 26px;
+     height: 26px;
+     padding: 6px;
+     box-sizing: border-box;
+     border-radius: 7px;
+     background: rgba(255, 255, 255, 0.035);
+     color: #8a8d92;
+     transition: background .15s ease, color .15s ease;
+   }
+
+   .stb-toc-name {
+     flex: 1 1 auto;
+     min-width: 0;
+     font-family: 'Sora', sans-serif;
+     font-size: 12.5px;
+     font-weight: 600;
+     line-height: 1.3;
+     color: #c9cacd;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     transition: color .2s ease;
+   }
+
+   .stb-toc-count {
+     flex-shrink: 0;
+     font-size: 11px;
+     font-weight: 700;
+     color: #6a6c70;
+     font-variant-numeric: tabular-nums;
+     background: rgba(255, 255, 255, 0.04);
+     padding: 3px 8px;
+     border-radius: 20px;
+   }
+
+   .stb-toc-card:hover .stb-toc-name {
+     color: #fff;
+   }
+
+   .stb-toc-card:hover .stb-toc-icon {
+     background: rgba(255, 255, 255, 0.06);
+     color: #c9cacd;
+   }
+
+   /* "you are here" marker — soft background only now (the red left
+accent bar was removed site-wide; see .dsn-hover-item.is-current
+for the matching change). border-left stays reserved at 2px
+transparent (inherited from the base .stb-toc-card rule above) so
+removing the color doesn't shift the row's padding/alignment. */
+   .stb-toc-card.is-current {
+     background: rgba(255, 255, 255, 0.06);
+   }
+
+   .stb-toc-card.is-current .stb-toc-name {
+     color: #fff;
+     font-weight: 700;
+   }
+
+   .stb-toc-card.is-current .stb-toc-icon {
+     background: rgba(194, 59, 59, 0.14);
+     color: #e8a3a3;
+   }
+
+/* The inset panel the sub-items sit in — darker than the sheet so the open
+   row reads as a drawer inside it rather than more of the same list. */
+.th-mini-dropdown .stb-toc-grid {
+  margin: 0 10px 10px;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+/* Two-up variant. hwr's own sections have long names ("General Video
+   Platforms") and stay one per row; sections like Minecraft's are short
+   enough that one per row wastes most of the width. */
+.th-mini-dropdown .stb-toc-grid.stb-toc-grid-2col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 4px;
+}
+
+/* ============================================================
+   SECONDARY TOP BAR — STRIP SYSTEM (moved verbatim from hwr-css.css)
+   ============================================================
+   .stb-dsn-wrap holds the page's own sections; .stb-hub-nav the fixed
+   destinations on the right. Each is a scroll strip between two arrows.
+   The min-width:1401px rule is the important one: above that width the hub
+   strip stops splitting the bar evenly and takes only what it needs, giving
+   all the slack (and any scrolling) to the sections strip. Below it, the
+   two share. */
+
+       .dsn-categories-scroll {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         height: 100%;
+         overflow-x: auto;
+         scroll-behavior: smooth;
+         scrollbar-width: none;
+         padding: 0 28px;
+         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+         mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+       }
+
+       .dsn-categories-scroll::-webkit-scrollbar {
+         display: none;
+       }
+
+   @media (min-width:971px) {
+
+     .stb-divider {
+       width: 1px;
+       height: 24px;
+       margin: 0 16px;
+       flex-shrink: 0;
+       background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.2) 80%, transparent 100%);
+     }
+
+     .stb-dsn-wrap {
+       position: relative;
+       display: flex;
+       align-items: center;
+       align-self: stretch;
+       flex: 1 1 0;
+       min-width: 0;
+       overflow: hidden;
+     }
+
+     .stb-dsn-wrap .dsn-categories-scroll,
+     .stb-hub-nav .dsn-categories-scroll {
+       padding: 0 24px;
+       gap: 8px;
+     }
+
+     /* Same "reclaim the gutter once the arrow is gone" rule as the base
+.dsn-categories-scroll one, restated at this selector's specificity
+so it actually beats the padding shorthand right above. */
+     .stb-dsn-wrap .dsn-categories-scroll.no-arrow-left,
+     .stb-hub-nav .dsn-categories-scroll.no-arrow-left {
+       padding-left: 0;
+     }
+
+     .stb-dsn-wrap .dsn-categories-scroll.no-arrow-right,
+     .stb-hub-nav .dsn-categories-scroll.no-arrow-right {
+       padding-right: 0;
+     }
+
+     .stb-dsn-wrap .dsn-chip {
+       padding: 5px 13px;
+       font-size: 11.5px;
+       border-radius: 16px;
+     }
+
+     .stb-dsn-wrap .dsn-chip-icon {
+       width: 14px;
+       height: 14px;
+     }
+
+     .stb-dsn-wrap .dsn-scroll-btn,
+     .stb-hub-nav .dsn-scroll-btn {
+       width: 22px;
+       height: 22px;
+     }
+
+     .stb-dsn-wrap .dsn-scroll-btn svg,
+     .stb-hub-nav .dsn-scroll-btn svg {
+       width: 11px;
+       height: 11px;
+     }
+
+     .stb-dsn-wrap .dsn-scroll-left,
+     .stb-hub-nav .dsn-scroll-left {
+       left: 0;
+     }
+
+     .stb-dsn-wrap .dsn-scroll-right,
+     .stb-hub-nav .dsn-scroll-right {
+       right: 0;
+     }
+
+     /* .stb-hub-link sits inside .stb-hub-nav's own scroll strip
+  (id="stbHubNavScroll", class="dsn-categories-scroll") now — same
+  "don't squish, just scroll" treatment .dsn-chip already gets. */
+     .stb-hub-link {
+       flex-shrink: 0;
+     }
+
+     .stb-hub-nav {
+       position: relative;
+       display: flex;
+       align-items: center;
+       align-self: stretch;
+       gap: 6px;
+       flex: 1 1 0;
+       min-width: 0;
+       overflow: hidden;
+     }
+
+     .stb-hub-link {
+       display: inline-flex;
+       align-items: center;
+       gap: 6px;
+       padding: 6px 12px;
+       border-radius: 6px;
+       background: rgba(255, 255, 255, 0.03);
+       border: 1px solid rgba(255, 255, 255, 0.07);
+       text-decoration: none;
+       color: var(--text-muted);
+       font-family: 'Sora', sans-serif;
+       font-size: 11.5px;
+       font-weight: 600;
+       letter-spacing: 0.2px;
+       white-space: nowrap;
+       transition: background .15s, color .15s, border-color .15s;
+     }
+
+     .stb-hub-link:hover {
+       background: rgba(255, 255, 255, 0.08);
+       color: var(--text-secondary);
+       border-color: rgba(255, 255, 255, 0.14);
+     }
+
+     .stb-hub-link.active {
+       background: rgba(255, 255, 255, 0.1);
+       color: #fff;
+       border-color: rgba(255, 255, 255, 0.18);
+     }
+
+     .stb-hub-link svg {
+       width: 14px;
+       height: 14px;
+       stroke: currentColor;
+       fill: none;
+       flex-shrink: 0;
+       transition: fill .15s;
+     }
+
+/* hwr's own hub links carry inline SVG icons; sections whose nav data points
+   at image files (Minecraft's editions) need the same box, or the raster
+   renders at its natural size and the strip swells to fit it. */
+.stb-hub-link img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+     /* Same fix as the mobile bn-item version of this icon: the "+"
+  is two straight strokes with no fillable area, so it would
+  otherwise vanish into the filled document body on .active. */
+     .stb-hub-link.active svg .fp-plus {
+       fill: none;
+     }
+
+     .stb-hub-link.active svg {
+       fill: currentColor;
+     }}
+
+   @media (max-width:970px) {
+
+     .stb-divider,
+     .stb-dsn-wrap,
+     .stb-hub-nav {
+       display: none !important;
+     }}
+
+   /* Above 1400px, box-two becomes the tall right sidebar column and
+gets its own static copy of this whole panel (.box-three, further
+down) — so the top-bar dropdown button hides itself there instead
+of duplicating the same controls in two places. Below 1400px
+box-two is hidden entirely (see its own max-width:1400px rule)
+and box-one is followed by the full-width "Discover more" section
+instead, so the dropdown stays the only way to reach these
+controls there. */
+   @media (min-width: 1401px) {
+
+     /* Box-three (the sticky sidebar) only ever shows up here, and at
+  this width there's room for .stb-hub-nav's 4 links to sit at their
+  natural size without splitting space evenly with .stb-dsn-wrap —
+  so hub-nav stops growing/shrinking and just takes what it needs,
+  leaving all the flexible space (and the scrolling, if any) to
+  .stb-dsn-wrap's category chips instead. */
+     .stb-hub-nav {
+       flex: 0 1 auto;
+     }}
+
+/* The bar's title does not grow: it takes its own width and the two strips
+   share everything left over. 11layout.css's base rule gives .secondary-left
+   `flex: 1 1 auto` so a long title can grow then truncate, which is right
+   when the title is alone in the bar -- but with strips beside it the title
+   ate the slack and left them scrolling for no reason. Moved from
+   hwr-css.css; it lives in the same min-width:971px tier as the strips. */
+@media (min-width:971px){
+.secondary-top-bar .secondary-left {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+}
+
+/* PINNED SHEET HEADER -- copied from hwr-css.css (.more-sheet-scroll /
+   .more-sheet-top). The handle + header used to scroll away with the list
+   because .more-sheet was itself the scroll container and they were just
+   its first children. hwr splits the two jobs: the outer sheet only clips
+   and animates, an inner element does the scrolling, and the handle/header
+   sit in a sticky wrapper that stays put while the list moves underneath.
+
+   hwr's note on why the scroll moved inward rather than just making the
+   header sticky: mobile Safari doesn't reliably clip border-radius on an
+   element that is also its own overflow-y:auto scroll container -- during
+   momentum scrolling a sliver of scrolled-past content paints outside the
+   rounded corner, on top of the dimmed overlay. Keeping the scroll in an
+   inner element and leaving only clipping on the rounded outer element is
+   what stops it.
+
+   Scoped with :has() so this only takes effect on pages that carry the new
+   markup. th9-th17 still have the old sheet (handle/header as direct
+   children, no .more-sheet-scroll) and share this stylesheet -- without the
+   guard they would lose their padding and their ability to scroll at all.
+   They keep the plain rules above untouched. */
+.more-sheet:has(> .more-sheet-scroll){
+  padding:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+
+.more-sheet-scroll{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  flex:1 1 auto;
+  min-height:0;
+  /* the padding that used to live on .more-sheet */
+  padding:8px 16px 20px;
+}
+
+/* Negative margins cancel .more-sheet-scroll's padding so the pinned bar
+   reaches the sheet's true edges -- otherwise rows would scroll past in the
+   16px gutters beside it -- then it re-applies that same padding itself.
+
+   top:-8px matches the -8px margin, so at rest the bar sits exactly where
+   it always did (8px padding + the handle's own 6px) and the sheet looks
+   unchanged; once you scroll, it pins with those 8px consumed, so it
+   tightens slightly instead of jumping. Same trick as hwr, whose larger
+   28px/-20px pair produces a more pronounced version of it. */
+.more-sheet-top{
+  position:sticky;
+  top:-8px;
+  z-index:5;
+  margin:-8px -16px 0;
+  padding:8px 16px 4px;
+  background:#161618;
+  border-radius:20px 20px 0 0;
+}
+
+/* Moved onto the wrapper's padding-bottom above. Left on the header it
+   would collapse out through the wrapper's zero bottom padding, leaving a
+   4px band the pinned background doesn't cover and scrolling rows show
+   through. */
+.more-sheet-top .more-sheet-header{ margin-bottom:0; }
+
+/* == SIDEBAR =============================================================
+   Shared by every page that loads this stylesheet. Trialled on the Minecraft
+   pages first, then promoted here.
+
+   One system rather than a stack of patches. Everything below reads off the
+   tokens in the next rule, so the sidebar retunes from a handful of values
+   instead of a hunt through selectors.
+
+   The tuning problem it solves: the sidebar has TWO surfaces (the raised
+   top group and the plain list), so every separator has to clear both.
+   Earlier passes kept colliding with one or the other -- a light divider
+   vanished against the tinted group (1 level apart) and a dark grey one
+   vanished against the content (3 levels). These values clear everything
+   they touch:
+
+       base    #0f0f10  = 15
+       raised  #16161a  = 22
+       line    9% white = 37   -> +15 on raised, +22 on base
+       content          ~ 14   -> +23 across the seam
+
+   Nothing here sits within 10 levels of a surface it has to read against. */
+.sidebar {
+
+  /* padding:0 on the sides -- 11layout.css sets padding:1px all round, and
+     a child can only paint inside its parent's content box, so the raised
+     group stopped 1px short of the border and that sliver of untinted
+     sidebar read as a black hairline. Bottom padding gives the list
+     somewhere to end instead of colliding with the viewport edge. */
+  padding: 0 0 72px;
+  border-right: 1px solid var(--sb-line);
+
+  /* No scrollbar. A native one always reserves its lane whether or not the
+     thumb is visible, and that empty 11px lane is what made every row look
+     cut short of the divider. Wheel, trackpad and touch scrolling are
+     unaffected. NB .sidebar sets scrollbar-color, and once that is set
+     Chrome ignores ::-webkit-scrollbar entirely -- which is why the careful
+     5px webkit styling at 11layout.css:335 never took effect at all. */
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+  -ms-overflow-style: none;
+}
+.sidebar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* 1. ONE GRID.
+      The sidebar used to run three grids at once -- top-box rows L18/R231
+      h42, game rows L19/R229 h46, triple-A a third variant -- each 1-2px
+      from the others. Individually invisible; together it reads as "off".
+      The cause was pairing margin-left with width:calc(100% - Npx): two
+      independent numbers that must agree and didn't. Margin on both sides
+      with width:auto cannot drift. */
+.sidebar .top-box-item,
+.sidebar .games-container .game {
+  margin: 0 var(--sb-inset) 4px;
+  width: auto;
+  padding: 9px 10px;
+  border-radius: var(--sb-radius);
+  gap: 10px;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+/* 2. THE RAISED GROUP.
+      Was a full-bleed #171716ee slab: a warm tint on a neutral sidebar,
+      ending in a hard edge with no divider and no label. Now a neutral
+      raised surface closed by the same hairline the games list already
+      uses, so the two group breaks match instead of one being a slab edge
+      and the other a rule. */
+.sidebar .top-box {
+  background: var(--sb-raised);
+  gap: 0;
+  /* Top padding gives the label air instead of it hugging the bar above.
+     No bottom margin: the gap between the two groups is owned entirely by
+     .games-container below, which is what lets the divider centre in it. */
+  padding: 14px 0 10px;
+  margin-bottom: 0;
+}
+/* The divider used to live here, which was the bug: as a child of .top-box it
+   was drawn ON the tint, 5px above its bottom edge (measured: hairline at
+   y174, tint ending at y179). It read as a line inside the top box rather
+   than a separator between the two groups. It is drawn by .games-container
+   now, out in the neutral gap. */
+.sidebar .top-box::after { display: none; }
+
+/* 3. SECTION LABELS.
+      Added as ::before so the shared 11layout.js that populates these
+      containers stays untouched. Indented to 22px = a row's 12px margin +
+      10px padding, so each label starts exactly where its rows do. */
+.sidebar .top-box::before,
+.sidebar .games-container::before,
+.sidebar .triple-a-header {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--sb-label);
+}
+.sidebar .top-box::before,
+.sidebar .games-container::before {
+  display: block;
+  margin: 0 0 8px 22px;
+}
+/* No divider between the tinted group and this one -- the tint's own edge
+   already reads as the boundary, so a hairline just below it was a second
+   separator doing the same job. The 18+18 spacing stays exactly as it was:
+   it is what keeps the title off the group above, and it was never the
+   divider doing that work. */
+.sidebar .games-container {
+  margin-top: 18px;
+  padding-top: 18px;
+}
+/* No label on the top group -- the tinted surface already sets it apart from
+   the list below, so it does not need naming as well. content:none stops the
+   pseudo-element being generated at all, so it takes its 8px bottom margin
+   with it rather than leaving a gap where the text used to be. */
+.sidebar .top-box::before { content: none; }
+.sidebar .games-container::before { content: "Featured"; }
+
+/* 4. HOVER AND ACTIVE.
+      11layout.css:340 fills the active row with #2b2d31 -- a cool blue-grey
+      on a warm red site, and the one colour in the sidebar belonging to no
+      palette. Replaced with a wash of the same red the accent bar already
+      uses, so the marker and the fill are one idea rather than two.
+
+      That accent also sat at left:-10px on a row starting at x=19, leaving
+      a 10px gap: a red tick floating clear of the row it marked. Flush now,
+      rounded on the outer side only. */
+.sidebar .top-box-item:hover,
+.sidebar .games-container .game:hover,
+.sidebar .triple-a-list .triple-a-game:hover {
+  background: var(--sb-hover);
+  color: var(--text-main);
+}
+/* One active style for every row type -- top-box-item, game, triple-a-game --
+   instead of top-box-item keeping the older neutral fill while games got a red
+   wash of their own. Games used to read as a different, more "alert" kind of
+   selected state than the rest of the sidebar for no real reason; this is the
+   same flat neutral fill top-box-item already had, so "selected" means one
+   thing everywhere in the sidebar. The red accent bar (::before, below) is
+   still the thing that actually signals "this one's active" -- the fill is
+   just a quiet lift behind it. */
+.sidebar a.active,
+.sidebar .game.active,
+.sidebar .triple-a-game.active {
+  background: #2b2d31;
+  color: var(--text-main);
+  font-weight: 600;
+  position: relative;
+}
+/* The accent bar sits centred in the gutter between the sidebar's edge and
+   the row -- not jammed against the window edge, and not cramped inside the
+   pill where it was a red stripe on a red fill.
+
+   (inset + width) / -2 centres it in that gutter by construction: with a
+   12px inset and a 3px bar it resolves to -7.5px, putting the bar's midline
+   on x=6, exactly half of 12. Retune --sb-inset and it re-centres itself,
+   which a hard-coded offset like the original -10px could never do. */
+.sidebar a.active::before,
+.sidebar .game.active::before {
+  display: block;
+  /* Geometry and colour are the original's, untouched: 4px wide, 60% tall,
+     border-radius 4px on every corner so it reads as a rounded brick rather
+     than a stripe, and the original two-stop red. I had slimmed it to 3px,
+     stretched it to 72% and flattened its left edge -- that is what stopped
+     it looking like the one on the other pages. */
+  width: 4px;
+  height: 60%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgb(194,59,59) 36%, rgb(143,31,31) 100%);
+  /* Only the position differs: centred in the gutter by construction,
+     (inset + width) / -2, instead of the original's fixed -10px. */
+  left: calc((var(--sb-inset) + 4px) / -2);
+}
+
+/* 5. ICONS.
+      Game icons carried box-shadow: 0 0 0 2px #1e1f22 -- a hard ring in a
+      colour matching no surface in the sidebar, so it read as a halo rather
+      than an edge. A hairline in the shared line colour sits on the icon
+      instead of glowing around it. */
+.sidebar .sidebar-icon,
+.sidebar .tripleimg {
+  box-shadow: none;
+  border: 1px solid var(--sb-line);
+}
+
+/* 6. TRIPLE A.
+      The header is a section label like its siblings -- rule 3 gives it the
+      type -- so it drops the controller icon, the pill hover and the 16-21px
+      text, keeping a small chevron to show it still discloses. Note
+      11layout.css:411 gives it a pill hover and :450 bumps it to 18px under
+      970px; a .sidebar-prefixed selector outranks both, media query or not.
+
+      Sub-items keep a deeper left inset, because that indent is what shows
+      they are nested; only the right edge joins the grid. Their old
+      width:calc(92% - 20px) with margins on both sides put the right edge
+      wherever the arithmetic landed, and it drifted with sidebar width. */
+.sidebar .triple-a-container { margin-top: 16px; }
+.sidebar .triple-a-header {
+  display: flex;
+  align-items: center;
+  /* 12px margin + 10px padding puts the text on 22px -- the same line
+     BROWSE and GAMES start on. The vertical padding is the point: styled as
+     a bare label this was a 14px-tall tap target, well under the 44px touch
+     minimum, and with no hover it read as a caption rather than a control
+     you can click. Now 44px tall with a hover state, while keeping the
+     label's type. */
+  margin: 0 var(--sb-inset) 4px;
+  padding: 16px 10px;
+  width: auto;
+  background: none;
+  border-radius: var(--sb-radius);
+  gap: 0;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+.sidebar .triple-a-header:hover {
+  background: var(--sb-hover);
+  color: rgba(255,255,255,0.78);
+}
+.sidebar .triple-a-header .tripleimg { display: none; }
+.sidebar .triple-a-header .arrow {
+  margin-left: 6px;
+  opacity: 0.45;
+  font-size: 10px;
+  transition: opacity 0.16s ease;
+}
+.sidebar .triple-a-header .arrow svg { width: 10px; height: 10px; }
+.sidebar .triple-a-header:hover .arrow { opacity: 0.85; }
+.sidebar .triple-a-list .triple-a-game {
+  margin: 0 var(--sb-inset) 4px 24px;
+  width: auto;
+  padding: 8px 10px;
+  border-radius: var(--sb-radius);
+  gap: 10px;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+/* 7. KEYBOARD FOCUS.
+      There was no focus style at all, so tabbing through the sidebar gave
+      no indication of position. :focus-visible shows only for keyboard
+      users, so nothing changes for pointer users. */
+.sidebar a:focus-visible,
+.sidebar .game:focus-visible,
+.sidebar .top-box-item:focus-visible,
+.sidebar .triple-a-header:focus-visible,
+.sidebar .triple-a-game:focus-visible {
+  outline: 2px solid var(--sb-accent);
+  outline-offset: -2px;
+  border-radius: var(--sb-radius);
+}
+
+/* 8. MOBILE.
+      .bn-bar is fixed at bottom:0 with z-index 9999, and the drawer is
+      fixed top:52px/bottom:0 -- so its last rows sat underneath the bar
+      with nothing to scroll into. env(safe-area-inset-bottom) covers the
+      iPhone home indicator and resolves to 0 everywhere else. */
+@media (max-width: 970px) {
+  .sidebar {
+    padding-bottom: calc(var(--bn-bar-h, 0px) + 56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* 9. SECONDARY TOP BAR SHADOW.
+      The sidebar's right edge and the bar's fixed left edge already meet
+      exactly -- both 245.0 at every width tested. What looked like an
+      overlap was 11layout.css:596's box-shadow: 0 2px 6px -- no offset and
+      no spread, so a 6px blur radiated equally in every direction including
+      left, across the seam onto the sidebar. The spread must cover the
+      blur's real reach, which in Chrome is about 0.75x the radius rather
+      than half: -6px against a 6px blur leaves nothing to spill sideways,
+      while the 5px offset keeps the drop underneath. */
+.secondary-top-bar {
+  box-shadow: 0 5px 6px -6px rgba(0,0,0,0.6);
+}
+
+/* Subtle glass on the secondary bar.
+
+   backdrop-filter does nothing behind an opaque background, so the fill has
+   to give up some alpha for there to be anything to blur. 0.88 keeps the
+   tint firmly in charge -- only 12% of the page reads through -- and the
+   blur turns that 12% into a soft wash rather than a legible slice of the
+   hero image. That is the difference between deliberate glass and the
+   see-through gradient this bar had before.
+
+   Wrapped in @supports so browsers without backdrop-filter keep the fully
+   opaque colour instead of a plainly translucent bar with nothing blurring
+   behind it. It sits at the end of the file deliberately: the desktop rule
+   inside @media (min-width: 971px) sets its own background, and only a later
+   declaration of equal specificity overrides that.
+
+   blur(14px)/saturate(118%) is a touch gentler than .bn-bar's
+   blur(16px)/saturate(140%), so the two read as the same material with the
+   bottom bar slightly more present. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .secondary-top-bar {
+    /* --sb-raised at 88% */
+    background: rgba(22, 22, 26, 0.88);
+    -webkit-backdrop-filter: blur(14px) saturate(118%);
+    backdrop-filter: blur(14px) saturate(118%);
+  }
+}
+
+/* ── BOTTOM BAR vs THE SIDEBAR DRAWER ───────────────────────────────
+   While the mobile drawer is open the bottom bar must get out of the way:
+   .bn-bar is z-index 9999 against the drawer's 15, so it wins and floats on
+   top of the sidebar's own rows.
+
+   This reuses the bar's existing hidden state rather than inventing one --
+   it already animates to translateY(115%) under .bn-hidden -- so it slides
+   away with the same easing the scroll-hide uses instead of blinking out.
+
+   Two separate rules, deliberately NOT one comma-joined selector list: if a
+   browser does not support :has(), an invalid selector in a list kills the
+   ENTIRE rule, which would take the working .sidebar-open case down with it.
+   Split, each stands or falls on its own.
+
+     body.sidebar-open          set by 11layout.js (30 pages)
+     body:has(.sidebar.active)  covers pages whose drawer is toggled by their
+                                own inline script, which only sets .active on
+                                the sidebar and never touches <body>. */
+@media (max-width: 970px) {
+  body.sidebar-open .bn-bar {
+    transform: translateY(115%);
+    pointer-events: none;
+  }
+  body:has(.sidebar.active) .bn-bar {
+    transform: translateY(115%);
+    pointer-events: none;
+  }
+}
+
+/* ── FIXED BARS vs THE SCROLLBAR ────────────────────────────────────
+   .coc-main is the scroll container and it starts at y=0 -- it clears the
+   top bar with padding-top, and padding sits INSIDE the scroll box, so its
+   scrollbar runs the full viewport height while both fixed bars span to
+   right:0. The top ~88px of the scrollbar therefore sits underneath them,
+   and at the top of a page the thumb is simply invisible.
+
+   Insetting the bars by the scrollbar's width lets them stop at the content
+   edge instead, with scrollbar-gutter:stable keeping that column reserved
+   even on a page too short to scroll, so the bars do not shift about by
+   10px depending on content length.
+
+   Desktop only, deliberately: 11layout.css:495 notes that .coc-main is the
+   real scroll container on desktop while mobile scrolls <body>, and mobile
+   browsers use overlay scrollbars that reserve no width at all. Applying
+   this there would inset the bars by 10px with nothing in the gap. */
+@media (min-width: 971px) {
+  .top-bar,
+  .secondary-top-bar {
+    right: var(--scrollbar-w, 0px);
+    /* width:auto is the part that does the work. Both bars declare a width
+       as well as left/right (.top-bar width:100%, .secondary-top-bar
+       calc(100% - var(--sidebar-width))), and with left, right AND width all
+       set the box is over-constrained -- CSS keeps width and discards
+       `right`. Setting right alone changed nothing: it computed to 10px
+       while the element still measured out to the viewport edge. */
+    width: auto;
+  }
+  .coc-main {
+    scrollbar-gutter: stable;
+  }
+}
+
+/* ---- KEYCAP BUTTONS: secondary top bar + active sidebar row -------------
+   Site-wide since Sep 2026 (tried on th18-layouts first). The top bar's
+   chips (.dsn-chip: TH chips, hwr categories, Minecraft sections...) and
+   its hub links (.stb-hub-link: Home / Layouts / Armies / Guides...) wear
+   the Clash pages' Layouts / Army / Guides tab styling: flat near-black at
+   rest, a step lighter on hover, and the ACTIVE one a raised keycap (--key-
+   face + a hard 3px --key-edge) that lightens on hover. Oxanium caps at
+   10.5px / 700 / 1px tracking -- the tabs' own compact size -- because the bar
+   is only 40px tall. The active sidebar row takes the same keycap; the
+   other rows, its font and the red accent bar stay as they were.
+   Tokens: same values as th-layouts.css's (which the TH pages' tabs and
+   card buttons use) -- change both together. Selectors are prefixed with
+   .secondary-top-bar / .sidebar so they outrank the plain chip rules above
+   and any page stylesheet loaded after this file. */
+:root {
+  --key-face: linear-gradient(180deg, #26282e, #1b1c21);
+  --key-face-hover: linear-gradient(180deg, #31343b, #24262b);
+  --key-edge: 0 3px 0 #08090a, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --flat-hover: #1e1f23;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip,
+.secondary-top-bar .stb-hub-nav .stb-hub-link {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(11, 11, 12, 0.8);
+  box-shadow: none;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700; /* 700, not the tabs' 800: at this size 800 read too wide */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: background 0.2s, color 0.2s;
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip:hover,
+.secondary-top-bar .stb-hub-nav .stb-hub-link:hover {
+  background: var(--flat-hover);
+  color: var(--text-secondary);
+}
+/* Top-bar active key: a touch lighter than --key-face (#26282e -> #1b1c21),
+   about 3 shades, so it lifts a little off the bar. Deliberately subtle. */
+.secondary-top-bar .stb-dsn-wrap .dsn-chip.active,
+.secondary-top-bar .stb-hub-nav .stb-hub-link.active {
+  border-radius: 8px;
+  background: linear-gradient(180deg, #292b31, #1e1f24);
+  color: var(--text-main);
+  box-shadow: var(--key-edge);
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip.active:hover,
+.secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover {
+  background: linear-gradient(180deg, #34373e, #27292e);
+}
+.secondary-top-bar .stb-dsn-wrap .dsn-chip:focus-visible,
+.secondary-top-bar .stb-hub-nav .stb-hub-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.sidebar a.active,
+.sidebar .games-container .game.active,
+.sidebar .triple-a-list .triple-a-game.active {
+  border-radius: 8px;
+  background: var(--key-face);
+  box-shadow: var(--key-edge);
+  color: var(--text-main);
+}
+.sidebar a.active:hover,
+.sidebar .games-container .game.active:hover,
+.sidebar .triple-a-list .triple-a-game.active:hover {
+  background: var(--key-face-hover);
+}
+/* Top box (Parchrome / Web Resources): the same keycap, a touch darker
+   (about 3 shades, same edge), so it sits a little clearer on that
+   panel's lighter --sb-raised (#16161a). Deliberately subtle. */
+.sidebar .top-box a.active {
+  background: linear-gradient(180deg, #232429, #18191c);
+}
+.sidebar .top-box a.active:hover {
+  background: linear-gradient(180deg, #2c2e34, #202226);
+}
+
+/* ── BOTTOM BAR = THE SECONDARY TOP BAR'S MATERIAL (Oct 2026) ─────────
+   The phone bottom nav (.bn-bar) used its own darker, more see-through
+   glass (rgba(15,15,16,0.72), blur 16px / saturate 140%), set separately
+   in 1coclayouts.css, hwr-css.css and mc-java.css. It now wears exactly
+   what .secondary-top-bar wears above (see "Subtle glass on the secondary
+   bar"): --sb-raised at 88% + blur(14px) saturate(118%), with that bar's
+   shadow flipped to fall upward. One rule here for every page: those
+   files load after this one, so ":root .bn-bar" (two parts) is what lets
+   it win over their single-class ".bn-bar". The hairline top border they
+   set is kept. valorant-*.html don't load this file; their inline copy
+   carries the same values. */
+:root .bn-bar {
+  background: var(--sb-raised, #16161a);
+  box-shadow: 0 -5px 6px -6px rgba(0, 0, 0, 0.6);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root .bn-bar {
+    background: rgba(22, 22, 26, 0.88);
+    -webkit-backdrop-filter: blur(14px) saturate(118%);
+    backdrop-filter: blur(14px) saturate(118%);
+  }
+}
