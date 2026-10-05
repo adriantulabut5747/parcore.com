@@ -3,7 +3,10 @@
 // "x/index.html" count as the same page.
 function cocPagePath(u) {
   var p = new URL(String(u || ''), location.origin + '/').pathname.toLowerCase();
-  return p.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1');
+  return p
+    .replace(/\.html$/, '')
+    .replace(/\/index$/, '/')
+    .replace(/(.)\/$/, '$1');
 }
 
 // NOTE: sidebar logic (normalizePage, currentPage, buildSidebarFromJSON,
@@ -988,8 +991,12 @@ if (document.readyState === 'loading') {
       if (currentPage === cocPagePath(th.armyHref)) trail = [{ text: th.label + ' Armies', href: th.armyHref }];
     });
     var paged = !!trail;
+    // A tool can ask for a parent step ("crumbParent", e.g. Tools) and can
+    // own a whole address range ("activePrefix": the Player Tracker owns every
+    // /coc/player/<TAG> profile). Both are set in coc-nav-data.json.
     data.guides.concat(data.upcoming || []).forEach(function (g) {
-      if (isActive(g.activeOn)) trail = [{ text: g.name || g.label, href: g.href }];
+      var here = isActive(g.activeOn) || (g.activePrefix && currentPage.indexOf(g.activePrefix) === 0);
+      if (here) trail = (g.crumbParent ? [g.crumbParent] : []).concat({ text: g.name || g.label, href: g.href });
     });
     if (!trail) return;
     // Desktop has the room for the full name; phones keep "COC" (Oct 2026).

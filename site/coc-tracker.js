@@ -128,12 +128,35 @@
     return ALIAS[k] || k;
   }
 
+  var BB_UNITS = [
+    'Battle Machine',
+    'Battle Copter',
+    'Raged Barbarian',
+    'Sneaky Archer',
+    'Boxer Giant',
+    'Beta Minion',
+    'Bomber',
+    'Baby Dragon',
+    'Cannon Cart',
+    'Night Witch',
+    'Drop Ship',
+    'Power P.E.K.K.A',
+    'Hog Glider',
+    'Electrofire Wizard',
+  ];
+
   function indexArmy(data) {
     var idx = {};
     ['heroes', 'pets', 'equipment', 'troops', 'sieges', 'spells'].forEach(function (group) {
       (data[group] || []).forEach(function (u) {
         idx[key(u.name)] = { group: group, img: data.imageDir + u.img };
       });
+    });
+    // Builder Base icons (bb-<name>.webp, from the Clash of Clans wiki) sit
+    // in the same folder. Keyed "bb:" so the BB Baby Dragon doesn't take the
+    // home one's place.
+    BB_UNITS.forEach(function (n) {
+      idx['bb:' + key(n)] = { group: 'builderBase', img: data.imageDir + 'bb-' + n.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.webp' };
     });
     return idx;
   }
@@ -142,7 +165,7 @@
   // inside the hero's own <li>.
   function tile(u, idx, extraClass, el) {
     el = el || 'li';
-    var info = idx[key(u.name)];
+    var info = idx[(u.village === 'builderBase' ? 'bb:' : '') + key(u.name)];
     var maxed = u.level >= u.maxLevel;
     var label = u.name + ', level ' + u.level + ' of ' + u.maxLevel + (maxed ? ' (max)' : '');
     return (
@@ -191,28 +214,46 @@
     );
   }
 
-  function listGroup(title, units) {
-    if (!units.length) return '';
+  // Heroes as cards (portrait, name, level), each with the equipment it has on.
+  function heroCards(heroes, idx) {
+    if (!heroes.length) return '';
     return (
-      '<section class="pt-group"><div class="pt-group-head"><h3>' +
-      title +
-      '</h3></div><ul class="pt-list">' +
-      units
-        .map(function (u) {
+      '<section class="pt-group"><div class="pt-group-head"><h3>Heroes</h3></div><ul class="pt-heroes">' +
+      heroes
+        .map(function (h) {
+          var gear = (h.equipment || [])
+            .map(function (e) {
+              return tile(e, idx, 'pt-tile--sm');
+            })
+            .join('');
           return (
-            '<li class="' +
-            (u.level >= u.maxLevel ? 'is-max' : '') +
-            '"><span>' +
-            esc(u.name) +
-            '</span><b>' +
-            u.level +
-            '<i> / ' +
-            u.maxLevel +
-            '</i></b></li>'
+            '<li class="pt-hero">' +
+            tile(h, idx, 'pt-tile--lg', 'div') +
+            '<div class="pt-hero-text"><b>' +
+            esc(h.name) +
+            '</b><span>Level ' +
+            h.level +
+            ' of ' +
+            h.maxLevel +
+            '</span>' +
+            (gear ? '<ul class="pt-tiles pt-gear" aria-label="Equipped">' + gear + '</ul>' : '') +
+            '</div></li>'
           );
         })
         .join('') +
       '</ul></section>'
+    );
+  }
+
+  function statGrid(rows) {
+    return (
+      '<dl class="pt-stats">' +
+      rows
+        .map(function (r) {
+          return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>';
+        })
+        .join('') +
+      '</dl>'
     );
   }
 
@@ -265,49 +306,19 @@
         '</span></p>'
       : '<p class="pt-clan pt-clan--none">Not in a clan</p>';
 
-    var stats = [
+    // "this season" numbers reset when the season ends; the rest are all time.
+    var stats = statGrid([
       ['Experience level', p.expLevel],
-      ['Trophies', num(p.trophies) + ' <i>best ' + num(p.bestTrophies) + '</i>'],
+      ['Trophies now', num(p.trophies)],
+      ['Best trophies ever', num(p.bestTrophies)],
       ['War stars', num(p.warStars)],
-      ['Donated / received', num(p.donations) + ' / ' + num(p.donationsReceived)],
-      ['Attack wins', num(p.attackWins)],
-      ['Defense wins', num(p.defenseWins)],
+      ['Attack wins this season', num(p.attackWins)],
+      ['Defense wins this season', num(p.defenseWins)],
+      ['Donated / received this season', num(p.donations) + ' / ' + num(p.donationsReceived)],
       ['Capital gold given', num(p.clanCapitalContributions)],
-      ['Builder Hall', p.builderHallLevel ? p.builderHallLevel + ' <i>' + num(p.builderBaseTrophies) + ' trophies</i>' : 'Not unlocked'],
-    ]
-      .map(function (s) {
-        return '<div><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>';
-      })
-      .join('');
+    ]);
 
-    // heroes, each with the equipment it has on
-    var heroes = p.heroes.filter(home);
-    var heroHtml = heroes.length
-      ? '<section class="pt-group"><div class="pt-group-head"><h3>Heroes</h3></div><ul class="pt-heroes">' +
-        heroes
-          .map(function (h) {
-            var gear = (h.equipment || [])
-              .map(function (e) {
-                return tile(e, idx, 'pt-tile--sm');
-              })
-              .join('');
-            return (
-              '<li class="pt-hero">' +
-              tile(h, idx, 'pt-tile--lg', 'div') +
-              '<div class="pt-hero-text"><b>' +
-              esc(h.name) +
-              '</b><span>Level ' +
-              h.level +
-              ' of ' +
-              h.maxLevel +
-              '</span>' +
-              (gear ? '<ul class="pt-tiles pt-gear" aria-label="Equipped">' + gear + '</ul>' : '') +
-              '</div></li>'
-            );
-          })
-          .join('') +
-        '</ul></section>'
-      : '';
+    var heroHtml = heroCards(p.heroes.filter(home), idx);
 
     var achievements = ['home', 'builderBase', 'clanCapital']
       .map(function (v) {
@@ -381,14 +392,13 @@
           esc(league.name) +
           '</span></div>'
         : '') +
+      // "Open in game" only works on a phone with Clash installed, so the row is phones-only (coc-tracker.css)
       '<div class="pt-actions">' +
       '<a class="th-soon-btn th-soon-btn--primary" href="https://link.clashofclans.com/en?action=OpenPlayerProfile&amp;tag=%23' +
       tag +
       '" rel="noopener">Open in game</a>' +
       '</div></header>' +
-      '<dl class="pt-stats">' +
       stats +
-      '</dl>' +
       '<div class="pt-tabs" role="tablist" aria-label="Profile sections">' +
       '<button type="button" role="tab" id="ptTabHome" aria-controls="ptPanelHome" aria-selected="true">Home village</button>' +
       '<button type="button" role="tab" id="ptTabBB" aria-controls="ptPanelBB" aria-selected="false" tabindex="-1">Builder base</button>' +
@@ -404,13 +414,20 @@
       '</div>' +
       '<div class="pt-panel" id="ptPanelBB" role="tabpanel" aria-labelledby="ptTabBB" hidden>' +
       (p.builderHallLevel
-        ? listGroup('Heroes', bbHeroes) + listGroup('Troops', bb)
+        ? statGrid([
+            ['Builder Hall level', p.builderHallLevel],
+            ['Trophies now', num(p.builderBaseTrophies)],
+            ['Best trophies ever', num(p.bestBuilderBaseTrophies)],
+            ['League', p.builderBaseLeague ? esc(p.builderBaseLeague.name) : 'Unranked'],
+          ]) +
+          heroCards(bbHeroes, idx) +
+          tileGroup('Troops', bb, idx)
         : '<p class="pt-empty">This player hasn&rsquo;t unlocked the Builder Base yet.</p>') +
       '</div>' +
       '<div class="pt-panel" id="ptPanelAch" role="tabpanel" aria-labelledby="ptTabAch" hidden>' +
       achievements +
       '</div>' +
-      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes. A tile with a red level is at the game&rsquo;s max level.</p>';
+      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. A red level means that unit is at the game&rsquo;s max level.</p>';
 
     wireTabs(root);
     root.querySelector('.pt-copy').addEventListener('click', function (e) {
