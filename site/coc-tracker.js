@@ -670,6 +670,7 @@
         var p = r[0];
         document.title = p.name + ' (TH' + p.townHallLevel + ') | Player Tracker | Parchrome';
         renderProfile(p, r[1], root);
+        if (window.setCrumbName) window.setCrumbName(p.name);
         saveRecent({ kind: 'player', tag: tag, name: p.name, th: p.townHallLevel, icon: thIcon(p.townHallLevel, r[1]) });
       })
       .catch(function (err) {
@@ -1355,13 +1356,13 @@
     return shortDate(d) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
-  // The header's track control: a button, or "Tracked since ...". Opening a
+  // The header's track control: a button, or nothing once tracked. Opening a
   // tracked clan's page keeps it tracked (lastViewed, once a day per device).
   function initTrack(box, tag, onTracked) {
     fsGet('trackedClans/' + tag)
       .then(function (doc) {
         if (doc) {
-          showTracked(doc.addedAt);
+          box.innerHTML = ''; // tracked: nothing to show (his call: no "tracked since" badge)
           var seenKey = 'pt-seen-' + tag;
           var today = new Date().toISOString().slice(0, 10);
           var seen;
@@ -1385,7 +1386,8 @@
           btn.textContent = 'Starting…';
           fsTrack(tag, true).then(
             function () {
-              showTracked(new Date());
+              box.innerHTML =
+                '<span class="pt-track-note">Tracking started. History fills in from the next check, within 15 minutes.</span>';
               onTracked();
             },
             function () {
@@ -1399,10 +1401,6 @@
       .catch(function () {
         box.innerHTML = '';
       });
-    function showTracked(since) {
-      box.innerHTML =
-        '<span class="pt-track-on"><i aria-hidden="true"></i>Tracked' + (since ? ' since ' + shortDate(since) : '') + '</span>';
-    }
   }
 
   var EVENT_TEXT = {
@@ -1446,7 +1444,7 @@
             }
             return d;
           });
-          var since = 'Recording since ' + shortDate(tracked.addedAt) + '. Checked every 15 minutes.';
+          var since = 'Updated every 15 minutes.';
           box.innerHTML =
             '<p class="pt-war-kind">' +
             since +
@@ -1670,6 +1668,7 @@
         var c = r[0];
         document.title = c.name + ' (clan) | Player Tracker | Parchrome';
         renderClan(c, r[1], r[2], root);
+        if (window.setCrumbName) window.setCrumbName(c.name);
         saveRecent({ kind: 'clan', tag: tag, name: c.name, icon: c.badgeUrls.small });
       })
       .catch(function (err) {

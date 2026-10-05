@@ -989,6 +989,29 @@ if (document.readyState === 'loading') {
   // data-page-label>, read here in case it got there first. A Town Hall
   // with no bases yet (no pages at all) never gets one. The trail replaces
   // the page's own title at every width (th-layouts.css, BREADCRUMB).
+  // A page about one thing (a player, a clan: coc-tracker.js) names it as
+  // the trail's last step: "COC > Tools > Player Tracker > Wild_Parkour".
+  // Called when the page's data arrives; if the trail isn't built yet, the
+  // name waits on <html data-crumb-name> and buildCrumbs adds it. Long
+  // names end in "..." (11layout.css, .stb-crumb-name).
+  window.setCrumbName = function (name) {
+    document.documentElement.dataset.crumbName = name;
+    var nav = document.querySelector('.secondary-content > .stb-crumbs');
+    if (!nav) return;
+    var step = nav.querySelector('.stb-crumb-name');
+    if (!step) {
+      var cur = nav.querySelector('[aria-current]');
+      if (cur) cur.removeAttribute('aria-current');
+      nav.insertAdjacentHTML(
+        'beforeend',
+        '<span class="stb-crumb-sep" aria-hidden="true">›</span><span class="stb-crumb-name" aria-current="page"></span>',
+      );
+      step = nav.querySelector('.stb-crumb-name');
+    }
+    step.textContent = name;
+    step.title = name;
+  };
+
   function buildCrumbs(data) {
     var box = document.querySelector('.secondary-left .secondary-content');
     if (!box || box.querySelector('.stb-crumbs')) return;
@@ -1063,6 +1086,7 @@ if (document.readyState === 'loading') {
       });
     box.appendChild(crumbs);
     box.classList.add('has-crumbs');
+    if (document.documentElement.dataset.crumbName) window.setCrumbName(document.documentElement.dataset.crumbName);
   }
 
   function buildSecondLayer(data) {
