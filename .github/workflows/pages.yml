@@ -1,0 +1,47 @@
+# Publishes the site to GitHub Pages:
+#   https://adriantulabut5747.github.io/parcore.com/
+# Pages serves this repo one folder deep (/parcore.com/), so scripts/build-pages.py
+# copies site/ into _pages/ with "/parcore.com" put in front of every path, and adds
+# forwarding pages for the old addresses listed in site/_redirects.
+# Needs Settings -> Pages -> Source: "GitHub Actions".
+
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # The clan-stats job commits with the built-in token, and those commits don't
+  # start other workflows -- so republish whenever it finishes.
+  workflow_run:
+    workflows: ["Update clan stats"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the Pages copy
+        run: python scripts/build-pages.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _pages
+      - id: deployment
+        uses: actions/deploy-pages@v4
