@@ -872,6 +872,25 @@
       },
     ],
     [
+      'league',
+      'League',
+      function (m) {
+        return m.leagueTier ? m.leagueTier.id : 0;
+      },
+      function (m) {
+        var l = m.leagueTier;
+        return l
+          ? '<img src="' +
+              l.iconUrls.small +
+              '" alt="" width="26" height="26" loading="lazy" title="' +
+              esc(l.name) +
+              '" /><span>' +
+              esc(l.name) +
+              '</span>'
+          : '&ndash;';
+      },
+    ],
+    [
       'trophies',
       'Trophies',
       function (m) {
@@ -1112,6 +1131,64 @@
   }
 
   // One war: score card, missing attacks, both line-ups (switchable).
+  // One side's attacks: how the stars split, and the average stars,
+  // destruction and duration (the API gives seconds) per attack.
+  function attackStats(side) {
+    var by = [0, 0, 0, 0];
+    var n = 0;
+    var dest = 0;
+    var dur = 0;
+    var durN = 0;
+    side.members.forEach(function (m) {
+      (m.attacks || []).forEach(function (a) {
+        n++;
+        by[a.stars]++;
+        dest += a.destructionPercentage;
+        if (a.duration) {
+          dur += a.duration;
+          durN++;
+        }
+      });
+    });
+    return { n: n, by: by, dest: n ? dest / n : 0, stars: n ? (by[1] + 2 * by[2] + 3 * by[3]) / n : 0, dur: durN ? dur / durN : null };
+  }
+
+  function warStats(us, them, total) {
+    var a = attackStats(us);
+    var b = attackStats(them);
+    function pct(x, i) {
+      return x.n ? Math.round((x.by[i] / x.n) * 100) + '%<i>' + x.by[i] + '</i>' : '&ndash;';
+    }
+    function mmss(x) {
+      if (x.dur == null) return '&ndash;';
+      var sec = Math.round(x.dur);
+      return Math.floor(sec / 60) + 'm ' + String(sec % 60).padStart(2, '0') + 's';
+    }
+    var rows = [
+      ['Attacks used', a.n + ' / ' + total, b.n + ' / ' + total],
+      ['Avg. stars per attack', a.n ? a.stars.toFixed(2) : '&ndash;', b.n ? b.stars.toFixed(2) : '&ndash;'],
+      ['3-star attacks', pct(a, 3), pct(b, 3)],
+      ['2-star attacks', pct(a, 2), pct(b, 2)],
+      ['1-star attacks', pct(a, 1), pct(b, 1)],
+      ['0-star attacks', pct(a, 0), pct(b, 0)],
+      ['Avg. destruction', a.n ? a.dest.toFixed(1) + '%' : '&ndash;', b.n ? b.dest.toFixed(1) + '%' : '&ndash;'],
+      ['Avg. attack time', mmss(a), mmss(b)],
+    ];
+    return (
+      '<section class="pt-group pt-wstats"><div class="pt-group-head"><h3>War stats</h3></div><table class="pt-wst"><thead><tr><th scope="col">' +
+      esc(us.name) +
+      '</th><th scope="col"><span class="pt-sr">Stat</span></th><th scope="col">' +
+      esc(them.name) +
+      '</th></tr></thead><tbody>' +
+      rows
+        .map(function (r) {
+          return '<tr><td>' + r[1] + '</td><th scope="row">' + r[0] + '</th><td>' + r[2] + '</td></tr>';
+        })
+        .join('') +
+      '</tbody></table></section>'
+    );
+  }
+
   function warView(w, ourTag, data) {
     var s = sides(w, ourTag);
     var us = s[0];
@@ -1164,6 +1241,7 @@
             .join(', ') +
           '</p></section>'
         : '') +
+      (live ? warStats(us, them, total) : '') +
       '<div class="pt-war-sides" role="tablist" aria-label="Line-up">' +
       '<button type="button" role="tab" aria-selected="true" data-side="us">' +
       esc(us.name) +
@@ -1192,14 +1270,26 @@
     });
   }
 
-  // At most `n` requests at once: the CWL group can mean 28 war lookups.
+  // At most `n` requests at once: the CWL group can mean 28 war lookups,
+  // and a burst can hit the Clash API's rate limit. A failed lookup is
+  // tried twice more after a short pause; one that still fails is null.
+  function retry(fn, item, left) {
+    return fn(item).catch(function (err) {
+      if (!left || err.message === 'notFound' || err.message === 'private') throw err;
+      return new Promise(function (ok) {
+        setTimeout(ok, 700);
+      }).then(function () {
+        return retry(fn, item, left - 1);
+      });
+    });
+  }
   function pool(items, n, fn) {
     var out = new Array(items.length);
     var next = 0;
     function worker() {
       if (next >= items.length) return Promise.resolve();
       var i = next++;
-      return fn(items[i])
+      return retry(fn, items[i], 2)
         .then(
           function (r) {
             out[i] = r;
@@ -1219,10 +1309,20 @@
 
   // CWL standings from every war so far: stars (+10 for each war won once it
   // has ended), then total destruction -- the game's own ranking rule.
-  function standings(group, wars) {
+  function standings(group, wars, rounds, byTag) {
     var t = {};
     group.clans.forEach(function (c) {
-      t[c.tag] = { clan: c, stars: 0, dest: 0, wins: 0 };
+      // days: each clan's result per war day -- win / lose / tie / live / prep / null
+      var days = rounds.map(function (list) {
+        for (var i = 0; i < list.length; i++) {
+          var w = byTag[list[i]];
+          if (!w || (w.clan.tag !== c.tag && w.opponent.tag !== c.tag)) continue;
+          if (w.state === 'warEnded') return outcome.apply(null, sides(w, c.tag));
+          return w.state === 'inWar' ? 'live' : 'prep';
+        }
+        return null;
+      });
+      t[c.tag] = { clan: c, stars: 0, dest: 0, wins: 0, days: days };
     });
     wars.forEach(function (w) {
       if (!w || (w.state !== 'inWar' && w.state !== 'warEnded')) return;
@@ -1249,35 +1349,81 @@
       });
   }
 
-  function standingsTable(rows, ourTag) {
+  // How many clans go up / down in each war league, from the wiki's CWL
+  // medal table. Groups under 8 clans demote fewer, so no demotion line there.
+  function cwlZones(league, n) {
+    var m = /^(\w+) League(?: (I{1,3}))?$/.exec(league || '');
+    if (!m) return null;
+    var tier = m[1];
+    var div = (m[2] || '').length; // III = 3 ... I = 1
+    var up = 2;
+    var down = 2;
+    if (tier === 'Bronze') {
+      up = 3;
+      down = div === 3 ? 0 : 1;
+    } else if (tier === 'Silver' && div === 3) down = 1;
+    else if ((tier === 'Master' && div === 1) || tier === 'Champion' || tier === 'Titan') up = 1;
+    else if (tier === 'Legend') up = 0;
+    return { up: up, down: n >= 8 ? down : 0 };
+  }
+
+  var DAY_TEXT = { win: 'won', lose: 'lost', tie: 'drawn', live: 'in progress', prep: 'preparation' };
+
+  function standingsTable(rows, ourTag, league) {
+    var z = cwlZones(league, rows.length);
+    var zone = function (kind) {
+      return (
+        '<li class="pt-zone is-' +
+        kind +
+        '" role="presentation"><span>' +
+        (kind === 'up' ? 'Promotion zone' : 'Demotion zone') +
+        '</span></li>'
+      );
+    };
     return (
-      '<section class="pt-group pt-standings"><div class="pt-group-head"><h3>League standings</h3><span>Stars include +10 for each war won</span></div><ol>' +
+      '<section class="pt-group pt-standings"><div class="pt-group-head"><h3>League standings</h3><span>' +
+      (league ? esc(league) + ' &middot; ' : '') +
+      'stars include +10 per war won</span></div><ol>' +
       rows
         .map(function (r, i) {
-          return (
+          var html =
             '<li' +
             (r.clan.tag === ourTag ? ' class="is-us"' : '') +
             '><span class="pt-st-rank">' +
             (i + 1) +
             '</span><img src="' +
             r.clan.badgeUrls.small +
-            '" alt="" width="28" height="28" loading="lazy" /><a href="' +
+            '" alt="" width="36" height="36" loading="lazy" /><span class="pt-st-name"><a href="' +
             clanHref(r.clan.tag.slice(1)) +
             '">' +
             esc(r.clan.name) +
-            '</a><span class="pt-st-num"><b>' +
+            '</a><span class="pt-st-days" role="img" aria-label="' +
+            r.days
+              .map(function (d, k) {
+                return 'Day ' + (k + 1) + ' ' + (DAY_TEXT[d] || 'not played');
+              })
+              .join(', ') +
+            '">' +
+            r.days
+              .map(function (d) {
+                return '<i class="is-' + (d || 'none') + '"></i>';
+              })
+              .join('') +
+            '</span></span><span class="pt-st-pill pt-st-stars">' +
             r.stars +
-            '</b> stars</span><span class="pt-st-num">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg><span class="pt-sr"> stars</span></span><span class="pt-st-pill">' +
             Math.round(r.dest).toLocaleString('en-US') +
-            '%</span></li>'
-          );
+            '%</span></li>';
+          if (z && z.up && i === z.up - 1) html += zone('up');
+          if (z && z.down && i === rows.length - z.down - 1) html += zone('down');
+          return html;
         })
         .join('') +
       '</ol></section>'
     );
   }
 
-  function loadCwl(box, ourTag, group, data) {
+  function loadCwl(box, ourTag, group, data, league) {
     var rounds = group.rounds.map(function (r) {
       return r.warTags.filter(function (t) {
         return t !== '#0';
@@ -1285,9 +1431,12 @@
     });
     var tags = [].concat.apply([], rounds);
     box.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading Clan War League&hellip;</div>';
-    pool(tags, 4, function (t) {
+    pool(tags, 3, function (t) {
       return api('type=cwlwar&tag=' + t.slice(1));
     }).then(function (wars) {
+      var failed = wars.filter(function (w) {
+        return !w;
+      }).length;
       var byTag = {};
       tags.forEach(function (t, i) {
         byTag[t] = wars[i];
@@ -1340,7 +1489,14 @@
         '</p>' +
         days +
         '<div class="pt-war-day"></div>' +
-        standingsTable(standings(group, wars), ourTag);
+        standingsTable(standings(group, wars, rounds, byTag), ourTag, league) +
+        (failed
+          ? '<p class="pt-empty">' +
+            failed +
+            ' of ' +
+            tags.length +
+            ' wars couldn&rsquo;t be loaded, so the standings may be missing some stars. Reload the page to try again.</p>'
+          : '');
       var dayBox = box.querySelector('.pt-war-day');
       function show(i) {
         dayBox.innerHTML = ours[i] ? warView(ours[i], ourTag, data) : '';
@@ -1359,7 +1515,7 @@
     });
   }
 
-  function loadWarTab(box, ourTag, data) {
+  function loadWarTab(box, ourTag, data, league) {
     box.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading the war&hellip;</div>';
     var t = ourTag.slice(1);
     // CWL first: a clan in CWL shows "not in war" in its regular war.
@@ -1373,7 +1529,7 @@
         },
       )
       .then(function (group) {
-        if (group && group.state !== 'notInWar' && group.rounds) return loadCwl(box, ourTag, group, data);
+        if (group && group.state !== 'notInWar' && group.rounds) return loadCwl(box, ourTag, group, data, league);
         return api('type=war&tag=' + t).then(
           function (w) {
             if (w.state === 'notInWar') {
@@ -1681,6 +1837,92 @@
       });
   }
 
+  // The war the clan is fighting now, for the banner under the clan header:
+  // during CWL the latest drawn day (battle day first, else preparation),
+  // otherwise the regular war (public war logs only). Resolves null if none.
+  function liveWar(c) {
+    var t = c.tag.slice(1);
+    var regular = function () {
+      if (!c.isWarLogPublic) return null;
+      return api('type=war&tag=' + t).then(
+        function (w) {
+          return w.state && w.state !== 'notInWar' ? { w: w, label: 'Clan war' } : null;
+        },
+        function () {
+          return null;
+        },
+      );
+    };
+    return api('type=cwlgroup&tag=' + t).then(
+      function (g) {
+        if (!g || g.state === 'notInWar' || !g.rounds) return regular();
+        var drawn = [];
+        g.rounds.forEach(function (r, i) {
+          var list = r.warTags.filter(function (x) {
+            return x !== '#0';
+          });
+          if (list.length) drawn.push({ day: i + 1, tags: list });
+        });
+        // newest two days: the newest is often preparation, the one before it the battle
+        var check = drawn.slice(-2).reverse();
+        var found = [];
+        return pool(check, 1, function (d) {
+          return pool(d.tags, 4, function (x) {
+            return api('type=cwlwar&tag=' + x.slice(1));
+          }).then(function (wars) {
+            wars.forEach(function (w) {
+              if (w && (w.clan.tag === c.tag || w.opponent.tag === c.tag)) found.push({ w: w, label: 'CWL day ' + d.day });
+            });
+          });
+        }).then(function () {
+          var live = found.filter(function (f) {
+            return f.w.state === 'inWar';
+          })[0];
+          return (
+            live ||
+            found.filter(function (f) {
+              return f.w.state === 'preparation';
+            })[0] ||
+            null
+          );
+        });
+      },
+      function () {
+        return regular();
+      },
+    );
+  }
+
+  function liveBanner(box, c, onView) {
+    liveWar(c).then(function (f) {
+      if (!f) return;
+      var w = f.w;
+      var s = sides(w, c.tag);
+      var prep = w.state === 'preparation';
+      box.innerHTML =
+        '<section class="pt-live' +
+        (prep ? ' is-prep' : '') +
+        '"><span class="pt-live-dot" aria-hidden="true"></span><span class="pt-live-main"><b>' +
+        f.label +
+        ' &middot; ' +
+        (prep ? 'preparation' : w.state === 'inWar' ? 'battle day' : 'ended') +
+        '</b><span>vs ' +
+        esc(s[1].name) +
+        ' &middot; ' +
+        (prep
+          ? 'battles start in ' + timeLeft(apiTime(w.startTime) - Date.now())
+          : w.state === 'inWar'
+            ? 'ends in ' + timeLeft(apiTime(w.endTime) - Date.now())
+            : '') +
+        '</span></span><span class="pt-live-score"><b>' +
+        (prep ? w.teamSize + ' v ' + w.teamSize : s[0].stars + ' &ndash; ' + s[1].stars) +
+        '</b>' +
+        (prep ? '' : '<span>' + s[0].destructionPercentage.toFixed(1) + '% &ndash; ' + s[1].destructionPercentage.toFixed(1) + '%</span>') +
+        '</span><button type="button" class="th-soon-btn th-soon-btn--primary">View war</button></section>';
+      box.querySelector('button').addEventListener('click', onView);
+    });
+  }
+
   function renderClan(c, log, data, root) {
     var tag = c.tag.slice(1);
     var members = (c.memberList || []).slice().sort(function (a, b) {
@@ -1744,6 +1986,7 @@
         ['Builder trophies', num(c.requiredBuilderBaseTrophies)],
       ]) +
       '</div></header>' +
+      '<div id="ptLive"></div>' +
       '<div class="pt-tabs" role="tablist" aria-label="Clan sections">' +
       '<button type="button" role="tab" id="ptTabMembers" aria-controls="ptPanelMembers" aria-selected="true">Members</button>' +
       '<button type="button" role="tab" id="ptTabWar" aria-controls="ptPanelWar" aria-selected="false" tabindex="-1">War</button>' +
@@ -1767,7 +2010,7 @@
     var warTab = root.querySelector('#ptTabWar');
     function openWar() {
       warTab.removeEventListener('click', openWar);
-      loadWarTab(root.querySelector('#ptPanelWar'), c.tag, data);
+      loadWarTab(root.querySelector('#ptPanelWar'), c.tag, data, c.warLeague && c.warLeague.id !== 48000000 ? c.warLeague.name : '');
     }
     warTab.addEventListener('click', openWar);
     if (location.hash === '#war') warTab.click();
@@ -1782,6 +2025,10 @@
       loadHistory(histBox, c, data);
     });
     if (location.hash === '#history') histTab.click();
+    liveBanner(root.querySelector('#ptLive'), c, function () {
+      warTab.click();
+      root.querySelector('.pt-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
     initTrack(root.querySelector('#ptTrack'), c.tag.slice(1), function () {
       if (histLoaded) loadHistory(histBox, c, data);
     });

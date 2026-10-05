@@ -1015,14 +1015,6 @@
   background: #23252a;
   color: #c9ccd2;
 }
-.pt-war.is-win .pt-war-res {
-  background: rgba(194, 59, 59, 0.18);
-  color: #f08a8a;
-}
-.pt-war.is-lose .pt-war-res {
-  background: #1a1b1f;
-  color: #7c818a;
-}
 .pt-war-opp {
   display: flex;
   align-items: center;
@@ -1138,16 +1130,9 @@
   vertical-align: 1px;
   background: #5a5e66;
 }
-.pt-days i.is-win {
-  background: #e06363;
-}
 .pt-days i.is-tie {
   background: none;
   box-shadow: inset 0 0 0 1.5px #9ea3ab;
-}
-.pt-days i.is-live {
-  background: #e06363;
-  box-shadow: 0 0 0 3px rgba(224, 99, 99, 0.25);
 }
 
 .pt-score {
@@ -1155,10 +1140,6 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: #121316;
-}
-.pt-score.is-win,
-.pt-score.is-inWar {
-  background: radial-gradient(70% 120% at 50% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 70%), #121316;
 }
 .pt-score-state {
   margin: 0 0 14px;
@@ -1169,10 +1150,6 @@
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: #c9ccd2;
-}
-.pt-score.is-win .pt-score-state,
-.pt-score.is-inWar .pt-score-state {
-  color: #f08a8a;
 }
 .pt-score-row {
   display: grid;
@@ -1377,70 +1354,6 @@
 }
 .pt-atk--none {
   color: #6d7178;
-}
-
-.pt-standings {
-  margin-top: 16px;
-}
-.pt-standings ol {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.pt-standings li {
-  display: grid;
-  grid-template-columns: 22px 28px minmax(0, 1fr) auto 72px;
-  gap: 10px;
-  align-items: center;
-  padding: 8px 6px;
-  border-bottom: 1px solid #1d1f23;
-  border-radius: 6px;
-}
-.pt-standings li:last-child {
-  border-bottom: 0;
-}
-.pt-standings li.is-us {
-  background: rgba(194, 59, 59, 0.1);
-}
-.pt-st-rank {
-  font:
-    700 13px 'Oxanium',
-    sans-serif;
-  color: #7c818a;
-  text-align: right;
-}
-.pt-standings img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-.pt-standings a {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #e9eaed;
-  font:
-    600 14px 'Sora',
-    sans-serif;
-  text-decoration: none;
-}
-.pt-standings a:hover {
-  text-decoration: underline;
-  text-decoration-color: #e06363;
-  text-underline-offset: 3px;
-}
-.pt-st-num {
-  text-align: right;
-  font:
-    600 12px 'Oxanium',
-    sans-serif;
-  font-variant-numeric: tabular-nums;
-  color: #8d929a;
-  white-space: nowrap;
-}
-.pt-st-num b {
-  font-size: 14px;
-  color: #f2f3f5;
 }
 
 /* ---- Tracking + History tab (clan page) ---------------------------------- */
@@ -1656,8 +1569,376 @@
   color: #7c818a;
 }
 
+/* ---- War results: green = won, red = lost, grey = drawn (Oct 2026) -------
+   Status colours, used only for results: war log pills, day dots, the
+   score card, the standings' day squares. Red stays the brand accent too,
+   but here it always means a loss. */
+.pt-war.is-win .pt-war-res {
+  background: rgba(92, 201, 138, 0.14);
+  color: #6fd59a;
+}
+.pt-war.is-lose .pt-war-res {
+  background: rgba(224, 99, 99, 0.14);
+  color: #f08a8a;
+}
+.pt-days i.is-win {
+  background: #5cc98a;
+}
+.pt-days i.is-lose {
+  background: #e06363;
+}
+.pt-days i.is-live {
+  background: #f2f3f5;
+  box-shadow: 0 0 0 3px rgba(242, 243, 245, 0.18);
+}
+.pt-score.is-win {
+  background: radial-gradient(70% 120% at 50% 0%, rgba(92, 201, 138, 0.12), rgba(92, 201, 138, 0) 70%), #121316;
+}
+.pt-score.is-lose {
+  background: radial-gradient(70% 120% at 50% 0%, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0) 70%), #121316;
+}
+.pt-score.is-inWar {
+  background: radial-gradient(70% 120% at 50% 0%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 70%), #121316;
+}
+.pt-score.is-win .pt-score-state {
+  color: #6fd59a;
+}
+.pt-score.is-lose .pt-score-state {
+  color: #f08a8a;
+}
+.pt-score.is-inWar .pt-score-state {
+  color: #f2f3f5;
+}
+
+/* ---- War stats: ours | stat | theirs ------------------------------------ */
+.pt-wstats {
+  margin-top: 12px;
+}
+.pt-wst {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.pt-wst thead th {
+  padding: 0 0 10px;
+  font:
+    600 13px 'Sora',
+    sans-serif;
+  color: #e9eaed;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pt-wst thead th:first-child {
+  text-align: left;
+}
+.pt-wst thead th:last-child {
+  text-align: right;
+}
+.pt-wst tbody th,
+.pt-wst td {
+  padding: 8px 0;
+  border-top: 1px solid #1d1f23;
+}
+.pt-wst tbody th {
+  width: 44%;
+  text-align: center;
+  font:
+    400 12.5px 'Sora',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-wst td {
+  width: 28%;
+  font:
+    700 14px 'Oxanium',
+    sans-serif;
+  color: #f2f3f5;
+}
+.pt-wst td:last-child {
+  text-align: right;
+}
+.pt-wst td i {
+  margin-left: 6px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 11.5px;
+  color: #7c818a;
+}
+
+/* ---- Live war banner (under the clan header) ---------------------------- */
+.pt-live {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(60% 160% at 0% 50%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 70%), #121316;
+}
+.pt-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e06363;
+  box-shadow: 0 0 0 4px rgba(224, 99, 99, 0.2);
+}
+.pt-live.is-prep .pt-live-dot {
+  background: #9ea3ab;
+  box-shadow: 0 0 0 4px rgba(158, 163, 171, 0.18);
+}
+.pt-live-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.pt-live-main b {
+  font:
+    800 11px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #f08a8a;
+}
+.pt-live.is-prep .pt-live-main b {
+  color: #c9ccd2;
+}
+.pt-live-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font:
+    400 13.5px 'Sora',
+    sans-serif;
+  color: #c9ccd2;
+}
+.pt-live-score {
+  display: grid;
+  justify-items: end;
+}
+.pt-live-score b {
+  font:
+    800 20px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+.pt-live-score span {
+  font:
+    600 11px 'Oxanium',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-live .th-soon-btn {
+  cursor: pointer;
+}
+
+/* ---- CWL standings (like the in-game table) ----------------------------- */
+.pt-standings {
+  margin-top: 16px;
+}
+.pt-standings ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pt-standings li {
+  display: grid;
+  grid-template-columns: 22px 36px minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 8px;
+  border-radius: 8px;
+}
+.pt-standings li.is-us {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.pt-st-rank {
+  font:
+    700 15px 'Oxanium',
+    sans-serif;
+  color: #9ea3ab;
+  text-align: right;
+}
+.pt-standings img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.pt-st-name {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.pt-st-name a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #f2f3f5;
+  font:
+    600 15px 'Sora',
+    sans-serif;
+  text-decoration: none;
+}
+.pt-st-name a:hover {
+  text-decoration: underline;
+  text-decoration-color: #e06363;
+  text-underline-offset: 3px;
+}
+.pt-st-days {
+  display: flex;
+  gap: 4px;
+}
+.pt-st-days i {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: #23252a;
+}
+.pt-st-days i.is-win {
+  background: #5cc98a;
+}
+.pt-st-days i.is-lose {
+  background: #e06363;
+}
+.pt-st-days i.is-tie {
+  background: #8d929a;
+}
+.pt-st-days i.is-live {
+  background: none;
+  box-shadow: inset 0 0 0 2px #f2f3f5;
+}
+.pt-st-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 64px;
+  padding: 7px 11px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #1b1d22;
+  font:
+    700 14px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+  white-space: nowrap;
+}
+.pt-st-stars {
+  width: 72px;
+}
+.pt-st-stars + .pt-st-pill {
+  width: 92px;
+}
+.pt-st-stars svg {
+  width: 14px;
+  height: 14px;
+  fill: #e0a63b;
+}
+.pt-standings li.pt-zone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px;
+  font:
+    700 11px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.pt-zone::before,
+.pt-zone::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dashed currentColor;
+  opacity: 0.6;
+}
+.pt-zone.is-up {
+  color: #6fd59a;
+}
+.pt-zone.is-down {
+  color: #f08a8a;
+}
+
+/* members table: league icon + name */
+.pt-table td.pt-col-league {
+  text-align: left;
+  font-family: 'Sora', sans-serif;
+  font-weight: 400;
+  font-size: 12.5px;
+  color: #c9ccd2;
+}
+.pt-table th.pt-col-league {
+  text-align: left;
+}
+.pt-table td.pt-col-league img {
+  width: 26px;
+  height: 26px;
+  margin-right: 6px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 /* ---- Phones ----------------------------------------------------------- */
 @media (max-width: 970px) {
+  .pt-table td.pt-col-th img {
+    width: 22px;
+    height: 22px;
+    margin-right: 4px;
+  }
+  .pt-table td.pt-col-league span {
+    display: none; /* icon only on phones; the name is in its tooltip */
+  }
+  .pt-table td.pt-col-league img {
+    margin-right: 0;
+  }
+  .pt-live {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 12px;
+  }
+  .pt-live .th-soon-btn {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+  .pt-standings li {
+    grid-template-columns: 16px 30px minmax(0, 1fr) auto auto;
+    gap: 8px;
+    padding: 9px 4px;
+  }
+  .pt-standings img {
+    width: 30px;
+    height: 30px;
+  }
+  .pt-st-name a {
+    font-size: 13.5px;
+  }
+  .pt-st-days i {
+    width: 9px;
+    height: 9px;
+  }
+  .pt-st-stars {
+    width: 58px;
+  }
+  .pt-st-stars + .pt-st-pill {
+    width: 70px;
+  }
+  .pt-st-pill {
+    min-width: 0;
+    padding: 6px 8px;
+    font-size: 12.5px;
+  }
+  .pt-wst tbody th {
+    font-size: 11.5px;
+  }
+  .pt-wst td {
+    font-size: 13px;
+  }
   .pt-pg li {
     grid-template-columns: 84px minmax(0, 1fr) 38px 64px;
     gap: 8px;
@@ -1690,12 +1971,6 @@
     grid-column: 3;
     justify-content: flex-start;
   }
-  .pt-standings li {
-    grid-template-columns: 18px 24px minmax(0, 1fr) auto;
-  }
-  .pt-standings li .pt-st-num:last-child {
-    display: none;
-  }
   .pt-head.pt-head--clan {
     grid-template-areas:
       'th id'
@@ -1713,13 +1988,22 @@
   .pt-table {
     font-size: 13px;
   }
+  /* 7 columns on a phone: tighter cells and smaller headings so the
+     table fits without scrolling sideways */
   .pt-table th button,
   .pt-table td {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
   }
-  .pt-table td.pt-col-th img {
-    display: none;
+  .pt-table th button {
+    font-size: 9.5px;
+    letter-spacing: 0.4px;
+  }
+  .pt-table td {
+    font-size: 12.5px;
+  }
+  .pt-table td.pt-col-name span {
+    font-size: 10px;
   }
   .pt-war {
     grid-template-columns: 52px minmax(0, 1fr) auto;
