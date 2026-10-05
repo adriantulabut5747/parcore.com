@@ -264,7 +264,6 @@
         p.clan.tag.slice(1) +
         '</span></p>'
       : '<p class="pt-clan pt-clan--none">Not in a clan</p>';
-    var hasPages = th >= 8 && th <= 18;
 
     var stats = [
       ['Experience level', p.expLevel],
@@ -386,17 +385,6 @@
       '<a class="th-soon-btn th-soon-btn--primary" href="https://link.clashofclans.com/en?action=OpenPlayerProfile&amp;tag=%23' +
       tag +
       '" rel="noopener">Open in game</a>' +
-      (hasPages
-        ? '<a class="th-soon-btn" href="/coc/town-hall-' +
-          th +
-          '/layouts">TH' +
-          th +
-          ' layouts</a><a class="th-soon-btn" href="/coc/town-hall-' +
-          th +
-          '/army">TH' +
-          th +
-          ' armies</a>'
-        : '') +
       '</div></header>' +
       '<dl class="pt-stats">' +
       stats +
