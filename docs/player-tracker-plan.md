@@ -76,7 +76,9 @@ because tracking just started ("recording since <date>").
 1. Hub + player profile (live) -- done Oct 5.
 2. Clan page + clan name search (live) -- done Oct 5: /coc/clan/<TAG>, members table
    (sortable), war log (or "private"), Player / Clan switch on the hub.
-3. War report: current war + CWL (live).
+3. War report: current war + CWL (live) -- done Oct 5: clan page War tab (loads on
+   first open, or /coc/clan/<TAG>#war). CWL: day chips, our war per day, league
+   standings from all group wars (finished CWL wars cached a day by the function).
 4. Tracking: Track button, poller, History tabs.
 5. Leaderboards, Compare, Rushed % checker, layout/army suggestions.
 

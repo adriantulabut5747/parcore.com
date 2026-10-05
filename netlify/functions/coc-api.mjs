@@ -92,7 +92,11 @@ export default async (req) => {
       if (why.reason === 'accessDenied') return reply(403, { error: 'private' }, 300);
     }
     if (!res.ok) return reply(502, { error: 'api' + res.status });
-    return reply(200, await res.text(), cacheSeconds);
+    const text = await res.text();
+    // A finished CWL war never changes again: keep it a day, not a minute.
+    // (A clan's CWL page asks for every war in its group, up to 28.)
+    if (type === 'cwlwar' && text.includes('"state":"warEnded"')) cacheSeconds = 86400;
+    return reply(200, text, cacheSeconds);
   } catch {
     return reply(502, { error: 'unreachable' });
   }
