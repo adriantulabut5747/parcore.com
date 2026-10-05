@@ -70,6 +70,8 @@ def main():
         if len(parts) < 2 or line.lstrip().startswith("#"):
             continue
         src, target = parts[0], parts[1]
+        if "*" in src:
+            continue  # rewrites like /coc/player/* can't be files; on Pages those pages use ?tag= instead
         rel = src.lstrip("/")
         if not rel:
             continue
