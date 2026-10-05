@@ -241,7 +241,9 @@
   padding: 24px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'th id league';
+  grid-template-areas:
+    'th id league'
+    'facts facts facts';
   gap: 16px 24px;
   align-items: center;
   background: radial-gradient(60% 140% at 0% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 65%), #121316;
@@ -353,53 +355,62 @@
   height: 64px;
   object-fit: contain;
 }
-.pt-actions {
-  grid-area: actions;
-  display: none; /* phones only, see the media query below */
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-/* ---- Profile: stats --------------------------------------------------- */
-.pt-stats {
+/* ---- Profile: facts (the numbers, inside the header) ----------------
+   Two short rows instead of a table: a row title on the left, then the
+   numbers side by side, each over its small label, split by hairlines. */
+.pt-head-facts {
+  grid-area: facts;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  margin: 16px 0 0;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.08); /* the 1px gaps draw the grid lines */
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #23252a;
 }
-.pt-stats div {
-  padding: 14px 16px;
-  background: #121316;
+.pt-facts {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
 }
-.pt-stats dt {
+.pt-facts-h {
   font:
     800 10.5px 'Oxanium',
     sans-serif;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #8d929a;
+  color: #e06363;
 }
-.pt-stats dd {
-  margin: 4px 0 0;
+.pt-facts dl {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.pt-facts dl > div {
+  display: flex;
+  flex-direction: column;
+  padding: 0 18px;
+  border-left: 1px solid #23252a;
+}
+.pt-facts dl > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.pt-facts dd {
+  order: -1; /* number on top, label under it, numbers aligned along the row */
+  margin: 0;
   font:
-    700 18px 'Oxanium',
+    700 17px 'Oxanium',
     sans-serif;
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
   color: #f2f3f5;
 }
-.pt-stats dd i {
-  font-style: normal;
-  font-size: 12px;
-  font-weight: 600;
+.pt-facts dt {
+  margin-top: 2px;
+  font:
+    400 11.5px 'Sora',
+    sans-serif;
   color: #8d929a;
-}
-
-.pt-panel > .pt-stats:first-child {
-  margin: 0 0 12px;
+  white-space: nowrap;
 }
 
 /* ---- Profile: tabs ---------------------------------------------------- */
@@ -668,7 +679,7 @@
     grid-template-areas:
       'th id'
       'league league'
-      'actions actions';
+      'facts facts';
     gap: 14px 16px;
   }
   .pt-th img {
@@ -686,18 +697,24 @@
     width: 36px;
     height: 36px;
   }
-  .pt-actions {
-    display: flex;
+  .pt-facts {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
-  .pt-actions .th-soon-btn {
-    flex: 1 1 auto;
-    justify-content: center;
+  /* each row stays on one line: equal columns, labels may wrap */
+  .pt-facts dl {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
   }
-  .pt-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .pt-facts dl > div {
+    padding: 0 8px;
   }
-  .pt-stats dd {
-    font-size: 16px;
+  .pt-facts dd {
+    font-size: 14.5px;
+  }
+  .pt-facts dt {
+    white-space: normal;
   }
   .pt-group {
     padding: 14px 12px 14px;

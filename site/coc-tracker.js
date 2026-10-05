@@ -245,15 +245,21 @@
     );
   }
 
-  function statGrid(rows) {
+  // One labelled row of numbers ("All time: 238 XP level | 2,071 war stars
+  // ..."). The profile header has two (all time, this season); the Builder
+  // Base tab has one. dt comes first for screen readers; CSS shows the
+  // number above its label.
+  function facts(title, rows) {
     return (
-      '<dl class="pt-stats">' +
+      '<div class="pt-facts"><span class="pt-facts-h">' +
+      title +
+      '</span><dl>' +
       rows
         .map(function (r) {
           return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>';
         })
         .join('') +
-      '</dl>'
+      '</dl></div>'
     );
   }
 
@@ -306,17 +312,23 @@
         '</span></p>'
       : '<p class="pt-clan pt-clan--none">Not in a clan</p>';
 
-    // "this season" numbers reset when the season ends; the rest are all time.
-    var stats = statGrid([
-      ['Experience level', p.expLevel],
-      ['Trophies now', num(p.trophies)],
-      ['Best trophies ever', num(p.bestTrophies)],
-      ['War stars', num(p.warStars)],
-      ['Attack wins this season', num(p.attackWins)],
-      ['Defense wins this season', num(p.defenseWins)],
-      ['Donations this season', num(p.donations) + ' <i>given</i> &middot; ' + num(p.donationsReceived) + ' <i>received</i>'],
-      ['Capital gold given', num(p.clanCapitalContributions)],
-    ]);
+    // "This season" numbers reset when the season ends; the others never do.
+    var stats =
+      '<div class="pt-head-facts">' +
+      facts('All time', [
+        ['XP level', p.expLevel],
+        ['Best trophies', num(p.bestTrophies)],
+        ['War stars', num(p.warStars)],
+        ['Capital gold', num(p.clanCapitalContributions)],
+      ]) +
+      facts('This season', [
+        ['Trophies', num(p.trophies)],
+        ['Attack wins', num(p.attackWins)],
+        ['Defense wins', num(p.defenseWins)],
+        ['Donated', num(p.donations)],
+        ['Received', num(p.donationsReceived)],
+      ]) +
+      '</div>';
 
     var heroHtml = heroCards(p.heroes.filter(home), idx);
 
@@ -392,13 +404,8 @@
           esc(league.name) +
           '</span></div>'
         : '') +
-      // "Open in game" only works on a phone with Clash installed, so the row is phones-only (coc-tracker.css)
-      '<div class="pt-actions">' +
-      '<a class="th-soon-btn th-soon-btn--primary" href="https://link.clashofclans.com/en?action=OpenPlayerProfile&amp;tag=%23' +
-      tag +
-      '" rel="noopener">Open in game</a>' +
-      '</div></header>' +
       stats +
+      '</header>' +
       '<div class="pt-tabs" role="tablist" aria-label="Profile sections">' +
       '<button type="button" role="tab" id="ptTabHome" aria-controls="ptPanelHome" aria-selected="true">Home village</button>' +
       '<button type="button" role="tab" id="ptTabBB" aria-controls="ptPanelBB" aria-selected="false" tabindex="-1">Builder base</button>' +
@@ -414,12 +421,14 @@
       '</div>' +
       '<div class="pt-panel" id="ptPanelBB" role="tabpanel" aria-labelledby="ptTabBB" hidden>' +
       (p.builderHallLevel
-        ? statGrid([
-            ['Builder Hall level', p.builderHallLevel],
-            ['Trophies now', num(p.builderBaseTrophies)],
-            ['Best trophies ever', num(p.bestBuilderBaseTrophies)],
+        ? '<section class="pt-group">' +
+          facts('Builder Base', [
+            ['Builder Hall', p.builderHallLevel],
+            ['Trophies', num(p.builderBaseTrophies)],
+            ['Best trophies', num(p.bestBuilderBaseTrophies)],
             ['League', p.builderBaseLeague ? esc(p.builderBaseLeague.name) : 'Unranked'],
           ]) +
+          '</section>' +
           heroCards(bbHeroes, idx) +
           tileGroup('Troops', bb, idx)
         : '<p class="pt-empty">This player hasn&rsquo;t unlocked the Builder Base yet.</p>') +
