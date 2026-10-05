@@ -1,0 +1,47 @@
+# Player Tracker history: every 15 minutes, scripts/track.mjs checks each
+# tracked clan (members, wars, daily trophies/donations) and saves what
+# changed to Firestore. Writes to the database only -- never commits, so it
+# never triggers a site deploy.
+#
+# Needs two repo secrets: COC_API_KEY and FIREBASE_SERVICE_ACCOUNT (the
+# Firebase admin key's JSON). Run it by hand from the Actions tab
+# ("Run workflow"). GitHub may start scheduled runs late when it's busy.
+name: Track clans
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: track
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      # Only the scripts folder, not the whole site.
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install the Firebase admin library
+        working-directory: scripts
+        run: npm install --no-save --no-package-lock firebase-admin@13
+
+      - name: Poll tracked clans
+        env:
+          COC_API_KEY: ${{ secrets.COC_API_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/track.mjs
