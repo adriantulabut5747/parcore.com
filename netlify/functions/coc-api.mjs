@@ -15,11 +15,16 @@
 const API = 'https://cocproxy.royaleapi.dev/v1/';
 
 // type -> [API path for a tag, CDN cache seconds]. Add a lookup here when a
-// page needs it (war, CWL...).
+// page needs it.
 const ROUTES = {
   player: [(tag) => 'players/' + tag, 300],
   clan: [(tag) => 'clans/' + tag, 300],
   warlog: [(tag) => 'clans/' + tag + '/warlog?limit=30', 600],
+  // War report: the clan's current war, its Clan War League group, and one
+  // CWL war by its war tag. Short caches -- attacks land all the time.
+  war: [(tag) => 'clans/' + tag + '/currentwar', 60],
+  cwlgroup: [(tag) => 'clans/' + tag + '/currentwar/leaguegroup', 300],
+  cwlwar: [(tag) => 'clanwarleagues/wars/' + tag, 60],
 };
 
 // Pages on another domain that may call this (GitHub Pages copy).
