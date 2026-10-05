@@ -761,9 +761,15 @@ if (document.readyState === 'loading') {
   }
 
   // Is this page one of a tool's pages? Its activeOn list, or anything under
-  // its activePrefix (the Player Tracker owns every /coc/player/<TAG>).
+  // its activePrefix list (the Player Tracker owns every /coc/player/<TAG>
+  // and /coc/clan/<TAG>).
   function onTool(g) {
-    return isActive(g.activeOn) || (!!g.activePrefix && currentPage.indexOf(g.activePrefix) === 0);
+    return (
+      isActive(g.activeOn) ||
+      [].concat(g.activePrefix || []).some(function (pre) {
+        return currentPage.indexOf(pre) === 0;
+      })
+    );
   }
   // On any tool page (live or upcoming), the Tools links light up.
   function inTools(data) {

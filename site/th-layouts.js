@@ -423,11 +423,14 @@ function cocPagePath(u) {
       // hero (thz-script.js's buildSecondLayer).
       // Guides pages (coctools*.html): the chip row switches between the
       // guides instead of Town Halls, the same as the strip under the hero.
-      // A tool also owns everything under its activePrefix (the Player
-      // Tracker owns every /coc/player/<TAG> profile).
+      // A tool also owns everything under its activePrefix list (the Player
+      // Tracker owns every /coc/player/<TAG> and /coc/clan/<TAG>).
       var guide = (data.guides || []).find(function (g) {
         return (
-          (g.activeOn || []).map(normalize).indexOf(currentPage) !== -1 || (!!g.activePrefix && currentPage.indexOf(g.activePrefix) === 0)
+          (g.activeOn || []).map(normalize).indexOf(currentPage) !== -1 ||
+          [].concat(g.activePrefix || []).some(function (pre) {
+            return currentPage.indexOf(pre) === 0;
+          })
         );
       });
       if (dsnScroll && guide) {

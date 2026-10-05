@@ -1,11 +1,11 @@
-/* Player Tracker (Oct 2026): the search on /coc/tools/player-tracker and the
-   profile at /coc/player/<TAG>. Data comes from /api/coc (the Netlify
+/* Player Tracker (Oct 2026): the search on /coc/tools/player-tracker, the
+   player profile at /coc/player/<TAG> and the clan page at /coc/clan/<TAG>. Data comes from /api/coc (the Netlify
    function netlify/functions/coc-api.mjs, which holds the API key); icons and
    unit groups come from coc-army-data.json, the army maker's data.
 
    GitHub Pages can't run that function or the /coc/player/<TAG> rewrite, so
    there the page calls the Netlify test site directly and profiles use
-   /coc/player/?tag=<TAG>. Plan: docs/player-tracker-plan.md. */
+   /coc/player/?tag=<TAG> (clans: /coc/clan/?tag=<TAG>). Plan: docs/player-tracker-plan.md. */
 (function () {
   'use strict';
 
@@ -27,6 +27,20 @@
   function playerHref(tag) {
     return ON_PAGES ? '/coc/player/?tag=' + tag : '/coc/player/' + tag;
   }
+  function clanHref(tag) {
+    return ON_PAGES ? '/coc/clan/?tag=' + tag : '/coc/clan/' + tag;
+  }
+
+  // GET /api/coc?<query>; rejects with Error('notFound' | 'maintenance' |
+  // 'private' | 'other').
+  function api(query) {
+    return fetch(API + '?' + query).then(function (res) {
+      return res.json().then(function (body) {
+        if (!res.ok) throw new Error(['notFound', 'maintenance', 'private'].indexOf(body.error) !== -1 ? body.error : 'other');
+        return body;
+      });
+    });
+  }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -45,6 +59,8 @@
       return [];
     }
   }
+  // Entries: { kind: 'player' | 'clan', tag, name, icon, th }. Entries saved
+  // before clans existed have no kind and are players.
   function saveRecent(p) {
     var list = readRecent().filter(function (r) {
       return r.tag !== p.tag;
@@ -63,50 +79,157 @@
     return th >= 4 ? '/icons/th' + th + 'icon.webp' : '';
   }
 
+  // Error text per page kind. maintenance / other read the same for both.
   var MESSAGES = {
-    badTag: 'That isn&rsquo;t a player tag. Tags start with # and only use the characters 0 2 8 9 P Y L Q G R J C U V.',
-    notFound: 'No player has this tag. Copy it from the in-game profile and try again.',
-    maintenance: 'Clash of Clans is in maintenance, so player data is unavailable. Try again when the game is back.',
-    other: 'The player couldn&rsquo;t be loaded. Check your connection and try again.',
+    player: {
+      badTag: 'That isn&rsquo;t a player tag. Tags start with # and only use the characters 0 2 8 9 P Y L Q G R J C U V.',
+      notFound: 'No player has this tag. Copy it from the in-game profile and try again.',
+    },
+    clan: {
+      badTag: 'That isn&rsquo;t a clan tag. Tags start with # and only use the characters 0 2 8 9 P Y L Q G R J C U V.',
+      notFound: 'No clan has this tag. Copy it from the clan&rsquo;s in-game profile and try again.',
+    },
+    maintenance: 'Clash of Clans is in maintenance, so its data is unavailable. Try again when the game is back.',
+    other: 'This couldn&rsquo;t be loaded. Check your connection and try again.',
   };
+  function message(what, kind) {
+    return MESSAGES[what][kind] || MESSAGES[kind] || MESSAGES.other;
+  }
 
   /* ---------------------------------------------------------------- search */
+  // Two modes, switched by the Player / Clan control above the field:
+  // - player: a tag -> /coc/player/<TAG>
+  // - clan: "#TAG" -> /coc/clan/<TAG>; anything else is a clan-name search
+  //   (3+ characters), listed under the field. A name search that finds
+  //   nothing but is a valid tag goes to that clan.
   function initSearch(form) {
     var input = form.querySelector('input');
+    var hash = form.querySelector('.pt-field-hash');
+    var label = form.querySelector('label');
     var msg = document.getElementById('ptSearchMsg');
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var tag = cleanTag(input.value);
-      if (!tag) {
-        msg.innerHTML = MESSAGES.badTag;
-        msg.hidden = false;
-        input.setAttribute('aria-invalid', 'true');
+    var results = document.getElementById('ptResults');
+    var modes = [].slice.call(document.querySelectorAll('.pt-mode [role=radio]'));
+    var mode = 'player';
+
+    function setMode(m) {
+      mode = m;
+      modes.forEach(function (b) {
+        var on = b.dataset.mode === m;
+        b.setAttribute('aria-checked', on);
+        b.tabIndex = on ? 0 : -1;
+      });
+      hash.hidden = m === 'clan';
+      form.classList.toggle('is-clan', m === 'clan');
+      input.placeholder = m === 'clan' ? 'Clan name or #tag' : 'Player tag';
+      label.textContent = m === 'clan' ? 'Clan name or tag' : 'Player tag';
+      clearMsg();
+      results.hidden = true;
+    }
+    modes.forEach(function (b, i) {
+      b.addEventListener('click', function () {
+        setMode(b.dataset.mode);
         input.focus();
-        return;
-      }
-      location.href = playerHref(tag);
+      });
+      b.addEventListener('keydown', function (e) {
+        var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (!step) return;
+        e.preventDefault();
+        var next = modes[(i + step + modes.length) % modes.length];
+        setMode(next.dataset.mode);
+        next.focus();
+      });
     });
-    input.addEventListener('input', function () {
+
+    function showMsg(html) {
+      msg.innerHTML = html;
+      msg.hidden = false;
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+    }
+    function clearMsg() {
       msg.hidden = true;
       input.removeAttribute('aria-invalid');
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var raw = input.value.trim();
+      if (mode === 'player') {
+        var tag = cleanTag(raw);
+        if (tag) location.href = playerHref(tag);
+        else showMsg(message('player', 'badTag'));
+        return;
+      }
+      if (raw.charAt(0) === '#') {
+        var ctag = cleanTag(raw);
+        if (ctag) location.href = clanHref(ctag);
+        else showMsg(message('clan', 'badTag'));
+        return;
+      }
+      if (raw.length < 3) return showMsg('Type at least 3 letters of the clan name, or its tag starting with #.');
+      searchClans(raw);
     });
+    input.addEventListener('input', clearMsg);
+
+    function searchClans(name) {
+      results.hidden = false;
+      results.innerHTML = '<li class="pt-results-note" role="status">Searching&hellip;</li>';
+      api('type=clansearch&name=' + encodeURIComponent(name))
+        .then(function (body) {
+          var items = body.items || [];
+          var asTag = cleanTag(name);
+          if (!items.length && asTag) {
+            location.href = clanHref(asTag);
+            return;
+          }
+          if (!items.length) {
+            results.innerHTML = '<li class="pt-results-note">No clans found with that name.</li>';
+            return;
+          }
+          results.innerHTML = items
+            .map(function (c) {
+              return (
+                '<li><a class="pt-result" href="' +
+                clanHref(c.tag.slice(1)) +
+                '"><img src="' +
+                c.badgeUrls.small +
+                '" alt="" width="40" height="40" loading="lazy" /><span class="pt-result-main"><b>' +
+                esc(c.name) +
+                '</b><span>#' +
+                c.tag.slice(1) +
+                (c.location ? ' &middot; ' + esc(c.location.name) : '') +
+                '</span></span><span class="pt-result-meta"><b>Level ' +
+                c.clanLevel +
+                '</b><span>' +
+                c.members +
+                '/50 members</span></span></a></li>'
+              );
+            })
+            .join('');
+        })
+        .catch(function (err) {
+          results.innerHTML = '<li class="pt-results-note">' + message('clan', err.message) + '</li>';
+        });
+    }
 
     var box = document.getElementById('ptRecent');
     var recent = readRecent();
     if (!box || !recent.length) return;
     box.querySelector('ul').innerHTML = recent
       .map(function (r) {
-        var icon = r.icon;
+        var clan = r.kind === 'clan';
         return (
           '<li><a class="pt-recent-row" href="' +
-          playerHref(r.tag) +
+          (clan ? clanHref(r.tag) : playerHref(r.tag)) +
           '">' +
-          (icon
-            ? '<img src="' + icon + '" alt="" width="36" height="36" loading="lazy" />'
+          (r.icon
+            ? '<img src="' + r.icon + '" alt="" width="36" height="36" loading="lazy" />'
             : '<span class="pt-recent-th">TH' + r.th + '</span>') +
           '<span class="pt-recent-name">' +
           esc(r.name) +
-          '</span>' +
+          '<i>' +
+          (clan ? 'Clan' : 'Player') +
+          '</i></span>' +
           '<span class="pt-recent-tag">#' +
           r.tag +
           '</span></a></li>'
@@ -303,9 +426,11 @@
     var clan = p.clan
       ? '<p class="pt-clan"><img src="' +
         p.clan.badgeUrls.small +
-        '" alt="" width="28" height="28" /><span><b>' +
+        '" alt="" width="28" height="28" /><span><a class="pt-clan-link" href="' +
+        clanHref(p.clan.tag.slice(1)) +
+        '">' +
         esc(p.clan.name) +
-        '</b> ' +
+        '</a> ' +
         esc(roleName(p.role)) +
         ' &middot; #' +
         p.clan.tag.slice(1) +
@@ -439,6 +564,10 @@
       '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. A red level means that unit is at the game&rsquo;s max level.</p>';
 
     wireTabs(root);
+    wireCopy(root);
+  }
+
+  function wireCopy(root) {
     root.querySelector('.pt-copy').addEventListener('click', function (e) {
       var btn = e.currentTarget;
       if (!navigator.clipboard) return;
@@ -479,26 +608,34 @@
     });
   }
 
-  function showState(root, kind, tag) {
+  // Error panel for the profile and clan pages. what: 'player' | 'clan'.
+  function showState(root, what, kind, retry) {
+    var noun = what === 'clan' ? 'Clan' : 'Player';
     root.innerHTML =
       '<section class="th-soon pt-state" role="alert"><h1 class="th-soon-title">' +
       (kind === 'notFound'
-        ? 'Player <em>not found</em>'
+        ? noun + ' <em>not found</em>'
         : kind === 'badTag'
-          ? 'Not a <em>player tag</em>'
+          ? 'Not a <em>' + noun.toLowerCase() + ' tag</em>'
           : 'Couldn&rsquo;t <em>load</em>') +
       '</h1><p class="th-soon-text">' +
-      MESSAGES[kind] +
+      message(what, kind) +
       '</p><div class="th-soon-actions">' +
-      (kind === 'other' || kind === 'maintenance'
+      (retry && (kind === 'other' || kind === 'maintenance')
         ? '<button type="button" class="th-soon-btn th-soon-btn--primary" data-retry>Try again</button>'
         : '') +
-      '<a class="th-soon-btn" href="/coc/tools/player-tracker">Search another tag</a></div></section>';
-    var retry = root.querySelector('[data-retry]');
-    if (retry)
-      retry.addEventListener('click', function () {
-        loadProfile(root, tag);
-      });
+      '<a class="th-soon-btn" href="/coc/tools/player-tracker">Search again</a></div></section>';
+    var btn = root.querySelector('[data-retry]');
+    if (btn) btn.addEventListener('click', retry);
+  }
+
+  // The tag in /coc/<player|clan>/<TAG> (or ?tag= on GitHub Pages), cleaned;
+  // tidies the address so shared links all look the same.
+  function tagFromAddress(what) {
+    var m = location.pathname.match(new RegExp('/coc/' + what + '/([^/]+)'));
+    var tag = cleanTag(m ? decodeURIComponent(m[1]) : new URLSearchParams(location.search).get('tag'));
+    if (tag && m && m[1] !== tag) history.replaceState(null, '', (what === 'clan' ? clanHref : playerHref)(tag) + location.hash);
+    return tag;
   }
 
   var armyData = null;
@@ -509,37 +646,334 @@
       fetch('/coc-army-data.json').then(function (r) {
         return r.json();
       });
-    Promise.all([fetch(API + '?type=player&tag=' + tag), armyData])
-      .then(function (res) {
-        return res[0].json().then(function (body) {
-          if (!res[0].ok) throw new Error(body.error === 'notFound' || body.error === 'maintenance' ? body.error : 'other');
-          return [body, res[1]];
-        });
-      })
+    Promise.all([api('type=player&tag=' + tag), armyData])
       .then(function (r) {
         var p = r[0];
         document.title = p.name + ' (TH' + p.townHallLevel + ') | Player Tracker | Parchrome';
         renderProfile(p, r[1], root);
-        saveRecent({ tag: tag, name: p.name, th: p.townHallLevel, icon: thIcon(p.townHallLevel, r[1]) });
+        saveRecent({ kind: 'player', tag: tag, name: p.name, th: p.townHallLevel, icon: thIcon(p.townHallLevel, r[1]) });
       })
       .catch(function (err) {
         armyData = null; // a failed JSON load gets another go on retry
-        showState(root, MESSAGES[err.message] ? err.message : 'other', tag);
+        showState(root, 'player', err.message, function () {
+          loadProfile(root, tag);
+        });
       });
   }
 
   function initProfile(root) {
-    var m = location.pathname.match(/\/coc\/player\/([^/]+)/);
-    var raw = m ? decodeURIComponent(m[1]) : new URLSearchParams(location.search).get('tag');
-    var tag = cleanTag(raw);
-    if (!tag) return showState(root, 'badTag');
-    // "/coc/player/%239l9glqlj" -> "/coc/player/9L9GLQLJ", so shared links all look the same
-    if (m && m[1] !== tag) history.replaceState(null, '', playerHref(tag) + location.hash);
+    var tag = tagFromAddress('player');
+    if (!tag) return showState(root, 'player', 'badTag');
     loadProfile(root, tag);
+  }
+
+  /* ------------------------------------------------------------------ clan */
+  var CLAN_TYPE = { open: 'Anyone can join', inviteOnly: 'Invite only', closed: 'Closed' };
+  var WAR_FREQ = {
+    always: 'Always',
+    moreThanOncePerWeek: 'Twice a week',
+    oncePerWeek: 'Once a week',
+    lessThanOncePerWeek: 'Rarely',
+    never: 'Never',
+    unknown: 'Not set',
+  };
+
+  // Members table columns: [key, heading, value to sort by, cell html].
+  var MEMBER_COLS = [
+    [
+      'rank',
+      '#',
+      function (m) {
+        return m.clanRank;
+      },
+      function (m) {
+        return m.clanRank;
+      },
+    ],
+    [
+      'name',
+      'Player',
+      function (m) {
+        return m.name.toLowerCase();
+      },
+      function (m) {
+        return '<a href="' + playerHref(m.tag.slice(1)) + '">' + esc(m.name) + '</a><span>' + roleName(m.role) + '</span>';
+      },
+    ],
+    [
+      'th',
+      'TH',
+      function (m) {
+        return m.townHallLevel;
+      },
+      function (m, data) {
+        var icon = thIcon(m.townHallLevel, data);
+        return (icon ? '<img src="' + icon + '" alt="" width="26" height="26" loading="lazy" />' : '') + '<b>' + m.townHallLevel + '</b>';
+      },
+    ],
+    [
+      'trophies',
+      'Trophies',
+      function (m) {
+        return m.trophies;
+      },
+      function (m) {
+        return num(m.trophies);
+      },
+    ],
+    [
+      'donated',
+      'Donated',
+      function (m) {
+        return m.donations;
+      },
+      function (m) {
+        return num(m.donations);
+      },
+    ],
+    [
+      'received',
+      'Received',
+      function (m) {
+        return m.donationsReceived;
+      },
+      function (m) {
+        return num(m.donationsReceived);
+      },
+    ],
+  ];
+
+  function memberRows(members, data) {
+    return members
+      .map(function (m) {
+        return (
+          '<tr>' +
+          MEMBER_COLS.map(function (c) {
+            return '<td class="pt-col-' + c[0] + '">' + c[3](m, data) + '</td>';
+          }).join('') +
+          '</tr>'
+        );
+      })
+      .join('');
+  }
+  function membersTable(members, data) {
+    return (
+      '<div class="pt-table-wrap"><table class="pt-table"><thead><tr>' +
+      MEMBER_COLS.map(function (c) {
+        return (
+          '<th scope="col" class="pt-col-' +
+          c[0] +
+          '"' +
+          (c[0] === 'rank' ? ' aria-sort="ascending"' : '') +
+          '><button type="button" data-sort="' +
+          c[0] +
+          '">' +
+          c[1] +
+          '</button></th>'
+        );
+      }).join('') +
+      '</tr></thead><tbody>' +
+      memberRows(members, data) +
+      '</tbody></table></div>'
+    );
+  }
+  // Click a heading to sort by it, again to flip. Rank and names sort up
+  // first, numbers down (most trophies first). Ties keep clan rank order.
+  function wireSort(root, members, data) {
+    var table = root.querySelector('.pt-table');
+    var by = 'rank';
+    var dir = 1;
+    table.querySelector('thead').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-sort]');
+      if (!btn) return;
+      var col = MEMBER_COLS.filter(function (c) {
+        return c[0] === btn.dataset.sort;
+      })[0];
+      dir = by === col[0] ? -dir : col[0] === 'rank' || col[0] === 'name' ? 1 : -1;
+      by = col[0];
+      var sorted = members.slice().sort(function (a, b) {
+        var x = col[2](a);
+        var y = col[2](b);
+        return x < y ? -dir : x > y ? dir : a.clanRank - b.clanRank;
+      });
+      table.querySelector('tbody').innerHTML = memberRows(sorted, data);
+      table.querySelectorAll('th').forEach(function (th) {
+        th.removeAttribute('aria-sort');
+      });
+      btn.parentNode.setAttribute('aria-sort', dir === 1 ? 'ascending' : 'descending');
+    });
+  }
+
+  // log: the war list, 'private', or null when it couldn't be loaded.
+  function warLog(log) {
+    if (log === 'private') return '<p class="pt-empty">This clan keeps its war log private, so its past wars can&rsquo;t be shown.</p>';
+    if (!log) return '<p class="pt-empty">The war log couldn&rsquo;t be loaded. Reload the page to try again.</p>';
+    if (!log.length) return '<p class="pt-empty">This clan hasn&rsquo;t finished a war yet.</p>';
+    return (
+      '<ul class="pt-wars">' +
+      log
+        .map(function (w) {
+          var cwl = !w.result; // Clan War League weeks come without a result or an opponent
+          var res = cwl ? 'cwl' : w.result;
+          var day = /^(\d{4})(\d{2})(\d{2})/.exec(w.endTime || '');
+          var date = day ? new Date(Date.UTC(+day[1], +day[2] - 1, +day[3], 12)) : null;
+          return (
+            '<li class="pt-war is-' +
+            res +
+            '"><span class="pt-war-res">' +
+            { win: 'Win', lose: 'Loss', tie: 'Draw', cwl: 'CWL' }[res] +
+            '</span><span class="pt-war-opp">' +
+            (cwl
+              ? '<span><b>Clan War League</b><span>' + w.teamSize + ' v ' + w.teamSize + '</span></span>'
+              : '<img src="' +
+                w.opponent.badgeUrls.small +
+                '" alt="" width="32" height="32" loading="lazy" /><span><b>' +
+                esc(w.opponent.name) +
+                '</b><span>' +
+                w.teamSize +
+                ' v ' +
+                w.teamSize +
+                '</span></span>') +
+            '</span><span class="pt-war-score"><b>' +
+            w.clan.stars +
+            (cwl ? '' : ' <i>&ndash;</i> ' + w.opponent.stars) +
+            '</b><span>' +
+            (cwl ? 'stars' : w.clan.destructionPercentage.toFixed(1) + '% &ndash; ' + w.opponent.destructionPercentage.toFixed(1) + '%') +
+            '</span></span>' +
+            (date
+              ? '<time class="pt-war-date" datetime="' +
+                date.toISOString().slice(0, 10) +
+                '">' +
+                date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
+                '</time>'
+              : '') +
+            '</li>'
+          );
+        })
+        .join('') +
+      '</ul>'
+    );
+  }
+
+  function renderClan(c, log, data, root) {
+    var tag = c.tag.slice(1);
+    var members = (c.memberList || []).slice().sort(function (a, b) {
+      return a.clanRank - b.clanRank;
+    });
+    var labels = (c.labels || [])
+      .map(function (l) {
+        return '<img src="' + l.iconUrls.small + '" alt="' + esc(l.name) + '" title="' + esc(l.name) + '" width="28" height="28" />';
+      })
+      .join('');
+    // Ties and losses only come with a public war log.
+    var full = c.warLosses != null;
+    var where = [c.location && esc(c.location.name), c.chatLanguage && esc(c.chatLanguage.name), CLAN_TYPE[c.type]]
+      .filter(Boolean)
+      .join(' &middot; ');
+    var league = c.warLeague && c.warLeague.id !== 48000000 ? c.warLeague : null; // 48000000 = "Unranked"
+
+    root.innerHTML =
+      '<header class="pt-head pt-head--clan">' +
+      '<div class="pt-th"><img src="' +
+      c.badgeUrls.large +
+      '" alt="" width="88" height="88" /><span>Level ' +
+      c.clanLevel +
+      '</span></div>' +
+      '<div class="pt-id"><h1 class="pt-name">' +
+      esc(c.name) +
+      '</h1>' +
+      '<p class="pt-tagline"><span>#' +
+      tag +
+      '</span><button type="button" class="pt-copy" data-copy="#' +
+      tag +
+      '">Copy tag</button>' +
+      (labels ? '<span class="pt-labels">' + labels + '</span>' : '') +
+      '</p>' +
+      (where ? '<p class="pt-clan">' + where + '</p>' : '') +
+      '</div>' +
+      (league ? '<div class="pt-league"><span>' + esc(league.name) + '</span><i>War league</i></div>' : '') +
+      (c.description ? '<p class="pt-desc">' + esc(c.description) + '</p>' : '') +
+      '<div class="pt-head-facts">' +
+      facts('Clan', [
+        ['Members', c.members + '<i>/50</i>'],
+        ['Clan points', num(c.clanPoints)],
+        ['Capital Hall', c.clanCapital && c.clanCapital.capitalHallLevel ? c.clanCapital.capitalHallLevel : '&ndash;'],
+        ['Capital league', c.capitalLeague ? esc(c.capitalLeague.name) : '&ndash;'],
+      ]) +
+      facts(
+        'War',
+        [
+          ['Wars won', num(c.warWins)],
+          full ? ['Drawn', num(c.warTies)] : null,
+          full ? ['Lost', num(c.warLosses)] : null,
+          ['Win streak', num(c.warWinStreak)],
+          ['Wars', WAR_FREQ[c.warFrequency] || 'Not set'],
+        ].filter(Boolean),
+      ) +
+      facts('To join', [
+        ['Town Hall', c.requiredTownhallLevel ? c.requiredTownhallLevel + '<i>+</i>' : 'Any'],
+        ['Trophies', num(c.requiredTrophies)],
+        ['Builder trophies', num(c.requiredBuilderBaseTrophies)],
+      ]) +
+      '</div></header>' +
+      '<div class="pt-tabs" role="tablist" aria-label="Clan sections">' +
+      '<button type="button" role="tab" id="ptTabMembers" aria-controls="ptPanelMembers" aria-selected="true">Members</button>' +
+      '<button type="button" role="tab" id="ptTabWars" aria-controls="ptPanelWars" aria-selected="false" tabindex="-1">War log</button>' +
+      '</div>' +
+      '<div class="pt-panel" id="ptPanelMembers" role="tabpanel" aria-labelledby="ptTabMembers">' +
+      (members.length ? membersTable(members, data) : '<p class="pt-empty">This clan has no members.</p>') +
+      '</div>' +
+      '<div class="pt-panel" id="ptPanelWars" role="tabpanel" aria-labelledby="ptTabWars" hidden>' +
+      warLog(log) +
+      '</div>' +
+      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes. Donations count this season only. Tap a heading to sort the members.</p>';
+
+    wireTabs(root);
+    wireCopy(root);
+    if (members.length) wireSort(root, members, data);
+  }
+
+  function loadClan(root, tag) {
+    root.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading #' + tag + '&hellip;</div>';
+    armyData =
+      armyData ||
+      fetch('/coc-army-data.json').then(function (r) {
+        return r.json();
+      });
+    // The war log can fail on its own (private, or a hiccup) without taking the page down.
+    var log = api('type=warlog&tag=' + tag).then(
+      function (b) {
+        return b.items || [];
+      },
+      function (err) {
+        return err.message === 'private' ? 'private' : null;
+      },
+    );
+    Promise.all([api('type=clan&tag=' + tag), log, armyData])
+      .then(function (r) {
+        var c = r[0];
+        document.title = c.name + ' (clan) | Player Tracker | Parchrome';
+        renderClan(c, r[1], r[2], root);
+        saveRecent({ kind: 'clan', tag: tag, name: c.name, icon: c.badgeUrls.small });
+      })
+      .catch(function (err) {
+        armyData = null;
+        showState(root, 'clan', err.message, function () {
+          loadClan(root, tag);
+        });
+      });
+  }
+
+  function initClan(root) {
+    var tag = tagFromAddress('clan');
+    if (!tag) return showState(root, 'clan', 'badTag');
+    loadClan(root, tag);
   }
 
   var form = document.getElementById('ptSearch');
   if (form) initSearch(form);
   var root = document.getElementById('ptProfile');
   if (root) initProfile(root);
+  var clanRoot = document.getElementById('ptClan');
+  if (clanRoot) initClan(clanRoot);
 })();

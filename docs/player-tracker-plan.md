@@ -72,9 +72,10 @@ because tracking just started ("recording since <date>").
 
 ## Build order
 
-0. `coc-api` function + CORS + rewrites; new Firebase project.
-1. Hub + player profile (live).
-2. Clan page + clan name search (live).
+0. `coc-api` function + CORS + rewrites (done Oct 5; Firebase project still to make).
+1. Hub + player profile (live) -- done Oct 5.
+2. Clan page + clan name search (live) -- done Oct 5: /coc/clan/<TAG>, members table
+   (sortable), war log (or "private"), Player / Clan switch on the hub.
 3. War report: current war + CWL (live).
 4. Tracking: Track button, poller, History tabs.
 5. Leaderboards, Compare, Rushed % checker, layout/army suggestions.

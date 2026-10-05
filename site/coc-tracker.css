@@ -649,8 +649,423 @@
   margin: 20px 0 8px;
 }
 
+/* ---- Search: Player / Clan switch and clan results -------------------- */
+.pt-mode {
+  display: inline-flex;
+  gap: 2px;
+  margin-top: 24px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #0b0c0e;
+  border: 1px solid #2a2c30;
+}
+.pt-mode button {
+  min-width: 96px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: #8d929a;
+  font:
+    800 11.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.pt-mode button:hover {
+  color: #e9eaed;
+}
+.pt-mode button[aria-checked='true'] {
+  background: linear-gradient(180deg, #2c2e35, #1f2126);
+  color: #f2f3f5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.pt-mode button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.pt-mode + .pt-form {
+  margin-top: 14px;
+}
+.pt-form.is-clan .pt-field input {
+  padding-left: 16px;
+  text-transform: none;
+  letter-spacing: 0.3px;
+}
+
+.pt-results {
+  list-style: none;
+  max-width: 540px;
+  max-height: 420px;
+  overflow-y: auto;
+  margin: 14px auto 0;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid #23252a;
+  background: #0d0e10;
+  text-align: left;
+}
+.pt-results-note {
+  padding: 14px;
+  font:
+    400 13px 'Sora',
+    sans-serif;
+  color: #9ea3ab;
+}
+.pt-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #e9eaed;
+  text-decoration: none;
+}
+.pt-result:hover,
+.pt-result:focus-visible {
+  background: #1b1d22;
+  outline: none;
+}
+.pt-result img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.pt-result-main,
+.pt-result-meta {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.pt-result-main {
+  flex: 1;
+}
+.pt-result-main b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font:
+    600 14px 'Sora',
+    sans-serif;
+}
+.pt-result-main span,
+.pt-result-meta span {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #7c818a;
+}
+.pt-result-meta {
+  text-align: right;
+}
+.pt-result-meta b {
+  font:
+    700 13px 'Oxanium',
+    sans-serif;
+  color: #c9ccd2;
+}
+.pt-recent-name i {
+  margin-left: 8px;
+  font:
+    700 10px 'Oxanium',
+    sans-serif;
+  font-style: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #6d7178;
+}
+
+/* ---- Clan page --------------------------------------------------------- */
+.pt-clan-link {
+  color: #f2f3f5;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(224, 99, 99, 0.5);
+}
+.pt-clan-link:hover {
+  border-bottom-color: #e06363;
+}
+.pt-head--clan .pt-th img {
+  width: 80px;
+  height: 80px;
+}
+.pt-league i {
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: #7c818a;
+}
+/* the clan description sits between the name row and the numbers */
+.pt-head.pt-head--clan {
+  grid-template-areas:
+    'th id league'
+    'desc desc desc'
+    'facts facts facts';
+}
+.pt-desc {
+  grid-area: desc;
+  max-width: 80ch;
+  margin: 0;
+  font:
+    400 13.5px/1.65 'Sora',
+    sans-serif;
+  color: #a9aeb6;
+  overflow-wrap: anywhere;
+}
+.pt-facts dd i {
+  font-style: normal;
+  color: #7c818a;
+}
+
+/* members: a sortable table; the name links to the player's profile */
+.pt-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #121316;
+}
+.pt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font:
+    400 14px 'Sora',
+    sans-serif;
+  color: #c9ccd2;
+}
+.pt-table th {
+  padding: 0;
+  background: #16171b;
+  border-bottom: 1px solid #2a2c30;
+  text-align: right;
+}
+.pt-table th button {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: #8d929a;
+  font:
+    800 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  text-align: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.pt-table th button:hover {
+  color: #e9eaed;
+}
+.pt-table th[aria-sort] button {
+  color: #f2f3f5;
+}
+.pt-table th[aria-sort] button::after {
+  content: '';
+  display: inline-block;
+  margin-left: 6px;
+  border: 4px solid transparent;
+  vertical-align: 1px;
+}
+.pt-table th[aria-sort='ascending'] button::after {
+  border-bottom-color: #e06363;
+  border-top-width: 0;
+}
+.pt-table th[aria-sort='descending'] button::after {
+  border-top-color: #e06363;
+  border-bottom-width: 0;
+}
+.pt-table th button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: -2px;
+}
+.pt-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid #1d1f23;
+  text-align: right;
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pt-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.pt-table tbody tr:hover td {
+  background: #17181c;
+}
+.pt-table .pt-col-rank {
+  width: 1%;
+  color: #6d7178;
+}
+.pt-table .pt-col-name {
+  width: 100%;
+  text-align: left;
+}
+.pt-table td.pt-col-name {
+  font-family: 'Sora', sans-serif;
+  white-space: normal;
+}
+.pt-table td.pt-col-name a {
+  color: #f2f3f5;
+  font-weight: 600;
+  text-decoration: none;
+}
+.pt-table td.pt-col-name a:hover {
+  text-decoration: underline;
+  text-decoration-color: #e06363;
+  text-underline-offset: 3px;
+}
+.pt-table td.pt-col-name span {
+  display: block;
+  font:
+    600 11px 'Oxanium',
+    sans-serif;
+  color: #7c818a;
+}
+.pt-table td.pt-col-th {
+  color: #e9eaed;
+}
+.pt-table td.pt-col-th img {
+  width: 26px;
+  height: 26px;
+  margin-right: 6px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+/* war log */
+.pt-wars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #121316;
+}
+.pt-war {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto 64px;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #1d1f23;
+}
+.pt-war:last-child {
+  border-bottom: 0;
+}
+.pt-war-res {
+  justify-self: start;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font:
+    800 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: #23252a;
+  color: #c9ccd2;
+}
+.pt-war.is-win .pt-war-res {
+  background: rgba(194, 59, 59, 0.18);
+  color: #f08a8a;
+}
+.pt-war.is-lose .pt-war-res {
+  background: #1a1b1f;
+  color: #7c818a;
+}
+.pt-war-opp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.pt-war-opp img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+.pt-war-opp > span {
+  display: grid;
+  min-width: 0;
+}
+.pt-war-opp b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font:
+    600 14px 'Sora',
+    sans-serif;
+  color: #e9eaed;
+}
+.pt-war-opp span span,
+.pt-war-score span {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #7c818a;
+}
+.pt-war-score {
+  display: grid;
+  text-align: right;
+}
+.pt-war-score b {
+  font:
+    700 16px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+.pt-war-score i {
+  font-style: normal;
+  color: #6d7178;
+}
+.pt-war-date {
+  text-align: right;
+  font:
+    600 12px 'Oxanium',
+    sans-serif;
+  color: #7c818a;
+}
+
 /* ---- Phones ----------------------------------------------------------- */
 @media (max-width: 970px) {
+  .pt-head.pt-head--clan {
+    grid-template-areas:
+      'th id'
+      'league league'
+      'desc desc'
+      'facts facts';
+  }
+  .pt-mode {
+    display: flex;
+  }
+  .pt-mode button {
+    flex: 1;
+    min-width: 0;
+  }
+  .pt-table {
+    font-size: 13px;
+  }
+  .pt-table th button,
+  .pt-table td {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .pt-table td.pt-col-th img {
+    display: none;
+  }
+  .pt-war {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .pt-war-date {
+    display: none;
+  }
   .pt-search {
     margin-top: 20px;
     padding: 32px 18px 22px;
