@@ -27,9 +27,11 @@
    Markup contract: any element with data-event="<id>" is a row.
    Inside it, [data-timer] gets the countdown, [data-label] gets
    "Time Left:" / "Starts in:", and (season only) [data-name]
-   gets "<Month> Battle Pass". Two opt-in variants for tight
-   layouts: data-name="short" abbreviates the month, and
-   data-label="bare" drops the label's trailing colon.
+   gets "<Month> Battle Pass". Opt-in variants: data-name="short"
+   abbreviates the month, data-label="bare" drops the label's
+   trailing colon, data-label="phrase" reads as plain words
+   ("Ends in" instead of "Time Left:"), and data-timer="long"
+   spells the units out ("2 days 4 hours" instead of "2d 4h").
    ============================================================ */
 
 (function () {
@@ -61,6 +63,19 @@
     const mins = totalMin % 60;
     if (days > 0) return [[days, 'd'], [hours, 'h']];
     return [[hours, 'h'], [mins, 'm']];
+  }
+
+  // "2 days 4 hours" / "4 hours 12 mins" / "12 mins".
+  function durationLong(ms) {
+    if (ms < 0) ms = 0;
+    const totalMin = Math.floor(ms / 60000);
+    const days = Math.floor(totalMin / 1440);
+    const hours = Math.floor((totalMin % 1440) / 60);
+    const mins = totalMin % 60;
+    const unit = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
+    if (days > 0) return unit(days, 'day') + ' ' + unit(hours, 'hour');
+    if (hours > 0) return unit(hours, 'hour') + ' ' + unit(mins, 'min');
+    return unit(mins, 'min');
   }
 
   // Most recent occurrence of a given UTC weekday+hour that is <= now
@@ -195,12 +210,15 @@
         // in front of the countdown. /coc/ puts them after it, where
         // a trailing colon would dangle -- data-label="bare" drops it.
         const text = result.active ? labelSet.active : labelSet.upcoming;
-        labelEl.textContent = labelEl.getAttribute('data-label') === 'bare'
-          ? text.replace(/:$/, '')
-          : text;
+        const mode = labelEl.getAttribute('data-label');
+        labelEl.textContent = mode === 'phrase'
+          ? text.replace('Time Left:', 'Ends in').replace(/:$/, '')
+          : mode === 'bare' ? text.replace(/:$/, '') : text;
       }
 
-      if (timerEl) {
+      if (timerEl && timerEl.getAttribute('data-timer') === 'long') {
+        timerEl.textContent = durationLong(result.target - now);
+      } else if (timerEl) {
         // Built as nodes, not a string, so the unit letters land in their
         // own <span>. An unstyled <span> renders as plain text, so pages
         // that don't target it look exactly as they did before.

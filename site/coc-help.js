@@ -51,7 +51,7 @@
       '</ul>' +
       // Not a support line: an optional invite, set apart from the fixes.
       '<div class="cch-clan">' +
-      '<span class="cch-logo" aria-hidden="true"><img src="/icons/aclogonobg-cropped.png" alt="" /></span>' +
+      '<span class="cch-logo" aria-hidden="true"><img src="/icons/aclogonobg-cropped.webp" alt="" /></span>' +
       '<div><h4>Join our clan</h4>' +
       '<p>Looking for people to war and raid with? Ascendere&rsquo;s Global Chat is open to everyone.</p></div>' +
       '</div>' +

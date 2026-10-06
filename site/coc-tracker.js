@@ -71,12 +71,91 @@
     } catch (e) {}
   }
 
+  // Shown under the search, headed "Featured", until this device has opened
+  // a player or clan (then it's the real "Recently viewed" list). Badge
+  // links come from the API; if a clan changes its badge, update them here.
+  var FEATURED = [
+    {
+      kind: 'clan',
+      tag: '2GYPGPJP9',
+      name: 'ASCENDERE',
+      icon: 'https://api-assets.clashofclans.com/badges/70/hoeu9IEsBCOUOoPkJ6jquo0mG3J8ls4l7zA1wt0AjEA.png',
+    },
+    { kind: 'player', tag: 'LL9PUCG8V', name: 'Wild_Parkour', icon: '/icons/th18icon.png' },
+    {
+      kind: 'clan',
+      tag: 'YJ9Q9YY0',
+      name: 'LIBRA',
+      icon: 'https://api-assets.clashofclans.com/badges/70/Im4DlsayRpIdshkgZm9GCV7o2-SRyywwyYPwZxy-a8c.png',
+    },
+  ];
+
+  // Result rows, shared by the search page and the slim bar's dropdown.
+  function recentRow(r) {
+    var clan = r.kind === 'clan';
+    return (
+      '<li><a class="pt-recent-row" href="' +
+      (clan ? clanHref(r.tag) : playerHref(r.tag)) +
+      '">' +
+      (r.icon
+        ? '<img src="' + r.icon + '" alt="" width="36" height="36" loading="lazy" />'
+        : '<span class="pt-recent-th">TH' + r.th + '</span>') +
+      '<span class="pt-recent-name">' +
+      esc(r.name) +
+      '<i>' +
+      (clan ? 'Clan' : 'Player') +
+      '</i></span>' +
+      '<span class="pt-recent-tag">#' +
+      r.tag +
+      '</span></a></li>'
+    );
+  }
+  function clanResult(c) {
+    return (
+      '<li><a class="pt-result" href="' +
+      clanHref(c.tag.slice(1)) +
+      '"><img src="' +
+      c.badgeUrls.small +
+      '" alt="" width="40" height="40" loading="lazy" /><span class="pt-result-main"><b>' +
+      esc(c.name) +
+      '</b><span>#' +
+      c.tag.slice(1) +
+      (c.location ? ' &middot; ' + esc(c.location.name) : '') +
+      '</span></span><span class="pt-result-meta"><b>Level ' +
+      c.clanLevel +
+      '</b><span>' +
+      c.members +
+      '/50 members</span></span></a></li>'
+    );
+  }
+  function playerResult(p) {
+    var th = p.townHallLevel;
+    var icon = thIcon(th);
+    var league = p.leagueTier || p.league;
+    return (
+      '<li><a class="pt-result" href="' +
+      playerHref(p.tag.slice(1)) +
+      '">' +
+      (icon ? '<img src="' + icon + '" alt="" width="40" height="40" />' : '<span class="pt-recent-th">TH' + th + '</span>') +
+      '<span class="pt-result-main"><b>' +
+      esc(p.name) +
+      '</b><span>#' +
+      p.tag.slice(1) +
+      (p.clan ? ' &middot; ' + esc(p.clan.name) : ' &middot; Not in a clan') +
+      '</span></span><span class="pt-result-meta"><b>' +
+      num(p.trophies) +
+      '</b><span>' +
+      (league ? esc(league.name) : 'Trophies') +
+      '</span></span></a></li>'
+    );
+  }
+
   // Town Hall art: coc-army-data.json has TH8-18; TH4-7 follow the same file
   // name; TH1-3 have no icon here.
   function thIcon(th, data) {
     var t = data && data.townHalls && data.townHalls[th];
     if (t && t.icon) return t.icon;
-    return th >= 4 ? '/icons/th' + th + 'icon.webp' : '';
+    return th >= 4 ? '/icons/th' + th + 'icon.' + (th === 18 ? 'png' : 'webp') : '';
   }
 
   // Error text per page kind. maintenance / other read the same for both.
@@ -92,6 +171,22 @@
     maintenance: 'Clash of Clans is in maintenance, so its data is unavailable. Try again when the game is back.',
     other: 'This couldn&rsquo;t be loaded. Check your connection and try again.',
   };
+  // A list that scrolls inside its box (search results, the quick search
+  // dropdown): a fade on whichever edge has more (.more-t / .more-b), so
+  // reaching the end is visible. The box keeps the scroll to itself
+  // (overscroll-behavior in the CSS), so the page doesn't move or refresh.
+  function scrollEdges(box) {
+    function edges() {
+      var max = box.scrollHeight - box.clientHeight;
+      box.classList.toggle('more-t', max > 1 && box.scrollTop > 1);
+      box.classList.toggle('more-b', max > 1 && box.scrollTop < max - 1);
+    }
+    box.addEventListener('scroll', edges, { passive: true });
+    if (window.MutationObserver) new MutationObserver(edges).observe(box, { childList: true });
+    if (window.ResizeObserver) new ResizeObserver(edges).observe(box);
+    edges();
+  }
+
   function message(what, kind) {
     return MESSAGES[what][kind] || MESSAGES[kind] || MESSAGES.other;
   }
@@ -108,6 +203,7 @@
     var label = form.querySelector('label');
     var msg = document.getElementById('ptSearchMsg');
     var results = document.getElementById('ptResults');
+    if (results) scrollEdges(results);
     var modes = [].slice.call(document.querySelectorAll('.pt-mode [role=radio]'));
     var mode = 'player';
 
@@ -145,6 +241,11 @@
     if (want === 'player' || want === 'clan') {
       setMode(want);
       input.focus();
+    }
+    var q = new URLSearchParams(location.search).get('q');
+    if (want === 'clan' && q) {
+      input.value = q;
+      searchClans(q);
     }
 
     function showMsg(html) {
@@ -193,26 +294,9 @@
             results.innerHTML = '<li class="pt-results-note">No clans found with that name.</li>';
             return;
           }
-          results.innerHTML = items
-            .map(function (c) {
-              return (
-                '<li><a class="pt-result" href="' +
-                clanHref(c.tag.slice(1)) +
-                '"><img src="' +
-                c.badgeUrls.small +
-                '" alt="" width="40" height="40" loading="lazy" /><span class="pt-result-main"><b>' +
-                esc(c.name) +
-                '</b><span>#' +
-                c.tag.slice(1) +
-                (c.location ? ' &middot; ' + esc(c.location.name) : '') +
-                '</span></span><span class="pt-result-meta"><b>Level ' +
-                c.clanLevel +
-                '</b><span>' +
-                c.members +
-                '/50 members</span></span></a></li>'
-              );
-            })
-            .join('');
+          results.innerHTML =
+            items.map(clanResult).join('') +
+            (items.length > 4 ? '<li class="pt-results-end">End of results &middot; ' + items.length + ' clans</li>' : '');
         })
         .catch(function (err) {
           results.innerHTML = '<li class="pt-results-note">' + message('clan', err.message) + '</li>';
@@ -220,29 +304,10 @@
     }
 
     var box = document.getElementById('ptRecent');
+    if (!box) return;
     var recent = readRecent();
-    if (!box || !recent.length) return;
-    box.querySelector('ul').innerHTML = recent
-      .map(function (r) {
-        var clan = r.kind === 'clan';
-        return (
-          '<li><a class="pt-recent-row" href="' +
-          (clan ? clanHref(r.tag) : playerHref(r.tag)) +
-          '">' +
-          (r.icon
-            ? '<img src="' + r.icon + '" alt="" width="36" height="36" loading="lazy" />'
-            : '<span class="pt-recent-th">TH' + r.th + '</span>') +
-          '<span class="pt-recent-name">' +
-          esc(r.name) +
-          '<i>' +
-          (clan ? 'Clan' : 'Player') +
-          '</i></span>' +
-          '<span class="pt-recent-tag">#' +
-          r.tag +
-          '</span></a></li>'
-        );
-      })
-      .join('');
+    if (!recent.length) box.querySelector('h2').textContent = 'Featured';
+    box.querySelector('ul').innerHTML = (recent.length ? recent : FEATURED).map(recentRow).join('');
     box.hidden = false;
   }
 
@@ -279,7 +344,7 @@
     var idx = {};
     ['heroes', 'pets', 'equipment', 'troops', 'sieges', 'spells'].forEach(function (group) {
       (data[group] || []).forEach(function (u) {
-        idx[key(u.name)] = { group: group, img: data.imageDir + u.img };
+        idx[key(u.name)] = { group: group, img: data.imageDir + u.img, super: !!u.super };
       });
     });
     // Builder Base icons (bb-<name>.webp, from the Clash of Clans wiki) sit
@@ -313,8 +378,9 @@
       (info
         ? '<img src="' + info.img + '" alt="" loading="lazy" decoding="async" />'
         : '<span class="pt-tile-initials">' + esc(u.name.replace(/[^A-Z]/g, '').slice(0, 2)) + '</span>') +
+      // Maxed for this Town Hall: the badge reads MAX (the level stays in the title / label).
       '<b class="pt-lvl">' +
-      u.level +
+      (maxed ? 'MAX' : u.level) +
       '</b></span><span class="pt-sr">' +
       esc(label) +
       '</span></' +
@@ -346,30 +412,24 @@
     );
   }
 
-  // Heroes as cards (portrait, name, level), each with the equipment it has on.
+  // Heroes as small cards: portrait, name, level. Their equipment isn't
+  // repeated here -- it has its own Hero equipment section below.
   function heroCards(heroes, idx) {
     if (!heroes.length) return '';
     return (
       '<section class="pt-group"><div class="pt-group-head"><h3>Heroes</h3></div><ul class="pt-heroes">' +
       heroes
         .map(function (h) {
-          var gear = (h.equipment || [])
-            .map(function (e) {
-              return tile(e, idx, 'pt-tile--sm');
-            })
-            .join('');
           return (
             '<li class="pt-hero">' +
             tile(h, idx, 'pt-tile--lg', 'div') +
-            '<div class="pt-hero-text"><b>' +
+            '<b class="pt-hero-name">' +
             esc(h.name) +
-            '</b><span>Level ' +
+            '</b><span class="pt-hero-lvl">' +
             h.level +
-            ' of ' +
+            '<i>/' +
             (h.cap || h.maxLevel) +
-            '</span>' +
-            (gear ? '<ul class="pt-tiles pt-gear" aria-label="Equipped">' + gear + '</ul>' : '') +
-            '</div></li>'
+            '</i></span></li>'
           );
         })
         .join('') +
@@ -485,20 +545,23 @@
     return { th: th, rows: rows, total: total, rushed: prev && prevNeed ? miss / prevNeed : null };
   }
 
+  // One row: Overall, then each group -- the percentage on top, the name,
+  // a hairline bar and what's left. Phones: Overall across the top, the six
+  // groups 3 x 2 under it (CSS).
   function progressBox(pr) {
     // floor, so 99.6% never reads as a finished 100%
-    function row(label, r, cls) {
+    function cell(label, r, cls) {
       var left = r.need - r.done;
       return (
         '<li' +
         (cls ? ' class="' + cls + '"' : '') +
-        '><span class="pt-pg-name">' +
+        '><b>' +
+        Math.floor((r.done / r.need) * 100) +
+        '<i>%</i></b><span class="pt-pg-name">' +
         label +
         '</span><span class="pt-pg-bar" aria-hidden="true"><i style="width:' +
         ((r.done / r.need) * 100).toFixed(1) +
-        '%"></i></span><b>' +
-        Math.floor((r.done / r.need) * 100) +
-        '%</b><span class="pt-pg-left">' +
+        '%"></i></span><span class="pt-pg-left">' +
         (left ? num(left) + ' left' : 'Maxed') +
         '</span></li>'
       );
@@ -515,17 +578,17 @@
       ' progress</h3>' +
       verdict +
       '</div><ul class="pt-pg">' +
-      row('Overall', pr.total, 'is-total') +
+      cell('Overall', pr.total, 'is-total') +
       PROGRESS_GROUPS.filter(function (g) {
         return pr.rows[g[0]];
       })
         .map(function (g) {
-          return row(g[1], pr.rows[g[0]]);
+          return cell(g[1], pr.rows[g[0]]);
         })
         .join('') +
       '</ul><p class="pt-pg-note">' +
-      (pr.rushed !== null ? 'Rushed means heroes, pets, troops, spells or sieges below the Town Hall ' + (pr.th - 1) + ' max. ' : '') +
-      'Equipment counts the items this player owns. &ldquo;Left&rdquo; is every level still to upgrade to this Town Hall&rsquo;s max.</p></section>'
+      (pr.rushed !== null ? 'Rushed: heroes, pets, troops, spells or sieges below the Town Hall ' + (pr.th - 1) + ' max. ' : '') +
+      'Equipment counts only the items this player owns.</p></section>'
     );
   }
 
@@ -543,9 +606,12 @@
       };
     };
     var homeTroops = p.troops.filter(home);
+    // Super troops are left out: the API lists every one at level 1 (they
+    // have no levels of their own -- a boost uses the base troop's), so they
+    // only cluttered the list. Only they carry superTroopIsActive.
     var troops = homeTroops.filter(function (u) {
       var i = idx[key(u.name)];
-      return !i || i.group === 'troops';
+      return !('superTroopIsActive' in u) && !(i && i.super) && (!i || i.group === 'troops');
     });
     var th = p.townHallLevel;
     var icon = thIcon(th, data);
@@ -638,8 +704,8 @@
     });
 
     root.innerHTML =
-      searchAgain('player') +
-      '<header class="pt-head">' +
+      quickSearch('player') +
+      '<header class="pt-head pt-head--player">' +
       '<div class="pt-th">' +
       (icon ? '<img src="' + icon + '" alt="" width="88" height="88" />' : '') +
       '<span>Town Hall ' +
@@ -654,6 +720,7 @@
       '</span><button type="button" class="pt-copy" data-copy="#' +
       tag +
       '">Copy tag</button>' +
+      '<button type="button" class="pt-copy pt-share"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4" /></svg><span>Share</span></button>' +
       (labels ? '<span class="pt-labels">' + labels + '</span>' : '') +
       '</p>' +
       clan +
@@ -698,10 +765,12 @@
       '<div class="pt-panel" id="ptPanelAch" role="tabpanel" aria-labelledby="ptTabAch" hidden>' +
       achievements +
       '</div>' +
-      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. A red level means that unit is maxed for this Town Hall.</p>';
+      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. MAX marks a unit that is maxed for this Town Hall.</p>';
 
     wireTabs(root);
     wireCopy(root);
+    wireShare(root, p.name);
+    wireQuick(root);
   }
 
   function wireCopy(root) {
@@ -717,15 +786,205 @@
     });
   }
 
-  // Above the profile / clan header: back to the search, in the same mode.
-  function searchAgain(what) {
+  // Share: the phone's share sheet where there is one, else copy the link.
+  function wireShare(root, name) {
+    var btn = root.querySelector('.pt-share');
+    if (!btn) return;
+    var label = btn.querySelector('span');
+    btn.addEventListener('click', function () {
+      var url = location.origin + location.pathname;
+      if (navigator.share) {
+        navigator.share({ title: name + ' | Parchrome Player Tracker', url: url }).catch(function () {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function () {
+          label.textContent = 'Link copied';
+          setTimeout(function () {
+            label.textContent = 'Share';
+          }, 1600);
+        });
+      }
+    });
+  }
+
+  // Above the profile / clan header: a slim search -- Player / Clan switch,
+  // the field and a go button -- so the next lookup happens right here. It
+  // starts in this page's mode. A clan name (not a #tag) goes to the search
+  // page's name search (?mode=clan&q=).
+  function quickSearch(what) {
+    function radio(m, label) {
+      var on = m === what;
+      return (
+        '<button type="button" role="radio" aria-checked="' +
+        on +
+        '" data-mode="' +
+        m +
+        '"' +
+        (on ? '' : ' tabindex="-1"') +
+        '>' +
+        label +
+        '</button>'
+      );
+    }
     return (
-      '<div class="pt-bar"><a class="pt-again" href="/coc/tools/player-tracker?mode=' +
+      '<div class="pt-quick-wrap"><form class="pt-quick" role="search" novalidate>' +
+      '<div class="pt-quick-mode" role="radiogroup" aria-label="Search for">' +
+      radio('player', 'Player') +
+      radio('clan', 'Clan') +
+      '</div><label class="pt-sr" for="ptQuick">Search another ' +
       what +
-      '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>Search another ' +
-      what +
-      '</a></div>'
+      '</label><svg class="pt-quick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>' +
+      '<input id="ptQuick" type="text" autocomplete="off" spellcheck="false" placeholder="" aria-controls="ptQuickPanel" />' +
+      '<button type="submit" class="pt-quick-go" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg></button>' +
+      '</form><div class="pt-quick-panel" id="ptQuickPanel" hidden><p class="pt-quick-head"></p><ul class="pt-quick-list" aria-live="polite"></ul></div></div>'
     );
+  }
+
+  // The dropdown under the slim bar. Empty field focused: Recently viewed
+  // (or Featured). Enter: the result -- a player or clan by tag, or up to
+  // 10 clans by name -- one API call per search. Esc / click outside closes.
+  function wireQuick(root) {
+    var wrap = root.querySelector('.pt-quick-wrap');
+    if (!wrap) return;
+    var form = wrap.querySelector('.pt-quick');
+    var input = form.querySelector('input');
+    var panel = wrap.querySelector('.pt-quick-panel');
+    var head = panel.querySelector('.pt-quick-head');
+    var list = panel.querySelector('.pt-quick-list');
+    scrollEdges(panel);
+    var radios = [].slice.call(form.querySelectorAll('[role=radio]'));
+    var mode;
+    var seq = 0; // a newer search wins over a slower older one
+
+    function show(title, html) {
+      head.textContent = title;
+      head.hidden = !title;
+      list.innerHTML = html;
+      panel.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+    }
+    function hide() {
+      seq++;
+      panel.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+    }
+    function note(html) {
+      return '<li class="pt-results-note">' + html + '</li>';
+    }
+    function showRecent() {
+      var recent = readRecent();
+      show(recent.length ? 'Recently viewed' : 'Featured', (recent.length ? recent : FEATURED).map(recentRow).join(''));
+    }
+    function setMode(m) {
+      mode = m;
+      radios.forEach(function (b) {
+        var on = b.dataset.mode === m;
+        b.setAttribute('aria-checked', on);
+        b.tabIndex = on ? 0 : -1;
+      });
+      input.placeholder = m === 'clan' ? 'Clan name or #tag' : 'Another player tag';
+      if (!panel.hidden) input.value.trim() ? hide() : showRecent();
+    }
+    radios.forEach(function (b, i) {
+      b.addEventListener('click', function () {
+        setMode(b.dataset.mode);
+        input.focus();
+      });
+      b.addEventListener('keydown', function (e) {
+        var step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!step) return;
+        e.preventDefault();
+        var next = radios[(i + step + radios.length) % radios.length];
+        setMode(next.dataset.mode);
+        next.focus();
+      });
+    });
+    setMode(form.querySelector('[aria-checked=true]').dataset.mode);
+
+    input.addEventListener('focus', function () {
+      if (!input.value.trim()) showRecent();
+    });
+    input.addEventListener('input', function () {
+      input.value.trim() ? hide() : showRecent();
+    });
+    wrap.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !panel.hidden) {
+        hide();
+        input.focus();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) hide();
+    });
+
+    function run(title, request) {
+      var my = ++seq;
+      show(title, '<li class="pt-quick-sk"><i class="pt-sk pt-sk-row"></i></li><li class="pt-quick-sk"><i class="pt-sk pt-sk-row"></i></li>');
+      request.then(
+        function (html) {
+          if (my === seq) show(title, html);
+        },
+        function (err) {
+          if (my === seq) show(title, note(message(mode, err.message)));
+        },
+      );
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var raw = input.value.trim();
+      if (!raw) return showRecent();
+      if (mode === 'clan' && raw.charAt(0) !== '#') {
+        if (raw.length < 3) return show('', note('Type at least 3 letters of the clan name, or its tag starting with #.'));
+        return run(
+          'Clans named \u201c' + raw + '\u201d',
+          api('type=clansearch&name=' + encodeURIComponent(raw)).then(function (body) {
+            var items = (body.items || []).slice(0, 10);
+            return items.length ? items.map(clanResult).join('') : note('No clans found with that name.');
+          }),
+        );
+      }
+      var tag = cleanTag(raw);
+      if (!tag) return show('', note(message(mode, 'badTag')));
+      if (mode === 'clan') return run('Clan #' + tag, api('type=clan&tag=' + tag).then(clanResult));
+      run('Player #' + tag, api('type=player&tag=' + tag).then(playerResult));
+    });
+  }
+
+  // ---- loading skeletons: grey shapes in the layout that's coming, with a
+  // slow shimmer, so nothing jumps when the data lands. kind: 'player' |
+  // 'clan' (whole page) or 'tab' (War / History panels).
+  function skeleton(kind, label) {
+    function n(count, html) {
+      return new Array(count + 1).join(html);
+    }
+    var sk = function (cls, style) {
+      return '<i class="pt-sk' + (cls ? ' ' + cls : '') + '"' + (style ? ' style="' + style + '"' : '') + '></i>';
+    };
+    var rows = '<div class="pt-sk-card">' + sk('', 'width:160px') + n(6, sk('pt-sk-row')) + '</div>';
+    var body =
+      kind === 'tab'
+        ? rows
+        : sk('pt-sk-quick') +
+          '<div class="pt-sk-card pt-sk-head">' +
+          sk('pt-sk-th') +
+          '<div class="pt-sk-lines">' +
+          sk('', 'width:44%;height:26px') +
+          sk('', 'width:28%') +
+          sk('', 'width:36%') +
+          '</div><div class="pt-sk-facts">' +
+          n(5, '<div>' + sk('', 'width:56px;height:16px') + sk('', 'width:70px;height:9px') + '</div>') +
+          '</div></div>' +
+          '<div class="pt-sk-tabs">' +
+          n(3, sk('', 'width:96px')) +
+          '</div>' +
+          (kind === 'clan'
+            ? rows
+            : '<div class="pt-sk-card">' +
+              sk('', 'width:200px') +
+              '<div class="pt-sk-tiles">' +
+              n(16, sk('pt-sk-tile')) +
+              '</div></div>');
+    return '<div class="pt-skel" role="status"><span class="pt-sr">' + label + '</span>' + body + '</div>';
   }
 
   function roleName(r) {
@@ -742,14 +1001,15 @@
         document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
       });
     }
-    tabs.forEach(function (t, i) {
+    tabs.forEach(function (t) {
       t.addEventListener('click', function () {
         select(t);
       });
       t.addEventListener('keydown', function (e) {
         var step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
         if (!step) return;
-        var next = tabs[(i + step + tabs.length) % tabs.length];
+        var order = [].slice.call(t.parentNode.querySelectorAll('[role=tab]')); // DOM order: the clan page can move War first
+        var next = order[(order.indexOf(t) + step + order.length) % order.length];
         next.click(); // click, not select(): a tab can load its content on first click (War)
         next.focus();
       });
@@ -788,7 +1048,7 @@
 
   var armyData = null;
   function loadProfile(root, tag) {
-    root.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading #' + tag + '&hellip;</div>';
+    root.innerHTML = skeleton('player', 'Loading player #' + tag);
     armyData =
       armyData ||
       fetch('/coc-army-data.json').then(function (r) {
@@ -1153,40 +1413,72 @@
     return { n: n, by: by, dest: n ? dest / n : 0, stars: n ? (by[1] + 2 * by[2] + 3 * by[3]) / n : 0, dur: durN ? dur / durN : null };
   }
 
-  function warStats(us, them, total) {
-    var a = attackStats(us);
-    var b = attackStats(them);
-    function pct(x, i) {
-      return x.n ? Math.round((x.by[i] / x.n) * 100) + '%<i>' + x.by[i] + '</i>' : '&ndash;';
-    }
-    function mmss(x) {
-      if (x.dur == null) return '&ndash;';
-      var sec = Math.round(x.dur);
-      return Math.floor(sec / 60) + 'm ' + String(sec % 60).padStart(2, '0') + 's';
-    }
-    var rows = [
-      ['Attacks used', a.n + ' / ' + total, b.n + ' / ' + total],
-      ['Avg. stars per attack', a.n ? a.stars.toFixed(2) : '&ndash;', b.n ? b.stars.toFixed(2) : '&ndash;'],
-      ['3-star attacks', pct(a, 3), pct(b, 3)],
-      ['2-star attacks', pct(a, 2), pct(b, 2)],
-      ['1-star attacks', pct(a, 1), pct(b, 1)],
-      ['0-star attacks', pct(a, 0), pct(b, 0)],
-      ['Avg. destruction', a.n ? a.dest.toFixed(1) + '%' : '&ndash;', b.n ? b.dest.toFixed(1) + '%' : '&ndash;'],
-      ['Avg. attack time', mmss(a), mmss(b)],
-    ];
+  // The matchup card's comparison rows. Each bar is split down the middle:
+  // ours grows left from the centre, theirs right, both against the same
+  // ceiling (`max`), and the side ahead is drawn brighter.
+  function mmss(sec) {
+    if (sec == null) return '&ndash;';
+    sec = Math.round(sec);
+    return Math.floor(sec / 60) + 'm ' + String(sec % 60).padStart(2, '0') + 's';
+  }
+  function muBar(label, a, b, max, fmt) {
+    var w = function (v) {
+      return max ? Math.min(100, (v / max) * 100) : 0;
+    };
+    var lead = a === b ? '' : a > b ? ' is-us-ahead' : ' is-them-ahead';
     return (
-      '<section class="pt-group pt-wstats"><div class="pt-group-head"><h3>War stats</h3></div><table class="pt-wst"><thead><tr><th scope="col">' +
-      esc(us.name) +
-      '</th><th scope="col"><span class="pt-sr">Stat</span></th><th scope="col">' +
-      esc(them.name) +
-      '</th></tr></thead><tbody>' +
-      rows
-        .map(function (r) {
-          return '<tr><td>' + r[1] + '</td><th scope="row">' + r[0] + '</th><td>' + r[2] + '</td></tr>';
-        })
-        .join('') +
-      '</tbody></table></section>'
+      '<li class="pt-mu-row' +
+      lead +
+      '"><span class="pt-mu-v">' +
+      fmt(a) +
+      '</span><span class="pt-mu-label">' +
+      label +
+      '</span><span class="pt-mu-v">' +
+      fmt(b) +
+      '</span>' +
+      (max
+        ? '<span class="pt-mu-bars" aria-hidden="true"><span class="pt-mu-bar"><i style="width:' +
+          w(a).toFixed(1) +
+          '%"></i></span><span class="pt-mu-bar"><i style="width:' +
+          w(b).toFixed(1) +
+          '%"></i></span></span>'
+        : '') +
+      '</li>'
     );
+  }
+
+  // Town Halls in a line-up, highest first: [[18, 5], [17, 2], ...]
+  function thMix(side) {
+    var n = {};
+    side.members.forEach(function (m) {
+      n[m.townhallLevel] = (n[m.townhallLevel] || 0) + 1;
+    });
+    return Object.keys(n)
+      .map(Number)
+      .sort(function (x, y) {
+        return y - x;
+      })
+      .map(function (th) {
+        return [th, n[th]];
+      });
+  }
+  function thMixHtml(side, data) {
+    return thMix(side)
+      .map(function (p) {
+        var icon = thIcon(p[0], data);
+        return (
+          '<span class="pt-mu-th" title="Town Hall ' +
+          p[0] +
+          '">' +
+          (icon ? '<img src="' + icon + '" alt="" width="22" height="22" loading="lazy" />' : '') +
+          '<b>TH' +
+          p[0] +
+          '</b><i>&times;' +
+          p[1] +
+          '</i></span>'
+        );
+      })
+      .join('');
   }
 
   function warView(w, ourTag, data) {
@@ -1201,33 +1493,88 @@
           return (m.attacks || []).length < apm;
         })
       : [];
-    var team = function (c) {
+    var team = function (c, cls) {
       return (
-        '<div class="pt-score-team"><img src="' +
+        '<div class="pt-mu-team ' +
+        cls +
+        '"><img src="' +
         c.badgeUrls.small +
-        '" alt="" width="48" height="48" /><b>' +
+        '" alt="" width="44" height="44" /><span><b>' +
         esc(c.name) +
-        '</b><span>' +
-        (live ? (c.attacks || 0) + ' / ' + total + ' attacks' : 'Level ' + c.clanLevel) +
-        '</span></div>'
+        '</b><i>Level ' +
+        c.clanLevel +
+        '</i></span></div>'
       );
     };
+    var rows = '';
+    if (live) {
+      var a = attackStats(us);
+      var b = attackStats(them);
+      var int = function (v) {
+        return String(v);
+      };
+      var pc = function (v) {
+        return v.toFixed(1) + '%';
+      };
+      rows =
+        '<ul class="pt-mu-rows">' +
+        muBar('Stars <small>of ' + w.teamSize * 3 + '</small>', us.stars, them.stars, w.teamSize * 3, int) +
+        muBar('Destruction', us.destructionPercentage, them.destructionPercentage, 100, pc) +
+        muBar('Attacks used <small>of ' + total + '</small>', a.n, b.n, total, int) +
+        muBar('3-star attacks', a.by[3], b.by[3], Math.max(a.n, b.n, 1), int) +
+        muBar(
+          'Avg. stars',
+          a.stars,
+          b.stars,
+          3,
+          function (v) {
+            return v ? v.toFixed(2) : '&ndash;';
+          },
+        ) +
+        muBar('Avg. destruction', a.dest, b.dest, 100, function (v) {
+          return v ? v.toFixed(1) + '%' : '&ndash;';
+        }) +
+        '<li class="pt-mu-row is-text"><span class="pt-mu-v">' +
+        [3, 2, 1, 0]
+          .map(function (k) {
+            return a.by[k];
+          })
+          .join(' &middot; ') +
+        '</span><span class="pt-mu-label">3&#9733; &middot; 2&#9733; &middot; 1&#9733; &middot; 0&#9733;</span><span class="pt-mu-v">' +
+        [3, 2, 1, 0]
+          .map(function (k) {
+            return b.by[k];
+          })
+          .join(' &middot; ') +
+        '</span></li>' +
+        '<li class="pt-mu-row is-text"><span class="pt-mu-v">' +
+        mmss(a.dur) +
+        '</span><span class="pt-mu-label">Avg. attack time</span><span class="pt-mu-v">' +
+        mmss(b.dur) +
+        '</span></li></ul>';
+    }
     return (
-      '<section class="pt-score is-' +
+      '<section class="pt-mu is-' +
       (w.state === 'warEnded' ? outcome(us, them) : w.state) +
-      '"><p class="pt-score-state">' +
+      '"><header class="pt-mu-head"><p class="pt-mu-state">' +
       warStatus(w, us, them) +
-      '</p><div class="pt-score-row">' +
-      team(us) +
-      '<div class="pt-score-mid"><b>' +
-      (live ? us.stars + '<i>&ndash;</i>' + them.stars : w.teamSize + '<i>v</i>' + w.teamSize) +
-      '</b>' +
+      '</p><span class="pt-mu-size">' +
+      w.teamSize +
+      ' v ' +
+      w.teamSize +
+      '</span></header><div class="pt-mu-teams">' +
+      team(us, 'is-us') +
       (live
-        ? '<span>' + us.destructionPercentage.toFixed(1) + '% &ndash; ' + them.destructionPercentage.toFixed(1) + '%</span>'
-        : '<span>teams</span>') +
+        ? '<b class="pt-mu-score">' + us.stars + '<i>&ndash;</i>' + them.stars + '</b>'
+        : '<b class="pt-mu-score is-vs">vs</b>') +
+      team(them, 'is-them') +
       '</div>' +
-      team(them) +
-      '</div></section>' +
+      rows +
+      '<div class="pt-mu-lineup"><h4>Line-up</h4><div class="pt-mu-ths">' +
+      thMixHtml(us, data) +
+      '</div><div class="pt-mu-ths is-them">' +
+      thMixHtml(them, data) +
+      '</div></div></section>' +
       (missing.length
         ? '<section class="pt-missing"><h3>' +
           (w.state === 'warEnded' ? 'Missed attacks' : 'Still to attack') +
@@ -1241,7 +1588,6 @@
             .join(', ') +
           '</p></section>'
         : '') +
-      (live ? warStats(us, them, total) : '') +
       '<div class="pt-war-sides" role="tablist" aria-label="Line-up">' +
       '<button type="button" role="tab" aria-selected="true" data-side="us">' +
       esc(us.name) +
@@ -1367,56 +1713,60 @@
     return { up: up, down: n >= 8 ? down : 0 };
   }
 
-  var DAY_TEXT = { win: 'won', lose: 'lost', tie: 'drawn', live: 'in progress', prep: 'preparation' };
-
+  // Star race: each clan's stars as a bar against the leader's, so the gaps
+  // read at a glance. Promotion / demotion places colour the rank chip
+  // (legend in the header) instead of dividing lines.
   function standingsTable(rows, ourTag, league) {
     var z = cwlZones(league, rows.length);
-    var zone = function (kind) {
-      return (
-        '<li class="pt-zone is-' +
-        kind +
-        '" role="presentation"><span>' +
-        (kind === 'up' ? 'Promotion zone' : 'Demotion zone') +
-        '</span></li>'
-      );
+    var top = rows.length ? rows[0].stars : 0;
+    var count = function (r, kind) {
+      return r.days.filter(function (d) {
+        return d === kind;
+      }).length;
     };
     return (
-      '<section class="pt-group pt-standings"><div class="pt-group-head"><h3>League standings</h3><span>' +
+      '<section class="pt-group pt-race"><div class="pt-group-head"><h3>League standings</h3><span>' +
       (league ? esc(league) + ' &middot; ' : '') +
-      'stars include +10 per war won</span></div><ol>' +
+      '+10 stars per war won</span></div>' +
+      (z && (z.up || z.down)
+        ? '<p class="pt-race-key">' +
+          (z.up ? '<span class="is-up">Promotion</span>' : '') +
+          (z.down ? '<span class="is-down">Demotion</span>' : '') +
+          '</p>'
+        : '') +
+      '<ol>' +
       rows
         .map(function (r, i) {
-          var html =
-            '<li' +
-            (r.clan.tag === ourTag ? ' class="is-us"' : '') +
-            '><span class="pt-st-rank">' +
+          var zone = z && i < z.up ? ' is-up' : z && z.down && i >= rows.length - z.down ? ' is-down' : '';
+          var tie = count(r, 'tie');
+          return (
+            '<li class="' +
+            (r.clan.tag === ourTag ? 'is-us' : '') +
+            '"><span class="pt-race-rank' +
+            zone +
+            '">' +
             (i + 1) +
             '</span><img src="' +
             r.clan.badgeUrls.small +
-            '" alt="" width="36" height="36" loading="lazy" /><span class="pt-st-name"><a href="' +
+            '" alt="" width="34" height="34" loading="lazy" /><span class="pt-race-main"><a href="' +
             clanHref(r.clan.tag.slice(1)) +
             '">' +
             esc(r.clan.name) +
-            '</a><span class="pt-st-days" role="img" aria-label="' +
-            r.days
-              .map(function (d, k) {
-                return 'Day ' + (k + 1) + ' ' + (DAY_TEXT[d] || 'not played');
-              })
-              .join(', ') +
-            '">' +
-            r.days
-              .map(function (d) {
-                return '<i class="is-' + (d || 'none') + '"></i>';
-              })
-              .join('') +
-            '</span></span><span class="pt-st-pill pt-st-stars">' +
-            r.stars +
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg><span class="pt-sr"> stars</span></span><span class="pt-st-pill">' +
+            '</a><span class="pt-race-track" aria-hidden="true"><i style="width:' +
+            (top ? Math.max(2, (r.stars / top) * 100) : 2).toFixed(1) +
+            '%"></i></span><span class="pt-race-meta">' +
+            count(r, 'win') +
+            'W ' +
+            (tie ? tie + 'D ' : '') +
+            count(r, 'lose') +
+            'L &middot; ' +
             Math.round(r.dest).toLocaleString('en-US') +
-            '%</span></li>';
-          if (z && z.up && i === z.up - 1) html += zone('up');
-          if (z && z.down && i === rows.length - z.down - 1) html += zone('down');
-          return html;
+            '% destruction' +
+            '</span></span><b class="pt-race-stars">' +
+            r.stars +
+            STAR_SVG +
+            '<span class="pt-sr"> stars</span></b></li>'
+          );
         })
         .join('') +
       '</ol></section>'
@@ -1430,7 +1780,7 @@
       });
     });
     var tags = [].concat.apply([], rounds);
-    box.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading Clan War League&hellip;</div>';
+    box.innerHTML = skeleton('tab', 'Loading Clan War League');
     pool(tags, 3, function (t) {
       return api('type=cwlwar&tag=' + t.slice(1));
     }).then(function (wars) {
@@ -1516,7 +1866,7 @@
   }
 
   function loadWarTab(box, ourTag, data, league) {
-    box.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading the war&hellip;</div>';
+    box.innerHTML = skeleton('tab', 'Loading the war');
     var t = ourTag.slice(1);
     // CWL first: a clan in CWL shows "not in war" in its regular war.
     api('type=cwlgroup&tag=' + t)
@@ -1721,7 +2071,7 @@
 
   function loadHistory(box, c, data) {
     var tag = c.tag.slice(1);
-    box.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading history&hellip;</div>';
+    box.innerHTML = skeleton('tab', 'Loading history');
     fsGet('trackedClans/' + tag)
       .then(function (tracked) {
         if (!tracked) {
@@ -1893,33 +2243,65 @@
     );
   }
 
+  // The war card under the clan header: both clans, the score (or the
+  // line-up in preparation), the time left and View war.
+  var STAR_SVG =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>';
   function liveBanner(box, c, onView) {
     liveWar(c).then(function (f) {
       if (!f) return;
       var w = f.w;
       var s = sides(w, c.tag);
       var prep = w.state === 'preparation';
+      var live = w.state === 'inWar';
+      function team(t, cls) {
+        return (
+          '<div class="pt-live-team ' +
+          cls +
+          '"><img src="' +
+          t.badgeUrls.medium +
+          '" alt="" width="72" height="72" /><b>' +
+          esc(t.name) +
+          '</b><span>' +
+          (prep ? 'Level ' + t.clanLevel : t.attacks + ' of ' + w.teamSize * (w.attacksPerMember || 1) + ' attacks') +
+          '</span></div>'
+        );
+      }
       box.innerHTML =
         '<section class="pt-live' +
-        (prep ? ' is-prep' : '') +
-        '"><span class="pt-live-dot" aria-hidden="true"></span><span class="pt-live-main"><b>' +
+        (prep ? ' is-prep' : live ? ' is-battle' : '') +
+        '" aria-label="Current war">' +
+        '<p class="pt-live-top"><span class="pt-live-dot" aria-hidden="true"></span><b>' +
         f.label +
         ' &middot; ' +
-        (prep ? 'preparation' : w.state === 'inWar' ? 'battle day' : 'ended') +
-        '</b><span>vs ' +
-        esc(s[1].name) +
-        ' &middot; ' +
+        (prep ? 'Preparation' : live ? 'Battle day' : 'Ended') +
+        '</b><span class="pt-live-time">' +
         (prep
-          ? 'battles start in ' + timeLeft(apiTime(w.startTime) - Date.now())
-          : w.state === 'inWar'
-            ? 'ends in ' + timeLeft(apiTime(w.endTime) - Date.now())
+          ? 'Battles start in <em>' + timeLeft(apiTime(w.startTime) - Date.now()) + '</em>'
+          : live
+            ? 'Ends in <em>' + timeLeft(apiTime(w.endTime) - Date.now()) + '</em>'
             : '') +
-        '</span></span><span class="pt-live-score"><b>' +
-        (prep ? w.teamSize + ' v ' + w.teamSize : s[0].stars + ' &ndash; ' + s[1].stars) +
-        '</b>' +
-        (prep ? '' : '<span>' + s[0].destructionPercentage.toFixed(1) + '% &ndash; ' + s[1].destructionPercentage.toFixed(1) + '%</span>') +
-        '</span><button type="button" class="th-soon-btn th-soon-btn--primary">View war</button></section>';
-      box.querySelector('button').addEventListener('click', onView);
+        '</span></p>' +
+        team(s[0], 'is-us') +
+        '<div class="pt-live-mid">' +
+        (prep
+          ? '<b class="pt-live-score">' + w.teamSize + '<i>v</i>' + w.teamSize + '</b><span>Line-up locked</span>'
+          : '<b class="pt-live-score">' +
+            STAR_SVG +
+            s[0].stars +
+            '<i>&ndash;</i>' +
+            s[1].stars +
+            STAR_SVG +
+            '</b><span>' +
+            s[0].destructionPercentage.toFixed(1) +
+            '% &ndash; ' +
+            s[1].destructionPercentage.toFixed(1) +
+            '%</span>') +
+        '</div>' +
+        team(s[1], 'is-them') +
+        '<button type="button" class="pt-live-cta">View war<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg></button>' +
+        '</section>';
+      box.querySelector('.pt-live-cta').addEventListener('click', onView);
     });
   }
 
@@ -1941,7 +2323,7 @@
     var league = c.warLeague && c.warLeague.id !== 48000000 ? c.warLeague : null; // 48000000 = "Unranked"
 
     root.innerHTML =
-      searchAgain('clan') +
+      quickSearch('clan') +
       '<header class="pt-head pt-head--clan">' +
       '<div class="pt-th"><img src="' +
       c.badgeUrls.large +
@@ -2005,6 +2387,7 @@
 
     wireTabs(root);
     wireCopy(root);
+    wireQuick(root);
     if (members.length) wireSort(root, members, data);
     // The war report loads the first time its tab is opened (CWL can mean 28 lookups).
     var warTab = root.querySelector('#ptTabWar');
@@ -2025,17 +2408,21 @@
       loadHistory(histBox, c, data);
     });
     if (location.hash === '#history') histTab.click();
-    liveBanner(root.querySelector('#ptLive'), c, function () {
-      warTab.click();
-      root.querySelector('.pt-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    liveBanner(
+      root.querySelector('#ptLive'),
+      c,
+      function () {
+        warTab.click();
+        root.querySelector('.pt-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    );
     initTrack(root.querySelector('#ptTrack'), c.tag.slice(1), function () {
       if (histLoaded) loadHistory(histBox, c, data);
     });
   }
 
   function loadClan(root, tag) {
-    root.innerHTML = '<div class="pt-loading" role="status"><span class="parchrome-ring"></span>Loading #' + tag + '&hellip;</div>';
+    root.innerHTML = skeleton('clan', 'Loading clan #' + tag);
     armyData =
       armyData ||
       fetch('/coc-army-data.json').then(function (r) {

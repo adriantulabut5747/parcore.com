@@ -35,13 +35,13 @@
     <link rel="apple-touch-icon" href="/icons/home.jpg" />
 
 
-    <link rel="stylesheet" href="/11layout.css?v=20261005c" />
+    <link rel="stylesheet" href="/11layout.css?v=20261006a" />
     <link rel="stylesheet" href="/1coclayouts.css" />
     <!-- Live events + official clan card, shared with /coc/ -->
-    <link rel="stylesheet" href="/coc-clan-clock.css" />
+    <link rel="stylesheet" href="/coc-clan-clock.css?v=20261006a" />
 
     <!-- Look + behaviour shared by every Town Hall layouts page -->
-    <link rel="stylesheet" href="/th-layouts.css" />
+    <link rel="stylesheet" href="/th-layouts.css?v=20261006b" />
     <link rel="stylesheet" href="/coc-help.css" />
   <link rel="stylesheet" href="/coc-more.css" />
   <link rel="stylesheet" href="/coc-hub-menus.css" />
@@ -181,124 +181,26 @@
 
       <div class="coc-main">
         <div class="coc-content">
-          <!-- PAGE HERO ("Hanging tags" mockup, tags brought inside): one
-            card holding everything. Left: the Orbitron headline with one
-            red word, "Did you know?", then the pinned event tags. Right:
-            the Revenge Tower standing on its own like a trophy, with its
-            badge, name and one line under it. Styles: the TH18 COC-HOME
-            THEME block in th-layouts.css. -->
-          <section class="t18-hero" aria-labelledby="t18-title">
-            <div class="t18-hero-copy">
-              <div class="t18-head">
-                <!-- #t18Page: "PAGE 1/2" pill above the title, desktop only
-                  (phones have "/ Page 1/2" in the secondary top bar).
-                  th-layouts.js fills it; hidden when the TH has one page. -->
-                <span class="t18-page" id="t18Page" hidden></span>
-                <h1 class="t18-title" id="t18-title">
-                  TH15 base<br />
-                  <em>layouts</em>
-                </h1>
-              </div>
-              <!-- DID YOU KNOW? -- sits where the intro sentence (.t18-sub) used
-                to be, in that sentence's colour and type. Facts live in coc-dyk.json (edit that file,
-                not this markup). th-layouts.js shuffles them on every
-                visit and fades to the next one on its own. Hidden until the
-                JSON loads, so a failed fetch leaves no empty label behind. -->
-              <div class="t18-dyk" id="t18-dyk" role="button" tabindex="0" hidden>
-                <span class="t18-dyk-label">Did you know?</span>
-                <div class="t18-dyk-stage"></div>
+          <!-- BANNER -- same block as the Tools pages (styles: .tb in th-layouts.css).
+            Icon, one-line title, then "Did you know?" (facts in coc-dyk.json).
+            #t18Page: "Page 1 of 2" after the title, desktop only; th-layouts.js
+            fills it and leaves it hidden when the TH has one page. -->
+          <div class="tb">
+            <img class="tb-art" src="/clashofclans/tools-header.webp" alt="" decoding="async" fetchpriority="high" />
+            <div class="tb-body">
+              <img class="tb-icon" src="/icons/th15icon.webp" alt="" />
+              <div class="tb-copy">
+                <div class="tb-head">
+                  <h1 class="tb-title">TH15 <em>layouts</em></h1>
+                  <span class="tb-page" id="t18Page" hidden></span>
+                </div>
+                <div class="t18-dyk" id="t18-dyk" role="button" tabindex="0" hidden>
+                  <span class="t18-dyk-label">Did you know?</span>
+                  <div class="t18-dyk-stage"></div>
+                </div>
               </div>
             </div>
-
-            <!-- EVENTS -- all six clan events on the card: event icon | name
-              over countdown. coc-events.js fills [data-timer] and sets
-              .is-live / .is-upcoming on each link: counting to an end = red
-              "ends 1d 3h" and a red dot on the icon, not started = grey
-              "starts 4d 4h" and a grey dot (the words are CSS). Each jumps to
-              Live events. Desktop: 2 per row; as many rows (2 or 3) as fit
-              beside the text, the rest hidden -- set by th-layouts.js.
-              Phones: ONE compact card beside the title, starting on Raid
-              Weekend, with small prev / next buttons either side (no
-              auto-rotate). -->
-            <ul class="t18-events" aria-label="Clan events">
-              <li class="t18-ev-navli t18-ev-navli--prev">
-                <button type="button" class="t18-ev-nav" data-step="-1" aria-label="Previous event">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M14.5 6l-6 6 6 6"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </button>
-              </li>
-              <li>
-                <a class="t18-event" href="#events-section" data-event="raid"
-                  ><span class="t18-event-icon"><img src="/clashofclans/coctools/raidmedals2.webp" alt="" decoding="async" /></span
-                  ><span class="t18-event-text"
-                    ><span class="t18-event-name">Raid Weekend</span> <b class="t18-event-time" data-timer>--</b></span
-                  ></a
-                >
-              </li>
-              <li>
-                <a class="t18-event" href="#events-section" data-event="cwl"
-                  ><span class="t18-event-icon"><img src="/clashofclans/coctools/cwl2.webp" alt="" decoding="async" /></span
-                  ><span class="t18-event-text"
-                    ><span class="t18-event-name">CWL</span> <b class="t18-event-time" data-timer>--</b></span
-                  ></a
-                >
-              </li>
-              <li>
-                <a class="t18-event" href="#events-section" data-event="clangames"
-                  ><span class="t18-event-icon"><img src="/clashofclans/coctools/clangames2.webp" alt="" decoding="async" /></span
-                  ><span class="t18-event-text"
-                    ><span class="t18-event-name">Clan Games</span> <b class="t18-event-time" data-timer>--</b></span
-                  ></a
-                >
-              </li>
-              <li>
-                <a class="t18-event" href="#events-section" data-event="trader"
-                  ><span class="t18-event-icon"><img src="/clashofclans/coctools/trader2.webp" alt="" decoding="async" /></span
-                  ><span class="t18-event-text"
-                    ><span class="t18-event-name">Trader Shop</span> <b class="t18-event-time" data-timer>--</b></span
-                  ></a
-                >
-              </li>
-              <li>
-                <a class="t18-event" href="#events-section" data-event="season"
-                  ><span class="t18-event-icon"><img src="/clashofclans/coctools/battlepass.webp" alt="" decoding="async" /></span
-                  ><span class="t18-event-text"
-                    ><span class="t18-event-name">Battle Pass</span> <b class="t18-event-time" data-timer>--</b></span
-                  ></a
-                >
-              </li>
-              <li>
-                <a class="t18-event" href="#events-section" data-event="legend"
-                  ><span class="t18-event-icon"><img src="/clashofclans/coctools/legend-league.png" alt="" decoding="async" /></span
-                  ><span class="t18-event-text"
-                    ><span class="t18-event-name">Legend League</span> <b class="t18-event-time" data-timer>--</b></span
-                  ></a
-                >
-              </li>
-              <li class="t18-ev-navli t18-ev-navli--next">
-                <button type="button" class="t18-ev-nav" data-step="1" aria-label="Next event">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M9.5 6l6 6-6 6"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </button>
-              </li>
-            </ul>
-          </section>
+          </div>
 
           <!-- First Layer -->
           <div class="first-layer" data-role="first-layer"></div>
@@ -338,7 +240,7 @@
             <section class="ac-card" aria-labelledby="clan-title">
               <div class="ac-top">
                 <div class="ac-body">
-                  <h2 class="clan-title" id="clan-title"><img class="ac-title-logo" src="/icons/aclogonobg-tight.png" alt="" width="238" height="258" />Play with <em>Ascendere</em></h2>
+                  <h2 class="clan-title" id="clan-title"><img class="ac-title-logo" src="/icons/aclogonobg-tight.webp" alt="" width="238" height="258" />Play with <em>Ascendere</em></h2>
                   <div class="ac-actions">
                     <button
                       type="button"
@@ -374,7 +276,7 @@
                   </div>
                 </div>
                 <div class="ac-art" aria-hidden="true">
-                  <img src="/clashofclans/coctools/kingdragon-tight.png" alt="" width="379" height="336" loading="lazy" decoding="async" />
+                  <img src="/clashofclans/coctools/ac-card-art.webp" alt="" width="1600" height="920" loading="lazy" decoding="async" />
                 </div>
               </div>
               <!-- Live stats: the card's full-width bottom row, cells split by hairlines; the King stands on its top edge. War record / win
@@ -501,7 +403,7 @@
             </ul>
           </div>
           <div class="t18-band-art" aria-hidden="true">
-            <img src="/clashofclans/coctools/wardendragon-tight.png" alt="" loading="lazy" decoding="async" />
+            <img src="/clashofclans/coctools/wardendragon-tight.webp" alt="" loading="lazy" decoding="async" />
             <!-- Embers: sparks rising off the fire orb in his hand and his wings, over a slow orb glow. -->
             <span class="t18-band-fx"
               ><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span
@@ -709,8 +611,8 @@
     <!-- /.main: was never closed, so the browser closed it at the end of the body;
      closed here to match (the More sheet, bottom nav and viewer above sit
      inside it, as they always have). -->
-    <script src="/11layout.js?v=20261005c" defer></script>
-    <script src="/thz-script.js?v=20261005f"></script>
+    <script src="/11layout.js?v=20261006c" defer></script>
+    <script src="/thz-script.js?v=20261006a"></script>
     <script src="/coc-events.js"></script>
 
     <!-- ============================================================
@@ -743,9 +645,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
     <!-- Everything this page does: hero, top bar, cards, likes, share. -->
-    <script src="/th-layouts.js?v=20261005d" defer></script>
+    <script src="/th-layouts.js?v=20261006c" defer></script>
     <script src="/coc-help.js" defer></script>
-  <script src="/coc-more.js" defer></script>
+  <script src="/coc-more.js?v=20261006a" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
 </body>
 </html>

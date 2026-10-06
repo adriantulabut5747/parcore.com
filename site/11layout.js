@@ -14,7 +14,7 @@ function cocPagePath(u) {
    ============================================================ */
 (function buildParchromeLoader() {
   const fade = document.querySelector('#page-loader .parchrome-fade');
-  if (!fade) return;
+  if (!fade || fade.querySelector('.parchrome-loader')) return; // home writes its boxes in the markup
   const loader = document.createElement('div');
   loader.className = 'parchrome-loader';
   for (let i = 0; i < 9; i++) {
@@ -24,6 +24,47 @@ function cocPagePath(u) {
   }
   fade.innerHTML = '';
   fade.appendChild(loader);
+})();
+
+/* LOADER LABEL — cycles the word under the boxes while the page loads:
+   Parchrome (1s) → section name (2s) → Rendering (2s) → Joining (2s) → Loading
+   (stays). Timed from navigation start (performance.now), so a script that runs
+   late jumps straight to the right word. Home has no section, so it uses Joining.
+   Stops by itself when the page's load handler removes #page-loader. */
+(function cycleLoaderLabel() {
+  const label = document.querySelector('#page-loader .parchrome-label');
+  if (!label) return;
+  const SECTION_NAMES = {
+    coc: 'Clash of Clans',
+    minecraft: 'Minecraft',
+    'call-of-duty-mobile': 'CoD Mobile',
+    'genshin-impact': 'Genshin Impact',
+    tekken: 'Tekken',
+    valorant: 'Valorant',
+  };
+  const words = ['Parchrome', SECTION_NAMES[location.pathname.split('/')[1]] || 'Joining', 'Rendering', 'Joining', 'Loading'];
+  const starts = [0, 1000, 3000, 5000, 7000];
+  let shown = 0;
+  label.innerHTML = '<span>' + words[0] + '</span>';
+
+  function swap(word) {
+    const old = label.lastElementChild;
+    old.className = 'parchrome-word-out';
+    setTimeout(() => old.remove(), 350);
+    const next = document.createElement('span');
+    next.className = 'parchrome-word-in';
+    next.textContent = word;
+    label.appendChild(next);
+  }
+
+  (function step() {
+    if (!label.isConnected) return;
+    const t = performance.now();
+    let i = starts.length - 1;
+    while (starts[i] > t) i--;
+    if (i !== shown) swap(words[(shown = i)]);
+    if (i < starts.length - 1) setTimeout(step, starts[i + 1] - t);
+  })();
 })();
 
 /* ============================================================
@@ -100,9 +141,13 @@ function buildSidebarFromJSON(data) {
     const a = document.createElement('a');
     a.href = game.link;
     a.className = 'game';
+    // activePrefix: the whole section ("/coc/" lights up on /coc/ and every
+    // page under it), so new pages don't need adding to a list.
+    const prefix = game.activePrefix && normalizePage(game.activePrefix);
     if (
       normalizePage(game.link) === currentPage ||
-      (game.activeOn?.map(normalizePage).includes(currentPage))) {
+      (game.activeOn?.map(normalizePage).includes(currentPage)) ||
+      (prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/')))) {
       a.classList.add('active');}
     a.innerHTML = `
       <img src="${game.icon}" class="sidebar-icon" alt="">
@@ -124,8 +169,8 @@ function buildSidebarFromJSON(data) {
     }
   }
 
-  // TRIPLE A GAMES
-  data.tripleA.forEach(game => {
+  // TRIPLE A GAMES (the upcoming mobile games from sidebar.json go first)
+  (data.upcoming || []).concat(data.tripleA).forEach(game => {
     const a = document.createElement('a');
     a.href = game.link || "#";
     a.className = 'triple-a-game';

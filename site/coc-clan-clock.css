@@ -495,8 +495,7 @@
    in the page's card material -- no starfield, no logo tile -- in two rows:
    - top: the title, the two buttons (Copy Layout's soft key face, see
      th-layouts.css .layout-link) and the last 10 wars on the left; the
-     King (Dragon skin) on the right, standing on the stats row's top
-     edge with his head and wings clearing the card's top edge.
+     art (.ac-art) on the right, fading out to the left like the banners.
    - bottom: the live stats as one full-width strip split by hairlines
      (the same board pattern as the red live band).
    Sized by the card's own width (container queries), not the window's:
@@ -512,11 +511,12 @@
     #121316;
   border:1px solid rgba(255,255,255,0.08);
 }
-.ac-top{ position:relative; }
+.ac-top{ position:relative; isolation:isolate; }
 .ac-body{
+  position:relative; z-index:1;
   display:flex; flex-direction:column; align-items:flex-start; gap:20px;
   min-width:0;
-  margin-right:330px;                 /* the King's column */
+  max-width:min(620px, 58%);          /* keeps the words on the plain side of the fade */
   padding:28px 30px 26px;
 }
 
@@ -563,19 +563,25 @@
 .ac-form{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; }
 .ac-form[hidden]{ display:none; }
 
-/* The King: stands on the stats row (the top area's bottom edge). 300px
-   wide = 266px tall, taller than the top area, so he clears the card's
-   top edge by ~60px. bottom -13px: his right boot ends 16px (native)
-   above the image bottom (the sword tip goes lower), so this puts that
-   boot on the stats row's top line. */
+/* The art (Oct 2026; was the Dragon-skin King standing out of the card):
+   fills the right two-thirds of the top area and fades out to the left,
+   the same treatment as the page banners (.tb-art in th-layouts.css), so
+   the title and buttons sit on the plain card colour. Swap the picture
+   in the markup; if its subject sits off-centre, set --ac-pos on the
+   <img> (e.g. style="--ac-pos: 70% 30%"). */
 .ac-art{
-  position:absolute; right:22px; bottom:-13px;
-  width:300px;
+  position:absolute; z-index:0; top:0; right:0; bottom:0;
+  width:64%;
+  overflow:hidden;
+  border-radius:0 11px 0 0;
   pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.3) 34%, #000 78%);
+  mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.3) 34%, #000 78%);
 }
 .ac-art img{
-  display:block; width:100%; height:auto;
-  filter:drop-shadow(0 14px 22px rgba(0,0,0,0.55));
+  display:block; width:100%; height:100%;
+  object-fit:cover; object-position:var(--ac-pos, 50% 40%);
+  filter:brightness(0.4);          /* darkened a lot so the words stay on top */
 }
 
 /* Stats: the card's bottom row, full width, cells split by 1px hairlines
@@ -619,17 +625,23 @@
 }
 /* Narrow card (phones, narrow laptop windows): compressed to four slim
    lines -- title, the two buttons side by side, the last 10 wars, then
-   the four stats 2 x 2 (one row of 4 squeezed "199W 15L"). No King here (he only had room to stand
-   inside the card, not pop out), and no "Updated ..." line. */
+   the four stats 2 x 2 (one row of 4 squeezed "199W 15L"). No "Updated ..."
+   line. The art runs the full width behind the words here, dimmed on the
+   left where they are (as the banners do on phones). */
 @container ac (max-width: 719px){
-  .ac-art{ display:none; }
-  .ac-body{ margin-right:0; gap:14px; padding:18px 16px 16px; }
+  .ac-art{
+    width:100%;
+    border-radius:11px 11px 0 0;
+    -webkit-mask-image:linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%);
+    mask-image:linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%);
+  }
+  .ac-body{ max-width:none; gap:14px; padding:18px 16px 16px; }
   .ac-body .clan-title{ font-size:18px; white-space:nowrap; }
   /* Ascendere logo before the title, phones only. Sized a little taller than
      the capitals (0.98em vs Orbitron's ~0.72em caps) and centred on them:
      the mark is a thin, pointed triangle, so at exact cap height it read
      smaller than the solid letters. The file is
-     cropped tight (icons/aclogonobg-tight.png) so no empty margin shrinks it. */
+     cropped tight (icons/aclogonobg-tight.webp) so no empty margin shrinks it. */
   .ac-title-logo{ display:inline-block; height:0.98em; width:auto; margin-right:0.38em; vertical-align:-0.13em; }
   .ac-actions{ align-self:stretch; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
   .ac-btn{ justify-content:center; height:36px; padding:0 10px; }

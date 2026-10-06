@@ -8,6 +8,20 @@ body { visibility: hidden; }
   opacity: 0; animation: parchrome-fadein 0.5s ease 0.1s forwards; }
   @keyframes parchrome-fadein { to { opacity: 1; } }
 
+/* Label word swap (11layout.js cycleLoaderLabel): both words sit in the same
+   grid cell; the old one slides up and out while the new one slides up from
+   below. overflow: hidden clips them to one line. */
+.parchrome-label { display: inline-grid; justify-items: center; overflow: hidden; }
+.parchrome-label > span { grid-area: 1 / 1; white-space: nowrap; }
+.parchrome-word-in { animation: parchrome-word-in 0.35s ease both; }
+.parchrome-word-out { animation: parchrome-word-out 0.35s ease both; }
+@keyframes parchrome-word-in { from { transform: translateY(100%); opacity: 0; } }
+@keyframes parchrome-word-out { to { transform: translateY(-100%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .parchrome-word-in { animation: none; }
+  .parchrome-word-out { display: none; }
+}
+
 /* PARCHROME LOADER — box shuffle (from Uiverse.io by Nawsome, adapted) */
 
 /* Force-hides any leftover .parchrome-ring markup still sitting in

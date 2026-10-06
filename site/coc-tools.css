@@ -1,0 +1,239 @@
+/* =======================================================================
+   TOOLS SECTION (/coc/tools/ and every tool under it), Oct 2026.
+
+   The tool banner (.tb) itself lives in th-layouts.css (Oct 2026): the
+   Town Hall layouts / army pages wear it too. This file has the Tools
+   page's own sections and the leave-confirm box.
+   ======================================================================= */
+
+/* ---- Tools page sections -------------------------------------------------
+   Under the Layouts / Army / Tools tabs: a hairline (.tl-rule), then
+   "Parchrome tools" (red cards) and "Outside websites" (grey cards). Both
+   card kinds are .tc-card in coc-cards.css. */
+.tl-rule {
+  height: 1px;
+  margin: 22px 0 0;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.12) 20%,
+    rgba(255, 255, 255, 0.12) 80%,
+    rgba(255, 255, 255, 0)
+  );
+}
+.tl-sec {
+  margin-top: 32px;
+}
+.tl-sec + .tl-sec {
+  margin-top: 56px;
+}
+.tl-head {
+  margin-bottom: 16px;
+}
+.tl-title {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--t18-text);
+}
+.tl-sub {
+  margin: 6px 0 0;
+  max-width: 62ch;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--t18-muted);
+}
+/* ---- Leaving-Parchrome dialog (coc-guides.js) ----------------------------
+   A native <dialog>: one small card, centred, over a dimmed page. The
+   site's favicon, name and full address, one sentence, a "Don't show this
+   again" box, then Stay here / Continue (Continue is the red one). */
+.lv {
+  width: min(420px, calc(100vw - 32px));
+  max-width: none;
+  /* the site's global margin reset would pin it to the top-left corner */
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #eff2f5;
+}
+.lv::backdrop {
+  background: rgba(5, 5, 7, 0.72);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.lv[open] {
+  animation: lv-in 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes lv-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+.lv-box {
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: #15161a;
+}
+.lv-title {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #fff;
+}
+.lv-site {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.lv-ico {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.lv-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.lv-name {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+.lv-host {
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  color: #9ea3ab;
+  overflow-wrap: anywhere;
+}
+.lv-text {
+  margin: 14px 0 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #b9bdc4;
+}
+.lv-skip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: #9ea3ab;
+  cursor: pointer;
+}
+.lv-skip input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #c23b3b;
+}
+.lv-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.lv-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: transparent;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #e3e5e8;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.lv-stay:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.05);
+}
+.lv-go {
+  border-color: #c23b3b;
+  background: #c23b3b;
+  color: #fff;
+}
+.lv-go:hover {
+  border-color: #d04747;
+  background: #d04747;
+}
+.lv-go-ico {
+  width: 15px;
+  height: 15px;
+}
+.lv-btn:focus-visible {
+  outline: 2px solid #e06363;
+  outline-offset: 3px;
+}
+
+
+/* ---- Phones --------------------------------------------------------------- */
+@media (max-width: 970px) {
+  .tl-rule {
+    margin-top: 16px;
+  }
+  .tl-sec {
+    margin-top: 22px;
+  }
+  .tl-sec + .tl-sec {
+    margin-top: 40px;
+  }
+  .tl-head {
+    margin-bottom: 12px;
+  }
+  .tl-title {
+    font-size: 16px;
+  }
+  .tl-sub {
+    font-size: 12px;
+  }
+  /* Phones: Continue on top, full width, where the thumb is. */
+  .lv-box {
+    padding: 20px;
+  }
+  .lv-actions {
+    flex-direction: column-reverse;
+  }
+  .lv-btn {
+    flex: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lv[open] {
+    animation: none;
+  }
+}

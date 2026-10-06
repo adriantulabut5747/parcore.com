@@ -1,6 +1,7 @@
 /* =======================================================================
    ARMY MAKER (/coc/tools/army-maker) -- builds a Clash of Clans "Copy Army"
-   link from the troops, spells, heroes and clan castle units you tap.
+   link from the troops, spells, heroes and clan castle units you pick:
+   tap a row of "Your army" to open its tray of units (see Unit trays).
 
    How the link works: everything is in its army= code, one letter per
    section, each followed by the units in it:
@@ -231,35 +232,52 @@
     );
   }
 
-  function buildPanels() {
+  // ---- Unit trays ---------------------------------------------------------
+  // Tapping a row of the army sheet (Troops / Spells / Siege / Clan Castle)
+  // opens a tray along the bottom of the screen with what can go in that
+  // row: tap a unit to add one, hold it to keep adding. The row stays
+  // lit while the rest of the builder dims, and its units get a remove
+  // badge (tap = one less, hold = keep removing). Heroes, pets and
+  // equipment still use the picker modal below.
+  // cls: the sheet group the row is drawn as (th-layouts.js ArmySheet).
+  var ROWS = {
+    troops: { cls: 'as-troops', title: 'Troops', meter: 'troops' },
+    spells: { cls: 'as-spells', title: 'Spells', meter: 'spells' },
+    sieges: { cls: 'as-sieges', title: 'Siege machines', meter: 'sieges' },
+    cc: { cls: 'as-cc', title: 'Clan Castle', meter: 'cc' },
+  };
+  function trayBody(row) {
     var T = data.troops;
-    // Elixir and dark troops in one group: elixir first, then dark.
-    var regular = T.filter((u) => !u.dark && !u.super).concat(T.filter((u) => u.dark && !u.super));
-    var supers = T.filter((u) => u.super);
-    $('[data-panel="troops"]').innerHTML =
-      group('Troops', '', 'troop', regular, 'th') +
-      group('Super troops', 'supers', 'troop', supers, 'th') +
-      group('Siege machines', 'sieges', 'troop', data.sieges, 'th');
-    $('[data-panel="spells"]').innerHTML =
-      group(
-        'Elixir spells',
-        '',
-        'spell',
-        data.spells.filter((u) => !u.dark),
-        'th',
-      ) +
-      group(
-        'Dark spells',
-        '',
-        'spell',
-        data.spells.filter((u) => u.dark),
-        'th',
+    if (row === 'troops') {
+      // Elixir and dark troops in one group: elixir first, then dark.
+      var regular = T.filter((u) => !u.dark && !u.super).concat(T.filter((u) => u.dark && !u.super));
+      return group('Troops', '', 'troop', regular, 'th') + group('Super troops', 'supers', 'troop', T.filter((u) => u.super), 'th');
+    }
+    if (row === 'sieges') return group('Siege machines', '', 'troop', data.sieges, 'th');
+    if (row === 'spells')
+      return (
+        group(
+          'Elixir spells',
+          '',
+          'spell',
+          data.spells.filter((u) => !u.dark),
+          'th',
+        ) +
+        group(
+          'Dark spells',
+          '',
+          'spell',
+          data.spells.filter((u) => u.dark),
+          'th',
+        )
       );
-    $('[data-panel="cc"]').innerHTML =
+    return (
       group('Troops', 'ccTroops', 'ccTroop', T, 'ccTh') +
       group('Spells', 'ccSpells', 'ccSpell', data.spells, 'ccTh') +
-      group('Siege machines', 'ccSieges', 'ccTroop', data.sieges, 'ccTh');
+      group('Siege machines', 'ccSieges', 'ccTroop', data.sieges, 'ccTh')
+    );
   }
+
   // Town Hall picker: the current TH as a chip with a ▾, and a drop-down
   // listing every Town Hall. The ones not in enabledTh yet are shown with
   // "Soon" and can't be picked.
@@ -475,6 +493,266 @@
     if (b) pick(b.dataset.pick);
   });
 
+  // The tray: in <body> like the modal (fixed to the screen's bottom),
+  // lined up with the builder on wide screens, full width on phones.
+  var editing = null; // the open row: 'troops' | 'spells' | 'sieges' | 'cc'
+  var tray = document.createElement('div');
+  tray.className = 'am-tray';
+  tray.hidden = true;
+  tray.setAttribute('role', 'dialog');
+  tray.setAttribute('aria-labelledby', 'amTrayTitle');
+  tray.innerHTML =
+    '<div class="am-tray-head"><h3 class="am-tray-title" id="amTrayTitle"></h3><span class="am-tray-meter" data-meter=""></span>' +
+    '<button type="button" class="am-btn am-tray-done" data-tray="close">Done</button>' +
+    '<button type="button" class="am-picker-close" data-tray="close" aria-label="Close">&times;</button></div>' +
+    '<div class="am-tray-body"></div>';
+  document.body.appendChild(tray);
+
+  function placeTray() {
+    if (tray.hidden) return;
+    var wide = window.innerWidth > 970;
+    var r = root.getBoundingClientRect();
+    tray.style.left = wide ? r.left + 'px' : '';
+    tray.style.width = wide ? r.width + 'px' : '';
+    // Room under the builder, so the last row can scroll up above the tray.
+    root.style.setProperty('--tray-h', tray.offsetHeight + 'px');
+  }
+  function fillTray() {
+    var R = ROWS[editing];
+    tray.querySelector('.am-tray-title').textContent = R.title;
+    tray.querySelector('.am-tray-meter').dataset.meter = R.meter;
+    tray.querySelector('.am-tray-body').innerHTML = trayBody(editing);
+    refresh();
+  }
+  // The page's scroller: the CoC pages scroll .coc-main, not the window.
+  function scroller() {
+    for (var el = root.parentElement; el; el = el.parentElement) {
+      var oy = getComputedStyle(el).overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) return el;
+    }
+    return document.scrollingElement;
+  }
+  // Keep the open row in view above the tray.
+  function revealRow() {
+    var g = $('#amList .' + ROWS[editing].cls);
+    if (!g) return;
+    var gr = g.getBoundingClientRect();
+    // Where the tray's top will settle (fixed to the bottom), not where it
+    // is now -- it's still sliding up for a moment after it opens.
+    var limit = window.innerHeight - tray.offsetHeight - 16;
+    var sc = scroller();
+    var dy = 0;
+    if (gr.bottom > limit) dy = gr.bottom - limit;
+    else if (gr.top < 110) dy = gr.top - 110; // under the top bars
+    if (!dy) return;
+    var before = sc.style.scrollBehavior;
+    sc.style.scrollBehavior = 'auto'; // .coc-main scrolls smoothly, which would lag behind
+    sc.scrollTop += dy;
+    sc.style.scrollBehavior = before;
+  }
+  function openTray(row) {
+    if (!ROWS[row]) return;
+    closePicker();
+    var was = editing;
+    editing = row;
+    if (tray.hidden) lastTrayFocus = document.activeElement;
+    tray.hidden = false;
+    root.classList.add('is-tray-open');
+    fillTray(); // redraws the sheet too (refresh), with the row lit
+    placeTray();
+    revealRow();
+    if (was !== row) {
+      var first = tray.querySelector('.am-tile:not(.is-full)') || tray.querySelector('.am-tray-done');
+      first.focus({ preventScroll: true });
+    }
+  }
+  var lastTrayFocus = null;
+  function closeTray() {
+    if (tray.hidden) return;
+    var row = editing;
+    editing = null;
+    stopHold();
+    tray.hidden = true;
+    root.classList.remove('is-tray-open');
+    root.style.removeProperty('--tray-h');
+    renderBar();
+    // Back to the row that was open (its first unit, else the row itself).
+    var g = $('#amList .' + ROWS[row].cls);
+    var back = (g && g.querySelector('button.as-tile')) || lastTrayFocus;
+    if (back && document.contains(back)) back.focus({ preventScroll: true });
+  }
+  window.addEventListener('resize', placeTray);
+  // The tray's height changes with its content (another row, another Town
+  // Hall): keep the room under the builder and the open row in step.
+  if ('ResizeObserver' in window)
+    new ResizeObserver(function () {
+      if (tray.hidden) return;
+      placeTray();
+      revealRow();
+    }).observe(tray);
+
+  // Hold to repeat: a tap does it once; holding past HOLD_MS starts
+  // repeating, faster the longer you hold, until you let go, move away,
+  // or fn() says stop (camp full, stack gone). The pointer is captured
+  // by a box that stays put (the tray, or the army list), because the
+  // sheet redraws under your finger on every change.
+  var HOLD_MS = 380;
+  var hold = null;
+  var swallowClick = false;
+  function startHold(e, box, fn) {
+    if (e.button !== 0) return;
+    stopHold();
+    var h = (hold = { id: e.pointerId, x: e.clientX, y: e.clientY, fn: fn, n: 0, box: box });
+    try {
+      box.setPointerCapture(e.pointerId);
+    } catch (err) {}
+    function tick() {
+      if (hold !== h) return;
+      h.n++;
+      if (fn() === false) return stopHold();
+      if (navigator.vibrate)
+        try {
+          navigator.vibrate(6);
+        } catch (err) {}
+      h.t = setTimeout(tick, Math.max(45, 170 - h.n * 12));
+    }
+    h.t = setTimeout(tick, HOLD_MS);
+  }
+  function stopHold() {
+    var h = hold;
+    if (!h) return null;
+    hold = null;
+    clearTimeout(h.t);
+    try {
+      h.box.releasePointerCapture(h.id);
+    } catch (err) {}
+    return h;
+  }
+  function holdEnd(e) {
+    if (!hold || e.pointerId !== hold.id) return;
+    var h = stopHold();
+    if (e.type !== 'pointerup') return;
+    if (h.n === 0) h.fn(); // a tap: just once
+    // The click that follows a press we handled must not do anything else
+    // (open / close a row). A mouse always sends one, a tap too; a long
+    // press on a phone may not, so then nothing is held back. Cleared
+    // shortly after in case none comes.
+    if (h.n === 0 || e.pointerType === 'mouse') {
+      swallowClick = true;
+      setTimeout(() => (swallowClick = false), 350);
+    }
+  }
+  function holdMove(e) {
+    if (hold && e.pointerId === hold.id && Math.abs(e.clientX - hold.x) + Math.abs(e.clientY - hold.y) > 10) stopHold();
+  }
+  document.addEventListener(
+    'click',
+    function (e) {
+      if (!swallowClick) return;
+      swallowClick = false;
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    true,
+  );
+  [tray, $('#amList')].forEach(function (box) {
+    box.addEventListener('pointerup', holdEnd);
+    box.addEventListener('pointercancel', holdEnd);
+    box.addEventListener('pointermove', holdMove);
+    box.addEventListener('lostpointercapture', holdEnd);
+    // A long press would otherwise open the image menu on phones.
+    box.addEventListener('contextmenu', function (e) {
+      if (e.target.closest('.am-tile, .is-editing .as-tile')) e.preventDefault();
+    });
+  });
+  function canAdd(kind, id) {
+    if (blocked(kind, id)) {
+      add(kind, id); // shows why
+      return false;
+    }
+    add(kind, id);
+    return true;
+  }
+  function canRemove(kind, id) {
+    remove(kind, id);
+    return s[MAP[kind]].has(id);
+  }
+  tray.addEventListener('pointerdown', function (e) {
+    var t = e.target.closest('.am-tile[data-kind]');
+    if (t) startHold(e, tray, () => canAdd(t.dataset.kind, parseInt(t.dataset.id, 10)));
+  });
+  $('#amList').addEventListener('pointerdown', function (e) {
+    var t = e.target.closest('.is-editing button.as-tile[data-sheet="remove"]');
+    if (t) startHold(e, $('#amList'), () => canRemove(t.dataset.kind, parseInt(t.dataset.id, 10)));
+  });
+  tray.addEventListener('click', function (e) {
+    if (e.target.closest('[data-tray="close"]')) return closeTray();
+    // Keyboard only (Enter / Space: detail 0) -- pointers go through startHold.
+    var t = e.target.closest('.am-tile[data-kind]');
+    if (t && e.detail === 0) add(t.dataset.kind, parseInt(t.dataset.id, 10));
+  });
+  // A tap anywhere else (not the tray, not the army sheet) closes the tray.
+  // Heroes / pets in the sheet close it themselves (they open the modal).
+  document.addEventListener('click', function (e) {
+    if (tray.hidden) return;
+    // A target that's no longer in the page was redrawn away by this very
+    // click (the sheet redraws on every change) -- i.e. it was in the builder.
+    if (!document.contains(e.target)) return;
+    if (tray.contains(e.target) || e.target.closest('#amList, .am-toast')) return;
+    closeTray();
+  });
+
+  // Each row's own Clear: the troops row and the siege row share one map.
+  function clearRow(row) {
+    var T = byId.troop;
+    if (row === 'troops') s.troops.forEach((c, id) => !T[id].siege && s.troops.delete(id));
+    else if (row === 'sieges') s.troops.forEach((c, id) => T[id].siege && s.troops.delete(id));
+    else if (row === 'spells') s.spells.clear();
+    else {
+      s.ccTroops.clear();
+      s.ccSpells.clear();
+    }
+    changed();
+  }
+  function rowHas(row) {
+    var T = byId.troop;
+    var n = 0;
+    if (row === 'troops') s.troops.forEach((c, id) => (n += T[id].siege ? 0 : 1));
+    else if (row === 'sieges') s.troops.forEach((c, id) => (n += T[id].siege ? 1 : 0));
+    else if (row === 'spells') n = s.spells.size;
+    else n = s.ccTroops.size + s.ccSpells.size;
+    return n > 0;
+  }
+  var TRASH =
+    '<svg class="am-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" /></svg>';
+  // After every redraw of the sheet: mark the rows, give each its Clear,
+  // and light the open one.
+  function decorateRows(list) {
+    var sheet = list.querySelector('.army-sheet');
+    if (!sheet) return;
+    sheet.classList.toggle('is-editing-row', !!editing);
+    Object.keys(ROWS).forEach(function (row) {
+      var g = sheet.querySelector('.' + ROWS[row].cls);
+      if (!g) return;
+      g.dataset.row = row;
+      g.classList.toggle('is-editing', editing === row);
+      g.classList.toggle('is-empty', !g.querySelector('.as-row > .as-tile:not(.as-ph)'));
+      if (editing !== row) g.setAttribute('title', 'Tap to edit ' + ROWS[row].title.toLowerCase());
+      g.querySelector('.as-head').insertAdjacentHTML(
+        'beforeend',
+        '<button type="button" class="am-row-clear" data-row-clear="' +
+          row +
+          '"' +
+          (rowHas(row) ? '' : ' disabled') +
+          ' aria-label="Clear ' +
+          ROWS[row].title.toLowerCase() +
+          '">' +
+          TRASH +
+          '<span>Clear</span></button>',
+      );
+    });
+  }
+
   // ---- Updating what's on screen -----------------------------------------
   function meter(val, max) {
     return '<b' + (val > max ? ' class="is-over"' : '') + '>' + val + '</b>/' + max;
@@ -483,7 +761,8 @@
     var u = used();
     var counts = { troop: s.troops, spell: s.spells, ccTroop: s.ccTroops, ccSpell: s.ccSpells };
 
-    $$('.am-tile[data-kind]').forEach(function (b) {
+    var inTray = (sel) => $$(sel).concat([].slice.call(tray.querySelectorAll(sel)));
+    inTray('.am-tile[data-kind]').forEach(function (b) {
       var kind = b.dataset.kind;
       var id = parseInt(b.dataset.id, 10);
       var n = counts[kind].get(id) || 0;
@@ -504,23 +783,22 @@
       ccSpells: meter(u.ccSpells, TH.cc.spells),
       ccSieges: meter(u.ccSieges, TH.cc.sieges),
     };
-    $$('[data-meter]').forEach(function (el) {
+    inTray('[data-meter]').forEach(function (el) {
       el.innerHTML = M[el.dataset.meter] || '';
     });
     renderBar();
   }
 
   // "Your army": the same army sheet as the army cards (th-layouts.js
-  // ArmySheet), in edit mode -- tap a unit to remove one, a hero's
-  // portrait to remove the hero, a pet / equipment slot to pick one, the
-  // Warden's corner icon to switch air / ground, an empty hero slot to go
-  // to the Heroes tab.
+  // ArmySheet), in edit mode -- tap a unit row to open its tray, a hero's
+  // portrait or an empty hero slot for the hero picker, a pet / equipment
+  // slot to pick one, the Warden's corner icon to switch air / ground.
   function renderBar() {
     var c0 = code();
     var list = $('#amList');
     list.innerHTML = window.ArmySheet.html(s.th, c0, { edit: true, stack: true });
+    decorateRows(list);
     window.ArmySheet.wire(list);
-    $('#amListNote').hidden = !c0; // "Click a unit to remove it": only once there's one
 
     var c = c0;
     var open = $('#amOpen');
@@ -555,6 +833,7 @@
     // sidebar pushes the builder off the window's centre).
     var r = root.getBoundingClientRect();
     t.style.left = r.left + r.width / 2 + 'px';
+    t.style.bottom = tray.hidden ? '' : tray.offsetHeight + 12 + 'px';
     t.textContent = msg;
     t.classList.add('is-on');
     clearTimeout(toastTimer);
@@ -618,7 +897,7 @@
     picking = null;
     buildThs();
     updateJumps();
-    buildPanels();
+    if (editing) fillTray();
     changed();
     if (gone.length) toast('Removed (not unlocked at TH' + n + '): ' + gone.join(', '));
   }
@@ -637,8 +916,23 @@
     }
   }
   root.addEventListener('click', function (e) {
+    var rc = e.target.closest('[data-row-clear]');
+    if (rc) return clearRow(rc.dataset.rowClear);
+    // A unit row: a closed one opens (wherever you tap it); in the open
+    // one a unit's tap is the remove badge (pointers: startHold above;
+    // this is the keyboard's Enter / Space).
+    var g = e.target.closest('#amList .as-group[data-row]');
+    if (g) {
+      if (g.dataset.row !== editing) return openTray(g.dataset.row);
+      var rm = e.target.closest('button.as-tile[data-sheet="remove"]');
+      if (rm && e.detail === 0) remove(rm.dataset.kind, parseInt(rm.dataset.id, 10));
+      return;
+    }
     var st = e.target.closest('#amList [data-sheet]');
-    if (st) return sheetAct(st);
+    if (st) {
+      closeTray();
+      return sheetAct(st);
+    }
     var t = e.target.closest('button, a');
     if (!t || !root.contains(t) || t.disabled) return;
 
@@ -652,10 +946,6 @@
       return;
     }
     if (t.dataset.share) return shareAction(t);
-    if (t.classList.contains('am-tab')) return showTab(t.dataset.tab);
-
-    var id = parseInt(t.dataset.id, 10);
-    if (t.classList.contains('am-tile') && t.dataset.kind) return add(t.dataset.kind, id);
 
     if (t.id === 'amOpen' && t.getAttribute('aria-disabled') === 'true') return e.preventDefault();
     var act = t.dataset.act;
@@ -819,6 +1109,7 @@
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
     if (!modal.hidden) return closePicker();
+    if (!tray.hidden) return closeTray();
     if (!shareMenuEl.hidden) {
       shareMenu(false);
       $('[data-act="share"]').focus();
@@ -842,40 +1133,14 @@
     toast(skipped.length ? 'Loaded. Left out: ' + skipped.join(', ') : 'Army loaded');
   });
 
-  function showTab(name) {
-    $$('.am-tab').forEach(function (b) {
-      var on = b.dataset.tab === name;
-      b.classList.toggle('active', on);
-      b.setAttribute('aria-selected', on);
-      b.tabIndex = on ? 0 : -1;
-    });
-    $$('.am-panel').forEach(function (p) {
-      p.hidden = p.dataset.panel !== name;
-    });
-  }
-  // Arrow keys move between tabs (the usual tablist keyboard pattern).
-  $('.am-tabs').addEventListener('keydown', function (e) {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    var tabs = $$('.am-tab');
-    var i = tabs.indexOf(document.activeElement);
-    if (i === -1) return;
-    var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
-    showTab(next.dataset.tab);
-    next.focus();
-  });
-
   // ---- "Tools" highlighted in the navs ---------------------------------------
   // The army maker is one of the Tools, but the nav scripts only light up
   // the link whose href is this page, and none is. So light Tools here:
-  // the bottom nav's (thz-script.js clears it on load), the tabs under the
-  // hero on phones, and the top bar's hub link (th-layouts.js builds that
+  // the bottom nav's (thz-script.js clears it on load) and the top bar's hub link (th-layouts.js builds that
   // strip after a fetch -- the observer catches it arriving).
   function markTools() {
     document.querySelectorAll('.bn-item[data-role]').forEach(function (a) {
       a.classList.toggle('active', a.dataset.role === 'bn-guides');
-    });
-    document.querySelectorAll('.first-layer button').forEach(function (b) {
-      b.classList.toggle('active', b.textContent.trim() === 'Tools');
     });
     document.querySelectorAll('#stbHubNavScroll .stb-hub-link').forEach(function (a) {
       a.classList.toggle('active', /coctools\.html$/.test(a.getAttribute('href') || ''));
@@ -916,8 +1181,6 @@
       var skipped = q.get('army') ? load(q.get('army')) : [];
       buildThs();
       updateJumps();
-      buildPanels();
-      showTab('troops');
       changed();
       root.classList.add('is-ready');
       if (skipped && skipped.length) toast('Left out: ' + skipped.join(', '));

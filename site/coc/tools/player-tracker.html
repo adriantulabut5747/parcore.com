@@ -40,20 +40,22 @@
     <link rel="shortcut icon" href="/icons/home.jpg" />
     <link rel="apple-touch-icon" href="/icons/home.jpg" />
 
-    <link rel="stylesheet" href="/11layout.css?v=20261005c" />
+    <link rel="stylesheet" href="/11layout.css?v=20261006a" />
     <link rel="stylesheet" href="/1coclayouts.css" />
     <!-- Live events + official clan card, shared with /coc/ -->
-    <link rel="stylesheet" href="/coc-clan-clock.css" />
+    <link rel="stylesheet" href="/coc-clan-clock.css?v=20261006a" />
 
     <!-- Look + behaviour shared by every Town Hall layouts page -->
-    <link rel="stylesheet" href="/th-layouts.css" />
+    <link rel="stylesheet" href="/th-layouts.css?v=20261006b" />
     <!-- The guides pages' own content (websites, glossary, equipment, wall calculator) -->
-    <link rel="stylesheet" href="/coc-armymaker.css" />
+    <link rel="stylesheet" href="/coc-armymaker.css?v=20261006a" />
     <link rel="stylesheet" href="/coc-guides.css" />
     <link rel="stylesheet" href="/coc-help.css" />
     <link rel="stylesheet" href="/coc-more.css" />
     <link rel="stylesheet" href="/coc-hub-menus.css" />
-    <link rel="stylesheet" href="/coc-tracker.css" />
+    <!-- The Tools banner -->
+    <link rel="stylesheet" href="/coc-tools.css" />
+    <link rel="stylesheet" href="/coc-tracker.css?v=20261006b" />
   </head>
   <body>
     <!-- Shared ember gradient for the liked flame. -->
@@ -189,43 +191,76 @@
 
       <div class="coc-main">
         <div class="coc-content">
-          <!-- PLAYER SEARCH (Oct 2026): the whole page is this one box (his ask:
-               no hero, no Layouts/Army/Tools or Town Hall rows here). A player
-               tag goes to /coc/player/<TAG>, a clan to /coc/clan/<TAG> (or a
-               name search listed in #ptResults); coc-tracker.js checks it, and
-               lists the players last opened on this device (localStorage)
-               under the box once there are any. Styles: coc-tracker.css. -->
-          <section class="pt-search" aria-labelledby="pt-title">
-            <img class="pt-search-emblem" src="/clashofclans/coctools/legend-league.png" alt="" width="72" height="72" />
-            <h1 id="pt-title">Player <em>tracker</em></h1>
-            <p class="pt-search-lead">Look up a player by tag, or a clan by name or tag.</p>
-            <div class="pt-mode" role="radiogroup" aria-label="Search for">
-              <button type="button" role="radio" aria-checked="true" data-mode="player">Player</button>
-              <button type="button" role="radio" aria-checked="false" data-mode="clan" tabindex="-1">Clan</button>
-            </div>
-            <form class="pt-form" id="ptSearch" role="search" novalidate>
-              <label class="pt-sr" for="ptTag">Player tag</label>
-              <div class="pt-field">
-                <span class="pt-field-hash" aria-hidden="true">#</span>
-                <input
-                  id="ptTag"
-                  name="tag"
-                  type="text"
-                  autocomplete="off"
-                  autocapitalize="characters"
-                  spellcheck="false"
-                  placeholder="Player tag"
-                  aria-describedby="ptSearchMsg ptHelp"
-                />
+          <!-- TOOL BANNER -- same block as every Tools page (coc-tools.css).
+            Art: clashofclans/tools-header.webp. -->
+          <div class="tb">
+            <img class="tb-art" src="/clashofclans/tools-header.webp" alt="" decoding="async" fetchpriority="high" />
+            <div class="tb-body">
+              <a class="tb-back" href="/coc/tools/"
+                ><span class="tb-back-text">Back to tools</span
+                ><svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 16l4-4-4-4M19 12H9"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+              ></a>
+              <img class="tb-icon" src="/clashofclans/coctools/legend-league.png" alt="" />
+              <div class="tb-copy">
+                <h1 class="tb-title" id="pt-title">Player <em>tracker</em></h1>
+                <p class="tb-desc">Look up any player by tag, or a clan by name or tag.</p>
+                <ul class="tb-facts">
+                  <li class="tb-fact">Players &amp; clans</li>
+                  <li class="tb-fact">Live from the game</li>
+                </ul>
               </div>
-              <button type="submit" class="th-soon-btn th-soon-btn--primary">Look up</button>
-            </form>
-            <p class="pt-msg" id="ptSearchMsg" role="alert" hidden></p>
-            <ul class="pt-results" id="ptResults" aria-label="Clans found" hidden></ul>
-            <p class="pt-help" id="ptHelp">
-              Find a tag in game: tap the player&rsquo;s name to open their profile. The tag is the code under the name.
-            </p>
-            <p class="pt-next">Open a clan and press Track this clan to keep its member changes and war attacks.</p>
+            </div>
+          </div>
+
+          <!-- PLAYER SEARCH (Oct 2026): a split card under the tool banner --
+               the form on the left, a cut-out character on the right (standing small in the
+               bottom-right corner on phones). A player tag goes
+               to /coc/player/<TAG>, a clan to /coc/clan/<TAG> (or a name
+               search listed in #ptResults); coc-tracker.js checks it. Under
+               the card: the last players / clans opened on this device
+               (localStorage), or three Featured ones before there are any.
+               Styles: coc-tracker.css. -->
+          <section class="pt-search" aria-label="Find a player or clan">
+            <div class="pt-search-main">
+              <div class="pt-mode" role="radiogroup" aria-label="Search for">
+                <button type="button" role="radio" aria-checked="true" data-mode="player">Player</button>
+                <button type="button" role="radio" aria-checked="false" data-mode="clan" tabindex="-1">Clan</button>
+              </div>
+              <form class="pt-form" id="ptSearch" role="search" novalidate>
+                <label class="pt-sr" for="ptTag">Player tag</label>
+                <div class="pt-field">
+                  <span class="pt-field-hash" aria-hidden="true">#</span>
+                  <input
+                    id="ptTag"
+                    name="tag"
+                    type="text"
+                    autocomplete="off"
+                    autocapitalize="characters"
+                    spellcheck="false"
+                    placeholder="Player tag"
+                    aria-describedby="ptSearchMsg ptHelp"
+                  />
+                </div>
+                <button type="submit" class="th-soon-btn th-soon-btn--primary">Look up</button>
+              </form>
+              <p class="pt-msg" id="ptSearchMsg" role="alert" hidden></p>
+              <ul class="pt-results" id="ptResults" aria-label="Clans found" hidden></ul>
+              <p class="pt-help" id="ptHelp">
+                Find a tag in game: tap the player&rsquo;s name to open their profile. The tag is the code under the name.
+              </p>
+              <p class="pt-next">Open a clan and press Track this clan to keep its member changes and war attacks.</p>
+            </div>
+            <div class="pt-search-art" aria-hidden="true">
+              <img src="/clashofclans/tracker-search-art.webp" alt="" decoding="async" />
+            </div>
           </section>
 
           <section class="pt-recent" id="ptRecent" aria-labelledby="pt-recent-title" hidden>
@@ -238,67 +273,6 @@
                  to the red band above the footer). Styles: .t18-lower in th-layouts.css. -->
           <div class="t18-lower"></div>
         </div>
-
-        <!-- Live band: the six events again, on a deep-red band that sits flush on
-             the footer (layout borrowed from supercell.com's careers band). Outside
-             .coc-content so it runs edge to edge. The Dragon Warden pokes out of the
-             top edge with a few bricks knocked loose. coc-events.js fills every
-             [data-event] on the page, so these need no script of their own.
-             Styles: .t18-band in th-layouts.css. -->
-        <section class="cc-section t18-band" id="events-section" aria-labelledby="t18-band-label">
-          <div class="t18-band-body">
-            <div class="cc-label-row">
-              <h2 class="cc-label" id="t18-band-label">Live in Clash right now</h2>
-              <span class="cc-label-note">Your local time</span>
-            </div>
-            <ul class="t18-clock" aria-label="Clan events">
-              <li class="t18-tag t18-clock-tag" data-event="raid">
-                <span class="cc-event-icon"
-                  ><img src="/clashofclans/coctools/raidmedals2.webp" alt="" loading="lazy" decoding="async" /></span
-                ><span class="t18-clock-text"
-                  ><span class="t18-tag-name">Raid Weekend</span> <b class="t18-tag-time" data-timer>--</b></span
-                >
-              </li>
-              <li class="t18-tag t18-clock-tag" data-event="cwl">
-                <span class="cc-event-icon"><img src="/clashofclans/coctools/cwl2.webp" alt="" loading="lazy" decoding="async" /></span
-                ><span class="t18-clock-text"
-                  ><span class="t18-tag-name">Clan War League</span> <b class="t18-tag-time" data-timer>--</b></span
-                >
-              </li>
-              <li class="t18-tag t18-clock-tag" data-event="clangames">
-                <span class="cc-event-icon"
-                  ><img src="/clashofclans/coctools/clangames2.webp" alt="" loading="lazy" decoding="async" /></span
-                ><span class="t18-clock-text"><span class="t18-tag-name">Clan Games</span> <b class="t18-tag-time" data-timer>--</b></span>
-              </li>
-              <li class="t18-tag t18-clock-tag" data-event="trader">
-                <span class="cc-event-icon"><img src="/clashofclans/coctools/trader2.webp" alt="" loading="lazy" decoding="async" /></span
-                ><span class="t18-clock-text"><span class="t18-tag-name">Trader Shop</span> <b class="t18-tag-time" data-timer>--</b></span>
-              </li>
-              <li class="t18-tag t18-clock-tag" data-event="season">
-                <span class="cc-event-icon"
-                  ><img src="/clashofclans/coctools/battlepass.webp" alt="" loading="lazy" decoding="async" /></span
-                ><span class="t18-clock-text"
-                  ><span class="t18-tag-name" data-name="short">Battle Pass</span> <b class="t18-tag-time" data-timer>--</b></span
-                >
-              </li>
-              <li class="t18-tag t18-clock-tag" data-event="legend">
-                <span class="cc-event-icon"
-                  ><img src="/clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async" /></span
-                ><span class="t18-clock-text"
-                  ><span class="t18-tag-name">Legend League</span> <b class="t18-tag-time" data-timer>--</b></span
-                >
-              </li>
-            </ul>
-          </div>
-          <div class="t18-band-art" aria-hidden="true">
-            <img src="/clashofclans/coctools/wardendragon-tight.png" alt="" loading="lazy" decoding="async" />
-            <!-- Embers: sparks rising off the fire orb in his hand and his wings, over a slow orb glow. -->
-            <span class="t18-band-fx"
-              ><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span
-              ><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span
-            ></span>
-          </div>
-        </section>
 
         <footer class="pf-footer">
           <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
@@ -620,17 +594,17 @@
     <!-- /.main: was never closed, so the browser closed it at the end of the body;
      closed here to match (the More sheet, bottom nav and viewer above sit
      inside it, as they always have). -->
-    <script src="/11layout.js?v=20261005c" defer></script>
-    <script src="/thz-script.js?v=20261005f"></script>
+    <script src="/11layout.js?v=20261006c" defer></script>
+    <script src="/thz-script.js?v=20261006a"></script>
     <script src="/coc-events.js"></script>
 
     <!-- Hero ("Did you know?", event tags) and the secondary top bar. -->
-    <script src="/th-layouts.js?v=20261005d" defer></script>
+    <script src="/th-layouts.js?v=20261006c" defer></script>
     <!-- This guide's content: built from its JSON file. -->
     <script src="/coc-guides.js" defer></script>
     <script src="/coc-help.js" defer></script>
-    <script src="/coc-more.js" defer></script>
+    <script src="/coc-more.js?v=20261006a" defer></script>
     <script src="/coc-hub-menus.js" defer></script>
-    <script src="/coc-tracker.js" defer></script>
+    <script src="/coc-tracker.js?v=20261006b" defer></script>
   </body>
 </html>

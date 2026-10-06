@@ -40,4 +40,53 @@ function cocPagePath(u) {
 
   var page = cocPagePath(location.pathname);
   select(/\/army$|army-maker/.test(page) ? 1 : 0, false);
+
+  // The tiles themselves, from coc-nav-data.json -- the one list every CoC
+  // page's sheet is built from (home included), so adding a TH or a tool
+  // there updates them all. The Tools hub ("hub": true) is skipped: the
+  // bottom nav's Tools button already goes there.
+  function fill(role, html) {
+    var box = document.querySelector('[data-role="' + role + '"]');
+    if (box) box.innerHTML = html;
+  }
+  function on(href) {
+    return cocPagePath(href) === page ? ' active' : '';
+  }
+  fetch('/coc-nav-data.json')
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function (data) {
+      function thTiles(hrefKey, iconKey) {
+        return data.townhalls
+          .map(function (th) {
+            return (
+              '<a href="' + th[hrefKey] + '" class="mx-th' + on(th[hrefKey]) + '">' +
+              '<img src="' + th[iconKey] + '" alt="' + th.label + '"><span>' + th.label + '</span></a>'
+            );
+          })
+          .join('');
+      }
+      fill('more-layouts-grid', thTiles('layoutHref', 'layoutIcon'));
+      fill('more-armies-grid', thTiles('armyHref', 'armyIcon'));
+      fill(
+        'more-guides-list',
+        data.guides
+          .filter(function (g) {
+            return !g.hub;
+          })
+          .map(function (g) {
+            var act = (g.activeOn || []).map(cocPagePath).indexOf(page) !== -1 ? ' active' : '';
+            return (
+              '<a href="' + g.href + '" class="mx-tool' + act + '">' +
+              '<span class="mx-tool-ico"><img src="' + g.icon + '" alt=""></span>' +
+              '<span class="mx-tool-name">' + g.label + '</span></a>'
+            );
+          })
+          .join(''),
+      );
+    })
+    .catch(function (err) {
+      console.error('More sheet failed to load:', err);
+    });
 })();

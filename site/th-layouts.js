@@ -209,50 +209,6 @@ function cocPagePath(u) {
     });
 })();
 
-// Desktop (1351px+): 2 cards per row, and only as many rows as fit
-// beside the text column -- at least 2, at most 3 -- the rest hidden
-// (.is-over). 971-1350px: under the text, 2 x 2. Phones: one card at a
-// time, Raid Weekend first, stepped with the prev / next buttons.
-(function () {
-  var list = document.querySelector('.t18-events');
-  if (!list) return;
-  var items = [].slice.call(list.querySelectorAll('li:not(.t18-ev-navli)'));
-  var copy = document.querySelector('.t18-hero-copy');
-  var phone = window.matchMedia('(max-width:970px)');
-  var wide = window.matchMedia('(min-width:1351px)');
-  var at = 0;
-  function show() {
-    items.forEach(function (li, i) {
-      li.classList.toggle('is-current', i === at);
-    });
-  }
-  var lastKey = '';
-  function fitRows() {
-    var rows = 2;
-    if (wide.matches && copy) {
-      var textH = copy.getBoundingClientRect().height;
-      var cardH = items[0].getBoundingClientRect().height || 52;
-      rows = Math.max(2, Math.min(3, Math.floor((textH + 8) / (cardH + 8))));
-    }
-    var key = (phone.matches ? 'p' : 'd') + rows;
-    if (key === lastKey) return; // only touch the DOM when the answer changes
-    lastKey = key;
-    items.forEach(function (li, i) {
-      li.classList.toggle('is-over', !phone.matches && i >= rows * 2);
-    });
-  }
-  list.addEventListener('click', function (e) {
-    var btn = e.target.closest('.t18-ev-nav');
-    if (!btn) return;
-    at = (at + +btn.getAttribute('data-step') + items.length) % items.length;
-    show();
-  });
-  show();
-  fitRows();
-  window.addEventListener('resize', fitRows);
-  if (window.ResizeObserver && copy) new ResizeObserver(fitRows).observe(copy);
-})();
-
 (function () {
   var box = document.getElementById('second-layer-container');
   var rail = document.getElementById('th-rail');
@@ -434,7 +390,11 @@ function cocPagePath(u) {
         );
       });
       if (dsnScroll && guide) {
+        // The Tools hub itself ("hub": true) is the Tools tab, not a chip.
         dsnScroll.innerHTML = data.guides
+          .filter(function (g) {
+            return !g.hub;
+          })
           .map(function (g) {
             return (
               '<a href="' +
@@ -710,11 +670,11 @@ function cocPagePath(u) {
   }
   // One labelled group: name on the left, "used/max" on the right, then a
   // row of tiles that scrolls sideways when it doesn't fit.
-  // Clan castle outline: the CC heading icon.
-  // Clan castle: a crenellated keep with an arched gate and the clan's
-  // pennant flying from the top (the flag is what makes it the CC).
+  // Clan castle: the CC heading icon -- a tall crenellated tower with an
+  // arched gate, rising out of low walls (like the in-game building).
+  // Oct 2026: replaced a keep with the clan's pennant on top.
   var CASTLE =
-    '<path d="M4 21V9h3v2h3.5V9h3v2H17V9h3v12z"/><path d="M9.5 21v-3.5a2.5 2.5 0 0 1 5 0V21"/><path d="M12 9V2.5"/><path d="M12 3h5l-1.5 1.75L17 6.5h-5z" fill="currentColor"/>';
+    '<path d="M3 21v-9h2.5v2.5H8"/><path d="M16 14.5h2.5V12H21v9"/><path d="M8 21V4.5h2.25V7h3.5V4.5H16V21"/><path d="M2 21h20"/><path d="M10.25 21v-3a1.75 1.75 0 0 1 3.5 0v3"/>';
   // Section icons (muted grey, before each heading, like the game's
   // headers): crown, army camp tent, potion flask, siege wagon, castle.
   // Stroke icons: crown, tent and flask are Lucide (ISC licence); the castle
@@ -818,6 +778,23 @@ function cocPagePath(u) {
       .map((k) => tiles(k[0], k[3]).replace(/class="as-tile( is-super)?"/, 'class="as-tile$1 as-kind"'))
       .join('');
     var bottom = `<div class="as-group as-cc">${headHtml('Clan Castle', 'castle', `<span class="as-cap">${ccCaps}</span>`)}<div class="as-row">${ccTiles}</div></div>`;
+    // Phones (cards only, not the maker): troops, spells and siege in one
+    // "Army" row -- troops first, then spells, then siege, each kind a
+    // little apart -- with the three used/max counts in that order. The
+    // separate rows stay in the markup for desktop; CSS picks which shows.
+    var armyRow = '';
+    if (!edit) {
+      var armyKinds = [
+        [army.troops, used(army.troops), cap.troops, 'troop'],
+        [army.spells, used(army.spells), cap.spells, 'spell'],
+        [army.sieges, used(army.sieges, true), cap.sieges, 'troop'],
+      ].filter((k) => k[0].length || k[2]);
+      var armyTiles = armyKinds
+        .filter((k) => k[0].length)
+        .map((k) => tiles(k[0], k[3]).replace(/class="as-tile( is-super)?"/, 'class="as-tile$1 as-kind"'))
+        .join('');
+      armyRow = `<div class="as-group as-army">${headHtml('Army', 'troops', `<span class="as-cap">${armyKinds.map((k) => capHtml(k[1], k[2])).join(' · ')}</span>`)}<div class="as-row">${armyTiles}</div></div>`;
+    }
     return tidy`
       <div class="army-sheet${edit ? ' is-edit' : ''}${opt && opt.stack ? ' is-stack' : ''}" style="--slots:${slots}">
         <div class="as-heroes">
@@ -825,6 +802,7 @@ function cocPagePath(u) {
           <div class="as-hero-row">${heroes}</div>
         </div>
         <div class="as-units">
+          ${armyRow}
           ${group('as-troops', 'Troops', 'troops', used(army.troops), cap.troops, tiles(army.troops, 'troop'))}
           <div class="as-pair">${mid}</div>
           ${bottom}
@@ -952,6 +930,7 @@ function cocPagePath(u) {
       <div class="army-sheet is-skel${opt && opt.stack ? ' is-stack' : ''}" style="--slots:4" aria-hidden="true">
         <div class="as-heroes">${head(64)}<div class="as-hero-row">${hero.repeat(4)}</div></div>
         <div class="as-units">
+          ${opt && opt.stack ? '' : grp('as-army', 60, 14)}
           ${grp('as-troops', 70, 12)}
           <div class="as-pair">${grp('as-spells', 54, 6)}${grp('as-sieges', 44, 3)}</div>
           ${grp('as-cc', 90, 8)}
@@ -1067,8 +1046,8 @@ function cocPagePath(u) {
     // so the built card is exactly the old hand-written markup.
     return tidy`
       <div class="discord-card" id="base-${id}">
-        <div class="card-media">
-          <img src="${esc(page.imageDir + b.image)}" alt="TH${page.th} base layout ${b.id}" class="zoomable" loading="lazy" onclick="openPalette(this)">${b.new ? '<span class="new-tag">New</span>' : ''}
+        <div class="card-media sk">
+          <img src="${esc(page.imageDir + b.image)}" alt="TH${page.th} base layout ${b.id}" class="zoomable" loading="lazy" onclick="openPalette(this)" onload="this.parentNode.classList.remove('sk')" onerror="this.parentNode.classList.remove('sk')">${b.new ? '<span class="new-tag">New</span>' : ''}
           <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="${esc(page.icon)}" alt="" decoding="async"></button>
           <div class="cc-popup" role="dialog" aria-label="Recommended clan castle troops"><div class="ccp-head"><span class="ccp-title">Clan Castle</span><span class="ccp-note">Recommended</span></div><ul class="ccp-list">${cc}</ul></div>
         </div>
@@ -1133,12 +1112,12 @@ function cocPagePath(u) {
     grid.innerHTML = skel.repeat(4);
     grid.setAttribute('aria-busy', 'true');
   }
-  // Layouts pages: the same idea -- a 16:10 block where the base's
-  // screenshot goes and the button bar under it.
+  // Layouts pages: the same idea -- a 16:9 block where the base's
+  // screenshot goes and the three buttons under it. 10 = one page.
   if (!ARMY && !grid.children.length) {
     grid.innerHTML =
-      '<div class="discord-card is-skel-card" aria-hidden="true"><div class="sk sk-shot"></div><div class="sk sk-bar"></div></div>'.repeat(
-        4,
+      '<div class="discord-card is-skel-card" aria-hidden="true"><div class="card-media sk sk-shot"></div><div class="action-row card-bar"><span class="sk"></span><span class="sk sk-copy"></span><span class="sk"></span></div></div>'.repeat(
+        10,
       );
     grid.setAttribute('aria-busy', 'true');
   }
@@ -1162,7 +1141,7 @@ function cocPagePath(u) {
       var pages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
       var nav = document.getElementById('layout-pages');
       var crumb = document.getElementById('stbPage');
-      var heroPage = document.getElementById('t18Page'); // pill above the hero title
+      var heroPage = document.getElementById('t18Page'); // "Page 1 of 2" after the banner title
       var current = 0;
 
       function pageFromUrl() {

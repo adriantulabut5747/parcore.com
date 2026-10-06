@@ -13,7 +13,7 @@ function cocPagePath(u) {
    GUIDES PAGES (coctools*.html) -- the content inside each page's box.
    One script for all four; each part runs only on the page that has its
    element:
-     #gdSites   Web Tools     <- coc-websites.json
+     #gdSites   Outside websites (Tools page) <- coc-websites.json
      #glossList Glossary      <- coc-glossary.json
      #eqGrid    Equipment     <- coc-equipment.json
      #wallCalc  Wall calculator (costs below, from the wiki)
@@ -52,11 +52,9 @@ function cocPagePath(u) {
   }
   var SK = {
     site:
-      '<div class="ct-card gd-skel" aria-hidden="true"><span class="sk gd-sk-ico"></span><span class="ct-card-body">' +
+      '<div class="tc-card tc-card--ext gd-skel" aria-hidden="true"><span class="sk tc-icon"></span><span class="tc-text">' +
       line(55, 'gd-sk-title') +
       line(90) +
-      line(70) +
-      line(35, 'gd-sk-foot') +
       '</span></div>',
     gloss:
       '<div class="gd-skel gd-sk-gloss" aria-hidden="true"><span class="sk gd-sk-head"></span><span class="gd-sk-list">' +
@@ -88,11 +86,19 @@ function cocPagePath(u) {
     });
   }
 
-  // ---- Web Tools ------------------------------------------------------------
-  // Same card as coc-home's Clash Tools (.ct-card): the site's icon, what it
-  // does as the title, one line, and the domain it opens.
-  var ARROW =
-    '<svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>';
+  // ---- Outside websites (Tools page) ----------------------------------------
+  // The same card as our own tools (.tc-card, coc-cards.css) in grey
+  // (.tc-card--ext): favicon, the site's name with its domain beside it,
+  // one line on what it is, and the leaving-the-site arrow.
+  var EXT =
+    '<svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>';
+  function hostOf(url) {
+    try {
+      return new URL(url).hostname.replace(/^www\./, '');
+    } catch (e) {
+      return '';
+    }
+  }
   var sites = $('#gdSites');
   if (sites) {
     skeleton(sites, SK.site, 6);
@@ -101,71 +107,86 @@ function cocPagePath(u) {
         sites.removeAttribute('aria-busy');
         sites.innerHTML = d.sites
           .map(function (s) {
-            var host = '';
-            try {
-              host = new URL(s.url).hostname.replace(/^www\./, '');
-            } catch (e) {}
             return (
-              '<a class="ct-card" href="' +
+              '<a class="tc-card tc-card--ext" href="' +
               esc(s.url) +
-              '" target="_blank" rel="noopener noreferrer" title="' +
-              esc(s.name) +
-              '">' +
-              '<span class="ct-card-icon"><img src="' +
+              '" target="_blank" rel="noopener noreferrer" data-leave>' +
+              '<span class="tc-icon"><img src="' +
               esc(s.icon) +
-              '" alt="" width="40" height="40" loading="lazy" decoding="async"></span>' +
-              '<div class="ct-card-body"><div class="ct-card-head"><span class="ct-card-name">' +
-              esc(s.tag) +
-              '</span>' +
-              ARROW +
-              '</div><p class="ct-card-desc">' +
+              '" alt="" width="30" height="30" loading="lazy" decoding="async"></span>' +
+              '<span class="tc-text"><span class="tc-name">' +
+              esc(s.name) +
+              '<span class="tc-host">' +
+              esc(hostOf(s.url)) +
+              '</span></span><span class="tc-desc">' +
               esc(s.desc) +
-              '</p><span class="ct-card-foot">' +
-              esc(host) +
-              '</span></div></a>'
+              '</span></span>' +
+              EXT +
+              '</a>'
             );
           })
           .join('');
       })
       .catch(() => failed(sites, 'websites'));
+    sites.addEventListener('click', leaving);
   }
 
-  // ---- Parchrome tools ------------------------------------------------------
-  // The rest of the Tools section, as the same small cards as the websites.
-  // Which tools, their order, names, icons and links come from
-  // coc-nav-data.json's guides -- the Tools strip -- minus this page, so the
-  // box always matches the strip; coc-websites.json only adds each one's
-  // line of text. They open in the same tab: they're our pages.
-  var tools = $('#gdTools');
-  if (tools) {
-    skeleton(tools, SK.site, 5);
-    var here = cocPagePath(location.pathname);
-    Promise.all([load('/coc-nav-data.json'), load(tools.dataset.src)])
-      .then(function (r) {
-        var text = r[1].tools || {};
-        tools.removeAttribute('aria-busy');
-        tools.innerHTML = r[0].guides
-          .filter((g) => (g.activeOn || []).map(cocPagePath).indexOf(here) === -1)
-          .map(function (g) {
-            return (
-              '<a class="ct-card" href="' +
-              esc(g.href) +
-              '">' +
-              '<span class="ct-card-icon"><img src="' +
-              esc(g.icon) +
-              '" alt="" width="40" height="40" loading="lazy" decoding="async"></span>' +
-              '<div class="ct-card-body"><div class="ct-card-head"><span class="ct-card-name">' +
-              esc(g.name || g.label) +
-              '</span>' +
-              ARROW +
-              '</div><p class="ct-card-desc">' +
-              esc(text[g.id] || '') +
-              '</p><span class="ct-card-foot">On Parchrome</span></div></a>'
-            );
-          })
-          .join('');
-      })
-      .catch(() => failed(tools, 'tools'));
+  // ---- "You're leaving Parchrome" ---------------------------------------------
+  // Clicking an outside website opens this dialog first: which site, that
+  // someone else runs it, and Continue / Stay. "Don't show this again" is
+  // remembered in this browser (localStorage), after which links open
+  // straight away. Ctrl / Cmd / Shift-clicks skip it (the person already
+  // chose where it opens). Native <dialog>: Esc, focus and the backdrop
+  // come from the browser. Styles: coc-tools.css (.lv).
+  var SKIP = 'parchrome-leave-skip';
+  var dialog;
+  function skipped() {
+    try {
+      return localStorage.getItem(SKIP) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+  function buildDialog() {
+    dialog = document.createElement('dialog');
+    dialog.className = 'lv';
+    dialog.setAttribute('aria-labelledby', 'lvTitle');
+    dialog.setAttribute('aria-describedby', 'lvText');
+    dialog.innerHTML =
+      '<div class="lv-box">' +
+      '<h2 class="lv-title" id="lvTitle">You\u2019re leaving Parchrome</h2>' +
+      '<div class="lv-site"><img class="lv-ico" alt="" width="40" height="40"><span class="lv-who"><b class="lv-name"></b><span class="lv-host"></span></span></div>' +
+      '<p class="lv-text" id="lvText">This website is run by someone else. Parchrome doesn\u2019t own or control it, and its own terms and privacy policy apply.</p>' +
+      '<label class="lv-skip"><input type="checkbox"> Don\u2019t show this again</label>' +
+      '<div class="lv-actions">' +
+      '<button type="button" class="lv-btn lv-stay">Stay here</button>' +
+      '<a class="lv-btn lv-go" target="_blank" rel="noopener noreferrer" autofocus>Continue' +
+      EXT.replace('tc-arrow', 'lv-go-ico') +
+      '</a></div></div>';
+    document.body.appendChild(dialog);
+    dialog.querySelector('.lv-stay').addEventListener('click', () => dialog.close());
+    dialog.querySelector('.lv-go').addEventListener('click', () => dialog.close());
+    dialog.querySelector('.lv-skip input').addEventListener('change', function () {
+      try {
+        if (this.checked) localStorage.setItem(SKIP, '1');
+        else localStorage.removeItem(SKIP);
+      } catch (e) {}
+    });
+    // a click on the dimmed backdrop (the <dialog> itself, outside the box)
+    dialog.addEventListener('click', function (e) {
+      if (e.target === dialog) dialog.close();
+    });
+  }
+  function leaving(e) {
+    var a = e.target.closest('a[data-leave]');
+    if (!a || skipped() || e.ctrlKey || e.metaKey || e.shiftKey || !window.HTMLDialogElement) return;
+    e.preventDefault();
+    if (!dialog) buildDialog();
+    dialog.querySelector('.lv-ico').src = a.querySelector('.tc-icon img').getAttribute('src');
+    dialog.querySelector('.lv-name').textContent = a.querySelector('.tc-name').firstChild.textContent;
+    dialog.querySelector('.lv-host').textContent = a.querySelector('.tc-host').textContent;
+    dialog.querySelector('.lv-go').href = a.href;
+    dialog.showModal();
   }
 
   // ---- Glossary ---------------------------------------------------------------

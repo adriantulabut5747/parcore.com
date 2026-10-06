@@ -833,28 +833,6 @@ if (document.readyState === 'loading') {
     return frag;
   }
 
-  // More sheet "Tools" tiles (redesigned Oct 2026; were .more-row rows):
-  // icon tile + name. Styles: .mx-tool in coc-more.css.
-  function buildGuidesMoreList(guides) {
-    var frag = document.createDocumentFragment();
-    guides.forEach(function (g) {
-      var a = el('a', 'mx-tool');
-      a.href = g.href;
-      var ico = el('span', 'mx-tool-ico');
-      var img = el('img');
-      img.src = g.icon;
-      img.alt = '';
-      ico.appendChild(img);
-      var name = el('span', 'mx-tool-name');
-      name.textContent = g.label;
-      a.appendChild(ico);
-      a.appendChild(name);
-      if (isActive(g.activeOn)) a.classList.add('active');
-      frag.appendChild(a);
-    });
-    return frag;
-  }
-
   function fillByRole(role, buildFn) {
     var nodes = document.querySelectorAll('[data-role="' + role + '"]');
     nodes.forEach(function (node) {
@@ -1019,18 +997,20 @@ if (document.readyState === 'loading') {
     var trail = null;
     // Only steps that are real pages (Oct 2026): there's no "all layouts" or
     // "all armies" page, so no "Layouts" / "Armies" step -- the Town Hall
-    // and the section are one step ("TH13 Layouts"). Same for tools: /coc/tools/
-    // is the Websites page, not a tools index, so no "Tools" step either.
+    // and the section are one step ("TH13 Layouts"). Tools do have one:
+    // /coc/tools/ is the Tools page (COC > Tools), and each tool's
+    // crumbParent points back to it (COC > Tools > Damage Calculator).
     data.townhalls.forEach(function (th) {
       if (currentPage === cocPagePath(th.layoutHref)) trail = [{ text: th.label + ' Layouts', href: th.layoutHref }];
       if (currentPage === cocPagePath(th.armyHref)) trail = [{ text: th.label + ' Armies', href: th.armyHref }];
     });
     var paged = !!trail;
-    // A tool can ask for a parent step ("crumbParent", e.g. Tools) and can
-    // own a whole address range ("activePrefix": the Player Tracker owns every
-    // /coc/player/<TAG> profile). Both are set in coc-nav-data.json.
+    // A tool can ask for a parent step ("crumbParent", e.g. Tools), its own
+    // crumb wording ("crumbText") and can own a whole address range
+    // ("activePrefix": the Player Tracker owns every /coc/player/<TAG>
+    // profile). All set in coc-nav-data.json.
     data.guides.concat(data.upcoming || []).forEach(function (g) {
-      if (onTool(g)) trail = (g.crumbParent ? [g.crumbParent] : []).concat({ text: g.name || g.label, href: g.href });
+      if (onTool(g)) trail = (g.crumbParent ? [g.crumbParent] : []).concat({ text: g.crumbText || g.name || g.label, href: g.href });
     });
     if (!trail) return;
     // Desktop has the room for the full name; phones keep "COC" (Oct 2026).
@@ -1185,15 +1165,8 @@ if (document.readyState === 'loading') {
       return buildGuidesDropdown(data.guides);
     });
 
-    fillByRole('more-layouts-grid', function () {
-      return buildLayoutsGrid(data.townhalls, 'mx-th');
-    });
-    fillByRole('more-armies-grid', function () {
-      return buildArmiesGrid(data.townhalls, 'mx-th');
-    });
-    fillByRole('more-guides-list', function () {
-      return buildGuidesMoreList(data.guides);
-    });
+    // The More sheet's tiles are filled by coc-more.js (it runs on /coc/
+    // too, which doesn't load this file).
 
     fillByRole('first-layer', function () {
       return buildFirstLayer(data);

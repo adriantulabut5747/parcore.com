@@ -15,9 +15,9 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css?v=20261005c">
+<link rel="stylesheet" href="/11layout.css?v=20261006a">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
-<link rel="stylesheet" href="/coc-clan-clock.css">
+<link rel="stylesheet" href="/coc-clan-clock.css?v=20261006a">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoC Base Layouts, Army Comps &amp; Tools | Clash of Clans | Parchrome</title>
@@ -512,7 +512,7 @@ Please open this page in Chrome for the best experience.</li><br>
 <div class="clan-modal-backdrop" id="clanModal" onclick="closeClanModalOutside(event)">
   <div class="clan-modal">
     <button class="clan-modal-close" onclick="closeClanModal()">✕</button>
-    <img src="/icons/aclogonobg-cropped.png" alt="Clan Logo" />
+    <img src="/icons/aclogonobg-cropped.webp" alt="Clan Logo" />
     <h2>Join Our Clan</h2>
     <p>Click the tag below to copy it to your clipboard</p>
     <button class="clan-tag-btn" onclick="copyClanTag()">
@@ -618,7 +618,23 @@ Please open this page in Chrome for the best experience.</li><br>
 }
 </style>
 
-<img class="hero-video" src="https://images8.alphacoders.com/855/thumb-1920-855963.jpg" alt="">
+<!-- Supercell Fan Kit art, saved locally from
+     media.ffycdn.net/eu/supercell/3VgYNDGwkKJpsie1Hw4a.png?width=2400
+     (re-saved as JPG q82: the PNG was 5.2 MB). On phones the crop is aimed
+     at the King chess piece -- see .hero-video in the 970px block. -->
+<img class="hero-video" src="/clashofclans/home/coc-hero.webp" alt="">
+<script>
+/* King fade-in (Oct 2026): the art brightens from near-black once, when the
+   image has actually loaded (so a slow connection never fades in an empty
+   box). .is-lit starts the CSS animation; skipped for reduced motion. */
+(function () {
+  var img = document.currentScript.previousElementSibling;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function lit() { img.classList.add('is-lit'); }
+  if (img.complete && img.naturalWidth) lit();
+  else img.addEventListener('load', lit, { once: true });
+})();
+</script>
 
     <!-- HERO OVERLAY — rebuilt. Everything that used to sit here (the
          "Ascendere Clan" pill and an empty .hero-content) is gone; the
@@ -645,35 +661,72 @@ Please open this page in Chrome for the best experience.</li><br>
           <h1 class="ch-title"><span class="ch-title-line">Stop copying<br>bases that</span><br><em>don't work.</em></h1>
 
           <p class="ch-desc">
-            Every layout and army comp here is personally captured and 
-            Designed by a <strong>national top player.</strong>
+            Base layouts and army comps, designed by a
+            <strong>national top player.</strong>
           </p>
 
+          <!-- Desktop only (hidden at <=970px, where the bottom nav covers both).
+               In-page jumps: .coc-main is the scroller and has
+               scroll-behavior:smooth, so a plain #anchor glides there. The
+               targets carry scroll-margin-top to clear the fixed top bars. -->
           <div class="ch-actions">
-            <a class="ch-btn ch-btn-primary" href="/coc/town-hall-18/layouts">
-              Browse Layouts
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+            <a class="ch-btn ch-btn-primary" href="#featured-townhalls">
+              Layouts &amp; Armies
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
             </a>
-            <a class="ch-btn ch-btn-ghost" href="/coc/town-hall-18/army">Army Comps</a>
+            <a class="ch-btn ch-btn-ghost" href="#clash-tools">Tools</a>
           </div>
 
-          <!-- Proof row. The claim above ("proven and tested") gets its
-               evidence directly underneath, the way the reference puts its
-               totals under its buttons. -->
+          <!-- Proof row, desktop only (hidden at <=970px). Real counts from
+               the data files (Oct 2026: 251 layouts in thNN-layouts.json, 109
+               armies in thNN-army.json; 6 tools in coc-nav-data.json) -- rounded down, so update them when
+               the totals pass the next step rather than rounding up. -->
           <div class="ch-stats">
             <div class="ch-stat">
               <span class="ch-stat-lbl">Layouts</span>
+              <span class="ch-stat-num">250<span>+</span></span>
+            </div>
+            <div class="ch-stat">
+              <span class="ch-stat-lbl">Armies</span>
               <span class="ch-stat-num">100<span>+</span></span>
             </div>
             <div class="ch-stat">
-              <span class="ch-stat-lbl">Tier</span>
-              <span class="ch-stat-num">CWL<span>&#10022;</span></span>
-            </div>
-            <div class="ch-stat">
-              <span class="ch-stat-lbl">War-Ready</span>
-              <span class="ch-stat-num">100<span>%</span></span>
+              <span class="ch-stat-lbl">Tools</span>
+              <span class="ch-stat-num">6</span>
             </div>
           </div>
+          <script>
+          /* Stats count-up (Oct 2026): every number in the row counts from 0
+             to its value once, ~1s, when the row scrolls into view. Set to 0
+             here, before first paint, so the real value never flashes first.
+             Reduced motion: left alone. */
+          (function () {
+            var row = document.currentScript.previousElementSibling;
+            if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            var nodes = [];
+            row.querySelectorAll('.ch-stat-num').forEach(function (el) {
+              el.childNodes.forEach(function (n) {
+                var v = n.nodeType === 3 ? parseInt(n.nodeValue, 10) : NaN;
+                if (!isNaN(v)) { nodes.push({ n: n, v: v }); n.nodeValue = '0'; }
+              });
+            });
+            function run() {
+              var t0 = null, D = 1000;
+              function step(t) {
+                if (t0 === null) t0 = t;
+                var k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+                nodes.forEach(function (o) { o.n.nodeValue = String(Math.round(o.v * e)); });
+                if (k < 1) requestAnimationFrame(step);
+              }
+              requestAnimationFrame(step);
+            }
+            if (!('IntersectionObserver' in window)) return run();
+            var io = new IntersectionObserver(function (es) {
+              if (es[0].isIntersecting) { io.disconnect(); setTimeout(run, 350); }
+            }, { threshold: 0.25 });
+            io.observe(row);
+          })();
+          </script>
         </div>
 
         <!-- RIGHT: four entry-point cards. Flush 2x2 on mobile/tablet; on
@@ -683,29 +736,29 @@ Please open this page in Chrome for the best experience.</li><br>
              same split as the reference's "RESOURCE PACK / Animated Items". -->
         <div class="ch-hero-cards">
           <a class="ch-card" href="/coc/town-hall-18/layouts">
-            <img class="ch-card-img" src="/clashofclans/th18layouts/compressed-th18-14_watermarked-compresso.jpg" alt="" loading="lazy" decoding="async">
+            <img class="ch-card-img" src="/clashofclans/home/compressed-th18-14_watermarked-compresso.webp" alt="" loading="lazy" decoding="async">
             <span class="ch-card-badge">TH8 &ndash; 18</span>
             <span class="ch-card-name">Base Layouts</span>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
 
           <a class="ch-card" href="/coc/town-hall-18/army">
-            <img class="ch-card-img" src="/clashofclans/coctools/shot-army-comps.jpg" alt="" loading="lazy" decoding="async">
-            <span class="ch-card-badge">Tested</span>
+            <img class="ch-card-img" src="/clashofclans/home/shot-army-comps.webp" alt="" loading="lazy" decoding="async">
+            <span class="ch-card-badge">Meta Armies</span>
             <span class="ch-card-name">Army Comps</span>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
 
           <a class="ch-card" href="/coc/tools/">
-            <img class="ch-card-img" src="/clashofclans/coctools/aqueen.jpg" alt="" loading="lazy" decoding="async">
-            <span class="ch-card-badge">Written</span>
+            <img class="ch-card-img" src="/clashofclans/home/aqueen.webp" alt="" loading="lazy" decoding="async">
+            <span class="ch-card-badge">Clash Tools</span>
             <span class="ch-card-name">CoC Tools</span>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
 
           <a class="ch-card" href="/coc/tools/army-maker">
-            <img class="ch-card-img" src="/clashofclans/coctools/shot-army-maker.jpg" alt="" loading="lazy" decoding="async">
-            <span class="ch-card-badge">TH8 &ndash; 18</span>
+            <img class="ch-card-img" src="/clashofclans/home/shot-army-maker.webp" alt="" loading="lazy" decoding="async">
+            <span class="ch-card-badge">edit armies</span>
             <span class="ch-card-name">Army Maker</span>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
@@ -716,42 +769,7 @@ Please open this page in Chrome for the best experience.</li><br>
 
 </div>
 
-<script>
-/* Hero parallax. The page scrolls inside .coc-main (overflow-y:auto), not
-   the window, so the listener has to go on that element -- a window scroll
-   handler never fires here. Runs through requestAnimationFrame so a burst
-   of scroll events collapses into one transform per frame, and stops
-   updating once the hero has scrolled out of view. Skipped entirely for
-   users who've asked for reduced motion. */
-(function () {
-  var scroller = document.querySelector('.coc-main');
-  var hero = document.querySelector('.hero-section');
-  var img = document.querySelector('.hero-video');
-  if (!scroller || !hero || !img) return;
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  var SPEED = 0.35;   // 0 = pinned to content, 1 = no parallax
-  var ticking = false;
-
-  /* Desktop scrolls .coc-main; mobile (11layout.css ≤970px) scrolls the
-     document instead. Take whichever one has actually moved. */
-  function scrollY() {
-    return Math.max(scroller.scrollTop, window.pageYOffset || document.documentElement.scrollTop || 0);
-  }
-  function update() {
-    ticking = false;
-    var y = scrollY();
-    if (y > hero.offsetHeight) return;
-    img.style.transform = 'translate3d(0,' + (y * SPEED).toFixed(1) + 'px,0)';
-  }
-  function onScroll() {
-    if (!ticking) { ticking = true; requestAnimationFrame(update); }
-  }
-  scroller.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('scroll', onScroll, { passive: true });
-  update();
-})();
-</script>
+<!-- The hero parallax script was removed (Oct 2026): the banner no longer moves on scroll. -->
 
 <style>
 /* ===================================================
@@ -786,6 +804,13 @@ Please open this page in Chrome for the best experience.</li><br>
   background: #0c0c0d;
 }
 
+/* King fade-in: animates from near-black to the element's own filter
+   (no "to" keyframe, so desktop's 0.64 and the phone's 0.86 both work). */
+@keyframes ch-king-in {
+  from { filter: brightness(0.1) saturate(0.6); }
+}
+.hero-video.is-lit { animation: ch-king-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
 .hero-video {
   position: absolute;
   inset: 0;
@@ -794,15 +819,11 @@ Please open this page in Chrome for the best experience.</li><br>
   margin: 0;
   display: block;
   object-fit: cover;
-  object-position: 50% 30%;
+  /* 54% x (was 50%): nudges the art left so the King sits a little clear
+     of the cards, between them and the copy. */
+  object-position: 54% 30%;
   z-index: 0;
   filter: brightness(0.64) saturate(0.9);
-  /* Parallax: the script after the hero markup translates this down at a
-     fraction of the scroll distance. Extra height + negative top give it
-     slack to move without exposing a gap at the bottom. */
-  height: 118%;
-  top: -9%;
-  will-change: transform;
 }
 
 .hero-overlay {
@@ -821,10 +842,13 @@ Please open this page in Chrome for the best experience.</li><br>
   /* 48px clears the fixed secondary top bar at >=971px. */
   padding: 48px 5% 56px;
   /* Dark where the copy needs contrast (left), lighter toward the cards
-     (right) -- they carry their own scrim. */
+     (right) -- they carry their own scrim. The first layer is a soft warm
+     light on the King (he stands at ~48% across, between the copy and the
+     cards, ~45% after the 54% nudge), and the left-to-right fade eases off around him (Oct 2026). */
   background:
-    linear-gradient(to bottom, rgba(10,10,11,0.42) 0%, rgba(10,10,11,0.5) 55%, rgba(10,10,11,0.65) 85%, rgba(10,10,11,0.88) 100%),
-    linear-gradient(to right, rgba(10,10,11,0.94) 0%, rgba(10,10,11,0.82) 42%, rgba(10,10,11,0.2) 100%);
+    radial-gradient(ellipse 22% 42% at 45% 46%, rgba(255, 200, 140, 0.12) 0%, rgba(255, 200, 140, 0) 100%),
+    linear-gradient(to bottom, rgba(10,10,11,0.42) 0%, rgba(10,10,11,0.45) 55%, rgba(10,10,11,0.65) 85%, rgba(10,10,11,0.88) 100%),
+    linear-gradient(to right, rgba(10,10,11,0.94) 0%, rgba(10,10,11,0.82) 30%, rgba(10,10,11,0.42) 48%, rgba(10,10,11,0.5) 62%, rgba(10,10,11,0.2) 100%);
   overflow: hidden;
 }
 
@@ -991,12 +1015,59 @@ Please open this page in Chrome for the best experience.</li><br>
 }
 
 /* ACTIONS ----------------------------------------------------------- */
+/* Desktop only: Layouts / Tools jump to their sections further down. */
 .ch-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 28px;
 }
+
+/* PROOF ROW (desktop only): small label over a large numeral, under a
+   hairline. */
+.ch-stats {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  /* Hairline only as wide as the three stats (desktop); phones reset it. */
+  width: fit-content;
+  padding-top: 22px;
+  padding-right: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.ch-stat { min-width: 0; }
+
+.ch-stat-lbl {
+  display: block;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #6d7178;
+  margin-bottom: 7px;
+}
+
+.ch-stat-num {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  color: #f2f3f5;
+  letter-spacing: 0.5px;
+}
+
+.ch-stat-num span {
+  color: #c23b3b;
+  font-size: 16px;
+}
+
+/* Jump targets for the hero buttons: clear the fixed top bar + secondary
+   bar (~88px) with a little air, so the heading isn't tucked under them. */
+#featured-townhalls,
+#clash-tools { scroll-margin-top: 104px; }
 
 /* Hard offset shadow instead of a soft glow -- the reference's buttons
    sit on the page like printed blocks, and the offset is what does that.
@@ -1092,46 +1163,6 @@ Please open this page in Chrome for the best experience.</li><br>
   }
 }
 
-/* PROOF ROW --------------------------------------------------------- */
-/* Small mono label over a large numeral, under a hairline -- the
-   reference's RESOURCES / GUIDES / LAST VERIFIED row. */
-.ch-stats {
-  display: flex;
-  align-items: flex-start;
-  gap: 40px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.ch-stat { min-width: 0; }
-
-.ch-stat-lbl {
-  display: block;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  color: #6d7178;
-  margin-bottom: 7px;
-}
-
-.ch-stat-num {
-  display: block;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1;
-  color: #f2f3f5;
-  letter-spacing: 0.5px;
-}
-
-.ch-stat-num span {
-  color: #c23b3b;
-  font-size: 16px;
-}
-
-
 /* RIGHT COLUMN — four entry-point cards ------------------------------ */
 /* Base rule is a flush 2x2 -- this is what mobile/tablet use as-is. Desktop
    (>1150px) re-adds the stagger via the media query further down: the right
@@ -1147,8 +1178,11 @@ Please open this page in Chrome for the best experience.</li><br>
      `stretch`, and every card's content is absolutely positioned, so there
      is no intrinsic width to fall back on -- the columns collapse to ~3px. */
   width: 100%;
-  max-width: 600px;
+  /* 564 (was 600) and 24px into the right margin: a touch smaller and
+     further right so the King between the copy and the cards shows more. */
+  max-width: 564px;
   justify-self: end;
+  margin-right: -24px;
 }
 
 .ch-card {
@@ -1324,11 +1358,12 @@ Please open this page in Chrome for the best experience.</li><br>
 }
 
 /* MOBILE / TABLET ---------------------------------------------------- */
+/* Poster in three bands (Oct 2026): headline + subtitle at the top over a
+   dark band, the King in the middle, a compact proof row at the bottom.
+   No kicker, buttons or cards -- the bottom nav already carries Layouts /
+   Armies / Tools. */
 @media (max-width: 970px) {
-  /* Undoes the base rule's 200px letterbox at this width too -- that pair
-     is declared twice (base + mobile), so overriding one isn't enough.
-     height:auto lets the stack set the height, with .hero-overlay's
-     min-height as the floor. */
+  /* Undoes the base 200px letterbox (declared twice, base + mobile). */
   .hero-section {
     min-height: 0;
     max-height: none;
@@ -1336,131 +1371,149 @@ Please open this page in Chrome for the best experience.</li><br>
     height: auto;
   }
 
+  /* 46% x lands the King chess piece in the middle of a portrait crop (he
+     stands at ~47% across the art). Brighter than desktop's 0.64: the art
+     is the point of this screen; the gradient handles legibility. */
+  /* Zoomed out (Oct 2026) so more of the King and the board shows: the
+     image box is full width but only 74% of the banner tall, pinned to the
+     bottom. object-fit:cover then sizes the art to that shorter box, so
+     more of the scene fits across. (Scaling the element instead shrank its
+     width too and left dark bars down both sides.) The spare room at the
+     top sits under the dark headline band, and the mask fades the art's
+     top edge in. Being lower also keeps the King clear of the subtitle. */
   .hero-video {
+    inset: auto 0 0 0;
+    width: 100%;
+    height: 74%;
     margin-top: 0;
-    object-position: 50% 35%;
+    object-position: 46% 50%;
+    filter: brightness(0.86) saturate(1);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%);
+            mask-image: linear-gradient(to bottom, transparent 0%, #000 22%);
   }
 
+  /* Fills the first screen exactly down to the seam ticker, so the ticker
+     lands right on top of the bottom nav on load, on any phone height:
+     screen - top bar (.coc-main's padding) - bottom nav (.bn-bar, 60px) -
+     ticker (--ch-ticker-h). Change a bar's height -> update it here too.
+     svh, not vh: on phones vh includes the space behind the address bar.
+     Layers, top first: a vignette around the King (centred at 46% / 40%,
+     his spot in the crop, like the torchlight in ::before -- move both with the
+     object-position above), then a dark band behind the headline block
+     sized in px, not %, so it stays under the text at every phone height
+     (a % stop drifted off the subtitle on short screens), and a bottom fade
+     behind the stats and into the seam ticker. */
   .hero-overlay {
     align-items: stretch;
-    justify-content: center;
-    /* Top: the 50px top bar + 38px secondary bar are both fixed here, so
-       88px clears them; +26px breathing room. The 70vh floor stops a short
-       stack reading as a header bar; centred content splits any slack. */
-    padding: calc(88px + 26px) 5% 56px;
-    min-height: 70vh;
-    /* Single column, so "dark left / light right" no longer maps to
-       anything -- a radial centred on the headline instead. */
-    background: radial-gradient(ellipse 85% 70% at 50% 40%,
-      rgba(10,10,11,0.62) 0%,
-      rgba(10,10,11,0.85) 55%,
-      rgba(10,10,11,0.97) 100%);
+    justify-content: stretch;
+    /* 38px clears the secondary top bar that sits over the banner's top
+       edge (the main top bar is above the banner, not over it). */
+    padding: calc(38px + 54px) 6% 26px;
+    min-height: calc(100vh - var(--topbar-height, 52px) - 60px - var(--ch-ticker-h));
+    min-height: calc(100svh - var(--topbar-height, 52px) - 60px - var(--ch-ticker-h));
+    background:
+      radial-gradient(ellipse 62% 40% at 46% 40%,
+        rgba(10,10,11,0) 0%,
+        rgba(10,10,11,0) 45%,
+        rgba(10,10,11,0.55) 100%),
+      linear-gradient(to bottom,
+        rgba(10,10,11,0.92) 0px,
+        rgba(10,10,11,0.86) 256px,
+        rgba(10,10,11,0.00) 346px),
+      linear-gradient(to bottom,
+        rgba(10,10,11,0) 62%,
+        rgba(10,10,11,0.85) 82%,
+        #0c0c0d 100%);
   }
 
-  /* The ambient light follows the headline to the centre. */
+  /* Warm light on the King, steady (the flicker was tried and dropped).
+     Swapped in for the desktop's red ambient glow; .ch-hero sits above it
+     (z-index 1). */
   .hero-overlay::before {
-    left: 15%;
-    top: 4%;
-    width: 70%;
-    height: 55%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse 40% 26% at 46% 42%,
+      rgba(255, 190, 110, 0.22) 0%,
+      rgba(255, 190, 110, 0) 70%);
+    animation: none;
+    opacity: 0.85;
   }
 
-  /* Centred, as asked. The reference is left-aligned; this is the one
-     deliberate departure from it. */
-  .ch-hero-left { text-align: center; }
-
+  /* .ch-hero and .ch-hero-left stretch to the full banner height so the
+     stats' margin-top:auto pins them to the bottom. align-items:stretch
+     overrides the base grid's center, which in a flex column would
+     shrink-wrap the text column and pull it off the 6% inset. */
   .ch-hero {
-    grid-template-columns: minmax(0, 1fr);
-    /* Stacks on .ch-stats' 14px margin-bottom for a 28px copy-to-cards
-       step -- the largest gap in the column on purpose (two groups), the
-       rest run 14-16px. */
-    gap: 14px;
-    /* hero-overlay's 5% padding is the whole inset at this width, same as
-       every other mobile section. */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     margin: 0;
   }
+  .ch-hero-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ch-actions { display: none; }
 
   .ch-kicker {
-    justify-content: center;
-    gap: 6px 14px;
-    font-size: 9px;
+    justify-content: flex-start;
+    gap: 6px 16px;
+    font-size: 9.5px;
     letter-spacing: 1.7px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
-  /* Same mobile size as /web-resources/'s .hero-title. */
   .ch-title {
-    font-size: clamp(30px, 6.4vw, 30px);
-    letter-spacing: -0.4px;
-    margin-bottom: 14px;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -0.5px;
+    margin: 0 0 12px;
+  }
+  /* Solid white here. The desktop shine is a moving gradient clipped to
+     the letters; paused or under reduced motion it rests on its grey end,
+     which left the headline dimmer than the stat numbers below it. */
+  .ch-title-line {
+    animation: none;
+    background: none;
+    color: #f4f5f7;
+  }
+  /* No red glow: over warm art it blurred the letters into the background.
+     A dark shadow gives the red line its edge instead. */
+  .ch-title em {
+    animation: none;
+    color: #d64545;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
   }
 
-  /* 14px, not the 10.5px it had been shrunk to: the reference keeps its
-     body copy genuinely readable on a phone, and a paragraph this short
-     has no reason to be small. */
   .ch-desc {
-    font-size: 11.3px;
-    line-height: 1.6;
-    max-width: 92%;
-    margin: 0 auto 20px;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 34ch;
+    margin: 0;
+    color: #c3c7cd;
   }
 
-  .ch-actions {
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-
-  .ch-btn {
-    padding: 12px 16px;
-    font-size: 10.5px;
-    letter-spacing: 1.2px;
-  }
-
+  /* Compact proof row, pinned to the bottom of the banner. */
   .ch-stats {
-    justify-content: center;
-    gap: 28px;
-    padding-top: 18px;
-    margin-bottom: 14px;
+    width: auto;
+    margin-top: auto;
+    gap: 26px;
+    padding-top: 14px;
+    padding-right: 0;
   }
-  .ch-stat-num { font-size: 20px; }
+  .ch-stat-lbl {
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    color: #8b9098;
+    margin-bottom: 5px;
+  }
+  .ch-stat-num { font-size: 17px; }
   .ch-stat-num span { font-size: 14px; }
-  .ch-stat-lbl { font-size: 9px; letter-spacing: 1.5px; margin-bottom: 6px; }
-
-  /* Same 2x2 as desktop, capped and centred: uncapped, a 760px tablet got
-     330px-tall cards -- the grid scales with the column, so it needs a
-     ceiling phones never reach but tablets do. */
-  .ch-hero-cards {
-    gap: 10px;
-    max-width: 480px;
-    justify-self: center;
-  }
-
-  .ch-card {
-    aspect-ratio: 16 / 9;
-    border-radius: 8px;
-  }
-
-  .ch-card-name {
-    left: 10px;
-    right: 30px;
-    bottom: 10px;
-    font-size: 11.5px;
-    letter-spacing: 0.6px;
-  }
-  .ch-card-badge {
-    top: 8px;
-    left: 8px;
-    font-size: 8px;
-    padding: 3px 7px;
-  }
-  .ch-card-arrow {
-    right: 10px;
-    bottom: 11px;
-    width: 12px;
-    height: 12px;
-  }
-
 }
 
 </style>
@@ -1502,7 +1555,7 @@ Please open this page in Chrome for the best experience.</li><br>
        onmouseout="this.style.background='#1e1e1e';this.style.color='#aaa'">✕</button>
     <iframe src="https://warreport.app/clans/2GYPGPJP9/currentwar" width="100%" height="100%" frameborder="0" style="border:none;"></iframe>
     <div style="position: absolute; bottom: 0; left: 0; width: 100%;  height: 80px; background: #212227; z-index: 999; display: flex; align-items: center; justify-content: center; gap: 8px;">
-      <img src="/icons/aclogonobg-cropped.png" style="width: 28px; height: 28px; object-fit: contain; opacity: 0.6;">
+      <img src="/icons/aclogonobg-cropped.webp" style="width: 28px; height: 28px; object-fit: contain; opacity: 0.6;">
       <span style="font-family: 'Oxanium', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #555;">Ascendere War Report</span>
     </div>
   </div>  </div>
@@ -1597,7 +1650,8 @@ function warModalEscHandler(e) {
   position: relative;
   z-index: 3;
   width: 100%;
-  min-height: 1200px;
+  /* No min-height (was 1200px): it padded the section with ~700px of
+     empty space under the Clash tools grid once Sites we use was removed. */
   /* No border of its own: the .ch-ticker band directly above carries the
      seam (its own top and bottom hairlines). The two top glows below still
      make the section read as lit from above. */
@@ -1723,367 +1777,9 @@ function warModalEscHandler(e) {
 }
 
 
-/* ── FEATURED TOWNHALLS GRID ─────────────────────────
-   4 columns on wide screens with the two newest THs (.th-card--wide)
-   spanning two each: 2 + 8 = three full rows, no orphan card, and the top
-   row reads as the featured one. 4 columns only fits from ~1400px -- at
-   1440px the grid is ~888px, so ~210px small cards; any narrower and the
-   base art stops reading, so mid-size desktops use a uniform 2-col and
-   mobile a single column (970px block at the bottom). */
-.layouts-list {
-  margin: 10px 12% 0 12%;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-/* ── TH CARD ──────────────────────────────────────
-   The whole tile is the link. Screenshot fills it; everything readable
-   sits in one footer stack at the bottom-left -- label, number, then the
-   layout count with the arrow -- so the rest of the card is just the base
-   art. The count used to be a glass chip and the arrow a separate
-   top-right icon; ten of each repeated across the grid read as clutter,
-   and folding them into the footer line leaves one thing to read per card.
-   isolation:isolate gives each card its own stacking context, so the
-   footer's z-index only has to beat the ::after scrim inside it. */
-.th-card {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  /* Only takes effect in the 2-column range (971-1399px): 1400px+ and
-     phones set their own ratios below. Was 16:10 -- ~237px tall cards in
-     5 rows made the grid ~1250px; 21:9 (the phone ratio) cuts it to ~880. */
-  aspect-ratio: 21 / 9;
-  padding: 18px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
-  text-decoration: none;
-  color: inherit;
-  overflow: hidden;
-  transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
-}
-.th-card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px -16px rgba(0, 0, 0, 0.85);
-}
-.th-card:focus-visible {
-  outline: 2px solid #c23b3b;
-  outline-offset: 3px;
-}
-
-/* Brighter than before (was 0.7) -- the base is the product being shown,
-   so it shouldn't sit under a veil. Contrast for the text comes from the
-   scrim below instead, which only darkens the bottom of the card. */
-.th-card .th-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.88) saturate(1.05);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
-}
-.th-card:hover .th-bg {
-  transform: scale(1.04);
-  filter: brightness(1) saturate(1.1);
-}
-/* Bottom-weighted: near-black at the very bottom for the footer text
-   (which also buries the AC.Parcore watermark in the bottom-right corner
-   of every screenshot), clear from ~60% up. */
-.th-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top,
-    rgba(8, 8, 10, 0.94) 0%,
-    rgba(8, 8, 10, 0.72) 32%,
-    rgba(8, 8, 10, 0.3) 55%,
-    rgba(8, 8, 10, 0) 75%);
-  pointer-events: none;
-}
-
-/* TH18 only. Same red tag as the hero cards' .ch-card-badge, so it reads
-   as part of the same system rather than a new component. */
-.th-card .th-tag {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  z-index: 1;
-  background: #c23b3b;
-  color: #fff;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  padding: 4px 9px;
-  border-radius: 3px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-}
-
-.th-card .th-foot {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  /* Centred, not bottom-aligned: the text stack is sized to roughly the
-     icon's height, so centring puts the label level with the icon's top
-     and the count level with its base. */
-  align-items: center;
-  gap: 14px;
-}
-/* Scoped under .th-card: a global .th-icon rule further down (22px, the
-   small game icon by the page title) would otherwise win. */
-.th-card .th-icon {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  flex-shrink: 0;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.th-card:hover .th-icon {
-  transform: translateY(-3px) scale(1.04);
-}
-
-/* The label sits at the top of the stack, where the scrim is thinning
-   out -- the shadow keeps it legible over bright or busy art. */
-.th-card .th-meta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
-}
-.th-card .th-label {
-  font-family: 'Oxanium', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
-  line-height: 1.2;
-  white-space: nowrap;
-}
-.th-card .th-name {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 24px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.5px;
-  color: #fff;
-  margin: 3px 0 5px;
-}
-.th-card .th-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Sora', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.2;
-  white-space: nowrap;
-  transition: color 0.2s ease;
-}
-.th-card .th-arrow {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
-}
-.th-card:hover .th-count { color: #fff; }
-.th-card:hover .th-arrow {
-  color: #e05252;
-  transform: translateX(3px);
-}
-
-/* Floor for the 21:9 cards on narrow desktops: at ~1000px they came out
-   115px tall, the TH18 "Latest" tag ran into the icon and the text stack
-   covered the whole base. 150px keeps the footer clear of the tag.
-   width:100% + min-width:0 are load-bearing: a grid item with a ratio
-   doesn't stretch, it derives its width from its height -- so the floor
-   made the cards 150 x 21/9 = 350px wide and pushed them over each other.
-   Pinning the width makes the height the side that gives: the card keeps
-   its column's width and just gets taller than 21:9 at the floor. */
-@media (min-width: 971px) and (max-width: 1399px) {
-  /* Oct 2026: 3:1 (was 21:9) -- shorter cards, he asked for less height. */
-  .th-card { width: 100%; min-width: 0; min-height: 132px; aspect-ratio: 3 / 1; }
-}
-
-@media (min-width: 1400px) {
-  .layouts-list { grid-template-columns: repeat(4, 1fr); }
-  /* Doubled class to beat .th-card's own aspect-ratio (21:9) above. 16:9 is the
-     screenshots' native ratio, so the wide cards show the full base. */
-  /* Oct 2026: shorter on request -- wide 12:5 (was 16:9, the screenshots'
-     own ratio, so the top and bottom of the base now crop a little) and
-     small 16:10 (was 4:3). */
-  .th-card.th-card--wide {
-    grid-column: span 2;
-    aspect-ratio: 12 / 5;
-    padding: 22px;
-  }
-  .th-card--wide .th-icon { width: 72px; height: 72px; }
-  .th-card--wide .th-foot { gap: 18px; }
-  .th-card--wide .th-label { font-size: 11px; letter-spacing: 2px; }
-  .th-card--wide .th-name { font-size: 32px; margin: 4px 0 7px; }
-  .th-card--wide .th-count { font-size: 13px; }
-  .th-card--wide .th-tag { top: 18px; left: 18px; }
-
-  /* The small cards are ~210px wide, so the footer scales down to fit.
-     4:3 rather than 16:10: at 16:10 they were ~130px tall and the text
-     stack covered most of the base. */
-  .th-card:not(.th-card--wide) { padding: 14px; aspect-ratio: 16 / 10; }
-  .th-card:not(.th-card--wide) .th-icon { width: 50px; height: 50px; }
-  .th-card:not(.th-card--wide) .th-foot { gap: 10px; }
-  .th-card:not(.th-card--wide) .th-label { font-size: 9px; letter-spacing: 1.5px; }
-  .th-card:not(.th-card--wide) .th-name { font-size: 20px; margin: 2px 0 4px; }
-  .th-card:not(.th-card--wide) .th-count { font-size: 11px; }
-  .th-card:not(.th-card--wide) .th-arrow { width: 11px; height: 11px; }
-}
-
-/* TH8 has no bases yet: its card ("Coming soon") is a phone-only filler
-   that makes the 2-per-row grid come out even. On desktop it would be the
-   odd card out, so it's hidden there. */
-.th-card--soon { display: none; }
-
-/* PHONES (Oct 2026, his pick): TH18 is the one card with art -- a short
-   full-width banner. Every other Town Hall is a plain button, two per row:
-   icon, "TH17", the layout count, an arrow. No screenshot, no scrim --
-   on a phone the art was too small to read and made the list a long scroll. */
-@media (max-width: 970px) {
-  .layouts-list {
-    margin: 10px 5% 0 5%;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .th-card {
-    aspect-ratio: auto;
-    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-  }
-  .th-card:hover { transform: none; box-shadow: none; }
-
-  /* TH18 banner */
-  .th-card.th-card--feat {
-    grid-column: 1 / -1;
-    height: 116px;
-    padding: 12px 14px;
-  }
-  .th-card--feat .th-icon { width: 48px; height: 48px; }
-  .th-card--feat .th-foot { gap: 12px; }
-  .th-card--feat .th-label { font-size: 9px; letter-spacing: 1.5px; }
-  .th-card--feat .th-name { font-size: 20px; margin: 2px 0 4px; }
-  .th-card--feat .th-count { font-size: 11px; }
-  .th-card--feat .th-arrow { width: 11px; height: 11px; }
-  .th-card--feat .th-tag { top: 10px; left: 12px; font-size: 8.5px; padding: 3px 8px; }
-
-  /* The two-per-row buttons: the base screenshot stays as the background
-     (his pick), under a scrim that's darkest on the left where the icon and
-     text sit, so "TH17" stays readable over busy art. */
-  .th-card:not(.th-card--feat) {
-    flex-direction: row;
-    align-items: center;
-    min-height: 64px;
-    padding: 8px 12px 8px 8px;
-    border-color: rgba(255, 255, 255, 0.08);
-    background: #141519;
-  }
-  .th-card:not(.th-card--feat)::after {
-    background: linear-gradient(90deg,
-      rgba(8, 8, 10, 0.88) 0%,
-      rgba(8, 8, 10, 0.62) 55%,
-      rgba(8, 8, 10, 0.35) 100%);
-  }
-  .th-card:not(.th-card--feat):active {
-    border-color: rgba(255, 255, 255, 0.18);
-    transform: scale(0.98);
-  }
-  .th-card:not(.th-card--feat):active .th-bg { filter: brightness(1.05) saturate(1.1); }
-  .th-card:not(.th-card--feat) .th-foot { flex: 1; min-width: 0; gap: 10px; }
-  .th-card:not(.th-card--feat) .th-icon {
-    width: 40px;
-    height: 40px;
-    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
-  }
-  .th-card:not(.th-card--feat) .th-meta { flex: 1; }
-  .th-card:not(.th-card--feat) .th-label { display: none; }
-  .th-card:not(.th-card--feat) .th-name {
-    font-size: 16px;
-    margin: 0 0 3px;
-  }
-  .th-card:not(.th-card--feat) .th-name::before { content: "TH"; }
-  .th-card:not(.th-card--feat) .th-count {
-    justify-content: space-between;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.72);
-  }
-  .th-card:not(.th-card--feat) .th-arrow { width: 12px; height: 12px; }
-
-  .th-card--soon { display: flex; }
-  .th-card--soon .th-icon { opacity: 0.55; }
-  .th-card--soon .th-name { color: rgba(255, 255, 255, 0.6); }
-}
-
-/* ── CLASH TOOLS ──────────────────────────────────
-   Same cards as the Town Hall grid; only the differences live here.
-   Names are words ("Army Maker"), not TH numbers, so they're set a step
-   smaller and cut off with an ellipsis instead of overflowing. The
-   screenshots are of dark UI, so they get a touch more light than base art. */
-.tools-title-box { margin-top: 72px; }
-.tool-card .th-bg { filter: brightness(1) saturate(1.05); }
-.tool-card .th-meta { min-width: 0; }
-.tool-card .th-name {
-  font-size: 18px;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tool-card.th-card--feat .th-name { font-size: 24px; }
-.tool-card .th-count > span { overflow: hidden; text-overflow: ellipsis; }
-
-/* Mid-size desktops (2 columns): Player Tracker takes the whole first row,
-   then the six tools fill three rows of two. */
-@media (min-width: 971px) and (max-width: 1399px) {
-  .tool-card--hero { grid-column: 1 / -1; aspect-ratio: 4 / 1; }
-}
-@media (min-width: 1400px) {
-  .tool-card.th-card--feat .th-name { font-size: 30px; }
-  /* The small cards are ~210px wide here: a smaller name, and the one-line
-     description gives way (the name says enough at this size). */
-  .tool-card:not(.th-card--feat) .th-name { font-family: 'Oxanium', sans-serif; font-size: 16px; font-weight: 800; margin: 0 0 4px; }
-  .tool-card:not(.th-card--feat) .th-icon { width: 44px; height: 44px; }
-  .tool-card:not(.th-card--feat) .th-count { font-size: 10.5px; }
-}
-@media (max-width: 970px) {
-  .tools-title-box { margin-top: 48px; }
-  /* The phone buttons put "TH" before the number -- not on tools. */
-  .tool-card:not(.th-card--feat) .th-name::before { content: none; }
-  .tool-card:not(.th-card--feat) .th-name {
-    font-family: 'Oxanium', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.2px;
-  }
-  .tool-card:not(.th-card--feat) .th-icon { width: 34px; height: 34px; }
-  .tool-card:not(.th-card--feat) .th-count { font-size: 10.5px; }
-  .tool-card.th-card--feat .th-name { font-size: 18px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .th-card,
-  .th-card .th-bg,
-  .th-card .th-icon,
-  .th-card .th-arrow { transition: none; }
-  .th-card:hover,
-  .th-card:hover .th-bg,
-  .th-card:hover .th-icon,
-  .th-card:hover .th-arrow { transform: none; }
-}
-
 </style>
+<!-- Town Hall + Clash tools cards: shared with /coc/tools/. -->
+<link rel="stylesheet" href="/coc-cards.css" />
 
 <!-- The .ql-wrap "Quality Over Quantity" block that used to sit here (its
      own <style> block plus markup) was merged into the hero section at the
@@ -2123,7 +1819,7 @@ function warModalEscHandler(e) {
   /* Negative delay starts the loop a third of the way in, so the first
      item is never sitting under the left-edge fade on load looking cut
      off. Both sets are identical, so where it starts is invisible. */
-  animation: ch-ticker 70s linear infinite;
+  animation: ch-ticker 90s linear infinite;
   animation-delay: -24s;
   will-change: transform;
   backface-visibility: hidden;
@@ -2165,8 +1861,13 @@ function warModalEscHandler(e) {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #c23b3b;
-  box-shadow: 0 0 6px rgba(194, 59, 59, 0.7);
+  background: #4a4e55;
+}
+/* One voice for every part of a timer: same grey, weight, case and size. */
+.ch-ticker-set span b,
+.ch-ticker-set span em {
+  font: inherit;
+  color: inherit;
 }
 
 /* translate3d, not translateX: forces the track onto its own compositor
@@ -2179,7 +1880,17 @@ function warModalEscHandler(e) {
 }
 
 @media (max-width: 970px) {
-  .ch-ticker-set { padding: 10px 0; }
+  /* Fixed height (borders included) so the hero above can subtract it
+     exactly -- see .hero-overlay's min-height in the 970px hero block. */
+  :root { --ch-ticker-h: 34px; }
+  .ch-ticker {
+    box-sizing: border-box;
+    height: var(--ch-ticker-h);
+    display: flex;
+    align-items: center;
+  }
+  .ch-ticker-viewport { flex: 1; min-width: 0; }
+  .ch-ticker-set { padding: 0; }
   .ch-ticker-set span { font-size: 8.5px; letter-spacing: 1.6px; margin-right: 28px; }
 }
 
@@ -2188,26 +1899,30 @@ function warModalEscHandler(e) {
 }
 </style>
 
+<!-- Live timers strip (Oct 2026; replaced the claims). coc-events.js fills
+     every [data-event]: data-label="phrase" gives "Ends in" / "Starts in" /
+     "Refreshes in" / "Resets in", data-timer="long" spells the units out
+     ("2 days 4 hours"). Both sets must stay identical -- the loop slides
+     the track by exactly half. The "Live in Clash right now" section below
+     uses the same script. -->
 <div class="ch-ticker" aria-hidden="true">
   <div class="ch-ticker-viewport">
     <div class="ch-ticker-track">
       <div class="ch-ticker-set">
-        <span>Town Hall 8 &ndash; 18</span>
-        <span>100+ Base Layouts</span>
-        <span>Proven Army Comps</span>
-        <span>Written Attack Guides</span>
-        <span>CWL Tested</span>
-        <span>Ascendere War Reports</span>
-        <span>Updated for TH18</span>
+        <span data-event="raid"><b>Raid Weekend</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="cwl"><b>Clan War League</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="trader"><b>Trader</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="season"><b data-name>Battle Pass</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="legend"><b>Legend League</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="clangames"><b>Clan Games</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
       </div>
       <div class="ch-ticker-set">
-        <span>Town Hall 8 &ndash; 18</span>
-        <span>100+ Base Layouts</span>
-        <span>Proven Army Comps</span>
-        <span>Written Attack Guides</span>
-        <span>CWL Tested</span>
-        <span>Ascendere War Reports</span>
-        <span>Updated for TH18</span>
+        <span data-event="raid"><b>Raid Weekend</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="cwl"><b>Clan War League</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="trader"><b>Trader</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="season"><b data-name>Battle Pass</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="legend"><b>Legend League</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
+        <span data-event="clangames"><b>Clan Games</b> <em data-label="phrase"></em> <em data-timer="long"></em></span>
       </div>
     </div>
   </div>
@@ -2216,7 +1931,7 @@ function warModalEscHandler(e) {
 <div class="layouts-army-container">
   <div class="layouts-box">
 
-   <div class="layouts-title-box">
+   <div class="layouts-title-box" id="featured-townhalls">
   <div class="layouts-title">Featured Townhalls</div>
   <div class="layouts-subtitle">Quality over quantity. Weak bases don't make it here</div>
 </div>
@@ -2230,7 +1945,7 @@ function warModalEscHandler(e) {
            the rest turn into plain two-per-row buttons. -->
 
       <a class="th-card th-card--wide th-card--feat" href="/coc/town-hall-18/layouts">
-        <img class="th-bg" src="/clashofclans/th18layouts/compressed-th18-3_watermarked-compresso.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/th18layouts/th18-21-compresso.jpg" alt="" loading="lazy" decoding="async">
         <span class="th-tag">Latest</span>
         <div class="th-foot">
           <img class="th-icon" src="/icons/th18icon.png" alt="">
@@ -2255,7 +1970,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-16/layouts">
-        <img class="th-bg" src="/clashofclans/th16layouts/th16-3.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th16-3.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th16icon.webp" alt="">
           <div class="th-meta">
@@ -2267,7 +1982,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-15/layouts">
-        <img class="th-bg" src="/clashofclans/th15layouts/th15-5_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th15-5_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th15icon.webp" alt="">
           <div class="th-meta">
@@ -2279,7 +1994,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-14/layouts">
-        <img class="th-bg" src="/clashofclans/th14layouts/th14-6_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th14-6_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th14icon.webp" alt="">
           <div class="th-meta">
@@ -2291,7 +2006,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-13/layouts">
-        <img class="th-bg" src="/clashofclans/th13layouts/th13-3_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th13-3_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th13icon.webp" alt="">
           <div class="th-meta">
@@ -2303,7 +2018,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-12/layouts">
-        <img class="th-bg" src="/clashofclans/th12layouts/th12-3_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th12-3_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th12icon.webp" alt="">
           <div class="th-meta">
@@ -2315,7 +2030,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-11/layouts">
-        <img class="th-bg" src="/clashofclans/th11layouts/th11-2_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th11-2_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th11icon.webp" alt="">
           <div class="th-meta">
@@ -2327,7 +2042,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-10/layouts">
-        <img class="th-bg" src="/clashofclans/th10layouts/th10-4_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th10-4_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th10icon.webp" alt="">
           <div class="th-meta">
@@ -2339,7 +2054,7 @@ function warModalEscHandler(e) {
       </a>
 
       <a class="th-card" href="/coc/town-hall-9/layouts">
-        <img class="th-bg" src="/clashofclans/th9layouts/th9-4_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th9-4_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th9icon.webp" alt="">
           <div class="th-meta">
@@ -2355,7 +2070,7 @@ function warModalEscHandler(e) {
            screenshots of its own. Phones only (.th-card--soon is hidden on
            desktop) -- it evens out the two-per-row grid there. -->
       <a class="th-card th-card--soon" href="/coc/town-hall-8/layouts">
-        <img class="th-bg" src="/clashofclans/th9layouts/th9-12_watermarked.jpg" alt="" loading="lazy" decoding="async">
+        <img class="th-bg" src="/clashofclans/home/th9-12_watermarked.webp" alt="" loading="lazy" decoding="async">
         <div class="th-foot">
           <img class="th-icon" src="/icons/th8icon.webp" alt="">
           <div class="th-meta">
@@ -2368,98 +2083,52 @@ function warModalEscHandler(e) {
 
     </div>
 
-    <!-- CLASH TOOLS (Oct 2026): our own tools, in the same card language as
-         Featured Townhalls above (.th-card), plus .tool-card for the bits that
-         differ (word names instead of TH numbers). Player Tracker is the big
-         card (.th-card--wide/--feat, like TH18) and is coming soon -- it links
-         to /coc/tools/player-tracker. Card backgrounds are screenshots of each
-         tool's own page, in clashofclans/coctools/previews/tool-*.webp. -->
-    <div class="layouts-title-box tools-title-box">
+    <!-- CLASH TOOLS (Oct 2026): our six tools as equal cards (.tc-card in
+         coc-cards.css, shared with the Tools page /coc/tools/). The red
+         marks them as ours; the Tools page shows outside websites in the
+         same card without it. -->
+    <div class="layouts-title-box tools-title-box" id="clash-tools">
       <div class="layouts-title">Clash tools</div>
-      <div class="layouts-subtitle">Calculators and guides we built for Clash. They open right here on the site.</div>
+      <div class="layouts-subtitle">Official Parchrome tools: calculators, trackers and guides we built ourselves.</div>
     </div>
 
-    <div class="layouts-list tools-list">
-
-      <a class="th-card th-card--wide th-card--feat tool-card tool-card--hero" href="/coc/tools/player-tracker">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-player-tracker.webp" alt="" loading="lazy" decoding="async">
-        <span class="th-tag">New</span>
-        <div class="th-foot">
-          <img class="th-icon" src="/clashofclans/coctools/legend-league.png" alt="">
-          <div class="th-meta">
-            <span class="th-label">New tool</span>
-            <span class="th-name">Player tracker</span>
-            <span class="th-count"><span>Look up a player</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
+    <div class="layouts-list tc-grid">
+      <a class="tc-card" href="/coc/tools/player-tracker">
+        <img class="tc-mark" src="/clashofclans/coctools/legend-league.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Player Tracker</span><span class="tc-desc">Track any player or clan</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-
-      <a class="th-card tool-card" href="/coc/tools/">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-websites.webp" alt="" loading="lazy" decoding="async">
-        <div class="th-foot">
-          <img class="th-icon" src="/icons/coctoolsicon.png" alt="">
-          <div class="th-meta">
-            <span class="th-name">Websites</span>
-            <span class="th-count"><span>Trackers and planners we use</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
+      <a class="tc-card" href="/coc/tools/slang">
+        <img class="tc-mark" src="/icons/Book_of_Everything.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/icons/Book_of_Everything.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Glossary</span><span class="tc-desc">34 Clash slang terms in plain English</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-
-      <a class="th-card tool-card" href="/coc/tools/slang">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-glossary.webp" alt="" loading="lazy" decoding="async">
-        <div class="th-foot">
-          <img class="th-icon" src="/icons/Book_of_Everything.webp" alt="">
-          <div class="th-meta">
-            <span class="th-name">Glossary</span>
-            <span class="th-count"><span>Clash slang, explained</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
+      <a class="tc-card" href="/coc/tools/army-maker">
+        <img class="tc-mark" src="/clashofclans/coctools/army-camp.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/clashofclans/coctools/army-camp.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Army Maker</span><span class="tc-desc">Create any army right on the website</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-
-      <a class="th-card tool-card" href="/coc/tools/army-maker">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-army-maker.webp" alt="" loading="lazy" decoding="async">
-        <div class="th-foot">
-          <img class="th-icon" src="/clashofclans/coctools/army-camp.webp" alt="">
-          <div class="th-meta">
-            <span class="th-name">Army Maker</span>
-            <span class="th-count"><span>Build an army, share the link</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
+      <a class="tc-card" href="/coc/tools/equipment">
+        <img class="tc-mark" src="/icons/fireball.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/icons/fireball.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Equipments</span><span class="tc-desc">All 42 hero items, level by level</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-
-      <a class="th-card tool-card" href="/coc/tools/equipment">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-equipment.webp" alt="" loading="lazy" decoding="async">
-        <div class="th-foot">
-          <img class="th-icon" src="/icons/fireball.webp" alt="">
-          <div class="th-meta">
-            <span class="th-name">Equipments</span>
-            <span class="th-count"><span>Every hero item, every level</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
+      <a class="tc-card" href="/coc/tools/damage-calculator">
+        <img class="tc-mark" src="/clashofclans/buildings/cannon/15.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/clashofclans/buildings/cannon/15.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Damage Calculator</span><span class="tc-desc">Calculate hitpoint damage before you attack</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-
-      <a class="th-card tool-card" href="/coc/tools/damage-calculator">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-damage-calculator.webp" alt="" loading="lazy" decoding="async">
-        <div class="th-foot">
-          <img class="th-icon" src="/clashofclans/buildings/cannon/15.webp" alt="">
-          <div class="th-meta">
-            <span class="th-name">Damage Calc.</span>
-            <span class="th-count"><span>Which spells take it down</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
+      <a class="tc-card" href="/coc/tools/walls">
+        <img class="tc-mark" src="/clashofclans/coctools/th17-wall.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/clashofclans/coctools/th17-wall.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Wall Calculator</span><span class="tc-desc">Calculate the total resources for wall upgrades</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-
-      <a class="th-card tool-card" href="/coc/tools/walls">
-        <img class="th-bg" src="/clashofclans/coctools/previews/tool-walls.webp" alt="" loading="lazy" decoding="async">
-        <div class="th-foot">
-          <img class="th-icon" src="/clashofclans/coctools/th17-wall.webp" alt="">
-          <div class="th-meta">
-            <span class="th-name">Wall Calc.</span>
-            <span class="th-count"><span>Gold to max your walls</span> <svg class="th-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </div>
-      </a>
-
     </div>
 <script>
 // Layout counts on the Town Hall cards: a count wrapped in
@@ -2616,7 +2285,6 @@ function warModalEscHandler(e) {
 
 /* Reuses the hero's kicker (mono caps, red dots) so the two sections
    share one voice; only the spacing below it is local. */
-.cl-feature-kicker { margin-bottom: 16px; }
 
 .cl-feature-text--sub {
   margin-top: 12px;
@@ -2627,7 +2295,7 @@ function warModalEscHandler(e) {
 /* Button borrows .ch-btn-primary from the hero -- same red, same hard
    offset shadow -- so "Get your base" reads as the same kind of action
    as "Browse layouts". */
-.cl-feature-actions { margin-top: 26px; }
+.cl-track { margin-top: 28px; max-width: 460px; }
 
 .cl-feature-device {
   position: relative;
@@ -2647,8 +2315,10 @@ function warModalEscHandler(e) {
    of the art, and the shadow does the lifting. */
 .cl-phone {
   position: relative;
-  left: 24%;
-  width: 132%;
+  /* Fully on screen (Oct 2026): it used to run off the right edge, but now
+     the screen shows live search results that can't be cropped. */
+  left: 0;
+  width: 112%;
   aspect-ratio: 800 / 380;
   filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55));
 }
@@ -2667,8 +2337,267 @@ function warModalEscHandler(e) {
   top: 4.5%;
   width: 96.6%;
   height: 91.4%;
+  overflow: hidden;
+  background: #141519;
+  /* The section centres its copy on phones; the phone UI never is. */
+  text-align: left;
+}
+.cl-phone-shot {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  background: #000;
+  transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-phone-screen.is-results .cl-phone-shot { opacity: 0; transform: scale(0.98); }
+
+/* Results panel: fills the screen and scrolls on its own. The frame PNG
+   above it has pointer-events:none, so wheel and touch reach this. */
+.cl-phone-results {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #141519;
+  animation: cl-results-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-phone-results[hidden] { display: none; }
+@keyframes cl-results-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.cl-phone-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 16px 8px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #8b9098;
+}
+.cl-phone-bar span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl-phone-bar button {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: transparent;
+  color: #e6e8ec;
+  font: inherit;
+  cursor: pointer;
+}
+.cl-phone-bar button:hover { border-color: rgba(255, 255, 255, 0.3); }
+.cl-phone-list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3d44 transparent;
+}
+.cl-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 18px;
+  color: #e6e8ec;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.cl-result:hover,
+.cl-result:focus-visible { background: rgba(255, 255, 255, 0.05); outline: none; }
+.cl-result img {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+.cl-result-th {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #1f2126;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  color: #8b9098;
+}
+.cl-result-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cl-result-main b {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cl-result-main span,
+.cl-result-meta span {
+  font-family: 'Sora', sans-serif;
+  font-size: 11.5px;
+  color: #8b9098;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cl-result-meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+.cl-result-meta b {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+.cl-result-arrow { flex-shrink: 0; width: 12px; height: 12px; color: #6d7178; }
+.cl-phone-note {
+  padding: 18px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #a3a7ae;
+}
+
+/* TRACKER SEARCH ----------------------------------------------------- */
+/* Player / Clan switch, then one bar: "#", the field and a Track button.
+   The bar is near-opaque so it reads over any part of the banner art. */
+.cl-track-modes {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.cl-track-modes button {
+  padding: 7px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(14, 14, 16, 0.6);
+  color: #a3a7ae;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.cl-track-modes button:hover { color: #fff; border-color: rgba(255, 255, 255, 0.24); }
+.cl-track-modes button[aria-checked="true"] {
+  background: #f2f3f5;
+  border-color: #f2f3f5;
+  color: #111214;
+}
+.cl-track-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 5px 5px 14px;
+  background: rgba(12, 12, 14, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  transition: border-color 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-track-bar:focus-within { border-color: rgba(255, 255, 255, 0.42); }
+.cl-track.is-clan .cl-track-hash { display: none; }
+.cl-track-hash {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #6d7178;
+}
+/* 16px+: iOS Safari zooms the page into any smaller input on tap. */
+.cl-track-bar input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 6px 11px 2px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f2f3f5;
+  caret-color: #d64545;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+.cl-track:not(.is-clan) .cl-track-bar input { text-transform: uppercase; }
+.cl-track-bar input::placeholder {
+  color: #6d7178;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+.cl-track-go {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9px;
+  background: #c23b3b;
+  color: #fff;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.cl-track-go svg { width: 14px; height: 14px; transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.cl-track-go:hover { background: #d04343; }
+.cl-track-go:hover svg { transform: translateX(3px); }
+.cl-track-go:active { transform: scale(0.97); }
+.cl-track-go[aria-busy="true"] { opacity: 0.7; pointer-events: none; }
+.cl-track-hint {
+  margin: 12px 0 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #a3a7ae;
+}
+.cl-track-hint.is-error { color: #f0a3a3; }
+.cl-track-try {
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #f2f3f5;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.cl-track-try:hover { text-decoration-color: #fff; }
+.cl-track-modes button:focus-visible,
+.cl-track-go:focus-visible,
+.cl-track-try:focus-visible,
+.cl-phone-bar button:focus-visible {
+  outline: 2px solid #f2f3f5;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cl-phone-results { animation: none; }
+  .cl-phone-shot, .cl-track-go svg { transition: none; }
 }
 
 /* Portrait-shaped wrapper for the portrait frame PNG, rotated to lie
@@ -2701,7 +2630,7 @@ function warModalEscHandler(e) {
   }
   .cl-feature-title { font-size: clamp(24px, 3vw, 32px); }
   .cl-feature-text { font-size: 15px; }
-  .cl-phone { width: 112%; }
+  .cl-phone { width: 104%; }
 }
 
 @media (max-width: 970px) {
@@ -2713,11 +2642,12 @@ function warModalEscHandler(e) {
     text-align: center;
   }
   .cl-feature-copy { max-width: 100%; margin: 0 auto; }
-  .cl-feature-kicker { justify-content: center; margin-bottom: 12px; }
   .cl-feature-title { font-size: clamp(24px, 6.4vw, 30px); margin-bottom: 14px; }
   .cl-feature-text { font-size: 14px; line-height: 1.65; }
   .cl-feature-text--sub { font-size: 12.5px; }
-  .cl-feature-actions { margin-top: 22px; display: flex; justify-content: center; }
+  /* Copy is centred here; the search block centres with it, its insides
+     stay left-aligned. */
+  .cl-track { margin: 24px auto 0; text-align: left; }
   /* Full width, no run-off, softer tilt: on a phone the phone is the
      whole row, not a thing peeking in from the side. */
   /* Centred and fully visible. The desktop rule's left offset was
@@ -2744,19 +2674,22 @@ function warModalEscHandler(e) {
 /* LIVE EVENTS + CLAN CARD + FAQ SPACING -- their look is in coc-clan-clock.css
    (shared with every TH layouts / army / tools page); only this page's
    placement is here. Same 12% / 5% side insets as the other sections.
-   - Clan card: the King clears its top edge by ~47px on desktop, so 47 on
-     top of the Clash Tools grid's own bottom padding (70) keeps the usual
-     gap above his head. Phones: no King, so no extra room.
-   - FAQ: a section break below the card (64 / 48), and its bottom margin
-     leaves room for the Warden's head above the red Live band (same 112 /
-     110 the TH pages give him).
+   - Clan card: 40 under the FAQ's 24 bottom margin = the usual 64 break
+     (was 47 extra while the King poked out of the card's top edge).
+   - FAQ: now ABOVE the card (Oct 2026), right after the tracker section.
+   - The card's bottom margin leaves room for the Warden's head above the
+     red Live band (same 112 / 110 the TH pages give him).
    - Band: 12% sides on desktop already match; phones get this page's 5%
      instead of the TH pages' 16px so it lines up with the FAQ above. */
-.coc-content .ac-card{ margin:47px 12% 0; }
-.coc-content .t18-faq{ margin:64px 12% 112px; }
+/* Clash tools -> tracker promo: the grid's 56 margin + the box's 64 padding
+   made a 120 gap. Now 88 on desktop, 64 on phones. */
+.coc-content .tc-grid{ margin-bottom:24px; }
+.coc-content .ac-card{ margin:40px 12% 112px; }
+.coc-content .t18-faq{ margin:64px 12% 24px; }
 @media (max-width:970px){
-  .coc-content .ac-card{ margin:0 5%; }
-  .coc-content .t18-faq{ margin:48px 5% 110px; }
+  .coc-content .tc-grid{ margin-bottom:0; }
+  .coc-content .ac-card{ margin:0 5% 110px; }
+  .coc-content .t18-faq{ margin:48px 5% 48px; }
   .cc-section.t18-band{ padding-left:5%; padding-right:5%; }
   .t18-band .t18-band-art{ right:calc(5% + 12px); }
 }
@@ -2764,41 +2697,63 @@ function warModalEscHandler(e) {
 
 
 <div class="clashguide-container">
-  <!-- Army maker promo (replaced the custom-base pitch, Sep 2026). Background
-       is hotlinked for now -- swap the src for a local copy before this
-       ships, hotlinks can break without notice. The screenshot inside the
-       phone is a real TH18 comp from th18-army.json (Fireball Yeti Furnace),
-       landscape, object-fit:cover. The button opens an empty army maker. -->
+  <!-- Tracker promo (Oct 2026; was the Army maker promo). Background is
+       Supercell Fan Kit art, saved locally from
+       media.ffycdn.net/eu/supercell/bzvB4q9eMLJEWUdpQToR.png?width=2400
+       (re-saved as JPG q82: the PNG was 6.9 MB). The phone still shows the
+       old army-maker screenshot -- to be swapped for a tracker screen later.
+       The search is DESIGN ONLY: submit does nothing yet. When it is wired
+       up, load the tracker code on the input's first focus, never on page
+       load. The Clan option has no backend yet -- the Player Tracker only
+       looks up players. -->
   <!-- cocophoto: BACKGROUND -- replace the src below -->
-  <img class="cl-feature-bg" src="https://images.hdqwalls.com/wallpapers/clash-of-clans-2025-ix.jpg" alt="" loading="lazy" decoding="async">
+  <img class="cl-feature-bg" src="/clashofclans/home/army-maker-bg.webp" alt="" loading="lazy" decoding="async">
   <div class="cl-feature-scrim" aria-hidden="true"></div>
 
   <div class="cl-feature-inner">
     <div class="cl-feature-copy">
-      <div class="ch-kicker cl-feature-kicker">
-        <span>Army maker</span>
-        <span>Town Hall 8 &ndash; 18</span>
-      </div>
-      <h2 class="cl-feature-title">Build an army, <em>open it in Clash</em></h2>
+      <h2 class="cl-feature-title">Track any player <em>or clan</em></h2>
       <p class="cl-feature-text">
-        Pick your troops, spells, heroes and Clan Castle. One link loads the
-        whole army into the game.
+        Look up a player by tag, or a clan by name or tag. Results show up on
+        the phone, and each one opens the full tracker.
       </p>
-      <p class="cl-feature-text cl-feature-text--sub">
-        Or start from a pro comp on our army pages and swap a few troops.
-      </p>
-      <div class="cl-feature-actions">
-        <a class="ch-btn ch-btn-primary" href="/coc/tools/army-maker">
-          Build your army
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </a>
-      </div>
+
+      <form class="cl-track" id="clTrack" role="search" novalidate>
+        <div class="cl-track-modes" role="radiogroup" aria-label="Search for">
+          <button type="button" role="radio" aria-checked="true" data-mode="player">Player</button>
+          <button type="button" role="radio" aria-checked="false" data-mode="clan" tabindex="-1">Clan</button>
+        </div>
+        <div class="cl-track-bar">
+          <span class="cl-track-hash" aria-hidden="true">#</span>
+          <input type="text" id="clTrackInput" aria-label="Player tag" placeholder="Player tag" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="50" enterkeyhint="search">
+          <button type="submit" class="cl-track-go">
+            Track
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <p class="cl-track-hint" id="clTrackHint">
+          Tags start with # and sit under the name on any in-game profile.
+          <button type="button" class="cl-track-try" data-try="LL9PUCG8V">Try #LL9PUCG8V</button>
+        </p>
+      </form>
     </div>
 
     <div class="cl-feature-device">
       <div class="cl-phone">
-        <!-- cocophoto: INSIDE THE PHONE -- replace the src below -->
-        <img class="cl-phone-screen" src="/clashofclans/th18army/th18-fireball2.jpg" alt="A TH18 Fireball Yeti Furnace army" loading="lazy" decoding="async">
+        <!-- The phone's screen. Default: a capture of the tracker's profile
+             header for Wild_Parkour (625x279 at 2x, edited to show Ascendere /
+             Leader / Legend I), cropped to the screen's exact 2.225:1 shape.
+             After a search, .cl-phone-results takes over and scrolls. -->
+        <div class="cl-phone-screen" id="clPhoneScreen">
+          <img class="cl-phone-shot" src="/clashofclans/coctools/tracker-wildparkour.webp" alt="The tracker profile of Wild_Parkour, Town Hall 18, Legend I, leader of Ascendere" loading="lazy" decoding="async">
+          <div class="cl-phone-results" id="clPhoneResults" hidden>
+            <div class="cl-phone-bar">
+              <span id="clPhoneTitle">Results</span>
+              <button type="button" id="clPhoneBack">Close</button>
+            </div>
+            <ul class="cl-phone-list" id="clPhoneList" aria-live="polite"></ul>
+          </div>
+        </div>
         <div class="cl-phone-portrait" aria-hidden="true">
           <img class="cl-phone-frame" src="/clashofclans/coctools/phone-frame.png" alt="">
         </div>
@@ -2807,161 +2762,213 @@ function warModalEscHandler(e) {
   </div>
 </div>
 
-<style>
-/* ── CLASH TOOLS (.ct-grid) ──────────────────────────
-   Six external tools. Same card language as .th-card above -- #121316
-   ground, faint white border, lift on hover.
+<script>
+/* Tracker search on the CoC home (Oct 2026). Shows results inside the phone
+   mockup; each result opens the full tracker (/coc/player/<TAG> or
+   /coc/clan/<TAG>). Nothing is fetched until someone presses Track -- page
+   load costs no API calls. Same API, tag rules and wording as coc-tracker.js;
+   keep the two in step if either changes. */
+(function () {
+  var form = document.getElementById('clTrack');
+  var screen = document.getElementById('clPhoneScreen');
+  if (!form || !screen) return;
 
-   No preview images (removed Sep 2026). They were screenshots of six
-   other websites, each in its own colours and layout, shrunk until their
-   text was unreadable -- they made the section look like a link dump.
-   Each card is now a row: the site's favicon in the same icon tile as the
-   Live events tags below, then name, one line and the domain.
+  var ON_PAGES = location.hostname.endsWith('github.io');
+  var API = ON_PAGES ? 'https://extraordinary-donut-f21bde.netlify.app/api/coc' : '/api/coc';
+  var input = document.getElementById('clTrackInput');
+  var hint = document.getElementById('clTrackHint');
+  var hintHtml = hint.innerHTML;
+  var go = form.querySelector('.cl-track-go');
+  var modes = [].slice.call(form.querySelectorAll('.cl-track-modes [role=radio]'));
+  var panel = document.getElementById('clPhoneResults');
+  var list = document.getElementById('clPhoneList');
+  var title = document.getElementById('clPhoneTitle');
+  var mode = 'player';
+  var ARROW = '<svg class="cl-result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 
-   Titles name the job ("Damage Calculator"), not the site -- two of the
-   six are on clasher.pro. The site shows in the footer, which also tells
-   people where an external link is taking them. Favicons are local
-   128px copies (coctools/favicons/), not live google.com/s2/favicons calls. */
-.ct-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin: 0 12%;
-  padding-bottom: 70px;
-}
-
-.ct-card {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 12px;
-  background: #121316;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.25s ease, background-color 0.25s ease,
-              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
-}
-.ct-card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: #15161a;
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px -16px rgba(0, 0, 0, 0.85);
-}
-.ct-card:focus-visible {
-  outline: 2px solid #c23b3b;
-  outline-offset: 3px;
-}
-
-/* Three favicons carry their own square background and two are
-   transparent -- the tile makes both read as the same rounded icon. */
-.ct-card-icon {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #1a1b1f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.ct-card-icon img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* flex column + the description's flex:1 push the domain down, so the
-   domains sit level across a row even when one description runs longer. */
-.ct-card-body {
-  flex: 1;
-  min-width: 0;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-}
-.ct-card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 20px;
-  margin-bottom: 6px;
-}
-.ct-card-name {
-  flex: 1;
-  min-width: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  color: #f1f2f4;
-}
-.ct-card-arrow {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  color: #5b5e64;
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
-}
-.ct-card:hover .ct-card-arrow {
-  color: #e05252;
-  transform: translate(2px, -2px);
-}
-.ct-card-desc {
-  flex: 1;
-  margin: 0;
-  font-family: 'Sora', sans-serif;
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: #9ea3ab;
-}
-.ct-card-foot {
-  margin-top: 10px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  color: #6f737a;
-  transition: color 0.2s ease;
-}
-.ct-card:hover .ct-card-foot { color: #c7cad0; }
-
-@media (max-width: 1150px) {
-  .ct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-/* Mobile: one column of compact rows. */
-@media (max-width: 970px) {
-  .ct-grid {
-    grid-template-columns: 1fr;
-    margin: 0 5%;
-    gap: 10px;
-    padding-bottom: 50px;
+  // "#abc o" -> "ABC0"; null if it isn't a real tag (0289PYLQGRJCUV only).
+  function cleanTag(raw) {
+    var t = String(raw || '').toUpperCase().replace(/O/g, '0').replace(/[^0-9A-Z]/g, '');
+    return /^[0289PYLQGRJCUV]{3,12}$/.test(t) ? t : null;
   }
-  .ct-card { gap: 12px; padding: 14px; }
-  .ct-card-icon { width: 36px; height: 36px; border-radius: 9px; }
-  .ct-card-head { margin-bottom: 4px; }
-  .ct-card-name { font-size: 14px; }
-  .ct-card-arrow { width: 13px; height: 13px; }
-  .ct-card-desc { font-size: 12px; line-height: 1.5; }
-  .ct-card-foot { margin-top: 6px; font-size: 10.5px; }
-}
+  function playerHref(tag) { return ON_PAGES ? '/coc/player/?tag=' + tag : '/coc/player/' + tag; }
+  function clanHref(tag) { return ON_PAGES ? '/coc/clan/?tag=' + tag : '/coc/clan/' + tag; }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function num(n) { return (n || 0).toLocaleString('en-US'); }
+  function api(query) {
+    return fetch(API + '?' + query).then(function (res) {
+      return res.json().then(function (body) {
+        if (!res.ok) throw new Error(['notFound', 'maintenance', 'private'].indexOf(body.error) !== -1 ? body.error : 'other');
+        return body;
+      });
+    });
+  }
+  var ERR = {
+    notFoundPlayer: 'No player has this tag. Copy it from the in-game profile and try again.',
+    notFoundClan: 'No clan has this tag. Copy it from the clan&rsquo;s in-game profile and try again.',
+    maintenance: 'Clash of Clans is in maintenance, so its data is unavailable. Try again when the game is back.',
+    other: 'This couldn&rsquo;t be loaded. Check your connection and try again.'
+  };
 
-@media (prefers-reduced-motion: reduce) {
-  .ct-card,
-  .ct-card-arrow { transition: none; }
-  .ct-card:hover,
-  .ct-card:hover .ct-card-arrow { transform: none; }
-}
-</style>
+  function setMode(m) {
+    mode = m;
+    modes.forEach(function (b) {
+      var on = b.dataset.mode === m;
+      b.setAttribute('aria-checked', on);
+      b.tabIndex = on ? 0 : -1;
+    });
+    form.classList.toggle('is-clan', m === 'clan');
+    var label = m === 'clan' ? 'Clan name or #tag' : 'Player tag';
+    input.placeholder = label;
+    input.setAttribute('aria-label', label);
+    say(null);
+  }
+  modes.forEach(function (b, i) {
+    b.addEventListener('click', function () { setMode(b.dataset.mode); input.focus(); });
+    b.addEventListener('keydown', function (e) {
+      var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      var next = modes[(i + step + modes.length) % modes.length];
+      setMode(next.dataset.mode);
+      next.focus();
+    });
+  });
+
+  // Hint line under the bar: the default help, or an error in its place.
+  function say(errorHtml) {
+    hint.classList.toggle('is-error', !!errorHtml);
+    hint.innerHTML = errorHtml || hintHtml;
+    if (errorHtml) input.setAttribute('aria-invalid', 'true');
+    else input.removeAttribute('aria-invalid');
+    wireTry();
+  }
+  function wireTry() {
+    var t = hint.querySelector('.cl-track-try');
+    if (t) t.addEventListener('click', function () {
+      setMode('player');
+      input.value = t.dataset.try;
+      form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true }));
+    });
+  }
+  wireTry();
+  input.addEventListener('input', function () { if (hint.classList.contains('is-error')) say(null); });
+
+  function open(heading, html) {
+    title.textContent = heading;
+    list.innerHTML = html;
+    list.scrollTop = 0;
+    panel.hidden = false;
+    screen.classList.add('is-results');
+  }
+  function busy(on) {
+    go.setAttribute('aria-busy', on ? 'true' : 'false');
+  }
+  document.getElementById('clPhoneBack').addEventListener('click', function () {
+    panel.hidden = true;
+    screen.classList.remove('is-results');
+    input.focus();
+  });
+
+  function playerRow(p) {
+    var th = p.townHallLevel;
+    var icon = th >= 8 && th <= 18 ? '/icons/th' + th + 'icon.' + (th === 18 ? 'png' : 'webp') : '';
+    var league = p.leagueTier || p.league;
+    return '<li><a class="cl-result" href="' + playerHref(p.tag.slice(1)) + '">' +
+      (icon ? '<img src="' + icon + '" alt="Town Hall ' + th + '">' : '<span class="cl-result-th">TH' + th + '</span>') +
+      '<span class="cl-result-main"><b>' + esc(p.name) + '</b><span>#' + p.tag.slice(1) +
+      (p.clan ? ' &middot; ' + esc(p.clan.name) : ' &middot; Not in a clan') + '</span></span>' +
+      '<span class="cl-result-meta"><b>' + num(p.trophies) + '</b><span>' + (league ? esc(league.name) : 'Trophies') + '</span></span>' +
+      ARROW + '</a></li>';
+  }
+  function clanRow(c) {
+    return '<li><a class="cl-result" href="' + clanHref(c.tag.slice(1)) + '">' +
+      '<img src="' + c.badgeUrls.small + '" alt="" loading="lazy">' +
+      '<span class="cl-result-main"><b>' + esc(c.name) + '</b><span>#' + c.tag.slice(1) +
+      (c.location ? ' &middot; ' + esc(c.location.name) : '') + '</span></span>' +
+      '<span class="cl-result-meta"><b>Level ' + c.clanLevel + '</b><span>' + c.members + '/50 members</span></span>' +
+      ARROW + '</a></li>';
+  }
+  function note(text) { return '<li class="cl-phone-note">' + text + '</li>'; }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var raw = input.value.trim();
+    if (!raw) return say(mode === 'clan' ? 'Type a clan name, or its tag starting with #.' : 'Type a player tag first. It starts with # and sits under the name on the in-game profile.');
+
+    if (mode === 'player') {
+      var tag = cleanTag(raw);
+      if (!tag) return say('That isn&rsquo;t a player tag. Tags only use the characters 0 2 8 9 P Y L Q G R J C U V.');
+      return run('Player #' + tag, api('type=player&tag=' + tag).then(function (p) { return playerRow(p); }), 'notFoundPlayer');
+    }
+    var looksTag = raw.charAt(0) === '#';
+    if (looksTag) {
+      var ctag = cleanTag(raw);
+      if (!ctag) return say('That isn&rsquo;t a clan tag. Tags only use the characters 0 2 8 9 P Y L Q G R J C U V.');
+      return run('Clan #' + ctag, api('type=clan&tag=' + ctag).then(function (c) { return clanRow(c); }), 'notFoundClan');
+    }
+    if (raw.length < 3) return say('Type at least 3 letters of the clan name, or its tag starting with #.');
+    run('Clans named “' + raw + '”', api('type=clansearch&name=' + encodeURIComponent(raw)).then(function (body) {
+      var items = body.items || [];
+      return items.length ? items.map(clanRow).join('') : note('No clans found with that name. Try the clan&rsquo;s tag instead.');
+    }), 'notFoundClan');
+  });
+
+  function run(heading, promise, notFoundKey) {
+    say(null);
+    busy(true);
+    open(heading, note('Searching&hellip;'));
+    promise.then(function (html) {
+      open(heading, html);
+    }).catch(function (err) {
+      var key = err.message === 'notFound' ? notFoundKey : err.message === 'maintenance' ? 'maintenance' : 'other';
+      open(heading, note(ERR[key]));
+    }).then(function () { busy(false); });
+  }
+})();
+</script>
+
+<!-- FAQ: same look as /coc/town-hall-18/layouts's (coc-clan-clock.css), questions
+     reworded for the hub page -- visitors reach the Copy Layout buttons
+     through a Town Hall card, and this page covers every Town Hall, not
+     just TH18. Native <details>/<summary>: no script, keyboard-friendly,
+     and the answers stay in the page text for search engines. -->
+<section class="t18-faq" aria-labelledby="t18-faq-label">
+  <div class="cc-label-row">
+    <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
+  </div>
+  <div class="t18-faq-list">
+    <details class="t18-faq-item">
+      <summary>How do I copy a base into my game?</summary>
+      <p>Pick your Town Hall under <b>Featured Townhalls</b>, then tap <b>Copy Layout</b> under any base. Clash of Clans opens with the layout loaded, so just save it to one of your layout slots.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Why won&rsquo;t the Copy Layout link open the game?</summary>
+      <p>Apps like Discord, Facebook and Messenger open links in their own built-in browser, which can&rsquo;t launch the game. Tap the <b>&#8942;</b> menu, choose <b>Open in Chrome</b> (or your usual browser), then tap Copy Layout again.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Can I use a base made for a different Town Hall?</summary>
+      <p>Only one level away. Base links work one Town Hall level up or down, and anything you haven&rsquo;t unlocked yet is simply left out. Any further than that and the link won&rsquo;t copy.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>Are these bases good for war, CWL or trophy pushing?</summary>
+      <p>Yes. We choose quality over quantity. We only post bases that have proven themselves, so every layout here is built to hold up in war, CWL and on the ladder.</p>
+    </details>
+    <details class="t18-faq-item">
+      <summary>How do I join Ascendere?</summary>
+      <p>Join our <b>Global Chat</b> and let us know you&rsquo;re interested. We&rsquo;ll reply and set you up with a quick tryout. We pick a base, you attack it, and a clean three-star earns your spot. You&rsquo;ll need <b>Town Hall 11</b> or higher.</p>
+    </details>
+  </div>
+</section>
 
 
- <div class="layouts-title-box" style="margin-top: 90px; margin-bottom: 30px;">
-  <div class="layouts-title">Sites we use</div>
-  <div class="layouts-subtitle">Free sites we use to track, plan and test. Each one opens in a new tab.</div>
- </div>
+
+
+
 
   <!-- Clan-tag copy is unrelated to this grid but lived in a script
        tag here before; kept as-is. -->
@@ -2985,79 +2992,7 @@ function warModalEscHandler(e) {
   });
   </script>
 
-  <div class="ct-grid">
-    <a class="ct-card" href="https://www.clashofstats.com/" target="_blank" rel="noopener">
-      <span class="ct-card-icon"><img src="/clashofclans/coctools/favicons/clashofstats.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-      <div class="ct-card-body">
-        <div class="ct-card-head">
-          <span class="ct-card-name">Player Rankings</span>
-          <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-        <p class="ct-card-desc">Look up any player or clan: detailed stats, global rankings and history.</p>
-        <span class="ct-card-foot">clashofstats.com</span>
-      </div>
-    </a>
 
-    <a class="ct-card" href="https://www.warreport.app/#/clans/2GYPGPJP9" target="_blank" rel="noopener">
-      <span class="ct-card-icon"><img src="/clashofclans/coctools/favicons/warreport.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-      <div class="ct-card-body">
-        <div class="ct-card-head">
-          <span class="ct-card-name">War Tracker</span>
-          <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-        <p class="ct-card-desc">Ascendere's attack logs, stats, top ranks and full clan war history.</p>
-        <span class="ct-card-foot">warreport.app</span>
-      </div>
-    </a>
-
-    <a class="ct-card" href="https://www.clash.ninja/" target="_blank" rel="noopener">
-      <span class="ct-card-icon"><img src="/clashofclans/coctools/favicons/clashninja.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-      <div class="ct-card-body">
-        <div class="ct-card-head">
-          <span class="ct-card-name">Upgrade Tracker</span>
-          <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-        <p class="ct-card-desc">Track upgrades, lab and builder queues, and plan your next moves.</p>
-        <span class="ct-card-foot">clash.ninja</span>
-      </div>
-    </a>
-
-    <a class="ct-card" href="https://clasharmies.com/army-builder" target="_blank" rel="noopener">
-      <span class="ct-card-icon"><img src="/clashofclans/coctools/favicons/clasharmies.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-      <div class="ct-card-body">
-        <div class="ct-card-head">
-          <span class="ct-card-name">Army Builder</span>
-          <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-        <p class="ct-card-desc">Build, save and share army comps with troops, spells and heroes.</p>
-        <span class="ct-card-foot">clasharmies.com</span>
-      </div>
-    </a>
-
-    <a class="ct-card" href="https://clasher.pro/labs/coc-damage-calculator" target="_blank" rel="noopener">
-      <span class="ct-card-icon"><img src="/clashofclans/coctools/favicons/clasherpro.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-      <div class="ct-card-body">
-        <div class="ct-card-head">
-          <span class="ct-card-name">Damage Calculator</span>
-          <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-        <p class="ct-card-desc">Calculate exact damage output for any troop or spell combination.</p>
-        <span class="ct-card-foot">clasher.pro</span>
-      </div>
-    </a>
-
-    <a class="ct-card" href="https://clasher.pro/labs/coc-troop-spin" target="_blank" rel="noopener">
-      <span class="ct-card-icon"><img src="/clashofclans/coctools/favicons/clasherpro.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-      <div class="ct-card-body">
-        <div class="ct-card-head">
-          <span class="ct-card-name">Troop Spinner</span>
-          <svg class="ct-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-        <p class="ct-card-desc">Randomly roll troops, heroes, spells or pets for a challenge run.</p>
-        <span class="ct-card-foot">clasher.pro</span>
-      </div>
-    </a>
-  </div>
 
   
   </div>
@@ -3080,7 +3015,7 @@ function warModalEscHandler(e) {
 <section class="ac-card" aria-labelledby="clan-title">
   <div class="ac-top">
     <div class="ac-body">
-      <h2 class="clan-title" id="clan-title"><img class="ac-title-logo" src="/icons/aclogonobg-tight.png" alt="" width="238" height="258" />Play with <em>Ascendere</em></h2>
+      <h2 class="clan-title" id="clan-title"><img class="ac-title-logo" src="/icons/aclogonobg-tight.webp" alt="" width="238" height="258" />Play with <em>Ascendere</em></h2>
       <div class="ac-actions">
         <button
           type="button"
@@ -3116,7 +3051,7 @@ function warModalEscHandler(e) {
       </div>
     </div>
     <div class="ac-art" aria-hidden="true">
-      <img src="/clashofclans/coctools/kingdragon-tight.png" alt="" width="379" height="336" loading="lazy" decoding="async" />
+      <img src="/clashofclans/coctools/ac-card-art.webp" alt="" width="1600" height="920" loading="lazy" decoding="async" />
     </div>
   </div>
   <!-- Live stats: the card's full-width bottom row, cells split by hairlines; the King stands on its top edge. War record / win
@@ -3142,38 +3077,7 @@ function warModalEscHandler(e) {
 </section>
 <script src="/coc-clan-clock.js" defer></script>
 
-<!-- FAQ: same look as /coc/town-hall-18/layouts's (coc-clan-clock.css), questions
-     reworded for the hub page -- visitors reach the Copy Layout buttons
-     through a Town Hall card, and this page covers every Town Hall, not
-     just TH18. Native <details>/<summary>: no script, keyboard-friendly,
-     and the answers stay in the page text for search engines. -->
-<section class="t18-faq" aria-labelledby="t18-faq-label">
-  <div class="cc-label-row">
-    <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
-  </div>
-  <div class="t18-faq-list">
-    <details class="t18-faq-item">
-      <summary>How do I copy a base into my game?</summary>
-      <p>Pick your Town Hall under <b>Featured Townhalls</b>, then tap <b>Copy Layout</b> under any base. Clash of Clans opens with the layout loaded, so just save it to one of your layout slots.</p>
-    </details>
-    <details class="t18-faq-item">
-      <summary>Why won&rsquo;t the Copy Layout link open the game?</summary>
-      <p>Apps like Discord, Facebook and Messenger open links in their own built-in browser, which can&rsquo;t launch the game. Tap the <b>&#8942;</b> menu, choose <b>Open in Chrome</b> (or your usual browser), then tap Copy Layout again.</p>
-    </details>
-    <details class="t18-faq-item">
-      <summary>Can I use a base made for a different Town Hall?</summary>
-      <p>Only one level away. Base links work one Town Hall level up or down, and anything you haven&rsquo;t unlocked yet is simply left out. Any further than that and the link won&rsquo;t copy.</p>
-    </details>
-    <details class="t18-faq-item">
-      <summary>Are these bases good for war, CWL or trophy pushing?</summary>
-      <p>Yes. We choose quality over quantity. We only post bases that have proven themselves, so every layout here is built to hold up in war, CWL and on the ladder.</p>
-    </details>
-    <details class="t18-faq-item">
-      <summary>How do I join Ascendere?</summary>
-      <p>Join our <b>Global Chat</b> and let us know you&rsquo;re interested. We&rsquo;ll reply and set you up with a quick tryout. We pick a base, you attack it, and a clean three-star earns your spot. You&rsquo;ll need <b>Town Hall 11</b> or higher.</p>
-    </details>
-  </div>
-</section>
+
 
 </div>
 
@@ -3228,7 +3132,7 @@ function warModalEscHandler(e) {
     </ul>
   </div>
   <div class="t18-band-art" aria-hidden="true">
-    <img src="/clashofclans/coctools/wardendragon-tight.png" alt="" loading="lazy" decoding="async" />
+    <img src="/clashofclans/coctools/wardendragon-tight.webp" alt="" loading="lazy" decoding="async" />
     <!-- Embers: sparks rising off the fire orb in his hand and his wings, over a slow orb glow. -->
     <span class="t18-band-fx"
       ><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span><span class="t18-ember"></span
@@ -3264,7 +3168,7 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js?v=20261005c" defer></script>
+<script src="/11layout.js?v=20261006c" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
@@ -4425,14 +4329,14 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
               <button type="button" class="mx-tab" role="tab" id="mxTabArmies" aria-controls="mxPanelArmies" aria-selected="false" tabindex="-1">Armies</button>
             </div>
           </div>
-          <div class="mx-grid" id="mxPanelLayouts" role="tabpanel" aria-labelledby="mxTabLayouts"><a href="/coc/town-hall-18/layouts" class="mx-th"><img src="/icons/th18icon.png" alt="TH18"><span>TH18</span></a><a href="/coc/town-hall-17/layouts" class="mx-th"><img src="/icons/th17icon.webp" alt="TH17"><span>TH17</span></a><a href="/coc/town-hall-16/layouts" class="mx-th"><img src="/icons/th16icon.webp" alt="TH16"><span>TH16</span></a><a href="/coc/town-hall-15/layouts" class="mx-th"><img src="/icons/th15icon.webp" alt="TH15"><span>TH15</span></a><a href="/coc/town-hall-14/layouts" class="mx-th"><img src="/icons/th14icon.webp" alt="TH14"><span>TH14</span></a><a href="/coc/town-hall-13/layouts" class="mx-th"><img src="/icons/th13icon.webp" alt="TH13"><span>TH13</span></a><a href="/coc/town-hall-12/layouts" class="mx-th"><img src="/icons/th12icon.webp" alt="TH12"><span>TH12</span></a><a href="/coc/town-hall-11/layouts" class="mx-th"><img src="/icons/th11icon.webp" alt="TH11"><span>TH11</span></a><a href="/coc/town-hall-10/layouts" class="mx-th"><img src="/icons/th10icon.webp" alt="TH10"><span>TH10</span></a><a href="/coc/town-hall-9/layouts" class="mx-th"><img src="/icons/th9icon.webp" alt="TH9"><span>TH9</span></a><a href="/coc/town-hall-8/layouts" class="mx-th"><img src="/icons/th8icon.webp" alt="TH8"><span>TH8</span></a></div>
-          <div class="mx-grid" id="mxPanelArmies" role="tabpanel" aria-labelledby="mxTabArmies" hidden><a href="/coc/town-hall-18/army" class="mx-th"><img src="/clashofclans/th18army/th17-army.webp" alt="TH18"><span>TH18</span></a><a href="/coc/town-hall-17/army" class="mx-th"><img src="/clashofclans/th17army/th17-troops.webp" alt="TH17"><span>TH17</span></a><a href="/coc/town-hall-16/army" class="mx-th"><img src="/clashofclans/th16army/th16-army.webp" alt="TH16"><span>TH16</span></a><a href="/coc/town-hall-15/army" class="mx-th"><img src="/clashofclans/th15army/th15-army.webp" alt="TH15"><span>TH15</span></a><a href="/coc/town-hall-14/army" class="mx-th"><img src="/clashofclans/th14army/th14-army.webp" alt="TH14"><span>TH14</span></a><a href="/coc/town-hall-13/army" class="mx-th"><img src="/clashofclans/th13army/th13-army.webp" alt="TH13"><span>TH13</span></a><a href="/coc/town-hall-12/army" class="mx-th"><img src="/clashofclans/th12army/th12-army.webp" alt="TH12"><span>TH12</span></a><a href="/coc/town-hall-11/army" class="mx-th"><img src="/clashofclans/th11army/th11-army.webp" alt="TH11"><span>TH11</span></a><a href="/coc/town-hall-10/army" class="mx-th"><img src="/clashofclans/th10army/th10-army.webp" alt="TH10"><span>TH10</span></a><a href="/coc/town-hall-9/army" class="mx-th"><img src="/clashofclans/th9army/th9-army.webp" alt="TH9"><span>TH9</span></a><a href="/coc/town-hall-8/army" class="mx-th"><img src="/clashofclans/th8army/th8-army.webp" alt="TH8"><span>TH8</span></a></div>
+          <div class="mx-grid" id="mxPanelLayouts" role="tabpanel" aria-labelledby="mxTabLayouts" data-role="more-layouts-grid"></div>
+          <div class="mx-grid" id="mxPanelArmies" role="tabpanel" aria-labelledby="mxTabArmies" hidden data-role="more-armies-grid"></div>
         </section>
         <section class="mx-sec" aria-labelledby="mxToolsLabel">
           <div class="mx-head">
             <h3 class="mx-label" id="mxToolsLabel">Tools</h3>
           </div>
-          <div class="mx-tools"><a href="/coc/tools/" class="mx-tool"><span class="mx-tool-ico"><img src="/icons/coctoolsicon.png" alt="" /></span><span class="mx-tool-name">Websites</span></a><a href="/coc/tools/slang" class="mx-tool"><span class="mx-tool-ico"><img src="/icons/Book_of_Everything.webp" alt="" /></span><span class="mx-tool-name">Glossary</span></a><a href="/coc/tools/equipment" class="mx-tool"><span class="mx-tool-ico"><img src="/icons/fireball.webp" alt="" /></span><span class="mx-tool-name">Equipments</span></a><a href="/coc/tools/walls" class="mx-tool"><span class="mx-tool-ico"><img src="/clashofclans/coctools/th17-wall.webp" alt="" /></span><span class="mx-tool-name">Wall Calculator</span></a></div>
+          <div class="mx-tools" data-role="more-guides-list"></div>
         </section>
       </div>
     </div>
@@ -4712,7 +4616,7 @@ function cocPagePath(u) {
 })();
 </script>
   <script src="/coc-help.js" defer></script>
-  <script src="/coc-more.js" defer></script>
+  <script src="/coc-more.js?v=20261006a" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
 </body>
 </html>

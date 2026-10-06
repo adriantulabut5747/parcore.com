@@ -13,51 +13,41 @@
 }
 
 /* ---- Search -----------------------------------------------------------
-   The whole hub page: one centred box. Emblem (the tool's nav icon), the
-   title, one sentence, then the tag field with a fixed "#" in front, since
-   every tag starts with one. Notes sit under a hairline at the bottom. */
+   Under the tool banner: one card as wide as the banner, split -- the form
+   on the left (Player / Clan switch, the tag field with a fixed "#" in
+   front, notes under a hairline), a cut-out character on the right. Phones: she stands small in the bottom-right corner. */
 .pt-search {
-  max-width: 760px;
-  margin: clamp(24px, 7vh, 72px) auto 0;
-  padding: 44px 40px 28px;
-  text-align: center;
-  background: radial-gradient(80% 70% at 50% 0%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 70%), #121316;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 34%); /* the art never squeezes the field */
+  overflow: hidden;
+  margin: 16px 0 0;
+  background: #121316;
 }
-.pt-search-emblem {
-  display: block;
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 14px;
+.pt-search-main {
+  padding: 24px 32px 26px;
+}
+.pt-search-art {
+  position: relative;
+  min-height: 100%;
+  /* a soft red floor under the character, nothing behind her */
+  background: radial-gradient(42% 30% at 58% 100%, rgba(194, 59, 59, 0.22), rgba(194, 59, 59, 0) 70%);
+}
+/* A transparent cut-out (clashofclans/tracker-search-art.webp), standing on
+   the card's bottom edge. Swap the file for another render; keep it cropped
+   tight to the figure. */
+.pt-search-art img {
+  position: absolute;
+  inset: 14px 0 0;
+  width: 100%;
+  height: calc(100% - 14px);
   object-fit: contain;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.55));
-}
-.pt-search h1 {
-  margin: 0;
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(26px, 4vw, 34px);
-  font-weight: 900;
-  line-height: 1.1;
-  text-transform: uppercase;
-  color: #f2f3f5;
-}
-.pt-search h1 em {
-  font-style: normal;
-  color: #c23b3b;
-}
-.pt-search-lead {
-  max-width: 46ch;
-  margin: 12px auto 0;
-  font:
-    400 15px/1.65 'Sora',
-    sans-serif;
-  color: #a9aeb6;
+  object-position: 58% 100%;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5));
 }
 .pt-form {
   display: flex;
   gap: 10px;
-  max-width: 540px;
-  margin: 28px auto 0;
-  text-align: left;
+  margin: 16px 0 0;
 }
 .pt-field {
   position: relative;
@@ -77,7 +67,7 @@
 }
 .pt-field input {
   width: 100%;
-  height: 56px;
+  height: 48px;
   padding: 0 16px 0 40px;
   border-radius: 10px;
   border: 1px solid #3a3d44;
@@ -111,15 +101,14 @@
   border-color: #e06363;
 }
 .pt-form .th-soon-btn {
-  min-height: 56px;
+  min-height: 48px;
   padding: 0 24px;
   border-radius: 10px;
   font-size: 12.5px;
   cursor: pointer;
 }
 .pt-msg {
-  max-width: 540px;
-  margin: 10px auto 0;
+  margin: 10px 0 0;
   text-align: left;
   font:
     400 13px/1.6 'Sora',
@@ -127,9 +116,9 @@
   color: #f0a1a1;
 }
 .pt-help {
-  max-width: 540px;
-  margin: 28px auto 0;
-  padding-top: 18px;
+  max-width: 62ch;
+  margin: 20px 0 0;
+  padding-top: 16px;
   border-top: 1px solid #23252a;
   font:
     400 13px/1.6 'Sora',
@@ -145,8 +134,7 @@
 }
 
 .pt-recent {
-  max-width: 760px;
-  margin: 16px auto 0;
+  margin: 12px 0 0;
   padding: 20px 20px 12px;
 }
 .pt-recent h2 {
@@ -167,9 +155,15 @@
   gap: 4px 12px;
 }
 .pt-recent-row {
-  display: flex;
+  /* icon | name over tag, so a three-across row never cuts the name off */
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-areas:
+    'icon name'
+    'icon tag';
   align-items: center;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 1px;
   padding: 8px;
   border-radius: 8px;
   color: #e9eaed;
@@ -179,6 +173,10 @@
 .pt-recent-row:focus-visible {
   background: #1b1d22;
   outline: none;
+}
+.pt-recent-row img,
+.pt-recent-th {
+  grid-area: icon;
 }
 .pt-recent-row img {
   width: 36px;
@@ -194,7 +192,7 @@
   color: #9ea3ab;
 }
 .pt-recent-name {
-  flex: 1;
+  grid-area: name;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -204,77 +202,253 @@
     sans-serif;
 }
 .pt-recent-tag {
+  grid-area: tag;
   font:
     700 12px 'Oxanium',
     sans-serif;
   color: #7c818a;
 }
 
-/* ---- "Search another player / clan" (above the profile and clan header) */
-.pt-bar {
-  display: flex;
-  justify-content: flex-end;
+/* ---- Slim search above the profile / clan header ------------------------
+   One field-shaped row as wide as the header: the Player / Clan switch
+   inside it on the left, a search glyph, the input, and a round go button
+   on the right. Replaces the lone "Search another player" button. */
+.pt-quick-wrap {
+  position: relative;
+  z-index: 5; /* the dropdown opens over the header below */
   margin-top: 16px;
 }
-.pt-bar + .pt-head {
-  margin-top: 10px;
-}
-.pt-again {
-  display: inline-flex;
+.pt-quick {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: 1px solid #3a3d44;
-  background: #15161a;
-  color: #c9ccd2;
+  gap: 10px;
+  height: 46px;
+  padding: 4px 4px 4px 4px;
+  border-radius: 12px;
+  border: 1px solid #2a2c30;
+  background: #0b0c0e;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.pt-quick:focus-within {
+  border-color: #c23b3b;
+  box-shadow: 0 0 0 3px rgba(194, 59, 59, 0.18);
+}
+.pt-quick-mode {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  height: 100%;
+  padding: 3px;
+  border-radius: 9px;
+  background: #16171b;
+}
+.pt-quick-mode button {
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #8d929a;
   font:
-    800 11px 'Oxanium',
+    800 10.5px 'Oxanium',
     sans-serif;
   letter-spacing: 1.1px;
   text-transform: uppercase;
-  text-decoration: none;
-  transition:
-    border-color 0.15s,
-    color 0.15s;
+  cursor: pointer;
 }
-.pt-again:hover {
-  border-color: #5a5e66;
-  color: #fff;
+.pt-quick-mode button:hover {
+  color: #e9eaed;
 }
-.pt-again:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 2px;
+.pt-quick-mode button[aria-checked='true'] {
+  background: #2a2c32;
+  color: #f2f3f5;
 }
-.pt-again svg {
-  width: 15px;
-  height: 15px;
+.pt-quick-mode button:focus-visible,
+.pt-quick-go:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 1px;
+}
+.pt-quick-ico {
+  flex: none;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: #e06363;
   stroke-width: 2.4;
   stroke-linecap: round;
 }
+.pt-quick input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  color: #f2f3f5;
+  font:
+    600 14px 'Sora',
+    sans-serif;
+  caret-color: #e06363;
+}
+.pt-quick input::placeholder {
+  color: #6d7178;
+}
+.pt-quick input:focus {
+  outline: none;
+}
+.pt-quick-go {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 100%;
+  border: 0;
+  border-radius: 9px;
+  background: #c23b3b;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.pt-quick-go:hover {
+  background: #d04747;
+}
+.pt-quick-go svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pt-quick-wrap + .pt-head {
+  margin-top: 12px;
+}
+/* The dropdown: Recently viewed / Featured on focus, results after Enter.
+   Same rows as the search page (.pt-recent-row, .pt-result). */
+.pt-quick-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+  overscroll-behavior: contain; /* reaching the end doesn't scroll (or refresh) the page */
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid #2a2c30;
+  background: #101114;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+.pt-quick-head {
+  margin: 6px 8px 4px;
+  font:
+    800 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #8d929a;
+}
+.pt-quick-head[hidden] {
+  display: none;
+}
+.pt-quick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pt-quick-sk {
+  padding: 4px;
+}
+
+/* ---- Loading skeletons ---------------------------------------------------
+   Grey shapes in the layout that's coming (header, tabs, tiles or rows),
+   with one slow shimmer sweeping across, so the page doesn't jump when the
+   data lands. Still on reduced motion. */
+.pt-skel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.pt-sk {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #1a1b1f 0%, #1a1b1f 35%, #25272d 50%, #1a1b1f 65%, #1a1b1f 100%) 0 0 / 300% 100%;
+  animation: pt-shimmer 1.6s linear infinite;
+}
+@keyframes pt-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+.pt-sk-quick {
+  height: 46px;
+  border-radius: 12px;
+}
+.pt-sk-card {
+  display: grid;
+  gap: 14px;
+  padding: 22px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #121316;
+}
+.pt-sk-head {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px 24px;
+}
+.pt-sk-th {
+  width: 88px;
+  height: 88px;
+  border-radius: 18px;
+}
+.pt-sk-lines {
+  display: grid;
+  gap: 10px;
+}
+.pt-sk-facts {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #1f2126;
+}
+.pt-sk-facts div {
+  display: grid;
+  gap: 6px;
+}
+.pt-sk-tabs {
+  display: flex;
+  gap: 18px;
+  padding: 10px 0 12px;
+  border-bottom: 1px solid #1f2126;
+}
+.pt-sk-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pt-sk-tile {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+}
+.pt-sk-row {
+  height: 40px;
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pt-sk {
+    animation: none;
+  }
+}
 
 /* ---- Profile: header -------------------------------------------------- */
-.pt-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  min-height: 260px;
-  font:
-    700 13px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1px;
-  color: #9ea3ab;
-}
-.pt-loading .parchrome-ring {
-  position: relative;
-  width: 26px;
-  height: 26px;
-  inset: auto;
-}
 .pt-state {
   margin-top: 16px;
 }
@@ -293,6 +467,33 @@
   gap: 16px 24px;
   align-items: center;
   background: radial-gradient(60% 140% at 0% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 65%), #121316;
+}
+/* Player header: the burning battlefield (clashofclans/tracker-battlefield.webp)
+   under a heavy dark wash -- near-black on the left where the name sits,
+   and along the bottom where the numbers sit -- so only the fire on the
+   right and the glow behind the stats show through. */
+.pt-head--player {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.09);
+  background: #0c0c0e;
+}
+.pt-head--player::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.82) 34%, rgba(10, 10, 12, 0.42) 72%, rgba(10, 10, 12, 0.28) 100%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.9) 0%, rgba(10, 10, 12, 0.6) 34%, rgba(10, 10, 12, 0) 70%),
+    url('/clashofclans/tracker-battlefield.webp') 72% 62% / cover no-repeat;
+}
+.pt-head--player .pt-head-facts {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+.pt-head--player .pt-facts dt {
+  color: #a3a8b0; /* a step lighter: it sits on the picture now */
 }
 .pt-th {
   grid-area: th;
@@ -360,6 +561,18 @@
 .pt-copy:hover {
   border-color: #5a5e66;
   color: #fff;
+}
+.pt-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pt-share svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
 }
 .pt-labels {
   display: inline-flex;
@@ -567,8 +780,12 @@
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
+/* MAX: the badge reads MAX in the accent red (the level is in the tooltip). */
 .pt-tile.is-max .pt-lvl {
+  padding: 2px 4px 1px;
   background: #c23b3b;
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
 }
 .pt-tile.is-active .pt-tile-art {
   box-shadow: 0 0 0 2px #c23b3b;
@@ -597,39 +814,45 @@
   white-space: nowrap;
 }
 
+/* Heroes: a strip of portraits, name and level under each, centred. No
+   box per hero (they already sit in the section's box), no equipment
+   (it has its own section). */
 .pt-heroes {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 16px 10px;
 }
 .pt-hero {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.pt-hero-text {
   display: grid;
-  gap: 2px;
+  justify-items: center;
+  align-content: start;
+  gap: 3px;
   min-width: 0;
+  text-align: center;
 }
-.pt-hero-text b {
+.pt-hero .pt-tile {
+  margin-bottom: 5px;
+}
+.pt-hero-name {
+  max-width: 100%;
   font:
-    600 14px 'Sora',
+    600 13px/1.25 'Sora',
     sans-serif;
   color: #e9eaed;
 }
-.pt-hero-text > span {
+.pt-hero-lvl {
   font:
     700 12px 'Oxanium',
     sans-serif;
-  color: #8d929a;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
 }
-.pt-gear {
-  margin-top: 6px;
-  gap: 6px;
+.pt-hero-lvl i {
+  font-style: normal;
+  color: #6d7178;
 }
 
 /* achievements */
@@ -699,7 +922,7 @@
 .pt-mode {
   display: inline-flex;
   gap: 2px;
-  margin-top: 24px;
+  margin-top: 0;
   padding: 3px;
   border-radius: 10px;
   background: #0b0c0e;
@@ -745,15 +968,45 @@
 
 .pt-results {
   list-style: none;
-  max-width: 540px;
   max-height: 420px;
   overflow-y: auto;
-  margin: 14px auto 0;
+  overscroll-behavior: contain; /* reaching the end doesn't scroll (or refresh) the page */
+  margin: 14px 0 0;
   padding: 4px;
   border-radius: 10px;
   border: 1px solid #23252a;
   background: #0d0e10;
   text-align: left;
+}
+/* Scroll lists: a fade on the edge that has more (coc-tracker.js
+   scrollEdges); no fade on an edge means you're at that end. */
+.pt-results.more-b,
+.pt-quick-panel.more-b {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
+}
+.pt-results.more-t,
+.pt-quick-panel.more-t {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 36px);
+  mask-image: linear-gradient(180deg, transparent, #000 36px);
+}
+.pt-results.more-t.more-b,
+.pt-quick-panel.more-t.more-b {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+}
+/* The last line of a long result list: says you've reached the end. */
+.pt-results-end {
+  padding: 12px 10px 8px;
+  border-top: 1px solid #1d1f23;
+  margin-top: 4px;
+  text-align: center;
+  font:
+    700 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #6d7178;
 }
 .pt-results-note {
   padding: 14px;
@@ -1135,75 +1388,6 @@
   box-shadow: inset 0 0 0 1.5px #9ea3ab;
 }
 
-.pt-score {
-  padding: 18px 20px 20px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
-}
-.pt-score-state {
-  margin: 0 0 14px;
-  text-align: center;
-  font:
-    800 11px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: #c9ccd2;
-}
-.pt-score-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 16px;
-}
-.pt-score-team {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-  min-width: 0;
-  text-align: center;
-}
-.pt-score-team img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-.pt-score-team b {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font:
-    600 15px 'Sora',
-    sans-serif;
-  color: #f2f3f5;
-}
-.pt-score-team span,
-.pt-score-mid span {
-  font:
-    600 11.5px 'Oxanium',
-    sans-serif;
-  color: #8d929a;
-}
-.pt-score-mid {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-}
-.pt-score-mid b {
-  font:
-    800 34px 'Oxanium',
-    sans-serif;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  color: #f2f3f5;
-}
-.pt-score-mid i {
-  margin: 0 8px;
-  font-style: normal;
-  color: #5a5e66;
-}
 
 .pt-missing {
   margin-top: 12px;
@@ -1494,79 +1678,89 @@
   background: #1f2126;
   color: #e9eaed;
 }
+/* One row of seven: Overall (bigger) then each group. In every cell the
+   percentage, the name, a hairline bar and what's left; cells split by
+   hairlines and bottom-aligned so the bars run along one line. */
 .pt-pg {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1.3fr) repeat(6, minmax(0, 1fr));
 }
 .pt-pg li {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr) 44px 92px;
-  gap: 12px;
-  align-items: center;
+  align-content: end;
+  gap: 5px;
+  min-width: 0;
+  padding: 0 14px;
+  border-left: 1px solid #1f2126;
+}
+.pt-pg li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.pt-pg b {
+  font:
+    700 22px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #f2f3f5;
+}
+.pt-pg b i {
+  margin-left: 1px;
+  font-size: 0.6em;
+  font-style: normal;
+  color: #8d929a;
 }
 .pt-pg-name {
   font:
-    400 13.5px 'Sora',
+    600 12px 'Sora',
     sans-serif;
   color: #c9ccd2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .pt-pg-bar {
-  height: 6px;
-  border-radius: 3px;
-  background: #1f2126;
+  height: 3px;
+  border-radius: 2px;
+  background: #23252a;
   overflow: hidden;
 }
 .pt-pg-bar i {
   display: block;
   height: 100%;
-  border-radius: 3px;
-  background: #9a3030;
-}
-.pt-pg b {
-  text-align: right;
-  font:
-    700 14px 'Oxanium',
-    sans-serif;
-  font-variant-numeric: tabular-nums;
-  color: #f2f3f5;
+  background: #8f2f2f;
 }
 .pt-pg-left {
-  text-align: right;
   font:
-    600 11.5px 'Oxanium',
+    600 11px 'Oxanium',
     sans-serif;
   font-variant-numeric: tabular-nums;
   color: #7c818a;
   white-space: nowrap;
 }
-.pt-pg li.is-total {
-  padding-bottom: 10px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid #1f2126;
+.pt-pg li.is-total b {
+  font-size: 34px;
+  color: #fff;
 }
 .pt-pg li.is-total .pt-pg-name {
-  font-weight: 600;
   color: #f2f3f5;
 }
 .pt-pg li.is-total .pt-pg-bar {
-  height: 8px;
-  border-radius: 4px;
+  height: 4px;
 }
 .pt-pg li.is-total .pt-pg-bar i {
   background: #c23b3b;
 }
-.pt-pg li.is-total b {
-  font-size: 16px;
-}
 .pt-pg-note {
   margin: 14px 0 0;
   font:
-    400 12px/1.6 'Sora',
+    400 11.5px/1.6 'Sora',
     sans-serif;
-  color: #7c818a;
+  color: #6d7178;
 }
 
 /* ---- War results: green = won, red = lost, grey = drawn (Oct 2026) -------
@@ -1591,279 +1785,238 @@
   background: #f2f3f5;
   box-shadow: 0 0 0 3px rgba(242, 243, 245, 0.18);
 }
-.pt-score.is-win {
-  background: radial-gradient(70% 120% at 50% 0%, rgba(92, 201, 138, 0.12), rgba(92, 201, 138, 0) 70%), #121316;
+
+
+/* ---- Live war card (under the clan header) -----------------------------
+   The page's focal point while the clan is at war: the battlefield picture
+   under a dark wash, a red glow from below, both clans facing each other
+   around the score, and a solid red View war button under it. Battle day
+   gets a pulsing red dot; preparation a grey one and the line-up size. */
+.pt-live {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas:
+    'top top top'
+    'us mid them'
+    'us cta them';
+  align-items: center;
+  gap: 4px 24px;
+  margin-top: 12px;
+  padding: 18px 24px 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(224, 99, 99, 0.28);
+  background: #0c0c0e;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
 }
-.pt-score.is-lose {
-  background: radial-gradient(70% 120% at 50% 0%, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0) 70%), #121316;
+.pt-live::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(55% 80% at 50% 115%, rgba(194, 59, 59, 0.38), rgba(194, 59, 59, 0) 70%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.5), rgba(10, 10, 12, 0.88) 70%),
+    linear-gradient(90deg, rgba(10, 10, 12, 0.6), rgba(10, 10, 12, 0.25) 50%, rgba(10, 10, 12, 0.6)),
+    url('/clashofclans/tracker-battlefield.webp') 50% 70% / cover no-repeat;
 }
-.pt-score.is-inWar {
-  background: radial-gradient(70% 120% at 50% 0%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 70%), #121316;
+.pt-live.is-prep {
+  border-color: rgba(255, 255, 255, 0.12);
 }
-.pt-score.is-win .pt-score-state {
-  color: #6fd59a;
+.pt-live-top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.pt-score.is-lose .pt-score-state {
+.pt-live-top b {
+  font:
+    800 11.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
   color: #f08a8a;
 }
-.pt-score.is-inWar .pt-score-state {
-  color: #f2f3f5;
+.pt-live.is-prep .pt-live-top b {
+  color: #c9ccd2;
 }
-
-/* ---- War stats: ours | stat | theirs ------------------------------------ */
-.pt-wstats {
-  margin-top: 12px;
-}
-.pt-wst {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-}
-.pt-wst thead th {
-  padding: 0 0 10px;
+.pt-live-time {
+  margin-left: auto;
   font:
-    600 13px 'Sora',
+    400 13px 'Sora',
     sans-serif;
-  color: #e9eaed;
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #a9aeb6;
   white-space: nowrap;
 }
-.pt-wst thead th:first-child {
-  text-align: left;
-}
-.pt-wst thead th:last-child {
-  text-align: right;
-}
-.pt-wst tbody th,
-.pt-wst td {
-  padding: 8px 0;
-  border-top: 1px solid #1d1f23;
-}
-.pt-wst tbody th {
-  width: 44%;
-  text-align: center;
-  font:
-    400 12.5px 'Sora',
-    sans-serif;
-  color: #8d929a;
-}
-.pt-wst td {
-  width: 28%;
+.pt-live-time em {
   font:
     700 14px 'Oxanium',
     sans-serif;
-  color: #f2f3f5;
-}
-.pt-wst td:last-child {
-  text-align: right;
-}
-.pt-wst td i {
-  margin-left: 6px;
   font-style: normal;
-  font-weight: 600;
-  font-size: 11.5px;
-  color: #7c818a;
-}
-
-/* ---- Live war banner (under the clan header) ---------------------------- */
-.pt-live {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 14px;
-  margin-top: 12px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: radial-gradient(60% 160% at 0% 50%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 70%), #121316;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
 }
 .pt-live-dot {
-  width: 9px;
-  height: 9px;
+  flex: none;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #e06363;
-  box-shadow: 0 0 0 4px rgba(224, 99, 99, 0.2);
-}
-.pt-live.is-prep .pt-live-dot {
   background: #9ea3ab;
-  box-shadow: 0 0 0 4px rgba(158, 163, 171, 0.18);
 }
-.pt-live-main {
+.pt-live.is-battle .pt-live-dot {
+  background: #ff5a4f;
+  animation: pt-live-pulse 1.8s ease-out infinite;
+}
+@keyframes pt-live-pulse {
+  from {
+    box-shadow: 0 0 0 0 rgba(255, 90, 79, 0.55);
+  }
+  to {
+    box-shadow: 0 0 0 10px rgba(255, 90, 79, 0);
+  }
+}
+.pt-live-team {
   display: grid;
-  gap: 2px;
+  justify-items: center;
+  gap: 4px;
   min-width: 0;
+  text-align: center;
 }
-.pt-live-main b {
-  font:
-    800 11px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-  color: #f08a8a;
+.pt-live-team.is-us {
+  grid-area: us;
 }
-.pt-live.is-prep .pt-live-main b {
-  color: #c9ccd2;
+.pt-live-team.is-them {
+  grid-area: them;
 }
-.pt-live-main span {
+.pt-live-team img {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 4px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.6));
+}
+.pt-live-team b {
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font:
-    400 13.5px 'Sora',
+    800 15px 'Orbitron',
     sans-serif;
-  color: #c9ccd2;
+  text-transform: uppercase;
+  color: #f2f3f5;
+}
+.pt-live-team span {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.4px;
+  color: #9ea3ab;
+}
+.pt-live-mid {
+  grid-area: mid;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
 }
 .pt-live-score {
-  display: grid;
-  justify-items: end;
-}
-.pt-live-score b {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font:
-    800 20px 'Oxanium',
+    800 46px 'Oxanium',
     sans-serif;
   font-variant-numeric: tabular-nums;
-  color: #f2f3f5;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
 }
-.pt-live-score span {
-  font:
-    600 11px 'Oxanium',
-    sans-serif;
+.pt-live-score i {
+  font-style: normal;
+  font-size: 0.5em;
   color: #8d929a;
 }
-.pt-live .th-soon-btn {
-  cursor: pointer;
+.pt-live-score svg {
+  width: 24px;
+  height: 24px;
+  fill: #e0a63b;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
-
-/* ---- CWL standings (like the in-game table) ----------------------------- */
-.pt-standings {
-  margin-top: 16px;
-}
-.pt-standings ol {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.pt-standings li {
-  display: grid;
-  grid-template-columns: 22px 36px minmax(0, 1fr) auto auto;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 8px;
-  border-radius: 8px;
-}
-.pt-standings li.is-us {
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-.pt-st-rank {
+.pt-live-mid span {
   font:
-    700 15px 'Oxanium',
-    sans-serif;
-  color: #9ea3ab;
-  text-align: right;
-}
-.pt-standings img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-.pt-st-name {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
-.pt-st-name a {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #f2f3f5;
-  font:
-    600 15px 'Sora',
-    sans-serif;
-  text-decoration: none;
-}
-.pt-st-name a:hover {
-  text-decoration: underline;
-  text-decoration-color: #e06363;
-  text-underline-offset: 3px;
-}
-.pt-st-days {
-  display: flex;
-  gap: 4px;
-}
-.pt-st-days i {
-  width: 11px;
-  height: 11px;
-  border-radius: 3px;
-  background: #23252a;
-}
-.pt-st-days i.is-win {
-  background: #5cc98a;
-}
-.pt-st-days i.is-lose {
-  background: #e06363;
-}
-.pt-st-days i.is-tie {
-  background: #8d929a;
-}
-.pt-st-days i.is-live {
-  background: none;
-  box-shadow: inset 0 0 0 2px #f2f3f5;
-}
-.pt-st-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 5px;
-  min-width: 64px;
-  padding: 7px 11px;
-  box-sizing: border-box;
-  border-radius: 8px;
-  background: #1b1d22;
-  font:
-    700 14px 'Oxanium',
+    600 12.5px 'Oxanium',
     sans-serif;
   font-variant-numeric: tabular-nums;
-  color: #f2f3f5;
-  white-space: nowrap;
+  color: #c9ccd2;
 }
-.pt-st-stars {
-  width: 72px;
-}
-.pt-st-stars + .pt-st-pill {
-  width: 92px;
-}
-.pt-st-stars svg {
-  width: 14px;
-  height: 14px;
-  fill: #e0a63b;
-}
-.pt-standings li.pt-zone {
-  display: flex;
+.pt-live-cta {
+  grid-area: cta;
+  justify-self: center;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 4px;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 0 20px 0 24px;
+  border: 0;
+  border-radius: 10px;
+  background: #c23b3b;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 8px 22px rgba(194, 59, 59, 0.38);
+  color: #fff;
   font:
-    700 11px 'Oxanium',
+    800 12.5px 'Oxanium',
     sans-serif;
-  letter-spacing: 1px;
+  letter-spacing: 1.3px;
   text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
-.pt-zone::before,
-.pt-zone::after {
-  content: '';
-  flex: 1;
-  border-top: 1px dashed currentColor;
-  opacity: 0.6;
+.pt-live-cta svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.pt-zone.is-up {
-  color: #6fd59a;
+.pt-live-cta:hover {
+  background: #d04747;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 26px rgba(194, 59, 59, 0.5);
 }
-.pt-zone.is-down {
-  color: #f08a8a;
+.pt-live-cta:hover svg {
+  transform: translateX(3px);
 }
+.pt-live-cta:active {
+  background: #a93232;
+}
+.pt-live-cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pt-live.is-battle .pt-live-dot {
+    animation: none;
+    box-shadow: 0 0 0 4px rgba(255, 90, 79, 0.25);
+  }
+  .pt-live-cta,
+  .pt-live-cta svg {
+    transition: none;
+  }
+}
+
 
 /* members table: league icon + name */
 .pt-table td.pt-col-league {
@@ -1898,65 +2051,70 @@
     margin-right: 0;
   }
   .pt-live {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 10px 12px;
-    padding: 12px;
+    grid-template-areas:
+      'top top top'
+      'us mid them'
+      'cta cta cta';
+    gap: 4px 8px;
+    padding: 14px 14px 16px;
   }
-  .pt-live .th-soon-btn {
-    grid-column: 1 / -1;
+  .pt-live-top {
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-bottom: 8px;
+    padding-bottom: 10px;
+  }
+  .pt-live-time {
+    font-size: 12px;
+  }
+  .pt-live-team img {
+    width: 52px;
+    height: 52px;
+  }
+  .pt-live-team b {
+    font-size: 12px;
+  }
+  .pt-live-team span {
+    font-size: 10.5px;
+  }
+  .pt-live-score {
+    gap: 6px;
+    font-size: 32px;
+  }
+  .pt-live-score svg {
+    width: 16px;
+    height: 16px;
+  }
+  .pt-live-mid span {
+    font-size: 11px;
+  }
+  .pt-live-cta {
+    justify-self: stretch;
     justify-content: center;
+    margin-top: 14px;
   }
-  .pt-standings li {
-    grid-template-columns: 16px 30px minmax(0, 1fr) auto auto;
-    gap: 8px;
-    padding: 9px 4px;
-  }
-  .pt-standings img {
-    width: 30px;
-    height: 30px;
-  }
-  .pt-st-name a {
-    font-size: 13.5px;
-  }
-  .pt-st-days i {
-    width: 9px;
-    height: 9px;
-  }
-  .pt-st-stars {
-    width: 58px;
-  }
-  .pt-st-stars + .pt-st-pill {
-    width: 70px;
-  }
-  .pt-st-pill {
-    min-width: 0;
-    padding: 6px 8px;
-    font-size: 12.5px;
-  }
-  .pt-wst tbody th {
-    font-size: 11.5px;
-  }
-  .pt-wst td {
-    font-size: 13px;
+  /* Overall across the top, the six groups 3 x 2 under it */
+  .pt-pg {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 16px;
   }
   .pt-pg li {
-    grid-template-columns: 84px minmax(0, 1fr) 38px 64px;
-    gap: 8px;
+    padding: 0 10px;
   }
-  .pt-pg-name {
-    font-size: 12.5px;
+  .pt-pg li:nth-child(3n + 2) {
+    padding-left: 0;
+    border-left: 0;
   }
-  .pt-score {
-    padding: 16px 12px 18px;
+  .pt-pg li.is-total {
+    grid-column: 1 / -1;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #1f2126;
   }
-  .pt-score-row {
-    gap: 8px;
+  .pt-pg li.is-total b {
+    font-size: 30px;
   }
-  .pt-score-team b {
-    font-size: 13px;
-  }
-  .pt-score-mid b {
-    font-size: 28px;
+  .pt-pg b {
+    font-size: 20px;
   }
   .pt-wm {
     grid-template-columns: 20px 28px minmax(0, 1fr);
@@ -2014,28 +2172,72 @@
     display: none;
   }
   .pt-search {
-    margin-top: 20px;
-    padding: 32px 18px 22px;
+    grid-template-columns: 1fr;
+    margin-top: 12px;
   }
-  .pt-search-emblem {
-    width: 60px;
-    height: 60px;
+  .pt-search-main {
+    padding: 18px 16px 20px;
   }
-  .pt-search-lead {
-    font-size: 14px;
+  /* Phones: the cut-out stands in the card's bottom-right corner, beside
+     the help text (which keeps clear of her). */
+  .pt-search {
+    position: relative;
+  }
+  .pt-search-art {
+    position: absolute;
+    right: 4px;
+    bottom: 0;
+    width: 112px;
+    height: 168px;
+    min-height: 0;
+    pointer-events: none;
+  }
+  .pt-search-art img {
+    inset: 0;
+    height: 100%;
+    object-position: 50% 100%;
+  }
+  .pt-help,
+  .pt-next {
+    padding-right: 104px;
+  }
+  .pt-quick {
+    gap: 8px;
+  }
+  .pt-quick-mode button {
+    padding: 0 9px;
+    font-size: 10px;
+  }
+  .pt-quick-ico {
+    display: none;
+  }
+  .pt-quick-wrap {
+    margin-top: 12px;
+  }
+  .pt-sk-card {
+    padding: 16px;
+  }
+  .pt-sk-th {
+    width: 64px;
+    height: 64px;
+  }
+  .pt-sk-facts {
+    gap: 16px;
+    overflow: hidden;
+  }
+  .pt-sk-tile {
+    width: 48px;
+    height: 48px;
   }
   .pt-form {
     flex-direction: column;
   }
   .pt-form .th-soon-btn {
     justify-content: center;
-    min-height: 52px;
+    min-height: 48px;
   }
   .pt-field input {
-    height: 52px;
-  }
-  .pt-bar {
-    margin-top: 12px;
+    height: 48px;
   }
   .pt-head {
     margin-top: 12px;
@@ -2089,14 +2291,17 @@
     height: 48px;
   }
   .pt-heroes {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px 8px;
   }
-  .pt-hero {
-    gap: 8px;
+  .pt-hero-name {
+    font-size: 12px;
   }
-  .pt-hero-text b {
-    font-size: 13px;
+  .pt-head--player::before {
+    background:
+      linear-gradient(0deg, rgba(10, 10, 12, 0.94) 0%, rgba(10, 10, 12, 0.78) 45%, rgba(10, 10, 12, 0.5) 100%),
+      linear-gradient(90deg, rgba(10, 10, 12, 0.7) 0%, rgba(10, 10, 12, 0.2) 100%),
+      url('/clashofclans/tracker-battlefield.webp') 70% 50% / cover no-repeat;
   }
   .pt-tile--lg .pt-tile-art {
     width: 56px;
@@ -2108,5 +2313,423 @@
   }
   .pt-tiles {
     gap: 6px;
+  }
+}
+
+/* ---- Matchup card (War tab, Oct 2026) ------------------------------------
+   One card per war: state + team size on top, both clans with the score,
+   then side-by-side comparison rows. Each bar is split down the middle:
+   ours (red) grows left from the centre, theirs (grey) right, against the
+   same ceiling; the side behind is dimmed. Line-up (Town Halls in each
+   roster) at the bottom. Replaced the old score box + "War stats" table,
+   which repeated the live banner above. Built by warView in coc-tracker.js. */
+.pt-mu {
+  padding: 16px 20px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #121316;
+}
+.pt-mu.is-win {
+  background: radial-gradient(70% 90px at 50% 0%, rgba(92, 201, 138, 0.12), rgba(92, 201, 138, 0) 100%), #121316;
+}
+.pt-mu.is-lose {
+  background: radial-gradient(70% 90px at 50% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 100%), #121316;
+}
+.pt-mu-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1f2126;
+}
+.pt-mu-state,
+.pt-mu-size,
+.pt-mu-lineup h4 {
+  margin: 0;
+  font:
+    800 11px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #8d929a;
+}
+.pt-mu-state {
+  color: #f2f3f5;
+}
+.pt-mu.is-win .pt-mu-state {
+  color: #6fd59a;
+}
+.pt-mu.is-lose .pt-mu-state {
+  color: #f08a8a;
+}
+.pt-mu-teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+.pt-mu-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.pt-mu-team.is-them {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+.pt-mu-team img {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+.pt-mu-team span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.pt-mu-team b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font:
+    600 15px 'Sora',
+    sans-serif;
+  color: #f2f3f5;
+}
+.pt-mu-team i {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-mu-score {
+  font:
+    800 30px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #f2f3f5;
+}
+.pt-mu-score i {
+  margin: 0 8px;
+  font-style: normal;
+  color: #5a5e66;
+}
+.pt-mu-score.is-vs {
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #8d929a;
+}
+.pt-mu-rows {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pt-mu-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 6px 12px;
+}
+.pt-mu-row.is-text {
+  padding-top: 12px;
+  border-top: 1px solid #1d1f23;
+}
+.pt-mu-row.is-text + .pt-mu-row.is-text {
+  padding-top: 0;
+  border-top: 0;
+}
+.pt-mu-v {
+  font:
+    700 15px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+.pt-mu-label + .pt-mu-v {
+  text-align: right;
+}
+.pt-mu-row.is-us-ahead .pt-mu-label + .pt-mu-v,
+.pt-mu-row.is-them-ahead .pt-mu-v:first-child {
+  color: #8d929a;
+}
+.pt-mu-label {
+  text-align: center;
+  font:
+    400 12.5px 'Sora',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-mu-label small {
+  font-size: 11px;
+  color: #5a5e66;
+}
+.pt-mu-bars {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.pt-mu-bar {
+  display: flex;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #1d1f23;
+}
+.pt-mu-bar:first-child {
+  justify-content: flex-end;
+}
+.pt-mu-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: #e06363;
+}
+.pt-mu-bar + .pt-mu-bar i {
+  background: #c9ccd2;
+}
+.pt-mu-row.is-them-ahead .pt-mu-bar:first-child i,
+.pt-mu-row.is-us-ahead .pt-mu-bar + .pt-mu-bar i {
+  opacity: 0.4;
+}
+.pt-mu-lineup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 16px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #1f2126;
+}
+.pt-mu-lineup h4 {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+.pt-mu-ths {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+}
+.pt-mu-ths.is-them {
+  justify-content: flex-end;
+}
+.pt-mu-th {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px 3px 4px;
+  border-radius: 999px;
+  background: #1b1d22;
+  font:
+    700 11.5px 'Oxanium',
+    sans-serif;
+  color: #c9ccd2;
+}
+.pt-mu-th img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+.pt-mu-th i {
+  font-style: normal;
+  font-weight: 600;
+  color: #8d929a;
+}
+
+/* ---- League standings: star race (Oct 2026) ------------------------------
+   Each clan's stars as a bar against the leader's, so the gaps read at a
+   glance; record and destruction in small type under it. Promotion /
+   demotion places tint the rank chip (key above the list). Built by
+   standingsTable in coc-tracker.js. */
+.pt-race {
+  margin-top: 16px;
+}
+.pt-race-key {
+  display: flex;
+  gap: 16px;
+  margin: -4px 0 12px;
+}
+.pt-race-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font:
+    700 11px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8d929a;
+}
+.pt-race-key span::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.pt-race-key .is-up::before {
+  background: #5cc98a;
+}
+.pt-race-key .is-down::before {
+  background: #e06363;
+}
+.pt-race ol {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pt-race li {
+  display: grid;
+  grid-template-columns: 26px 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 10px;
+}
+.pt-race li.is-us {
+  background: rgba(224, 99, 99, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(224, 99, 99, 0.22);
+}
+.pt-race-rank {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #1b1d22;
+  font:
+    700 13px 'Oxanium',
+    sans-serif;
+  color: #c9ccd2;
+}
+.pt-race-rank.is-up {
+  background: rgba(92, 201, 138, 0.16);
+  color: #6fd59a;
+}
+.pt-race-rank.is-down {
+  background: rgba(224, 99, 99, 0.16);
+  color: #f08a8a;
+}
+.pt-race li > img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+.pt-race-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.pt-race-main a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font:
+    600 14.5px 'Sora',
+    sans-serif;
+  color: #f2f3f5;
+  text-decoration: none;
+}
+.pt-race-main a:hover {
+  text-decoration: underline;
+  text-decoration-color: #e06363;
+  text-underline-offset: 3px;
+}
+.pt-race-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #1b1d22;
+}
+.pt-race-track i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #4a4e56, #9ea3ab);
+}
+.pt-race li.is-us .pt-race-track i {
+  background: linear-gradient(90deg, #a83232, #e06363);
+}
+.pt-race-meta {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-race-stars {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 58px;
+  font:
+    800 18px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+.pt-race-stars svg {
+  width: 15px;
+  height: 15px;
+  fill: #e0a63b;
+}
+
+@media (max-width: 970px) {
+  .pt-mu {
+    padding: 14px 14px 16px;
+  }
+  .pt-mu-teams {
+    gap: 8px;
+  }
+  .pt-mu-team {
+    gap: 8px;
+  }
+  .pt-mu-team img {
+    width: 34px;
+    height: 34px;
+  }
+  .pt-mu-team b {
+    font-size: 13px;
+  }
+  .pt-mu-score {
+    font-size: 24px;
+  }
+  .pt-mu-score i {
+    margin: 0 4px;
+  }
+  .pt-mu-v {
+    font-size: 13.5px;
+  }
+  .pt-mu-label {
+    font-size: 11.5px;
+  }
+  .pt-race li {
+    grid-template-columns: 24px 28px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 9px 6px;
+  }
+  .pt-race-rank {
+    width: 24px;
+    height: 24px;
+  }
+  .pt-race li > img {
+    width: 28px;
+    height: 28px;
+  }
+  .pt-race-main a {
+    font-size: 13.5px;
+  }
+  .pt-race-stars {
+    min-width: 48px;
+    font-size: 16px;
   }
 }

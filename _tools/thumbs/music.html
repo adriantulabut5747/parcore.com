@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Thumbnail: Web Resources > Music (home page card, 16:9).
+     Render: python _tools/thumbs/render.py music  ->  site/icons/home/wr-music.webp
+     Layers, back to front: dark stage + red glow, the music page's own cat
+     playlist sleeves fanned like a record crate, a vinyl sliding out, the
+     headphone cat cut out in front (assets/music-cat.png, made with rembg),
+     no text: the site prints the title over/under every card. Keep the subject in the
+     upper two-thirds (the spotlight card fades the bottom third under its title).
+     Paths are relative to this file. -->
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --accent: #de1038; --deep: #8c0d25; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: #0c0a0b; }
+  .stage { position: relative; width: 1280px; height: 720px; overflow: hidden; isolation: isolate;
+    background:
+      radial-gradient(60% 75% at 72% 62%, rgba(222, 16, 56, 0.42) 0%, rgba(222, 16, 56, 0.1) 45%, rgba(222, 16, 56, 0) 70%),
+      radial-gradient(40% 50% at 18% 20%, rgba(140, 13, 37, 0.35) 0%, rgba(140, 13, 37, 0) 70%),
+      linear-gradient(160deg, #161214 0%, #0b090a 100%);
+  }
+  /* the original photo, huge and blurred, as a faint texture */
+  .haze { position: absolute; inset: -60px; z-index: -1; background: url("../../site/webresources-icon/wr-music.jpg") center / cover; filter: blur(40px) saturate(0.6) brightness(0.35); opacity: 0.55; }
+
+  /* record crate: four real playlist sleeves, fanned */
+  .crate { position: absolute; left: 190px; top: 118px; width: 330px; height: 330px; z-index: 1; }
+  .crate .s4 { z-index: 2; }
+  .sleeve { position: absolute; inset: 0; border-radius: 14px; background-size: cover; background-position: center;
+    box-shadow: 0 30px 50px -18px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08) inset; transform-origin: 50% 120%; }
+  .s1 { background-image: url("../../site/webresources-icon/cat-rapper.jfif"); transform: rotate(-21deg) translateX(-96px); filter: brightness(0.55); }
+  .s2 { background-image: url("../../site/webresources-icon/cat-driver.jpg"); transform: rotate(-9deg) translateX(-34px); filter: brightness(0.72); }
+  .s3 { background-image: url("../../site/webresources-icon/cat-rnb.jfif"); transform: rotate(4deg) translateX(30px); filter: brightness(0.86); }
+  .s4 { background-image: url("../../site/webresources-icon/cat-disco.jfif"); transform: rotate(15deg) translateX(96px) translateY(10px); }
+  /* vinyl sliding out of the front sleeve */
+  .vinyl { position: absolute; left: 300px; top: -96px; width: 320px; height: 320px; border-radius: 50%; transform: rotate(15deg); z-index: 1;
+    background:
+      radial-gradient(circle, var(--accent) 0 17%, #1a0408 17.5% 19%, rgba(0,0,0,0) 19.5%),
+      repeating-radial-gradient(circle, #121214 0 2px, #1d1d21 2px 3px),
+      #111;
+    box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.9); }
+  .vinyl::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 200deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0.16) 30deg, rgba(255,255,255,0) 60deg, rgba(255,255,255,0) 180deg, rgba(255,255,255,0.1) 210deg, rgba(255,255,255,0) 240deg); }
+  .vinyl::before { content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px; border-radius: 50%; background: #0c0a0b; z-index: 1; }
+
+  /* the headphone cat */
+  .cat { position: absolute; right: 40px; bottom: -40px; height: 700px; z-index: 2;
+    filter: drop-shadow(-24px 30px 40px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 60px rgba(222, 16, 56, 0.25)); }
+
+  /* tag + equalizer, bottom left */
+  .tag { position: absolute; left: 64px; bottom: 74px; z-index: 3; display: flex; align-items: center; gap: 16px; }
+  .tag b { font: 900 46px/1 'Orbitron', sans-serif; letter-spacing: 0.04em; color: #fff; text-shadow: 0 6px 24px rgba(0, 0, 0, 0.6); }
+  .eq { display: flex; align-items: flex-end; gap: 6px; height: 46px; }
+  .eq i { display: block; width: 8px; border-radius: 3px; background: var(--accent); box-shadow: 0 0 14px rgba(222, 16, 56, 0.55); }
+  .bar { position: absolute; left: 64px; bottom: 52px; z-index: 3; width: 120px; height: 4px; border-radius: 2px; background: var(--accent); }
+
+  /* film grain (same tile as the site) + vignette */
+  .grain { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0.55; mix-blend-mode: overlay;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .vignette { position: absolute; inset: 0; z-index: 4; pointer-events: none; box-shadow: inset 0 0 180px 40px rgba(0, 0, 0, 0.75); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="haze"></div>
+    <div class="crate"><div class="sleeve s1"></div><div class="sleeve s2"></div><div class="sleeve s3"></div><div class="vinyl"></div><div class="sleeve s4"></div></div>
+    <img class="cat" src="assets/music-cat.png" alt="">
+    <div class="grain"></div>
+    <div class="vignette"></div>
+  </div>
+</body>
+</html>

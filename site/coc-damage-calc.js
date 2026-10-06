@@ -723,12 +723,10 @@
     renderGrid();
   });
 
-  // Phone nav: the maker pages light "Tools" in the tabs under the hero and
-  // in the bottom bar.
+  // Phone nav: the tool pages light "Tools" in the bottom bar.
   function markTools() {
     var bn = document.querySelector('.bn-item[data-role="bn-guides"]');
     if (bn) bn.classList.add('active');
-    document.querySelectorAll('.first-layer button').forEach((x) => x.classList.toggle('active', x.textContent.trim() === 'Tools'));
   }
   markTools();
   document.addEventListener('parchome:coc-nav-ready', markTools);

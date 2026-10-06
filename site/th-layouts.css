@@ -55,6 +55,18 @@
 .card-media:hover img.zoomable {
   transform: scale(1.035);
 }
+/* While a base's screenshot downloads, its box shimmers (.sk, see LOADING
+   SKELETON) at 16:9 -- the shape of 242 of the 251 bases -- and the picture
+   fades in when it arrives. th-layouts.js cardHtml drops .sk on load/error. */
+.card-media.sk img.zoomable {
+  aspect-ratio: 16 / 9;
+  opacity: 0;
+}
+.card-media img.zoomable {
+  transition:
+    opacity 0.35s ease,
+    transform 0.15s ease;
+}
 
 /* ARMY CARD (thNN-army.html) -- the layout card with a name row on top:
    Legend I / II / III badge for the top 3 (th-layouts.js RANK_ICONS),
@@ -166,9 +178,23 @@
 .army-sheet {
   --as-tile: clamp(28px, 8cqi, 42px);
   --as-gap: clamp(3px, 0.9cqi, 6px);
+  --as-cgap: clamp(10px, 3cqi, 18px);
   display: grid;
-  grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
-  gap: clamp(10px, 3cqi, 18px);
+  /* Heroes get 44% for 3 or 4 slots. Fewer slots get a narrower column at
+     the same per-hero width as 3 (TH8 1/3 of it, TH9-10 2/3), so a 2-hero
+     card doesn't stretch each portrait to half the column; the units take
+     the rest. Each hero also stops at ~74px, so a wide single-column card
+     (tablets) keeps tall portraits instead of squat ones. */
+  grid-template-columns:
+    minmax(
+      0,
+      min(
+        calc((100% - var(--as-cgap)) * 0.44 * min(var(--slots, 4), 3) / 3),
+        calc(var(--slots, 4) * 74px + (var(--slots, 4) - 1) * var(--as-gap))
+      )
+    )
+    minmax(0, 1fr);
+  gap: var(--as-cgap);
 }
 .as-units {
   display: flex;
@@ -542,10 +568,24 @@
 .discord-card.is-skel-card {
   width: 100%;
 }
-/* a base layout's screenshot (they're 1920x1200) */
+/* a base layout's screenshot (almost all 16:9) */
 .sk-shot {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   border-radius: 6px;
+}
+/* Placeholder button row: the real .card-bar grid (heart, Copy Layout,
+   share) with shimmer blocks in the cells. */
+.card-bar > .sk {
+  height: var(--bar-h);
+  border-radius: 8px;
+}
+.card-bar > .sk-copy {
+  width: 170px;
+}
+@media (max-width: 970px) {
+  .card-bar > .sk-copy {
+    width: 140px;
+  }
 }
 .sk-bar {
   height: 40px;
@@ -661,10 +701,17 @@
   }
 }
 
-/* Clan castle row: each kind (troops / spells / siege) starts a little
+/* Clan castle row (and the phones' Army row): each kind starts a little
    apart from the one before. */
-.as-cc .as-row > .as-kind:not(:first-child) {
+.as-cc .as-row > .as-kind:not(:first-child),
+.as-army .as-row > .as-kind:not(:first-child) {
   margin-left: 6px;
+}
+
+/* The Army row (troops + spells + siege in one) is the phone layout's;
+   desktop keeps the separate rows. */
+.as-army {
+  display: none;
 }
 
 /* Spells beside siege: spells take the room, siege sizes to its tiles
@@ -706,12 +753,28 @@
     --as-tile: 40px;
     --as-gap: 5px;
   }
-  /* Heroes go last when stacked: troops, spells / siege, clan castle,
-     then heroes (his pick, Oct 2026). Only the look moves -- the markup
-     keeps heroes first, so desktop's left column is untouched. Cards
-     only: the army maker (.is-stack) keeps heroes on top. */
+  /* Cards, stacked (his pick, Oct 2026): one Army row (troops, then
+     spells, then siege), then heroes, then the clan castle. .as-units
+     steps aside (display: contents) so its rows and the heroes line up
+     as one column; only the look moves -- the markup keeps heroes first,
+     so desktop's left column is untouched. The army maker (.is-stack)
+     keeps its own order and separate rows. */
+  .army-sheet:not(.is-stack) .as-units {
+    display: contents;
+  }
+  .army-sheet:not(.is-stack) .as-army {
+    display: block;
+    order: 0;
+  }
+  .army-sheet:not(.is-stack) .as-troops,
+  .army-sheet:not(.is-stack) .as-pair {
+    display: none;
+  }
   .army-sheet:not(.is-stack) .as-heroes {
     order: 1;
+  }
+  .army-sheet:not(.is-stack) .as-cc {
+    order: 2;
   }
   .as-hero-row {
     flex: none;
@@ -1831,17 +1894,22 @@
 .clan-card {
   margin: 142px 0 0;
 }
-/* Clan card v2: 64 + 47 -- the King clears the card's top edge by 47px,
-   so his head sits 64px under the page numbers (was 96; Oct 2026). */
+/* Clan card v2: the usual 64 section break (was 64 + 47 while the King
+   poked out of the card's top edge; the art sits inside it now). */
 .ac-card {
-  margin: 111px 0 0;
+  margin: 64px 0 0;
 }
 /* Whichever section comes last: 34 + .coc-content's 30px bottom padding
    = 64 to the footer. last-of-type, not last-child: the clan card's
    <script> tag comes after it, so it's never the last child. Not the
    hero: on th18 the lower sections sit inside .t18-lower, which left the
    hero as the last section and pushed the tabs 48px down on phones. */
-.coc-content > section:last-of-type:not(.t18-hero) {
+.coc-content > section:last-of-type,
+/* Tool pages (Glossary, Equipments, Wall Calculator...) end on the FAQ
+   inside .t18-lower and have no Live band, so give the wrapper the same
+   room or the FAQ sits on the footer. Pages with the band are left alone:
+   coc-clan-clock.css pads .t18-lower for the Warden there. */
+.coc-content:not(:has(+ .t18-band)) > .t18-lower:last-child {
   margin-bottom: 34px;
 }
 /* Desktop spacing, one scale (8 / 16 / 24 / 32 / 64). Things that belong
@@ -1875,14 +1943,13 @@
   .clan-card {
     margin: 72px 0 0;
   }
-  /* Clan card v2. Phones: the King stands inside the card (no pop-out).
-     Tablets (~768px) get the wide card, where he clears the top by ~30px,
-     so 80 leaves ~50 there and 80 on phones. */
+  /* Clan card v2: the same 72 as the other sections on phones. */
   .ac-card {
-    margin: 80px 0 0;
+    margin: 72px 0 0;
   }
   /* mobile .coc-content has no bottom padding */
-  .coc-content > section:last-of-type:not(.t18-hero) {
+  .coc-content > section:last-of-type,
+  .coc-content:not(:has(+ .t18-band)) > .t18-lower:last-child {
     margin-bottom: 48px;
   }
 }
@@ -1923,135 +1990,340 @@ html.loaded {
   background: radial-gradient(1100px 460px at 22% 0%, rgba(194, 59, 59, 0.07), rgba(194, 59, 59, 0) 70%);
 }
 
-/* ---- Hero ------------------------------------------------------------
-   One card, two columns: the copy (Revenge Tower art | two-line title,
-   then "Did you know?") and, on the right, the six clan events, 2 x 3.
-   Red and dark grey only: one red wash from the bottom-left over the
-   #121316 card. */
-.t18-hero {
+/* ---- Banner (.tb) ------------------------------------------------------
+   The one page header for the layouts / army pages and the Tools section
+   (Oct 2026; replaced the starfield hero and its event clock here, and
+   moved from coc-tools.css so both page sets share it):
+     - art on the right, faded into the card on the left (.tb-art);
+     - an icon, the title (Orbitron, second word red), then one line:
+       "Did you know?" on the TH pages, a sentence (.tb-desc) on Tools;
+     - fact chips (.tb-facts, Tools only): one row of real numbers;
+     - "Back to tools" in the top-right corner (tool pages only).
+   Swap a banner's picture by changing .tb-art's src; if the subject sits
+   off-centre, set --tb-pos on that <img> (e.g. style="--tb-pos: 70% 20%"). */
+.tb {
   position: relative;
-  isolation: isolate; /* keeps the star layer behind the content */
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'copy events';
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
   align-items: center;
-  column-gap: 32px;
-  row-gap: 18px;
-  padding: 28px 32px;
+  min-height: 196px;
   margin-top: 12px;
-  border-radius: 16px;
+  padding: 28px 32px;
   border: 1px solid var(--t18-line);
-  background:
-    radial-gradient(70% 90% at 0% 100%, rgba(194, 59, 59, 0.09), rgba(194, 59, 59, 0) 70%),
-    radial-gradient(60% 70% at 18% 0%, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 70%), var(--t18-surface);
+  border-radius: 16px;
+  background: var(--t18-surface);
 }
-/* Starfield (hero): a sparse scatter of tiny points, mostly
-   warm white with a couple of faint red ones, denser on the left. A layer
-   of radial-gradient dots, not an image. The pattern is a 240px-tall tile
-   repeated down the card and scrolled up by exactly one tile per 60s, so
-   the stars drift upward (~4px/s) in a seamless loop, while the opacity
-   twinkle breathes on top. Reduced-motion users get still stars. */
-.t18-hero::before {
-  content: '';
+
+/* The picture fills the right two-thirds and fades out to the left, so
+   the text always sits on the plain card colour. */
+.tb-art {
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(1.5px 1.5px at 6% 22%, rgba(255, 244, 228, 0.75), transparent),
-    radial-gradient(1px 1px at 13% 74%, rgba(255, 244, 228, 0.55), transparent),
-    radial-gradient(1.5px 1.5px at 21% 90%, rgba(255, 214, 176, 0.55), transparent),
-    radial-gradient(1px 1px at 28% 12%, rgba(255, 244, 228, 0.45), transparent),
-    radial-gradient(2px 2px at 34% 64%, rgba(224, 99, 99, 0.45), transparent),
-    radial-gradient(1px 1px at 40% 30%, rgba(255, 244, 228, 0.4), transparent),
-    radial-gradient(1.5px 1.5px at 46% 86%, rgba(255, 244, 228, 0.35), transparent),
-    radial-gradient(1px 1px at 52% 16%, rgba(255, 214, 176, 0.35), transparent),
-    radial-gradient(1px 1px at 3% 58%, rgba(255, 244, 228, 0.45), transparent),
-    radial-gradient(1.5px 1.5px at 17% 46%, rgba(255, 244, 228, 0.3), transparent),
-    radial-gradient(1px 1px at 58% 70%, rgba(224, 99, 99, 0.35), transparent),
-    radial-gradient(1px 1px at 63% 8%, rgba(255, 244, 228, 0.25), transparent);
-  background-size: 100% 240px;
-  background-repeat: repeat-y;
-  animation:
-    t18-twinkle 6s ease-in-out infinite alternate,
-    t18-drift 60s linear infinite;
+  z-index: -2;
+  top: 0;
+  right: 0;
+  width: 64%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--tb-pos, 50% 28%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 34%, #000 78%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 34%, #000 78%);
+  /* The one moment: the art settles in once, already visible. */
+  animation: tb-settle 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-@keyframes t18-twinkle {
+@keyframes tb-settle {
   from {
-    opacity: 0.55;
+    transform: scale(1.06);
   }
   to {
-    opacity: 1;
-  }
-}
-@keyframes t18-drift {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 0 -240px;
+    transform: none;
   }
 }
 
-.t18-hero-copy {
-  grid-area: copy;
-  align-self: center;
+/* The series' red wash from the bottom-left, and a soft floor so the
+   chips stay readable where the art reaches them. */
+.tb::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 120% at 0% 100%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 70%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.55) 0%, rgba(10, 10, 12, 0) 45%);
 }
-/* The whole title in Orbitron ("TH18 BASE" was Oxanium on phones until Sep 2026). One line on
-   desktop -- sized off the copy column's width (cqi, see the 971px+ rule)
-   so it never overflows beside the events -- two lines on phones. */
-.t18-title {
-  margin: 0 0 12px;
+
+.tb-body {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+  /* Keeps the words on the plain side of the fade. */
+  max-width: min(640px, 58%);
+}
+.tb-icon {
+  flex: none;
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+}
+.tb-copy {
+  min-width: 0;
+}
+
+.tb-title {
+  margin: 0;
   font-family: 'Orbitron', sans-serif;
-  font-size: clamp(28px, 2.9vw, 44px);
-  white-space: nowrap;
+  font-size: clamp(26px, 2.5vw, 38px);
   font-weight: 900;
-  line-height: 1.02;
-  letter-spacing: -1px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
+  text-wrap: balance;
   color: var(--t18-text);
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.55);
 }
-/* Page pill (#t18Page): "PAGE 1/2" on its own line above the title
-   (inside .t18-head, which stacks it over the title). Filled by the
-   script; stays hidden when the TH has one page. */
-.t18-page {
-  align-self: flex-start;
-  padding: 5px 10px 4px;
-  border: 1px solid rgba(224, 99, 99, 0.45);
-  border-radius: 999px;
-  background: rgba(194, 59, 59, 0.14);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #e06363;
-}
-.t18-page[hidden] {
-  display: none;
-}
-/* Desktop only: phones already show "/ Page 1/2" in the secondary top
-   bar (#stbPage), and the pill made the phone hero taller. */
-@media (max-width: 970px) {
-  .t18-page {
-    display: none;
-  }
-}
-/* Red word, no glow: it used to carry a pulsing red text-shadow. */
-.t18-title em {
-  font-style: normal;
+/* Named in full: a broader rule elsewhere sets <em> in Oxanium. */
+.tb-title em {
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  letter-spacing: -1px;
+  font-style: normal;
   color: var(--t18-red);
 }
-/* Hero copy is just the title and this line now -- the red-dot label
-   line above the title and the Layouts / Flames / Pages stats row were
-   removed, so the sentence is the last thing in the block (no bottom
-   margin). */
+
+/* TH pages: "TH18 LAYOUTS" on one line, with "Page 1 of 2" after it when
+   the TH has more than one page (#t18Page, filled by th-layouts.js).
+   Desktop only: phones show the page in the secondary top bar (#stbPage). */
+.tb-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+}
+.tb-head .tb-title {
+  white-space: nowrap;
+}
+.tb-page {
+  flex: none;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  color: var(--t18-muted);
+}
+.tb-page[hidden] {
+  display: none;
+}
+
+.tb-desc {
+  margin: 10px 0 0;
+  max-width: 54ch;
+  font-family: 'Sora', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #b9bdc4;
+  text-wrap: pretty;
+}
+
+/* One row, never wraps: small chips so they fit a 360px phone. */
+.tb-facts {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tb-fact {
+  padding: 5px 9px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 7px;
+  background: rgba(18, 19, 22, 0.72);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  color: var(--t18-muted);
+  white-space: nowrap;
+}
+.tb-fact b {
+  margin-right: 2px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+/* "Back to tools" (tool pages): top-right corner of the banner, over the
+   art. Desktop: the words and an exit icon. Phones: the icon alone (the
+   words stay for screen readers). A dark glass pill so it reads on any
+   picture. */
+.tb-back {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(10, 10, 12, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #e3e5e8;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.tb-back svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tb-back:hover {
+  border-color: rgba(224, 99, 99, 0.55);
+  background: rgba(194, 59, 59, 0.22);
+  color: #fff;
+}
+.tb-back:hover svg {
+  transform: translateX(2px);
+}
+.tb-back:focus-visible {
+  outline: 2px solid var(--t18-red);
+  outline-offset: 3px;
+}
+
+/* Narrow desktops: the banner is ~560-860px wide here, so the words get
+   more of it and the art a narrower strip on the right. */
+@media (min-width: 971px) and (max-width: 1350px) {
+  .tb-body {
+    gap: 18px;
+    max-width: 74%;
+  }
+  .tb-icon {
+    width: 60px;
+    height: 60px;
+  }
+  .tb-art {
+    width: 50%;
+  }
+}
+
+@media (max-width: 970px) {
+  .tb {
+    min-height: 0;
+    margin-top: 8px;
+    padding: 18px 16px 16px;
+    border-radius: 14px;
+  }
+  /* The art runs the full width behind the text here, dimmed on the left
+     where the words are. The ::before overlay below darkens it further so
+     the text stays readable over busy art. */
+  .tb-art {
+    width: 100%;
+    -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
+  }
+  .tb::before {
+    background:
+      radial-gradient(70% 120% at 0% 100%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 70%),
+      linear-gradient(90deg, rgba(18, 19, 22, 0.9) 0%, rgba(18, 19, 22, 0.65) 70%, rgba(18, 19, 22, 0.45) 100%);
+  }
+  .tb-body {
+    align-items: flex-start;
+    gap: 12px;
+    max-width: none;
+  }
+  .tb-icon {
+    width: 46px;
+    height: 46px;
+  }
+  .tb-back {
+    top: 10px;
+    right: 10px;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 8px;
+  }
+  .tb-back svg {
+    width: 15px;
+    height: 15px;
+  }
+  /* hidden but still read out */
+  .tb-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* keep the title clear of the corner button */
+  .tb-back ~ .tb-copy {
+    padding-right: 26px;
+  }
+  .tb-title {
+    font-size: 21px;
+    letter-spacing: -0.01em;
+  }
+  .tb-page {
+    display: none;
+  }
+  .tb-desc {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #c4c7cd;
+  }
+  .tb-facts {
+    gap: 5px;
+    margin-top: 10px;
+  }
+  .tb-fact {
+    padding: 5px 7px 4px;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-art {
+    animation: none;
+  }
+  .tb-back,
+  .tb-back svg {
+    transition: none;
+  }
+}
+
+/* DID YOU KNOW? -- the line under the title on the TH pages. Facts live
+   in coc-dyk.json (edit that file, not the markup). The small label is
+   grey; the fact is Sora 15px / 1.65, #c9ccd2 (13px on phones). */
+.tb .t18-dyk {
+  margin-top: 10px;
+  max-width: 52ch;
+}
+/* The banner's text column is narrower than the old hero's, so a fact
+   gets three lines here before it ends in "...". */
+.tb .t18-dyk-fact {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
 /* DID YOU KNOW? -- replaces the old intro sentence (.t18-sub) directly
    under the title, and the fact text takes that sentence's colour and
    type (Sora 15px / 1.65, #c9ccd2; 13.5px on phones). The small label
@@ -2124,9 +2396,6 @@ html.loaded {
     transition: none;
     transform: none;
   }
-  .t18-hero::before {
-    animation: none;
-  }
 }
 @media (max-width: 970px) {
   .t18-dyk-fact {
@@ -2140,180 +2409,6 @@ html.loaded {
   .t18-dyk-fact {
     -webkit-line-clamp: 3;
     line-clamp: 3;
-  }
-}
-
-/* Title block: the page pill (#t18Page) stacked over the two-line title
-   (the Revenge Tower art that sat beside it was removed). */
-.t18-head {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.t18-head .t18-title {
-  margin: 0;
-}
-
-/* ---- Banner events (right column) ------------------------------------
-   Six small cards, 2 x 3, one per event: the event's icon in a tile on
-   the left, its name over the countdown on the right. A hairline
-   separates the block from the copy. A running event (or an always-on
-   one, counting to its end) gets a red LIVE tag on its icon; one that's
-   only counting down to its start gets nothing. Times are grey either
-   way. Cards lift a shade on hover. */
-.t18-events {
-  grid-area: events;
-  display: grid;
-  grid-template-columns: repeat(2, 176px);
-  gap: 8px;
-  margin: 0;
-  padding: 0 0 0 28px;
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
-  list-style: none;
-}
-.t18-event {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px 8px 8px;
-  border-radius: 12px;
-  background: #141519; /* dark grey-black, solid: the stars don't show through */
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  text-decoration: none;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.t18-event:hover {
-  background: #1a1b20;
-  border-color: rgba(255, 255, 255, 0.12);
-}
-.t18-event:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.75);
-  outline-offset: 2px;
-}
-.t18-event-icon {
-  position: relative;
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #1a1b1f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.t18-event-icon img {
-  width: 23px;
-  height: 23px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
-}
-/* Running events (anything coc-events.js hasn't marked .is-upcoming): a
-   solid LIVE tag on the icon's bottom edge, like a live stream's profile
-   picture (the icon's own border stays grey -- a red edge was tried and
-   removed). The tag's red gently brightens and dims.
-   Upcoming events get nothing -- no dot, no tag. (Replaced the old red /
-   grey corner dot, Sep 2026; picked from 4 previews.) */
-.t18-event:not(.is-upcoming) .t18-event-icon::after {
-  content: 'LIVE';
-  position: absolute;
-  left: 50%;
-  bottom: -6px;
-  transform: translateX(-50%);
-  padding: 2px 4px 1px;
-  border-radius: 3px;
-  background: #d04747;
-  box-shadow: 0 0 0 2px #141519; /* the card's colour: cuts the tag out of the icon's edge */
-  font:
-    800 7px/1 'Oxanium',
-    sans-serif;
-  letter-spacing: 0.8px;
-  color: #fff;
-  animation: t18-live 2s ease-in-out infinite;
-}
-@keyframes t18-live {
-  0%,
-  100% {
-    background: #d04747;
-  }
-  50% {
-    background: #ff5a4f;
-  }
-}
-.t18-event-text {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-.t18-event-name {
-  font-family: 'Oxanium', sans-serif;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-  color: #c9ccd2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.t18-event:hover .t18-event-name {
-  color: #fff;
-}
-.t18-event-time {
-  font-family: 'Oxanium', sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  font-variant-numeric: tabular-nums;
-  color: #8b9099; /* grey, running or not -- the LIVE tag shows which are running */
-  white-space: nowrap;
-}
-.t18-event-time::before {
-  content: 'ends ';
-  font-weight: 700;
-}
-.t18-event.is-upcoming .t18-event-time {
-  color: #8b9099;
-}
-.t18-event.is-upcoming .t18-event-time::before {
-  content: 'starts ';
-}
-.t18-event-time span {
-  margin-left: 1px;
-  font-size: 0.82em;
-}
-
-/* Prev / next buttons exist for phones only. */
-.t18-ev-navli {
-  display: none;
-}
-/* Desktop: cards that don't fit the rows beside the text (set by script). */
-@media (min-width: 971px) {
-  .t18-events > li.is-over {
-    display: none;
-  }
-}
-/* Desktop title: one line, sized off the copy column so it can't overflow. */
-@media (min-width: 971px) {
-  .t18-hero-copy {
-    container-type: inline-size;
-  }
-  /* desktop: the whole title in Orbitron (phones keep "TH18 BASE" in Oxanium) */
-  .t18-title {
-    font-size: clamp(24px, 8.4cqi, 44px);
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    letter-spacing: -1px;
-  }
-  .t18-title br {
-    display: none;
   }
 }
 
@@ -2592,190 +2687,8 @@ html.loaded {
 
 /* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: the Clash Clock tags (.t18-clock). */
 
-@media (min-width: 1351px) and (max-width: 1519px) {
-  .t18-events {
-    grid-template-columns: repeat(2, 164px);
-  }
-  .t18-dyk-fact {
-    font-size: 14px;
-  } /* with the narrower cards, keeps every fact to 2 lines */
-}
-/* Wide screens: the text column stops at 560px (the one-line title at its
-   44px max is ~530px; the fact box is 52ch, ~481px) and the event cards
-   stretch into the rest, instead of a dead gap opening between the text and
-   the events. The events column's minimum is its content (auto), so on
-   narrower screens the TEXT column gives way, never the cards' 176px
-   floor. Cards stop at 300px on very wide screens; the block then sits
-   right, where it always was. */
-@media (min-width: 1440px) {
-  .t18-hero {
-    grid-template-columns: minmax(0, 560px) minmax(auto, 1fr);
-  }
-  .t18-events {
-    grid-template-columns: repeat(2, minmax(176px, 300px));
-    justify-self: end;
-  }
-}
-/* 1350px and down: there's no room beside the text, so the events move
-   under it -- still 2 per row, 2 rows (4 cards) -- and the hairline goes. */
-@media (max-width: 1350px) {
-  .t18-hero {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'copy' 'events';
-    row-gap: 18px;
-  }
-  .t18-events {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    padding: 0;
-    border-left: 0;
-  }
-}
-@media (max-width: 1180px) {
-  .t18-hero {
-    padding: 22px 26px 20px;
-  }
-}
-/* ---- Phone hero ------------------------------------------------------
-   Same card, compact:
-     row 1: two-line title | [‹] one event card [›]
-     row 2: "Did you know?" + the fact, full width
-   .t18-hero-copy steps aside (display:contents) so the title and the fact
-   box can sit in the card's grid directly. */
+/* Phones: the Layouts / Army / Tools tabs, a little tighter. */
 @media (max-width: 970px) {
-  .t18-hero {
-    container-type: inline-size; /* title/tower size off the card's width (cqi) */
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'head events'
-      'dyk  dyk';
-    column-gap: 10px;
-    row-gap: 14px;
-    padding: 18px 16px;
-    margin-top: 22px; /* clear air under the fixed top bars */
-    border-radius: 14px;
-  }
-  .t18-hero-copy {
-    display: contents;
-  }
-  .t18-head {
-    grid-area: head;
-    align-self: center;
-    gap: 10px;
-    margin: 0;
-  }
-  .t18-dyk {
-    grid-area: dyk;
-  }
-  /* sized off the card so "TH18 BASE" still fits beside the event card on a 360px phone */
-  .t18-title {
-    font-size: clamp(17px, 6cqi, 24px);
-  }
-  .t18-dyk-label {
-    margin-bottom: 4px;
-    font-size: 10.5px;
-  }
-  /* One compact card at a time, prev / next either side. All six cards
-     share the middle cell (so it's as wide as the widest and never jumps);
-     only .is-current shows. The leaving card fades out, the next slides in. */
-  .t18-events {
-    display: grid;
-    grid-template-columns: auto minmax(0, auto) auto;
-    align-items: center;
-    column-gap: 2px;
-    padding: 0;
-    border-left: 0;
-    align-self: center;
-  }
-  .t18-ev-navli {
-    display: block;
-    grid-row: 1;
-  }
-  .t18-ev-navli--prev {
-    grid-column: 1;
-  }
-  .t18-ev-navli--next {
-    grid-column: 3;
-  }
-  .t18-events > li:not(.t18-ev-navli) {
-    grid-column: 2;
-    grid-row: 1;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(8px);
-    transition:
-      opacity 0.18s ease,
-      transform 0.18s ease,
-      visibility 0s linear 0.18s;
-  }
-  .t18-events > li.is-current {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition:
-      opacity 0.25s ease 0.1s,
-      transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s,
-      visibility 0s;
-  }
-  /* the buttons: just a grey chevron, no box -- brighter when pressed */
-  .t18-ev-nav {
-    display: grid;
-    place-items: center;
-    width: 20px;
-    height: 34px;
-    padding: 0;
-    border: 0;
-    border-radius: 6px;
-    background: none;
-    color: #5a5e66;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition:
-      color 0.15s ease,
-      background-color 0.15s ease;
-  }
-  .t18-ev-nav svg {
-    width: 15px;
-    height: 15px;
-  }
-  .t18-ev-nav:hover,
-  .t18-ev-nav:active {
-    color: #c9ccd2;
-    background: rgba(255, 255, 255, 0.04);
-  }
-  .t18-ev-nav:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.6);
-    outline-offset: 1px;
-  }
-  .t18-event {
-    gap: 8px;
-    padding: 5px 10px 5px 5px;
-    border-radius: 10px;
-  }
-  .t18-event-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-  }
-  .t18-event-icon img {
-    width: 18px;
-    height: 18px;
-  }
-  .t18-event:not(.is-upcoming) .t18-event-icon::after {
-    bottom: -5px;
-    padding: 2px 3px 1px;
-    font-size: 6px;
-  }
-  .t18-event-text {
-    gap: 4px;
-  }
-  .t18-event-name {
-    font-size: 10px;
-    letter-spacing: 0.6px;
-  }
-  .t18-event-time {
-    font-size: 11px;
-  }
   .coc-content .first-layer {
     margin-top: 14px;
     gap: 8px;
@@ -2790,11 +2703,6 @@ html.loaded {
   .fl-ico-fill {
     width: 14px;
     height: 14px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .t18-event .t18-event-icon::after {
-    animation: none;
   }
 }
 
@@ -2830,9 +2738,6 @@ html.loaded {
   .coc-content {
     padding-top: 0;
   }
-  .coc-content .t18-hero {
-    margin-top: 32px;
-  }
 }
 @media (max-width: 970px) {
   .coc-main {
@@ -2840,9 +2745,6 @@ html.loaded {
   } /* top bar + secondary bar */
   .coc-content {
     padding-top: 0;
-  }
-  .coc-content .t18-hero {
-    margin-top: 14px;
   }
 }
 
@@ -3142,4 +3044,3 @@ html.loaded {
 .as-row::-webkit-scrollbar-track {
   background: transparent;
 }
-

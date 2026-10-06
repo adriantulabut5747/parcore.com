@@ -20,13 +20,17 @@
    reads as one separate thing on the page. Inside: the header (title,
    Town Hall, Paste link), then Pick units and Your army -- side by side
    when the box is wide enough (@container below), stacked otherwise. */
-.am {
-  container-type: inline-size;
+.am,
+.am-tray,
+.am-modal {
   --am-tile: #1f2025;
   --am-text: var(--text-main, #eff2f5);
   --am-muted: #8b9099;
   --am-faint: #6d7178;
   --am-line: rgba(255, 255, 255, 0.07);
+}
+.am {
+  container-type: inline-size;
   margin-top: 32px;
   padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -71,22 +75,9 @@
   flex: none;
 }
 
-/* ---- Phone-only nav -----------------------------------------------------------
-   The Layouts / Army / Guides tabs (under the hero) and the breadcrumb in
-   the secondary top bar (Clash of Clans > Armies > Army maker) only show on
-   phones -- see the Phones block. Desktop has the top bar's own links.
-   Scoped with :has(#armyMaker): the guides pages load this file for its
-   box and button styles, and keep their tabs on desktop. */
-.coc-content:has(> #armyMaker) > .first-layer {
-  display: none;
-}
-/* Desktop: the phone strip's divider line goes too -- with no tabs above
-   it, it would be a stray hairline over the box. */
-@media (min-width: 971px) {
-  .coc-content:has(> #armyMaker) > .th-rail {
-    display: none;
-  }
-}
+/* ---- Phone breadcrumb --------------------------------------------------------
+   The secondary top bar shows the breadcrumb (Clash of Clans > Tools > Army
+   Maker) on phones in place of the page name -- see the Phones block. */
 .am-stb-crumbs {
   display: none;
   align-items: center;
@@ -293,7 +284,6 @@
 
 /* ---- Buttons: the one style ---------------------------------------------- */
 .am-btn,
-.am-tab,
 .am-th,
 .am-mode,
 .am-picker-remove,
@@ -323,7 +313,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 .am-btn:hover,
-.am-tab:hover,
 .am-th:hover,
 .am-mode:hover,
 .am-picker-remove:hover,
@@ -332,32 +321,27 @@
   color: var(--text-secondary, #c8cbcd);
 }
 .am-btn:active,
-.am-tab:active,
 .am-mode:active,
 .am-picker-remove:active {
   transform: translateY(1px);
 }
 /* Selected / main action: the raised keycap. */
 .am-btn-main,
-.am-tab.active,
 .am-th[aria-pressed='true'] {
   background: var(--key-face);
   box-shadow: var(--key-edge);
   color: var(--text-main, #eff2f5);
 }
 .am-btn-main:hover,
-.am-tab.active:hover,
 .am-th[aria-pressed='true']:hover {
   background: var(--key-face-hover);
   color: var(--text-main, #eff2f5);
 }
-.am-btn-main:active,
-.am-tab.active:active {
+.am-btn-main:active {
   transform: translateY(2px);
   box-shadow: var(--key-pressed);
 }
 .am-btn:focus-visible,
-.am-tab:focus-visible,
 .am-th:focus-visible,
 .am-mode:focus-visible,
 .am-picker-remove:focus-visible,
@@ -436,10 +420,6 @@
   color: var(--am-faint);
   text-align: center;
 }
-/* "Clan castle" in full on desktop, "CC" on phones (tab + meter). */
-.am-short {
-  display: none;
-}
 b.is-over {
   color: #e06363 !important;
 }
@@ -477,40 +457,8 @@ b.is-over {
   }
 }
 
-/* ---- Pick units -------------------------------------------------------------- */
-.am-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-/* Tab: name on top, what's used below ("340/352"). */
-.am-tab {
-  flex-direction: column;
-  gap: 3px;
-  min-height: 52px;
-  padding: 6px 4px;
-}
-.am-tab-meter {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-transform: none;
-  color: var(--am-faint);
-  font-variant-numeric: tabular-nums;
-}
-.am-tab-meter b {
-  color: inherit;
-}
-.am-tab.active .am-tab-meter {
-  color: var(--am-muted);
-}
-.am-tab.active .am-tab-meter b {
-  color: var(--am-text);
-}
+/* ---- Tray tiles (the unit groups inside .am-tray) ------------------------------ */
 
-.am-panel {
-  margin-top: 18px;
-}
 .am-group + .am-group {
   margin-top: 22px;
 }
@@ -869,22 +817,11 @@ html.am-modal-open {
     padding-top: 18px;
   }
   .am-btn,
-  .am-tab,
   .am-th,
   .am-mode,
   .am-picker-remove {
     font-size: 10.5px;
     letter-spacing: 1px;
-  }
-  .am-long {
-    display: none;
-  }
-  .am-short {
-    display: inline;
-  }
-  /* The Layouts / Army / Guides tabs are back on phones (under the hero). */
-  .coc-content:has(> #armyMaker) > .first-layer {
-    display: flex;
   }
   /* Secondary top bar: the breadcrumb takes the page name's place. */
   .am-stb-title {
@@ -896,12 +833,6 @@ html.am-modal-open {
   .am-btn {
     padding: 0 8px;
     gap: 6px;
-  }
-  .am-tab {
-    padding: 6px 2px;
-  }
-  .am-tab-meter {
-    font-size: 10px;
   }
   /* 7 tiles a row on phones. */
   .am-grid {
@@ -934,17 +865,248 @@ html.am-modal-open {
   }
 }
 
-/* ---- Live in Clash band ------------------------------------------------------
-   The red "Live in Clash right now" band above the footer (styled in
-   coc-clan-clock.css, same as the other Clash pages). On the other pages a
-   FAQ sits between the content and the band; here it follows the maker box
-   straight away, so it gets its own gap -- room for the Dragon Warden that
-   pokes out of its top edge, too. (#id beats the band's margin: 0.) */
-#events-section.t18-band {
-  margin-top: 96px;
+/* ---- Unit rows + tray (Oct 2026; replaced the Pick units tabs) -----------------
+   Each unit row of "Your army" (Troops / Spells / Siege / Clan Castle) is
+   a button-like area: tap it and a tray rises along the bottom of the
+   screen with that row's units (.am-tray, in <body>, lined up with the
+   builder on desktop by coc-armymaker.js). While it's open the row is
+   lit (.is-editing), everything else in the builder dims, and the row's
+   units get a red remove badge. Rows also carry their own Clear, and an
+   empty row says "Tap to edit". Modelled on clasher.pro's army maker. */
+.army-sheet .as-group[data-row] {
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    opacity 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+@media (hover: hover) {
+  .am:not(.is-tray-open) .army-sheet .as-group[data-row]:hover {
+    background: rgba(255, 255, 255, 0.025);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.025);
+  }
+}
+/* The open row: a lighter panel with a light rim, 6px out from the row. */
+.army-sheet .as-group.is-editing {
+  position: relative;
+  z-index: 1;
+  background: #1e2025;
+  box-shadow:
+    0 0 0 6px #1e2025,
+    0 0 0 7.5px rgba(255, 255, 255, 0.4);
+}
+/* Everything else in the builder fades back while a tray is open. */
+.am.is-tray-open .am-head,
+.am.is-tray-open .am-import,
+.am.is-tray-open .am-part-head,
+.am.is-tray-open .am-actions,
+.army-sheet.is-editing-row .as-heroes,
+.army-sheet.is-editing-row .as-group[data-row]:not(.is-editing) {
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+.am.is-tray-open {
+  margin-bottom: var(--tray-h, 0px); /* so the last row can scroll up above the tray */
+}
+
+/* Row header: label, then the used/max and the row's Clear on the right. */
+.army-sheet .as-head:has(.am-row-clear) .as-cap {
+  margin-left: auto;
+}
+.am-row-clear {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  margin: -3px 0 -3px 8px;
+  padding: 0 7px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: rgba(11, 11, 12, 0.6);
+  color: var(--am-muted);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.am-row-clear .am-ico {
+  width: 11px;
+  height: 11px;
+}
+.am-row-clear:hover {
+  color: #e6e7ea;
+  background: #1e1f23;
+}
+.am-row-clear:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+.am-row-clear:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+
+/* Empty row: "Tap to edit" over its empty places ("Add from the tray"
+   once it's the open one). */
+.army-sheet .as-group.is-empty .as-row {
+  position: relative;
+}
+.army-sheet .as-group.is-empty .as-row::after {
+  content: 'Tap to edit';
+  position: absolute;
+  inset: 0 0 5px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--am-faint);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.army-sheet .as-group.is-editing.is-empty .as-row::after {
+  content: 'Add from the tray';
+  color: var(--am-muted);
+}
+
+/* Remove badge: only on the open row's units -- a red disc with a minus,
+   top-right (the count chip is top-left). Tap = one less, hold = repeat. */
+.army-sheet .as-group.is-editing .as-row > button.as-tile::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 2;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background:
+    linear-gradient(#fff, #fff) center / 7px 2px no-repeat,
+    #d93b3b;
+  box-shadow: 0 0 0 1.5px #0a0b0d;
+  pointer-events: none;
+}
+/* Long presses (hold to repeat) shouldn't select text or pop the image menu. */
+.army-sheet .as-group.is-editing .as-tile,
+.am-tray .am-tile {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* The tray. */
+.am-tray {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10045; /* over the phone bottom bar (.bn-bar, 9999), under the modal */
+  display: flex;
+  flex-direction: column;
+  max-height: min(46vh, 430px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: #16171b;
+  box-shadow: 0 -24px 60px -12px rgba(0, 0, 0, 0.85);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: am-tray-up 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.am-tray[hidden] {
+  display: none;
+}
+@keyframes am-tray-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+.am-tray-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 16px;
+  border-bottom: 1px solid #202227;
+}
+.am-tray-title {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--am-text);
+}
+.am-tray-meter {
+  margin-right: auto;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--am-faint);
+}
+.am-tray-meter b {
+  color: var(--am-text);
+}
+.am-tray .am-tray-done {
+  min-height: 34px;
+  padding: 0 16px;
+  background: var(--key-face, #26282e);
+  box-shadow: var(--key-edge, none);
+  color: var(--am-text);
+}
+.am-tray .am-picker-close {
+  min-height: 34px;
+  width: 34px;
+}
+.am-tray-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 16px 16px;
+}
+.am-tray .am-group-head {
+  margin-bottom: 8px;
+}
+.am-tray .am-group + .am-group {
+  margin-top: 16px;
+}
+.am-tray .am-grid {
+  grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+  gap: 6px;
 }
 @media (max-width: 970px) {
-  #events-section.t18-band {
-    margin-top: 72px;
+  .am-tray {
+    max-height: 52vh;
+  }
+  .am-tray-head {
+    padding: 8px 10px 8px 14px;
+  }
+  .am-tray-body {
+    padding: 10px 12px 14px;
+  }
+  .am-tray .am-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+  .am-row-clear span {
+    display: none; /* icon only on phones: the siege row's header is narrow */
+  }
+  .am-row-clear {
+    width: 24px;
+    justify-content: center;
+    padding: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .am-tray {
+    animation: none;
   }
 }
