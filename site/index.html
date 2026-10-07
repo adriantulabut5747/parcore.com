@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://parchrome.netlify.app/og/home.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="The Parchrome home page: game guides and popular topics">
+<meta property="og:image:alt" content="The Parchrome home page: game guides and featured topics">
 <meta name="twitter:card" content="summary_large_image">
 
 
@@ -32,14 +32,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/11layout.css?v=20261006a">
+<link rel="stylesheet" href="/11layout.css?v=20261007a">
 
 <!-- ============================================================
      HOME PAGE STYLES (one block, Oct 2026 rebuild)
      Shell look (top bar, sidebar, loader, search overlay, footer) comes
      from 11layout.css. Everything below is this page only. Sections, in
-     page order: base, hero (+ smoke), hero search results, dock bar, popular
-     topics, about + perks, explore rows, feedback + FAQ, modal. Game
+     page order: base, hero (+ smoke), hero search results, dock bar, featured
+     topics, about + perks, new-bases banner, feedback + FAQ, modal. Game
      Guides has its own block next to its markup.
      ============================================================ -->
 <style>
@@ -101,6 +101,25 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--hm-text);
+}
+/* Section title box: same look as the CoC home's .layouts-title-box
+   ("Featured Townhalls"): gradient Orbitron title, grey subtitle, a full-width
+   hairline and a short glowing red stub on its left end. */
+.hm-head { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 12px 0; margin-bottom: 24px; }
+.hm-head::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.hm-head::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2.5px; background: #c23b3b; box-shadow: 0 0 8px rgba(194, 59, 59, 0.7); }
+.hm-head .hm-title {
+  margin: 0; font: 900 clamp(15px, 2vw, 26px)/1.15 'Orbitron', sans-serif; letter-spacing: 1px;
+  background: linear-gradient(90deg, #ffffff, #c0c9d4); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hm-head-sub { margin: 0; font: 400 12px/1.5 'Sora', sans-serif; letter-spacing: 0.2px; color: #7a7d82; }
+@media (max-width: 970px) {
+  .hm-head { margin-bottom: 18px; }
+  .hm-head::after { width: 40px; }
+  .hm-head-sub { font-size: 11px; }
 }
 .hm-lede { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--hm-muted); max-width: 60ch; }
 
@@ -374,123 +393,57 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 }
 
 /* ============================================================
-   POPULAR TOPICS: tabs + list + preview panel.
+   FEATURED TOPICS: one group per section, compact text tiles with the
+   page's art faded in behind them (game.guide style).
    ============================================================ */
-.hm-topics { padding: 64px var(--hm-gut) 72px; background: var(--hm-grain), var(--hm-bg-deep); border-top: 1px solid var(--hm-line); }
-.hm-tabs { display: flex; gap: 30px; margin: 16px 0 22px; border-bottom: 1px solid var(--hm-line); overflow-x: auto; scrollbar-width: none; }
-.hm-tabs::-webkit-scrollbar { display: none; }
-.hm-tab {
-  appearance: none; background: none; border: 0; cursor: pointer; position: relative; white-space: nowrap;
-  padding: 12px 0 14px; font: 600 15px/1 'Sora', sans-serif; color: #8d8f96; transition: color 0.2s ease;
+.hm-ft { padding: 64px var(--hm-gut) 72px; background: var(--hm-grain), var(--hm-bg-deep); border-top: 1px solid var(--hm-line); }
+/* groups are spaced well apart so each reads as its own block */
+.ft-group { margin-top: 28px; }
+.ft-group + .ft-group { margin-top: 40px; }
+.ft-group h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 700 17px/1.2 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff; }
+.ft-group h3 a { color: inherit; text-decoration: none; }
+.ft-logo { flex: none; width: 24px; height: 24px; border-radius: 6px; object-fit: cover; }
+.ft-group h3 a:hover { color: #ff5874; }
+.ft-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; list-style: none; }
+.ft-tile {
+  position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 9px 14px;
+  border-radius: 8px; overflow: hidden; isolation: isolate; background: #1b1b1e; color: #fff; text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-.hm-tab:hover { color: #d7d8db; }
-.hm-tab[aria-selected="true"] { color: #fff; }
-.hm-tab::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0;
-  background: var(--hm-accent); transform: scaleX(0); transition: transform 0.4s var(--hm-ease);
-}
-.hm-tab[aria-selected="true"]::after { transform: scaleX(1); }
-.hm-tab:focus-visible { outline-offset: 0; }
-
-/* POPULAR TOPICS is laid out like a chart: a spotlight card for the selected
-   topic on the left, the ranked list on the right. The spotlight moves down
-   the list on its own (the thin red line under the active row is the timer)
-   and holds still while the pointer or keyboard focus is in the section. */
-.hm-topics-body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
-.hm-topic-list { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-
-/* -- ranked rows -- */
-.hm-row {
-  position: relative; overflow: hidden;
-  display: grid; grid-template-columns: 44px 124px minmax(0, 1fr) auto; align-items: center; gap: 16px;
-  padding: 10px 18px 10px 4px; border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.045);
-  text-decoration: none; color: inherit;
-  transition: background 0.25s ease, border-color 0.25s ease;
-}
-.hm-row:hover, .hm-row.is-active { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.1); }
-.hm-row-rank {
-  font: 900 30px/1 'Orbitron', sans-serif; text-align: center; font-variant-numeric: tabular-nums;
-  color: transparent; -webkit-text-stroke: 1.2px rgba(255, 255, 255, 0.28);
-  transition: color 0.3s ease, -webkit-text-stroke-color 0.3s ease;
-}
-.hm-row:hover .hm-row-rank { -webkit-text-stroke-color: rgba(255, 255, 255, 0.6); }
-.hm-row.is-active .hm-row-rank { color: var(--hm-accent); -webkit-text-stroke-color: var(--hm-accent); }
-.hm-row-media { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #222226; }
-.hm-row-media::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); pointer-events: none; }
-.hm-row-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: scale 0.6s var(--hm-ease); }
-.hm-row:hover .hm-row-img { scale: 1.06; }
-.hm-row-head { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.hm-row-icon { flex: none; width: 22px; height: 22px; border-radius: 6px; object-fit: cover; background: #222226; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45); }
-.hm-row-title { min-width: 0; font: 700 15.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; color: #e3e4e7; text-wrap: balance; }
-.hm-row.is-active .hm-row-title { color: #fff; }
-.hm-row-meta { margin-top: 6px; font: 500 12.5px/1.35 'Sora', sans-serif; color: var(--hm-muted); min-height: 1.35em; }
-.hm-row-meta .hm-badge { display: inline-block; margin-left: 8px; vertical-align: 1px; padding: 4px 7px; font-size: 10.5px; }
-.hm-row-side { display: flex; align-items: center; gap: 10px; }
-.hm-badge { font: 700 11px/1 'Sora', sans-serif; padding: 6px 9px; border-radius: 6px; background: rgba(222, 16, 56, 0.16); color: #ff5874; white-space: nowrap; }
-.hm-row-go { display: none; width: 16px; height: 16px; color: #6f7279; }
-.hm-row-progress { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; background: var(--hm-accent); pointer-events: none; }
-@keyframes hmProgress { to { width: 100%; } }
-@media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
-  .hm-row.is-active .hm-row-progress { animation: hmProgress 7s linear forwards; }
-  .hm-topics-body:hover .hm-row-progress,
-  .hm-topics-body:focus-within .hm-row-progress,
-  .hm-topics.is-away .hm-row-progress { animation-play-state: paused; }
-}
-.hm-row.is-ph { pointer-events: none; }
-.hm-row.is-ph .hm-row-img { aspect-ratio: 16 / 9; border-radius: 8px; }
-.hm-row.is-ph .hm-row-img, .hm-row.is-ph .hm-ph-line {
-  background: linear-gradient(90deg, #1d1d20 25%, #26262a 50%, #1d1d20 75%); background-size: 200% 100%;
-  animation: shimmer 1.2s linear infinite;
-}
-.hm-ph-line { display: block; height: 12px; border-radius: 4px; width: 60%; }
-.hm-ph-line + .hm-ph-line { width: 38%; margin-top: 10px; }
-
-/* -- spotlight -- */
-.hm-preview {
-  grid-column: 1; grid-row: 1; position: sticky; top: 72px; overflow: hidden;
-  border-radius: 16px; background: #121214; border: 1px solid rgba(255, 255, 255, 0.07);
-}
-.hm-pv-media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: #1a1a1d; }
-.hm-pv-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 18, 20, 0) 42%, rgba(18, 18, 20, 0.55) 70%, #121214 100%); pointer-events: none; }
-.hm-pv-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.hm-pv-rank {
-  position: absolute; top: 16px; left: 20px; z-index: 1;
-  font: 900 64px/1 'Orbitron', sans-serif; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9);
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.55));
-}
-.hm-pv-body { position: relative; z-index: 1; margin-top: -64px; padding: 0 26px 26px; }
-.hm-pv-head { display: flex; align-items: center; gap: 12px; }
-.hm-pv-icon { flex: none; width: 36px; height: 36px; border-radius: 9px; object-fit: cover; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55); }
-.hm-pv-icon[hidden] { display: none; }
-.hm-pv-title { font: 700 clamp(22px, 1.9vw, 28px)/1.15 'Sora', sans-serif; letter-spacing: -0.02em; color: #fff; text-wrap: balance; }
-.hm-pv-meta { margin-top: 10px; font-size: 13px; color: var(--hm-muted); min-height: 1.3em; }
-.hm-pv-desc { margin-top: 12px; max-width: 54ch; font-size: 14.5px; line-height: 1.65; color: #c9cace; }
-.hm-pv-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; list-style: none; }
-.hm-pv-tags li { font: 600 11.5px/1 'Sora', sans-serif; padding: 6px 9px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); color: #d7d8db; }
-.hm-pv-cta { margin-top: 20px; }
-.hm-pv-cta svg { width: 15px; height: 15px; transition: transform 0.3s var(--hm-ease); }
-.hm-pv-cta:hover svg { transform: translateX(3px); }
-
-@media (max-width: 1100px) {
-  .hm-topics-body { grid-template-columns: 1fr; }
-  .hm-topic-list { grid-column: 1; }
-  .hm-preview { display: none; }
-  .hm-row-go { display: block; }
-}
+.ft-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; transition: transform 0.6s var(--hm-ease), opacity 0.3s ease; }
+/* dark on the left where the text sits, art showing through on the right */
+.ft-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(20, 20, 22, 0.96) 0%, rgba(20, 20, 22, 0.85) 45%, rgba(20, 20, 22, 0.45) 100%); }
+.ft-name { font: 700 14.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ft-sub { margin-top: 3px; font: 500 11.5px/1.3 'Sora', sans-serif; color: #9a9ca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
+a.ft-tile:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
+a.ft-tile:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px; }
+/* coming soon: not a link, greyed out */
+.ft-soon .ft-art { filter: grayscale(1); opacity: 0.3; }
+.ft-soon .ft-name { color: rgba(255, 255, 255, 0.6); }
+.ft-soon .ft-sub { color: rgba(255, 255, 255, 0.4); }
+/* "+N more": the last visible slot of a long group (16th on desktop, 10th on
+   phones) opens the rest; same tile, dashed edge so it reads as an action */
+.ft-more { width: 100%; border: 0; cursor: pointer; font: inherit; text-align: left; background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.ft-more::before { display: none; }
+.ft-more:hover { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
+.ft-more:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px; }
+.ft-ph { min-height: 56px; border-radius: 8px; background: linear-gradient(90deg, #18181b 25%, #222226 50%, #18181b 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
 @media (max-width: 970px) {
-  .hm-topics { padding: 44px var(--hm-gut) 48px; }
-  .hm-tabs { gap: 22px; margin: 12px 0 16px; }
-  .hm-tab { font-size: 14px; padding: 11px 0 12px; }
-  .hm-row { grid-template-columns: 34px 104px minmax(0, 1fr) auto; gap: 11px; padding: 7px 12px 7px 2px; border-radius: 11px; }
-  .hm-row-rank { font-size: 21px; -webkit-text-stroke-width: 1px; }
-  .hm-row-media { border-radius: 7px; }
-  .hm-row-head { gap: 7px; }
-  .hm-row-icon { width: 18px; height: 18px; border-radius: 5px; }
-  .hm-row-title { font-size: 14px; }
-  .hm-row-meta { font-size: 11.5px; margin-top: 4px; }
-  .hm-badge { font-size: 10px; padding: 5px 7px; }
+  .hm-ft { padding: 44px var(--hm-gut) 48px; }
+  .ft-group { margin-top: 22px; }
+  .ft-group + .ft-group { margin-top: 32px; }
+  .ft-group h3 { font-size: 15.5px; margin-bottom: 12px; }
+  .ft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  /* phones: "+N more" gets its own full-width row under the 5 rows of tiles */
+  .ft-more-li { grid-column: 1 / -1; }
+  .ft-tile.ft-more { min-height: 34px; padding: 0 12px; align-items: center; background: none; }
+  .ft-more .ft-name { font-size: 12.5px; font-weight: 600; color: #c8cbcd; }
+  .ft-more .ft-sub { display: none; }
+  .ft-tile { min-height: 52px; padding: 8px 10px; }
+  /* names wrap to two lines instead of being cut off */
+  .ft-name { font-size: 13px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .ft-sub { font-size: 10.5px; margin-top: 2px; }
 }
 
 /* ============================================================
@@ -579,14 +532,14 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 }
 
 /* ============================================================
-   EXPLORE BY GAME: Steam-style category rows + the new-bases banner
+   NEW-BASES BANNER (shown only when some TH has bases marked "new")
    ============================================================ */
-.hm-explore { background: var(--hm-grain), var(--hm-bg-deep); padding: 64px var(--hm-gut) 72px; border-top: 1px solid var(--hm-line); }
-.hm-explore-head { margin-bottom: 28px; }
+.hm-promo-band { background: var(--hm-grain), var(--hm-bg-deep); padding: 48px var(--hm-gut); border-top: 1px solid var(--hm-line); }
+.hm-promo-band:has(.hm-promo[hidden]) { display: none; }
 
 .hm-promo {
   position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 28px;
-  margin-bottom: 48px; padding: 18px 26px 18px 20px; border-radius: 14px; overflow: hidden;
+  padding: 18px 26px 18px 20px; border-radius: 14px; overflow: hidden;
   text-decoration: none; color: #fff;
   background: linear-gradient(100deg, #5b1313 0%, #2b0e10 46%, #151517 100%);
   border: 1px solid rgba(224, 48, 47, 0.28);
@@ -615,71 +568,11 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .hm-promo:hover .hm-promo-cta { background: #fff; }
 .hm-promo:hover .hm-promo-cta svg { transform: translateX(3px); }
 
-.hm-rail + .hm-rail { margin-top: 40px; }
-.hm-rail-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.hm-rail-icon { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; flex: none; }
-.hm-rail-head h3 { font: 700 18px/1.2 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff; }
-.hm-link {
-  margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px;
-  font: 600 12.5px/1 'Sora', sans-serif; color: #d2d3d7; text-decoration: none; white-space: nowrap;
-  background: rgba(255, 255, 255, 0.06); transition: background 0.2s ease, color 0.2s ease;
-}
-.hm-link:hover { background: rgba(255, 255, 255, 0.11); color: #fff; }
-.hm-rail-body { position: relative; }
-.hm-rail-track {
-  display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 4 * 16px) / 5); gap: 16px;
-  overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
-}
-.hm-rail-track::-webkit-scrollbar { display: none; }
-.hm-tile {
-  position: relative; display: grid; place-items: end start; padding: 0 14px 12px; aspect-ratio: 16 / 10; border-radius: 10px; overflow: hidden;
-  container-type: inline-size;
-  isolation: isolate; scroll-snap-align: start; text-decoration: none; background: #18181b;
-}
-.hm-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 0.7s var(--hm-ease); }
-.hm-tile::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  /* clear art up top, dark at the bottom where the name sits */
-  background: linear-gradient(180deg, rgba(10, 10, 11, 0) 38%, rgba(10, 10, 11, 0.55) 68%, rgba(10, 10, 11, 0.92) 100%);
-  transition: background 0.3s ease;
-}
-.hm-tile-label {
-  display: flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0;
-  font: 700 clamp(13px, 7.4cqi, 17px)/1.2 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  transition: transform 0.35s var(--hm-ease);
-}
-.hm-tile-label > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.hm-tile .hm-tile-icon {
-  position: static; inset: auto; z-index: auto; flex: none; width: 22px; height: 22px; border-radius: 6px; object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); transition: none;
-}
-.hm-tile:hover img:not(.hm-tile-icon) { transform: scale(1.07); }
-.hm-tile:hover::before { background: linear-gradient(180deg, rgba(10, 10, 11, 0) 30%, rgba(60, 6, 18, 0.6) 66%, rgba(22, 4, 10, 0.94) 100%); }
-.hm-tile:hover .hm-tile-label { transform: translateY(-2px); }
-.hm-rail-btn {
-  position: absolute; top: 50%; z-index: 2; width: 40px; height: 72px; margin-top: -36px;
-  display: grid; place-items: center; border: 0; border-radius: 8px; cursor: pointer;
-  background: none; color: #d7d8db; transition: color 0.2s ease, opacity 0.2s ease, background 0.2s ease;
-}
-.hm-rail-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
-.hm-rail-btn:disabled { opacity: 0.18; cursor: default; background: none; }
-.hm-rail-btn svg { width: 26px; height: 26px; }
-.hm-rail-btn.is-prev { left: -50px; }
-.hm-rail-btn.is-next { right: -50px; }
-@media (max-width: 1280px) {
-  .hm-rail-track { grid-auto-columns: calc((100% - 3 * 14px) / 4); gap: 14px; }
-}
 @media (max-width: 970px) {
-  .hm-explore { padding: 44px var(--hm-gut) 48px; }
-  .hm-promo { grid-template-columns: minmax(0, 1fr); justify-items: start; gap: 14px; padding: 18px; margin-bottom: 36px; }
+  .hm-promo-band { padding: 32px var(--hm-gut); }
+  .hm-promo { grid-template-columns: minmax(0, 1fr); justify-items: start; gap: 14px; padding: 18px; }
   .hm-promo-fan { width: 168px; height: 84px; }
   .hm-promo-text strong { font-size: 17px; }
-  .hm-rail + .hm-rail { margin-top: 30px; }
-  .hm-rail-head h3 { font-size: 16px; }
-  .hm-rail-track { grid-auto-columns: 46%; gap: 12px; }
-  .hm-rail-btn { display: none; }
 }
 
 /* ============================================================
@@ -752,7 +645,8 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   .hero-content > * { animation: none; }
   .hm-anim .hm-shape, .hm-anim .hm-laptop, .hm-anim .hm-phone { transition: none; }
   .hm-live:has(.is-live) .hm-live-dot { animation: none; }
-  .hm-tile img, .hm-promo-fan img, .hm-row-go { transition: none; }
+  .ft-art, .hm-promo-fan img { transition: none; }
+  .ft-ph { animation: none; }
   .hm-q::details-content { transition: none; }
 }
 </style>
@@ -844,10 +738,10 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 <!-- ============================================================
      PAGE CONTENT (right of the sidebar). Order: hero, search results,
      then #homeBelow (everything the hero search hides while you type):
-     jump to a game (smoke section), game guides, popular topics, about,
-     explore, feedback + FAQ.
-     Lists here are built from JSON at runtime: home.json (topics,
-     explore rows), sidebar.json (game guides), hwr-categories.json
+     jump to a game (smoke section), game guides, featured topics, about,
+     new-bases banner, feedback + FAQ.
+     Lists here are built from JSON at runtime: home.json (featured
+     topics), sidebar.json (game guides), hwr-categories.json
      (Web Resources row), thNN-layouts.json (counts, new-bases banner).
      ============================================================ -->
 <div class="coc-main">
@@ -876,7 +770,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 
   <!-- ---- JUMP TO A GAME: the bar in the old smoke section. The launcher
        comes from sidebar.json (each entry's "short" name is the label). ---- -->
-  <section class="hm-jump" id="jump" aria-label="Popular topics and games">
+  <section class="hm-jump" id="jump" aria-label="Recently added">
     <div class="hm-embers" id="hmEmbers" aria-hidden="true"></div>
     <div class="hm-in">
       <h2 class="hm-title hm-pt-head" id="ptTitle">Recently Added
@@ -919,8 +813,10 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
        with everything else below the carousel.
        ============================================================ -->
   <section class="gg-section" id="guides" aria-labelledby="ggTitle">
-    <h2 class="hm-title gg-title" id="ggTitle">Featured Games</h2>
-    <p class="gg-lede" id="ggLede"></p>
+    <div class="hm-head">
+      <h2 class="hm-title" id="ggTitle">Featured Games</h2>
+      <p class="hm-head-sub" id="ggLede"></p>
+    </div>
     <div class="gg-grid" id="ggGrid" aria-busy="true">
       <!-- placeholders until sidebar.json arrives; same size as a card so nothing jumps -->
       <div class="gg-card gg-ph"></div><div class="gg-card gg-ph"></div><div class="gg-card gg-ph"></div><div class="gg-card gg-ph"></div>
@@ -932,12 +828,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   .gg-section {
     padding: 56px 10% 48px;
     background: var(--hm-grain), #0f0f10;
-  }
-  .gg-title { margin: 0 0 6px; }
-  .gg-lede {
-    margin: 0 0 24px;
-    font-size: 14px;
-    color: #9a9ca3;
   }
   .gg-grid {
     display: grid;
@@ -1071,7 +961,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 
   @media (max-width: 970px) {
     .gg-section { padding: 56px 5% 36px; }
-    .gg-lede { font-size: 13px; margin-bottom: 18px; }
     .gg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 22px; }
     .gg-meta { padding: 0 10px 11px; }
     .gg-meta::before { margin-bottom: 7px; }
@@ -1090,31 +979,19 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   }
   </style>
 
-  <!-- ---- POPULAR TOPICS: tabs, a ranked list and a spotlight card for the
-       active row (auto-advances on desktop, see the CSS).
-       Built from home.json ("topics"). The rows below are loading
-       placeholders, replaced as soon as the file arrives. ---- -->
-  <section class="hm-topics" id="topics" aria-labelledby="topicsTitle">
+  <!-- ---- FEATURED TOPICS: one group of compact tiles per section (Web
+       Resources, then the games in sidebar order). Built from home.json
+       ("featured"); Web Resources comes from hwr-categories.json and the
+       CODM/Genshin/Tekken/Valorant groups from game-nav.json, so a page
+       added there (or taken out of "soon") shows up here too. ---- -->
+  <section class="hm-ft" id="topics" aria-labelledby="topicsTitle">
     <div class="hm-in">
-      <h2 class="hm-title" id="topicsTitle">Popular Topics</h2>
-      <div class="hm-tabs" id="topicTabs" role="tablist" aria-label="Topic groups"></div>
-      <div class="hm-topics-body">
-        <div class="hm-topic-list" id="topicList" role="tabpanel">
-          <div class="hm-row is-ph"><span class="hm-row-rank"></span><span class="hm-row-img"></span><span><span class="hm-ph-line"></span><span class="hm-ph-line"></span></span></div>
-          <div class="hm-row is-ph"><span class="hm-row-rank"></span><span class="hm-row-img"></span><span><span class="hm-ph-line"></span><span class="hm-ph-line"></span></span></div>
-          <div class="hm-row is-ph"><span class="hm-row-rank"></span><span class="hm-row-img"></span><span><span class="hm-ph-line"></span><span class="hm-ph-line"></span></span></div>
-          <div class="hm-row is-ph"><span class="hm-row-rank"></span><span class="hm-row-img"></span><span><span class="hm-ph-line"></span><span class="hm-ph-line"></span></span></div>
-        </div>
-        <aside class="hm-preview" id="topicPreview" hidden>
-          <span class="hm-pv-media"><img class="hm-pv-img" id="pvImg" src="/icons/home/th16-layouts.webp" alt="" width="960" height="540"><span class="hm-pv-rank" id="pvRank" aria-hidden="true">1</span></span>
-          <div class="hm-pv-body">
-            <div class="hm-pv-head"><img class="hm-pv-icon" id="pvIcon" alt="" width="36" height="36" hidden><h3 class="hm-pv-title" id="pvTitle"></h3></div>
-            <p class="hm-pv-meta" id="pvMeta"></p>
-            <p class="hm-pv-desc" id="pvDesc"></p>
-            <ul class="hm-pv-tags" id="pvTags"></ul>
-            <a class="hm-btn hm-pv-cta" id="pvLink" href="/"><span id="pvLinkText">Open</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </aside>
+      <div class="hm-head">
+        <h2 class="hm-title" id="topicsTitle">Featured Topics</h2>
+        <p class="hm-head-sub">Every guide, tool and website list on Parchrome.</p>
+      </div>
+      <div id="ftGroups" aria-busy="true">
+        <div class="ft-group"><div class="ft-grid"><div class="ft-ph"></div><div class="ft-ph"></div><div class="ft-ph"></div><div class="ft-ph"></div><div class="ft-ph"></div></div></div>
       </div>
     </div>
   </section>
@@ -1184,26 +1061,20 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     </div>
   </section>
 
-  <!-- ---- EXPLORE BY GAME: the new-bases banner (only when some TH
-       has bases marked "new": true), then one row per game, built from
-       home.json ("explore") plus hwr-categories.json for Web Resources. ---- -->
-  <section class="hm-explore" id="explore" aria-labelledby="exploreTitle">
+  <!-- ---- NEW-BASES BANNER: hidden unless some TH has bases marked
+       "new": true (see the script). ---- -->
+  <section class="hm-promo-band" aria-label="New bases">
     <div class="hm-in">
       <a class="hm-promo" id="promo" href="/coc/" hidden>
-        <span class="hm-promo-fan" id="promoFan" aria-hidden="true"></span>
-        <span class="hm-promo-text">
-          <strong id="promoTitle">New bases are up</strong>
-          <span>Every new base has a copy link that opens it straight in Clash of Clans.</span>
-        </span>
-        <span class="hm-promo-cta">See the new bases
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
-      </a>
-      <div class="hm-explore-head">
-        <h2 class="hm-title" id="exploreTitle">Explore by game</h2>
-        <p class="hm-lede">Jump straight to a game's layouts, tools and guides, or browse the website directory by category.</p>
-      </div>
-      <div id="exploreRows"></div>
+      <span class="hm-promo-fan" id="promoFan" aria-hidden="true"></span>
+      <span class="hm-promo-text">
+        <strong id="promoTitle">New bases are up</strong>
+        <span>Every new base has a copy link that opens it straight in Clash of Clans.</span>
+      </span>
+      <span class="hm-promo-cta">See the new bases
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
     </div>
   </section>
 
@@ -1305,13 +1176,13 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 </div><!-- /.main -->
 
 <!-- Sidebar, top-bar search, scroll-to-top, pull-to-refresh: all shared, from 11layout.js. -->
-<script src="/11layout.js?v=20261006c"></script>
+<script src="/11layout.js?v=20261007a"></script>
 <script>
 /* ============================================================
    HOME PAGE SCRIPT (Oct 2026 rebuild). Needs 11layout.js first
    (loadSidebarData). Parts, in order: loader, helpers, hero parallax,
-   hero search, dock numbers, popular topics, new-bases banner,
-   explore rows, game guides grid, about entrance, feedback form.
+   hero search, dock numbers, featured topics, new-bases banner,
+   game guides grid, about entrance, feedback form.
    Firebase loads after this file.
    ============================================================ */
 (function () {
@@ -1369,22 +1240,9 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     return jsonCache[url];
   }
 
-  // spec = { src, path?, where? }: load src, take src[path] (or the file
-  // itself), keep entries matching every `where` key, return how many.
-  function countOf(spec) {
-    return getJSON(spec.src).then(d => {
-      let list = spec.path ? d[spec.path] : d;
-      if (!Array.isArray(list)) return 0;
-      if (spec.where) list = list.filter(x => Object.keys(spec.where).every(k => x[k] === spec.where[k]));
-      return list.length;
-    });
-  }
-
   // Town Halls that have layouts/army JSON files, newest first.
   // ponytail: hardcoded range -- add 19 when TH19 pages ship.
   const TOWN_HALLS = [18, 17, 16, 15, 14, 13, 12, 11, 10, 9];
-
-  const ICON_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
 
   // ---------- HERO PARALLAX: the GIF drifts at 25% of scroll speed.
   // Desktop scrolls .coc-main, phones scroll the window, so listen to both.
@@ -1494,161 +1352,97 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     mark();
   })();
 
-  // ---------- HOME DATA (home.json) feeds Popular Topics and the explore rows.
+  // ---------- HOME DATA (home.json) feeds Featured Topics.
   const homeData = getJSON('/home.json');
 
-  // ---------- POPULAR TOPICS: tabs -> list of rows -> preview of the
-  // hovered/focused row (desktop). Counts in "{n}" lines load lazily.
+  // ---------- FEATURED TOPICS: one titled grid of tiles per group. A group
+  // lists its tiles, or pulls them from hwr-categories.json / game-nav.json.
   (function () {
-    const tabsEl = document.getElementById('topicTabs');
-    const list = document.getElementById('topicList');
-    const preview = document.getElementById('topicPreview');
-    if (!tabsEl || !list) return;
-    const pv = {
-      img: document.getElementById('pvImg'),
-      title: document.getElementById('pvTitle'),
-      meta: document.getElementById('pvMeta'),
-      desc: document.getElementById('pvDesc'),
-      tags: document.getElementById('pvTags'),
-      link: document.getElementById('pvLink'),
-      linkText: document.getElementById('pvLinkText'),
-      rank: document.getElementById('pvRank'),
-      icon: document.getElementById('pvIcon')
-    };
-    const rowItem = new WeakMap(); // row element -> its home.json item
+    const host = document.getElementById('ftGroups');
+    if (!host) return;
 
-    // "{n} bases with copy links" -> fill n once counted; drop the number if the count fails.
-    const metaCache = new Map();
-    function metaText(item) {
-      if (!item.meta) return Promise.resolve('');
-      if (!item.count || item.meta.indexOf('{n}') < 0) return Promise.resolve(item.meta);
-      if (!metaCache.has(item)) {
-        metaCache.set(item, countOf(item.count)
-          .then(n => item.meta.replace('{n}', n.toLocaleString('en-US')))
-          .catch(() => {
-            const t = item.meta.replace('{n} ', '').replace('{n}', '');
-            return t.charAt(0).toUpperCase() + t.slice(1);
-          }));
+    function tile(t) {
+      const box = el(t.soon ? 'div' : 'a', t.soon ? 'ft-tile ft-soon' : 'ft-tile');
+      if (!t.soon) box.href = t.link;
+      box.title = t.soon ? t.name + ' (coming soon)' : t.name;
+      if (t.image) box.appendChild(img(t.image, 'ft-art', 480, 270));
+      box.appendChild(el('span', 'ft-name', t.name));
+      box.appendChild(el('span', 'ft-sub', t.soon ? 'Coming soon' : t.sub || ''));
+      const li = el('li');
+      li.appendChild(box);
+      return li;
+    }
+
+    // Long groups show 4 rows on desktop (the 16th slot is a "+N more" tile)
+    // and 5 rows on phones (10 tiles, then "+N more" as a full-width row).
+    const phone = window.matchMedia('(max-width: 970px)');
+    const clamps = [];
+    function clamp(grid) {
+      const items = [...grid.children];
+      const li = el('li', 'ft-more-li');
+      const btn = el('button', 'ft-tile ft-more');
+      btn.type = 'button';
+      const name = el('span', 'ft-name');
+      btn.append(name, el('span', 'ft-sub', 'Show all'));
+      li.appendChild(btn);
+      function lay() {
+        // desktop: the 16th slot becomes the button; phones: 10 tiles, then the button as its own row
+        const shown = phone.matches ? 10 : 15;
+        const extra = items.length - shown;
+        const on = phone.matches ? extra > 0 : extra > 1;
+        items.forEach((x, i) => { x.hidden = on && i >= shown; });
+        li.hidden = !on;
+        name.textContent = '+' + extra + ' more';
+        if (on) grid.insertBefore(li, items[shown] || null);
       }
-      return metaCache.get(item);
+      btn.addEventListener('click', () => {
+        items.forEach(x => { x.hidden = false; });
+        li.remove();
+        clamps.splice(clamps.indexOf(lay), 1);
+      });
+      clamps.push(lay);
+      lay();
     }
+    phone.addEventListener('change', () => clamps.forEach(f => f()));
 
-    let tabs = [];
-    let current = null;
-
-    function showPreview(item, row) {
-      list.querySelectorAll('.hm-row.is-active').forEach(r => r.classList.remove('is-active'));
-      if (row) row.classList.add('is-active');
-      if (!preview || current === item) return;
-      current = item;
-      const rank = row ? [...list.children].indexOf(row) + 1 : 1;
-      pv.rank.textContent = String(rank);
-      pv.img.src = item.image;
-      pv.img.style.cssText = item.imageStyle || '';
-      if (item.icon) { pv.icon.src = item.icon; pv.icon.hidden = false; } else pv.icon.hidden = true;
-      pv.title.textContent = item.title;
-      pv.desc.textContent = item.desc || '';
-      pv.tags.replaceChildren(...(item.tags || []).map(t => el('li', null, t)));
-      pv.link.href = item.link;
-      pv.linkText.textContent = 'Open ' + item.title;
-      pv.meta.textContent = '';
-      metaText(item).then(t => { if (current === item) pv.meta.textContent = t; });
-      preview.hidden = false;
-      if (!reduceMotion && preview.animate) {
-        preview.querySelector('.hm-pv-media').animate([{ opacity: 0.35, scale: 1.03 }, { opacity: 1, scale: 1 }], { duration: 420, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
-        preview.querySelector('.hm-pv-body').animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+    function tilesOf(g) {
+      if (g.from === 'hwr') {
+        return getJSON('/hwr-categories.json').then(c => (c.categories || []).map(x => ({
+          name: x.name, sub: 'Web Resources', link: x.link,
+          // home uses small copies of the category banners: /icons/home/<same name>.webp
+          image: (x.bg || '').replace(/^\/webresources-icon\/(.+)\.\w+$/, '/icons/home/$1.webp')
+        })));
       }
-    }
-
-    function row(item, i) {
-      const a = el('a', 'hm-row');
-      a.href = item.link;
-      rowItem.set(a, item);
-      const rank = el('span', 'hm-row-rank', String(i + 1));
-      rank.setAttribute('aria-hidden', 'true');
-      a.appendChild(rank);
-      const media = el('span', 'hm-row-media');
-      const pic = img(item.image, 'hm-row-img', 320, 180);
-      if (item.imageStyle) pic.style.cssText = item.imageStyle;
-      media.appendChild(pic);
-      a.appendChild(media);
-      const text = el('div');
-      text.style.minWidth = '0';
-      const head = el('div', 'hm-row-head');
-      if (item.icon) head.appendChild(img(item.icon, 'hm-row-icon', 22, 22));
-      head.appendChild(el('h3', 'hm-row-title', item.title));
-      text.appendChild(head);
-      const meta = el('p', 'hm-row-meta');
-      metaText(item).then(t => { meta.prepend(t); });
-      if (item.newCount) {
-        countOf(item.newCount).then(n => {
-          if (n > 0) meta.appendChild(el('span', 'hm-badge', n + ' new'));
-        }).catch(() => {});
+      if (g.gameNav) {
+        return getJSON('/game-nav.json').then(n => ((n[g.gameNav] || {}).pages || []).map(p => {
+          const o = (g.tiles || {})[p.link] || {};
+          return { name: o.name || p.name, sub: o.sub || g.title, link: p.link, image: o.image || g.cover, soon: p.soon };
+        }));
       }
-      text.appendChild(meta);
-      a.appendChild(text);
-      const side = el('div', 'hm-row-side');
-      side.insertAdjacentHTML('beforeend', ICON_CHEVRON.replace('<svg ', '<svg class="hm-row-go" '));
-      a.appendChild(side);
-      a.appendChild(el('span', 'hm-row-progress'));
-      a.addEventListener('mouseenter', () => showPreview(item, a));
-      a.addEventListener('focus', () => showPreview(item, a));
-      return a;
+      return Promise.resolve(g.tiles || []);
     }
 
-    // The red line under the active row is a 7s CSS timer (desktop only, paused
-    // while the pointer/focus is inside); when it ends the next row takes over.
-    list.addEventListener('animationend', e => {
-      if (!e.target.classList.contains('hm-row-progress')) return;
-      const rows = [...list.children];
-      const next = rows[(rows.indexOf(e.target.parentElement) + 1) % rows.length];
-      if (next && rowItem.has(next)) showPreview(rowItem.get(next), next);
-    });
-    const section = document.getElementById('topics');
-    if (section && 'IntersectionObserver' in window) {
-      new IntersectionObserver(es => section.classList.toggle('is-away', !es[0].isIntersecting)).observe(section);
-    }
-
-    function select(i, focus) {
-      tabs.forEach((t, j) => {
-        const on = i === j;
-        t.btn.setAttribute('aria-selected', on ? 'true' : 'false');
-        t.btn.tabIndex = on ? 0 : -1;
-      });
-      const items = tabs[i].items.slice(0, tabs[i].show || 4); // four rows per tab unless the tab sets "show"
-      list.setAttribute('aria-labelledby', tabs[i].btn.id);
-      list.replaceChildren(...items.map((it, k) => row(it, k)));
-      current = null;
-      if (items.length) showPreview(items[0], list.firstElementChild);
-      if (focus) tabs[i].btn.focus();
-    }
-
-    homeData.then(data => {
-      tabs = (data.topics || []).map((t, i) => {
-        const btn = el('button', 'hm-tab', t.tab);
-        btn.type = 'button';
-        btn.id = 'topicTab' + i;
-        btn.setAttribute('role', 'tab');
-        btn.setAttribute('aria-controls', 'topicList');
-        btn.addEventListener('click', () => select(i));
-        return { btn: btn, items: t.items || [], show: t.show };
-      });
-      if (!tabs.length) throw new Error('no topics');
-      tabsEl.replaceChildren(...tabs.map(t => t.btn));
-      // Arrow keys move between tabs (standard tablist behaviour).
-      tabsEl.addEventListener('keydown', e => {
-        const i = tabs.findIndex(t => t.btn === document.activeElement);
-        if (i < 0) return;
-        let j = null;
-        if (e.key === 'ArrowRight') j = (i + 1) % tabs.length;
-        if (e.key === 'ArrowLeft') j = (i - 1 + tabs.length) % tabs.length;
-        if (e.key === 'Home') j = 0;
-        if (e.key === 'End') j = tabs.length - 1;
-        if (j !== null) { e.preventDefault(); select(j, true); }
-      });
-      select(0);
+    homeData.then(data => Promise.all((data.featured || []).map(g => tilesOf(g).catch(() => []).then(tiles => {
+      if (!tiles.length) return null;
+      const wrap = el('div', 'ft-group');
+      const h = el('h3');
+      if (g.icon) h.appendChild(img(g.icon, 'ft-logo', 24, 24));
+      if (g.link) {
+        const a = el('a', null, g.title);
+        a.href = g.link;
+        h.appendChild(a);
+      } else h.append(g.title);
+      const grid = el('ul', 'ft-grid');
+      grid.setAttribute('aria-label', g.title);
+      grid.append(...tiles.map(tile));
+      wrap.append(h, grid);
+      if (tiles.length > 10) clamp(grid);
+      return wrap;
+    })))).then(groups => {
+      host.replaceChildren(...groups.filter(Boolean));
+      host.removeAttribute('aria-busy');
     }).catch(() => {
-      list.replaceChildren(el('p', 'hm-lede', 'Popular topics did not load. Refresh the page to try again.'));
+      host.replaceChildren(el('p', 'hm-lede', 'Featured topics did not load. Refresh the page to try again.'));
     });
   })();
 
@@ -1680,80 +1474,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
         promo.href = '/coc/town-hall-' + best.t + '/layouts';
         promo.hidden = false;
       });
-  })();
-
-  // ---------- EXPLORE ROWS: one Steam-style row per game. The Web Resources
-  // row comes from hwr-categories.json so it always matches that section.
-  (function () {
-    const host = document.getElementById('exploreRows');
-    if (!host) return;
-    const smooth = reduceMotion ? 'auto' : 'smooth';
-
-    function rail(r) {
-      const wrap = el('div', 'hm-rail');
-      const head = el('div', 'hm-rail-head');
-      if (r.icon) head.appendChild(img(r.icon, 'hm-rail-icon', 30, 30));
-      head.appendChild(el('h3', null, r.title));
-      if (r.link) {
-        const a = el('a', 'hm-link', 'See all');
-        a.href = r.link;
-        a.setAttribute('aria-label', 'See all ' + r.title);
-        a.insertAdjacentHTML('beforeend', ICON_CHEVRON.replace('<svg ', '<svg width="14" height="14" '));
-        head.appendChild(a);
-      }
-      wrap.appendChild(head);
-
-      const body = el('div', 'hm-rail-body');
-      const prev = el('button', 'hm-rail-btn is-prev');
-      const next = el('button', 'hm-rail-btn is-next');
-      prev.type = next.type = 'button';
-      prev.setAttribute('aria-label', 'Scroll ' + r.title + ' left');
-      next.setAttribute('aria-label', 'Scroll ' + r.title + ' right');
-      prev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>';
-      next.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
-      const track = el('div', 'hm-rail-track');
-      (r.tiles || []).forEach(t => {
-        const a = el('a', 'hm-tile');
-        a.href = t.link;
-        a.appendChild(img(t.image, null, 480, 300));
-        const label = el('span', 'hm-tile-label');
-        if (t.icon) label.appendChild(img(t.icon, 'hm-tile-icon', 22, 22));
-        label.appendChild(el('span', null, t.label));
-        a.appendChild(label);
-        track.appendChild(a);
-      });
-      body.append(prev, track, next);
-      wrap.appendChild(body);
-
-      // Arrows page by one screen of tiles; they dim at either end.
-      function sync() {
-        const max = track.scrollWidth - track.clientWidth;
-        prev.disabled = track.scrollLeft <= 4;
-        next.disabled = track.scrollLeft >= max - 4;
-      }
-      prev.addEventListener('click', () => track.scrollBy({ left: -track.clientWidth, behavior: smooth }));
-      next.addEventListener('click', () => track.scrollBy({ left: track.clientWidth, behavior: smooth }));
-      track.addEventListener('scroll', sync, { passive: true });
-      if (window.ResizeObserver) new ResizeObserver(sync).observe(track);
-      requestAnimationFrame(sync);
-      return wrap;
-    }
-
-    const webRow = getJSON('/hwr-categories.json').then(c => ({
-      title: 'Web Resources',
-      icon: '/icons/webicon.png',
-      link: '/web-resources/',
-      // home uses small copies of the category banners: /icons/home/<same name>.webp
-      tiles: (c.categories || []).map(x => ({ label: x.name, link: x.link, image: (x.bg || '').replace(/^\/webresources-icon\/(.+)\.\w+$/, '/icons/home/$1.webp'), icon: x.icon }))
-    })).catch(() => null);
-
-    Promise.all([homeData, webRow]).then(([data, web]) => {
-      const rows = (data.explore || []).slice();
-      if (web) rows.splice(Math.min(2, rows.length), 0, web); // after Clash of Clans and Minecraft
-      host.replaceChildren(...rows.map(rail));
-    }).catch(() => {
-      host.replaceChildren(el('p', 'hm-lede', 'The game rows did not load. Refresh the page to try again.'));
-    });
   })();
 
   // ---------- GAME GUIDES: one portrait card per sidebar.json entry with a

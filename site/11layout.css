@@ -2742,3 +2742,236 @@ controls there. */
     display: none;
   }
 }
+
+/* ============================================================
+   BOTTOM NAV + MORE SHEET (game sections)
+   ============================================================
+   CoC's bottom nav (1coclayouts.css "BOTTOM NAV + DESKTOP SUB NAV + MORE
+   MENU"), copied here so Valorant / CODM / Genshin / Tekken share one copy.
+   Scoped to <body data-game-nav> because CoC, Minecraft and Web Resources
+   still load their own copy after this file -- unscoped, any property theirs
+   doesn't set would leak in from here. Items come from game-nav.json
+   (initHubNav in 11layout.js); open/close is initGameMoreSheet. */
+[data-game-nav] .bn-bar{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  height:60px;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 6px;
+  background:rgba(15,15,16,0.72);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  border-top:1px solid rgba(255,255,255,0.06);
+  z-index:9999;
+  transform:translateY(0);
+  transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change:transform;
+}
+[data-game-nav] .bn-bar.bn-hidden{
+  transform:translateY(115%);
+  transition:transform .32s cubic-bezier(0.4, 0, 1, 1);
+}
+[data-game-nav] .bn-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  text-decoration:none;
+  color:#7d7f85;
+  font-family:'Oxanium',sans-serif;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+  transition:color .15s;
+  padding:6px 0;
+}
+[data-game-nav] .bn-item svg{ width:22px; height:22px; stroke:currentColor; transition:stroke .15s; }
+[data-game-nav] .bn-item.active,
+[data-game-nav] .bn-item:hover{ color:#ffffff; }
+
+[data-game-nav] .bn-more-wrap{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  position:relative;
+  padding:6px 0;
+}
+[data-game-nav] .bn-more-spacer{ width:22px; height:22px; }
+[data-game-nav] .bn-more{
+  position:absolute;
+  top:-22px;
+  left:50%;
+  transform:translateX(-50%);
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:1.5px solid #3a3a3e;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#232326;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.5),
+    0 0 0 4px rgba(15,15,16,0.72);
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+[data-game-nav] .bn-more:hover{ background:#28282b; border-color:#48484d; }
+[data-game-nav] .bn-more:active{ transform:translateX(-50%) scale(0.92); }
+[data-game-nav] .bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
+[data-game-nav] .bn-more-wrap.open .bn-more{ background:#2c2c30; border-color:#55555b; }
+[data-game-nav] .bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
+[data-game-nav] .bn-more-label{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+  color:#7d7f85;
+  font-family:'Oxanium',sans-serif;
+  transition:color .15s;
+}
+[data-game-nav] .bn-more-wrap.open .bn-more-label{ color:#e9e9ec; }
+
+[data-game-nav] .more-overlay{
+  position:fixed;
+  inset:0;
+  bottom:60px;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  z-index:9997;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .28s ease, visibility 0s linear .28s;
+}
+[data-game-nav] .more-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transition:opacity .28s ease, visibility 0s linear 0s;
+}
+[data-game-nav] .more-sheet{
+  width:100%;
+  max-width:600px;
+  background:#161618;
+  border:1px solid #2a2a2e;
+  border-bottom:none;
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -8px 30px rgba(0,0,0,0.5);
+  transform:translateY(100%);
+  transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height:80vh;
+}
+[data-game-nav] .more-overlay.open .more-sheet{ transform:translateY(0); }
+[data-game-nav] .more-sheet.dragging{ transition:none; }
+[data-game-nav] .more-sheet-handle{
+  width:36px; height:4px; border-radius:4px;
+  background:#3a3a3e;
+  margin:6px auto 10px;
+  position:relative;
+  touch-action:none;
+  cursor:grab;
+}
+[data-game-nav] .more-sheet-handle::before{
+  content:'';
+  position:absolute;
+  top:-14px; left:-30px; right:-30px; bottom:-14px;
+}
+[data-game-nav] .more-sheet-handle:active{ cursor:grabbing; }
+[data-game-nav] .more-sheet-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-bottom:8px;
+  border-bottom:1px solid #232326;
+}
+[data-game-nav] .more-sheet-title{
+  font-family:'Oxanium',sans-serif;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:#fff;
+  position:relative;
+  padding-left:12px;
+}
+[data-game-nav] .more-sheet-title::before{
+  content:"";
+  position:absolute;
+  left:0; top:50%;
+  transform:translateY(-50%);
+  width:4px; height:14px;
+  background:linear-gradient(180deg,#ff4655,#a3121f);
+  border-radius:2px;
+}
+[data-game-nav] .more-sheet-close{
+  width:30px; height:30px;
+  border-radius:50%;
+  background:#1f1f22;
+  border:1px solid #2a2a2e;
+  display:flex; align-items:center; justify-content:center;
+  color:#9a9ba1;
+  cursor:pointer;
+  transition:color .15s, border-color .15s, background .15s;
+}
+[data-game-nav] .more-sheet-close svg{ width:14px; height:14px; }
+[data-game-nav] .more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
+[data-game-nav] .more-list{ display:flex; flex-direction:column; padding-top:12px; }
+
+/* Sheet rows carry the page's line icon (an SVG, not an image), in the same
+   34px tile .th-mini gives an <img>. */
+[data-game-nav] .th-mini > svg:first-child{
+  width:34px;
+  height:34px;
+  padding:8px;
+  box-sizing:border-box;
+  border-radius:9px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.07);
+  color:#c8cbcd;
+  flex-shrink:0;
+}
+
+/* Pages that aren't built yet ("soon": true in game-nav.json): shown so the
+   section's plan is visible, greyed out and not clickable. */
+[data-game-nav] .is-soon{ opacity:0.4; cursor:default; pointer-events:none; }
+[data-game-nav] .gn-soon{
+  font-style:normal;
+  font-family:'Oxanium',sans-serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+  color:#949ba4;
+  flex-shrink:0;
+}
+
+html.no-scroll, html.no-scroll body{ overflow:hidden !important; height:100%; }
+[data-game-nav].search-modal-open .bn-bar{ display:none !important; }
+
+@media (max-width:970px){
+  [data-game-nav] .bn-bar{ display:flex; }
+  /* Room for the bar under the footer's last line. */
+  [data-game-nav] .pf-footer{ padding-bottom:90px; }
+  /* Bottom bar steps aside while the sidebar drawer is open (it is z-index
+     9999 against the drawer's 15). Two rules, not one list: an unsupported
+     :has() would invalidate the whole list. */
+  [data-game-nav].sidebar-open .bn-bar{ transform:translateY(115%); pointer-events:none; }
+  [data-game-nav]:has(.sidebar.active) .bn-bar{ transform:translateY(115%); pointer-events:none; }
+}
+@media (min-width:971px){
+  [data-game-nav] .bn-bar,
+  [data-game-nav] .more-overlay{ display:none !important; }
+}

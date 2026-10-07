@@ -322,14 +322,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!buildHubStrip && !buildBottomBar) return; // page has neither hub nav
 
+  // Game sections (Valorant, CODM, Genshin, Tekken) put
+  // <body data-game-nav="<key>"> on every page and read that key's entry in
+  // game-nav.json instead of hwr's hubNav: its pages fill the bar's strip,
+  // the "bottomNav": true ones the phone bar, and all of them the More sheet.
+  const gameKey = document.body && document.body.dataset.gameNav;
+
   function iconSvg(item, isActive) {
     const markup = (isActive && item.activeIcon) ? item.activeIcon : (item.icon || '');
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">${markup}</svg>`;
   }
 
+  // "soon": true = the page isn't built yet. It still shows, greyed out and
+  // not clickable (no href), so the section's plan is visible without 404s.
   function itemHtml(item, className) {
+    if (item.soon) {
+      return `<a class="${className} is-soon" aria-disabled="true" title="Coming soon">${iconSvg(item, false)}<span>${item.name}</span></a>`;
+    }
     const isActive = normalizePage(item.link) === currentPage;
     return `<a href="${item.link}" class="${className}${isActive ? ' active' : ''}">${iconSvg(item, isActive)}<span>${item.name}</span></a>`;
+  }
+
+  // More sheet rows for the game sections, in the sheet's shared .th-mini
+  // row style (11layout.css "MORE SHEET — ROWS").
+  function buildMoreSheet(items) {
+    const list = document.querySelector('#moreOverlay .more-list');
+    if (!list) return;
+    const chevron = '<svg class="th-mini-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+    list.innerHTML = '<div class="th-mini-grid">' + items.map(item => {
+      const tail = item.soon ? '<em class="gn-soon">Soon</em>' : chevron;
+      return itemHtml(item, 'th-mini').replace('</span></a>', '</span>' + tail + '</a>');
+    }).join('') + '</div>';
   }
 
   function buildHubNav(data) {
@@ -358,9 +381,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Split around the floating More button: first half before it,
       // rest after — matches the original 2 + More + 2 layout for 4 items,
       // and scales automatically if more destinations are added later.
-      const splitAt = Math.ceil(items.length / 2);
-      const before = items.slice(0, splitAt);
-      const after = items.slice(splitAt);
+      const bnItems = data.bottomNav || items;
+      const splitAt = Math.ceil(bnItems.length / 2);
+      const before = bnItems.slice(0, splitAt);
+      const after = bnItems.slice(splitAt);
 
       before.forEach(item => {
         bnMoreWrap.insertAdjacentHTML('beforebegin', itemHtml(item, 'bn-item'));
@@ -384,34 +408,158 @@ document.addEventListener('DOMContentLoaded', () => {
   // (#scMobileGroup). .secondary-content is itself a link, so the trail
   // sits beside it, not inside it (no links inside a link); CSS swaps
   // them (BREADCRUMB in 11layout.css).
-  function buildHwrCrumbs(data) {
-    if (currentPage.indexOf('/web-resources/') !== 0) return;
+  // The game sections use the same trail: "Valorant › Crosshairs".
+  function buildCrumbs(homeLink, homeName, pages) {
     const left = document.querySelector('.secondary-left');
     const title = left && left.querySelector('.secondary-content');
     if (!title || left.querySelector('.stb-crumbs')) return;
-    const pages = [].concat(data.categories || [], data.hubNav || []);
-    const here = pages.find(item => normalizePage(item.link) === currentPage);
-    const home = normalizePage('/web-resources/');
-    if (!here || normalizePage(here.link) === home) return;
+    const here = pages.find(item => !item.soon && normalizePage(item.link) === currentPage);
+    if (!here || normalizePage(here.link) === normalizePage(homeLink)) return;
     const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
     const crumbs = document.createElement('nav');
     crumbs.className = 'stb-crumbs';
     crumbs.setAttribute('aria-label', 'Breadcrumb');
     crumbs.innerHTML =
-      `<a href="/web-resources/">Web Resources</a>` +
+      `<a href="${homeLink}">${esc(homeName)}</a>` +
       `<span class="stb-crumb-sep" aria-hidden="true">›</span>` +
       `<a href="${here.link}" aria-current="page">${esc(here.name)}</a>`;
     title.after(crumbs);
     left.classList.add('has-crumbs');
   }
 
+  if (gameKey) {
+    fetch('/game-nav.json')
+      .then(res => res.json())
+      .then(all => {
+        const game = all[gameKey];
+        if (!game) return console.error('game-nav.json has no "' + gameKey + '" entry');
+        buildHubNav({ hubNav: game.pages, bottomNav: game.pages.filter(p => p.bottomNav) });
+        buildMoreSheet(game.pages);
+        buildCrumbs(game.home, game.name, game.pages);
+      })
+      .catch(err => console.error('Game nav data failed to load:', err));
+    return;
+  }
+
   fetch('/hwr-categories.json')
     .then(res => res.json())
     .then(data => {
       buildHubNav(data);
-      buildHwrCrumbs(data);
+      if (currentPage.indexOf('/web-resources/') === 0) {
+        buildCrumbs('/web-resources/', 'Web Resources', [].concat(data.categories || [], data.hubNav || []));
+      }
     })
     .catch(err => console.error('Hub nav data failed to load:', err));
+})();
+
+/* ============================================================
+   MORE SHEET OPEN / CLOSE (game sections)
+   Copied from thz-script.js (the CoC pages). Only runs on pages with
+   <body data-game-nav>: CoC, Minecraft and Web Resources still ship their
+   own copy of these functions, and two definitions would fight. Once one
+   of them adds data-game-nav and deletes its copy, it uses this one.
+   Styles: "BOTTOM NAV + MORE SHEET (game sections)" in 11layout.css.
+   ============================================================ */
+(function initGameMoreSheet() {
+  if (!document.body || !document.body.dataset.gameNav) return;
+  const overlay = document.getElementById('moreOverlay');
+  if (!overlay) return;
+
+  function lockScroll(lock) {
+    document.documentElement.classList.toggle('no-scroll', lock);
+    const cocMain = document.querySelector('.coc-main');
+    if (cocMain) cocMain.style.overflow = lock ? 'hidden' : '';
+  }
+  function setOpen(open) {
+    overlay.classList.toggle('open', open);
+    const wrap = document.getElementById('bnMoreWrap');
+    if (wrap) wrap.classList.toggle('open', open);
+    lockScroll(open);
+  }
+  // Global: the page markup calls these from onclick.
+  window.toggleMoreMenu = () => setOpen(!overlay.classList.contains('open'));
+  window.closeMoreMenu = () => setOpen(false);
+
+  overlay.addEventListener('touchmove', e => {
+    if (!e.target.closest('.more-sheet')) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) setOpen(false);
+  });
+
+  // DRAG-TO-CLOSE: dragging the handle down past ~28% of the sheet's
+  // height (or a fast flick) closes the sheet; otherwise it snaps back.
+  const sheet = overlay.querySelector('.more-sheet');
+  const handle = overlay.querySelector('.more-sheet-handle');
+  if (!sheet || !handle) return;
+  let dragging = false, startY = 0, dragY = 0, sheetHeight = 1, lastY = 0, lastT = 0, velocity = 0;
+
+  handle.addEventListener('pointerdown', e => {
+    dragging = true;
+    startY = lastY = e.clientY;
+    lastT = Date.now();
+    velocity = 0;
+    sheetHeight = sheet.getBoundingClientRect().height || 1;
+    sheet.classList.add('dragging');
+    if (handle.setPointerCapture) handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const now = Date.now();
+    if (now > lastT) velocity = (e.clientY - lastY) / (now - lastT); // px per ms
+    lastY = e.clientY;
+    lastT = now;
+    dragY = Math.max(0, e.clientY - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+    overlay.style.opacity = String(1 - Math.min(dragY / sheetHeight, 1) * 0.9);
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    sheet.classList.remove('dragging');
+    overlay.style.opacity = '';
+    if (dragY > sheetHeight * 0.28 || velocity > 0.6) {
+      // Close first, then drop the inline transform next frame so the CSS
+      // transition animates from the drag position instead of jumping.
+      setOpen(false);
+      requestAnimationFrame(() => { sheet.style.transform = ''; });
+    } else {
+      sheet.style.transform = '';
+    }
+    dragY = 0;
+  }
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+})();
+
+/* PAGE LOADER + SCROLL RESTORE (game sections) -- was pasted at the bottom
+   of every game page. Other sections still hide #page-loader from their
+   own scripts, hence the same data-game-nav gate. */
+(function initGamePageLoad() {
+  if (!document.body || !document.body.dataset.gameNav) return;
+  window.addEventListener('load', () => {
+    document.documentElement.classList.add('loaded');
+    const loader = document.getElementById('page-loader');
+    if (!loader) return;
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 400);
+  });
+
+  // Back/forward lands where you left off inside .coc-main (the desktop
+  // scroller). Same as the old per-page copy: phones scroll the window,
+  // which this does not save.
+  const cocMain = document.querySelector('.coc-main');
+  if (!cocMain) return;
+  history.scrollRestoration = 'manual';
+  const key = 'scrollPos_' + location.pathname;
+  cocMain.addEventListener('scroll', () => {
+    try { sessionStorage.setItem(key, cocMain.scrollTop); } catch (e) {}
+  }, { passive: true });
+  window.addEventListener('pageshow', () => {
+    let saved = null;
+    try { saved = sessionStorage.getItem(key); } catch (e) {}
+    if (saved) setTimeout(() => { cocMain.scrollTop = parseInt(saved, 10); }, 100);
+  });
 })();
 
 /* ============================================================
