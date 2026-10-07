@@ -1,0 +1,53 @@
+# Refreshes site/coc-lobby-stats.json (Philippines leaderboards, equipment
+# counts, dashboard numbers for /coc/stats/) once a day. Daily, not every
+# 30 min like clan-stats: rankings move slowly, each run makes ~205 API calls,
+# and every commit is a new deploy. See scripts/lobby-stats.mjs.
+#
+# Uses the same COC_API_KEY secret as clan-stats. Run it by hand any time
+# from the Actions tab ("Run workflow").
+name: Update lobby stats
+
+on:
+  schedule:
+    - cron: "17 21 * * *" # 21:17 UTC = 5:17 AM Philippines time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lobby-stats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+            site/coc-lobby-stats.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch lobby stats
+        env:
+          COC_API_KEY: ${{ secrets.COC_API_KEY }}
+        run: node scripts/lobby-stats.mjs
+
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain -- site/coc-lobby-stats.json)" ]; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/coc-lobby-stats.json
+          git commit -m "Update lobby stats"
+          git pull --rebase
+          git push
