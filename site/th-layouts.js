@@ -284,65 +284,33 @@ function cocPagePath(u) {
   }
   var currentPage = normalize(window.location.pathname);
 
-  // stb-hub-link: Home / Layouts / Armies / Guides, from primaryNav.
-  // Active when that item's own href matches the current page --
-  // on a layouts page that's Layouts. Icon set v2: the old ones
-  // (raster images, then a first inline-SVG pass) didn't read as a
-  // matched set and the old "Armies" glyph was literally half of
-  // Lucide's crossed-swords icon (one blade + hilt, no mirror), which
-  // is why it read as a stray slash instead of swords -- completed
-  // into the real two-sword icon here. Same set as #bottomNav below.
-  var HUB_ICONS = {
-    home: {
-      outline:
-        '<path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      fill: '<defs><mask id="hubHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#hubHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/>',
-    },
-    // Icon set v5 (two-tone): Home = a house (was a castle with a flag until
-    // Oct 2026 -- it read as "fort", not "home"),
-    // Layouts = a folded map, Armies = crossed swords, Guides = a light bulb
-    // (tips), all at a 1.8 line weight. Active = filled in two tones: the
-    // main part solid white, a secondary part at 55% (reads as light grey) --
-    // the castle's keep, the map's outer panels, the back sword, the bulb's
-    // glass. Grey pieces sit in <g opacity> so overlapping bits don't
-    // double up. Pieces meant to be fill-only carry stroke="none" because
-    // the nav CSS strokes the whole <svg>. Same paths as #bottomNav below;
-    // change both together.
-    layouts: {
-      outline:
-        '<path d="M3 6.5L9 3.5l6 3 6-3v14l-6 3-6-3-6 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3.5v14M15 6.5v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      fill: '<g opacity="0.55"><path d="M3 6.5L7.6 4.2V18.2L3 20.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.4 5.8L21 3.5V17.5L16.4 19.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M10.4 4.2L13.6 5.8V19.8L10.4 18.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-    },
-    armies: {
-      outline:
-        '<path d="M14.5 17.5L3 6V3h3l11.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      fill: '<g opacity="0.55"><path d="M14.5 6.5L18 3h3v3l-3.5 3.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4M7 17l-3 3M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M14.5 17.5L3 6V3h3l11.5 11.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-    },
-    guides: {
-      outline:
-        '<path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="3.2" y="7.4" width="17.6" height="12.6" rx="1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.2 12.6h6.3M14.5 12.6h6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.5" y="11.1" width="5" height="3.1" rx="0.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      fill: '<path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 7.4h14a1.8 1.8 0 0 1 1.8 1.8v2.2H3.2V9.2A1.8 1.8 0 0 1 5 7.4Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/><path d="M3.2 14h17.6v4.2a1.8 1.8 0 0 1-1.8 1.8H5a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.6" y="11" width="4.8" height="4" rx="0.8" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-    },
-  };
+  // Nav pictures (Oct 2026): the Lobby tower, this TH's Town Hall /
+  // barracks (TH18's off the Town Hall pages) and the Tools anvil, in the
+  // top bar and on the Layouts / Army / Tools tabs under the hero -- grey
+  // at rest, colour on the page you're on (.coc-nav-pic, coc-hub-menus.css).
+  // Paths come from coc-nav-data.json (fetched below); every CoC #bottomNav
+  // and /coc/'s inline copy use the same pictures.
+  var navPics = null;
+  function pic(key, cls) {
+    return '<img class="coc-nav-pic ' + cls + '" src="' + navPics[key] + '" alt="" aria-hidden="true">';
+  }
 
-  // The same icons go on the Layouts / Army / Guides tabs under the hero.
-  // thz-script.js builds those buttons after its own fetch, then fires
-  // parchome:coc-nav-ready -- so decorate on that event (and once now, in
-  // case they already exist). Matched by label; skipped if already done.
+  // thz-script.js builds the hero tabs after its own fetch, then fires
+  // parchome:coc-nav-ready -- so decorate on that event and again once the
+  // pictures are known. Matched by label; skipped if already done.
+  // The first layer has its own Layouts / Army pictures (Oct 2026, Adrian's
+  // pick: Supercell Fan Kit layout-editor house + lab-style building),
+  // the same on every page; Tools keeps the shared anvil. The top bar and
+  // bottom nav still show each TH's own Town Hall / barracks.
+  var FL_PICS = { layouts: '/icons/coc-nav/layouts-fl.webp', armies: '/icons/coc-nav/armies-fl.webp' };
   function iconFirstLayer() {
     var keyFor = { Layouts: 'layouts', Army: 'armies', Tools: 'guides' };
+    if (!navPics) return;
     document.querySelectorAll('.first-layer button').forEach(function (btn) {
-      var icon = HUB_ICONS[keyFor[btn.textContent.trim()]];
-      if (!icon || btn.querySelector('.fl-ico')) return;
-      btn.insertAdjacentHTML(
-        'afterbegin',
-        '<svg class="fl-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          icon.outline +
-          '</svg>' +
-          '<svg class="fl-ico-fill" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-          icon.fill +
-          '</svg>',
-      );
+      var key = keyFor[btn.textContent.trim()];
+      if (!key || btn.querySelector('.coc-nav-pic')) return;
+      var src = FL_PICS[key] || navPics[key];
+      btn.insertAdjacentHTML('afterbegin', '<img class="coc-nav-pic fl-pic" src="' + src + '" alt="" aria-hidden="true">');
     });
   }
   document.addEventListener('parchome:coc-nav-ready', iconFirstLayer);
@@ -450,11 +418,17 @@ function cocPagePath(u) {
           return (t.activeOn || []).map(normalize).indexOf(currentPage) !== -1;
         });
         var hrefFor = { layouts: th && th.layoutHref, armies: th && th.armyHref };
+        navPics = {
+          home: data.primaryNav.home.icon,
+          layouts: th ? th.navIcon : data.primaryNav.layouts.icon,
+          armies: th ? th.navArmyIcon : data.primaryNav.armies.icon,
+          guides: data.primaryNav.guides.icon,
+        };
+        iconFirstLayer();
         hubScroll.innerHTML = order
           .map(function (key) {
             var item = data.primaryNav[key];
-            var icon = HUB_ICONS[key];
-            if (!item || !icon) return '';
+            if (!item) return '';
             var href = hrefFor[key] || item.href;
             // Guides stays lit on all four guides pages, not just the first.
             var isActive = normalize(href) === currentPage || (key === 'guides' && !!guide);
@@ -466,12 +440,7 @@ function cocPagePath(u) {
               '" class="stb-hub-link' +
               (isActive ? ' active' : '') +
               '">' +
-              '<svg class="hub-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-              icon.outline +
-              '</svg>' +
-              '<svg class="hub-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-              icon.fill +
-              '</svg>' +
+              pic(key, 'hub-pic') +
               '<span>' +
               item.label +
               '</span></a>'

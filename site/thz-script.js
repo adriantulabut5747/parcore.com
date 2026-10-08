@@ -230,7 +230,7 @@ if (ascendereTag) {
   });
 }
 
-// Top-bar search modal (herosearch.json fetch, shuffleArray,
+// Top-bar search modal (data load, shuffleArray,
 // renderHeroSearchCard, searchItems, openSearch/closeSearch/toggleSearch,
 // and the DOMContentLoaded init) moved to 11layout.js.
 
@@ -859,10 +859,12 @@ if (document.readyState === 'loading') {
       guides: nav.guides.href,
     };
 
+    // Nav pictures (Oct 2026): this TH's Town Hall / barracks, TH18's off
+    // the Town Hall pages. Small 96px copies in /icons/coc-nav/.
     var iconMap = {
       home: nav.home.icon,
-      layouts: th ? th.layoutIcon : nav.layouts.icon,
-      armies: th ? th.armyIcon : nav.armies.icon,
+      layouts: th ? th.navIcon : nav.layouts.icon,
+      armies: th ? th.navArmyIcon : nav.armies.icon,
       guides: nav.guides.icon,
     };
 

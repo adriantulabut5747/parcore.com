@@ -1,0 +1,544 @@
+/* Articles section (/articles/…): page shell + the hub header + the article
+   reading layout. Cards and feed rows live in article-cards.css (shared with
+   /coc/'s strip). Chrome (sidebar, bars, bottom nav) is 11layout's, switched
+   on by <body data-game-nav="articles"> + game-nav.json "articles". */
+
+/* ---- Shell (same as the game sections' pages) ---- */
+:root {
+  --bg-main: #202225;
+  --bg-tertiary: #0f0f10;
+  --bg-sidebar: #0f0f10;
+  --bg-hover: #202122;
+  --bg-box: #161616;
+  --bg-box-active: #303135;
+  --accent: #c22d2d;
+  --text-main: #eff2f5;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+}
+html { visibility: hidden; }
+html.loaded { visibility: visible; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Oxanium', sans-serif; }
+* { scrollbar-width: thin; scrollbar-color: #2f3136 #121318; }
+body { height: 100vh; background: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; overflow: hidden; }
+.main { margin-top: 0; }
+.coc-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-top: var(--topbar-height, 52px);
+  background: #141517;
+}
+@media (min-width: 971px) {
+  .sidebar { margin-top: var(--topbar-height, 40px); }
+}
+@media (max-width: 970px) {
+  body { overflow: auto; height: auto; }
+}
+/* Phone title: "Articles › CoC › Hammer Jam" (desktop shows the full
+   breadcrumb there instead). */
+.sc-sep { margin: 0 6px; color: #6d7178; }
+/* Phone trail is tappable too: earlier steps are links, the current page
+   is plain text. Padding makes the small links easier to hit. */
+.secondary-content a { color: #a9adb3; text-decoration: none; padding: 6px 0; }
+.secondary-content a:active,
+.secondary-content a:hover { color: #fff; }
+.secondary-content [aria-current] { color: #eef0f3; }
+.secondary-content { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* Phones: table of contents button at the bar's right end + its dropdown
+   (filled and scroll-spied by article-cards.js). Desktop has the sticky
+   column instead. */
+.ap-toc-btn { display: none; }
+.ap-toc-menu[hidden] { display: none; }
+@media (max-width: 970px) {
+  .ap-toc-btn {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #d4d7db;
+    cursor: pointer;
+  }
+  .ap-toc-btn svg { width: 18px; height: 18px; }
+  .ap-toc-btn[aria-expanded='true'] { color: #fff; border-color: rgba(194, 59, 59, 0.75); background: rgba(194, 59, 59, 0.18); }
+  .ap-toc-menu {
+    position: absolute; /* hangs from the (fixed) secondary bar */
+    top: calc(100% + 6px);
+    right: 10px;
+    width: min(320px, calc(100vw - 20px));
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 14px 14px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: #1a1b1f;
+    box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.85);
+    z-index: 50;
+  }
+  .ap-toc-menu-label {
+    margin: 0 0 10px 2px;
+    font: 800 10px/1 'Oxanium', sans-serif;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #7a7d82;
+  }
+  .ap-toc-menu ol { list-style: none; border-left: 1px solid rgba(255, 255, 255, 0.1); }
+  .ap-toc-menu a {
+    display: block;
+    margin-left: -1px;
+    padding: 9px 0 9px 14px;
+    border-left: 2px solid transparent;
+    font: 500 14px/1.4 'Sora', sans-serif;
+    color: #a9adb3;
+    text-decoration: none;
+  }
+  .ap-toc-menu a.is-current { color: #fff; border-left-color: #c23b3b; }
+}
+
+::selection { background: rgba(194, 59, 59, 0.45); color: #fff; }
+
+/* ---- Hub (/articles/, /articles/coc/) ---- */
+.ah {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 104px 24px 80px; /* 48px is the bar (see --topbar-height) */
+}
+.ah-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.ah-title {
+  font: 900 clamp(24px, 3vw, 34px) / 1.1 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.ah-sub {
+  margin-top: 8px;
+  font: 400 13px/1.4 'Sora', sans-serif;
+  color: #8b9097;
+}
+.ah-search {
+  position: relative;
+  flex: 0 1 300px;
+}
+.ah-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: #7a7d82;
+  pointer-events: none;
+}
+.ah-search input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 36px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: #1b1c20;
+  color: #fff;
+  font: 400 14px 'Sora', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.ah-search input::placeholder { color: #7a7d82; }
+.ah-search input:focus { border-color: rgba(194, 59, 59, 0.7); }
+/* Game filter (/articles/ only): one chip per game that has articles. */
+.ah-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.ah-filters button {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: #1b1c20;
+  color: #a9adb3;
+  font: 600 13px 'Sora', sans-serif;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.ah-filters button:hover { color: #fff; border-color: rgba(255, 255, 255, 0.22); }
+.ah-filters button[aria-pressed='true'] {
+  color: #fff;
+  border-color: rgba(194, 59, 59, 0.75);
+  background: rgba(194, 59, 59, 0.16);
+}
+.ah-filters button:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
+.ah-filters span { margin-left: 6px; color: #7a7d82; font-weight: 500; }
+
+.ah-empty {
+  padding: 40px 0;
+  font: 400 14px 'Sora', sans-serif;
+  color: #8b9097;
+}
+@media (max-width: 970px) {
+  .ah { padding: 66px 5% 96px; } /* clears the 38px secondary bar */
+  .ah-head { flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 18px; }
+  .ah-search { flex-basis: auto; }
+  .ah-search input { font-size: 16px; } /* 16px stops iOS zooming in on focus */
+}
+
+/* ---- Article page (/articles/<game>/<slug>) ----
+   Desktop: reading column (~700px) on the left, contents column on the
+   right (sticky, Adrian's pick). Phones: one column, contents as a
+   collapsible box. The breadcrumb lives in the secondary top bar. */
+.ap {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 88px 24px 96px; /* 48px is the bar (see --topbar-height) */
+  display: grid;
+  grid-template-columns: minmax(0, 700px) 220px;
+  justify-content: center;
+  column-gap: 56px;
+}
+
+.ap-toc {
+  grid-column: 2;
+  grid-row: 2 / span 3;
+  align-self: start;
+  position: sticky;
+  top: 88px; /* below the 64px bar (.coc-main scrolls under it) */
+}
+.ap-toc summary {
+  display: none;
+  list-style: none;
+}
+.ap-toc summary::-webkit-details-marker { display: none; }
+.ap-toc-label {
+  margin-bottom: 12px;
+  font: 800 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #7a7d82;
+}
+.ap-toc ol {
+  list-style: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+.ap-toc a {
+  display: block;
+  margin-left: -1px;
+  padding: 7px 0 7px 14px;
+  border-left: 2px solid transparent;
+  font: 500 13px/1.4 'Sora', sans-serif;
+  color: #8b9097;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.ap-toc a:hover { color: #fff; }
+/* Scroll-spy (article-cards.js): the section you're reading. */
+.ap-toc a.is-current { color: #fff; border-left-color: #c23b3b; }
+
+.ap-header, .ap-body, .ap-more { grid-column: 1; min-width: 0; }
+/* Header, Minecraft.net style: a wide banner over both columns with the
+   category tag sitting on its bottom edge, then the author block (avatar +
+   "Written by / Published") beside the title. Phones: banner edge to edge,
+   author block centred above a centred title. */
+.ap-banner {
+  grid-column: 1 / -1;
+  position: relative;
+  margin-bottom: 44px;
+}
+.ap-banner img {
+  display: block;
+  width: 100%;
+  height: auto; /* the width/height attributes would otherwise win over aspect-ratio */
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #0c0d0f;
+}
+.ap-tag {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  padding: 7px 12px;
+  border-radius: 3px;
+  background: #fff;
+  color: #111214;
+  font: 800 12px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.7);
+}
+.ap-header {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.ap-author {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+.ap-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px #141517, 0 0 0 3px rgba(255, 255, 255, 0.14), 0 10px 24px -10px rgba(0, 0, 0, 0.8);
+}
+.ap-author dl, .ap-author dl * { font-family: 'Sora', sans-serif; }
+.ap-author dt { font-size: 11px; font-weight: 600; color: #8b9097; }
+.ap-author dd { font-size: 14px; font-weight: 650; color: #fff; }
+.ap-author dd + dt { margin-top: 8px; }
+.ap-header h1 {
+  font: 700 clamp(26px, 3vw, 36px) / 1.2 'Sora', sans-serif;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-wrap: balance;
+}
+.ap-dek {
+  margin-top: 12px;
+  font: 400 18px/1.5 'Sora', sans-serif;
+  color: #a9adb3;
+}
+.ap-read {
+  margin-top: 12px;
+  font: 500 13px/1.4 'Sora', sans-serif;
+  color: #8b9097;
+}
+
+/* Body copy */
+.ap-body { font-family: 'Sora', sans-serif; color: #d4d7db; }
+.ap-body * { font-family: inherit; }
+.ap-body > * + * { margin-top: 18px; }
+.ap-body p, .ap-body li { font-size: 17px; line-height: 1.75; }
+.ap-body h2 {
+  margin-top: 52px;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: #fff;
+  scroll-margin-top: 96px;
+}
+.ap-body h3 {
+  margin-top: 32px;
+  font-size: 19px;
+  font-weight: 650;
+  color: #fff;
+}
+.ap-body strong { color: #fff; font-weight: 650; }
+.ap-body a {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(224, 96, 95, 0.7);
+  text-underline-offset: 3px;
+}
+.ap-body a:hover { text-decoration-color: #e0605f; }
+.ap-body ul, .ap-body ol { padding-left: 22px; }
+.ap-body li + li { margin-top: 8px; }
+.ap-body li::marker { color: #e0605f; }
+
+/* Section pictures (16:9, same frame as the hero). */
+/* Real screenshots show whole at their own shape (no crop: a 16:9 frame
+   cut off the League Shop prices); width/height attributes keep the space
+   reserved while they load. */
+.ap-fig img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  background: #0c0d0f;
+}
+/* Caption: one line saying what the photo shows (every body photo has one). */
+.ap-body .ap-fig figcaption {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8b9097;
+  text-align: center;
+}
+
+/* Tables: scroll sideways on phones instead of squashing. */
+.ap-table { overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+.ap-table table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.ap-table th, .ap-table td { padding: 12px 16px; text-align: left; vertical-align: top; line-height: 1.5; }
+.ap-table th {
+  font: 800 11px/1.2 'Oxanium', sans-serif;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #8b9097;
+  background: #1a1b1f;
+}
+.ap-table tr + tr td { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.ap-yes { color: #6fcf8a; font-weight: 650; white-space: nowrap; }
+.ap-no { color: #e0605f; font-weight: 650; white-space: nowrap; }
+
+/* Callout ("Key point") */
+.ap-note {
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: #1b1c20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.ap-note > b {
+  display: block;
+  margin-bottom: 6px;
+  font: 800 11px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #e0605f;
+}
+.ap-note p { font-size: 16px; }
+
+/* Summary card: every takeaway in one place, at the end of each article
+   (after the last section, before "More for <game>"). */
+.ap-summary {
+  scroll-margin-top: 96px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(194, 59, 59, 0.35);
+  background: linear-gradient(180deg, rgba(194, 59, 59, 0.1), rgba(194, 59, 59, 0.03)), #18191c;
+}
+.ap-summary > b {
+  display: block;
+  margin-bottom: 10px;
+  font: 800 12px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #e0605f;
+}
+.ap-body .ap-summary { margin-top: 40px; }
+.ap-body .ap-summary li { font-size: 15px; line-height: 1.6; }
+.ap-body .ap-summary li + li { margin-top: 6px; }
+
+/* Tool links carry the tool's icon (Adrian's rule: it draws the eye). */
+.ap-body a.ap-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 8px 1px 3px;
+  border-radius: 7px;
+  background: rgba(194, 59, 59, 0.12);
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+.ap-body a.ap-tool:hover { background: rgba(194, 59, 59, 0.24); }
+.ap-tool img { width: 20px; height: 20px; object-fit: contain; }
+
+/* "More for <game>": links into the game's own pages and tools. */
+.ap-more { margin-top: 64px; padding-top: 28px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.ap-more h2 {
+  font: 800 12px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8b9097;
+}
+.ap-more-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.ap-more-list a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1a1b1f;
+  color: #fff;
+  text-decoration: none;
+  font: 650 15px/1.3 'Sora', sans-serif;
+  transition: border-color 0.2s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ap-more-list a span { font: 400 13px/1.4 'Sora', sans-serif; color: #8b9097; }
+.ap-more-list a img { width: 36px; height: 36px; object-fit: contain; margin-bottom: 6px; }
+.ap-more-list a:hover { border-color: rgba(194, 59, 59, 0.6); transform: translateY(-2px); }
+
+@media (max-width: 970px) {
+  .ap { display: block; padding: 38px 5% 104px; } /* banner sits flush under the 38px secondary bar */
+  /* Edge to edge: cancel .ap's 5% side padding (5% of the page = 5.5556%
+     of .ap's content box). */
+  .ap-banner { margin: 0 -5.5556% 36px; }
+  .ap-banner img { aspect-ratio: 2 / 1; border-radius: 0; }
+  .ap-tag { font-size: 11px; padding: 6px 10px; }
+  .ap-header { display: block; text-align: center; }
+  .ap-author { flex-direction: row; justify-content: center; gap: 22px; margin-bottom: 22px; }
+  .ap-avatar { width: 84px; height: 84px; }
+  .ap-header h1 { font-size: 26px; }
+  .ap-toc {
+    position: static;
+    margin: 24px 0 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: #1a1b1f;
+  }
+  .ap-toc summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    font: 600 14px 'Sora', sans-serif;
+    color: #fff;
+    cursor: pointer;
+  }
+  .ap-toc summary::after { content: '+'; font-size: 18px; color: #8b9097; }
+  .ap-toc[open] summary::after { content: '−'; }
+  .ap-toc-label { display: none; }
+  .ap-toc ol { margin: 0 16px 12px; }
+  .ap-dek { font-size: 16px; }
+  .ap-body p, .ap-body li { font-size: 16px; }
+  .ap-body h2 { font-size: 21px; margin-top: 40px; }
+  .ap-more-list { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ap-more-list a { transition: none; }
+}
+
+/* Town Hall headings in the upgrade-order article: the TH picture before the text. */
+.ap-body h2.ap-th-h { display: flex; align-items: center; gap: 10px; }
+.ap-th-h img { width: 40px; height: 40px; flex: none; }
+
+/* Breadcrumb in the secondary bar: Sora, not the page's Oxanium (Adrian's pick).
+   Needed because "* { font-family: Oxanium }" above beats the inherited Sora. */
+.secondary-top-bar .secondary-content,
+.secondary-top-bar .secondary-content *,
+.secondary-top-bar .stb-crumbs,
+.secondary-top-bar .stb-crumbs * { font-family: 'Sora', sans-serif; }
+
+/* Stat tables (crafted defenses): tighter rows, numbers don't wrap, a bold
+   total row at the bottom. */
+.ap-stats table { font-size: 14px; }
+.ap-stats th, .ap-stats td { padding: 9px 12px; white-space: nowrap; }
+.ap-stats .ap-total td { font-weight: 700; color: #eef0f3; background: rgba(255, 255, 255, 0.03); }
+
+/* A building's looks side by side (level forms, melt stages). */
+.ap-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.ap-forms > div { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px 12px; border-radius: 12px; background: #16171b; }
+.ap-forms img { width: 100%; max-width: 120px; height: 110px; object-fit: contain; }
+.ap-forms span { font-size: 12.5px; color: #8b9097; text-align: center; }
+
+/* A small building render (not a full-width screenshot). */
+.ap-fig-sm img { max-width: 220px; margin: 0 auto; background: none; }
+
+/* Game-icon chips (unit library pictures next to the text that names them). */
+.ap-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ap-chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 999px; background: #16171b; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 14px; font-weight: 600; color: #e6e8eb; }
+.ap-chip img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+
+/* A defense name with its picture inside a table cell. */
+.ap-def { white-space: nowrap; font-weight: 650; color: #fff; }
+.ap-def img { width: 40px; height: 40px; object-fit: contain; vertical-align: middle; margin-right: 10px; }

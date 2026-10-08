@@ -125,9 +125,13 @@ function buildSidebarFromJSON(data) {
     const a = document.createElement('a');
     a.href = item.link;
     a.className = 'top-box-item';
+    // activePrefix works like the games' one below ("/articles/" lights up
+    // on every article page).
+    const prefix = item.activePrefix && normalizePage(item.activePrefix);
     const isActive =
       normalizePage(item.link) === currentPage ||
-      item.activeOn?.map(normalizePage).includes(currentPage);
+      item.activeOn?.map(normalizePage).includes(currentPage) ||
+      (prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/')));
     if (isActive) {
       a.classList.add('active'); }
     a.innerHTML = `
@@ -136,16 +140,16 @@ function buildSidebarFromJSON(data) {
       <span>${item.name}</span>`;
     topBox.appendChild(a);});
 
-  // TOP GAMES
-  data.games.forEach(game => {
+  // TOP GAMES (the upcoming mobile games from sidebar.json go last; no link yet)
+  data.games.concat(data.upcoming || []).forEach(game => {
     const a = document.createElement('a');
-    a.href = game.link;
+    a.href = game.link || "#";
     a.className = 'game';
     // activePrefix: the whole section ("/coc/" lights up on /coc/ and every
     // page under it), so new pages don't need adding to a list.
     const prefix = game.activePrefix && normalizePage(game.activePrefix);
     if (
-      normalizePage(game.link) === currentPage ||
+      (game.link && normalizePage(game.link) === currentPage) ||
       (game.activeOn?.map(normalizePage).includes(currentPage)) ||
       (prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/')))) {
       a.classList.add('active');}
@@ -169,8 +173,8 @@ function buildSidebarFromJSON(data) {
     }
   }
 
-  // TRIPLE A GAMES (the upcoming mobile games from sidebar.json go first)
-  (data.upcoming || []).concat(data.tripleA).forEach(game => {
+  // TRIPLE A GAMES
+  data.tripleA.forEach(game => {
     const a = document.createElement('a');
     a.href = game.link || "#";
     a.className = 'triple-a-game';
@@ -278,6 +282,19 @@ function handleDesktopSidebar() {
 document.addEventListener('DOMContentLoaded', handleDesktopSidebar);
 window.addEventListener('resize', handleDesktopSidebar);
 
+// The fixed bars stop --scrollbar-w short of the right edge so they don't
+// cover .coc-main's scrollbar (11layout.css "FIXED BARS vs THE SCROLLBAR").
+// The CSS default is 10px, but overlay scrollbars (Windows 11 / Chrome's
+// thin floating ones, macOS, phones) take no width at all -- the bars then
+// stopped 10px short for nothing and left a gap. Measure the real width.
+function syncScrollbarWidth() {
+  const main = document.querySelector('.coc-main');
+  if (!main) return;
+  document.documentElement.style.setProperty('--scrollbar-w', Math.max(0, main.offsetWidth - main.clientWidth) + 'px');
+}
+document.addEventListener('DOMContentLoaded', syncScrollbarWidth);
+window.addEventListener('resize', syncScrollbarWidth);
+
 // Triple-a list starts open
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('.triple-a-header');
@@ -329,6 +346,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const gameKey = document.body && document.body.dataset.gameNav;
 
   function iconSvg(item, isActive) {
+    // "img": a picture (game icons) instead of an SVG. Pictures can't swap
+    // outline/filled, so .gn-pic is greyed at rest and in colour when its
+    // entry is active (11layout.css, same idea as CoC's .coc-nav-pic).
+    if (item.img) return `<img class="gn-pic" src="${item.img}" alt="" decoding="async">`;
     const markup = (isActive && item.activeIcon) ? item.activeIcon : (item.icon || '');
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">${markup}</svg>`;
   }
@@ -339,7 +360,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (item.soon) {
       return `<a class="${className} is-soon" aria-disabled="true" title="Coming soon">${iconSvg(item, false)}<span>${item.name}</span></a>`;
     }
-    const isActive = normalizePage(item.link) === currentPage;
+    // activePrefix: lit on every page under that folder (Articles' "Clash of
+    // Clans" stays lit while reading /articles/coc/<slug>). noActive: never
+    // lit (Articles' "Search" points at the feed, like "All").
+    const prefix = item.activePrefix && normalizePage(item.activePrefix);
+    const isActive = !item.noActive && (normalizePage(item.link) === currentPage ||
+      (item.activeOn || []).some(l => normalizePage(l) === currentPage) ||
+      !!(prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/'))));
     return `<a href="${item.link}" class="${className}${isActive ? ' active' : ''}">${iconSvg(item, isActive)}<span>${item.name}</span></a>`;
   }
 
@@ -356,10 +383,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildHubNav(data) {
-    const items = (data && data.hubNav) || [];
+    let items = (data && data.hubNav) || [];
     if (!items.length) return;
+    // Web Resources: "Resources" (the hub home) stays lit on every category
+    // page too, since the categories sit under it (its menu lists them).
+    const cats = (!gameKey && data.categories) || [];
+    if (cats.length) {
+      items = items.map(it => normalizePage(it.link) === normalizePage('/web-resources/')
+        ? Object.assign({}, it, { activeOn: cats.map(c => c.link) }) : it);
+    }
 
-    if (stbHubNav) {
+    // Only strips that aren't self-managed (Minecraft fills its own with its
+    // editions; it only lets this build its bottom bar).
+    if (buildHubStrip) {
       // Every hwr page's hub nav is now the same three-part structure:
       // left arrow + #stbHubNavScroll strip + right arrow. Fill the strip,
       // never the <nav> itself, or the arrows get wiped out with the old
@@ -371,6 +407,24 @@ document.addEventListener('DOMContentLoaded', () => {
       // Arrow visibility depends on scrollWidth, which isn't known until
       // the links above actually exist — re-measure now that they do.
       if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
+
+      // Web Resources menu: hovering "Resources" lists the categories, and
+      // hovering a category lists that page's sections (its table of
+      // contents from hwr-categories.json "sections"), each linking to the
+      // section's #toc-<id> anchor.
+      if (cats.length && window.stbHubMenus) {
+        const secs = data.sections || {};
+        window.stbHubMenus(hubStrip, {
+          keyOf: link => (normalizePage(link.getAttribute('href')) === normalizePage('/web-resources/') ? 'resources' : ''),
+          labels: { resources: 'Resources' },
+          lists: {
+            resources: cats.map(c => ({
+              href: c.link, icon: c.icon, name: c.name,
+              children: (secs[c.link] || []).map(sec => ({ href: c.link + '#toc-' + sec.id, svg: sec.icon, name: sec.title }))
+            }))
+          }
+        });
+      }
     }
 
     if (buildBottomBar) {
@@ -434,7 +488,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const game = all[gameKey];
         if (!game) return console.error('game-nav.json has no "' + gameKey + '" entry');
         buildHubNav({ hubNav: game.pages, bottomNav: game.pages.filter(p => p.bottomNav) });
-        buildMoreSheet(game.pages);
+        // "more": a section can give the sheet its own list (Articles lists
+        // the featured games) instead of repeating its pages.
+        buildMoreSheet(game.more || game.pages);
         buildCrumbs(game.home, game.name, game.pages);
       })
       .catch(err => console.error('Game nav data failed to load:', err));
@@ -595,7 +651,8 @@ document.addEventListener('click', () => {
 
 /* ============================================================
    TOP-BAR SEARCH MODAL — SHARED
-   Uses herosearch.json and renders fg-card style result boxes.
+   Searches the home page's Featured Topics (loadFeaturedGroups below)
+   and renders .ft-tile result tiles.
    Requires #search-btn, #search-icon, #search-overlay,
    #search-input, #search-input-clear, #search-results,
    #search-view-more, and .coc-main on the page.
@@ -610,10 +667,43 @@ let topSearchCurrentMatches = [];
 let searchoverlay, searchinput, searchIcon, resultsContainer, topSearchViewMoreBtn, searchInputClearBtn;
 let searchScrollObserver = null;
 
-fetch('/herosearch.json')
-  .then(res => res.json())
-  .then(data => {
-    topSearchItems = data;
+// ---- Featured Topics data: the home page's tile groups AND the search
+// index. home.json "featured" lists the groups; a group either lists its
+// tiles or pulls them from hwr-categories.json ("from": "hwr") or
+// game-nav.json ("gameNav": key). Edit those files, not this code.
+// (404.html has a short copy of this for its "Find a page" box.)
+const featuredJSON = {};
+function getFeaturedJSON(url) {
+  if (!featuredJSON[url]) featuredJSON[url] = fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
+  return featuredJSON[url];
+}
+function featuredTilesOf(g) {
+  if (g.from === 'hwr') {
+    return getFeaturedJSON('/hwr-categories.json').then(c => (c.categories || []).map(x => ({
+      name: x.name, sub: 'Web Resources', link: x.link,
+      // home uses small copies of the category banners: /icons/home/<same name>.webp
+      image: (x.bg || '').replace(/^\/webresources-icon\/(.+)\.\w+$/, '/icons/home/$1.webp')
+    })));
+  }
+  if (g.gameNav) {
+    return getFeaturedJSON('/game-nav.json').then(n => ((n[g.gameNav] || {}).pages || []).map(p => {
+      const o = (g.tiles || {})[p.link] || {};
+      return { name: o.name || p.name, sub: o.sub || g.title, link: p.link, image: o.image || g.cover, soon: p.soon };
+    }));
+  }
+  return Promise.resolve(g.tiles || []);
+}
+// -> Promise of [{ title, link, icon, tiles: [...] }], groups in page order.
+function loadFeaturedGroups() {
+  return getFeaturedJSON('/home.json').then(d => Promise.all((d.featured || []).map(g =>
+    featuredTilesOf(g).catch(() => []).then(tiles => Object.assign({}, g, { tiles: tiles }))
+  )));
+}
+
+// Search index = every Featured Topics tile, with its group's logo and name.
+loadFeaturedGroups()
+  .then(groups => {
+    topSearchItems = [].concat(...groups.map(g => g.tiles.map(t => Object.assign({}, t, { icon: g.icon, group: g.title }))));
     topSearchIsLoaded = true;
   })
   .catch(err => console.error('Top-bar search data failed to load:', err));
@@ -628,24 +718,32 @@ function shuffleArray(array) {
   return copy;
 }
 
-// Renders a single result as an fg-card — same box design used by
-// Popular Topics / /'s hero search results.
+// Renders a single result as a .ft-tile -- the same tile as the home page's
+// Featured Topics, with the game's logo before the name.
 function renderHeroSearchCard(item) {
-  const a = document.createElement('a');
-  a.href = item.link || '#';
-  a.className = 'fg-card';
-
-  a.innerHTML = `
-    <div class="fg-img-wrap">
-      <img src="${item.image}" class="fg-img">
-      <div class="fg-img-shade"></div>
-      <div class="fg-icon-badge"><img src="${item.icon}" alt=""></div>
-    </div>
-    <div class="fg-info">
-      <h3 class="fg-title">${item.name}</h3>
-      <p class="fg-sub">${item.sub}</p>
-    </div>
-  `;
+  const a = document.createElement(item.soon ? 'div' : 'a');
+  if (!item.soon) a.href = item.link || '#';
+  a.className = item.soon ? 'ft-tile ft-soon' : 'ft-tile';
+  const art = document.createElement('img');
+  art.className = 'ft-art';
+  art.src = item.image;
+  art.alt = '';
+  art.loading = 'lazy';
+  art.decoding = 'async';
+  const name = document.createElement('span');
+  name.className = 'ft-name';
+  if (item.icon) {
+    const logo = document.createElement('img');
+    logo.className = 'ft-name-logo';
+    logo.src = item.icon;
+    logo.alt = '';
+    name.appendChild(logo);
+  }
+  name.append(item.name || '');
+  const sub = document.createElement('span');
+  sub.className = 'ft-sub';
+  sub.textContent = item.soon ? 'Coming soon' : item.sub || '';
+  a.append(art, name, sub);
   return a;
 }
 
@@ -663,8 +761,11 @@ function renderTopSearchVisible() {
   const hasMore = topSearchCurrentMatches.length > topSearchVisibleCount;
   topSearchViewMoreBtn.style.display = hasMore ? 'block' : 'none';
   if (searchScrollObserver) {
+    // Re-observe after every render: observe() reports the current state once,
+    // so if the sentinel is still on screen (short tiles) the next batch loads.
+    // Watching it continuously would only fire when visibility changes.
+    searchScrollObserver.unobserve(topSearchViewMoreBtn);
     if (hasMore) searchScrollObserver.observe(topSearchViewMoreBtn);
-    else searchScrollObserver.unobserve(topSearchViewMoreBtn);
   }
 }
 
@@ -684,7 +785,7 @@ function searchItems() {
     topSearchCurrentMatches = topSearchItems.filter(item => {
       if (item.name && item.name.toLowerCase().includes(query)) return true;
       if (item.sub && item.sub.toLowerCase().includes(query)) return true;
-      if (item.keywords && item.keywords.some(k => k.toLowerCase().includes(query))) return true;
+      if (item.group && item.group.toLowerCase().includes(query)) return true; // "minecraft" finds every Minecraft tile
       return false;
     });
   }
@@ -755,6 +856,15 @@ window.addEventListener('popstate', () => {
 
 document.addEventListener('DOMContentLoaded', function () {
   searchoverlay = document.getElementById('search-overlay');
+  // Box the input, results and "Loading more" line into one panel: on
+  // desktop it's the centered card, and the overlay around it is the dim
+  // backdrop (a click on the backdrop still hits #search-overlay and closes).
+  if (searchoverlay && !document.getElementById('search-panel')) {
+    const panel = document.createElement('div');
+    panel.id = 'search-panel';
+    panel.append(...searchoverlay.children);
+    searchoverlay.appendChild(panel);
+  }
 
   // The markup nests this inside .top-bar on 71 pages. That bar carries
   // `transform` + `will-change` for the auto-hide, and an ancestor with a
@@ -770,6 +880,47 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(searchoverlay);
   }
 
+  // One search button on every page: pages ship older icon markup and
+  // inline styles, so rebuild it here (styled in 11layout.css).
+  const searchBtn = document.getElementById('search-btn');
+  if (searchBtn) {
+    searchBtn.removeAttribute('style');
+    searchBtn.type = 'button';
+    searchBtn.setAttribute('aria-label', 'Search Parchrome');
+    searchBtn.innerHTML =
+      '<svg id="search-icon" class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>' +
+      '<svg id="close-icon" class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>' +
+      '<span class="sb-label">Search Parchrome</span><kbd class="sb-key">/</kbd>';
+    searchBtn.classList.add('sb-ready');
+  }
+
+  // ONE DESKTOP BAR: the secondary bar carries the search on desktop (the
+  // top bar is hidden there, see 11layout.css). Pages without a secondary
+  // bar (the site home) get a plain one with the page's name. The button is
+  // display:none on phones, where the top bar's icon stays.
+  if (searchoverlay) {
+    let bar = document.querySelector('.secondary-top-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'secondary-top-bar stb-generated';
+      bar.id = 'secondary-top-bar';
+      bar.innerHTML = '<div class="secondary-left"><img class="th-icon" src="/icons/home.jpg" alt=""><div class="secondary-content">Lobby</div></div>';
+      document.body.appendChild(bar);
+    }
+    if (!bar.querySelector('.stb-search')) {
+      const wrap = document.createElement('div');
+      wrap.className = 'stb-search-wrap';
+      wrap.innerHTML =
+        '<button type="button" class="stb-search" aria-label="Search Parchrome">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>' +
+        '<span>Search Parchrome</span><kbd>/</kbd></button>';
+      bar.appendChild(wrap);
+    }
+    bar.querySelectorAll('.stb-search').forEach(b => {
+      b.removeAttribute('onclick');
+      b.addEventListener('click', () => openSearch());
+    });
+  }
   resultsContainer = document.getElementById('search-results');
   searchinput = document.getElementById('search-input');
   searchIcon = document.getElementById('search-icon');
@@ -783,6 +934,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeSearch();
+    // "/" opens the search from anywhere, unless you're typing in a field
+    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && searchoverlay.style.display !== 'block') {
+      const t = e.target;
+      if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      e.preventDefault();
+      openSearch();
+    }
   });
 
   // Auto-loads the next batch of results a bit before the user actually
@@ -795,7 +953,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderTopSearchVisible();
       }
     });
-  }, { root: searchoverlay, rootMargin: '0px 0px 400px 0px' });
+  }, { root: document.getElementById('search-panel'), rootMargin: '0px 0px 400px 0px' });
 
   // Guarded like the other use of this button further up: the clear (X) is
   // optional markup, and several pages' search boxes simply don't have one.
@@ -1518,3 +1676,223 @@ function toggleThMiniDropdown(btn) {
   if (wrap) wrap.classList.toggle('open');
 }
 window.toggleThMiniDropdown = toggleThMiniDropdown;
+
+/* =======================================================================
+   HUB MENUS -- shared engine (Oct 2026; was coc-hub-menus.js only).
+   Hovering a top-bar menu link opens a list under it; a row with children
+   opens a second list beside it (Web Resources: category -> its sections).
+   Each section passes its own data:
+     window.stbHubMenus(hubScroll, {
+       lists:  { key: [row, ...] },       // rows: { href, name, sub, icon (img
+                                          //   src) or svg (inner markup), meta,
+                                          //   src + kind (count from a JSON),
+                                          //   soon, children: [row, ...] }
+       keyOf:  function (link) -> key,     // which list a top-bar link opens
+       labels: { key: 'Layouts' },         // aria-label per menu
+       countWords: { kind: ['layout', 'layouts'] }
+     });
+   Desktop with a mouse only. Hover opens after a short pause (sweeping
+   across the bar doesn't flash menus) and closing waits a beat so the gap
+   to the panel can be crossed. Keyboard: Down on a link opens and enters the
+   list, Up/Down walk it, Right opens a row's side list, Left/Esc go back.
+   Panels hang off <body> (the bar's strip scrolls sideways and would clip
+   them). Styles: HUB MENUS in 11layout.css.
+   ======================================================================= */
+window.stbHubMenus = function (hubScroll, opts) {
+  if (!hubScroll || hubScroll.dataset.menus) return;
+  hubScroll.dataset.menus = '1';
+  // Links get rebuilt by some sections after this runs (Minecraft re-renders
+  // its editions); attach() is idempotent per link and re-runs on change.
+  const desk = window.matchMedia('(min-width: 971px) and (hover: hover)');
+  const CHEV = '<svg class="hub-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>';
+  const SIDE = '<svg class="stb-dd-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  const norm = u => new URL(String(u || ''), location.origin + '/').pathname.toLowerCase()
+    .replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1');
+  const here = norm(location.pathname);
+  const words = opts.countWords || {};
+
+  function ico(o) {
+    if (o.svg) return '<span class="stb-dd-ico is-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + o.svg + '</svg></span>';
+    if (o.icon) return '<span class="stb-dd-ico"><img src="' + o.icon + '" alt="" loading="lazy" decoding="async"></span>';
+    return '';
+  }
+  function row(o, i) {
+    const on = !!o.href && o.href.indexOf('#') < 0 && norm(o.href) === here;
+    const kids = !!(o.children && o.children.length);
+    const tail = o.soon ? '<span class="stb-dd-tag">Soon</span>'
+      : kids ? SIDE
+      : '<span class="stb-dd-meta"' + (o.src ? ' data-src="' + o.src + '" data-kind="' + o.kind + '"' : '') + '>' + (o.meta || '') + '</span>';
+    return '<a class="stb-dd-row' + (on ? ' is-on' : '') + (o.soon ? ' is-soon' : '') + (kids ? ' has-kids' : '') +
+      (o.svg || o.icon ? '' : ' no-ico') + '" href="' + (o.href || '#') + '"' +
+      (kids ? ' data-kids="' + i + '" aria-haspopup="true"' : '') + (on ? ' aria-current="page"' : '') + '>' +
+      ico(o) + '<span class="stb-dd-text"><span class="stb-dd-name">' + o.name + '</span>' +
+      (o.sub ? '<span class="stb-dd-sub">' + o.sub + '</span>' : '') + '</span>' + tail + '</a>';
+  }
+
+  // One shared side panel (the second level).
+  const side = document.createElement('div');
+  side.className = 'stb-dd stb-dd--side';
+  side.setAttribute('role', 'navigation');
+  side.hidden = true;
+  document.body.appendChild(side);
+
+  const menus = {};
+  let openKey = null, openT = 0, closeT = 0, sideT = 0, sideRow = null;
+  const counts = {};
+  const count = src => counts[src] || (counts[src] = fetch(src).then(r => (r.ok ? r.json() : null)).catch(() => null));
+
+  function attach() {
+  hubScroll.querySelectorAll('.stb-hub-link:not([data-menu])').forEach(link => {
+    const key = opts.keyOf(link);
+    const list = key && opts.lists[key];
+    if (!list || !list.length) return;
+    link.setAttribute('data-menu', key);
+    link.insertAdjacentHTML('beforeend', CHEV);
+    const old = document.getElementById('stbMenu-' + key);
+    if (old) old.remove();
+    const panel = document.createElement('div');
+    panel.className = 'stb-dd stb-dd--' + key;
+    panel.id = 'stbMenu-' + key;
+    panel.setAttribute('role', 'navigation');
+    panel.setAttribute('aria-label', (opts.labels && opts.labels[key]) || link.textContent.trim());
+    panel.hidden = true;
+    panel.innerHTML = '<div class="stb-dd-list">' + list.map(row).join('') + '</div>';
+    document.body.appendChild(panel);
+    link.setAttribute('aria-controls', panel.id);
+    link.setAttribute('aria-expanded', 'false');
+    const m = menus[key] = { link, panel, list, filled: false };
+
+    link.addEventListener('mouseenter', () => {
+      if (!desk.matches) return;
+      clearTimeout(closeT); clearTimeout(openT);
+      openT = setTimeout(() => open(key), openKey ? 0 : 110); // moving between menus switches at once
+    });
+    link.addEventListener('mouseleave', () => { clearTimeout(openT); scheduleClose(); });
+    panel.addEventListener('mouseenter', () => clearTimeout(closeT));
+    panel.addEventListener('mouseleave', scheduleClose);
+    panel.addEventListener('mouseover', e => {
+      const r = e.target.closest('.stb-dd-row');
+      if (!r || r === sideRow) return;
+      clearTimeout(sideT);
+      sideT = setTimeout(() => (r.dataset.kids ? showSide(m, r) : hideSide()), r.dataset.kids ? 60 : 120);
+    });
+    link.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' && desk.matches) {
+        e.preventDefault(); open(key);
+        const first = panel.querySelector('.stb-dd-row'); if (first) first.focus();
+      } else if (e.key === 'Escape') close();
+    });
+    panel.addEventListener('keydown', e => {
+      const rows = [].slice.call(panel.querySelectorAll('.stb-dd-row'));
+      const i = rows.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const next = rows[(i + (e.key === 'ArrowDown' ? 1 : -1) + rows.length) % rows.length];
+        if (next) { next.focus(); if (next.dataset.kids) showSide(m, next); else hideSide(); }
+      } else if (e.key === 'ArrowRight' && document.activeElement.dataset.kids) {
+        e.preventDefault(); showSide(m, document.activeElement);
+        const first = side.querySelector('.stb-dd-row'); if (first) first.focus();
+      } else if (e.key === 'Escape') { close(); link.focus(); }
+    });
+    panel.addEventListener('focusout', e => {
+      if (!panel.contains(e.relatedTarget) && !side.contains(e.relatedTarget) && e.relatedTarget !== link) close();
+    });
+  });
+  }
+  attach();
+  new MutationObserver(attach).observe(hubScroll, { childList: true });
+
+  side.addEventListener('mouseenter', () => { clearTimeout(closeT); clearTimeout(sideT); });
+  side.addEventListener('mouseleave', scheduleClose);
+  side.addEventListener('keydown', e => {
+    const rows = [].slice.call(side.querySelectorAll('.stb-dd-row'));
+    const i = rows.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const next = rows[(i + (e.key === 'ArrowDown' ? 1 : -1) + rows.length) % rows.length];
+      if (next) next.focus();
+    } else if ((e.key === 'ArrowLeft' || e.key === 'Escape') && sideRow) {
+      e.preventDefault(); const back = sideRow; hideSide(); back.focus();
+    }
+  });
+  side.addEventListener('focusout', e => {
+    const m = openKey && menus[openKey];
+    if (m && !side.contains(e.relatedTarget) && !m.panel.contains(e.relatedTarget)) close();
+  });
+
+  function showSide(m, r) {
+    const kids = m.list[+r.dataset.kids].children;
+    if (sideRow) sideRow.classList.remove('is-hot');
+    sideRow = r; r.classList.add('is-hot');
+    side.setAttribute('aria-label', r.querySelector('.stb-dd-name').textContent);
+    side.innerHTML = '<div class="stb-dd-list">' + kids.map(row).join('') + '</div>';
+    side.hidden = false;
+    // beside the hovered row: to the right, or to the left if it won't fit
+    const pr = m.panel.getBoundingClientRect(), rr = r.getBoundingClientRect(), w = side.offsetWidth;
+    const left = pr.right + 6 + w <= window.innerWidth - 8 ? pr.right + 6 : pr.left - 6 - w;
+    const top = Math.min(rr.top - 6, window.innerHeight - side.offsetHeight - 8);
+    side.style.left = Math.round(left) + 'px';
+    side.style.top = Math.round(Math.max(8, top)) + 'px';
+    side.style.maxHeight = Math.max(200, window.innerHeight - 16) + 'px';
+    requestAnimationFrame(() => side.classList.add('is-open'));
+  }
+  function hideSide() {
+    clearTimeout(sideT);
+    if (sideRow) sideRow.classList.remove('is-hot');
+    sideRow = null;
+    side.classList.remove('is-open');
+    side.hidden = true;
+  }
+  function scheduleClose() { clearTimeout(closeT); closeT = setTimeout(close, 180); }
+  function place(m) {
+    const r = m.link.getBoundingClientRect(), w = m.panel.offsetWidth;
+    m.panel.style.left = Math.round(Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12)) + 'px';
+    m.panel.style.top = Math.round(r.bottom + 8) + 'px';
+    m.panel.style.maxHeight = Math.max(200, window.innerHeight - r.bottom - 24) + 'px';
+  }
+  function fill(m) {
+    if (m.filled) return;
+    m.filled = true;
+    m.panel.querySelectorAll('.stb-dd-meta[data-src]').forEach(el => {
+      count(el.getAttribute('data-src')).then(json => {
+        const kind = el.getAttribute('data-kind'), list = json && json[kind];
+        if (!Array.isArray(list)) return;
+        const w = words[kind] || ['item', 'items'];
+        el.textContent = list.length + ' ' + (list.length === 1 ? w[0] : w[1]);
+      });
+    });
+  }
+  function open(key) {
+    const m = menus[key];
+    if (!m) return;
+    if (openKey && openKey !== key) close(true);
+    fill(m);
+    m.panel.hidden = false;
+    place(m);
+    requestAnimationFrame(() => m.panel.classList.add('is-open')); // entrance runs from its start state
+    m.link.classList.add('is-open');
+    m.link.setAttribute('aria-expanded', 'true');
+    openKey = key;
+  }
+  function close(instant) {
+    clearTimeout(closeT);
+    hideSide();
+    if (!openKey) return;
+    const m = menus[openKey];
+    m.panel.classList.remove('is-open');
+    m.link.classList.remove('is-open');
+    m.link.setAttribute('aria-expanded', 'false');
+    if (instant) m.panel.hidden = true;
+    else setTimeout(() => !m.panel.classList.contains('is-open') && (m.panel.hidden = true), 150);
+    openKey = null;
+  }
+  window.addEventListener('resize', () => close(true));
+  // Only the page itself scrolling closes it (the window, or .coc-main);
+  // sideways strips scroll on their own after load.
+  document.addEventListener('scroll', e => {
+    const t = e.target;
+    const page = t === document || t === document.documentElement || t === document.body || (t.classList && t.classList.contains('coc-main'));
+    if (openKey && page) close(true);
+  }, { capture: true, passive: true });
+  if (desk.addEventListener) desk.addEventListener('change', () => close(true));
+};

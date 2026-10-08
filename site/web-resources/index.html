@@ -33,8 +33,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="/11layout.css?v=20261007a">
-<script src="/11layout.js?v=20261007a" defer></script>
+<link rel="stylesheet" href="/11layout.css?v=20261008c">
+<script src="/11layout.js?v=20261008c" defer></script>
 <script src="/hwr-bookmarks.js" defer></script>
 <link rel="stylesheet" href="/hwr-css.css">
 <script src="/hwr-js.js" defer></script>
@@ -64,31 +64,7 @@ body {height: 100vh; background: var(--bg-main); color: var(--text-main); displa
   overflow-y: auto;
 }
 
-/* Fix: visible empty gap above the .coc-main scrollbar (the thumb only
-   started partway down the right edge, with a blank strip above it).
-   Cause -- 11layout.css's .main{margin-top:52px / 40px at >=971px} pushes
-   .main's WHOLE box (sidebar + coc-main together) below the fixed
-   .top-bar. That means .coc-main -- the element that actually owns the
-   scrollbar -- only starts at y=52/40 instead of y=0, so its scrollbar
-   only spans from there down; the reserved gutter column above that
-   point belongs to nothing (.top-bar has no scrollbar of its own),
-   hence the blank gap. Verified via computed layout (DevTools protocol)
-   before touching this: .coc-main currently sits at the exact same top
-   offset as .main, confirming this is genuinely where the offset comes
-   from, not something else. Moving the same offset from .main's margin
-   (outside the scroll box) to .coc-main's own padding-top (inside it)
-   keeps every element in the exact same visual position but lets
-   .coc-main's scrollbar span the full viewport height from y=0,
-   closing the gap. .sidebar loses the free ride from .main's margin on
-   desktop, where it's a normal static flex child (unlike mobile, where
-   it's already position:fixed with its own top:52px and unaffected by
-   this) -- given its own matching margin-top so it doesn't move. */
-.main{ margin-top: 0; }
-.coc-main{ padding-top: 52px; }
-@media (min-width: 971px){
-  .coc-main{ padding-top: 40px; }
-  .sidebar{ margin-top: 40px; }
-}
+/* Full-height scrollbar: see .main / .coc-main in hwr-css.css. */
 /* Bases grid */
 .grid-container {margin-top: 0px;}
 /* Film grain (same look as th18-layouts): a tiny inline-SVG noise tile laid on
@@ -181,7 +157,7 @@ background: linear-gradient(180deg, #101010 0%, #171717 100%);
 <!-- Secondary Top Bar -->
 <div class="secondary-top-bar" id="secondary-top-bar">
   <div class="secondary-left">
-    <img src="/icons/webicon.png" alt="TH10 Icon" class="th-icon" id="secondaryTopIcon">
+    <img src="/icons/web-resources.svg" alt="TH10 Icon" class="th-icon" id="secondaryTopIcon">
     <a href="/web-resources/" class="secondary-content" id="secondaryContentLink">
       <span class="secondary-content-desktop">Web Resources</span>
       <span class="secondary-content-mobile" id="secondaryContentMobile">
@@ -280,7 +256,7 @@ background: linear-gradient(180deg, #101010 0%, #171717 100%);
             </svg><strong>bookmark button</strong></span> on it.
         </p>
         <p class="stb-info-dd-text">
-          It gets saved! Go back to the <span class="stb-info-dd-chip"><img class="stb-info-dd-icon-inline" src="/icons/webicon.png" alt=""><strong>Web Resources Home</strong></span> to see all your saved sites in one box.
+          It gets saved! Go back to the <span class="stb-info-dd-chip"><img class="stb-info-dd-icon-inline" src="/icons/web-resources.svg" alt=""><strong>Web Resources Home</strong></span> to see all your saved sites in one box.
         </p>
       </div>
     </div>
@@ -3654,8 +3630,8 @@ body {
 <!-- Bottom Nav (mobile) -->
 <div class="bn-bar" id="bottomNav">
   <a href="/web-resources/" class="bn-item active">
-    <img src="/icons/webicon.png" alt="Home">
-    <span>Home</span>
+    <img src="/icons/web-resources.svg" alt="Resources">
+    <span>Resources</span>
   </a>
   <a href="/web-resources/music" class="bn-item">
     <img src="https://www.google.com/s2/favicons?domain=spotify.com&sz=64" alt="Music">

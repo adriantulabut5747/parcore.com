@@ -59,16 +59,8 @@ window.addEventListener("load", () => { document.documentElement.classList.add("
 
 // ── SEARCH ──
 
-fetch('/herosearch.json')
-  .then(res => res.json())
-  .then(data => {
-    topSearchItems = data;
-    topSearchIsLoaded = true;
-  })
-  .catch(err => console.error('Top-bar search data failed to load:', err));
+// Search data: 11layout.js fills topSearchItems from the Featured Topics.
 
-// Renders a single result as an fg-card — same box design used by
-// Popular Topics / /'s hero search results.
 
 // Main search function — called on every keystroke and when the
 // overlay first opens (with an empty query, showing a random sample).
@@ -107,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderTopSearchVisible();
       }
     });
-  }, { root: searchoverlay, rootMargin: '0px 0px 400px 0px' });
+  }, { root: document.getElementById('search-panel') || searchoverlay, rootMargin: '0px 0px 400px 0px' });
 
   searchInputClearBtn.addEventListener('click', () => {
     searchinput.value = '';
@@ -2554,6 +2546,20 @@ document.addEventListener('keydown', function(e){
     // re-measure hwr's renderCategoryNav() does after it injects.
     if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
     if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
+    // Desktop: the sections strip is hidden (one-bar layout, 11layout.css),
+    // so hovering "Java" lists them instead -- the shared menu engine
+    // (window.stbHubMenus in 11layout.js), same as the Clash menus.
+    // This file isn't deferred, so the engine (11layout.js, deferred) may not
+    // exist yet when the nav data arrives: wait for it in that case.
+    const attachMenu = () =>
+      dests && window.stbHubMenus &&
+      window.stbHubMenus(dests, {
+        keyOf: (link) => (/^\/minecraft\/java\/?$/.test(link.getAttribute('href') || '') ? 'java' : ''),
+        labels: { java: 'Java sections' },
+        lists: { java: categories.map((c) => ({ href: c.link, icon: c.image, name: c.name, sub: c.subtitle })) },
+      });
+    if (window.stbHubMenus) attachMenu();
+    else document.addEventListener('DOMContentLoaded', attachMenu);
   }
 
   // ---- init ----

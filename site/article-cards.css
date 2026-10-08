@@ -1,0 +1,433 @@
+/* Article cards -- one horizontal strip of landscape cards, shared by every
+   game section (CoC first, CODM next). Game-neutral on purpose: the page
+   supplies its own heading; this file only styles the strip.
+
+   Markup (see /coc/ "Popular Articles"):
+     <div class="art-nav" data-for="TRACK_ID">‹ ›</div>   (optional, anywhere)
+     <div class="art-track" id="TRACK_ID">
+       <a class="art-card" href="...">           -- live article
+       <div class="art-card is-soon">           -- not written yet: greyed, no link
+         <div class="art-media"><img ...><span class="art-soon">Coming soon</span></div>
+         <div class="art-body"><div class="art-eyebrow"><span class="art-game">Clash of Clans</span><span class="art-tag">Guide</span></div><h3 class="art-title">...</h3><p class="art-dek">3-5 words</p></div>
+
+   Side inset: set --art-side on the page to its column inset (CoC uses
+   --coc-side). Desktop: the track sits inside the column and shows whole
+   cards only (4 / 3 / 2 by the track's own width, so a page sidebar or a
+   narrower column picks the right count); the ‹ › pair says there's more.
+   It used to bleed to the screen edge with a half card -- that ran past
+   every other section's right edge and read as overflow (Oct 2026).
+   Phones (<=970px): edge to edge, one card plus a peek of the next. */
+
+.art-track {
+  --art-gap: 16px;
+  display: flex;
+  gap: var(--art-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin-inline: var(--art-side, 5%);
+  /* Room for the hover lift and shadow (a scroller clips its overflow),
+     cancelled by the negative margin so the space around the strip is
+     exactly what the page sets. */
+  padding: 4px 0 12px;
+  margin-block: -4px -12px;
+  scrollbar-width: none;
+  container-type: inline-size;
+}
+.art-track::-webkit-scrollbar {
+  display: none;
+}
+
+.art-card {
+  flex: 0 0 calc((100% - 3 * var(--art-gap)) / 4);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #121316;
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease;
+}
+a.art-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px -16px rgba(0, 0, 0, 0.85);
+}
+a.art-card:focus-visible {
+  outline: 2px solid #c23b3b;
+  outline-offset: 2px;
+}
+
+.art-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #0c0d0f;
+  overflow: hidden;
+}
+.art-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+a.art-card:hover .art-media img {
+  transform: scale(1.04);
+}
+
+.art-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 18px;
+}
+/* Eyebrow row: game on the left, category on the right. The game name keeps
+   a card readable when strips mix games (e.g. a home-page strip). */
+.art-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font: 800 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.art-game {
+  color: #8b9097;
+}
+.art-tag {
+  color: #e0605f;
+}
+.art-title {
+  margin: 0;
+  font: 600 15px/1.4 'Sora', sans-serif;
+  color: #f2f3f5;
+  /* Two lines max, so every card in the row is the same height. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Not written yet: dimmed picture, a glass badge on it, no hover.
+   opacity: 11layout.css fades every [data-game-nav] .is-soon to 0.4 (meant
+   for nav entries); cards and rows do their own dimming below. */
+.art-card.is-soon,
+.art-row.is-soon {
+  cursor: default;
+  opacity: 1;
+}
+.art-card.is-soon .art-media img {
+  filter: grayscale(0.55) brightness(0.6);
+}
+/* Dek: 3-5 words under the title naming the payoff (Adrian's rule, Oct 2026).
+   One line; ellipsis if a long one slips through. */
+.art-dek {
+  margin: -4px 0 0;
+  font: 400 13px/1.4 'Sora', sans-serif;
+  color: #8b9097;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.art-card.is-soon .art-dek {
+  color: #80858c;
+}
+.art-card.is-soon .art-title {
+  color: #a9adb3;
+}
+.art-soon {
+  position: absolute;
+  top: 12px;
+  right: 12px; /* top-left is the watermark's */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 10, 12, 0.62);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font: 800 9.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.art-soon::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e0a33a;
+}
+
+/* ‹ › pair -- same look as the /coc/ heroes row's .hm-nav. Desktop only:
+   phones swipe. */
+.art-nav {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(18, 19, 23, 0.75);
+}
+.art-nav button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.art-nav button + button {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+.art-nav svg {
+  width: 17px;
+  height: 17px;
+}
+.art-nav button:hover:not(:disabled),
+.art-nav button:focus-visible {
+  background: rgba(194, 59, 59, 0.22);
+}
+.art-nav button:disabled {
+  color: rgba(255, 255, 255, 0.22);
+  cursor: default;
+}
+
+@container (max-width: 1099px) {
+  .art-card {
+    flex-basis: calc((100% - 2 * var(--art-gap)) / 3);
+  }
+}
+@container (max-width: 759px) {
+  .art-card {
+    flex-basis: calc((100% - var(--art-gap)) / 2);
+  }
+}
+@media (max-width: 970px) {
+  .art-nav {
+    display: none;
+  }
+  .art-track {
+    --art-gap: 12px;
+    margin-inline: 0;
+    padding-inline: var(--art-side, 5%);
+    scroll-padding-inline: var(--art-side, 5%);
+  }
+  .art-track .art-card {
+    flex-basis: 78%;
+  }
+  .art-title {
+    font-size: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-card,
+  .art-media img {
+    transition: none;
+  }
+}
+
+/* Holds the strip's height while article-cards.js fetches the cards. */
+.art-track:empty {
+  min-height: 280px;
+}
+
+/* ---- Feed rows (/articles/) ------------------------------------------
+   ONE Esports-style list (Adrian's pick, Oct 2026): picture left; game ·
+   category and the date on top; then title and dek. Rows are split by a
+   hairline, no card boxes. Phones keep the picture left, just smaller. */
+.art-feed {
+  display: flex;
+  flex-direction: column;
+}
+.art-row {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: inherit;
+  text-decoration: none;
+}
+.art-row:first-child {
+  padding-top: 4px;
+}
+.art-row[hidden] {
+  display: none;
+}
+.art-row-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0c0d0f;
+}
+.art-row-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+a.art-row:hover .art-row-media img {
+  transform: scale(1.04);
+}
+a.art-row:hover .art-title {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(224, 96, 95, 0.7);
+  text-underline-offset: 4px;
+}
+a.art-row:focus-visible {
+  outline: 2px solid #c23b3b;
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+.art-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 2px;
+}
+.art-row-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.art-row .art-tag {
+  flex: 0 0 auto;
+  margin-top: 5px; /* lines up with the title's first line */
+  font: 800 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.art-row-meta {
+  margin: 2px 0 0;
+  font: 600 12px/1.4 'Sora', sans-serif;
+  color: #7a7d82;
+}
+.art-row-meta time { font: inherit; }
+.art-row .art-title {
+  font-size: 19px;
+  line-height: 1.35;
+}
+.art-row .art-dek {
+  margin: 0;
+  font-size: 14px;
+}
+.art-row.is-soon .art-row-media img {
+  filter: grayscale(0.55) brightness(0.6);
+}
+.art-row.is-soon .art-title {
+  color: #a9adb3;
+}
+.art-row.is-soon .art-dek {
+  color: #80858c;
+}
+@media (max-width: 970px) {
+  .art-row {
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px 0;
+  }
+  .art-row .art-title {
+    font-size: 15px;
+  }
+  .art-row .art-dek {
+    font-size: 13px;
+  }
+}
+
+/* ---- "Read next" card inside an article (.art-next[data-article]) ----
+   One compact row: picture, label, title, game · dek, arrow. */
+.art-next-card {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 18px 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1a1b1f;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+a.art-next-card:hover { border-color: rgba(194, 59, 59, 0.6); transform: translateY(-2px); }
+a.art-next-card:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
+.art-next-media { aspect-ratio: 16 / 9; border-radius: 9px; overflow: hidden; background: #0c0d0f; }
+.art-next-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.art-next-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; font-family: 'Sora', sans-serif; }
+.art-next-body * { font-family: inherit; }
+.art-next-label {
+  font: 800 10px/1 'Oxanium', sans-serif !important;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #e0605f;
+}
+.art-next-body strong { font-size: 16px; font-weight: 650; line-height: 1.35; color: #fff; }
+.art-next-body > span:last-child { font-size: 13px; color: #8b9097; }
+.art-next-card > svg { width: 20px; height: 20px; color: #8b9097; transition: transform 0.2s, color 0.2s; }
+a.art-next-card:hover > svg { color: #fff; transform: translateX(3px); }
+.art-next-card.is-soon { opacity: 1; cursor: default; }
+.art-next-card.is-soon .art-next-media img { filter: grayscale(0.55) brightness(0.6); }
+.art-next-card.is-soon strong { color: #c8cbcd; }
+@media (max-width: 970px) {
+  .art-next-card { grid-template-columns: 104px minmax(0, 1fr); gap: 14px; }
+  .art-next-card > svg { display: none; }
+  .art-next-body strong { font-size: 15px; }
+}
+
+/* ---- Watermark on article thumbnails (Adrian's pick, Oct 2026) ----------
+   Favicon + "Parchrome" in a small glass badge, top-left of every card
+   picture: the /coc/ Popular Articles strip and the /articles/ feed rows.
+   Not on the pictures inside an article. Page overlay only: the image files
+   stay clean. */
+.art-media::before,
+.art-row-media::before {
+  content: '';
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: url('/icons/home.jpg') center / cover;
+  pointer-events: none;
+}
+.art-media::after,
+.art-row-media::after {
+  content: 'Parchrome';
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  z-index: 1;
+  padding: 4px 8px 4px 23px;
+  border-radius: 6px;
+  background: rgba(10, 10, 12, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font: 700 10px/14px 'Oxanium', sans-serif;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+@media (max-width: 970px) {
+  /* Feed thumbnails are only ~130px wide on phones: a smaller badge. */
+  .art-row-media::before { top: 9px; left: 9px; width: 11px; height: 11px; border-radius: 3px; }
+  .art-row-media::after { top: 6px; left: 6px; padding: 3px 6px 3px 18px; font-size: 8.5px; line-height: 11px; border-radius: 5px; }
+}

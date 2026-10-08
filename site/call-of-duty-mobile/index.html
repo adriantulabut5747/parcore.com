@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
 <link rel="icon" href="/icons/home.jpg">
 <link rel="shortcut icon" href="/icons/home.jpg">
 <link rel="apple-touch-icon" href="/icons/home.jpg">
@@ -18,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261007a">
+<link rel="stylesheet" href="/11layout.css?v=20261008c">
 
 
 <style>
@@ -428,8 +430,8 @@ background: linear-gradient(
 
 /* ============================================================
    TOP-BAR SEARCH — upgraded to match /'s version.
-   Icon morph (magnifying glass <-> ✖), fg-card style results grid
-   fed by herosearch.json, clear button, body scroll lock, and
+   Icon morph (magnifying glass <-> ✖), tile results grid
+   fed by the Featured Topics data, clear button, body scroll lock, and
    mobile back-button support (handled in the JS further down).
    ============================================================ */
 
@@ -440,7 +442,6 @@ background: linear-gradient(
 
 /* View More button, reused as .hero-search-viewmore in / */
 
-/* ---- fg-card box design (Popular Topics / hero search style) ---- */
 
 .coc-main{
 background-color: #181A1C;
@@ -518,311 +519,363 @@ background-color: #181A1C;
 
   <div class="coc-main" >
 
-<div class="codm-hero">
-  <div class="codm-hero-bg" role="img" aria-label="Call of Duty Mobile — Ghost"></div>
-  <div class="codm-hero-overlay">
-    <div class="codm-hero-content">
-      <h1 class="codm-hero-title"><em>Call of Duty</em><br>Mobile</h1>
+<!-- LOBBY HERO (Oct 2026). Laid out like Valorant's agent select: the battle pass card
+     top-left (where the map card sits), the title panel on the right (the agent panel),
+     and the pages as a row of cards along the bottom (the agent row). Pages that aren't
+     built yet are greyed and not links, like locked agents. The empty space under the
+     battle pass card is deliberate for now. Background: MW3 key art, title erased,
+     mirrored so Ghost and Price are on the right. -->
+<section class="li" aria-labelledby="liTitle">
+  <div class="li-bg" aria-hidden="true"></div>
+  <div class="li-fx" aria-hidden="true"><i style="--x:43%;--t:-8.5s;--d:8.0s;--dx:-54px;--h:3px"></i><i style="--x:70%;--t:-0.8s;--d:8.9s;--dx:56px;--h:6px"></i><i style="--x:13%;--t:-5.0s;--d:6.3s;--dx:12px;--h:3px"></i><i style="--x:30%;--t:-5.7s;--d:8.9s;--dx:-53px;--h:6px"></i><i style="--x:19%;--t:-2.6s;--d:6.7s;--dx:-45px;--h:6px"></i><i style="--x:41%;--t:-5.0s;--d:9.4s;--dx:-47px;--h:6px"></i><i style="--x:74%;--t:-0.5s;--d:7.0s;--dx:27px;--h:6px"></i><i style="--x:56%;--t:-7.0s;--d:8.3s;--dx:58px;--h:6px"></i><i style="--x:12%;--t:-5.2s;--d:8.6s;--dx:52px;--h:3px"></i><i style="--x:95%;--t:-4.0s;--d:9.0s;--dx:-51px;--h:3px"></i><i style="--x:55%;--t:-0.4s;--d:9.3s;--dx:37px;--h:6px"></i></div>
+
+  <div class="li-side">
+    <!-- BATTLE PASS CARD. Filled by the script below from ggseason.com; stays hidden if that fails. -->
+    <div class="li-bp" id="bp-widget" hidden>
+      <div class="li-bp-ring" aria-hidden="true">
+        <svg viewBox="0 0 64 64"><circle class="li-bp-track" cx="32" cy="32" r="28"/><circle class="li-bp-fill" id="bpRing" cx="32" cy="32" r="28" pathLength="100"/></svg>
+        <span class="li-bp-days"><b id="bp-days">--</b>days</span>
+      </div>
+      <div class="li-bp-text">
+        <p class="li-bp-k">Battle pass ends in</p>
+        <p class="li-bp-name" id="bp-season-name"></p>
+        <p class="li-bp-clock"><b id="bp-hours">--</b>h <b id="bp-mins">--</b>m <b id="bp-secs">--</b>s</p>
+      </div>
+      <p class="li-bp-sub" id="bp-sub"></p>
     </div>
+
+    <!-- guide links, Valorant objectives-list style: outlined icon + label, no box.
+         Only Loadouts is built; the others land on the 404 page until their page exists. -->
+    <nav class="li-links" aria-label="Guides">
+      <a href="/call-of-duty-mobile/color-codes"><i><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.9-.7-1.3-.7-2.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><path d="M7.5 11h.01M10 7h.01M15 7.5h.01"/></svg></i>Color codes</a>
+      <a href="/call-of-duty-mobile/sensitivity"><i><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></i>Sensitivity codes</a>
+      <a href="/call-of-duty-mobile/hud-settings"><i><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="7.5" cy="12" r="2"/><circle cx="16" cy="10.5" r="1.2"/><circle cx="18.2" cy="13.5" r="1.2"/></svg></i>HUD settings</a>
+      <a href="/call-of-duty-mobile/bot-checker"><i><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01"/></svg></i>Bot checker</a>
+      <a href="/call-of-duty-mobile/loadouts"><i><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></i>Loadouts</a>
+    </nav>
   </div>
-</div>
+
+  <div class="li-copy">
+    <h1 class="li-title" id="liTitle">Call of Duty: <em>Mobile</em></h1>
+    <p class="li-desc">Gun builds copied from our own Gunsmith, plus the ranked, perk, mode and map basics you need to climb.</p>
+    <!-- store buttons, filled from /codm-feed.json (Android gets Google Play links) -->
+    <div class="li-store" id="liVer" hidden></div>
+    <!-- PC: GameLoop is Tencent's emulator and the official way to play CODM on PC -->
+    <a class="li-pc" href="https://www.gameloop.com/game/action/call-of-duty-mobile-on-pc" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+      <span><b>Play on PC</b><small>GameLoop, the official CODM emulator</small></span>
+    </a>
+  </div>
+
+  <!-- gun builds; each opens attachments with that gun searched (?q=). Pictures are crops of
+       the real Gunsmith screenshots. The last USS-9 is a placeholder until a fifth build. -->
+  <div class="li-row">
+  <div class="li-row-head">
+    <h2 class="li-row-title" id="liRowTitle">Popular builds <span>from real Gunsmith screenshots</span></h2>
+    <a href="/call-of-duty-mobile/attachments">All builds <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+  </div>
+  <nav class="li-doors" aria-labelledby="liRowTitle">
+    <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=KRM-262">
+      <img src="/images/codm/guns/krm262.webp" alt="" decoding="async">
+      <span class="li-door-k">Shotgun</span><span class="li-door-n">KRM-262</span>
+    </a>
+    <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=USS-9">
+      <img src="/images/codm/guns/uss9.webp" alt="" decoding="async">
+      <span class="li-door-k">SMG</span><span class="li-door-n">USS-9</span>
+    </a>
+    <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=Tundra">
+      <img src="/images/codm/guns/tundra.webp" alt="" decoding="async">
+      <span class="li-door-k">Sniper</span><span class="li-door-n">Tundra</span>
+    </a>
+    <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=AK117">
+      <img src="/images/codm/guns/ak117.webp" alt="" decoding="async">
+      <span class="li-door-k">Assault rifle</span><span class="li-door-n">AK117</span>
+    </a>
+    <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=USS-9">
+      <img src="/images/codm/guns/uss9.webp" alt="" decoding="async">
+      <span class="li-door-k">SMG</span><span class="li-door-n">USS-9</span>
+    </a>
+  </nav>
+  </div>
+</section>
 
 <style>
-.codm-hero{
-  position:relative;
-  min-width:100%;
-  min-height:455px;
-  max-height:420px;
-  overflow:hidden;
-  flex:0 0 auto;
-  background:#0c0c0d;
-  margin-top: 45px;
+/* One screen: hero fills the space under the top bar (16px --topbar-height + 45px gap). */
+.li{
+  position:relative; flex:0 0 auto; margin-top:45px; min-height:calc(100vh - var(--topbar-height, 16px) - 45px);
+  display:grid; grid-template-columns:minmax(300px,360px) 1fr minmax(360px,460px); grid-template-rows:1fr auto;
+  grid-template-areas:"side . copy" "doors doors doors"; gap:24px 32px;
+  padding:28px clamp(24px,8.5vw,168px) 28px; overflow:hidden; color:#fff; background:#0c0c0d; isolation:isolate;
 }
-.codm-hero-bg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  background-image:url('https://i.pinimg.com/736x/f5/d6/1d/f5d61d6d2f2541b4661a9840940909b1.jpg');
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position:center 15%;
-  filter:saturate(1.1) contrast(1.05);
-  z-index:1;
+/* Layers, back to front: the art (slow push-in), ::before (shading + faint grid), embers, content. */
+.li-bg{
+  position:absolute; inset:0; z-index:-3;
+  /* zoomed to 140% so Ghost and the skull soldier he faces fill the middle; 66% puts the
+     pair (faces at 44% and 59% across the art) between the two panels.
+     Makarov and Price crop out behind the battle pass card and the title panel. */
+  background:url('/images/codm/codm-hero-mw.webp') 66% 8% / 140% auto no-repeat;
+  transform-origin:46% 30%; animation:liPush 26s cubic-bezier(.2,.6,.2,1) both;
 }
-/* On mobile this gets overridden with an explicit oversized background-size below,
-   which guarantees both left-right AND up-down panning always work — with plain
-   "cover", the crop math only leaves room to pan in ONE direction depending on
-   how the image's shape compares to the box's shape (that's why the vertical
-   number seemed to do nothing before: there was zero vertical room to pan through). */
-/* fallback look when no image is supplied yet */
-.codm-hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
+/* Shade the right (title panel) and the bottom (card row); the bottom shade is in px
+   because the card row is a fixed height whatever the screen. The middle stays bright. */
+.li::before{
+  content:""; position:absolute; inset:0; z-index:-2; pointer-events:none;
   background:
-    radial-gradient(circle at 80% 20%, rgba(194,45,45,0.16), transparent 55%),
-    linear-gradient(135deg, #150404 0%, #0c0c0d 55%, #050505 100%);
-  z-index:0;
+    linear-gradient(to top, #121213 0, rgba(12,12,13,.92) 120px, rgba(12,12,13,.55) 230px, rgba(12,12,13,0) 340px),
+    /* push Makarov (left) and Price (right) back so Ghost and the skull soldier lead */
+    radial-gradient(ellipse 40% 75% at 0% 30%, rgba(8,8,9,.97) 0%, rgba(8,8,9,.8) 45%, rgba(8,8,9,0) 85%),
+    radial-gradient(ellipse 34% 70% at 100% 25%, rgba(8,8,9,.9) 0%, rgba(8,8,9,.6) 45%, rgba(8,8,9,0) 80%),
+    linear-gradient(270deg, rgba(12,12,13,.92) 0%, rgba(12,12,13,.78) 24%, rgba(12,12,13,0) 50%),
+    linear-gradient(90deg, rgba(12,12,13,.85) 0%, rgba(12,12,13,.5) 22%, rgba(12,12,13,0) 38%),
+    linear-gradient(to bottom, rgba(12,12,13,.45) 0%, rgba(12,12,13,0) 16%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 64px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 64px);
 }
-.codm-hero-overlay{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  padding-left:6%;
+.li-fx{ position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+.li-fx i{
+  position:absolute; left:var(--x); bottom:-12px; width:2px; height:var(--h); border-radius:3px;
+  background:#ff8a4d; box-shadow:0 0 4px 1px rgba(255,80,30,.4);
+  opacity:0; animation:liEmber var(--d) linear var(--t) infinite;
+}
+/* smoke along the bottom edge: two soft layers of radial puffs drifting in opposite directions */
+.li-fx::before, .li-fx::after{
+  content:""; position:absolute; left:-25%; right:-25%; bottom:0; height:280px;
+  -webkit-mask-image:linear-gradient(to top, transparent 0%, #000 40%, #000 65%, transparent 100%);
+          mask-image:linear-gradient(to top, transparent 0%, #000 40%, #000 65%, transparent 100%);
   background:
-    linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%),
-    linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 45%);
+    radial-gradient(ellipse 18% 45% at 10% 70%, rgba(120,120,128,.16), transparent 70%),
+    radial-gradient(ellipse 22% 40% at 34% 80%, rgba(110,110,118,.13), transparent 70%),
+    radial-gradient(ellipse 16% 50% at 58% 75%, rgba(130,130,138,.15), transparent 70%),
+    radial-gradient(ellipse 24% 42% at 82% 82%, rgba(110,110,118,.13), transparent 70%);
+  animation:liSmoke 38s ease-in-out infinite alternate;
 }
-/* Fade the very bottom of the hero into the same dark tone the battle pass
-   widget uses, so the two sections blend into one continuous surface
-   instead of meeting at a hard edge. */
-.codm-hero::after{
-  content:"";
-  position:absolute;
-  left:0; right:0; bottom:0;
-  height:180px;
-  z-index:3;
-  pointer-events:none;
-  background:linear-gradient(to bottom, rgba(18,18,19,0) 0%, rgba(18,18,19,0.75) 60%, #121213 100%);
+.li-fx::after{
+  bottom:10px; height:230px; opacity:.8;
+  background:
+    radial-gradient(ellipse 20% 45% at 22% 75%, rgba(140,120,120,.12), transparent 70%),
+    radial-gradient(ellipse 18% 50% at 50% 80%, rgba(120,120,128,.14), transparent 70%),
+    radial-gradient(ellipse 22% 40% at 76% 70%, rgba(130,115,115,.12), transparent 70%);
+  animation-duration:52s; animation-direction:alternate-reverse;
+}
+@keyframes liSmoke{ from{ transform:translateX(-6%); } to{ transform:translateX(6%); } }
+@keyframes liPush{ from{ transform:scale(1.08); } to{ transform:scale(1); } }
+@keyframes liEmber{
+  0%{ transform:translate(0,0) rotate(18deg); opacity:0; }
+  12%{ opacity:.45; }
+  80%{ opacity:.25; }
+  100%{ transform:translate(var(--dx),-520px) rotate(18deg); opacity:0; }
+}
+@media (prefers-reduced-motion: reduce){
+  .li-bg{ animation:none; }
+  .li-fx i{ display:none; }
+  .li-fx::before, .li-fx::after{ animation:none; }
+  .li-door, .li-door img, .li-bp-fill{ transition:none; }
 }
 
-.codm-hero-content{
-  position:relative;
-  z-index:3;
-  max-width:640px;
-  color:#fff;
-  animation:codmFadeInUp .8s ease forwards;
-  margin-top: 50px;
+/* ---- battle pass card (top-left) ---- */
+.li-side{ grid-area:side; align-self:start; margin-top:clamp(24px,8vh,96px); } /* room above the battle pass card */
+.li-bp[hidden]{ display:none; }
+.li-bp{
+  display:grid; grid-template-columns:76px 1fr; gap:6px 14px; align-items:center;
+  padding:16px; border-radius:12px; background:rgba(16,16,18,.88); border:1px solid #2a2a2f;
 }
-.codm-hero-eyebrow{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:#ff5555;
-  margin-bottom:14px;
+.li-bp p{ margin:0; }
+.li-bp-ring{ position:relative; width:76px; height:76px; }
+.li-bp-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.li-bp-ring circle{ fill:none; stroke-width:5; }
+.li-bp-track{ stroke:#2a2a2f; }
+.li-bp-fill{ stroke:#be1b1b; stroke-linecap:round; stroke-dasharray:0 100; transition:stroke-dasharray .8s cubic-bezier(.2,.7,.2,1); }
+.li-bp-days{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#8d8f95;
 }
-.codm-hero-eyebrow::before{
-  content:"";
-  width:22px;
-  height:2px;
-  background:#c22d2d;
-  display:inline-block;
-}
-.codm-hero-title{
-  font-size:clamp(40px,6vw,72px);
-  font-weight:900;
-  line-height:1.02;
-  text-transform:uppercase;
-  margin-bottom:18px;
-  background:linear-gradient(90deg,#ffffff,#e6dede,#c9c4c4);
-  background-clip:text;
-  -webkit-background-clip:text;
-  color:transparent;
-  text-shadow:2px 4px 10px rgba(0,0,0,0.5);
-  margin-left: 25%;
-  max-width: 100%;
-  min-width: 100%;
-}
-.codm-hero-title em{
-  font-style:normal;
-  background:linear-gradient(90deg,#be1b1b,#a70e0e);
-  background-clip:text;
-  -webkit-background-clip:text;
-}
-.codm-hero-tagline{
-  font-size:clamp(14px,1.2vw,17px);
-  line-height:1.6;
-  color:#c8c8c8;
-  max-width:520px;
-  text-shadow:0 1px 3px rgba(0,0,0,0.6);
-}
+.li-bp-days b{ font-family:'Orbitron', sans-serif; font-size:22px; font-weight:900; line-height:1; color:#fff; letter-spacing:0; }
+.li-bp .li-bp-k{ font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#8d8f95; }
+.li-bp .li-bp-name{ margin-top:3px; font-family:'Orbitron', sans-serif; font-size:15px; font-weight:800; line-height:1.25; text-wrap:balance; }
+.li-bp .li-bp-clock{ margin-top:6px; font-size:12px; color:#8d8f95; font-variant-numeric:tabular-nums; }
+.li-bp-clock b{ font-family:'Orbitron', sans-serif; font-size:13px; color:#e03a3a; }
+.li-bp .li-bp-sub{ grid-column:1 / -1; margin-top:8px; padding-top:10px; border-top:1px solid #222226; font-size:12px; line-height:1.5; color:#8a8a8f; }
+.li-bp-sub a{ color:#b9bbc0; text-decoration:underline; text-underline-offset:2px; }
+.li-bp-sub a:hover{ color:#fff; }
 
-@keyframes codmFadeInUp{
-  0%{opacity:0; transform:translateY(18px);}
-  100%{opacity:1; transform:translateY(0);}
+/* ---- guide links (left, under the battle pass card) ---- */
+.li-links{ margin-top:26px; display:grid; gap:4px; }
+.li-links a{
+  display:flex; align-items:center; gap:14px; padding:6px 4px; border-radius:8px;
+  font-size:14px; font-weight:600; color:#c4c6cb; text-decoration:none; text-shadow:0 1px 8px rgba(0,0,0,.8);
+  transition:color .15s ease;
 }
-  @media (max-width:970px){
-  .codm-hero-title{margin-left: 0%;}
-  .codm-hero{min-height:350px; max-height:350px; margin-top: 50px;}
-  .codm-hero-overlay{
-    padding-left:6%;
-    padding-right:6%;
-    justify-content:center;
-    text-align:center;
-    background:
-      linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.35)),
-      linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.2) 45%, rgba(0,0,0,0.92) 100%);
+.li-links i{
+  flex:none; width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; border:1px solid rgba(255,255,255,.22); background:rgba(12,12,13,.35);
+  transition:border-color .15s ease, background-color .15s ease;
+}
+.li-links svg{ width:17px; height:17px; fill:none; stroke:#d5d7dc; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:stroke .15s ease; }
+.li-links a:hover{ color:#fff; }
+.li-links a:hover i{ border-color:#be1b1b; background:rgba(190,27,27,.18); }
+.li-links a:hover svg{ stroke:#ff5555; }
+.li-links a:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
+
+/* ---- title panel (right) ---- */
+.li-copy{ grid-area:copy; align-self:center; }
+/* Orbitron like the CoC lobby; title size/weight/tracking copied from /coc/'s .ch-title */
+.li-title{ margin:0; font-family:'Orbitron', sans-serif; font-size:clamp(33px,3.4vw,56px); font-weight:900; line-height:1.02; letter-spacing:-1px; text-transform:uppercase; text-shadow:0 2px 24px rgba(0,0,0,.6); text-wrap:balance; }
+.li-title em{ font-family:inherit; font-style:normal; color:#be1b1b; } /* the page sets * { font-family:oxanium } */
+.li-desc{ margin:14px 0 0; max-width:44ch; font-size:15px; line-height:1.6; color:#c8c8c8; }
+
+/* ---- store buttons (title panel) ---- */
+.li-store[hidden]{ display:none; }
+.li-store{ margin-top:20px; display:flex; flex-wrap:wrap; gap:10px; }
+.li-store a{
+  display:flex; align-items:center; gap:10px; padding:9px 16px 9px 12px; border-radius:10px;
+  background:rgba(16,16,18,.88); border:1px solid #2a2a2f; color:#fff; text-decoration:none;
+  transition:border-color .15s ease, background-color .15s ease;
+}
+.li-store a:hover{ border-color:#be1b1b; background:rgba(190,27,27,.14); }
+.li-store a:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
+.li-store svg{ width:20px; height:20px; flex:none; fill:none; stroke:#e03a3a; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.li-store b{ display:block; font-family:'Orbitron', sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
+.li-store small{ display:block; margin-top:2px; font-size:11px; color:#9a9ca1; font-variant-numeric:tabular-nums; }
+.li-store svg.li-brand{ width:24px; height:24px; stroke:none; }
+.li-store svg.li-brand--ios{ fill:none; stroke:#e8e9ec; stroke-width:2.2; stroke-linecap:round; }
+.li-store a:hover svg.li-brand--ios{ stroke:#fff; }
+.li-pc{
+  margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:8px 16px 8px 12px; border-radius:10px;
+  border:1px dashed #3a3a40; color:#fff; text-decoration:none; transition:border-color .15s ease, background-color .15s ease;
+}
+.li-pc:hover{ border-color:#be1b1b; border-style:solid; background:rgba(190,27,27,.14); }
+.li-pc:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
+.li-pc svg{ width:22px; height:22px; flex:none; fill:none; stroke:#d5d7dc; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.li-pc b{ display:block; font-family:'Orbitron', sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
+.li-pc small{ display:block; margin-top:2px; font-size:11px; color:#9a9ca1; }
+.li-store .star{ color:#f5c518; }
+
+
+/* ---- card row (bottom): five equal cards; a swipeable row on phones ---- */
+.li-row{ grid-area:doors; min-width:0; }
+.li-row-head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:12px; }
+.li-row-title{ margin:0; font-family:'Orbitron', sans-serif; font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; }
+.li-row-title span{ margin-left:10px; font-family:'Oxanium', sans-serif; font-size:12px; font-weight:500; text-transform:none; letter-spacing:0; color:#8d8f95; }
+.li-row-head a{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; color:#c4c6cb; text-decoration:none; white-space:nowrap; }
+.li-row-head a:hover{ color:#fff; }
+.li-row-head a svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.li-doors{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
+.li-door{
+  position:relative; aspect-ratio:16 / 9; scroll-snap-align:start;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:16px; border-radius:12px; overflow:hidden; text-decoration:none; color:#fff;
+  background:#141416; border:1px solid #2a2a2f; transition:transform .18s cubic-bezier(.2,.7,.2,1), border-color .18s ease;
+}
+a.li-door:hover{ transform:translateY(-3px); border-color:#be1b1b; }
+a.li-door:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
+.li-door img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.55; transition:opacity .18s ease; }
+a.li-door:hover img{ opacity:.8; }
+.li-door::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,11,.95) 15%, rgba(10,10,11,0) 75%); }
+.li-door--gun img{
+  inset:8% 6% auto; width:88%; height:58%; object-fit:contain; opacity:.9;
+  /* soften the grey Gunsmith backdrop of the crops into the card */
+  -webkit-mask-image:radial-gradient(ellipse 58% 62% at 50% 50%, #000 55%, transparent 100%);
+          mask-image:radial-gradient(ellipse 58% 62% at 50% 50%, #000 55%, transparent 100%);
+}
+a.li-door--gun:hover img{ opacity:1; }
+.li-door-k, .li-door-n{ position:relative; z-index:1; }
+.li-door-k{ font-family:'Orbitron', sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#ff5555; }
+.li-door-n{ margin-top:5px; font-family:'Orbitron', sans-serif; font-size:clamp(14px,1.1vw,18px); font-weight:800; text-transform:uppercase; }
+
+/* laptops: narrower panels and less zoom, or the title lands on Ghost's face */
+@media (max-width:1500px) and (min-width:971px){
+  .li{ grid-template-columns:minmax(280px,320px) 1fr minmax(320px,380px); padding-left:clamp(24px,6.5vw,96px); padding-right:clamp(24px,6.5vw,96px); }
+  .li-bg{ background-position:90% 8%; background-size:115% auto; }
+  /* tighter guide list so the gun row stays on a 768px-tall laptop screen */
+  .li-links{ margin-top:16px; gap:0; }
+  .li-links a{ padding:3px 4px; font-size:13px; }
+  .li-links i{ width:30px; height:30px; }
+  .li-links svg{ width:15px; height:15px; }
+}
+@media (max-width:970px){
+  /* phones: stacked -- battle pass card, title, then the cards as one swipeable row.
+     52px top bar + 50px gap above, 60px bottom nav below. */
+  .li{
+    margin-top:50px; min-height:calc(100svh - var(--topbar-height, 52px) - 110px);
+    display:flex; flex-direction:column; gap:24px; padding:20px 5% 24px;
   }
-  .codm-hero-content{max-width:100%; margin:60px auto 0 auto;}
-  .codm-hero-eyebrow{justify-content:center;}
-  .codm-hero-tagline{max-width:100%; margin:0 auto;}
-.codm-hero-bg{
-  background-position:20% 0%;
-}
-}
-</style>
-<!-- BATTLE PASS COUNTDOWN WIDGET -->
-<div class="bp-widget" id="bp-widget">
-  <svg class="bp-watermark" width="140" height="140" viewBox="0 0 236 256" fill="currentColor">
-    <path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/>
-    <path d="M108,35 L94,62 L207,256 L236,256 Z"/>
-  </svg>
-  <div class="bp-widget-left">
-    <div class="bp-widget-label">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-      Current Battlepass
-    </div>
-    <div class="bp-widget-season" id="bp-season-name">Season 6 — Take Your Heart</div>
-    <div class="bp-widget-sub">Battle Pass resets when Season 7 begins </div>
-  </div>
-  <div class="bp-widget-right">
-    <div class="bp-countdown" id="bp-countdown">
-      <div class="bp-time-block"><span class="bp-num" id="bp-days">--</span><span class="bp-unit">Days</span></div>
-      <div class="bp-time-block"><span class="bp-num" id="bp-hours">--</span><span class="bp-unit">Hrs</span></div>
-      <div class="bp-time-block"><span class="bp-num" id="bp-mins">--</span><span class="bp-unit">Min</span></div>
-      <div class="bp-time-block"><span class="bp-num" id="bp-secs">--</span><span class="bp-unit">Sec</span></div>
-    </div>
-  </div>
-</div>
-
-<style>
-.bp-widget{
-  position:relative;
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-  background:
-    linear-gradient(180deg, #121213 0%, rgba(22,22,23,0.7) 40px, rgba(15,15,16,0.85) 100%);
-  border:none;
-  border-radius:0;
-  padding:40px 15% 20px 15%;
-  flex-wrap:wrap;
-}
-.bp-watermark{
-  position:absolute;
-  right:11%;
-  top:50%;
-  transform:translateY(-50%);
-  color:rgba(255, 255, 255, 0.023);
-  pointer-events:none;
-  width: 80px;
-  z-index:0;
-}
-.bp-widget-left, .bp-widget-right{ position:relative; z-index:1; }
-.bp-widget-label{
-  display:flex; align-items:center; gap:6px;
-  font-size:11px; text-transform:uppercase; letter-spacing:2px;
-  color:var(--text-muted); font-weight:600; margin-bottom:4px;
-}
-.bp-widget-season{
-  font-size:19px; font-weight:700; color:var(--text-main);
-}
-.bp-widget-sub{
-  font-size:12px; color:#676565; margin-top:3px;
-}
-.bp-widget-right{ display:flex; flex-direction:column; align-items:center; gap:6px; }
-.bp-countdown{ display:flex; gap:10px; }
-.bp-time-block{
-  display:flex; flex-direction:column; align-items:center;
-  background:rgba(0,0,0,0.35);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:8px;
-  padding:8px 12px;
-  min-width:52px;
-}
-.bp-num{ font-size:22px; font-weight:800; color:var(--accent); font-family:'Oxanium', sans-serif; line-height:1; }
-.bp-unit{ font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-top:4px; }
-.bp-widget-target{ font-size:11px; color:var(--text-muted); }
-
-@media (max-width: 600px){
-  .bp-widget{ flex-direction:column; align-items:flex-start;   padding:30px 5% 0px 5%;
- }
-  .bp-widget-right{ align-items:flex-start; width:100%; }
-  .bp-countdown{ width:100%; justify-content:space-between; }
-  .bp-time-block{ min-width:0; flex:1; }
-  .bp-watermark{ width:90px; height:90px; right:12px; top:16px; transform:none; }
+  .li-copy{ margin-top:auto; }
+  .li-bg{ background-size:cover; background-position:51% top; } /* Ghost + the skull soldier */
+  .li::before{
+    background:
+      linear-gradient(to bottom, rgba(18,18,19,0) 70%, #121213 100%),
+      linear-gradient(to bottom, rgba(12,12,13,.35), rgba(12,12,13,.9) 50%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 48px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 48px);
+  }
+  /* desktop's align-self values mean horizontal alignment in this column stack, which
+     would size these to their content (the nowrap link row) -- stretch them to the screen */
+  .li-side, .li-copy{ align-self:stretch; min-width:0; }
+  .li-side{ margin-top:0; }
+  .li-row-title span{ display:none; }
+  .li-bp{ background:rgba(16,16,18,.9); }
+  .li-links{ margin-top:14px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+  .li-links::-webkit-scrollbar{ display:none; }
+  .li-links a{ flex:none; gap:8px; padding:4px 12px 4px 4px; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:13px; white-space:nowrap; }
+  .li-links i{ width:28px; height:28px; }
+  .li-links svg{ width:14px; height:14px; }
+  .li-doors{
+    display:flex; overflow-x:auto; gap:10px; padding:4px 2px 6px; margin:-4px -2px -6px;
+    scroll-snap-type:x proximity; scrollbar-width:thin; scrollbar-color:#2f3136 transparent;
+  }
+  .li-door{ flex:0 0 240px; }
+  .li-door-n{ font-size:13px; }
 }
 </style>
 <script>
 // ===== BATTLE PASS COUNTDOWN =====
-// The exact reset TIMESTAMP is not published anywhere as structured data (no API,
-// official or fan-made, exposes it) so that stays a manually-set fallback below —
-// clearly labeled, and easy to update once Activision confirms the next date.
-// The SEASON NAME, however, we pull live from Activision's own blog RSS feed,
-// so at least that part is never hand-typed and always reflects their latest post.
-(function(){
-  const FALLBACK_SEASON_NAME = 'Season 6 — Take Your Heart';
-  // Unconfirmed estimate based on the typical ~5-week CODM season cadence.
-  // Update the moment Activision publishes the real Season 7 date.
-  // Back-calculated from the actual in-game countdown reported on the Garena PH build
-  // (29 days 9 hours remaining as of 2026-07-07), which lines up with CODM's usual
-  // "5PM PT" reset pattern. Activision Global's official date may still shift slightly.
-  const SEASON_RESET_UTC = new Date('2026-08-05T17:00:00-07:00'); // 5PM PDT ≈ Aug 6, 8AM PH time
-
-  const seasonNameEl = document.getElementById('bp-season-name');
-  const targetLabelEl = document.getElementById('bp-target-label');
-  const daysEl = document.getElementById('bp-days');
-  const hoursEl = document.getElementById('bp-hours');
-  const minsEl = document.getElementById('bp-mins');
-  const secsEl = document.getElementById('bp-secs');
-
-  function pad(n){ return String(n).padStart(2,'0'); }
-
-  // Live-fetch the newest CODM season post title from Activision's official blog RSS.
-  // Uses a free JSON-ified RSS proxy (no API key) since browsers can't parse raw RSS/CORS directly.
-  async function loadLiveSeasonName(){
-    try {
-      const feedUrl = 'mobilehttps://www.callofduty.com/site/callofduty/blog/rss?category=';
-      const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedUrl));
-      if (!res.ok) throw new Error('bad response');
-      const data = await res.json();
-      const latest = data.items && data.items.find(item => /season/i.test(item.title));
-      if (latest && latest.title){
-        seasonNameEl.textContent = latest.title.replace(/^Introducing\s+/i, '').trim();
-      } else {
-        seasonNameEl.textContent = FALLBACK_SEASON_NAME;
-      }
-    } catch (err) {
-      seasonNameEl.textContent = FALLBACK_SEASON_NAME;
+// CODM has no API. ggseason.com (a fan-run season tracker) publishes each season as
+// schema.org JSON inside its CoD Mobile page and allows cross-site reads (CORS *), so
+// we read the season name, its estimated end, a one-line summary and Activision's
+// patch-notes link from there -- nothing to edit by hand. Their end date is an
+// estimate from past season lengths ("Est."). If the fetch fails, their markup
+// changes, or the date passes, the widget stays hidden.
+(async function(){
+  const widget = document.getElementById('bp-widget');
+  let ev;
+  try {
+    const html = await (await fetch('https://ggseason.com/codmobile/')).text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    for (const el of doc.querySelectorAll('script[type="application/ld+json"]')) {
+      try { const j = JSON.parse(el.textContent); if (j['@type'] === 'Event') { ev = j; break; } } catch (e) {}
     }
-  }
+  } catch (e) { return; }
+  const est = ev && [].concat(ev.additionalProperty || []).find(p => p.name === 'estimatedEndDate');
+  const end = new Date(ev && (ev.endDate || (est && est.value)));
+  if (!ev || isNaN(end)) return;
+  const start = new Date(ev.startDate);
 
+  const name = ev.name.replace(/^.*?(Season)/, '$1').replace(':', ' —');
+  const num = (name.match(/Season (\d+)/) || [])[1];
+  const summary = (ev.description || '').replace(/^.*?Ends (Est\. )?[^.]*\.\s*/, '');
+  const notes = ev.location && ev.location.url;
+  document.getElementById('bp-season-name').textContent = name;
+  document.getElementById('bp-sub').innerHTML =
+    (summary ? summary.replace(/[<>&]/g, '') + ' ' : '') +
+    (notes && /^https:\/\/www\.callofduty\.com\//.test(notes) ? `<a href="${notes.replace(/["<>]/g, encodeURIComponent)}" target="_blank" rel="noopener">Patch notes</a> · ` : '') +
+    `Ends ${est && !ev.endDate ? 'around ' : ''}${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` +
+    (num ? `, when Season ${+num + 1} begins` : '') +
+    ` · <a href="https://ggseason.com/codmobile/" target="_blank" rel="noopener">GGS</a>`;
+
+  const els = ['days','hours','mins','secs'].map(k => document.getElementById('bp-' + k));
+  const pad = n => String(n).padStart(2,'0');
   function tick(){
-    const now = new Date();
-    let diff = SEASON_RESET_UTC - now;
-
-    if (diff <= 0) {
-      daysEl.textContent = '00';
-      hoursEl.textContent = '00';
-      minsEl.textContent = '00';
-      secsEl.textContent = '00';
-      targetLabelEl.textContent = 'Season reset is live!';
-      return;
-    }
-
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff / (1000*60*60)) % 24);
-    const mins = Math.floor((diff / (1000*60)) % 60);
-    const secs = Math.floor((diff / 1000) % 60);
-
-    daysEl.textContent = pad(days);
-    hoursEl.textContent = pad(hours);
-    minsEl.textContent = pad(mins);
-    secsEl.textContent = pad(secs);
+    const diff = end - Date.now();
+    if (!(diff > 0)) { widget.hidden = true; clearInterval(timer); return; }
+    widget.hidden = false;
+    // ring = how much of the season has gone by
+    if (!isNaN(start)) document.getElementById('bpRing').style.strokeDasharray =
+      Math.min(100, Math.max(0, (Date.now() - start) / (end - start) * 100)).toFixed(1) + ' 100';
+    [diff / 864e5, diff / 36e5 % 24, diff / 6e4 % 60, diff / 1e3 % 60]
+      .forEach((v, i) => { els[i].textContent = pad(Math.floor(v)); });
   }
-
-  loadLiveSeasonName();
+  const timer = setInterval(tick, 1000);
   tick();
-  setInterval(tick, 1000);
 })();
 </script>
 
@@ -899,7 +952,7 @@ background-color: #181A1C;
   background:#141416;
   border:1px solid #26262a;
   padding:22px 26px;
-  margin:0 15% 20px 15%;
+  margin:0 12% 20px 12%;
   border-radius:12px;
   box-shadow:0 8px 20px rgba(0,0,0,0.35);
   overflow:hidden;
@@ -970,10 +1023,9 @@ background-color: #181A1C;
 </style>
 <script>
 // ===== ESPORTS CHAMPIONSHIP HUB =====
-// No free live-scores API exists for CODM esports, so this tracks the official
-// 2026 World Championship schedule and counts down to whichever stage is next.
-// Update dates here whenever Activision/CODM esports confirms new ones.
-// Source: callofduty.com/mobile/esports
+// Counts down to whichever stage is next. The earlier stages are typed in below;
+// the World Championship Finals (dates, prize pool, teams, city) come from
+// Liquipedia via /codm-feed.json (daily GitHub Action), so they stay correct.
 (function(){
   const STAGES = [
     { name: 'Summer Split Open Qualifiers', start: '2026-05-29T00:00:00-07:00', end: '2026-07-05T23:59:00-07:00' },
@@ -1054,13 +1106,27 @@ background-color: #181A1C;
 
   tick();
   setInterval(tick, 1000);
+
+  fetch('/codm-feed.json').then(r => r.json()).then(f => {
+    const e = f.esports;
+    if (!e || !e.start) return;
+    const fin = STAGES[STAGES.length - 1];
+    fin.start = e.start + 'T00:00:00Z';
+    fin.end = (e.end || e.start) + 'T23:59:00Z';
+    const when = new Date(e.start + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    document.querySelector('.champ-prize').innerHTML =
+      (e.prizeUsd ? `<span class="champ-prize-amount">$${e.prizeUsd.toLocaleString('en-US')}</span> Prize Pool · ` : '') +
+      (e.teams ? `${e.teams} Teams · ` : '') + when + (e.city ? ' · ' + e.city.replace(/[<>&]/g, '') : '');
+    tick();
+  }).catch(() => {});
 })();
 </script>
 
-<!-- FEATURED CODM CONTENTS -->
+<!-- SECTION TITLES shared by every middle section (.layouts-title-box). The old
+     "Featured CODM Contents" cards are gone: the intro's four doors replaced them. -->
 <style>
 .layouts-title-box {
-  margin: 0px 15% 15px 15%;
+  margin: 0px 12% 15px 12%;
   border-radius: 0;
   padding: 12px 20px 12px 0;
   text-align: center;
@@ -1086,123 +1152,899 @@ background-color: #181A1C;
   background-clip: text;
   color: transparent;
 }
+.layouts-subtitle{ margin-top:6px; font-size:13px; color:var(--text-muted); }
 @media (max-width: 900px){
 .layouts-title-box {
   margin: 0px 5% 15px 5%;
 }}
 </style>
-<div class="layouts-title-box">
-  <div class="layouts-title">Featured CODM Contents</div>
-</div>
+<!-- THE ARMORY (Oct 2026): the guide doors as sealed supply crates in the Shipment yard.
+     A crate's lid hides most of its gun and its teaser is blacked out; hover or focus
+     (or scrolling it into view on touch screens) lifts the lid and wipes the redaction.
+     Field Kit crates point at their planned pages (/sensitivity, /color-codes, /tools);
+     those pages are still to be built. Manifest counts come from /codm-guns.json.
+     Pictures are placeholders (gun cut-outs, and drawn icons for the Field Kit). -->
+<section class="ar" id="armory" aria-labelledby="arTitle">
+  <div class="ar-inner">
+    <div class="ar-head">
+      <h2 class="ar-title" id="arTitle">The Armory</h2>
+      <p class="ar-sub">Each crate opens onto a guide. Hover or tap one to look inside.</p>
+    </div>
 
-<div class="content-grid">
-  <a href="/call-of-duty-mobile/attachments" class="content-card">
-    <div class="content-card-img">  <img src="/callofdutymobile-icons/uss9.jpg" alt="Loadouts">
-      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
-    </div>
-    <div class="content-card-body">
-      <div class="content-card-name">Gunsmith Attachments</div>
-      <div class="content-card-desc">Top picked Attachments used for tournaments</div>
-    </div>
-  </a>
+    <div class="ar-grid">
+      <a class="cr cr--lead" href="/call-of-duty-mobile/attachments?mode=multiplayer">
+        <span class="cr-hold"><img src="/images/codm/guns/ak117.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">MP</span><span class="cr-rivets"></span></span>
+        <span class="cr-body">
+          <span class="cr-name">MP Attachments</span>
+          <span class="cr-tease">Attachment builds for Multiplayer. Verified builds include a code you can paste into the game.</span>
+          <span class="cr-manifest"><span data-manifest="multiplayer">Gun builds</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
 
-  <a href="/call-of-duty-mobile/loadouts" class="content-card">
-    <div class="content-card-img">  
+      <a class="cr" href="/call-of-duty-mobile/attachments?mode=battleroyale">
+        <span class="cr-hold"><img src="/images/codm/guns/tundra.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">BR</span><span class="cr-rivets"></span></span>
+        <span class="cr-body">
+          <span class="cr-name">BR Attachments</span>
+          <span class="cr-tease">Longer-range builds for Battle Royale fights.</span>
+          <span class="cr-manifest"><span data-manifest="battleroyale">Gun builds</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
 
-      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+      <a class="cr" href="/call-of-duty-mobile/loadouts">
+        <span class="cr-hold"><img src="/images/codm/guns/uss9.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">LO</span><span class="cr-rivets"></span></span>
+        <span class="cr-body">
+          <span class="cr-name">Loadouts</span>
+          <span class="cr-tease">Primary, secondary, perks, lethal and tactical for each mode.</span>
+          <span class="cr-manifest"><span>Full classes</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
     </div>
-    <div class="content-card-body">
-      <div class="content-card-name">MP/BR Loadouts</div>
-      <div class="content-card-desc">Complete class setups — perks, lethals, and gear combos.</div>
-    </div>
-  </a>
 
-  <a href="/codm-bot-checker.html" class="content-card">
-    <div class="content-card-img">
-      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    <div class="ar-head ar-head--kit">
+      <h2 class="ar-title ar-title--kit">Field Kit</h2>
+      <p class="ar-sub">Set up your controls, colour your name and use our CODM tools.</p>
     </div>
-    <div class="content-card-body">
-      <div class="content-card-name">Bot Checker</div>
-      <div class="content-card-desc">Check if a player name matches a known CODM bot.</div>
-    </div>
-  </a>
 
-  <a href="/codm-tools.html" class="content-card">
-    <div class="content-card-img">
-      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
+    <div class="kit-grid">
+      <a class="cr" href="/call-of-duty-mobile/sensitivity">
+        <span class="cr-hold"><span class="cr-art" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="2.5"/><path d="M24 3v10M24 35v10M3 24h10M35 24h10"/></svg></span></span>
+        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">SN</span><span class="cr-rivets"></span></span>
+        <span class="cr-body">
+          <span class="cr-name">Sensitivity Codes</span>
+          <span class="cr-tease">Sensitivity settings for each device and playstyle.</span>
+          <span class="cr-manifest"><span>Sensitivity</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="cr" href="/call-of-duty-mobile/color-codes">
+        <span class="cr-hold"><span class="cr-art cr-art--swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span>
+        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">CC</span><span class="cr-rivets"></span></span>
+        <span class="cr-body">
+          <span class="cr-name">Color Codes</span>
+          <span class="cr-tease">Codes that change the colour of your in-game name.</span>
+          <span class="cr-manifest"><span>Name colours</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="cr" href="/call-of-duty-mobile/tools">
+        <span class="cr-hold"><span class="cr-art" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M30 8a9 9 0 0 0-8.4 12.3L8 33.9a3.5 3.5 0 0 0 5 5l13.7-13.6A9 9 0 0 0 39 17.3l-5.6 5.6-6-1.4-1.4-6 5.6-5.6A9 9 0 0 0 30 8z"/></svg></span></span>
+        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">TL</span><span class="cr-rivets"></span></span>
+        <span class="cr-body">
+          <span class="cr-name">Tools</span>
+          <span class="cr-tease">Calculators and checkers for CODM players.</span>
+          <span class="cr-manifest"><span>CODM tools</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
     </div>
-    <div class="content-card-body">
-      <div class="content-card-name">Web Tools</div>
-      <div class="content-card-desc">Community tools and utilities for CODM players.</div>
-    </div>
-  </a>
-
-  <a href="/codm-color-codes.html" class="content-card">
-    <div class="content-card-img">
-      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
-    </div>
-    <div class="content-card-body">
-      <div class="content-card-name">Graphic Color Codes</div>
-      <div class="content-card-desc">In-game name color codes to customize your username.</div>
-    </div>
-  </a>
-
-  <a href="/codm-sensitivity.html" class="content-card">
-    <div class="content-card-img">
-      <svg width="56" height="56" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg>
-    </div>
-    <div class="content-card-body">
-      <div class="content-card-name">Preset Sensitivity</div>
-      <div class="content-card-desc">Recommended sensitivity settings by playstyle and device.</div>
-    </div>
-  </a>
-</div>
+  </div>
+</section>
 
 <style>
-.content-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:24px;
-  margin:0 15% 40px 15%;
+.ar{
+  --ar-edge:#16161a; --ar-steel:#1a1c1f; --ar-lid:#26292d; --ar-ink:#e8e6e1; --ar-dim:#9b9a96; --ar-red:#d42a2a;
+  position:relative; isolation:isolate; flex:0 0 auto; min-height:780px; margin-top:40px;
+  padding:56px 12% 64px; color:var(--ar-ink);
+  /* the Shipment yard, pushed almost to black so the crates read on top of it */
+  background:
+    linear-gradient(to bottom, var(--ar-edge) 0%, rgba(10,10,11,.86) 16%, rgba(10,10,11,.9) 84%, var(--ar-edge) 100%),
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(10,10,11,.55), rgba(10,10,11,.85)),
+    url('/callofdutymobile-icons/shipment.jpg') center 40% / cover no-repeat,
+    #0b0b0c;
 }
-.content-card{
-  display:block;
-  text-decoration:none;
-  background:#141416;
-  border:1px solid #26262a;
-  border-radius:12px;
-  overflow:hidden;
-  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+.ar-inner{ max-width:1280px; margin:0 auto; }
+.ar-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px 32px; flex-wrap:wrap; margin-bottom:22px; }
+.ar-head--kit{ margin:30px 0 12px; }
+.ar-title{
+  margin:0; font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800;
+  font-size:clamp(44px,5vw,68px); line-height:.9; letter-spacing:.01em; text-transform:uppercase;
 }
-.content-card:hover{
-  transform:translateY(-3px);
-  border-color:#3a3a3a;
-  box-shadow:0 10px 24px rgba(0,0,0,0.4);
-}
-.content-card-img{
-  width:100%;
-  aspect-ratio:16/9;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0f0f10;
-  color:rgba(255,255,255,0.08);
-  overflow:hidden;
-}
-.content-card-img img{
-  width:100%;
-  height:110%;
-  object-fit:cover;
-}
-.content-card-body{ padding:14px 16px 16px 16px; }
-.content-card-name{ font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:4px; }
-.content-card-desc{ font-size:12px; color:var(--text-muted); line-height:1.5; }
+.ar-title--kit{ font-size:clamp(32px,3.4vw,44px); }
+.ar-sub{ margin:0; max-width:46ch; font-size:14px; line-height:1.55; color:var(--ar-dim); }
 
-@media (max-width: 970px){
-  .content-grid{ grid-template-columns:1fr; gap:18px; margin:0 5% 40px 5%; }
+/* ---- crates ---- */
+.ar-grid{ display:grid; grid-template-columns:1.35fr 1fr; grid-template-rows:repeat(2, 220px); gap:14px; }
+.cr--lead{ grid-row:1 / span 2; }
+.cr{
+  position:relative; display:flex; flex-direction:column; overflow:hidden; border-radius:6px;
+  text-decoration:none; color:var(--ar-ink);
+  background:linear-gradient(180deg, #202225, var(--ar-steel) 60%, #141517);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 22px 44px -22px rgba(0,0,0,.95);
+  -webkit-tap-highlight-color:transparent;
 }
-@media (min-width: 601px) and (max-width: 970px){
-  .content-grid{ grid-template-columns:repeat(2,1fr); }
+.cr-hold{ position:relative; flex:1; min-height:0; overflow:hidden;
+  background:radial-gradient(ellipse 70% 80% at 50% 70%, rgba(212,42,42,.16), transparent 70%), #0e0f10; }
+/* The picture (a gun cut-out, or a drawn icon on Field Kit crates) is fitted whole
+   inside the hold. Shut, it sits zoomed in and low, so only its top shows in the
+   peek; open, it zooms out to the full picture at full brightness. */
+.cr-hold img, .cr-art{
+  position:absolute; left:50%; top:50%; width:auto; height:auto; max-width:94%; max-height:88%;
+  transform:translate(-50%, -50%) translateY(26%) scale(1.45); filter:brightness(.62) saturate(.85);
+  transition:transform .7s cubic-bezier(.16,1,.3,1), filter .5s ease;
+}
+.cr-hold img{
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
+  -webkit-mask-composite:source-in;
+          mask-image:linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
+          mask-composite:intersect;
+}
+.cr-art{ width:min(34%, 120px); aspect-ratio:1; color:rgba(232,230,225,.85); }
+.cr-art svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.cr-art--swatch{ display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:8%; padding:8%; }
+.cr-art--swatch i{ border-radius:3px; }
+.cr-art--swatch i:nth-child(1){ background:#d42a2a; } .cr-art--swatch i:nth-child(2){ background:#e0b030; }
+.cr-art--swatch i:nth-child(3){ background:#2f8fd6; } .cr-art--swatch i:nth-child(4){ background:#47b36a; }
+/* the lid: covers all but the bottom sliver of the hold */
+.cr-lid{
+  position:absolute; left:0; right:0; top:0; height:calc(100% - var(--body-h, 118px) - var(--peek, 46px));
+  display:flex; align-items:center; justify-content:center;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 30%),
+    linear-gradient(180deg, var(--ar-lid), #1f2225);
+  box-shadow:0 10px 18px -6px rgba(0,0,0,.85);
+  transition:transform .7s cubic-bezier(.16,1,.3,1);
+}
+.cr-lid::after{ /* lip */
+  content:""; position:absolute; left:0; right:0; bottom:0; height:6px;
+  background:linear-gradient(180deg, #33373c, #1b1d20);
+}
+.cr-mark{
+  font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800; line-height:1;
+  font-size:clamp(40px,4.4vw,64px); letter-spacing:.06em; color:rgba(232,230,225,.1);
+}
+.cr--lead .cr-mark{ font-size:clamp(88px,10vw,160px); }
+.cr-rivets, .cr-lid::before{ /* two rivets on the lid's top corners */
+  position:absolute; top:12px; width:7px; height:7px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #4a4e54, #17191b 70%);
+}
+.cr-rivets{ left:12px; }
+.cr-lid::before{ content:""; right:12px; }
+
+.cr-body{ position:relative; display:flex; flex-direction:column; gap:6px; padding:12px 18px 14px; height:var(--body-h, 118px); flex:0 0 auto;
+  background:linear-gradient(180deg, #17181b, #121315); }
+.cr--lead{ --body-h:140px; --peek:64px; }
+.cr-name{
+  font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800; text-transform:uppercase;
+  font-size:26px; line-height:1; letter-spacing:.02em;
+}
+.cr--lead .cr-name{ font-size:clamp(30px,2.8vw,38px); }
+/* the teaser is blacked out line by line, like a redacted file, until the crate opens */
+.cr-tease{ position:relative; font-size:13px; line-height:1.6; color:#c8c6c0; max-width:52ch; }
+.cr-tease::after{
+  content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(to bottom, transparent 0 .22em, #050505 .22em 1.38em, transparent 1.38em 1.6em);
+  transform-origin:right center; transition:transform .5s cubic-bezier(.16,1,.3,1) .1s;
+}
+.cr-manifest{
+  margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ar-red);
+  font-variant-numeric:tabular-nums;
+}
+.cr-manifest svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;
+  transition:transform .4s cubic-bezier(.16,1,.3,1); }
+
+/* opened: hover / keyboard focus, or scrolled into view on touch screens (.is-open) */
+@media (hover:hover){
+  a.cr:hover .cr-lid{ transform:translateY(-100%); }
+  a.cr:hover .cr-hold img, a.cr:hover .cr-art{ transform:translate(-50%, -50%) scale(1); filter:none; }
+  a.cr:hover .cr-tease::after{ transform:scaleX(0); }
+  a.cr:hover .cr-manifest svg{ transform:translateX(4px); }
+}
+a.cr:focus-visible .cr-lid, a.cr.is-open .cr-lid{ transform:translateY(-100%); }
+a.cr:focus-visible .cr-hold img, a.cr.is-open .cr-hold img, a.cr:focus-visible .cr-art, a.cr.is-open .cr-art{ transform:translate(-50%, -50%) scale(1); filter:none; }
+a.cr:focus-visible .cr-tease::after, a.cr.is-open .cr-tease::after{ transform:scaleX(0); }
+a.cr:focus-visible{ outline:2px solid var(--ar-red); outline-offset:3px; }
+
+/* ---- field kit: the same crates, three across ---- */
+.kit-grid{ display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:210px; gap:14px; }
+
+@media (max-width:1150px){
+  .ar-grid{ grid-template-rows:repeat(2, 205px); }
+  .kit-grid{ grid-auto-rows:200px; }
+  .cr-name{ font-size:22px; }
+}
+@media (max-width:970px){
+  .ar{ min-height:0; margin-top:32px; padding:44px 5% 52px; }
+  .ar-title{ font-size:44px; }
+  .ar-grid{ grid-template-columns:1fr 1fr; grid-template-rows:260px 230px; gap:10px; }
+  .cr--lead{ grid-row:auto; grid-column:1 / -1; }
+  .cr{ --body-h:118px; }
+  .cr--lead{ --body-h:128px; }
+  .cr-body{ padding:12px 14px 14px; }
+  .cr-name{ font-size:20px; }
+  .cr--lead .cr-name{ font-size:28px; }
+  .cr-tease{ font-size:12px; }
+  /* phones: same pattern as the Armory, first crate full width, two below */
+  .kit-grid{ grid-template-columns:1fr 1fr; grid-auto-rows:230px; gap:10px; }
+  .kit-grid > .cr:first-child{ grid-column:1 / -1; }
+}
+@media (max-width:520px){
+  .ar-grid{ grid-template-rows:250px 250px; }
+  .ar-grid .cr:not(.cr--lead) .cr-tease, .kit-grid .cr:not(:first-child) .cr-tease{ display:none; }
+}
+@media (prefers-reduced-motion: reduce){
+  .cr-lid, .cr-hold img, .cr-art, .cr-tease::after, .cr-manifest svg{ transition:none; }
+}
+</style>
+
+<script>
+(function(){
+  // manifests: real counts from the shared gun file
+  fetch('/codm-guns.json').then(r => r.json()).then(guns => {
+    document.querySelectorAll('[data-manifest]').forEach(el => {
+      const list = guns.filter(g => (g.modes || []).includes(el.dataset.manifest));
+      // "verified" = a build read off a real Gunsmith screenshot (it has an attachments block)
+      const verified = list.filter(g => g.attachments).length;
+      el.textContent = `${list.length} guns` + (verified ? ` · ${verified} verified` : '');
+    });
+  }).catch(() => {});
+  // touch screens have no hover: open each crate once it's mostly on screen
+  if (!window.matchMedia('(hover: none)').matches || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('is-open'); io.unobserve(e.target); }
+  }), { threshold: 0.7 });
+  document.querySelectorAll('#armory a.cr').forEach(c => io.observe(c));
+})();
+</script>
+
+
+<!-- OFFICIAL VIDEOS: newest uploads from the official CODM YouTube channel.
+     /codm-feed.json is refreshed daily by .github/workflows/codm-feed.yml. -->
+<section class="cg" id="videos" aria-labelledby="videosTitle" hidden>
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="videosTitle">Official Videos</h2>
+    <p class="layouts-subtitle">The latest uploads from the official Call of Duty: Mobile YouTube channel.</p>
+  </div>
+  <div class="yt-grid" id="ytGrid"></div>
+</section>
+
+<style>
+.yt-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.yt{ display:block; text-decoration:none; color:#fff; border-radius:10px; overflow:hidden; background:#141416; border:1px solid #26262a; transition:border-color .18s, transform .18s; }
+.yt:hover{ border-color:#be1b1b; transform:translateY(-2px); }
+.yt-thumb{ position:relative; aspect-ratio:16/9; background:#0f0f10; }
+.yt-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.yt-badge{ position:absolute; left:8px; top:8px; font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:3px 7px; border-radius:3px; background:#be1b1b; color:#fff; }
+.yt-body{ padding:10px 12px 12px; }
+.yt-title{ font-size:13px; font-weight:700; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.yt-date{ margin-top:4px; font-size:11px; color:var(--text-muted); }
+
+.wd-tabs{ margin:0 12% 14px; display:flex; flex-wrap:wrap; gap:6px; }
+.wd-tabs button{
+  font:inherit; font-size:13px; font-weight:800; cursor:pointer; padding:8px 12px; border-radius:6px;
+  border:1px solid #2a2a2f; background:#141416; color:#9a9da3;
+}
+.wd-tabs button span{ margin-left:6px; font-size:11px; color:#6f7177; }
+.wd-tabs button[aria-selected="true"]{ color:#fff; border-color:#be1b1b; background:rgba(190,27,27,0.14); }
+.wd-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+.wd{ position:relative; display:flex; flex-direction:column; text-decoration:none; color:#fff; border-radius:8px; overflow:hidden; background:#141416; border:1px solid #26262a; transition:border-color .18s; }
+.wd:hover{ border-color:#3a3a40; }
+.wd img{ width:100%; aspect-ratio:2/1; object-fit:contain; background:radial-gradient(circle at 50% 60%, #1f1f24, #111113 75%); padding:6px; }
+.wd b{ padding:8px 10px 10px; font-size:12.5px; font-weight:800; }
+.wd-tag{ position:absolute; right:6px; top:6px; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:3px 6px; border-radius:3px; background:#be1b1b; }
+.wd-more{ font:inherit; font-size:13px; font-weight:800; cursor:pointer; height:40px; padding:0 18px; border-radius:8px; color:#fff; background:#141416; border:1px solid #2e2e33; }
+.wd-more:hover{ border-color:#be1b1b; }
+.wd-more[hidden]{ display:none; }
+.wd-foot{ margin:16px 12% 0; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.wd-credit{ margin:0; font-size:11px; color:#6f7177; text-align:center; }
+.wd-credit a{ color:inherit; }
+
+/* version strip (in the intro) */
+
+@media (max-width:1150px){ .wd-grid{ grid-template-columns:repeat(4,1fr); } }
+@media (max-width:970px){
+  .yt-grid, .wd-tabs, .wd-grid, .wd-foot, { margin-left:5%; margin-right:5%; }
+  .yt-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+  .wd-tabs{ flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+  .wd-tabs::-webkit-scrollbar{ display:none; }
+  .wd-tabs button{ flex:0 0 auto; }
+  .wd-grid{ grid-template-columns:repeat(3,1fr); gap:8px; }
+}
+@media (max-width:520px){ .wd-grid{ grid-template-columns:1fr 1fr; } }
+</style>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ago = iso => {
+    const d = Math.floor((Date.now() - new Date(iso)) / 864e5);
+    return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : d < 30 ? d + ' days ago' : new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  };
+  const fmt = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n);
+
+
+  fetch('/codm-feed.json').then(r => r.json()).then(f => {
+    // store buttons. The feed has App Store data only; Android phones get the Google Play
+    // listing instead (fixed package ids), without the App Store rating.
+    const a = f.apps || {};
+    const android = /Android/i.test(navigator.userAgent);
+    const PLAY = { global: 'com.activision.callofduty.shooter', garena: 'com.garena.game.codm' };
+    // store marks drawn inline: App Store "A" tile, or the four-colour Play triangle on Android
+    const dl = android
+      ? '<svg class="li-brand" viewBox="0 0 24 24" aria-hidden="true"><path fill="#00c3ff" d="M4 2.5v19l9.5-9.5z"/><path fill="#00e676" d="M4 2.5l12.8 7.4-3.3 2.1z"/><path fill="#ffd500" d="M16.8 9.9l3.7 2.1-3.7 2.1-3.3-2.1z"/><path fill="#ff3a44" d="M4 21.5l9.5-9.5 3.3 2.1z"/></svg>'
+      : '<svg class="li-brand li-brand--ios" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.4 3.2 6.2 18.2M9.6 3.2l8.2 15M3.6 14.6h11.6M18.2 14.6h2.2M3.4 20.2l1.5-2.6"/></svg>';
+    const ver = [['Global', 'global'], ['Garena', 'garena']].filter(x => a[x[1]]).map(([label, k]) => {
+      const v = a[k];
+      const url = android ? 'https://play.google.com/store/apps/details?id=' + PLAY[k] : v.url;
+      const meta = 'v' + esc(v.version) + (android ? '' : ` · <span class="star">★</span> ${v.rating} (${fmt(v.ratings)}) App Store`);
+      return `<a href="${esc(url)}" target="_blank" rel="noopener">${dl}<span><b>Get ${label}</b><small>${meta}</small></span></a>`;
+    }).join('');
+    if (ver) { $('liVer').innerHTML = ver; $('liVer').hidden = false; }
+
+
+    // videos: newest 8
+    const vids = (f.videos || []).slice(0, 8);
+    if (vids.length) {
+      $('ytGrid').innerHTML = vids.map(v =>
+        `<a class="yt" href="https://www.youtube.com/${v.short ? 'shorts/' : 'watch?v='}${esc(v.id)}" target="_blank" rel="noopener">` +
+        `<div class="yt-thumb"><img src="https://i.ytimg.com/vi/${esc(v.id)}/mqdefault.jpg" alt="" loading="lazy">${v.short ? '<span class="yt-badge">Short</span>' : ''}</div>` +
+        `<div class="yt-body"><div class="yt-title">${esc(v.title)}</div><div class="yt-date">${ago(v.published)}</div></div></a>`).join('');
+      $('videos').hidden = false;
+    }
+  }).catch(() => {});
+
+  // weapon database
+  const LABEL = { ar:'Assault', smg:'SMG', sr:'Sniper', lmg:'LMG', sg:'Shotgun', marksman:'Marksman' };
+  const key = n => n.toLowerCase().replace(/^lw3\W*/, '').replace(/[^a-z0-9]/g, '');
+  const PAGE = 12;
+  Promise.all([fetch('/codm-weapons.json').then(r => r.json()), fetch('/codm-guns.json').then(r => r.json()).catch(() => [])]).then(([w, ours]) => {
+    const built = new Set(ours.map(g => key(g.name)));
+    const classes = Object.keys(LABEL).filter(k => (w.classes[k] || []).length);
+    if (!classes.length) return;
+    const total = classes.reduce((n, k) => n + w.classes[k].length, 0);
+    $('wdSub').textContent = `All ${total} primary weapons in Call of Duty: Mobile, by class.`;
+    let cls = classes[0], all = false;
+    function render(){
+      const list = w.classes[cls];
+      $('wdTabs').innerHTML = classes.map(k => `<button type="button" role="tab" data-k="${k}" aria-selected="${k === cls}">${LABEL[k]}<span>${w.classes[k].length}</span></button>`).join('');
+      $('wdGrid').innerHTML = (all ? list : list.slice(0, PAGE)).map(g => {
+        const ok = built.has(key(g.name));
+        return `<a class="wd" href="${ok ? '/call-of-duty-mobile/attachments?type=' + cls : esc(g.url)}"${ok ? '' : ' target="_blank" rel="noopener"'}>` +
+          (ok ? '<span class="wd-tag">Build</span>' : '') +
+          `<img src="${esc(g.img)}" alt="" loading="lazy"><b>${esc(g.name)}</b></a>`;
+      }).join('');
+      $('wdMore').hidden = all || list.length <= PAGE;
+      $('wdMore').textContent = `Show all ${list.length}`;
+    }
+    $('wdTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { cls = b.dataset.k; all = false; render(); } });
+    $('wdMore').addEventListener('click', () => { all = true; render(); });
+    render();
+    $('weapons').hidden = false;
+  }).catch(() => {});
+})();
+</script>
+
+<!-- PLAYSTYLE FINDER: four buttons -> a class, three perks and a matching build from
+     /codm-guns.json (prefers guns with real attachments). Data is the STYLES object. -->
+<section class="cg" id="finder" aria-labelledby="finderTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="finderTitle">Find Your Playstyle</h2>
+    <p class="layouts-subtitle">Pick how you like to play and get a class, perks and a build to start with.</p>
+  </div>
+  <div class="pf-wrap">
+    <div class="pf-pick" role="tablist" aria-label="Playstyles" id="pfPick">
+      <button type="button" role="tab" data-style="rusher" aria-selected="true"><b>Rusher</b><span>First into every fight</span></button>
+      <button type="button" role="tab" data-style="anchor" aria-selected="false"><b>Anchor</b><span>Holds lanes, wins long fights</span></button>
+      <button type="button" role="tab" data-style="objective" aria-selected="false"><b>Objective</b><span>Lives on the point</span></button>
+      <button type="button" role="tab" data-style="sniper" aria-selected="false"><b>Sniper</b><span>One shot, then reposition</span></button>
+    </div>
+    <div class="pf-out" id="pfOut" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="cg" id="classes" aria-labelledby="classesTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="classesTitle">Weapon Classes</h2>
+    <p class="layouts-subtitle">What each class is for, so you know which builds to look at.</p>
+  </div>
+  <div class="wc-grid">
+    <a class="wc" href="/call-of-duty-mobile/attachments?type=ar"><img src="/images/codm/guns/ak117.webp" alt="" loading="lazy"><b>Assault Rifle</b><span class="wc-r">Mid range</span><p>The all-rounder. Good damage and control at most distances. The safest first class to learn.</p></a>
+    <a class="wc" href="/call-of-duty-mobile/attachments?type=smg"><img src="/images/codm/guns/uss9.webp" alt="" loading="lazy"><b>SMG</b><span class="wc-r">Close range</span><p>Fastest movement and aim-down-sights speed. Built for rushers who take fights around corners.</p></a>
+    <a class="wc" href="/call-of-duty-mobile/attachments?type=sr"><img src="/images/codm/guns/tundra.webp" alt="" loading="lazy"><b>Sniper Rifle</b><span class="wc-r">Long range</span><p>Kills in one shot to the upper body, but slow to aim. Best for holding long lines of sight.</p></a>
+    <a class="wc" href="/call-of-duty-mobile/attachments?type=sg"><img src="/images/codm/guns/krm262.webp" alt="" loading="lazy"><b>Shotgun</b><span class="wc-r">Very close</span><p>One shot up close, nearly useless past a few metres. Strongest on small maps.</p></a>
+    <a class="wc" href="/call-of-duty-mobile/attachments?type=lmg"><span class="wc-ph" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg></span><b>LMG</b><span class="wc-r">Mid to long</span><p>Huge magazine and steady fire, but heavy. Holds a lane or an objective for a long time.</p></a>
+    <a class="wc" href="/call-of-duty-mobile/attachments?type=marksman"><span class="wc-ph" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 236 256" fill="currentColor"><path fill-rule="evenodd" d="M45,0 L31,28 L71,100 L0,223 L174,222 Z M86,126 L127,197 L46,196 Z"/><path d="M108,35 L94,62 L207,256 L236,256 Z"/></svg></span><b>Marksman Rifle</b><span class="wc-r">Mid to long</span><p>Semi-auto or bolt-action rifles between an assault rifle and a sniper. High damage per shot, less forgiving.</p></a>
+  </div>
+</section>
+
+<!-- WEAPON DATABASE: every CODM primary weapon, by class, from the CoD Fandom wiki
+     (/codm-weapons.json, refreshed by the same daily workflow). Guns we have a build
+     for get a "Build" tag and link to our attachments page instead of the wiki. -->
+<section class="cg" id="weapons" aria-labelledby="weaponsTitle" hidden>
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="weaponsTitle">Weapon Database</h2>
+    <p class="layouts-subtitle" id="wdSub">Every primary weapon in Call of Duty: Mobile, by class.</p>
+  </div>
+  <div class="wd-tabs" id="wdTabs" role="tablist" aria-label="Weapon class"></div>
+  <div class="wd-grid" id="wdGrid"></div>
+  <div class="wd-foot">
+    <button type="button" class="wd-more" id="wdMore" hidden>Show all</button>
+    <p class="wd-credit">Weapon list and pictures: <a href="https://callofduty.fandom.com/wiki/Call_of_Duty:_Mobile" target="_blank" rel="noopener">Call of Duty Wiki</a> (CC BY-SA). Pictures show each gun's original console model.</p>
+  </div>
+</section>
+
+
+<section class="cg" id="perks" aria-labelledby="perksTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="perksTitle">Perks Guide</h2>
+    <p class="layouts-subtitle">A loadout has three perk slots: one red, one green, one blue. These are the ones you'll see most.</p>
+  </div>
+  <div class="pk-grid">
+    <div class="pk pk-red">
+      <h3>Red slot</h3>
+      <dl>
+        <dt>Lightweight</dt><dd>Move faster.</dd>
+        <dt>Quick Fix</dt><dd>Killing an enemy starts your health regeneration straight away.</dd>
+        <dt>Flak Jacket</dt><dd>Take less damage from explosives and fire.</dd>
+        <dt>Restock</dt><dd>Your lethal and tactical equipment recharge over time.</dd>
+      </dl>
+    </div>
+    <div class="pk pk-green">
+      <h3>Green slot</h3>
+      <dl>
+        <dt>Toughness</dt><dd>Less flinch when you're shot while aiming.</dd>
+        <dt>Tracker</dt><dd>See enemy footprints for a short time.</dd>
+        <dt>Hardline</dt><dd>Scorestreaks cost less score.</dd>
+        <dt>Amped</dt><dd>Swap weapons faster.</dd>
+      </dl>
+    </div>
+    <div class="pk pk-blue">
+      <h3>Blue slot</h3>
+      <dl>
+        <dt>Dead Silence</dt><dd>Your footsteps are much quieter.</dd>
+        <dt>Ghost</dt><dd>Enemy UAVs can't see you while you move.</dd>
+        <dt>Cold-Blooded</dt><dd>Enemy AI scorestreaks and thermal scopes don't pick you out.</dd>
+        <dt>Engineer</dt><dd>See enemy equipment and scorestreaks through walls.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="cg" id="streaks" aria-labelledby="streaksTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="streaksTitle">Scorestreaks and Operator Skills</h2>
+    <p class="layouts-subtitle">The two kinds of power-up you bring into a Multiplayer match.</p>
+  </div>
+  <div class="sk-grid">
+    <div class="sk">
+      <h3>Scorestreaks</h3>
+      <p>You equip three. Each unlocks at a set score earned in one life, and dying resets your progress. Cheap streaks get used far more often than big ones, so carry one you'll earn every match.</p>
+      <ol class="sk-tiers">
+        <li><b>Early</b><span>UAV, Counter-UAV</span></li>
+        <li><b>Middle</b><span>Hunter Killer Drone, Predator Missile, Sentry Gun</span></li>
+        <li><b>Late</b><span>VTOL Escort, Stealth Chopper, Chopper Gunner</span></li>
+      </ol>
+    </div>
+    <div class="sk">
+      <h3>Operator Skills</h3>
+      <p>One per loadout. It charges during the match from kills, objective play and time, then gives you a short, strong ability.</p>
+      <ul class="sk-list">
+        <li><b>Purifier</b><span>Flamethrower</span></li>
+        <li><b>Death Machine</b><span>Minigun</span></li>
+        <li><b>War Machine</b><span>Grenade launcher</span></li>
+        <li><b>Sparrow</b><span>Explosive bow</span></li>
+        <li><b>Gravity Spikes</b><span>Area kill on landing</span></li>
+        <li><b>Ballistic Shield</b><span>Blocks bullets</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="cg" id="modes" aria-labelledby="modesTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="modesTitle">Game Modes</h2>
+    <p class="layouts-subtitle">The goal of each mode in one line, and one tip to win it.</p>
+  </div>
+  <div class="gm-grid">
+    <div class="gm"><h3>Team Deathmatch</h3><p>First team to the kill limit wins.</p><p class="gm-tip">Trade kills with a teammate. Never take a 1v2.</p></div>
+    <div class="gm"><h3>Domination <span class="gm-tag">Ranked</span></h3><p>Hold flags A, B and C to earn points over time.</p><p class="gm-tip">Hold two flags, not three. Chasing the third flips your spawns.</p></div>
+    <div class="gm"><h3>Hardpoint <span class="gm-tag">Ranked</span></h3><p>One zone moves around the map. Stand in it to score.</p><p class="gm-tip">Head to the next zone before this one ends.</p></div>
+    <div class="gm"><h3>Search &amp; Destroy <span class="gm-tag">Ranked</span></h3><p>One life per round. Attackers plant the bomb, defenders stop them.</p><p class="gm-tip">Information wins rounds. Don't peek first when you're the last one alive.</p></div>
+    <div class="gm"><h3>Kill Confirmed</h3><p>Kills only count when someone picks up the dog tag.</p><p class="gm-tip">Deny enemy tags near your teammates' bodies.</p></div>
+    <div class="gm"><h3>Free-for-All</h3><p>Everyone for themselves. First to the kill limit wins.</p><p class="gm-tip">Fight at the edges of the map, not the middle.</p></div>
+    <div class="gm"><h3>Gun Game</h3><p>Every kill swaps you to the next weapon. Finish the list first to win.</p><p class="gm-tip">A melee kill sets the victim back one weapon.</p></div>
+    <div class="gm gm-br"><h3>Battle Royale <span class="gm-tag">Ranked</span></h3><p>Drop in, loot, and be the last squad alive while the zone shrinks.</p><p class="gm-tip">Rotate early. Fighting your way in at the zone edge costs fights.</p></div>
+  </div>
+</section>
+
+<section class="cg" id="maps" aria-labelledby="mapsTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="mapsTitle">Multiplayer Maps</h2>
+    <p class="layouts-subtitle">How big each classic map is and which class fits it.</p>
+  </div>
+  <div class="mp-grid">
+    <div class="mp"><h3>Shipment</h3><span class="mp-s s1">Tiny</span><p>Nonstop fights between containers.</p><span class="mp-c">Shotgun, SMG</span></div>
+    <div class="mp"><h3>Nuketown</h3><span class="mp-s s2">Small</span><p>Two houses facing each other across one yard.</p><span class="mp-c">SMG, Assault Rifle</span></div>
+    <div class="mp"><h3>Killhouse</h3><span class="mp-s s2">Small</span><p>Tight indoor lanes with three main routes.</p><span class="mp-c">SMG, Shotgun</span></div>
+    <div class="mp"><h3>Rust</h3><span class="mp-s s2">Small</span><p>A tower in the middle controls the map.</p><span class="mp-c">SMG, Shotgun</span></div>
+    <div class="mp"><h3>Hijacked</h3><span class="mp-s s2">Small</span><p>A yacht with fights above and below deck.</p><span class="mp-c">SMG, Shotgun</span></div>
+    <div class="mp"><h3>Firing Range</h3><span class="mp-s s3">Medium</span><p>Mixed close buildings and open ranges.</p><span class="mp-c">Assault Rifle, SMG</span></div>
+    <div class="mp"><h3>Raid</h3><span class="mp-s s3">Medium</span><p>A villa with a pool in the middle and flanks on both sides.</p><span class="mp-c">Assault Rifle</span></div>
+    <div class="mp"><h3>Standoff</h3><span class="mp-s s3">Medium</span><p>A small town with long streets and lots of windows.</p><span class="mp-c">Assault Rifle</span></div>
+    <div class="mp"><h3>Crash</h3><span class="mp-s s3">Medium</span><p>A downed helicopter splits the middle of the map.</p><span class="mp-c">Assault Rifle, LMG</span></div>
+    <div class="mp"><h3>Summit</h3><span class="mp-s s3">Medium</span><p>A snowy mountain base with a central lab building.</p><span class="mp-c">Assault Rifle</span></div>
+    <div class="mp"><h3>Terminal</h3><span class="mp-s s4">Large</span><p>An airport with a plane and long indoor halls.</p><span class="mp-c">Assault Rifle, LMG</span></div>
+    <div class="mp"><h3>Crossfire</h3><span class="mp-s s4">Large</span><p>One long main street that snipers love.</p><span class="mp-c">Sniper, Assault Rifle</span></div>
+  </div>
+</section>
+<style>
+/* ---- shared card look for the lobby's middle sections ---- */
+.cg{ scroll-margin-top:90px; }
+.wc, .pk, .sk, .gm, .mp, .ol, .gl-grid > div, .pf-out{
+  background:#141416; border:1px solid #26262a; border-radius:10px;
+}
+
+/* playstyle finder */
+.pf-wrap{ margin:0 12%; display:grid; grid-template-columns:260px 1fr; gap:16px; align-items:start; }
+.pf-pick{ display:grid; gap:8px; }
+.pf-pick button{
+  font:inherit; text-align:left; cursor:pointer; padding:12px 14px; border-radius:10px;
+  background:#141416; border:1px solid #26262a; color:#fff; display:flex; flex-direction:column; gap:2px;
+}
+.pf-pick button span{ font-size:12px; color:var(--text-muted); }
+.pf-pick button[aria-selected="true"]{ border-color:#be1b1b; background:rgba(190,27,27,0.12); }
+.pf-out{ padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:18px; min-height:220px; }
+.pf-k{ display:block; font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#6f7177; margin-bottom:6px; }
+.pf-class{ font-size:22px; font-weight:900; }
+.pf-perks{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.pf-perks li{ font-size:13px; font-weight:700; padding:6px 10px; border-radius:6px; background:#1b1b1f; border-left:3px solid; }
+.pf-perks .r{ border-color:#d23a3a; } .pf-perks .g{ border-color:#3fae5a; } .pf-perks .b{ border-color:#3a7ed2; }
+.pf-tip{ grid-column:1 / -1; margin:0; font-size:13px; line-height:1.6; color:var(--text-muted); }
+.pf-build{ grid-column:1 / -1; display:flex; align-items:center; gap:14px; padding:10px; border-radius:8px; background:#1b1b1f; text-decoration:none; color:#fff; }
+.pf-build img{ width:150px; height:56px; object-fit:cover; border-radius:6px; }
+.pf-build b{ display:block; font-size:15px; }
+.pf-build span{ font-size:12px; color:var(--text-muted); }
+
+/* weapon classes */
+.wc-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.wc{ display:block; padding:14px; text-decoration:none; color:#fff; transition:border-color .18s, transform .18s; }
+.wc:hover{ border-color:#be1b1b; transform:translateY(-2px); }
+.wc img{ display:block; width:100%; aspect-ratio:3/1; object-fit:cover; border-radius:6px; margin-bottom:12px; opacity:.85; }
+.wc-ph{ display:flex; align-items:center; justify-content:center; aspect-ratio:3/1; border-radius:6px; margin-bottom:12px; background:#0f0f10; color:rgba(255,255,255,0.08); }
+.wc b{ font-size:16px; }
+.wc-r{ margin-left:8px; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#ff5555; }
+.wc p{ margin:6px 0 0; font-size:13px; line-height:1.6; color:var(--text-muted); }
+
+/* perks */
+.pk-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.pk{ padding:16px; border-top:3px solid; }
+.pk-red{ border-top-color:#d23a3a; } .pk-green{ border-top-color:#3fae5a; } .pk-blue{ border-top-color:#3a7ed2; }
+.pk h3{ margin:0 0 10px; font-size:13px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:#a7a9ae; }
+.pk dl{ margin:0; }
+.pk dt{ font-size:14px; font-weight:800; color:#fff; margin-top:10px; }
+.pk dt:first-child{ margin-top:0; }
+.pk dd{ margin:2px 0 0; font-size:13px; line-height:1.55; color:var(--text-muted); }
+
+/* scorestreaks + skills */
+.sk-grid{ margin:0 12%; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sk{ padding:18px; }
+.sk h3{ margin:0 0 6px; font-size:16px; font-weight:800; }
+.sk > p{ margin:0 0 14px; font-size:13px; line-height:1.6; color:var(--text-muted); }
+.sk-tiers, .sk-list{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.sk-tiers li, .sk-list li{ display:flex; gap:12px; align-items:baseline; font-size:13px; padding:8px 10px; border-radius:6px; background:#1b1b1f; }
+.sk-tiers b, .sk-list b{ flex:0 0 120px; color:#fff; }
+.sk-tiers span, .sk-list span{ color:var(--text-muted); }
+.sk-list{ grid-template-columns:1fr 1fr; }
+.sk-list b{ flex:none; }
+.sk-list li{ flex-direction:column; gap:1px; }
+
+/* game modes */
+.gm-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.gm{ padding:16px; }
+.gm h3{ margin:0 0 6px; font-size:15px; font-weight:800; display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.gm-tag{ font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:3px 6px; border-radius:3px; color:#16161a; background:#d9dadd; }
+.gm p{ margin:0; font-size:13px; line-height:1.55; color:var(--text-muted); }
+.gm .gm-tip{ margin-top:10px; padding-top:10px; border-top:1px solid #222226; color:#c9cbd0; }
+.gm .gm-tip::before{ content:"Tip: "; color:#ff5555; font-weight:800; }
+
+/* maps */
+.mp-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.mp{ padding:14px; display:flex; flex-direction:column; gap:6px; }
+.mp h3{ margin:0; font-size:15px; font-weight:800; }
+.mp-s{ align-self:flex-start; font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:3px 7px; border-radius:3px; background:#1f1f23; color:#c9cbd0; }
+.mp-s::before{ content:""; display:inline-block; height:6px; margin-right:6px; border-radius:2px; background:#be1b1b; vertical-align:middle; }
+.mp-s.s1::before{ width:6px; } .mp-s.s2::before{ width:12px; } .mp-s.s3::before{ width:20px; } .mp-s.s4::before{ width:30px; }
+.mp p{ margin:0; flex:1; font-size:13px; line-height:1.55; color:var(--text-muted); }
+.mp-c{ font-size:12px; font-weight:700; color:#fff; }
+.mp-c::before{ content:"Best with "; color:#6f7177; font-weight:600; }
+
+/* glossary */
+.gl-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.gl-grid > div{ padding:12px 14px; }
+.gl-grid dt{ font-size:14px; font-weight:800; color:#fff; }
+.gl-grid dd{ margin:3px 0 0; font-size:13px; line-height:1.55; color:var(--text-muted); }
+
+/* official links */
+.ol-grid{ margin:0 12%; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.ol{ padding:16px; display:flex; flex-direction:column; gap:6px; }
+.ol h3{ margin:0 0 6px; font-size:15px; font-weight:800; }
+.ol h3 span{ font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#6f7177; margin-left:6px; }
+.ol a{ font-size:13px; font-weight:700; color:#e6e6e6; text-decoration:none; padding:8px 10px; border-radius:6px; background:#1b1b1f; display:flex; justify-content:space-between; }
+.ol a::after{ content:"\2197"; color:#be1b1b; }
+.ol a:hover{ background:#232328; }
+
+@media (max-width:1150px){
+  .gm-grid, .mp-grid{ grid-template-columns:repeat(3,1fr); }
+}
+@media (max-width:970px){
+  .pf-wrap, .wc-grid, .pk-grid, .sk-grid, .gm-grid, .mp-grid, .gl-grid, .ol-grid{ margin-left:5%; margin-right:5%; }
+  .pf-wrap{ grid-template-columns:1fr; }
+  .pf-pick{ grid-template-columns:1fr 1fr; }
+  .pf-out{ grid-template-columns:1fr; padding:16px; }
+  .wc-grid, .pk-grid, .sk-grid, .ol-grid{ grid-template-columns:1fr; }
+  .gm-grid, .mp-grid, .gl-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+}
+@media (max-width:520px){
+  .gm-grid, .gl-grid{ grid-template-columns:1fr; }
+  .sk-list{ grid-template-columns:1fr; }
+}
+</style>
+
+<script>
+(function(){
+  // Playstyle -> class + perks (red, green, blue) + a tip. The build is the first gun
+  // of that class in /codm-guns.json, preferring guns with real attachments.
+  const STYLES = {
+    rusher:    { cls:'SMG',           type:'smg', perks:['Lightweight','Toughness','Dead Silence'], tip:'Avoid long sightlines. Take fights around corners and doorways, where your fire rate and speed win.' },
+    anchor:    { cls:'Assault Rifle', type:'ar',  perks:['Quick Fix','Tracker','Ghost'],            tip:'Pick one lane and hold it. Reposition after every kill so the enemy can\'t pre-aim you.' },
+    objective: { cls:'Assault Rifle', type:'ar',  perks:['Flak Jacket','Hardline','Engineer'],      tip:'Play the edge of the zone, not the middle, and spawn back in as a group.' },
+    sniper:    { cls:'Sniper Rifle',  type:'sr',  perks:['Quick Fix','Toughness','Ghost'],          tip:'Take one shot, then move. Staying in the same window after a kill gets you killed.' }
+  };
+  const $out = document.getElementById('pfOut');
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let guns = [];
+
+  function render(key){
+    const s = STYLES[key];
+    const pool = guns.filter(g => g.type === s.type);
+    const g = pool.find(x => x.attachments) || pool[0];
+    const pic = g && g.attachments ? '/images/codm/guns/' + g.name.toLowerCase().replace(/[^a-z0-9]/g,'') + '.webp' : '';
+    $out.innerHTML =
+      `<div><span class="pf-k">Class</span><div class="pf-class">${s.cls}</div></div>` +
+      `<div><span class="pf-k">Perks</span><ul class="pf-perks"><li class="r">${s.perks[0]}</li><li class="g">${s.perks[1]}</li><li class="b">${s.perks[2]}</li></ul></div>` +
+      `<p class="pf-tip">${esc(s.tip)}</p>` +
+      (g ? `<a class="pf-build" href="/call-of-duty-mobile/attachments?type=${s.type}">` +
+           (pic ? `<img src="${pic}" alt="" loading="lazy">` : '') +
+           `<div><b>Start with: ${esc(g.name)}</b><span>See its build</span></div></a>` : '');
+  }
+
+  document.getElementById('pfPick').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#pfPick button').forEach(x => x.setAttribute('aria-selected', x === b));
+    render(b.dataset.style);
+  });
+
+  fetch('/codm-guns.json').then(r => r.json()).then(all => { guns = all; render('rusher'); });
+})();
+</script>
+<!-- RANKED GUIDE + FIRST-TIME SETUP (Oct 2026). Evergreen on purpose: nothing here
+     names a season, a date or a number that changes, so it never needs updating. -->
+<section class="cg" id="ranked" aria-labelledby="rankedTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="rankedTitle">How Ranked Works</h2>
+    <p class="layouts-subtitle">Seven tiers, the same ladder in Multiplayer and Battle Royale.</p>
+  </div>
+
+  <ol class="rk-ladder">
+    <li><span class="rk-n">01</span>Rookie</li>
+    <li><span class="rk-n">02</span>Veteran</li>
+    <li><span class="rk-n">03</span>Elite</li>
+    <li><span class="rk-n">04</span>Pro</li>
+    <li><span class="rk-n">05</span>Master</li>
+    <li><span class="rk-n">06</span>Grandmaster</li>
+    <li class="rk-top"><span class="rk-n">07</span>Legendary</li>
+  </ol>
+
+  <div class="rk-notes">
+    <div class="rk-note">
+      <h3>Two separate ranks</h3>
+      <p>Multiplayer and Battle Royale each have their own rank. Climbing one does nothing for the other.</p>
+    </div>
+    <div class="rk-note">
+      <h3>How you climb</h3>
+      <p>Multiplayer ranked rotates objective modes such as Hardpoint and Search &amp; Destroy, and winning matters most. In Battle Royale, placement and kills both earn points.</p>
+    </div>
+    <div class="rk-note">
+      <h3>Season resets</h3>
+      <p>Ranked seasons run on their own schedule, not the battle pass. When one ends you get rewards for the highest tier you reached, and your rank drops back a few tiers.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cg" id="setup" aria-labelledby="setupTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="setupTitle">First-Time Setup</h2>
+    <p class="layouts-subtitle">Settings to change before your first ranked match.</p>
+  </div>
+
+  <ul class="st-panel">
+    <li class="st-row">
+      <div class="st-k"><b>Shooting mode</b><span>Simple mode fires on its own when an enemy is under your crosshair. Advanced lets you choose when to shoot.</span></div>
+      <span class="st-v">Advanced</span>
+    </li>
+    <li class="st-row">
+      <div class="st-k"><b>Frame rate</b><span>A steadier, higher frame rate helps your aim more than better graphics do.</span></div>
+      <span class="st-v">Highest available</span>
+    </li>
+    <li class="st-row">
+      <div class="st-k"><b>Graphics quality</b><span>Lower it until the highest frame rate option unlocks and stays smooth.</span></div>
+      <span class="st-v">As low as needed</span>
+    </li>
+    <li class="st-row">
+      <div class="st-k"><b>Sensitivity</b><span>Multiplayer and Battle Royale have separate sensitivity settings. Change them in small steps and play a few matches before changing them again.</span></div>
+      <span class="st-v">Small steps</span>
+    </li>
+    <li class="st-row">
+      <div class="st-k"><b>Gyroscope</b><span>Tilting the phone to fine-tune your aim. Many players use it only while aiming down sights.</span></div>
+      <span class="st-v">Optional</span>
+    </li>
+    <li class="st-row">
+      <div class="st-k"><b>Custom layout</b><span>Move fire, aim, crouch and jump to where your fingers already rest, so you can shoot while moving.</span></div>
+      <span class="st-v">Make it yours</span>
+    </li>
+  </ul>
+</section>
+
+<section class="cg" id="glossary" aria-labelledby="glossaryTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="glossaryTitle">Glossary</h2>
+    <p class="layouts-subtitle">Words you'll hear in lobbies and videos, in plain English.</p>
+  </div>
+  <dl class="gl-grid">
+    <div><dt>ADS</dt><dd>Aim down sights: looking through your gun's scope or sight.</dd></div>
+    <div><dt>Hipfire</dt><dd>Shooting without aiming down sights. Faster to start, less accurate.</dd></div>
+    <div><dt>TTK</dt><dd>Time to kill: how fast a gun kills someone at full health.</dd></div>
+    <div><dt>Quickscope</dt><dd>Aiming a sniper and shooting almost instantly.</dd></div>
+    <div><dt>Drop shot</dt><dd>Going prone while shooting so your head drops out of the enemy's aim.</dd></div>
+    <div><dt>Slide cancel</dt><dd>Stopping a slide early to aim and shoot sooner.</dd></div>
+    <div><dt>Pre-aim</dt><dd>Keeping your crosshair where an enemy will appear before they do.</dd></div>
+    <div><dt>Jiggle peek</dt><dd>Stepping in and out of cover quickly to see without getting shot.</dd></div>
+    <div><dt>Flank</dt><dd>Going around the side to hit enemies from behind.</dd></div>
+    <div><dt>Spawn trap</dt><dd>Holding the area where the enemy team keeps coming back in.</dd></div>
+    <div><dt>Wallbang</dt><dd>Shooting an enemy through a thin wall or door.</dd></div>
+    <div><dt>Rotate</dt><dd>In Battle Royale: moving to the next safe zone.</dd></div>
+    <div><dt>Third party</dt><dd>In Battle Royale: attacking two squads while they fight each other.</dd></div>
+    <div><dt>Meta</dt><dd>The guns and setups most top players use right now.</dd></div>
+  </dl>
+</section>
+
+<section class="cg" id="links" aria-labelledby="linksTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="linksTitle">Official Links</h2>
+    <p class="layouts-subtitle">Players in Southeast Asia, including the Philippines, play the Garena version. Use the links that match your version.</p>
+  </div>
+  <div class="ol-grid">
+    <div class="ol">
+      <h3>Global <span>Activision</span></h3>
+      <a href="https://www.callofduty.com/mobile" target="_blank" rel="noopener">Official site</a>
+      <a href="https://redeem.codm.activision.com/" target="_blank" rel="noopener">Redeem a code</a>
+      <a href="https://www.callofduty.com/blog" target="_blank" rel="noopener">Patch notes and news</a>
+      <a href="https://support.activision.com/" target="_blank" rel="noopener">Support</a>
+    </div>
+    <div class="ol">
+      <h3>Southeast Asia <span>Garena</span></h3>
+      <a href="https://codm.garena.com/" target="_blank" rel="noopener">Official site</a>
+      <a href="https://codm.garena.com/redeem" target="_blank" rel="noopener">Redeem a code</a>
+    </div>
+    <div class="ol">
+      <h3>Follow <span>Official channels</span></h3>
+      <a href="https://www.youtube.com/@CallofDutyMobile" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://x.com/PlayCODMobile" target="_blank" rel="noopener">X (Twitter)</a>
+    </div>
+  </div>
+</section>
+
+<section class="cg cg-faq" id="faq" aria-labelledby="faqTitle">
+  <div class="layouts-title-box">
+    <h2 class="layouts-title" id="faqTitle">Frequently Asked Questions</h2>
+  </div>
+  <div class="fq-list">
+    <details class="fq">
+      <summary>Where do these builds come from?</summary>
+      <p>Each build on our attachments page was copied from our own Gunsmith screens in game. The ones with a build code were exported straight from the game.</p>
+    </details>
+    <details class="fq">
+      <summary>How do I use a build code?</summary>
+      <p>Tap <b>Copy</b> on a build, then paste the code into the Gunsmith's build code import in game. The game fills in the attachments for you.</p>
+    </details>
+    <details class="fq">
+      <summary>Should I use different builds for Multiplayer and Battle Royale?</summary>
+      <p>Usually, yes. Battle Royale fights happen at longer range, so BR builds favour range and recoil control. Multiplayer builds favour moving fast and aiming down sights quickly. Each build is tagged MP, BR or both.</p>
+    </details>
+    <details class="fq">
+      <summary>When does the current season end?</summary>
+      <p>The battle pass countdown near the top estimates it from the length of recent seasons. Activision usually confirms the exact date a few days before a new season starts.</p>
+    </details>
+    <details class="fq">
+      <summary>Is Parchrome an official Call of Duty site?</summary>
+      <p>No. Parchrome is a fan site. It isn't affiliated with Activision or TiMi Studio Group.</p>
+    </details>
+  </div>
+</section>
+
+<style>
+.cg{ margin:56px 0 0; }
+.cg .layouts-title-box{ margin-bottom:22px; }
+
+/* ranked ladder: seven steps that rise left to right */
+.rk-ladder{ list-style:none; margin:0 12%; padding:0; display:grid; grid-template-columns:repeat(7,1fr); gap:8px; align-items:end; }
+.rk-ladder li{
+  display:flex; flex-direction:column; justify-content:flex-end; gap:6px;
+  padding:12px 10px; border-radius:6px; background:#141416; border:1px solid #26262a;
+  font-size:13px; font-weight:800; color:var(--text-main); letter-spacing:.3px;
+}
+.rk-ladder li:nth-child(1){ height:64px; }
+.rk-ladder li:nth-child(2){ height:78px; }
+.rk-ladder li:nth-child(3){ height:92px; }
+.rk-ladder li:nth-child(4){ height:106px; }
+.rk-ladder li:nth-child(5){ height:120px; }
+.rk-ladder li:nth-child(6){ height:134px; }
+.rk-ladder li:nth-child(7){ height:148px; }
+.rk-n{ font-size:11px; color:#6f7177; letter-spacing:1px; }
+.rk-ladder .rk-top{ border-color:#be1b1b; background:linear-gradient(180deg, rgba(190,27,27,0.28), #141416 80%); }
+.rk-ladder .rk-top .rk-n{ color:#ff5555; }
+
+.rk-notes{ margin:20px 12% 0; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.rk-note{ padding:16px; border-radius:10px; background:#141416; border:1px solid #26262a; }
+.rk-note h3{ margin:0 0 6px; font-size:14px; font-weight:800; color:var(--text-main); }
+.rk-note p{ margin:0; font-size:13px; line-height:1.6; color:var(--text-muted); }
+
+/* first-time setup: rows like the in-game settings menu, recommended value on the right */
+.st-panel{ list-style:none; margin:0 12%; padding:0; border:1px solid #26262a; border-radius:10px; overflow:hidden; background:#141416; }
+.st-row{ display:flex; align-items:center; justify-content:space-between; gap:20px; padding:14px 18px; }
+.st-row + .st-row{ border-top:1px solid #222226; }
+.st-k{ min-width:0; display:flex; flex-direction:column; gap:3px; }
+.st-k b{ font-size:14px; color:var(--text-main); }
+.st-k span{ font-size:12.5px; line-height:1.55; color:var(--text-muted); }
+.st-v{
+  flex:0 0 auto; font-size:12px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; white-space:nowrap;
+  padding:6px 12px; border-radius:4px; color:#16161a; background:#d9dadd; border-bottom:2px solid #be1b1b;
+}
+
+.fq-list{ margin:0 12%; display:grid; gap:10px; }
+.fq{ border:1px solid #26262a; border-radius:10px; background:#141416; }
+.fq summary{
+  list-style:none; cursor:pointer; padding:15px 18px; font-size:14px; font-weight:800; color:var(--text-main);
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+}
+.fq summary::-webkit-details-marker{ display:none; }
+.fq summary::after{ content:"+"; font-size:20px; font-weight:400; color:#be1b1b; line-height:1; }
+.fq[open] summary::after{ content:"\2212"; }
+.fq p{ margin:0; padding:0 18px 16px; font-size:13px; line-height:1.65; color:var(--text-muted); }
+.fq p b{ color:var(--text-main); }
+.cg-faq{ margin-bottom:56px; }
+
+@media (max-width:970px){
+  .rk-ladder, .rk-notes, .st-panel, .fq-list{ margin-left:5%; margin-right:5%; }
+  .rk-notes{ grid-template-columns:1fr; }
+  /* phones: the ladder becomes a vertical list, top tier first */
+  .rk-ladder{ grid-template-columns:1fr; gap:6px; }
+  .rk-ladder li{ height:auto !important; flex-direction:row; justify-content:flex-start; align-items:center; gap:12px; padding:11px 14px; }
+  .rk-ladder li:nth-child(1){ order:7; } .rk-ladder li:nth-child(2){ order:6; } .rk-ladder li:nth-child(3){ order:5; }
+  .rk-ladder li:nth-child(4){ order:4; } .rk-ladder li:nth-child(5){ order:3; } .rk-ladder li:nth-child(6){ order:2; }
+  .rk-ladder li:nth-child(7){ order:1; }
+  .st-row{ padding:13px 14px; gap:12px; }
 }
 </style>
 <footer class="pf-footer">
@@ -1289,6 +2131,6 @@ body {
   </div>
 </div>
 
-<script src="/11layout.js?v=20261007a"></script>
+<script src="/11layout.js?v=20261008c"></script>
 </body>
 </html>

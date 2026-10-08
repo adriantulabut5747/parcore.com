@@ -433,61 +433,82 @@
 }
 
 /* ---- FAQ (under the clan card) ----------------------------------------
-   One panel in the clan card's material, questions split by hairlines.
-   Native <details>: click a question to open its answer; the chevron
-   turns. The questions differ per page (coc-home's are reworded for the
-   hub); only the look is shared. Margins are set by each page. */
+   The CoC lobby look (Oct 2026), shared by /coc/, the tool pages and every
+   TH page: each question is its own card, numbered 01, 02 ... by a CSS
+   counter (no numbers in the markup), with a round chevron button on the
+   right. Open: the number turns red, the chevron flips -- nothing else.
+   Native <details>: no script, keyboard-friendly, answers stay in the
+   page text for search engines. The questions differ per page; margins
+   are set by each page. */
 .t18-faq-label::before{ display:none; }   /* no pulsing "live" dot: nothing here is live */
 .t18-faq-list{
-  border-radius:12px;
-  background:#121316;
-  border:1px solid rgba(255, 255, 255, 0.08);
-  overflow:hidden;
+  display:grid;
+  gap:10px;
+  counter-reset:faq;
 }
-.t18-faq-item + .t18-faq-item{ border-top:1px solid rgba(255, 255, 255, 0.06); }
+.t18-faq-item{
+  counter-increment:faq;
+  border:1px solid rgba(255, 255, 255, 0.07);
+  border-radius:14px;
+  background:linear-gradient(180deg, #16171b 0%, #121316 100%);
+  box-shadow:inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition:border-color .25s ease;
+}
+.t18-faq-item:hover{ border-color:rgba(255, 255, 255, 0.14); }
 .t18-faq-item summary{
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-  padding:17px 22px;
+  display:flex; align-items:center; gap:16px;
+  padding:18px 20px;
+  border-radius:14px;
   list-style:none;
   cursor:pointer;
   font-family:'Sora', sans-serif;
-  font-size:14px; font-weight:600;
+  font-size:14.5px; font-weight:600; line-height:1.4;
   color:#e6e7ea;
   -webkit-tap-highlight-color:transparent;
-  transition:background-color .15s ease;
 }
 .t18-faq-item summary::-webkit-details-marker{ display:none; }
-.t18-faq-item summary::after{                /* chevron */
-  content:"";
-  flex-shrink:0;
-  width:7px; height:7px;
-  margin-top:-3px;
-  border-right:1.8px solid #8b9099;
-  border-bottom:1.8px solid #8b9099;
-  transform:rotate(45deg);
-  transition:transform .2s ease, margin .2s ease;
+.t18-faq-item summary::before{              /* 01, 02 ... */
+  content:counter(faq, decimal-leading-zero);
+  flex:none;
+  min-width:22px;
+  font-family:'Orbitron', sans-serif;
+  font-size:12px; font-weight:800;
+  color:#5d6168;
+  transition:color .25s ease;
 }
-.t18-faq-item[open] summary::after{ transform:rotate(-135deg); margin-top:3px; }
-.t18-faq-item summary:hover{ background:rgba(255, 255, 255, 0.025); }
-.t18-faq-item summary:focus-visible{ outline:2px solid rgba(255, 255, 255, 0.5); outline-offset:-2px; }
+.t18-faq-item[open] summary::before{ color:#e05252; }
+.t18-faq-item summary::after{               /* chevron in a round button */
+  content:"";
+  flex:none;
+  width:28px; height:28px;
+  margin-left:auto;
+  border:1px solid rgba(255, 255, 255, 0.1);
+  border-radius:50%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9ccd2' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / 14px no-repeat,
+    rgba(255, 255, 255, 0.03);
+  transition:transform .25s ease;
+}
+.t18-faq-item[open] summary::after{ transform:rotate(180deg); }
+.t18-faq-item summary:focus-visible{ outline:2px solid rgba(255, 255, 255, 0.5); outline-offset:2px; }
 .t18-faq-item p{
   margin:0;
-  padding:0 22px 20px;
+  padding:0 24px 22px 58px;                /* lines up with the question, past the number */
   max-width:72ch;
   font-family:'Sora', sans-serif;
-  font-size:13.5px; line-height:1.7;
+  font-size:14px; line-height:1.7;
   color:#a9aeb6;
 }
 .t18-faq-item p b{ color:#e6e7ea; font-weight:600; }
 @media (max-width:970px){
-  .t18-faq-item summary{ padding:15px 16px; font-size:13.5px; }
-  .t18-faq-item p{ padding:0 16px 16px; font-size:13px; }
+  .t18-faq-item summary{ gap:12px; padding:15px 14px; font-size:13.5px; }
+  .t18-faq-item p{ padding:0 16px 16px 48px; font-size:13px; }
 }
 
 @media (prefers-reduced-motion: reduce){
   .cc-label::before, .clan-card::before, .t18-band::before{ animation:none; }
   .t18-tag{ transition:none; }
-  .t18-faq-item summary::after{ transition:none; }
+  .t18-faq-item, .t18-faq-item summary::before, .t18-faq-item summary::after{ transition:none; }
 }
 
 /* ---- Clan card v2 (.ac-card) -- TH layouts / army / tools pages, Oct 2026 ----
@@ -683,7 +704,7 @@
   position: relative;
   isolation: isolate; /* keeps the star layer behind the content */
   margin: 0;
-  padding: 44px 12% 48px; /* 12% = the content column above */
+  padding: 44px var(--coc-side, 12%) 48px; /* = the content column above (/coc/ sets --coc-side) */
   background:
     linear-gradient(90deg, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0.45)) top / 100% 1px no-repeat,
     radial-gradient(40% 110% at 86% 100%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 72%),
@@ -823,7 +844,7 @@
   position: absolute;
   top: 0;
   bottom: -12px;
-  right: 12%; /* = the content column's right edge (the FAQ above) */
+  right: var(--coc-side, 12%); /* = the content column's right edge (the FAQ above) */
   width: 254px;
   pointer-events: none;
 }

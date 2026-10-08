@@ -276,7 +276,9 @@ body { visibility: hidden; }
   /* Width of .coc-main's scrollbar. The fixed bars are inset by this so
      they stop at the scroll container's content edge instead of running
      over its scrollbar -- see the .top-bar/.secondary-top-bar rule. Keep in
-     step with the ::-webkit-scrollbar width set further down this file. */
+     step with the ::-webkit-scrollbar width set further down this file.
+     11layout.js (syncScrollbarWidth) overwrites it with the measured width,
+     which is 0 for overlay scrollbars. */
   --scrollbar-w: 10px;
 
   --sidebar-width: max(260px, 18%);
@@ -784,8 +786,8 @@ body { visibility: hidden; }
 
 /* ============================================================
    TOP-BAR SEARCH MODAL — SHARED
-   Icon morph (magnifying glass <-> ✖), fg-card style results grid
-   fed by herosearch.json, clear button, body scroll lock, and
+   Icon morph (magnifying glass <-> ✖), tile results grid
+   fed by the Featured Topics data, clear button, body scroll lock, and
    mobile back-button support (handled in 11layout.js).
    ============================================================ */
 @media (min-width:969px) {
@@ -808,52 +810,47 @@ body.search-modal-open .coc-main {
   overflow: hidden !important;
 }
 
-/* Search button icon morph — magnifying glass rotates/fades out and
-   the ✖ rotates/fades in, same pattern language as the hamburger's
-   animated 3-line-to-X transform. Toggled by .active on #search-btn. */
+/* Search button (#search-btn). 11layout.js rebuilds its contents on load
+   (pages ship two older icon versions plus inline styles), so this is the
+   one place it's styled.
+   Phones: a line icon drawn like the hamburger on the left -- same 2px
+   stroke, rounded ends, --text-main -- that morphs into a matching X while
+   the search is open. Desktop: a search bar in the search panel's style
+   ("Search Parchrome" + a "/" key hint); clicking it opens the panel. */
 #search-btn {
-  position: relative;
-  width: 25px;
-  height: 25px;
+  position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; margin: 0;
+  border: 0; background: none; color: var(--text-main); cursor: pointer;
 }
-#search-btn #search-icon,
-#search-btn #close-icon {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 25px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#search-btn:not(.sb-ready) > * { visibility: hidden; } /* hides the old icon until it's rebuilt */
+#search-btn .sb-icon {
+  position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
-#search-btn #close-icon {
-  font-size: 1.4rem;
-  line-height: 1;
-  color: #fff;
-  opacity: 0;
-  transform: rotate(-45deg) scale(0.6);
-  pointer-events: none;
-}
-#search-btn #search-icon {
-  opacity: 1;
-  transform: rotate(0deg) scale(1);
-}
-#search-btn.active #search-icon {
-  opacity: 0;
-  transform: rotate(45deg) scale(0.6);
-}
-#search-btn.active #close-icon {
-  opacity: 1;
-  transform: rotate(0deg) scale(1);
-}
+#search-btn #close-icon { opacity: 0; transform: rotate(-45deg) scale(0.6); }
+#search-btn.active #search-icon { opacity: 0; transform: rotate(45deg) scale(0.6); }
+#search-btn.active #close-icon { opacity: 1; transform: none; }
+#search-btn .sb-label, #search-btn .sb-key { display: none; }
+#search-btn:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; border-radius: 6px; }
 @media (min-width: 971px) {
-  #search-btn { width: 21px; height: 21px; }
-  #search-btn #search-icon,
-  #search-btn #close-icon { width: 21px; height: 21px; }
-  #search-icon { width: 21px; height: 21px; }
-  #search-btn #close-icon { font-size: 1.2rem; }
+  #search-btn {
+    justify-content: flex-start; gap: 8px; width: 260px; height: 28px; padding: 0 5px 0 10px;
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 7px;
+    color: #8a8d93; transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  #search-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.14); color: #b9bcc2; }
+  #search-btn.active { border-color: rgba(224, 48, 47, 0.55); }
+  #search-btn .sb-icon { position: static; width: 15px; height: 15px; margin: 0; flex: none; }
+  /* desktop keeps the magnifier; the panel has its own Esc hint */
+  #search-btn #close-icon { display: none; }
+  #search-btn.active #search-icon { opacity: 1; transform: none; }
+  #search-btn .sb-label { display: block; flex: 1; text-align: left; font: 400 12.5px/1 'Sora', sans-serif; white-space: nowrap; }
+  #search-btn .sb-key {
+    display: block; min-width: 18px; padding: 3px 5px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 4px;
+    font: 600 10.5px/1 'Sora', sans-serif; color: #8a8d93; text-align: center; background: none;
+  }
 }
 
 /* Sits below the top bar and fills everything under it. This used to be
@@ -865,8 +862,22 @@ body.search-modal-open .coc-main {
    desktop override is no longer needed. */
 #search-overlay { position: fixed;  top: var(--topbar-height);  left: 0; width: 100%;
   height: calc(100% - var(--topbar-height));
-  background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none;  z-index: 9999;
-  overflow-y: auto; padding: 20px 20px 50px; box-sizing: border-box;}
+  background: #0f0f10; display: none;  z-index: 9999;
+  overflow: hidden; padding: 0; box-sizing: border-box;}
+
+/* #search-panel is added by 11layout.js around the input, the results and
+   the "Loading more" line (no page markup changes needed). Phones: it fills
+   the overlay and scrolls. Desktop: a centered card over the dimmed page,
+   scrolling inside; clicking the dim area around it closes the search. */
+#search-panel { height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 100px; box-sizing: border-box; }
+@media (min-width: 971px) {
+  #search-overlay { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); }
+  #search-panel {
+    width: min(760px, calc(100% - 48px)); height: auto; max-height: calc(100% - 96px); margin: 48px auto 0; padding: 0 0 8px;
+    background: #141416; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  }
+}
 
 /* The search box is type="search" rather than type="text" so Android's
    autofill service treats it as a search field and stops offering its
@@ -881,137 +892,103 @@ body.search-modal-open .coc-main {
   display: none;
 }
 
-/* Wraps the input + its clear (X) button. */
+/* The bar: a flat input with the search icon, a hairline under it and an
+   Esc hint (desktop). Sticky, so it stays put while the results scroll. */
 #search-input-wrap {
-  position: relative;
-  max-width: 1100px;
-  margin: 0 auto 30px auto;
+  position: sticky; top: 0; z-index: 2;
+  margin: 0 -16px 14px; padding: 0 16px;
+  background: #0f0f10; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 #search-input-wrap::before {
   content: '';
   position: absolute;
-  top: 50%; left: 18px;
+  top: 50%; left: 16px;
   width: 18px; height: 18px;
   transform: translateY(-50%);
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a8d93' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='6.5'/%3E%3Cline x1='15' y1='15' x2='20.5' y2='20.5'/%3E%3C/svg%3E") no-repeat center / contain;
   pointer-events: none;
 }
 #search-input {
-  width: 100%; max-width: 100%;
-  padding: 13px 44px 13px 46px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 1.05rem; font-weight: 500;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.08);
-  outline: none; margin: 0; display: block;
-  background: rgba(255,255,255,0.045);
-  backdrop-filter: blur(10px);
+  display: block; width: 100%; max-width: 100%; height: 56px; margin: 0;
+  padding: 0 40px 0 30px; box-sizing: border-box;
+  border: 0; border-radius: 0; outline: none; background: transparent; box-shadow: none;
+  font: 500 16px 'Sora', sans-serif; /* 16px: phones don't zoom in on focus */
   color: #f2f3f5;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
-#search-input::placeholder { color: #8a8d93; font-weight: 400; }
-#search-input:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.14);
-}
-#search-input:focus {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(155,32,48,0.65);
-  box-shadow: 0 0 0 3px rgba(155,32,48,0.22), 0 6px 20px rgba(0,0,0,0.4);
-}
+#search-input::placeholder { color: #6f727a; font-weight: 400; }
+#search-input-wrap:focus-within { border-bottom-color: rgba(224, 48, 47, 0.55); }
 #search-input-clear {
-  position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
-  width: 24px; height: 24px; border: none; border-radius: 50%;
+  position: absolute; top: 50%; right: 16px; transform: translateY(-50%);
+  width: 22px; height: 22px; border: none; border-radius: 50%;
   background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
-  font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; line-height: 1; display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: background 0.2s ease, color 0.2s ease;
 }
 #search-input-clear:hover { background: rgba(255,255,255,0.2); color: #fff; }
+@media (min-width: 971px) {
+  #search-input-wrap { margin: 0 0 14px; padding: 0 18px; background: #141416; border-radius: 14px 14px 0 0; }
+  #search-input-wrap::before { left: 18px; }
+  #search-input { height: 60px; padding-right: 64px; }
+  /* "Esc" key hint while the box is empty; the clear (X) takes its place once you type */
+  #search-input-wrap::after {
+    content: 'Esc'; position: absolute; top: 50%; right: 18px; transform: translateY(-50%);
+    padding: 3px 7px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 5px;
+    font: 600 11px/1 'Sora', sans-serif; color: #8a8d93; pointer-events: none;
+  }
+  #search-input-wrap:has(#search-input:not(:placeholder-shown))::after { display: none; }
+  #search-input-clear { right: 18px; }
+}
 
-/* Results grid — fg-card boxes (same design as Popular Topics /
-   /'s hero search) instead of the old plain link list. */
+/* ---- Tile (.ft-tile): compact name + subtitle over the page's faded art.
+   Shared by the top-bar search results (below) and the home page's
+   Featured Topics (index.html adds its groups, "+N more" and logos). */
+.ft-tile {
+  position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 9px 14px;
+  border-radius: 8px; overflow: hidden; isolation: isolate; background: #1b1b1e; color: #fff; text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.ft-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
+/* dark on the left where the text sits, art showing through on the right */
+.ft-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(20, 20, 22, 0.96) 0%, rgba(20, 20, 22, 0.85) 45%, rgba(20, 20, 22, 0.45) 100%); }
+.ft-name { font: 700 14.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* game logo before the name (search results, where games are mixed) */
+.ft-name-logo { display: inline-block; width: 16px; height: 16px; margin-right: 7px; border-radius: 4px; object-fit: cover; vertical-align: -3px; }
+.ft-sub { margin-top: 3px; font: 500 11.5px/1.3 'Sora', sans-serif; color: #9a9ca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
+a.ft-tile:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
+a.ft-tile:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+/* coming soon: not a link, greyed out */
+.ft-soon .ft-art { filter: grayscale(1); opacity: 0.3; }
+.ft-soon .ft-name { color: rgba(255, 255, 255, 0.6); }
+.ft-soon .ft-sub { color: rgba(255, 255, 255, 0.4); }
+@media (max-width: 970px) {
+  .ft-tile { min-height: 52px; padding: 8px 10px; }
+  /* names wrap to two lines instead of being cut off */
+  .ft-name { font-size: 13px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .ft-sub { font-size: 10.5px; margin-top: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ft-art { transition: none; }
+}
+
+/* Results grid: the same tiles, one per row on phones, two in the desktop panel. */
 #search-results {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1100px;
-  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+/* one line each here: long names end in "..." instead of wrapping */
+#search-results .ft-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 971px) {
+  #search-results { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0 16px; }
 }
 
-/* Search results use their own fg-card look (scoped to #search-results so
-   the shared .fg-card design used by Popular Topics elsewhere on the page
-   isn't affected): top-left icon badge, plain white title, no tag ribbon. */
-#search-results .fg-card { box-sizing: border-box; text-decoration: none; display: block; color: inherit; position: relative; flex: unset; max-width: 100%; width: 100%; padding: 0; }
-#search-results .fg-img-wrap { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 16/10; background: #1a1a1a; }
-#search-results .fg-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.25,.8,.25,1), filter .3s ease; filter: brightness(0.88) contrast(1.05); }
-#search-results .fg-card:hover .fg-img { transform: scale(1.07); filter: brightness(1.05) contrast(1.05); }
-#search-results .fg-img-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.9) 100%); pointer-events: none; }
-#search-results .fg-icon-badge { position: absolute; top: 10px; left: 10px; bottom: auto; width: 34px; height: 34px; border-radius: 50%; background: #161616; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; overflow: hidden; z-index: 3; transition: transform .3s ease, border-color .3s ease; }
-#search-results .fg-icon-badge img { width: 100%; height: 100%; object-fit: cover; }
-#search-results .fg-card:hover .fg-icon-badge { transform: scale(1.08); border-color: rgba(255,255,255,0.4); }
-#search-results .fg-info { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 14px 14px 12px; }
-#search-results .fg-title { font-size: 16px; font-weight: 700; color: #fff; background: none; -webkit-background-clip: initial; background-clip: initial; margin-bottom: 3px; text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
-#search-results .fg-sub { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; }
-
-@media (max-width: 970px) {
-  #search-results { grid-template-columns: 1fr; max-width: 480px; gap: 10px; }
-  #search-input-wrap { max-width: 480px; width: 100%; }
-  #search-overlay { padding-bottom: 100px; }
-
-  /* Compact horizontal card: big image as background, gray overlay
-     fading left -> right, small icon badge on top, title/sub to its right. */
-  #search-results .fg-card {
-    display: flex;
-    align-items: center;
-    position: relative;
-    height: 80px;
-    padding: 0;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  #search-results .fg-img-wrap {
-    position: absolute;
-    inset: 0;
-    aspect-ratio: unset;
-    border-radius: 12px;
-    z-index: 0;
-  }
-  #search-results .fg-img-shade {
-    background: linear-gradient(90deg, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.75) 45%, rgba(12,12,14,0.25) 100%);
-  }
-  #search-results .fg-icon-badge {
-    top: 50%;
-    bottom: auto;
-    left: 12px;
-    transform: translateY(-50%);
-    width: 42px;
-    height: 42px;
-    z-index: 2;
-  }
-  #search-results .fg-card:hover .fg-icon-badge { transform: translateY(-50%) scale(1.08); }
-  #search-results .fg-info {
-    position: relative;
-    z-index: 2;
-    padding: 0 14px 0 0;
-    margin-left: 68px;
-    min-width: 0;
-  }
-  #search-results .fg-title {
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  #search-results .fg-sub { font-size: 12px; }
-}
-
-/* View More sentinel — auto-loads on scroll now instead of a click button */
-.hero-search-viewmore {
-  display: block; margin: 20px auto 40px; padding: 8px;
-  text-align: center;
-  color: #8a8d93; font-family: 'Oxanium', sans-serif; font-size: 13px; font-weight: 600;
-  letter-spacing: 0.5px; opacity: 0.8;
+/* "Loading more..." line under the results -- auto-loads the next batch
+   when it scrolls into view (11layout.js). Styled by id: pages give it
+   either .hero-search-viewmore or .search-viewmore-sentinel. */
+#search-view-more {
+  margin: 14px auto 6px; padding: 6px; background: none; border: 0;
+  text-align: center; color: #8a8d93; font: 600 12px 'Sora', sans-serif; letter-spacing: 0.3px;
 }
 
 .result-icon {
@@ -2660,9 +2637,9 @@ controls there. */
    (thz-script.js buildCrumbs): "Clash of Clans > TH18 Layouts > Page 1 of 3",
    "Clash of Clans > Army Maker". Phones and desktop since Oct 2026
    (was phones only); it replaces the page title in the secondary top bar.
-   The first step reads "Clash of Clans" on desktop, "COC" on phones. One grey
-   for every step -- the current page isn't highlighted -- with the arrows a
-   step darker. */
+   The first step reads "Clash of Clans" on desktop, "COC" on phones. Grey
+   steps, arrows a step darker, and only the last step (aria-current, set by
+   every crumb builder) in white. */
 .secondary-content.has-crumbs > :not(.stb-crumbs) {
   display: none;
 }
@@ -2723,6 +2700,9 @@ controls there. */
 .stb-crumbs a:focus-visible {
   color: #c3c7ce;
   text-decoration: underline;
+}
+.stb-crumbs [aria-current] {
+  color: var(--text-main, #eff2f5);
 }
 /* Web Resources (11layout.js buildHwrCrumbs): the trail sits BESIDE the
    title link, not inside it, so it swaps at the .secondary-left level.
@@ -2791,6 +2771,9 @@ controls there. */
   padding:6px 0;
 }
 [data-game-nav] .bn-item svg{ width:22px; height:22px; stroke:currentColor; transition:stroke .15s; }
+/* Labels: always one line, "…" when too long ("CLASH OF CLANS"). */
+[data-game-nav] .bn-item{ min-width:0; }
+[data-game-nav] .bn-item span{ max-width:100%; padding:0 3px; box-sizing:border-box; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 [data-game-nav] .bn-item.active,
 [data-game-nav] .bn-item:hover{ color:#ffffff; }
 
@@ -2947,6 +2930,13 @@ controls there. */
 /* Pages that aren't built yet ("soon": true in game-nav.json): shown so the
    section's plan is visible, greyed out and not clickable. */
 [data-game-nav] .is-soon{ opacity:0.4; cursor:default; pointer-events:none; }
+
+/* Game-nav entries with "img" (11layout.js iconSvg): game icons in the
+   bottom nav and More sheet. Grey at rest, colour when active. */
+.gn-pic { object-fit: cover; border-radius: 6px; flex-shrink: 0; filter: grayscale(1) brightness(0.8); opacity: 0.6; transition: filter 0.2s ease, opacity 0.2s ease; }
+.active > .gn-pic { filter: none; opacity: 1; }
+.bn-item img.gn-pic { width: 22px; height: 22px; }
+.th-mini img.gn-pic { width: 34px; height: 34px; padding: 0; object-fit: cover; border-radius: 9px; } /* game icons fill the tile (.th-mini img pads line icons) */
 [data-game-nav] .gn-soon{
   font-style:normal;
   font-family:'Oxanium',sans-serif;
@@ -2974,4 +2964,345 @@ html.no-scroll, html.no-scroll body{ overflow:hidden !important; height:100%; }
 @media (min-width:971px){
   [data-game-nav] .bn-bar,
   [data-game-nav] .more-overlay{ display:none !important; }
+}
+
+/* =====================================================================
+   ONE DESKTOP BAR (Oct 2026, tried on /coc/ first, then site-wide)
+   Desktop has no primary top bar: its only content was a centered logo
+   repeating the sidebar's "Parchrome" row. The secondary bar sits at the
+   top edge and is the page's only bar:
+     page title ........ menus | search | page buttons (i) etc.
+   The section chip strips (Town Halls, categories, Minecraft sections) are
+   gone from the bar; their pages are in the menus' hover lists instead.
+
+   Offsets: every page clears the bars with var(--topbar-height) + 48px
+   (the old secondary bar). The new bar is 64px at y=0, so the variable
+   becomes 16px (64 - 48) and every page's content lands under it with its
+   own gap unchanged. The sidebar is pinned to y=0 separately.
+   Phones keep their top bar and are untouched (all rules are desktop-only
+   except the two display defaults right below).
+   ===================================================================== */
+html body .stb-right { display: contents; }        /* /coc/ wraps menus + help; a no-op wrapper */
+html body .stb-search-wrap { display: none; }      /* desktop-only search button (11layout.js adds it) */
+
+@media (min-width: 971px) {
+  :root { --topbar-height: 16px; }
+  html body .top-bar { display: none; }
+  html body .main { margin-top: 0; }
+  html body .main > .sidebar { margin-top: 0; height: 100vh; }
+
+  html body .secondary-top-bar,
+  html body .secondary-top-bar.stb-raised {
+    top: 0; height: 64px; transform: none;
+    display: flex; align-items: center; justify-content: flex-start; gap: 12px;
+    padding: 0 14px 0 22px;
+    background: var(--sb-raised); box-shadow: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  html body .secondary-top-bar .stb-dsn-wrap,
+  html body .secondary-top-bar .stb-divider,
+  html body .secondary-top-bar .stb-divider-end,
+  html body .secondary-top-bar .stb-help-divider { display: none !important; }
+
+  /* left: the page title */
+  /* the title keeps its width (up to 45%); a long menu list scrolls instead */
+  html body .secondary-top-bar .secondary-left { order: 0; flex: 0 0 auto; max-width: 45%; min-width: 0; gap: 10px; }
+  html body .secondary-top-bar .th-icon { margin-left: 0; width: 24px; height: 24px; border-radius: 7px; }
+  html body .secondary-top-bar .secondary-content,
+  html body .secondary-top-bar .secondary-content * {
+    font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #eef0f3;
+  }
+  /* ...but a breadcrumb in that box stays grey, last step white
+     (BREADCRUMB above); the white "*" above would otherwise win. */
+  html body .secondary-top-bar .stb-crumbs * { color: var(--text-muted, #949ba4); }
+  html body .secondary-top-bar .stb-crumbs .stb-crumb-sep { color: #6d7178; }
+  html body .secondary-top-bar .stb-crumbs a:hover,
+  html body .secondary-top-bar .stb-crumbs a:hover * { color: #c3c7ce; }
+  html body .secondary-top-bar .stb-crumbs [aria-current],
+  html body .secondary-top-bar .stb-crumbs [aria-current] * { color: #eef0f3; }
+
+  /* right: menus, then search, then the page's own buttons */
+  html body .secondary-top-bar .stb-hub-nav { order: 1; margin-left: auto; flex: 0 1 auto; min-width: 0; }
+  html body .stb-search-wrap { order: 2; display: flex; flex: 0 1 280px; min-width: 160px; }
+  html body .secondary-top-bar > .stb-mobile-actions,
+  html body .secondary-top-bar > .help-container { order: 3; flex: none; }
+
+  /* ---- Menus: grey outline icon + sentence-case label; faint wash on
+     hover; the page you're on in white with its icon filled (pages that
+     ship an outline/fill pair: .hub-ico / .hub-ico-fill). Icons 20px,
+     TikTok-weight 2.25 round strokes. */
+  html body .secondary-top-bar .stb-hub-nav .dsn-categories-scroll { gap: 2px; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link {
+    position: relative; height: 40px; padding: 0 12px; gap: 8px; border: 0; border-radius: 10px;
+    background: transparent; box-shadow: none;
+    font: 500 13.5px/1 'Sora', sans-serif; letter-spacing: -0.005em; text-transform: none;
+    color: #9a9da4; transition: background .2s ease, color .2s ease;
+  }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link span { font-family: inherit; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link:hover,
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.is-open { background: rgba(255, 255, 255, 0.06); color: #eceef1; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active,
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover { background: transparent; box-shadow: none; color: #fff; font-weight: 600; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover,
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active.is-open { background: rgba(255, 255, 255, 0.06); }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link svg {
+    width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round;
+  }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link img { width: 20px; height: 20px; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link .hub-ico-fill { display: none; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active .hub-ico:not(:only-of-type) { display: none; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active .hub-ico-fill { display: block; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link .hub-chev { width: 10px; height: 10px; margin-left: -3px; stroke-width: 2.6; opacity: .5; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+
+  /* ---- Search: opens the same panel as "/" */
+  html body .stb-search {
+    display: flex; align-items: center; gap: 10px; width: 100%; height: 40px; padding: 0 8px 0 14px;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;
+    color: #a4a7ae; cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease;
+  }
+  html body .stb-search:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.2); color: #d4d6da; }
+  html body .stb-search:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+  html body .stb-search svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; }
+  html body .stb-search span { flex: 1; min-width: 0; text-align: left; font: 400 13.5px/1 'Sora', sans-serif; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html body .stb-search kbd {
+    flex: none; min-width: 20px; padding: 4px 6px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 5px;
+    font: 600 11px/1 'Sora', sans-serif; color: #a4a7ae; text-align: center; background: rgba(255, 255, 255, 0.04);
+  }
+
+  /* ---- Page buttons on the right (CoC (i), Web Resources info/settings):
+     plain icon buttons in the menus' weight */
+  html body .secondary-top-bar .stb-mobile-actions { gap: 4px; }
+  html body .secondary-top-bar .stb-icon-btn {
+    width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; color: #9a9da4;
+    transition: background .2s ease, color .2s ease;
+  }
+  html body .secondary-top-bar .stb-icon-btn:hover,
+  html body .secondary-top-bar .stb-icon-btn[aria-expanded="true"],
+  html body .secondary-top-bar .stb-icon-btn.is-active { background: rgba(255, 255, 255, 0.06); color: #eceef1; border: 0; }
+  html body .secondary-top-bar .stb-icon-btn:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+  html body .secondary-top-bar .stb-icon-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.25; }
+
+  /* small laptops: menus scroll (their own arrows) before anything is pushed off */
+  @media (max-width: 1199px) {
+    html body .secondary-top-bar { gap: 8px; }
+    /* small laptops: the search shrinks to its icon (same panel, "/" still
+       works) and the title takes at most a third, so the menus fit */
+    html body .secondary-top-bar .secondary-left { max-width: 34%; }
+    html body .stb-search-wrap { flex: 0 0 40px; min-width: 40px; }
+    html body .stb-search { justify-content: center; padding: 0; }
+    html body .stb-search span,
+    html body .stb-search kbd { display: none; }
+  }
+}
+/* The bar 11layout.js builds for pages that have none (the site home):
+   desktop only, and the page's content starts below it (64px). */
+@media (max-width: 970px) { .stb-generated { display: none !important; } }
+@media (min-width: 971px) { body:has(.stb-generated) .coc-main { padding-top: 64px; } }
+
+/* =======================================================================
+   HUB MENUS -- the lists that open under the top bar's menu links
+   (window.stbHubMenus in 11layout.js; data from coc-hub-menus.js on CoC
+   pages, from buildHubNav for Web Resources, mc-java.js for Minecraft).
+   Desktop with a mouse only. One near-black card per menu, one row per
+   item: icon tile, name (+ description), detail or an arrow on the right.
+   ======================================================================= */
+/* The chevron after Layouts / Armies / Tools says "this opens". Flips
+   while its menu is open. Hidden on phones (no menus there). */
+.stb-hub-link .hub-chev {
+  width: 11px;
+  height: 11px;
+  margin-left: -2px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.15s ease;
+}
+.stb-hub-link.is-open .hub-chev {
+  transform: rotate(180deg);
+  opacity: 0.9;
+}
+@media (max-width: 970px), (hover: none) {
+  .stb-hub-link .hub-chev {
+    display: none;
+  }
+}
+
+.stb-dd {
+  position: fixed;
+  z-index: 1200;
+  width: 272px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: #141519;
+  box-shadow:
+    0 18px 40px -12px rgba(0, 0, 0, 0.85),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  scrollbar-width: thin;
+  scrollbar-color: #2e3036 transparent;
+}
+.stb-dd[hidden] {
+  display: none;
+}
+.stb-dd.is-open {
+  opacity: 1;
+  transform: none;
+}
+.stb-dd--guides {
+  width: 300px;
+}
+.stb-dd-list {
+  display: grid;
+  gap: 2px;
+}
+
+.stb-dd-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 5px 10px 5px 5px;
+  line-height: 1.25;
+  border-radius: 8px;
+  color: var(--text-secondary, #c8cbcd);
+  text-decoration: none;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+.stb-dd-row:hover,
+.stb-dd-row:focus-visible {
+  background: var(--flat-hover, #1e1f23);
+  color: var(--text-main, #eff2f5);
+  outline: none;
+}
+.stb-dd-row:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+/* The page you're on: white text on a soft highlight (same language as
+   the bar's active link, no keycap). */
+.stb-dd-row.is-on {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+.stb-dd-row.is-on:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stb-dd-ico {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.stb-dd-ico img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.stb-dd-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.stb-dd-name {
+  overflow: hidden;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.stb-dd-sub {
+  overflow: hidden;
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  color: #8b9099;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.stb-dd-meta {
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  color: #8b9099;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stb-dd-row.is-on .stb-dd-meta,
+.stb-dd-row.is-on .stb-dd-sub {
+  color: #a7abb3;
+}
+/* Coming soon (Player Tracker): the red tag from the Clash home cards. */
+.stb-dd-tag {
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #c23b3b;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stb-dd,
+  .stb-hub-link .hub-chev {
+    transition: none;
+  }
+  .stb-dd {
+    transform: none;
+  }
+}
+
+
+/* Second level (Web Resources: a category's sections), beside the list. */
+.stb-dd--side {
+  width: 288px;
+  z-index: 1201;
+}
+.stb-dd-row.has-kids.is-hot {
+  background: var(--flat-hover, #1e1f23);
+  color: var(--text-main, #eff2f5);
+}
+.stb-dd-go {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+.stb-dd-row.is-hot .stb-dd-go { opacity: 0.9; }
+/* line-icon rows (section icons drawn as SVG, not pictures) */
+.stb-dd-ico.is-svg svg {
+  width: 18px;
+  height: 18px;
+  color: #a4a7ae;
+}
+.stb-dd-row:hover .stb-dd-ico.is-svg svg,
+.stb-dd-row.is-hot .stb-dd-ico.is-svg svg { color: #eceef1; }
+.stb-dd-row.no-ico {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-left: 12px;
 }

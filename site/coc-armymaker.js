@@ -354,7 +354,8 @@
   function optHtml(o, on, taken, title) {
     return (
       '<button type="button" class="am-tile am-opt' +
-      (o.epic != null && o.hero != null ? (o.epic ? ' am-epic' : ' am-common') : '') +
+      // Only equipment has a hero; commons carry no "epic" field at all.
+      (o.hero != null ? (o.epic ? ' am-epic' : ' am-common') : '') +
       (on ? ' is-on' : '') +
       (taken ? ' is-taken' : '') +
       '" data-pick="' +

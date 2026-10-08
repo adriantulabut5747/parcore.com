@@ -406,7 +406,7 @@ a { color: inherit; }
           <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
         </a></li>
         <li><a class="lobby" href="/web-resources/" data-blip="3">
-          <img src="/icons/webicon.png" alt="">
+          <img src="/icons/web-resources.svg" alt="">
           <span><strong>Web Resources</strong><small>Free sites for anime, movies, music, games and AI tools</small></span>
           <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
         </a></li>
@@ -522,8 +522,27 @@ a { color: inherit; }
   var index = null;
   function load() {
     if (index) return Promise.resolve(index);
-    return fetch('/herosearch.json').then(function (r) { return r.json(); })
-      .then(function (d) { index = d; return d; })
+    // Same index as the top-bar search: every Featured Topics tile. Short copy
+    // of loadFeaturedGroups() in 11layout.js (this page doesn't load it).
+    function get(u) { return fetch(u).then(function (r) { return r.json(); }); }
+    return get('/home.json').then(function (d) {
+      return Promise.all((d.featured || []).map(function (g) {
+        var tiles;
+        if (g.from === 'hwr') tiles = get('/hwr-categories.json').then(function (c) {
+          return (c.categories || []).map(function (x) { return { name: x.name, sub: 'Web Resources', link: x.link }; });
+        });
+        else if (g.gameNav) tiles = get('/game-nav.json').then(function (n) {
+          return ((n[g.gameNav] || {}).pages || []).filter(function (p) { return !p.soon; }).map(function (p) {
+            var o = (g.tiles || {})[p.link] || {};
+            return { name: o.name || p.name, sub: o.sub || g.title, link: p.link };
+          });
+        });
+        else tiles = Promise.resolve((g.tiles || []).filter(function (t) { return !t.soon; }));
+        return tiles.then(function (ts) {
+          return ts.map(function (t) { return { name: t.name, sub: t.sub, link: t.link, icon: g.icon, group: g.title }; });
+        });
+      }));
+    }).then(function (groups) { index = [].concat.apply([], groups); return index; })
       .catch(function () { index = []; return index; });
   }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -534,7 +553,7 @@ a { color: inherit; }
     if (!q) { list.innerHTML = original; empty.hidden = true; return; }
     load().then(function (items) {
       var hits = items.filter(function (it) {
-        return (it.name + ' ' + (it.sub || '') + ' ' + (it.keywords || []).join(' ')).toLowerCase().indexOf(q) !== -1;
+        return (it.name + ' ' + (it.sub || '') + ' ' + (it.group || '')).toLowerCase().indexOf(q) !== -1;
       }).slice(0, 6);
       empty.hidden = hits.length > 0;
       list.innerHTML = hits.map(function (it) {

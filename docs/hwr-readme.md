@@ -128,7 +128,7 @@ this doc's scope.
 | `11layout.css` | Layout/chrome styling | `home.html`, `coc-home.html`, `th18-layouts.html` |
 | `sidebar.json` | Sidebar menu contents | site-wide |
 | `11footer.json` | Footer contents | site-wide |
-| `herosearch.json` | Top-bar search index | site-wide |
+| `home.json` (`featured`) | Featured Topics + top-bar search index (11layout.js `loadFeaturedGroups`) | site-wide |
 
 ### 4d. Data files — where the content actually lives
 
@@ -259,7 +259,7 @@ Every live page follows the same skeleton:
 <head>   → hwr-css.css, 11layout.css, 11layout.js, hwr-bookmarks.js
 <body>
   ├── sidebar              (11layout.js, from sidebar.json)
-  ├── top bar + search     (11layout.js, from herosearch.json)
+  ├── top bar + search     (11layout.js, from home.json "featured")
   ├── secondary top bar    ← see below, this is the fiddly one
   ├── hero
   ├── main content         (hwr-js.js, from the JSON files)

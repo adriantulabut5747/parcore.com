@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CoC Leaderboards: World &amp; Philippines | Clash of Clans | Parchrome</title>
+    <meta name="description" content="The world&rsquo;s top 200 Clash of Clans players, the Philippines&rsquo; top players and clans, and the hero equipment the best players use. Updated daily." />
+    <link rel="canonical" href="https://parchrome.netlify.app/coc/tools/leaderboards" />
+    <meta property="og:site_name" content="Parchrome" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CoC Leaderboards | Parchrome" />
+    <meta property="og:description" content="The world&rsquo;s top 200 Clash of Clans players, the Philippines&rsquo; top players and clans, and the hero equipment the best players use. Updated daily." />
+    <meta property="og:url" content="https://parchrome.netlify.app/coc/tools/leaderboards" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Oxanium -->
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet" />
+    <!-- Teko Russo Orbitron Sora -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" href="/icons/home.jpg" />
+    <link rel="shortcut icon" href="/icons/home.jpg" />
+    <link rel="apple-touch-icon" href="/icons/home.jpg" />
+
+    <link rel="stylesheet" href="/11layout.css?v=20261008c" />
+    <link rel="stylesheet" href="/1coclayouts.css?v=20261007q" />
+    <!-- Live events + official clan card, shared with /coc/ -->
+    <link rel="stylesheet" href="/coc-clan-clock.css?v=20261007s" />
+
+    <!-- Look + behaviour shared by every Town Hall layouts page -->
+    <link rel="stylesheet" href="/th-layouts.css?v=20261008a" />
+    <!-- The guides pages' own content (websites, glossary, equipment, wall calculator) -->
+    <link rel="stylesheet" href="/coc-armymaker.css?v=20261006a" />
+    <link rel="stylesheet" href="/coc-guides.css" />
+    <link rel="stylesheet" href="/coc-help.css" />
+    <link rel="stylesheet" href="/coc-more.css" />
+    <link rel="stylesheet" href="/coc-hub-menus.css?v=20261007s" />
+    <!-- The Tools banner -->
+    <link rel="stylesheet" href="/coc-tools.css" />
+    <!-- This page: leaderboards + equipment cards -->
+    <link rel="stylesheet" href="/coc-stats.css" />
+  </head>
+  <body>
+    <!-- Shared ember gradient for the liked flame. -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="heartActiveFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffd36b" />
+          <stop offset=".55" stop-color="#ff8a3d" />
+          <stop offset="1" stop-color="#e2531f" />
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div id="page-loader">
+      <div class="parchrome-fade">
+        <div class="parchrome-ring"></div>
+      </div>
+      <span class="parchrome-label">Parchrome</span>
+    </div>
+
+    <!-- Top Nav -->
+    <div class="top-bar">
+      <div class="top-bar-left-avatar"></div>
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="top-bar-title">
+        <div class="topbar-logo">
+          <img src="/icons/home.jpg" alt="" />
+        </div>
+        <a href="/">Parchrome</a>
+      </div>
+
+      <!-- Search button -->
+      <button
+        id="search-btn"
+        onclick="toggleSearch()"
+        style="background: transparent; border: none; padding: 0; cursor: pointer; right: 15px; position: fixed; margin-top: 2px"
+      >
+        <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+          <!-- Magnifying glass -->
+          <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none" />
+          <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span id="close-icon">✖</span>
+      </button>
+      <!-- Overlay -->
+      <div id="search-overlay">
+        <div id="search-input-wrap">
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Find your next game..."
+            oninput="searchItems()"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+          <button type="button" id="search-input-clear" aria-label="Clear search" style="display: none">✖</button>
+        </div>
+        <!-- Search results -->
+        <div id="search-results"></div>
+        <div id="search-view-more" class="hero-search-viewmore" style="display: none">Loading more…</div>
+      </div>
+    </div>
+
+    <!-- Secondary Top Bar -->
+    <div class="secondary-top-bar" id="secondary-top-bar">
+      <div class="secondary-left">
+        <picture><source media="(min-width: 971px)" srcset="/icons/cocicon.jpg" /><img src="/icons/leaderboards.webp" alt="" class="th-icon" /></picture>
+        <div class="secondary-content">Leaderboards</div>
+      </div>
+
+      <div class="stb-divider" aria-hidden="true"></div>
+
+      <!-- dsn-chip strip: Town Halls TH18→TH8, built from coc-nav-data.json.
+       No more dropdown -- each chip links straight to that TH's layouts
+       page. Markup/behavior mirrors hwr's .stb-dsn-wrap (11layout.css/js),
+       same as /coc/. -->
+      <div class="stb-dsn-wrap" id="stbDsnWrap">
+        <button class="dsn-scroll-btn dsn-scroll-left" id="dsnScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
+        <button class="dsn-scroll-btn dsn-scroll-right" id="dsnScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Divider between the two strips -- caps off the dsn-chip row before
+       the stb-hub-link row begins, same as hwr's reference layout. -->
+      <div class="stb-divider-end" aria-hidden="true"></div>
+
+      <!-- stb-hub-link strip: Home / Layouts / Armies / Guides, built from
+       coc-nav-data.json's primaryNav. data-hub-nav="off" opts this out of
+       11layout.js's hwr-only hub-nav builder (initHubNav), which would
+       otherwise overwrite it with hwr's own Home/Bookmarks/etc. -->
+      <div class="stb-hub-nav" id="stbHubNav" data-hub-nav="off">
+        <button class="dsn-scroll-btn dsn-scroll-left" id="hubScrollLeft" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+        <button class="dsn-scroll-btn dsn-scroll-right" id="hubScrollRight" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="sidebar" id="sidebar">
+        <!-- Top Box -->
+        <div class="top-box" id="top-box"></div>
+        <!-- Games list -->
+        <div class="games-container" id="games-container"></div>
+        <!-- Triple A Games -->
+        <div class="triple-a-container">
+          <div class="triple-a-header" id="triple-a-header" onclick="toggleTripleA()"></div>
+          <div class="triple-a-list" id="triple-a-list"></div>
+        </div>
+      </div>
+
+      <div class="coc-main">
+        <div class="coc-content">
+          <!-- TOOL BANNER -- same block as every Tools page (coc-tools.css).
+            Art: clashofclans/tools-header.webp. -->
+          <div class="tb">
+            <img class="tb-art" src="/clashofclans/tools-header.webp" alt="" decoding="async" fetchpriority="high" />
+            <div class="tb-body">
+              <a class="tb-back" href="/coc/tools/"
+                ><span class="tb-back-text">Back to tools</span
+                ><svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 16l4-4-4-4M19 12H9"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+              ></a>
+              <img class="tb-icon" src="/icons/leaderboards.webp" alt="" />
+              <div class="tb-copy">
+                <h1 class="tb-title">Leader<em>boards</em></h1>
+                <p class="tb-desc">The world&rsquo;s and the Philippines&rsquo; top 200, and what the best players equip.</p>
+                <ul class="tb-facts">
+                  <!-- Filled by coc-stats.js from coc-lobby-stats.json -->
+                  <li class="tb-fact" id="stUpdated" hidden></li>
+                  <li class="tb-fact" id="stSeason" hidden></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- LEADERBOARDS + EQUIPMENT (Oct 2026). Built by coc-stats.js from
+               /coc-lobby-stats.json, which a GitHub Action rebuilds every morning
+               (scripts/lobby-stats.mjs). Plan: docs/coc-lobby-plan.md. -->
+          <section class="am st" id="leaderboards" aria-labelledby="st-lb-title">
+            <header class="am-head">
+              <div>
+                <h2 class="am-title" id="st-lb-title">Leaderboards</h2>
+                <p class="am-intro">Top 200 by trophies or points. Arrows show the change since yesterday.</p>
+              </div>
+              <!-- Region: World has players only; the Philippines has all five boards.
+                   More countries come with the switcher (docs/coc-lobby-plan.md step 4). -->
+              <label class="am-vh" for="stRegion">Region</label>
+              <select class="gd-input st-region" id="stRegion">
+                <option value="global">World</option>
+                <option value="ph" selected>Philippines</option>
+              </select>
+            </header>
+            <div class="am-part">
+              <div class="gd-chips" id="stTabs" role="group" aria-label="Leaderboard"></div>
+              <ol class="st-list" id="stList"></ol>
+              <button type="button" class="am-btn st-more" id="stMore" hidden>Show more</button>
+              <p class="gd-error" id="stError" hidden>Couldn&rsquo;t load the leaderboards. Refresh to try again.</p>
+            </div>
+          </section>
+
+          <section class="am st" id="equipment" aria-labelledby="st-eq-title">
+            <header class="am-head">
+              <div>
+                <h2 class="am-title" id="st-eq-title">What the world&rsquo;s top 200 equip</h2>
+                <p class="am-intro" id="stEqIntro">The equipment on each hero of the world&rsquo;s top 200 players right now.</p>
+              </div>
+            </header>
+            <div class="am-part">
+              <div class="st-heroes" id="stHeroes"></div>
+            </div>
+          </section>
+
+          <!-- Lower sections: the clan card and the FAQ, on the page's own flat
+                 background (no panel or divider since Oct 2026; the live events moved
+                 to the red band above the footer). Styles: .t18-lower in th-layouts.css. -->
+          <div class="t18-lower">
+            <!-- FAQ: native <details>/<summary> accordion -- no script needed, works
+       with the keyboard, and the answers stay in the page text (search
+       engines read them). Header uses the same small-caps label as "Live
+       events". Written for this guide, Sep 2026. -->
+            <section class="t18-faq" aria-labelledby="t18-faq-label">
+              <div class="cc-label-row">
+                <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
+              </div>
+              <div class="t18-faq-list">
+                <details class="t18-faq-item">
+                  <summary>Where do these numbers come from?</summary>
+                  <p>From Supercell&rsquo;s official Clash of Clans API. We save the Philippines&rsquo; top 200 rankings and the profiles of the world&rsquo;s top 200 players once a day.</p>
+                </details>
+                <details class="t18-faq-item">
+                  <summary>Does this show the equipment people attack with?</summary>
+                  <p>Not exactly. The API shows what each hero has equipped right now, not what was used in a given attack. For top players the two are usually the same.</p>
+                </details>
+                <details class="t18-faq-item">
+                  <summary>How do I get on the Philippines leaderboard?</summary>
+                  <p>Set your in-game location to the Philippines and finish in the country&rsquo;s top 200 by trophies. Clans need their clan location set to the Philippines.</p>
+                </details>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <footer class="pf-footer">
+          <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+          <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+          <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+          <div class="pf-footer-divider"></div>
+
+          <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+          <div class="pf-footer-divider"></div>
+
+          <div class="pf-footer-bottom">
+            <div class="pf-footer-legal" id="pfFooterLegal"></div>
+          </div>
+
+          <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+          <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+        </footer>
+      </div>
+
+      <!-- More Menu Modal (bottom sheet) -->
+      <div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+        <div class="more-sheet" onclick="event.stopPropagation()">
+          <div class="more-sheet-scroll">
+            <div class="more-sheet-top">
+              <div class="more-sheet-handle"></div>
+              <div class="more-sheet-header">
+                <span class="more-sheet-title">Clash of Clans Contents</span>
+                <button class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="more-list mx">
+              <!-- More sheet body (redesigned Oct 2026). Each Town Hall once, as a
+                   tile; the Layouts / Armies switch decides where the tiles go
+                   (coc-more.js; starts on whichever section this page is in). The
+                   old two-column list repeated every TH twice. Styles: coc-more.css. -->
+              <section class="mx-sec" aria-labelledby="mxThLabel">
+                <div class="mx-head">
+                  <h3 class="mx-label" id="mxThLabel">Town Halls</h3>
+                  <div class="mx-seg" role="tablist" aria-label="Show Town Halls for">
+                    <button type="button" class="mx-tab" role="tab" id="mxTabLayouts" aria-controls="mxPanelLayouts" aria-selected="true">
+                      Layouts
+                    </button>
+                    <button
+                      type="button"
+                      class="mx-tab"
+                      role="tab"
+                      id="mxTabArmies"
+                      aria-controls="mxPanelArmies"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Armies
+                    </button>
+                  </div>
+                </div>
+                <div class="mx-grid" id="mxPanelLayouts" role="tabpanel" aria-labelledby="mxTabLayouts" data-role="more-layouts-grid"></div>
+                <div
+                  class="mx-grid"
+                  id="mxPanelArmies"
+                  role="tabpanel"
+                  aria-labelledby="mxTabArmies"
+                  hidden
+                  data-role="more-armies-grid"
+                ></div>
+              </section>
+              <section class="mx-sec" aria-labelledby="mxToolsLabel">
+                <div class="mx-head">
+                  <h3 class="mx-label" id="mxToolsLabel">Tools</h3>
+                </div>
+                <div class="mx-tools" data-role="more-guides-list"></div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav (mobile) -->
+      <div class="bn-bar" id="bottomNav" data-hub-nav="off">
+        <a href="/coc/" class="bn-item" data-role="bn-home">
+          <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/lobby.webp" alt="" aria-hidden="true" />
+          <span>Lobby</span>
+        </a>
+        <a href="/coc/town-hall-18/layouts" class="bn-item" data-role="bn-layouts">
+          <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/th18.webp" alt="" aria-hidden="true" />
+          <span>Layouts</span>
+        </a>
+
+        <div class="bn-more-wrap" id="bnMoreWrap">
+          <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke: #7d7f85 !important">
+              <rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25" />
+              <rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25" />
+              <rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25" />
+              <rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25" />
+            </svg>
+          </button>
+          <div class="bn-more-spacer"></div>
+          <span class="bn-more-label">More</span>
+        </div>
+
+        <a href="/coc/town-hall-18/army" class="bn-item" data-role="bn-armies">
+          <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/barracks-th18.webp" alt="" aria-hidden="true" />
+          <span>Armies</span>
+        </a>
+        <a href="/coc/tools/" class="bn-item" data-role="bn-guides">
+          <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/tools.webp" alt="" aria-hidden="true" />
+          <span>Tools</span>
+        </a>
+      </div>
+
+      <!-- Palette Lightbox (zoomable image viewer) -->
+      <button id="pal-lb-close" onclick="closePalette()">✕</button>
+      <div id="pal-lightbox">
+        <div id="pal-lb-inner" onclick="event.stopPropagation()">
+          <img id="pal-lb-img" src="" alt="" />
+        </div>
+      </div>
+    </div>
+    <!-- /.main: was never closed, so the browser closed it at the end of the body;
+     closed here to match (the More sheet, bottom nav and viewer above sit
+     inside it, as they always have). -->
+    <script src="/11layout.js?v=20261008c" defer></script>
+    <script src="/thz-script.js?v=20261007q"></script>
+    <script src="/coc-events.js"></script>
+
+    <!-- Hero ("Did you know?", event tags) and the secondary top bar. -->
+    <script src="/th-layouts.js?v=20261007r" defer></script>
+    <!-- This guide's content: built from its JSON file. -->
+    <script src="/coc-stats.js" defer></script>
+    <script src="/coc-help.js" defer></script>
+    <script src="/coc-more.js?v=20261006a" defer></script>
+    <script src="/coc-hub-menus.js" defer></script>
+  </body>
+</html>

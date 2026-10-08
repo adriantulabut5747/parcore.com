@@ -1,0 +1,50 @@
+# Refreshes site/codm-feed.json (official videos, app versions, World Championship)
+# and site/codm-weapons.json (weapon database) for the CODM lobby, once a day.
+# No secrets needed: every source is public. See scripts/codm-feed.mjs.
+#
+# Run it by hand any time from the Actions tab ("Run workflow").
+name: Update CODM feed
+
+on:
+  schedule:
+    - cron: "43 21 * * *" # 21:43 UTC = 5:43 AM Philippines time (after lobby-stats)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: codm-feed
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+            site/codm-feed.json
+            site/codm-weapons.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch CODM feed
+        run: node scripts/codm-feed.mjs
+
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain -- site/codm-feed.json site/codm-weapons.json)" ]; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/codm-feed.json site/codm-weapons.json
+          git commit -m "Update CODM feed"
+          git pull --rebase
+          git push

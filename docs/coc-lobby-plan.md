@@ -74,11 +74,16 @@ Two data paths:
      calls from the Pages domain (CORS), so the switcher works there too
      as long as the Netlify site is live.
 
+**Change 2026-10-07 (Adrian):** the equipment section uses the **world's** top 200
+(`/locations/global/rankings/players`), not PH's: a stronger signal, and only 5
+PH players are in it. Leaderboards stay PH. The job is now ~600 profile calls/day
+(PH home + PH builder for badges, global for equipment).
+
 ## Pages
 
 - **`/coc/` teaser** (between Clash tools and the tracker promo, TBD): PH top 5
-  players, 2-3 headline stats, "View stats ›" link to `/coc/stats/`.
-- **`/coc/stats/`**: country switcher + leaderboard tabs (Players / Clans /
+  players, 2-3 headline stats, "View stats ›" link to `/coc/tools/stats`.
+- **`/coc/tools/stats`**: country switcher + leaderboard tabs (Players / Clans /
   Builder / Capital), then the PH equipment and dashboard sections. Rows link to
   `/coc/player/TAG` and `/coc/clan/TAG` (tracker pages already exist).
   Add to `coc-nav-data.json` (Tools menu) and the CoC bottom nav / More sheet.
@@ -98,7 +103,21 @@ Two data paths:
    not worth showing. War league isn't in ranking rows (it would cost 200 clan
    calls), so it's dropped. Rankings shift by the minute, so every run commits.
    Still to do: Adrian runs the workflow once from the Actions tab.
-3. `/coc/stats/` page (trial it before touching the lobby).
+3. ~~Stats page~~ Built 2026-10-07 at **`/coc/tools/stats`** (not `/coc/stats/`:
+   it's a Tools-menu page, so it lives with the other tools and gets their
+   banner + "Back to tools"). Files: `site/coc/tools/stats.html` (shell copied
+   from slang.html), `site/coc-stats.js`, `site/coc-stats.css`, and a `stats` entry in
+   `coc-nav-data.json` guides (second, after Player Tracker).
+   Two API problems found and fixed in the job:
+   - **Clan badges in *player* ranking rows are broken.** They point at images
+     Supercell's CDN no longer has, which return a generic placeholder shield
+     ("X-Cache: Error from cloudfront"). Badges now come from each player's
+     profile, so the job also fetches the 200 builder-base profiles (400 calls/day total).
+     Clan ranking rows' badges are fine.
+   - **`previousRank` isn't "yesterday"** (the #1 player showed +33, most rows
+     +500). Arrows now compare with the job's own previous file (`prevFrom` =
+     baseline time; a same-day manual re-run keeps the old baseline).
+     `prev`: null = no baseline yet ("–"), -1 = new in the top 200.
 4. Switcher (function routes).
 5. `/coc/` teaser + decoration pass.
 
@@ -108,3 +127,16 @@ Two data paths:
   ambient village art? Decide with mockups at step 5.
 - Teaser position on `/coc/`.
 - Which dashboard stats make the cut (pick after seeing real numbers at step 1).
+
+## Update 2026-10-07 (later): Leaderboards + lobby sections
+
+- Page renamed **Leaderboards**: `/coc/tools/leaderboards` (was `stats`; never
+  published). Icon = `site/icons/leaderboards.webp` (Fan Kit trophy, only 80×88
+  at the source). Region select World / Philippines; `?region=global` opens World.
+- 7th Parchrome tool: `.tc-card--wide` card (spans both columns) on `/coc/`
+  and `/coc/tools/`. Tool counts bumped to 7 (hero proof row, hub fact chip).
+- `/coc/` after the tracker promo: **Hero meta** (`#heroMeta`: 6 hero cards,
+  majestic skin renders, top 3 equipment of the world's top 200) and **World top 10**
+  (`#worldTop`: podium + list, Legend crests background). Files: `coc-lobby.css`,
+  `coc-lobby.js`, data `coc-lobby-home.json` (~4 KB, written by the same job).
+- Job also saves `rankings.globalPlayers` (world top 200, badges from profiles).

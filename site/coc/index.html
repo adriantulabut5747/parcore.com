@@ -15,9 +15,9 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css?v=20261007a">
+<link rel="stylesheet" href="/11layout.css?v=20261008c">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
-<link rel="stylesheet" href="/coc-clan-clock.css?v=20261006a">
+<link rel="stylesheet" href="/coc-clan-clock.css?v=20261007s">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoC Base Layouts, Army Comps &amp; Tools | Clash of Clans | Parchrome</title>
@@ -150,74 +150,6 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain;}
 /* Top-bar search modal (search-btn, #search-overlay, #search-input,
    #search-results, .search-close-btn, .result-icon, .hero-search-viewmore
    etc.) rules moved to 11layout.css */
-
-/* ---- fg-card box design (Popular Topics / hero search style) ---- */
-.fg-card {
-  flex: 0 0 33.3333%;
-  max-width: 33.3333%;
-  box-sizing: border-box;
-  padding: 0 10px;
-  text-decoration: none;
-  display: block;
-  color: inherit;
-}
-.fg-img-wrap {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  aspect-ratio: 16/10;
-  background: #1a1a1a;
-}
-.fg-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform .5s cubic-bezier(.25,.8,.25,1), filter .3s ease;
-  filter: brightness(0.88) contrast(1.05);
-}
-.fg-card:hover .fg-img {
-  transform: scale(1.07);
-  filter: brightness(1.05) contrast(1.05);
-}
-.fg-img-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.75) 100%);
-  pointer-events: none;
-}
-.fg-icon-badge {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #161616;
-  border: 2px solid rgba(255,255,255,0.15);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  z-index: 3;
-  transition: transform .3s ease, border-color .3s ease;
-}
-.fg-icon-badge img { width: 100%; height: 100%; object-fit: cover; }
-.fg-card:hover .fg-icon-badge { transform: scale(1.08); border-color: rgba(255,255,255,0.4); }
-.fg-info { padding: 12px 4px 4px; }
-.fg-title {
-  font-size: 16px;
-  font-weight: 700;
-  background: linear-gradient(90deg, #ffffff, #cfd6ff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  margin-bottom: 3px;
-}
-.fg-sub { font-size: 13px; color: #8a8d93; font-weight: 500; }
-
-
 
 .coc-main{
  background:
@@ -382,7 +314,7 @@ margin: auto;
 </script>
   <link rel="stylesheet" href="/coc-help.css" />
   <link rel="stylesheet" href="/coc-more.css" />
-  <link rel="stylesheet" href="/coc-hub-menus.css" />
+  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261007s" />
 </head>
 <body>
 
@@ -442,16 +374,15 @@ margin: auto;
  
   <div class="stb-divider" aria-hidden="true"></div>
 
-  <!-- dsn-chip strip: Town Halls TH18→TH8, built from coc-nav-data.json.
-       No more dropdown -- each chip links straight to that TH's layouts
-       page. Markup/behavior mirrors hwr's .stb-dsn-wrap (11layout.css/js). -->
-  <div class="stb-dsn-wrap" id="stbDsnWrap">
-    <button class="dsn-scroll-btn dsn-scroll-left" id="dsnScrollLeft" aria-label="Scroll left">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
-    <button class="dsn-scroll-btn dsn-scroll-right" id="dsnScrollRight" aria-label="Scroll right">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <!-- Search bar in place of the TH18->TH8 chip strip (trial on /coc/ first;
+       the Town Halls are in the Layouts menu on the right). Opens the same
+       search panel as the top bar's button. Desktop only; phones keep the
+       top bar's icon. -->
+  <div class="stb-search-wrap">
+    <button type="button" class="stb-search" onclick="openSearch()" aria-label="Search Parchrome">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
+      <span>Search Parchrome</span>
+      <kbd>/</kbd>
     </button>
   </div>
 
@@ -463,6 +394,9 @@ margin: auto;
        coc-nav-data.json's primaryNav. data-hub-nav="off" opts this out of
        11layout.js's hwr-only hub-nav builder (initHubNav), which would
        otherwise overwrite it with hwr's own Home/Bookmarks/etc. -->
+  <!-- Right group: menus + help. A plain wrapper on phones (display:contents),
+       the bar's right-hand column on desktop. -->
+  <div class="stb-right">
   <div class="stb-hub-nav" id="stbHubNav" data-hub-nav="off">
     <button class="dsn-scroll-btn dsn-scroll-left" id="hubScrollLeft" aria-label="Scroll left">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -484,7 +418,7 @@ Please open this page in Chrome for the best experience.</li><br>
    </div>
 
  
-</div></div>
+</div></div></div>
 
 
     <!-- Main -->
@@ -665,21 +599,25 @@ Please open this page in Chrome for the best experience.</li><br>
             <strong>national top player.</strong>
           </p>
 
-          <!-- Desktop only (hidden at <=970px, where the bottom nav covers both).
-               In-page jumps: .coc-main is the scroller and has
-               scroll-behavior:smooth, so a plain #anchor glides there. The
-               targets carry scroll-margin-top to clear the fixed top bars. -->
+          <!-- Desktop only (hidden at <=970px). Store downloads for Clash of
+               Clans (Oct 2026; were Layouts & Armies / Tools jumps -- the cards
+               beside the copy still link there). Both black (ghost) with the
+               stores' own colours in the icons. Google Play first: most of the
+               PH/SEA audience is on Android. Store ids are fixed. -->
           <div class="ch-actions">
-            <a class="ch-btn ch-btn-primary" href="#featured-townhalls">
-              Layouts &amp; Armies
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+            <a class="ch-btn ch-btn-ghost ch-btn-store" href="https://play.google.com/store/apps/details?id=com.supercell.clashofclans" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#00c3ff" d="M4 2.5v19l9.5-9.5z"/><path fill="#00e676" d="M4 2.5l12.8 7.4-3.3 2.1z"/><path fill="#ffd500" d="M16.8 9.9l3.7 2.1-3.7 2.1-3.3-2.1z"/><path fill="#ff3a44" d="M4 21.5l9.5-9.5 3.3 2.1z"/></svg>
+              <span class="ch-store"><b>Google Play</b><small>Free on Android</small></span>
             </a>
-            <a class="ch-btn ch-btn-ghost" href="#clash-tools">Tools</a>
+            <a class="ch-btn ch-btn-ghost ch-btn-store" href="https://apps.apple.com/app/clash-of-clans/id529479190" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="chAsBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1ec8ff"/><stop offset="1" stop-color="#0a6cff"/></linearGradient></defs><rect width="24" height="24" rx="5.5" fill="url(#chAsBlue)"/><path d="M13.6 6.2 8 16M10.4 6.2 16 16M6.5 13.3h8.3M16.8 13.3h1.2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+              <span class="ch-store"><b>App Store</b><small id="chAsMeta">Free on iPhone and iPad</small></span>
+            </a>
           </div>
 
           <!-- Proof row, desktop only (hidden at <=970px). Real counts from
                the data files (Oct 2026: 251 layouts in thNN-layouts.json, 109
-               armies in thNN-army.json; 6 tools in coc-nav-data.json) -- rounded down, so update them when
+               armies in thNN-army.json; 7 tools in coc-nav-data.json) -- rounded down, so update them when
                the totals pass the next step rather than rounding up. -->
           <div class="ch-stats">
             <div class="ch-stat">
@@ -692,7 +630,7 @@ Please open this page in Chrome for the best experience.</li><br>
             </div>
             <div class="ch-stat">
               <span class="ch-stat-lbl">Tools</span>
-              <span class="ch-stat-num">6</span>
+              <span class="ch-stat-num">7</span>
             </div>
           </div>
           <script>
@@ -742,17 +680,28 @@ Please open this page in Chrome for the best experience.</li><br>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
 
+          <!-- Live war tile: Ascendere's current war (CWL day or regular war),
+               else the clan's war record. Filled by the script below the
+               cards from /api/coc -- same lookups as the tracker's banner. -->
+          <a class="ch-card ch-war" href="/coc/clan/2GYPGPJP9">
+            <img class="ch-card-img" src="/clashofclans/tracker-battlefield.webp" alt="" loading="lazy" decoding="async">
+            <span class="ch-card-badge">Clash Tracker</span>
+            <span class="ch-war-body is-loading" id="chWar" aria-live="polite">
+              <span class="ch-war-top"><i class="ch-sk" style="width:64px"></i></span>
+              <span class="ch-war-mid">
+                <span class="ch-war-team"><i class="ch-sk ch-sk-badge"></i><i class="ch-sk" style="width:52px"></i></span>
+                <span class="ch-war-score"><i class="ch-sk" style="width:34px"></i><i class="ch-sk" style="width:54px;height:22px"></i></span>
+                <span class="ch-war-team"><i class="ch-sk ch-sk-badge"></i><i class="ch-sk" style="width:52px"></i></span>
+              </span>
+            </span>
+            <span class="ch-card-name">Clan Tracker</span>
+            <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+          </a>
+
           <a class="ch-card" href="/coc/town-hall-18/army">
             <img class="ch-card-img" src="/clashofclans/home/shot-army-comps.webp" alt="" loading="lazy" decoding="async">
             <span class="ch-card-badge">Meta Armies</span>
             <span class="ch-card-name">Army Comps</span>
-            <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-          </a>
-
-          <a class="ch-card" href="/coc/tools/">
-            <img class="ch-card-img" src="/clashofclans/home/aqueen.webp" alt="" loading="lazy" decoding="async">
-            <span class="ch-card-badge">Clash Tools</span>
-            <span class="ch-card-name">CoC Tools</span>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
 
@@ -763,6 +712,130 @@ Please open this page in Chrome for the best experience.</li><br>
             <svg class="ch-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
           </a>
         </div>
+        <script>
+        (function () {
+          // Ascendere's war for the live tile. Mirrors liveWar() in
+          // coc-tracker.js: during CWL the newest drawn day the clan is in
+          // (battle day first, else preparation), otherwise the regular war.
+          // The proxy caches every answer 60s, hence the 60s refetch.
+          var box = document.getElementById('chWar');
+          if (!box) return;
+          var TAG = '#2GYPGPJP9';
+          var API = location.hostname.endsWith('github.io') ? 'https://extraordinary-donut-f21bde.netlify.app/api/coc' : '/api/coc';
+          var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>';
+
+          function api(q) {
+            return fetch(API + '?' + q).then(function (r) {
+              if (!r.ok) throw new Error(r.status);
+              return r.json();
+            });
+          }
+          var soft = function (p) { return p.catch(function () { return null; }); };
+          function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+              return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+          }
+          function apiTime(s) {
+            var m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/.exec(s || '');
+            return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : 0;
+          }
+          function timeLeft(ms) {
+            var min = Math.max(0, Math.ceil(ms / 60000));
+            var h = Math.floor(min / 60);
+            return h ? h + 'h ' + (min % 60) + 'm' : min + 'm';
+          }
+
+          function liveWar() {
+            var t = TAG.slice(1);
+            var regular = function () {
+              return soft(api('type=war&tag=' + t)).then(function (w) {
+                return w && w.state && w.state !== 'notInWar' ? { w: w, label: 'Clan war' } : null;
+              });
+            };
+            return soft(api('type=cwlgroup&tag=' + t)).then(function (g) {
+              if (!g || g.state === 'notInWar' || !g.rounds) return regular();
+              var drawn = [];
+              g.rounds.forEach(function (r, i) {
+                var tags = r.warTags.filter(function (x) { return x !== '#0'; });
+                if (tags.length) drawn.push({ day: i + 1, tags: tags });
+              });
+              // newest two days: the newest is often preparation, the one before it the battle
+              return Promise.all(drawn.slice(-2).map(function (d) {
+                return Promise.all(d.tags.map(function (x) { return soft(api('type=cwlwar&tag=' + x.slice(1))); })).then(function (wars) {
+                  var w = wars.filter(function (w) { return w && (w.clan.tag === TAG || w.opponent.tag === TAG); })[0];
+                  return w ? { w: w, label: 'CWL day ' + d.day } : null;
+                });
+              })).then(function (found) {
+                var pick = function (s) { return found.filter(function (f) { return f && f.w.state === s; })[0]; };
+                return pick('inWar') || pick('preparation') || null;
+              });
+            });
+          }
+
+          function team(c, sub) {
+            return '<span class="ch-war-team"><img src="' + esc(c.badgeUrls.medium) + '" alt="" width="38" height="38"><b>' + esc(c.name) + '</b><small>' + sub + '</small></span>';
+          }
+          function renderWar(f) {
+            var w = f.w;
+            var us = w.clan.tag === TAG ? w.clan : w.opponent;
+            var them = us === w.clan ? w.opponent : w.clan;
+            var prep = w.state === 'preparation';
+            var live = w.state === 'inWar';
+            var total = w.teamSize * (w.attacksPerMember || 1);
+            var won = us.stars - them.stars || us.destructionPercentage - them.destructionPercentage;
+            var sub = function (c) { return prep ? 'Level ' + c.clanLevel : c.attacks + ' of ' + total + ' attacks'; };
+            box.className = 'ch-war-body' + (live ? ' is-live' : '');
+            box.innerHTML =
+              '<span class="ch-war-top">' +
+              (prep || live
+                ? '<span class="ch-war-time">' + (prep ? 'Starts in ' : 'Ends in ') + '<em data-until="' + apiTime(prep ? w.startTime : w.endTime) + '"></em></span>'
+                : '<span class="ch-war-time"><em>' + (won > 0 ? 'Won' : won < 0 ? 'Lost' : 'Draw') + '</em></span>') +
+              '</span><span class="ch-war-mid">' + team(us, sub(us)) +
+              '<span class="ch-war-score"><span class="ch-war-day"><i class="ch-war-dot"></i>' + f.label.replace('CWL day', 'Day') + (prep ? ' &middot; Prep' : '') + '</span>' +
+              (prep
+                ? '<b>' + w.teamSize + '<i>v</i>' + w.teamSize + '</b><small>Line-up locked</small></span>'
+                : '<b>' + STAR + us.stars + '<i>&ndash;</i>' + them.stars + STAR + '</b><small>' +
+                  us.destructionPercentage.toFixed(1) + '% &ndash; ' + them.destructionPercentage.toFixed(1) + '%</small></span>') +
+              team(them, sub(them)) + '</span>';
+            tick();
+          }
+          function renderClan(c) {
+            var league = c && c.warLeague && c.warLeague.id !== 48000000 ? c.warLeague.name : ''; // 48000000 = "Unranked"
+            var stats = c
+              ? [[c.warWins, 'won'], [c.warLosses, 'lost'], [c.warWinStreak, 'streak']].filter(function (s) { return s[0] != null; })
+              : [];
+            box.className = 'ch-war-body is-idle';
+            box.innerHTML =
+              '<span class="ch-war-top">' + (league ? '<span class="ch-war-time">' + esc(league) + '</span>' : '') + '</span>' +
+              '<span class="ch-war-clan">' + (c ? '<img src="' + esc(c.badgeUrls.medium) + '" alt="" width="46" height="46">' : '') +
+              '<span><span class="ch-war-day"><i class="ch-war-dot"></i>Not in war</span><b>' + esc(c ? c.name : 'Ascendere') + '</b><small>' + TAG + '</small>' +
+              '<span class="ch-war-rec">' +
+              (stats.length
+                ? stats.map(function (s) { return '<b>' + s[0].toLocaleString('en-US') + '</b> ' + s[1]; }).join(' &middot; ')
+                : 'War info is unavailable right now.') +
+              '</span></span></span>';
+          }
+
+          function tick() {
+            box.querySelectorAll('[data-until]').forEach(function (el) {
+              el.textContent = timeLeft(+el.getAttribute('data-until') - Date.now());
+            });
+          }
+          var loaded = false;
+          function load() {
+            Promise.all([liveWar(), soft(api('type=clan&tag=' + TAG.slice(1)))]).then(function (r) {
+              // A failed refetch keeps the last good tile instead of blanking it.
+              if (r[0]) renderWar(r[0]);
+              else if (r[1] || !loaded) renderClan(r[1]);
+              loaded = true;
+            });
+          }
+          load();
+          setInterval(tick, 1000);
+          setInterval(function () { if (!document.hidden) load(); }, 60000);
+        })();
+        </script>
 
       </div>
     </div>
@@ -839,8 +912,8 @@ Please open this page in Chrome for the best experience.</li><br>
      file sets align-items:center and would otherwise fall through, which
      shrink-wraps .ch-hero to its content and makes its margins meaningless. */
   align-items: stretch;
-  /* 48px clears the fixed secondary top bar at >=971px. */
-  padding: 48px 5% 56px;
+  /* 48px clears the fixed secondary top bar at >=971px. Sides = the page column. */
+  padding: 48px var(--coc-side) 56px;
   /* Dark where the copy needs contrast (left), lighter toward the cards
      (right) -- they carry their own scrim. The first layer is a soft warm
      light on the King (he stands at ~48% across, between the copy and the
@@ -876,16 +949,14 @@ Please open this page in Chrome for the best experience.</li><br>
   to   { transform: translate(6%, -5%) scale(1.12); opacity: 1;   }
 }
 
-/* Both margins are definite percentages, not margin-left + auto: an auto
-   margin makes flexbox shrink-wrap this grid instead of stretching it.
-   hero-overlay already pads 5%; the page column is 12%; the extra 7% as a
-   share of hero-overlay's content box is 7 / 90 = 7.778%. */
+/* No side margin: hero-overlay's padding is already the page column
+   (--coc-side). Never margin auto -- that makes flexbox shrink-wrap this grid. */
 .ch-hero {
   position: relative;
   z-index: 1;
   max-width: 1280px;
   display: grid;
-  margin: 0 7.778%;
+  margin: 0;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: 56px;
@@ -1015,7 +1086,7 @@ Please open this page in Chrome for the best experience.</li><br>
 }
 
 /* ACTIONS ----------------------------------------------------------- */
-/* Desktop only: Layouts / Tools jump to their sections further down. */
+/* Desktop only: Google Play / App Store downloads. */
 .ch-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1095,22 +1166,32 @@ Please open this page in Chrome for the best experience.</li><br>
 
 .ch-btn svg {
   flex-shrink: 0;
-  width: 13px;
-  height: 13px;
+  width: 18px;
+  height: 18px;
 }
 
-/* The primary button's arrow nudges toward its corner once every few
-   seconds -- a small "this way" on the one action that matters. Most of
-   the cycle is rest; the nudge itself is ~0.7s. */
-.ch-btn-primary svg {
-  animation: ch-arrow-nudge 4s ease-in-out infinite;
+/* Store buttons: name over a small line of App Store numbers, like the CODM
+   lobby's. The App Store line is filled by coc-lobby.js from
+   /coc-lobby-home.json ("app"); Google has no public lookup, so Play keeps
+   plain text rather than a made-up rating. */
+.ch-btn-store {
+  gap: 11px;
+  padding: 9px 18px 9px 14px;
+  text-align: left;
 }
-
-@keyframes ch-arrow-nudge {
-  0%, 74%, 100% { transform: translate(0, 0); }
-  82%           { transform: translate(2px, -2px); }
-  90%           { transform: translate(0, 0); }
+.ch-btn-store svg { width: 22px; height: 22px; }
+.ch-store b { display: block; font-weight: 800; }
+.ch-store small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #9a9ca1;
+  font-variant-numeric: tabular-nums;
 }
+.ch-store .star { color: #f5c518; }
 
 .ch-btn-primary {
   background: #c23b3b;
@@ -1295,6 +1376,218 @@ Please open this page in Chrome for the best experience.</li><br>
 .ch-card:hover .ch-card-arrow {
   color: #c23b3b;
   transform: translate(2px, -2px);
+}
+
+/* LIVE WAR TILE -------------------------------------------------------- */
+/* Compact take on the tracker's .pt-live banner (same battlefield art).
+   Content is built by the inline script after .ch-hero-cards. */
+.ch-war .ch-card-img {
+  object-position: 50% 70%;
+  filter: brightness(0.42);
+}
+.ch-war:hover .ch-card-img {
+  filter: brightness(0.55);
+}
+.ch-war-body {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* top/bottom leave room for the static chip and the "Clan Tracker" title */
+  padding: 10px 12px 32px;
+  color: #fff;
+  font-family: 'Oxanium', sans-serif;
+}
+.ch-war-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 17px;
+  gap: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* "Day 4" / "Not in war": quiet glass pill, the chip stays the loud one. */
+.ch-war-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ch-war-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e5484d;
+}
+.ch-war-body.is-live .ch-war-dot {
+  animation: chWarPulse 1.6s ease-in-out infinite;
+}
+.ch-war-body.is-idle .ch-war-dot {
+  background: rgba(255, 255, 255, 0.45);
+}
+.ch-war-time {
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.6px;
+}
+.ch-war-time em {
+  font-style: normal;
+  color: #fff;
+}
+.ch-war-mid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  align-content: center;
+  gap: 2px;
+}
+.ch-war-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  padding-top: 8px; /* badge centre level with the score below the day pill */
+  text-align: center;
+}
+.ch-war-team img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}
+.ch-war-team b {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.ch-war-clan b {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.ch-war-team small,
+.ch-war-score small,
+.ch-war-clan small {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.62);
+  white-space: nowrap;
+}
+.ch-war-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.ch-war-score b {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+.ch-war-score i {
+  font-style: normal;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.ch-war-score svg {
+  width: 9px;
+  height: 9px;
+  fill: #f5b83d;
+}
+
+/* Not in war: badge, then pill / name / tag / war record stacked beside it. */
+.ch-war-clan {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.ch-war-clan img {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}
+.ch-war-clan > span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.ch-war-clan b {
+  font-size: 17px;
+  letter-spacing: 0.8px;
+}
+.ch-war-rec {
+  margin-top: 2px;
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.62);
+  white-space: nowrap;
+}
+.ch-war-rec b {
+  font-size: 11px;
+  letter-spacing: 0;
+  color: #fff;
+}
+
+/* Loading: grey bars in the war layout's shape with a light sweep. */
+.ch-sk {
+  display: block;
+  height: 9px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 30%, rgba(255, 255, 255, 0.24) 50%, rgba(255, 255, 255, 0.1) 70%) 0 0 / 300% 100%;
+  animation: chWarShimmer 1.3s linear infinite;
+}
+.ch-sk-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+@keyframes chWarShimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+@keyframes chWarPulse {
+  50% { opacity: 0.3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ch-sk,
+  .ch-war-body.is-live .ch-war-dot {
+    animation: none;
+  }
 }
 
 /* DESKTOP STAGGER ------------------------------------------------------ */
@@ -1671,9 +1964,8 @@ function warModalEscHandler(e) {
 }
 /* Ported from /web-resources/'s .layouts-title-box system
    (hwr-css.css ~line 2779) instead of this page's own centered version --
-   left-aligned, a flex column instead of a centered block, and a short
-   red accent stub under the fading divider instead of a flat full-width
-   border-bottom. This page's four .layouts-title-box instances all have
+   left-aligned, a flex column instead of a centered block. No divider
+   (the line + red stub under the subtitle were removed, Oct 2026). This page's four .layouts-title-box instances all have
    plain text directly inside .layouts-title (no icon, no wrapping <span>)
    so the gradient clip below is applied straight to .layouts-title itself
    rather than requiring the child-span markup HWR's version uses -- same
@@ -1686,14 +1978,19 @@ function warModalEscHandler(e) {
    96 is what a 1080p window lands on, and the two only drift apart on
    unusually tall or short screens. */
 .layouts-box > .layouts-title-box:first-child {
-  margin-top: 114px;
-  margin-bottom: 36px;
+  margin-top: 64px;
+}
+/* One rhythm for every section heading on this page (Oct 2026): 56px from
+   the section above, 20px to its own cards (10px on phones). Two classes so
+   it beats coc-cards.css's .tools-title-box, which loads after this. */
+.layouts-box > .layouts-title-box {
+  margin-top: 56px;
+  margin-bottom: 20px;
 }
 .layouts-title-box {
-  /* 12% side insets -- shared with .layouts-list / .guides-list /
-     .ct-grid below and with .ch-hero's own margin, so all four stay
-     lined up with each other. */
-  margin: 50px 12% 20px 12%;
+  /* page-column side insets (--coc-side) -- shared with .layouts-list /
+     .guides-list / .ct-grid below and with the hero, so all stay lined up. */
+  margin: 50px var(--coc-side) 20px var(--coc-side);
   border-radius: 0;
   padding: 12px 0;
   text-align: left;
@@ -1705,33 +2002,71 @@ function warModalEscHandler(e) {
   gap: 6px;
 }
 
-/* Fading divider + red accent stub, replacing the flat
-   `border-bottom: 1px solid #2a2a2a` this page used to have -- same
-   reasoning as HWR's version: an even-toned full-width line reads as a
-   plain table rule, this reads as a trailing accent under the stub. */
-.layouts-title-box::before {
-  content: "";
+/* Quiet "View more" link, right end of a heading, sitting on the divider. */
+.ltb-more {
   position: absolute;
-  left: 0;
   right: 0;
-  bottom: -1px;
-  height: 1px;
-  background: linear-gradient(90deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.07) 30%,
-    transparent 75%);
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 500 12px/1 'Sora', sans-serif;
+  color: #7a7d82;
+  text-decoration: none;
+  transition: color 0.2s;
 }
-.layouts-title-box::after {
-  content: "";
+.ltb-more svg {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.2s;
+}
+.ltb-more:hover,
+.ltb-more:focus-visible {
+  color: #fff;
+}
+.layouts-title-box:has(.ltb-more) .layouts-subtitle {
+  padding-right: 92px; /* keeps a wrapping subtitle clear of the link */
+}
+.ltb-more:hover svg {
+  transform: translateX(2px);
+}
+/* Popular Articles: the title is a link (keeps the gradient -- the parent's
+   background-clip paints through it), and the ‹ › pair sits at the right
+   end with "View all" just left of it. Phones hide the pair (they swipe). */
+.layouts-title a {
+  color: inherit;
+  font: inherit; /* a site-wide link rule sets Oxanium */
+  letter-spacing: inherit;
+  text-decoration: none;
+}
+.layouts-title a:hover,
+.layouts-title a:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: #c23b3b;
+  text-underline-offset: 6px;
+}
+.layouts-title-box .art-nav {
   position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 64px;
-  height: 2.5px;
-  background: #c23b3b;
-  box-shadow: 0 0 8px rgba(194, 59, 59, 0.7);
+  right: 0;
+  bottom: 8px;
 }
-
+.layouts-title-box:has(.art-nav) .ltb-more {
+  right: 98px;
+}
+.layouts-title-box:has(.art-nav) .layouts-subtitle {
+  padding-right: 190px;
+}
+.art-track {
+  --art-side: var(--coc-side, 5%);
+}
+@media (max-width: 970px) {
+  .layouts-title-box:has(.art-nav) .ltb-more {
+    right: 0;
+  }
+  .layouts-title-box:has(.art-nav) .layouts-subtitle {
+    padding-right: 92px;
+  }
+}
 .layouts-title {
   display: flex;
   align-items: center;
@@ -1761,15 +2096,16 @@ function warModalEscHandler(e) {
 }
 @media (max-width: 970px) {
   .layouts-box > .layouts-title-box:first-child {
-    margin-top: 64px;
+    margin-top: 40px;
+  }
+  .layouts-box > .layouts-title-box {
+    margin-top: 48px;
+    margin-bottom: 10px;
   }
   .layouts-title-box {
     margin-left: 5%;
     margin-right: 5%;
     margin-top: 80px;
-  }
-  .layouts-title-box::after {
-    width: 40px;
   }
   .layouts-subtitle {
     font-size: 11px;
@@ -1780,6 +2116,10 @@ function warModalEscHandler(e) {
 </style>
 <!-- Town Hall + Clash tools cards: shared with /coc/tools/. -->
 <link rel="stylesheet" href="/coc-cards.css" />
+<!-- Popular Articles strip: shared with every game section. -->
+<link rel="stylesheet" href="/article-cards.css" />
+<!-- Hero meta + World top 10 sections (after the tracker promo) -->
+<link rel="stylesheet" href="/coc-lobby.css" />
 
 <!-- The .ql-wrap "Quality Over Quantity" block that used to sit here (its
      own <style> block plus markup) was merged into the hero section at the
@@ -1930,6 +2270,20 @@ function warModalEscHandler(e) {
 
 <div class="layouts-army-container">
   <div class="layouts-box">
+
+   <!-- Popular Articles: cards are built from /articles.json by article-cards.js
+        (shared with /articles/ and every game section). Add or publish an
+        article there, not here. -->
+   <div class="layouts-title-box" id="coc-articles">
+  <div class="layouts-title"><a href="/coc/articles/">Popular Articles</a></div>
+  <div class="layouts-subtitle">Written by Parcore, former #1 in the Philippines</div>
+  <a class="ltb-more" href="/coc/articles/">View all <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+  <div class="art-nav" data-for="cocArticles" role="group" aria-label="Scroll articles">
+    <button type="button" aria-label="Previous articles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button type="button" aria-label="Next articles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+</div>
+    <div class="art-track" id="cocArticles" data-game="coc"></div>
 
    <div class="layouts-title-box" id="featured-townhalls">
   <div class="layouts-title">Featured Townhalls</div>
@@ -2083,13 +2437,14 @@ function warModalEscHandler(e) {
 
     </div>
 
-    <!-- CLASH TOOLS (Oct 2026): our six tools as equal cards (.tc-card in
+    <!-- CLASH TOOLS (Oct 2026): our seven tools as equal cards (.tc-card in
          coc-cards.css, shared with the Tools page /coc/tools/). The red
          marks them as ours; the Tools page shows outside websites in the
          same card without it. -->
     <div class="layouts-title-box tools-title-box" id="clash-tools">
       <div class="layouts-title">Clash tools</div>
       <div class="layouts-subtitle">Official Parchrome tools: calculators, trackers and guides we built ourselves.</div>
+      <a class="ltb-more" href="/coc/tools/">View more<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
     </div>
 
     <div class="layouts-list tc-grid">
@@ -2117,6 +2472,12 @@ function warModalEscHandler(e) {
         <span class="tc-text"><span class="tc-name">Equipments</span><span class="tc-desc">All 42 hero items, level by level</span></span>
         <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
+      <a class="tc-card" href="/coc/tools/equipment-tier-list">
+        <img class="tc-mark" src="/icons/blacksmith.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/icons/blacksmith.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Equipment Tier List</span><span class="tc-desc">Rank every hero equipment, S to D</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
       <a class="tc-card" href="/coc/tools/damage-calculator">
         <img class="tc-mark" src="/clashofclans/buildings/cannon/15.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
         <span class="tc-icon"><img src="/clashofclans/buildings/cannon/15.webp" alt="" loading="lazy" decoding="async"></span>
@@ -2127,6 +2488,12 @@ function warModalEscHandler(e) {
         <img class="tc-mark" src="/clashofclans/coctools/th17-wall.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
         <span class="tc-icon"><img src="/clashofclans/coctools/th17-wall.webp" alt="" loading="lazy" decoding="async"></span>
         <span class="tc-text"><span class="tc-name">Wall Calculator</span><span class="tc-desc">Calculate the total resources for wall upgrades</span></span>
+        <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="tc-card tc-card--wide" href="/coc/tools/leaderboards">
+        <img class="tc-mark" src="/icons/leaderboards.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <span class="tc-icon"><img src="/icons/leaderboards.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="tc-text"><span class="tc-name">Leaderboards</span><span class="tc-desc">The world&rsquo;s and the Philippines&rsquo; top 200, updated daily</span></span>
         <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -2213,7 +2580,7 @@ function warModalEscHandler(e) {
     linear-gradient(to bottom, rgba(6, 8, 12, 0.35) 0%, rgba(6, 8, 12, 0) 28%, rgba(6, 8, 12, 0) 72%, rgba(6, 8, 12, 0.45) 100%);
 }
 
-/* Page column (12%) so the copy lines up with every other section. */
+/* Page column (--coc-side) so the copy lines up with every other section. */
 .cl-feature-inner {
   position: relative;
   z-index: 1;
@@ -2221,7 +2588,7 @@ function warModalEscHandler(e) {
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   align-items: center;
   gap: 40px;
-  margin: 0 12%;
+  margin: 0 var(--coc-side);
   min-height: 700px;
   padding: 96px 0;
 }
@@ -2673,19 +3040,19 @@ function warModalEscHandler(e) {
 <style>
 /* LIVE EVENTS + CLAN CARD + FAQ SPACING -- their look is in coc-clan-clock.css
    (shared with every TH layouts / army / tools page); only this page's
-   placement is here. Same 12% / 5% side insets as the other sections.
+   placement is here. Same --coc-side / 5% side insets as the other sections.
    - Clan card: 40 under the FAQ's 24 bottom margin = the usual 64 break
      (was 47 extra while the King poked out of the card's top edge).
    - FAQ: now ABOVE the card (Oct 2026), right after the tracker section.
    - The card's bottom margin leaves room for the Warden's head above the
      red Live band (same 112 / 110 the TH pages give him).
-   - Band: 12% sides on desktop already match; phones get this page's 5%
+   - Band: --coc-side on desktop already matches; phones get this page's 5%
      instead of the TH pages' 16px so it lines up with the FAQ above. */
 /* Clash tools -> tracker promo: the grid's 56 margin + the box's 64 padding
    made a 120 gap. Now 88 on desktop, 64 on phones. */
 .coc-content .tc-grid{ margin-bottom:24px; }
-.coc-content .ac-card{ margin:40px 12% 112px; }
-.coc-content .t18-faq{ margin:64px 12% 24px; }
+.coc-content .ac-card{ margin:40px var(--coc-side) 112px; }
+.coc-content .t18-faq{ margin:64px var(--coc-side) 24px; }
 @media (max-width:970px){
   .coc-content .tc-grid{ margin-bottom:0; }
   .coc-content .ac-card{ margin:0 5% 110px; }
@@ -2932,14 +3299,72 @@ function warModalEscHandler(e) {
 })();
 </script>
 
+<!-- LOBBY SECTIONS (Oct 2026). Live numbers so the lobby changes every day:
+     each hero's top equipment and the world's top 10 players, from
+     /coc-lobby-home.json (GitHub Action, scripts/lobby-stats.mjs). Built by
+     coc-lobby.js, styled by coc-lobby.css. Both start hidden and only show
+     once the data has loaded. Plan: docs/coc-lobby-plan.md. -->
+<section class="hm" id="heroMeta" aria-labelledby="hmTitle" hidden>
+  <img class="hm-bg" src="/clashofclans/coctools/firebg0.webp" alt="" loading="lazy" decoding="async">
+  <div class="hm-inner">
+    <div class="hm-top">
+      <div class="lb-head">
+        <p class="lb-kicker" id="hmKicker">Global top 200</p>
+        <h2 class="lb-title" id="hmTitle">Most popular equipment in <em>Legend League</em></h2>
+        <p class="lb-text">The equipment the 200 highest-ranked players on the global leaderboard use right now. Tap an item to see every level.</p>
+      </div>
+      <!-- A quiet text link (same idea as the Clash tools "View more") and one
+           joined ‹ › control. Was a red pill + two round buttons (Oct 2026). -->
+      <div class="hm-actions">
+        <a class="lb-more" href="/coc/tools/leaderboards#equipment">All equipment stats <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <div class="hm-nav" role="group" aria-label="Scroll heroes">
+          <button type="button" id="hmPrev" aria-label="Previous heroes" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button type="button" id="hmNext" aria-label="Next heroes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="hm-grid" id="hmGrid"></div>
+  </div>
+</section>
+
+<section class="gt" id="worldTop" aria-labelledby="gtTitle" hidden>
+  <!-- Background: Supercell Fan Kit dungeon gate, cropped to 16:9 and re-saved as WebP (321 KB -> 63 KB) from
+       media.ffycdn.net/eu/supercell/fo2MFqkEpyPJEMYQJn1h.png -->
+  <img class="gt-bg" src="/clashofclans/coctools/world-top-bg.webp" alt="" loading="lazy" decoding="async">
+  <div class="gt-inner">
+    <div class="lb-head gt-head">
+      <p class="lb-kicker" id="gtKicker">Global top 10</p>
+      <h2 class="lb-title" id="gtTitle">Current <span class="lb-nw">top 10</span> <em>in the world</em></h2>
+      <p class="lb-text">The ten best players in the world right now, from today&rsquo;s global leaderboard. Tap a player to open their full profile.</p>
+      <!-- Two copies of the one link: the eye-catching one under the text on
+           wide screens (sheen + pulsing ring), a plain one under the board
+           once the columns stack (<=1200px). coc-lobby.css shows one. -->
+      <a class="lb-cta lb-cta--live gt-cta-wide" href="/coc/tools/leaderboards?region=global"><span class="lb-cta-shine" aria-hidden="true"></span><img src="/icons/leaderboards.webp" alt="" width="80" height="88">View full leaderboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="gt-board">
+      <ol class="gt-podium" id="gtPodium"></ol>
+      <ol class="gt-list" id="gtList" start="4"></ol>
+      <a class="lb-cta gt-cta-narrow" href="/coc/tools/leaderboards?region=global"><img src="/icons/leaderboards.webp" alt="" width="80" height="88">View full leaderboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</section>
+<script src="/coc-lobby.js" defer></script>
+<script src="/article-cards.js" defer></script>
+
 <!-- FAQ: same look as /coc/town-hall-18/layouts's (coc-clan-clock.css), questions
      reworded for the hub page -- visitors reach the Copy Layout buttons
      through a Town Hall card, and this page covers every Town Hall, not
      just TH18. Native <details>/<summary>: no script, keyboard-friendly,
      and the answers stay in the page text for search engines. -->
-<section class="t18-faq" aria-labelledby="t18-faq-label">
-  <div class="cc-label-row">
-    <h2 class="cc-label t18-faq-label" id="t18-faq-label">Frequently asked questions</h2>
+<section class="t18-faq lb-faq" aria-labelledby="t18-faq-label">
+  <!-- Header on the left like the World top 10, question cards on the
+       right. The cards are the shared look (coc-clan-clock.css); only this
+       two-column layout and the Queen are /coc/'s own (coc-lobby.css .lb-faq). -->
+  <div class="lb-head lb-faq-head">
+    <p class="lb-kicker lb-kicker--still">Help &middot; 5 questions</p>
+    <h2 class="lb-title" id="t18-faq-label">Frequently asked <em>questions</em></h2>
+    <p class="lb-text">Quick answers about copying bases, layout links and joining Ascendere.</p>
+    <img class="lb-faq-art" src="/clashofclans/coctools/dragonscale/archer-queen.webp" alt="" width="480" height="480" loading="lazy" decoding="async">
   </div>
   <div class="t18-faq-list">
     <details class="t18-faq-item">
@@ -3007,31 +3432,22 @@ function warModalEscHandler(e) {
      and the last 10 wars on the left; the King (Dragon skin) on the right,
      standing on the stats row with his head and wings clearing the card's
      top edge. Bottom: the live stats as one full-width strip.
-     "Join Our Clan" copies the tag (copyClanTagBtn); "Join Global Chat"
+     On /coc/ the first button opens Ascendere in the tracker (Oct 2026;
+     elsewhere it's "Join Our Clan", which copies the tag); "Join Global Chat"
      opens the in-game chat. coc-clan-clock.js fills the stats and wars
      through the ids / data-stat hooks; both stay hidden until
      clan-stats.json loads. Styles: .ac-card in coc-clan-clock.css.
      Same block as every TH layouts / army page. -->
-<section class="ac-card" aria-labelledby="clan-title">
+<section class="ac-card lb-clan" aria-labelledby="clan-title">
   <div class="ac-top">
     <div class="ac-body">
+      <p class="lb-kicker lb-kicker--still">Official Parchrome clan</p>
       <h2 class="clan-title" id="clan-title"><img class="ac-title-logo" src="/icons/aclogonobg-tight.webp" alt="" width="238" height="258" />Play with <em>Ascendere</em></h2>
       <div class="ac-actions">
-        <button
-          type="button"
-          class="ac-btn ac-btn-copy"
-          onclick="copyClanTagBtn(this)"
-          title="Copy the clan tag"
-          data-copy="#2GYPGPJP9"
-        >
-          <svg class="ac-ico ac-ico-copy" viewBox="0 0 24 24" aria-hidden="true">
-            <rect width="13" height="13" x="9" y="9" rx="2" />
-            <path d="M5 15c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2" />
-          </svg>
-          <svg class="ac-ico ac-ico-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-          <span class="clan-btn-label">Join <span class="clan-sm-hide">Our </span>Clan</span>
-        </button>
-        <span class="t18-vh" id="clanCopyStatus" aria-live="polite"></span>
+        <!-- Was "Join Our Clan" (copied the tag); now opens Ascendere in the
+             tracker (Oct 2026). coc-lobby.js switches the address to
+             ?tag= on GitHub Pages, like the other tracker links. -->
+        <a class="lb-cta" href="/coc/clan/2GYPGPJP9" data-clan-tag="2GYPGPJP9"><span class="lb-cta-shine" aria-hidden="true"></span><svg class="ac-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>View clan in tracker</a>
         <a
           class="ac-btn"
           href="https://link.clashofclans.com/en/?action=OpenGlobalChat&chatId=P46a9cfc5f81340b1b43363b9a30316fb"
@@ -3168,7 +3584,7 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js?v=20261007a" defer></script>
+<script src="/11layout.js?v=20261008c" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
@@ -3612,15 +4028,6 @@ window.addEventListener('popstate', () => {
 .bn-item svg{ width:22px; height:22px; stroke:currentColor; transition:stroke .15s; }
 .bn-item.active,.bn-item:hover{ color:#ffffff; }
 
-/* Active icon = the solid twin, same as hwr. Its hub icons ship as an
-   icon/activeIcon pair in hwr-categories.json where the active one is the
-   identical path plus fill="currentColor", so the outline fills in when you
-   are on that page. These pages have no JSON behind their bottom nav, so
-   both forms sit in the markup and only the swap lives here. */
-.bn-item .bn-ico-fill{ display:none; }
-.bn-item.active .bn-ico{ display:none; }
-.bn-item.active .bn-ico-fill{ display:block; }
-
 .bn-more-wrap{
   flex:1;
   display:flex;
@@ -3906,14 +4313,6 @@ window.addEventListener('popstate', () => {
    ".secondary-content { font-family:'Oxanium' }". Same rule as
    /coc/town-hall-18/layouts. */
 .secondary-top-bar .secondary-content{ font-family:'Sora', sans-serif; font-weight:500; }
-
-/* stb-hub-link icons (Home/Layouts/Armies/Guides): outline/fill SVG pair,
-   ported from /coc/town-hall-18/layouts so both pages draw the same set -- this
-   page used to load raster PNGs from coc-nav-data.json instead. The
-   active link shows the filled glyph. */
-.stb-hub-link .hub-ico-fill{ display:none; }
-.stb-hub-link.active .hub-ico{ display:none; }
-.stb-hub-link.active .hub-ico-fill{ display:block; }
 
 /* ---- Desktop secondary nav (below secondary-top-bar) ----
    Redesigned: the old .desktop-sub-nav (Home/Layouts/Armies/Guides links,
@@ -4301,6 +4700,8 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
 @media (min-width: 971px){
   .sidebar{ margin-top: var(--topbar-height, 40px); }
 }
+
+/* Desktop bar: the shared ONE DESKTOP BAR block in 11layout.css. */
 </style>
 
 <!-- More Menu Modal (bottom sheet) -->
@@ -4346,32 +4747,28 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
 <!-- Bottom Nav (mobile) -->
 <div class="bn-bar" id="bottomNav" data-hub-nav="off">
   <a href="/coc/" class="bn-item">
-    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><mask id="bnHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#bnHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/></svg>
-    <span>Home</span>
+    <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/lobby.webp" alt="" aria-hidden="true" />
+    <span>Lobby</span>
   </a>
   <a href="/coc/town-hall-18/layouts" class="bn-item">
-    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5L9 3.5l6 2.5 6-3v14.5l-6 3-6-2.5-6 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3.5V18M15 6v14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5L9 3.5V18l-6 3z" fill="currentColor" opacity="0.55" stroke="none"/><path d="M9 3.5l6 2.5v14.5L9 18z" fill="currentColor" stroke="none"/><path d="M15 6l6-3v14.5l-6 3z" fill="currentColor" opacity="0.55" stroke="none"/></svg>
+    <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/th18.webp" alt="" aria-hidden="true" />
     <span>Layouts</span>
   </a>
 
   <div class="bn-more-wrap" id="bnMoreWrap">
     <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="2.25"/></svg>
     </button>
     <div class="bn-more-spacer"></div>
     <span class="bn-more-label">More</span>
   </div>
 
   <a href="/coc/town-hall-18/army" class="bn-item">
-    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 17.5L3 6V3h3l11.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 17.5L3 6V3h3l11.5 11.5Z" fill="currentColor"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5Z" fill="currentColor"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/barracks-th18.webp" alt="" aria-hidden="true" />
     <span>Armies</span>
   </a>
   <a href="/coc/tools/" class="bn-item">
-    <svg class="bn-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><rect x="3.2" y="7.4" width="17.6" height="12.6" rx="1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M3.2 12.6h6.3M14.5 12.6h6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><rect x="9.5" y="11.1" width="5" height="3.1" rx="0.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-    <svg class="bn-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><path d="M5 7.4h14a1.8 1.8 0 0 1 1.8 1.8v2.2H3.2V9.2A1.8 1.8 0 0 1 5 7.4Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55" /><path d="M3.2 14h17.6v4.2a1.8 1.8 0 0 1-1.8 1.8H5a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /><rect x="9.6" y="11" width="4.8" height="4" rx="0.8" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <img class="nav-icon coc-nav-pic" src="/icons/coc-nav/tools.webp" alt="" aria-hidden="true" />
     <span>Tools</span>
   </a>
 </div>
@@ -4569,44 +4966,20 @@ function cocPagePath(u) {
         if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
       }
 
-      // stb-hub-link: Home / Layouts / Armies / Guides, from primaryNav.
+      // stb-hub-link: Lobby / Layouts / Armies / Tools, from primaryNav.
       // Active when that item's own href matches the current page --
-      // on /coc/ that's Home. Outline/fill SVG icon pairs copied
-      // from /coc/town-hall-18/layouts's copy of this script, so the strip looks
-      // the same on both pages (this one used to load primaryNav's raster
-      // .icon images). Keep the two HUB_ICONS tables in sync.
-      var HUB_ICONS = {
-        home: {
-          outline: '<path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 8.6v10.6A1.8 1.8 0 0 0 7.3 21h9.4a1.8 1.8 0 0 0 1.8-1.8V8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21v-4.6a2 2 0 0 1 4 0V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-          fill: '<defs><mask id="hubHomeCut"><rect width="24" height="24" fill="#fff"/><path d="M10.1 22v-5.6a1.9 1.9 0 0 1 3.8 0V22Z" fill="#000"/></mask></defs><path d="M5.5 8.6 12 3.4l6.5 5.2v10.6a1.8 1.8 0 0 1-1.8 1.8H7.3a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#hubHomeCut)"/><path d="M3 10.2 12 3l9 7.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 21v-4.6a1.9 1.9 0 0 1 3.8 0V21Z" fill="currentColor" stroke="none" opacity="0.55"/>'
-        },
-        // Icon set v3: Home = a castle, Layouts = a folded map, Guides = an
-        // open book, in the Armies swords' 1.8 line weight; active = filled. Filled pieces carry stroke="none" because the nav CSS
-        // strokes the whole <svg>. Same paths as the #bottomNav Layouts icon
-        // on /coc/ and /coc/town-hall-18/layouts; change all four together.
-        layouts: {
-          outline: '<path d="M3 6.5L9 3.5l6 2.5 6-3v14.5l-6 3-6-2.5-6 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3.5V18M15 6v14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-          fill: '<path d="M3 6.5L9 3.5V18l-6 3z" fill="currentColor" opacity="0.55" stroke="none"/><path d="M9 3.5l6 2.5v14.5L9 18z" fill="currentColor" stroke="none"/><path d="M15 6l6-3v14.5l-6 3z" fill="currentColor" opacity="0.55" stroke="none"/>'
-        },
-        armies: {
-          outline: '<path d="M14.5 17.5L3 6V3h3l11.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-          fill: '<path d="M14.5 17.5L3 6V3h3l11.5 11.5Z" fill="currentColor"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5Z" fill="currentColor"/><path d="M13 19l6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 21l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
-        },
-        guides: {
-          outline: '<path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="3.2" y="7.4" width="17.6" height="12.6" rx="1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.2 12.6h6.3M14.5 12.6h6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.5" y="11.1" width="5" height="3.1" rx="0.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-          fill: '<path d="M8.6 7.4V5.9c0-1 .8-1.8 1.8-1.8h3.2c1 0 1.8.8 1.8 1.8v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 7.4h14a1.8 1.8 0 0 1 1.8 1.8v2.2H3.2V9.2A1.8 1.8 0 0 1 5 7.4Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/><path d="M3.2 14h17.6v4.2a1.8 1.8 0 0 1-1.8 1.8H5a1.8 1.8 0 0 1-1.8-1.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.6" y="11" width="4.8" height="4" rx="0.8" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
-        }
-      };
+      // on /coc/ that's Lobby. Nav pictures (Oct 2026): primaryNav's icons
+      // (Lobby tower, TH18 Town Hall / barracks, Tools anvil), grey at rest,
+      // colour when active (.coc-nav-pic, coc-hub-menus.css) -- the same as
+      // th-layouts.js builds on every other CoC page.
       if (hubScroll && data.primaryNav) {
         var order = ['home', 'layouts', 'armies', 'guides'];
         hubScroll.innerHTML = order.map(function(key){
           var item = data.primaryNav[key];
-          var icon = HUB_ICONS[key];
-          if (!item || !icon) return '';
+          if (!item) return '';
           var isActive = normalize(item.href) === currentPage;
           return '<a href="' + item.href + '" class="stb-hub-link' + (isActive ? ' active' : '') + '">' +
-            '<svg class="hub-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' + icon.outline + '</svg>' +
-            '<svg class="hub-ico-fill" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' + icon.fill + '</svg>' +
+            '<img class="coc-nav-pic hub-pic" src="' + item.icon + '" alt="" aria-hidden="true">' +
             '<span>' + item.label + '</span></a>';
         }).join('');
         if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
@@ -4616,6 +4989,13 @@ function cocPagePath(u) {
 })();
 </script>
   <script src="/coc-help.js" defer></script>
+  <script>
+  // (i) in the v8 nav icon style; coc-help.js builds the button.
+  window.addEventListener('load', function(){
+    var svg = document.querySelector('#stbInfoBtn svg');
+    if (svg) svg.outerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5.5\"/><path d=\"M12 7.7v.1\"/></svg>';
+  });
+  </script>
   <script src="/coc-more.js?v=20261006a" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
 </body>

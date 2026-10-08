@@ -114,7 +114,7 @@ with HWR and other parts of the site, so a change here has a wider blast radius:
 | `11layout.css` | Layout/chrome styling — **includes the sidebar system**, see §5 |
 | `sidebar.json` | Sidebar menu contents |
 | `11footer.json` | Footer contents |
-| `herosearch.json` | Top-bar search index |
+| `home.json` (`featured`) | Top-bar search index (Featured Topics tiles) |
 
 ---
 

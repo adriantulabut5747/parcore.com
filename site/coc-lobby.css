@@ -1,0 +1,1050 @@
+/* =======================================================================
+   CoC home (/coc/) -- the two "lobby" sections under the tracker promo:
+     .hm  Hero meta: each hero's top 3 equipment among the world's top 200
+     .gt  World top 10 players (podium + list)
+   Filled by coc-lobby.js from /coc-lobby-home.json (daily GitHub Action,
+   scripts/lobby-stats.mjs). Same column as the rest of the page: 12% sides
+   on desktop, 5% on phones. Type: Orbitron titles (2nd word red, like
+   .cl-feature-title), Sora copy, Oxanium numbers.
+   Art: Supercell Fan Kit -- Dragon Scale hero skins (clashofclans/coctools/
+   dragonscale/), embers (firebg0.webp), Legend crests (ranks2.webp).
+   Layers inside each section: art (z 0) < dark overlay (z 1) < content.
+   Screenshot note: headless Chrome never paints these lazy background
+   images; real browsers do. Test with loading="lazy" removed.
+   ======================================================================= */
+
+.hm,
+.gt {
+  --lb-red: #c23b3b;
+  --lb-red-hi: #e05252;
+  --lb-text: #eff2f5;
+  --lb-muted: #9aa0a8;
+  --lb-faint: #6d7178;
+  --lb-line: rgba(255, 255, 255, 0.07);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Shared header: kicker, title, one line, link */
+.lb-head {
+  max-width: 640px;
+}
+.lb-kicker {
+  display: flex;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap; /* always one line; phones get a smaller size below */
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--lb-muted);
+}
+/* A live dot: the data is today's. */
+.lb-kicker::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lb-red-hi);
+  box-shadow: 0 0 0 3px rgba(224, 82, 82, 0.18), 0 0 10px rgba(224, 82, 82, 0.7);
+}
+.lb-title {
+  margin: 0 0 14px;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(24px, 2.2vw, 36px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+.lb-nw {
+  white-space: nowrap;
+}
+/* 1coclayouts.css puts Oxanium on every element, so any <span>/<em>
+   inside a title has to ask for Orbitron itself. */
+.lb-title * {
+  font-family: 'Orbitron', sans-serif;
+}
+.lb-title em {
+  /* 1coclayouts.css puts Oxanium on every element, so the red part has to
+     ask for Orbitron itself. */
+  font-family: 'Orbitron', sans-serif;
+  font-style: normal;
+  white-space: nowrap; /* "top 10" never splits across lines */
+  color: var(--lb-red-hi);
+  text-shadow: 0 0 24px rgba(224, 82, 82, 0.35);
+}
+.lb-text {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--lb-muted);
+}
+/* Grey dot for labels over things that aren't live (FAQ, clan card). */
+.lb-kicker--still::before {
+  background: #5d6168;
+  box-shadow: none;
+}
+
+/* ---- CALL-TO-ACTION BUTTON ---------------------------------------------
+   Solid red, top-lit, with a glow. .lb-cta--live adds the attention
+   seekers: a light sheen sweeping across every ~4s (.lb-cta-shine, its own
+   clipped layer) and a ring pulsing out from the edge (::before). */
+.lb-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 20px 0 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #e3524f 0%, #b83030 55%, #9c2627 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+    0 12px 30px -10px rgba(224, 82, 82, 0.75);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s,
+    filter 0.2s;
+}
+.lb-cta img {
+  width: 28px;
+  height: auto;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+.lb-cta svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s;
+}
+.lb-cta .ac-ico {
+  width: 17px;
+  height: 17px;
+}
+.lb-cta:hover,
+.lb-cta:focus-visible {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+    0 16px 36px -10px rgba(224, 82, 82, 0.95);
+}
+.lb-cta:hover svg:last-child {
+  transform: translateX(3px);
+}
+.lb-cta:active {
+  transform: translateY(0);
+}
+.lb-cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.lb-cta-shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.lb-cta--live .lb-cta-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-20deg);
+  animation: lb-sheen 4s ease-in-out 1.2s infinite;
+}
+.lb-cta--live::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: lb-ring 2.4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes lb-sheen {
+  0%,
+  55% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+/* A fixed-width ring (box-shadow spread), not a scale -- scaling a
+   full-width button grew the ring ~60px past each side. */
+@keyframes lb-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(224, 82, 82, 0.75);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(224, 82, 82, 0);
+  }
+}
+
+/* ---- HERO META ---------------------------------------------------------- */
+.hm {
+  padding: 120px 0 40px;
+  background: #0a0a0b;
+}
+/* Embers, faded in from the page colour at top and bottom so the section
+   has no hard edges. */
+.hm-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 70%, transparent);
+}
+.hm-inner {
+  position: relative;
+  z-index: 1;
+  margin: 0 var(--coc-side, 12%);
+}
+.hm-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+}
+.hm-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 20px;
+}
+.lb-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lb-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.lb-more svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.2s;
+}
+.lb-more:hover,
+.lb-more:focus-visible {
+  color: #fff;
+}
+.lb-more:hover svg {
+  transform: translateX(2px);
+}
+/* ‹ › as one joined control: scrolls the row by one card (coc-lobby.js).
+   Desktop mice can't swipe, so without it most people would never see the
+   last heroes. At an end, its arrow just dims. */
+.hm-nav {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(18, 19, 23, 0.75);
+}
+.hm-nav button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.hm-nav button + button {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+.hm-nav svg {
+  width: 17px;
+  height: 17px;
+}
+.hm-nav button:hover:not(:disabled),
+.hm-nav button:focus-visible {
+  background: rgba(194, 59, 59, 0.22);
+}
+.hm-nav button:disabled {
+  color: rgba(255, 255, 255, 0.22);
+  cursor: default;
+}
+
+/* One row of heroes that scrolls sideways, on every screen size (Adrian's
+   pick, Oct 2026). It bleeds past the page column to the section's edges
+   (--bleed = the column's side margin as a % of the column) so cards slide
+   in from the edge of the screen; scroll-padding keeps the first card lined
+   up with the title. ~2.7 cards show on desktop so the next one peeks in.
+   The top padding is room for the heads: a scroller clips anything above
+   it, and the renders stand ~96px above their cards. */
+.hm-grid {
+  --bleed: var(--coc-side, 15.79%); /* = the page column's side inset; 15.79% = 12% of the section / the 76% column */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max(280px, (100% - 2 * 16px) / 2.75);
+  gap: 16px;
+  margin: 0 calc(-1 * var(--bleed));
+  padding: 160px var(--bleed) 24px; /* tallest action pose stands ~148px above its card */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--bleed);
+  scrollbar-width: none;
+  /* Cards fade out at the screen edges instead of being sliced. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
+}
+.hm-grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* One hero. The render stands on the card and breaks out of its top edge.
+   Lighting, in the hero's colour (--acc): a spotlight pooling at the top
+   of the card, a lit top edge, a halo behind the hero, a rim light on the
+   render and a glowing floor under its feet. Hover turns it all up. */
+.hm-card {
+  --acc: 194, 59, 59; /* per-hero colour, set by coc-lobby.js */
+  --lit: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0 18px 18px;
+  border: 1px solid rgba(var(--acc), 0.18);
+  border-radius: 18px;
+  background:
+    radial-gradient(90% 55% at 50% 0%, rgba(var(--acc), 0.34), rgba(var(--acc), 0.08) 55%, rgba(var(--acc), 0) 80%),
+    linear-gradient(180deg, #17181c 0%, #101114 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 30px 60px -28px rgba(0, 0, 0, 0.95),
+    0 0 50px -20px rgba(var(--acc), 0.35);
+  scroll-snap-align: start;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.4s,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hm-card:hover {
+  --lit: 1.5;
+  border-color: rgba(var(--acc), 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 34px 70px -28px rgba(0, 0, 0, 0.95),
+    0 0 70px -16px rgba(var(--acc), 0.55);
+  transform: translateY(-4px);
+}
+.hm-art {
+  position: relative;
+  height: 150px;
+  margin: -48px -18px 0;
+  pointer-events: none;
+}
+/* The hero's Hero Hall banner, hanging from the card's top edge on the
+   left (its pole sits on the edge). Files are 84x91 (Duke 117x101), shown
+   at half size so they stay sharp on phones. */
+.hm-flag {
+  position: absolute;
+  top: -7px;
+  left: 16px;
+  z-index: 2;
+  width: 42px;
+  height: auto;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.6));
+  transform-origin: 50% 0;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+/* The Duke's file has extra space around its pole (pole ~90 of 117px) --
+   sized so his pole matches the others' 42px. */
+.hm-flag[src*='dragon-duke'] {
+  width: 55px;
+  left: 10px;
+}
+/* A small swing on hover, like a flag catching air. */
+.hm-card:hover .hm-flag {
+  transform: rotate(-4deg);
+}
+
+/* Halo: the light source behind the hero. */
+.hm-art::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 78%;
+  height: 170px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(var(--acc), calc(0.42 * var(--lit))), rgba(var(--acc), 0.1) 60%, transparent);
+  filter: blur(6px);
+  transition: background 0.4s;
+}
+.hm-art img {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 198px;
+  width: auto;
+  transform: translateX(-50%);
+  /* rim light in the hero's colour + the contact shadow */
+  filter: drop-shadow(0 0 14px rgba(var(--acc), 0.45)) drop-shadow(0 18px 16px rgba(0, 0, 0, 0.7));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Hover: the still pose fades out and the action pose (wider -- swords,
+   spears, wings) fades in, fitted into the same box, feet on the floor.
+   Touch screens have no hover, so phones always show the still pose. */
+.hm-art .hm-pose {
+  width: auto; /* height comes per hero from coc-lobby.js (POSE_H) */
+  max-width: none;
+  opacity: 0;
+  transform: translateX(-50%) scale(0.96);
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hm-art .hm-still {
+  transition:
+    opacity 0.25s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .hm-card:hover .hm-still {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.04);
+  }
+  .hm-card:hover .hm-pose {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+/* The ground the hero stands on: a soft ellipse in the card's colour. */
+.hm-art::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 72%;
+  height: 26px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(var(--acc), calc(0.6 * var(--lit))), rgba(var(--acc), 0.12) 70%, transparent);
+}
+.hm-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 18px 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--lb-line);
+}
+.hm-name h3 {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #fff;
+}
+.hm-lvl {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--lb-faint);
+  white-space: nowrap;
+}
+.hm-lvl b {
+  color: var(--lb-muted);
+}
+
+.hm-eqs {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hm-eq {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-areas:
+    'pic name pct'
+    'pic bar  bar';
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.hm-eq:hover,
+.hm-eq:focus-visible {
+  background: rgba(255, 255, 255, 0.045);
+}
+.hm-eq-pic {
+  position: relative;
+  grid-area: pic;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01) 70%);
+}
+.hm-eq-pic img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+.hm-eq-name {
+  grid-area: name;
+  overflow: hidden;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lb-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hm-eq-pct {
+  grid-area: pct;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.hm-eq-bar {
+  grid-area: bar;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.hm-eq-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8f2a2a, var(--lb-red-hi));
+  box-shadow: 0 0 8px rgba(224, 82, 82, 0.5);
+}
+/* Rank 1-3 as a small medal on the socket's corner: gold, silver, bronze. */
+.hm-eq-rank {
+  --medal: 205, 127, 50;
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgb(var(--medal)), rgba(var(--medal), 0.65));
+  box-shadow: 0 0 0 2px #121316, 0 0 8px rgba(var(--medal), 0.5);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1;
+  color: #141414;
+}
+.hm-eqs li:nth-child(1) .hm-eq-rank {
+  --medal: 240, 192, 90;
+}
+.hm-eqs li:nth-child(2) .hm-eq-rank {
+  --medal: 200, 208, 220;
+}
+/* The #1 pick also gets the gold socket. */
+.hm-eqs li:first-child .hm-eq-pic {
+  border-color: rgba(240, 192, 90, 0.45);
+  background: radial-gradient(circle at 50% 35%, rgba(240, 192, 90, 0.28), rgba(240, 192, 90, 0.04) 72%);
+}
+
+/* ---- WORLD TOP 10 ------------------------------------------------------- */
+.gt {
+  padding: 112px 0 56px;
+  background: #0a0a0b;
+}
+/* The three Legend crests on the right; dark on the left for the copy, and
+   faded top/bottom into the page. */
+.gt-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  filter: brightness(0.8);
+}
+.gt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 22%, rgba(10, 10, 11, 0) 78%, #0a0a0b 100%),
+    linear-gradient(to right, rgba(8, 8, 10, 0.94) 0%, rgba(8, 8, 10, 0.78) 34%, rgba(8, 8, 10, 0.3) 70%, rgba(8, 8, 10, 0.45) 100%);
+}
+.gt-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 56px;
+  margin: 0 var(--coc-side, 12%);
+}
+/* Wide screens: the eye-catching button under the text. Once the columns
+   stack (<=1200px) a plain one under the board instead -- no sheen, no ring,
+   a softer glow. */
+.gt-cta-wide {
+  margin-top: 26px;
+}
+.gt-cta-narrow {
+  display: none;
+}
+.gt-note {
+  margin: 18px 0 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  color: var(--lb-faint);
+}
+
+/* Podium: 2nd, 1st, 3rd -- the 1st card stands taller. */
+.gt-podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.gt-pod {
+  --medal: 205, 127, 50;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 26px 12px 18px;
+  border: 1px solid rgba(var(--medal), 0.3);
+  border-radius: 16px;
+  background:
+    radial-gradient(100% 60% at 50% 0%, rgba(var(--medal), 0.2), rgba(var(--medal), 0) 70%),
+    rgba(17, 18, 21, 0.62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s;
+}
+.gt-pod:hover,
+.gt-pod:focus-visible {
+  border-color: rgba(var(--medal), 0.65);
+  transform: translateY(-4px);
+}
+.gt-pod--1 {
+  --medal: 240, 192, 90;
+  order: 2;
+  padding-top: 40px;
+  padding-bottom: 26px;
+}
+.gt-pod--2 {
+  --medal: 200, 208, 220;
+  order: 1;
+}
+.gt-pod--3 {
+  order: 3;
+}
+.gt-medal {
+  position: absolute;
+  top: -14px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgb(var(--medal)), rgba(var(--medal), 0.6));
+  box-shadow: 0 0 0 3px #0e0f12, 0 0 16px rgba(var(--medal), 0.55);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #141414;
+}
+.gt-pod-badge {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 10px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+}
+.gt-pod--1 .gt-pod-badge {
+  width: 72px;
+  height: 72px;
+}
+.gt-pod-name,
+.gt-pod-clan {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gt-pod-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.gt-pod-clan {
+  margin-top: 3px;
+  font-family: 'Sora', sans-serif;
+  font-size: 11.5px;
+  color: var(--lb-faint);
+}
+
+/* Trophy count: league icon + number */
+.gt-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.gt-score img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+.gt-pod .gt-score {
+  margin-top: 12px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* 4 -> 10 */
+.gt-list {
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--lb-line);
+  border-radius: 16px;
+  background: rgba(17, 18, 21, 0.62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  list-style: none;
+}
+.gt-row {
+  display: grid;
+  grid-template-columns: 30px 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.gt-row:hover,
+.gt-row:focus-visible {
+  background: rgba(255, 255, 255, 0.045);
+}
+.gt-list li + li .gt-row {
+  box-shadow: 0 -1px 0 var(--lb-line);
+}
+.gt-rank {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--lb-faint);
+  text-align: center;
+}
+.gt-badge {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+.gt-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.gt-who b,
+.gt-who span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gt-who b {
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--lb-text);
+}
+.gt-who span {
+  font-family: 'Sora', sans-serif;
+  font-size: 11.5px;
+  color: var(--lb-faint);
+}
+
+/* ---- FAQ layout (coc-home only: .lb-faq) ---------------------------------
+   Header left / questions right, like the World top 10, plus the Queen.
+   The question cards themselves are the shared look in coc-clan-clock.css. */
+.coc-content .t18-faq.lb-faq {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: start;
+  gap: 56px;
+  margin-top: 72px;
+}
+/* The Queen as the guide figure under the header (desktop). */
+.lb-faq-art {
+  display: block;
+  width: 240px;
+  height: auto;
+  margin: 18px 0 0 -20px;
+  filter: drop-shadow(0 0 22px rgba(150, 175, 210, 0.25)) drop-shadow(0 18px 18px rgba(0, 0, 0, 0.7));
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+/* ---- ASCENDERE CARD (coc-home only: .lb-clan) ---------------------------- */
+.coc-content .ac-card.lb-clan {
+  border: 1px solid rgba(224, 99, 99, 0.2);
+  border-radius: 18px;
+  background:
+    radial-gradient(40% 80% at 85% 40%, rgba(194, 59, 59, 0.22), rgba(194, 59, 59, 0) 70%),
+    linear-gradient(180deg, #17181c 0%, #111215 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 30px 60px -28px rgba(0, 0, 0, 0.95),
+    0 0 60px -24px rgba(224, 82, 82, 0.4);
+}
+.lb-clan .ac-art {
+  border-radius: 0 17px 0 0;
+}
+.lb-clan .ac-art img {
+  filter: brightness(0.6) saturate(1.05);
+}
+.lb-clan .ac-body {
+  gap: 0;
+  padding: 36px 36px 30px;
+}
+.lb-clan .lb-kicker {
+  margin-bottom: 12px;
+}
+/* Sized by the card's own width (cqi = 1% of it; the card is a container,
+   see coc-clan-clock.css) so "Play with Ascendere" + logo always fits one
+   line -- with a fixed 24px minimum it ran off narrow phone cards. */
+.lb-clan .clan-title {
+  margin-bottom: 24px;
+  font-size: clamp(16px, 4.8cqi, 34px);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.lb-clan .ac-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.lb-clan .ac-btn {
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.lb-clan .ac-stats {
+  border-radius: 0 0 17px 17px;
+}
+.lb-clan .ac-stat {
+  background: rgba(16, 17, 20, 0.92);
+}
+.lb-clan .ac-stat dd {
+  font-size: 22px;
+}
+
+/* ---- Phones / tablets ---------------------------------------------------- */
+@media (max-width: 1200px) {
+  .gt-cta-wide {
+    display: none;
+  }
+  .gt-cta-narrow {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 46px;
+    margin-top: 14px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 8px 20px -14px rgba(224, 82, 82, 0.6);
+  }
+  .gt-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .gt-head {
+    max-width: 560px;
+  }
+}
+@media (max-width: 970px) {
+  .hm {
+    padding: 80px 0 32px;
+  }
+  .hm-inner,
+  .gt-inner {
+    margin: 0 5%;
+  }
+  .hm-top {
+    display: block;
+  }
+  .hm-actions {
+    margin-top: 20px;
+  }
+  /* Name on its own line, average level under it -- side by side, long
+     names (Barbarian King) wrapped to 2 lines and short ones didn't. */
+  .hm-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .hm-name h3 {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .coc-content .t18-faq.lb-faq {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 64px;
+  }
+  .lb-faq-art {
+    display: none;
+  }
+  .lb-clan .ac-body {
+    padding: 28px 20px 24px;
+  }
+  .lb-clan .lb-cta,
+  .lb-clan .ac-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  /* Phones swipe; the arrows would only crowd the link. */
+  .hm-nav {
+    display: none;
+  }
+  .lb-title {
+    font-size: clamp(22px, 6vw, 28px);
+  }
+  .lb-kicker {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+  }
+  .lb-text {
+    font-size: 14px;
+  }
+  /* Same scroller; the phone column is 90% with 5% sides. */
+  .hm-grid {
+    --bleed: 5.556%;
+    grid-auto-columns: min(78%, 340px);
+    gap: 12px;
+    padding-bottom: 8px;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .gt {
+    padding: 72px 0 80px;
+  }
+  .gt-bg {
+    object-position: 60% 50%;
+  }
+  .gt-podium {
+    gap: 8px;
+  }
+  .gt-pod {
+    padding: 22px 8px 14px;
+  }
+  .gt-pod--1 {
+    padding-top: 30px;
+    padding-bottom: 20px;
+  }
+  .gt-pod-badge {
+    width: 44px;
+    height: 44px;
+  }
+  .gt-pod--1 .gt-pod-badge {
+    width: 56px;
+    height: 56px;
+  }
+  .gt-pod-name {
+    font-size: 12.5px;
+  }
+  .gt-pod .gt-score {
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+  .gt-row {
+    gap: 10px;
+    padding: 8px 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-cta--live::before,
+  .lb-cta--live .lb-cta-shine::before {
+    animation: none;
+  }
+  .lb-cta--live::before {
+    opacity: 0;
+  }
+  .hm-card,
+  .hm-art img,
+  .hm-flag,
+  .gt-pod {
+    transition: none;
+  }
+}

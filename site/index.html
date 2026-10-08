@@ -32,14 +32,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/11layout.css?v=20261007a">
+<link rel="stylesheet" href="/11layout.css?v=20261008c">
 
 <!-- ============================================================
      HOME PAGE STYLES (one block, Oct 2026 rebuild)
      Shell look (top bar, sidebar, loader, search overlay, footer) comes
      from 11layout.css. Everything below is this page only. Sections, in
      page order: base, hero (+ smoke), hero search results, dock bar, featured
-     topics, about + perks, new-bases banner, feedback + FAQ, modal. Game
+     topics, about + perks, feedback + FAQ, modal. Game
      Guides has its own block next to its markup.
      ============================================================ -->
 <style>
@@ -87,6 +87,13 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
 .top-bar-title a { font-family: 'Oxanium', sans-serif; }
 body.search-modal-open { overflow: hidden !important; }
 body.search-modal-open .coc-main { overflow: hidden !important; }
+/* Full-height scrollbar (desktop): .coc-main starts at the very top and clears
+   the top bar with padding instead of .main's margin, so its scrollbar runs
+   from y=0 like the CoC pages' (11layout.css insets the bars by its width).
+   The sidebar carries the offset itself at desktop widths. */
+.main { margin-top: 0; }
+.coc-main { padding-top: var(--topbar-height, 52px); }
+@media (min-width: 971px) { .sidebar { margin-top: var(--topbar-height, 40px); } }
 .sidebar a.active::before,
 .sidebar .game.active::before { background: linear-gradient(180deg, rgb(194, 59, 59) 36%, rgb(143, 31, 31) 100%); }
 
@@ -269,14 +276,15 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   .hero-searchbar-btn { width: 36px; height: 36px; border-radius: 7px; }
 }
 
-/* Also used by the top bar's search overlay and the Featured Games "show more" button. */
-.hero-search-viewmore {
+/* Featured Games "show more" button only -- the search overlay's "Loading more..."
+   sentinel shares the class and keeps its plain-text look from 11layout.css. */
+#ggMore {
   display: block; margin: 32px auto 0; padding: 10px 28px; cursor: pointer;
   background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 8px;
   color: #c8cbcd; font: 600 14px 'Sora', sans-serif; letter-spacing: 0.5px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-.hero-search-viewmore:hover { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.24); }
+#ggMore:hover { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.24); }
 
 /* ============================================================
    JUMP TO A GAME: the old Popular Topics section's look (smoke at the
@@ -405,28 +413,13 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .ft-logo { flex: none; width: 24px; height: 24px; border-radius: 6px; object-fit: cover; }
 .ft-group h3 a:hover { color: #ff5874; }
 .ft-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; list-style: none; }
-.ft-tile {
-  position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 9px 14px;
-  border-radius: 8px; overflow: hidden; isolation: isolate; background: #1b1b1e; color: #fff; text-decoration: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-.ft-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; transition: transform 0.6s var(--hm-ease), opacity 0.3s ease; }
-/* dark on the left where the text sits, art showing through on the right */
-.ft-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(20, 20, 22, 0.96) 0%, rgba(20, 20, 22, 0.85) 45%, rgba(20, 20, 22, 0.45) 100%); }
-.ft-name { font: 700 14.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ft-sub { margin-top: 3px; font: 500 11.5px/1.3 'Sora', sans-serif; color: #9a9ca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
-a.ft-tile:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
-a.ft-tile:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px; }
-/* coming soon: not a link, greyed out */
-.ft-soon .ft-art { filter: grayscale(1); opacity: 0.3; }
-.ft-soon .ft-name { color: rgba(255, 255, 255, 0.6); }
-.ft-soon .ft-sub { color: rgba(255, 255, 255, 0.4); }
+/* The tile itself (.ft-tile, .ft-art, .ft-name, .ft-sub, .ft-soon) lives in
+   11layout.css: the top-bar search results use the same tile. */
 /* "+N more": the last visible slot of a long group (16th on desktop, 10th on
    phones) opens the rest; same tile, dashed edge so it reads as an action */
-.ft-more { width: 100%; border: 0; cursor: pointer; font: inherit; text-align: left; background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
-.ft-more::before { display: none; }
-.ft-more:hover { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
+.ft-tile.ft-more { width: 100%; border: 0; cursor: pointer; font: inherit; text-align: left; background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.ft-tile.ft-more::before { display: none; }
+.ft-tile.ft-more:hover { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
 .ft-more:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px; }
 .ft-ph { min-height: 56px; border-radius: 8px; background: linear-gradient(90deg, #18181b 25%, #222226 50%, #18181b 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
 @media (max-width: 970px) {
@@ -440,10 +433,6 @@ a.ft-tile:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px;
   .ft-tile.ft-more { min-height: 34px; padding: 0 12px; align-items: center; background: none; }
   .ft-more .ft-name { font-size: 12.5px; font-weight: 600; color: #c8cbcd; }
   .ft-more .ft-sub { display: none; }
-  .ft-tile { min-height: 52px; padding: 8px 10px; }
-  /* names wrap to two lines instead of being cut off */
-  .ft-name { font-size: 13px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .ft-sub { font-size: 10.5px; margin-top: 2px; }
 }
 
 /* ============================================================
@@ -532,50 +521,6 @@ a.ft-tile:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px;
 }
 
 /* ============================================================
-   NEW-BASES BANNER (shown only when some TH has bases marked "new")
-   ============================================================ */
-.hm-promo-band { background: var(--hm-grain), var(--hm-bg-deep); padding: 48px var(--hm-gut); border-top: 1px solid var(--hm-line); }
-.hm-promo-band:has(.hm-promo[hidden]) { display: none; }
-
-.hm-promo {
-  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 28px;
-  padding: 18px 26px 18px 20px; border-radius: 14px; overflow: hidden;
-  text-decoration: none; color: #fff;
-  background: linear-gradient(100deg, #5b1313 0%, #2b0e10 46%, #151517 100%);
-  border: 1px solid rgba(224, 48, 47, 0.28);
-}
-.hm-promo[hidden] { display: none; }
-.hm-promo-fan { position: relative; width: 168px; height: 92px; flex: none; }
-.hm-promo-fan img {
-  position: absolute; top: 8px; left: 38px; width: 96px; aspect-ratio: 16 / 10; object-fit: cover;
-  border-radius: 8px; border: 2px solid #f1f1f3; box-shadow: 0 10px 22px -6px rgba(0, 0, 0, 0.8);
-  transition: transform 0.5s var(--hm-ease);
-}
-.hm-promo-fan img:nth-child(1) { transform: translate(-30px, 6px) rotate(-11deg); }
-.hm-promo-fan img:nth-child(2) { transform: translate(30px, 6px) rotate(11deg); }
-.hm-promo-fan img:nth-child(3) { transform: translateY(-4px); z-index: 1; }
-.hm-promo:hover .hm-promo-fan img:nth-child(1) { transform: translate(-40px, 8px) rotate(-15deg); }
-.hm-promo:hover .hm-promo-fan img:nth-child(2) { transform: translate(40px, 8px) rotate(15deg); }
-.hm-promo:hover .hm-promo-fan img:nth-child(3) { transform: translateY(-8px); }
-.hm-promo-text strong { display: block; font: 700 19px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; }
-.hm-promo-text span { display: block; margin-top: 4px; font-size: 13.5px; line-height: 1.5; color: #dcc2c2; }
-.hm-promo-cta {
-  display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 10px;
-  background: #f4f4f5; color: #151517; font: 600 13.5px/1 'Sora', sans-serif; white-space: nowrap;
-  transition: background 0.2s ease;
-}
-.hm-promo-cta svg { width: 15px; height: 15px; transition: transform 0.3s var(--hm-ease); }
-.hm-promo:hover .hm-promo-cta { background: #fff; }
-.hm-promo:hover .hm-promo-cta svg { transform: translateX(3px); }
-
-@media (max-width: 970px) {
-  .hm-promo-band { padding: 32px var(--hm-gut); }
-  .hm-promo { grid-template-columns: minmax(0, 1fr); justify-items: start; gap: 14px; padding: 18px; }
-  .hm-promo-fan { width: 168px; height: 84px; }
-  .hm-promo-text strong { font-size: 17px; }
-}
-
-/* ============================================================
    FEEDBACK + FAQ
    ============================================================ */
 .hm-help { background: var(--hm-grain), var(--hm-bg); padding: 72px var(--hm-gut) 80px; border-top: 1px solid var(--hm-line); }
@@ -645,7 +590,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   .hero-content > * { animation: none; }
   .hm-anim .hm-shape, .hm-anim .hm-laptop, .hm-anim .hm-phone { transition: none; }
   .hm-live:has(.is-live) .hm-live-dot { animation: none; }
-  .ft-art, .hm-promo-fan img { transition: none; }
   .ft-ph { animation: none; }
   .hm-q::details-content { transition: none; }
 }
@@ -739,10 +683,9 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
      PAGE CONTENT (right of the sidebar). Order: hero, search results,
      then #homeBelow (everything the hero search hides while you type):
      jump to a game (smoke section), game guides, featured topics, about,
-     new-bases banner, feedback + FAQ.
+     feedback + FAQ.
      Lists here are built from JSON at runtime: home.json (featured
-     topics), sidebar.json (game guides), hwr-categories.json
-     (Web Resources row), thNN-layouts.json (counts, new-bases banner).
+     topics, also game-nav.json + hwr-categories.json), sidebar.json (game guides).
      ============================================================ -->
 <div class="coc-main">
 
@@ -1061,23 +1004,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     </div>
   </section>
 
-  <!-- ---- NEW-BASES BANNER: hidden unless some TH has bases marked
-       "new": true (see the script). ---- -->
-  <section class="hm-promo-band" aria-label="New bases">
-    <div class="hm-in">
-      <a class="hm-promo" id="promo" href="/coc/" hidden>
-      <span class="hm-promo-fan" id="promoFan" aria-hidden="true"></span>
-      <span class="hm-promo-text">
-        <strong id="promoTitle">New bases are up</strong>
-        <span>Every new base has a copy link that opens it straight in Clash of Clans.</span>
-      </span>
-      <span class="hm-promo-cta">See the new bases
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </span>
-    </a>
-    </div>
-  </section>
-
   <!-- ---- FEEDBACK + FAQ ---- -->
   <section class="hm-help" id="feedback" aria-label="Feedback and common questions">
     <div class="hm-in hm-help-grid">
@@ -1176,12 +1102,12 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 </div><!-- /.main -->
 
 <!-- Sidebar, top-bar search, scroll-to-top, pull-to-refresh: all shared, from 11layout.js. -->
-<script src="/11layout.js?v=20261007a"></script>
+<script src="/11layout.js?v=20261008c"></script>
 <script>
 /* ============================================================
    HOME PAGE SCRIPT (Oct 2026 rebuild). Needs 11layout.js first
    (loadSidebarData). Parts, in order: loader, helpers, hero parallax,
-   hero search, dock numbers, featured topics, new-bases banner,
+   hero search, dock numbers, featured topics,
    game guides grid, about entrance, feedback form.
    Firebase loads after this file.
    ============================================================ */
@@ -1239,10 +1165,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     }
     return jsonCache[url];
   }
-
-  // Town Halls that have layouts/army JSON files, newest first.
-  // ponytail: hardcoded range -- add 19 when TH19 pages ship.
-  const TOWN_HALLS = [18, 17, 16, 15, 14, 13, 12, 11, 10, 9];
 
   // ---------- HERO PARALLAX: the GIF drifts at 25% of scroll speed.
   // Desktop scrolls .coc-main, phones scroll the window, so listen to both.
@@ -1352,9 +1274,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     mark();
   })();
 
-  // ---------- HOME DATA (home.json) feeds Featured Topics.
-  const homeData = getJSON('/home.json');
-
   // ---------- FEATURED TOPICS: one titled grid of tiles per group. A group
   // lists its tiles, or pulls them from hwr-categories.json / game-nav.json.
   (function () {
@@ -1405,24 +1324,9 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     }
     phone.addEventListener('change', () => clamps.forEach(f => f()));
 
-    function tilesOf(g) {
-      if (g.from === 'hwr') {
-        return getJSON('/hwr-categories.json').then(c => (c.categories || []).map(x => ({
-          name: x.name, sub: 'Web Resources', link: x.link,
-          // home uses small copies of the category banners: /icons/home/<same name>.webp
-          image: (x.bg || '').replace(/^\/webresources-icon\/(.+)\.\w+$/, '/icons/home/$1.webp')
-        })));
-      }
-      if (g.gameNav) {
-        return getJSON('/game-nav.json').then(n => ((n[g.gameNav] || {}).pages || []).map(p => {
-          const o = (g.tiles || {})[p.link] || {};
-          return { name: o.name || p.name, sub: o.sub || g.title, link: p.link, image: o.image || g.cover, soon: p.soon };
-        }));
-      }
-      return Promise.resolve(g.tiles || []);
-    }
-
-    homeData.then(data => Promise.all((data.featured || []).map(g => tilesOf(g).catch(() => []).then(tiles => {
+    // Data: loadFeaturedGroups() in 11layout.js (the top-bar search uses it too).
+    loadFeaturedGroups().then(all => all.map(g => {
+      const tiles = g.tiles;
       if (!tiles.length) return null;
       const wrap = el('div', 'ft-group');
       const h = el('h3');
@@ -1438,42 +1342,12 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
       wrap.append(h, grid);
       if (tiles.length > 10) clamp(grid);
       return wrap;
-    })))).then(groups => {
+    })).then(groups => {
       host.replaceChildren(...groups.filter(Boolean));
       host.removeAttribute('aria-busy');
     }).catch(() => {
       host.replaceChildren(el('p', 'hm-lede', 'Featured topics did not load. Refresh the page to try again.'));
     });
-  })();
-
-  // ---------- NEW-BASES BANNER: the Town Hall with the most bases marked
-  // "new": true in its layouts JSON (ties go to the higher TH). Hidden if none.
-  (function () {
-    const promo = document.getElementById('promo');
-    if (!promo) return;
-    Promise.all(TOWN_HALLS.map(t => getJSON('/th' + t + '-layouts.json').then(d => ({ t: t, d: d })).catch(() => null)))
-      .then(all => {
-        let best = null;
-        all.forEach(x => {
-          if (!x || !Array.isArray(x.d.bases)) return;
-          const fresh = x.d.bases.filter(b => b.new);
-          if (fresh.length && (!best || fresh.length > best.fresh.length)) best = { t: x.t, d: x.d, fresh: fresh };
-        });
-        if (!best) return;
-        const n = best.fresh.length;
-        document.getElementById('promoTitle').textContent =
-          n + ' new Town Hall ' + best.t + ' base' + (n === 1 ? ' is' : 's are') + ' up';
-        const dir = best.d.imageDir || '/clashofclans/th' + best.t + 'layouts/';
-        // the fan shows one base each from TH16, TH14 and TH17 (left, right, front)
-        const pick = t => {
-          const x = all.find(y => y && y.t === t && Array.isArray(y.d.bases) && y.d.bases.length);
-          return x ? img('/icons/home/th' + t + '-layouts.webp') : null; // small home copies, not the full base images
-        };
-        const fan = [16, 14, 17].map(pick).filter(Boolean);
-        document.getElementById('promoFan').replaceChildren(...(fan.length === 3 ? fan : best.fresh.slice(0, 3).map(b => img(dir + b.image))));
-        promo.href = '/coc/town-hall-' + best.t + '/layouts';
-        promo.hidden = false;
-      });
   })();
 
   // ---------- GAME GUIDES: one portrait card per sidebar.json entry with a

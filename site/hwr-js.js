@@ -2830,7 +2830,7 @@ try {
 
           // Only one icon can show at a time — on mobile the single
           // .th-icon swaps to the page's favicon; on desktop it stays
-          // untouched (webicon.png), so we only overwrite src there.
+          // untouched (web-resources.svg), so we only overwrite src there.
           var iconEl = document.getElementById('secondaryTopIcon');
           var originalIconSrc = iconEl ? iconEl.getAttribute('src') : null;
           var originalIconAlt = iconEl ? iconEl.getAttribute('alt') : null;
