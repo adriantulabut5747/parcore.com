@@ -459,11 +459,44 @@ every 11layout link site-wide (CLAUDE.md rule).
 | 6 | farming | Guide | Farming Guide: Gold, Elixir and Dark Elixir Without Wasted Attacks | Full storages, within minutes. | soon |
 | 7 | clan-games | Event | Clan Games: Max Out 4,000 Points Without the Grind | 4,000 points, no sweat. | soon |
 | 8 | best-pets | Guide | The Right Pet for Every Hero | Every hero needs a sidekick. | soon |
-| 9 | equipment-tier-list | Tier List | Equipment Tier List: Don't Waste Your Ore | Every slot, graded. | soon |
+| 9 | equipment-tier-list | Tier List | Equipment Tier List: Don't Waste Your Ore | Every slot, graded. | live (Oct 2026, 4th article) |
 | 10 | troop-tier-list | Tier List | Troop Tier List: Who Actually Carries | S tier or straight to the bench. | soon |
 | 11 | best-hero-skins | Skins | The Best Hero Skins Ever Released, Ranked | Pure drip, properly ranked. | soon |
 
 Adrian rejected other title rewrites for 1–6 and 10: keep those titles.
+
+### Equipment Tier List: Adrian's calls (Oct 2026, in progress)
+
+Picked ahead of Base Building. **Adrian sends the ranking; Claude writes
+around it** (Claude can't credibly grade the Dragon Duke or post-rebalance
+pieces). One S–D table per hero (King, Queen, Warden, RC, Prince, Duke), then
+an "ore priority" section across heroes. Real secret: **don't try to max them
+all. Max by pairs: the pieces you'll actually use, and learn the meta.** Tool
+link: only the Top 200 equipment (`/coc/tools/leaderboards#equipment`). The
+tier list maker (`/coc/tools/equipment-tier-list`) already promotes this
+article from its own page.
+
+Draft built 2026-10-08: `site/articles/coc/equipment-tier-list.html`
+(noindex; `articles.json` still "soon"). His ranking came as a tier list maker
+link; his pairs per hero are listed under each hero table ("Pairs Worth
+Maxing"). Tier tables = `.ap-tiers` in articles.css (tier letters in the tool's
+colours, equipment icons on the army cards' blue/purple rarity backgrounds;
+phones stack the reason under the name). Ore facts come from
+`coc-equipment.json`: Commons max at 18 with no Starry Ore, Epics go to 27 at
+about double the Shiny/Glowy plus Starry; all 42 maxed > 1.6M Shiny.
+No "More for" box (one tool link, inline).  His answers (same day): Queen's third pair is Monolith Arrow + **Action
+Figure**; the ranking is "overall, every Town Hall once unlocked"; each pair
+has his one-line "when to use" note under it (King, Queen, Warden, Prince);
+RC and Duke notes added later the same day; Haste Vial + Hog Rider Doll
+dropped (RC keeps two pairs). Only C-tier pieces (Rage Vial, Life Gem) sit in
+pairs now, and the tier text says so.
+Banner and thumbnail (Adrian's pick, an exception to "official key art"): his
+42-piece board from the tier list maker, rendered by headless Chrome with the
+board lifted onto a plain background (every row on one line), centred so it
+survives the 21:9 desktop crop, the 2:1 phone crop and the 16:9 card.
+Pairs list the higher-tier piece first (his "consistency" call). Piece reasons were aligned to his notes
+(Heroic Torch = Bowlers/Throwers/Electro Titans, Healing Tome = Dragons and
+Dragon Riders, Life Gem = Thrower attacks, Monolith Arrow = Queen Charges).
 
 ### Crafted Defenses Season 4: Adrian's calls (Oct 2026)
 
