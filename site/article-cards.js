@@ -6,6 +6,8 @@
 //   <details id="apToc">                             -> article contents + scroll-spy
 //   <div class="art-next" data-article="<id>">       -> "Read next" card for another article
 //   <div class="art-nav" data-for="X">‹ ›</div>      -> scrolls strip X one card at a time
+//   <div class="art-spot" data-game="coc">          -> newest live article big + the next three as rows (/coc/)
+//   <span class="art-spot-count" data-game="coc">   -> "All N articles"
 (function () {
   const esc = (t) => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   // Month + year only ("Oct 2026"): articles say when, not the exact day (Adrian's rule).
@@ -20,14 +22,16 @@
   }
   function media(a, cls, badge = true) {
     return `<div class="${cls}"><img src="${esc(a.image)}" alt="" loading="lazy" decoding="async">` +
-      (badge && a.status !== 'live' ? '<span class="art-soon">Coming soon</span>' : '') + '</div>';
+      (badge ? `<div class="art-chips"><span class="art-cat">${esc(a.category)}</span>` +
+        (a.status !== 'live' ? '<span class="art-soon">Coming soon</span>' : '') + '</div>' : '') + '</div>';
   }
 
-  function card(a, gameName) {
+  // Strip card: category (and "Coming soon") on the picture's top right, no
+  // game name -- strips only sit on their own game's page (Adrian, Oct 2026).
+  function card(a) {
     return shell(a, 'art-card',
       media(a, 'art-media') +
-      `<div class="art-body"><div class="art-eyebrow"><span class="art-game">${esc(gameName)}</span><span class="art-tag">${esc(a.category)}</span></div>` +
-      `<h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p></div>`);
+      `<div class="art-body"><h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p></div>`);
   }
 
   // Feed row (ONE Esports-style list): picture left; title with the
@@ -36,8 +40,11 @@
   // no label (Adrian's pick).
   function row(a, gameName) {
     const meta = esc(gameName) + (a.status === 'live' && a.date ? ` · <time datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '');
+    // The category also goes on the picture (top right): phones show that
+    // one, desktop the one beside the title (article-cards.css).
+    const cat = `<span class="art-row-cat">${esc(a.category)}</span>`;
     return shell(a, 'art-row',
-      media(a, 'art-row-media', false) +
+      media(a, 'art-row-media', false).replace(/<\/div>$/, cat + '</div>') +
       `<div class="art-row-body"><div class="art-row-top"><h2 class="art-title">${esc(a.title)}</h2><span class="art-tag">${esc(a.category)}</span></div>` +
       `<p class="art-dek">${esc(a.dek)}</p><p class="art-row-meta">${meta}</p></div>`);
   }
@@ -176,10 +183,35 @@
       (live ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' : '</div>');
   }
 
+  // Spotlight (the /coc/ lobby): the newest live article big on the left with
+  // its category on the picture ("New ·" for two weeks after its date), the
+  // next three as rows on the right. Ties on date keep file order.
+  function spot(el, list) {
+    const live = list.filter((a) => a.status === 'live').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    if (!live.length) return;
+    // "lead": true in articles.json pins an article to the top here only
+    // (the /articles/ feed and the strips keep their own order).
+    const pin = live.findIndex((a) => a.lead);
+    if (pin > 0) live.unshift(live.splice(pin, 1)[0]);
+    const [f, ...rest] = live;
+    const fresh = f.date && Date.now() - new Date(f.date + 'T00:00:00') < 14 * 864e5;
+    el.innerHTML =
+      `<a class="as-feat" href="${esc(f.link)}"><div class="as-feat-media"><img src="${esc(f.image)}" alt="" loading="lazy" decoding="async">` +
+      '<span class="as-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span>' +
+      `<span class="as-label">${fresh ? 'New · ' : ''}${esc(f.category)}</span></div>` +
+      `<div class="as-feat-body"><h3 class="as-feat-title">${esc(f.title)}</h3><p class="as-feat-dek">${esc(f.dek)}</p></div></a>` +
+      // The lead again as a plain row: phones show this instead of the big picture.
+      '<div class="as-list">' + [f].concat(rest.slice(0, 3)).map((a, i) =>
+        `<a class="as-row${i ? '' : ' as-row--lead'}" href="${esc(a.link)}"><span class="as-row-media"><img src="${esc(a.image)}" alt="" loading="lazy" decoding="async">` +
+        '<span class="as-wm"><img src="/icons/home.jpg" alt=""></span></span>' +
+        `<div class="as-row-body"><span class="as-row-cat">${esc(a.category)}</span><h3 class="as-row-title">${esc(a.title)}</h3></div></a>`).join('') + '</div>';
+  }
+
   const strips = document.querySelectorAll('.art-track[data-game]');
+  const spots = document.querySelectorAll('.art-spot[data-game]');
   const feeds = document.querySelectorAll('.art-feed[data-game]');
   const nexts = document.querySelectorAll('.art-next[data-article]');
-  if (!strips.length && !feeds.length && !nexts.length) {
+  if (!strips.length && !spots.length && !feeds.length && !nexts.length) {
     document.querySelectorAll('.art-nav[data-for]').forEach(arrows);
     return;
   }
@@ -191,7 +223,11 @@
       const all = (data.articles || []).map((a) => Object.assign({ link: '/articles/' + a.game + '/' + a.id }, a));
       const pick = (g) => (g === 'all' ? all : all.filter((a) => a.game === g));
       strips.forEach((el) => {
-        el.innerHTML = pick(el.dataset.game).map((a) => card(a, (games[a.game] || {}).name || a.game)).join('');
+        el.innerHTML = pick(el.dataset.game).map(card).join('');
+      });
+      spots.forEach((el) => spot(el, pick(el.dataset.game)));
+      document.querySelectorAll('.art-spot-count[data-game]').forEach((el) => {
+        el.textContent = 'All ' + pick(el.dataset.game).length + ' articles';
       });
       feeds.forEach((el) => feed(el, pick(el.dataset.game), games));
       nexts.forEach((el) => {

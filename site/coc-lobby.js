@@ -134,11 +134,12 @@
   fetch('/coc-lobby-home.json')
     .then((r) => r.json())
     .then((d) => {
-      // hero's App Store button: version + star rating, like the CODM lobby
-      var a = d.app, as = document.getElementById('chAsMeta');
-      if (a && as && a.rating) {
-        var n = a.ratings >= 1e6 ? (a.ratings / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : a.ratings >= 1e3 ? Math.round(a.ratings / 1e3) + 'K' : String(a.ratings);
-        as.innerHTML = 'v' + String(a.version).replace(/[<>&]/g, '') + ' · <span class="star">★</span> ' + a.rating + ' (' + n + ')';
+      // hero's Leaderboards tile: today's world #1 (static fallback stays if this fails)
+      var lb = document.getElementById('chLb'), p1 = d.top[0];
+      if (lb && p1) {
+        lb.innerHTML =
+          (p1.tierIcon ? '<img src="' + ASSETS + 'leaguetiers/125/' + esc(p1.tierIcon) + '.png" alt="" width="52" height="52">' : '') +
+          '<span><span class="ch-lb-rank">World #1</span><b>' + esc(p1.name) + '</b><small>' + p1.score.toLocaleString('en-US') + ' trophies</small></span>';
       }
 
       var h = Math.round((Date.now() - new Date(d.updated)) / 36e5);

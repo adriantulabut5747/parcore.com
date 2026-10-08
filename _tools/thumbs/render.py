@@ -15,6 +15,7 @@ SITE = os.path.normpath(os.path.join(HERE, '..', '..', 'site'))
 CHROME = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 OUT = {
     'music': 'icons/home/wr-music.webp',
+    'equipment-tier-list': 'clashofclans/articles/equipment-tier-list/thumb.webp',
 }
 
 def render(name, out=None):

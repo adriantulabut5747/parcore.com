@@ -381,7 +381,11 @@ every 11layout link site-wide (CLAUDE.md rule).
   Hammer Jam" + the site search. No page strip (`data-hub-nav="off"`).
 - **Phone secondary bar:** "Articles › CoC › Hammer Jam" (short names), the
   earlier steps are **links**; the table-of-contents button at the right end.
-- **Phone bottom nav:** All · **this game** · More · **related game** ·
+- **No bottom nav on any articles page** (Adrian, Oct 2026): the article HTML
+  has no `#bottomNav` / `#moreOverlay` markup, and articles.css drops the
+  footer's 90px bar room when `.bn-bar` is missing. Don't add them back when
+  copying hammer-jam.html. The hubs (/articles/, /articles/coc/) have none either.
+- **Phone bottom nav (removed Oct 2026, kept for reference):** All · **this game** · More · **related game** ·
   Search, with game icons (grey at rest, colour when active), labels one line
   with "…". Tapping the related game opens `/articles/?game=<key>` ("No Clash
   Royale articles yet."). The More sheet lists every featured game (CoC →
@@ -452,18 +456,18 @@ every 11layout link site-wide (CLAUDE.md rule).
 | # | id | Category | Title | Dek | Status |
 |---|---|---|---|---|---|
 | 1 | hammer-jam | Event | Hammer Jam Explained: What to Upgrade While It's Cheap | Half the price, double the gains. | **live** |
-| 2 | upgrade-order | Guide | Upgrade Order: What Comes First at Every Town Hall | Build smart, not just fast. | **live, noindex** (awaiting Adrian's fact-check) |
-| 3 | crafted-defenses-season-4 | Guide | Crafted Defenses Season 4: Hot Candle, Hero Hunter and Cake-A-Pult Explained | Three new toys, one station. | **live, noindex** (draft, awaiting Adrian) |
+| 2 | upgrade-order | Guide | Stop Upgrading Blind: The Town Hall Upgrade Order | Every hammer swing counts. | **live, noindex** (awaiting Adrian's fact-check) |
+| 3 | crafted-defenses-season-4 | Guide | Cake-A-Pult Is Here: Crafted Defenses Season 4 Explained | Your heroes have a new problem. | **live, noindex** (draft, awaiting Adrian) |
 | 4 | base-building | Guide | Base Building 101: Layouts That Hold Up in Real Attacks | Stop giving away free triples. | soon ← **next** |
 | 5 | sixth-builder | Guide | The Fastest Way to Unlock Your 6th Builder | One more hammer, zero excuses. | soon |
 | 6 | farming | Guide | Farming Guide: Gold, Elixir and Dark Elixir Without Wasted Attacks | Full storages, within minutes. | soon |
 | 7 | clan-games | Event | Clan Games: Max Out 4,000 Points Without the Grind | 4,000 points, no sweat. | soon |
 | 8 | best-pets | Guide | The Right Pet for Every Hero | Every hero needs a sidekick. | soon |
-| 9 | equipment-tier-list | Tier List | Equipment Tier List: Don't Waste Your Ore | Every slot, graded. | live (Oct 2026, 4th article) |
+| 9 | equipment-tier-list | Tier List | Upgrade the Right Equipment: The Full Tier List | Spend ore smarter. | live (Oct 2026, 4th article) |
 | 10 | troop-tier-list | Tier List | Troop Tier List: Who Actually Carries | S tier or straight to the bench. | soon |
 | 11 | best-hero-skins | Skins | The Best Hero Skins Ever Released, Ranked | Pure drip, properly ranked. | soon |
 
-Adrian rejected other title rewrites for 1–6 and 10: keep those titles.
+Adrian rejected other title rewrites for 1–6 and 10: keep those titles. Exception (Oct 2026): he picked new hook-first titles + deks for 2, 3 and 9 (listed above); their H1s are the plain card title. In articles.json, equipment-tier-list is now first (Adrian: most popular), so it leads the /coc/ strip; the table keeps its old numbers.
 
 ### Equipment Tier List: Adrian's calls (Oct 2026, in progress)
 

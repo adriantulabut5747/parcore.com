@@ -295,26 +295,8 @@ function cocPagePath(u) {
     return '<img class="coc-nav-pic ' + cls + '" src="' + navPics[key] + '" alt="" aria-hidden="true">';
   }
 
-  // thz-script.js builds the hero tabs after its own fetch, then fires
-  // parchome:coc-nav-ready -- so decorate on that event and again once the
-  // pictures are known. Matched by label; skipped if already done.
-  // The first layer has its own Layouts / Army pictures (Oct 2026, Adrian's
-  // pick: Supercell Fan Kit layout-editor house + lab-style building),
-  // the same on every page; Tools keeps the shared anvil. The top bar and
-  // bottom nav still show each TH's own Town Hall / barracks.
-  var FL_PICS = { layouts: '/icons/coc-nav/layouts-fl.webp', armies: '/icons/coc-nav/armies-fl.webp' };
-  function iconFirstLayer() {
-    var keyFor = { Layouts: 'layouts', Army: 'armies', Tools: 'guides' };
-    if (!navPics) return;
-    document.querySelectorAll('.first-layer button').forEach(function (btn) {
-      var key = keyFor[btn.textContent.trim()];
-      if (!key || btn.querySelector('.coc-nav-pic')) return;
-      var src = FL_PICS[key] || navPics[key];
-      btn.insertAdjacentHTML('afterbegin', '<img class="coc-nav-pic fl-pic" src="' + src + '" alt="" aria-hidden="true">');
-    });
-  }
-  document.addEventListener('parchome:coc-nav-ready', iconFirstLayer);
-  iconFirstLayer();
+  // The first layer (Layouts / Army / Tools) is text only: its pictures were
+  // removed in Oct 2026 (Adrian's call).
 
   // Tools chip row: .is-tight (short labels) only when the full names
   // would make the row scroll sideways. Measured with the full names
@@ -424,7 +406,6 @@ function cocPagePath(u) {
           armies: th ? th.navArmyIcon : data.primaryNav.armies.icon,
           guides: data.primaryNav.guides.icon,
         };
-        iconFirstLayer();
         hubScroll.innerHTML = order
           .map(function (key) {
             var item = data.primaryNav[key];
