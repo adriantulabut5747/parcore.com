@@ -25,8 +25,24 @@ What this means when writing:
 - The byline is **Parcore** (his player name). "Parchrome" is the site's name,
   never the author.
 - Credentials on the page: **"experienced player"** only. No rank claims,
-  badge lists or proof screenshots in articles (for now). The one exception
-  is the section subtitle: "Written by Parcore, former #1 in the Philippines".
+  badge lists or proof screenshots in articles (for now). The /coc/articles/
+  subtitle still says "Written by Parcore, former #1 in the Philippines";
+  the /articles/ hub dropped it (Oct 9 2026, Adrian). The hub's top is a
+  short charcoal header band (brush streaks, a few muted red ones, torn bottom edge,
+  modelled on Riot's support-site header; text left-aligned on desktop; bright red was
+  rejected as too loud next to the sidebar;
+  vector art drawn by _tools/articles-band.py) with the title ("Your unfair advantage" / "Read one. Leave with at least one
+  move most players never learned. What the top of the ladder knows,
+  written down for you."), then the newest live article as a big
+  cover story with the next three beside it ("Also new", #artLead, built by
+  article-cards.js); its blurred picture tints the page behind it. Every
+  other article sits below in a card grid (3 across max; the .ah column
+  caps at 1240px). The game chips and the search sit under the "More
+  articles" heading; filtering or searching keeps the lead and lists every
+  match in the grid. Earlier tries, both rejected: a patch-notes header
+  (too plain), then a rounded banner with a placeholder Valorant cast
+  (hero didn't match a CoC-only list; site/images/articles/hub-cast.webp
+  is now unused).
 
 ---
 
@@ -366,8 +382,9 @@ every 11layout link site-wide (CLAUDE.md rule).
   top-right on soon cards), eyebrow "CLASH OF CLANS" left + red category
   right, title (2 lines max), dek (1 line). 4 / 3 / 2 whole cards per row by
   width, ‹ › arrows on desktop, swipe on phones.
-- **Feed row:** picture left (watermark), title with the red category at its
-  top right, dek, then a quiet line "Clash of Clans · Oct 2026". Soon rows
+- **Feed card (grid, Oct 9 2026):** picture on top (watermark top left, red
+  category chip top right), full title, dek, then a quiet line "Clash of
+  Clans · Oct 2026". 3 across on desktop, 1 column on phones. Soon cards
   are dimmed with **no "Coming soon" text** (Adrian's pick).
 - **Read next card:** `<div class="art-next" data-article="<id>" data-label="Read next"></div>`
   inside the article. Shows "Read next · Coming soon" until the target is
@@ -449,25 +466,26 @@ every 11layout link site-wide (CLAUDE.md rule).
 
 ---
 
-## 10. Current state (2026-10-08)
+## 10. Current state (2026-10-10)
 
 ### The list (`articles.json`, in order)
 
 | # | id | Category | Title | Dek | Status |
 |---|---|---|---|---|---|
-| 1 | hammer-jam | Event | Hammer Jam Explained: What to Upgrade While It's Cheap | Half the price, double the gains. | **live** |
-| 2 | upgrade-order | Guide | Stop Upgrading Blind: The Town Hall Upgrade Order | Every hammer swing counts. | **live, noindex** (awaiting Adrian's fact-check) |
-| 3 | crafted-defenses-season-4 | Guide | Cake-A-Pult Is Here: Crafted Defenses Season 4 Explained | Your heroes have a new problem. | **live, noindex** (draft, awaiting Adrian) |
-| 4 | base-building | Guide | Base Building 101: Layouts That Hold Up in Real Attacks | Stop giving away free triples. | soon ← **next** |
-| 5 | sixth-builder | Guide | The Fastest Way to Unlock Your 6th Builder | One more hammer, zero excuses. | soon |
-| 6 | farming | Guide | Farming Guide: Gold, Elixir and Dark Elixir Without Wasted Attacks | Full storages, within minutes. | soon |
-| 7 | clan-games | Event | Clan Games: Max Out 4,000 Points Without the Grind | 4,000 points, no sweat. | soon |
-| 8 | best-pets | Guide | The Right Pet for Every Hero | Every hero needs a sidekick. | soon |
-| 9 | equipment-tier-list | Tier List | Upgrade the Right Equipment: The Full Tier List | Spend ore smarter. | live (Oct 2026, 4th article) |
-| 10 | troop-tier-list | Tier List | Troop Tier List: Who Actually Carries | S tier or straight to the bench. | soon |
-| 11 | best-hero-skins | Skins | The Best Hero Skins Ever Released, Ranked | Pure drip, properly ranked. | soon |
+| 1 | equipment-tier-list | Tier List | Upgrade the Right Equipment: The Full Tier List | Spend ore smarter. | **live** (Oct 2026) |
+| 2 | hammer-jam | Event | The Hammer Jam Trick Most Players Miss... | Half the price, double the gains. | **live** |
+| 3 | upgrade-order | Guide | What to Upgrade First at Every Town Hall (The Full Upgrade Order) | Every hammer swing counts. | **live, noindex** (awaiting Adrian's fact-check) |
+| 4 | crafted-defenses-season-4 | Guide | Cake-A-Pult Is Here: Crafted Defenses Season 4 Explained | Your heroes have a new problem. | **live, noindex** (draft, awaiting Adrian) |
+| 5 | rushing-meta | Guide | Rushing Is the New Meta: Here's Why Everyone's Doing It | Max less. Reach the top sooner. | **live** |
+| 6 | best-pets | Guide | Which Pet Should You Upgrade First at Each Town Hall? | Spend Dark Elixir where it counts. | soon; selected next, draft noindex |
+| 7 | base-building | Guide | Base Building 101: Layouts That Hold Up in Real Attacks | Stop giving away free triples. | soon |
+| 8 | sixth-builder | Guide | The Fastest Way to Unlock Your 6th Builder | One more hammer, zero excuses. | **live** (Oct 9; placeholder images, 4 SHOTs pending) |
+| 9 | farming | Guide | Why Are We Farming With Valkyries Instead of Sneaky Goblins? | Stop Clearing the Whole Base | **live, noindex** (Oct 9; awaiting fact-check; 3 SHOTs pending) |
+| 10 | clan-games | Event | Clan Games: Max Out 4,000 Points Without the Grind | 4,000 points, no sweat. | **live** |
+| 11 | troop-tier-list | Tier List | Troop Tier List: Who Actually Carries | S tier or straight to the bench. | soon |
+| 12 | best-hero-skins | Skins | The Best Hero Skins Ever Released, Ranked | Pure drip, properly ranked. | soon |
 
-Adrian rejected other title rewrites for 1–6 and 10: keep those titles. Exception (Oct 2026): he picked new hook-first titles + deks for 2, 3 and 9 (listed above); their H1s are the plain card title. In articles.json, equipment-tier-list is now first (Adrian: most popular), so it leads the /coc/ strip; the table keeps its old numbers.
+Older title decisions refer to the article-list order before the Oct 2026 additions; see the individual article notes below. In `articles.json`, equipment-tier-list leads the /coc/ strip (Adrian: most popular).
 
 ### Equipment Tier List: Adrian's calls (Oct 2026, in progress)
 
@@ -576,7 +594,48 @@ builder is busy. Real banner, thumbnail and 4 screenshots are in.
   or keep it general for the 6th Builder article? And should "When to Expect"
   say the May 2026 run was a **Builder Base** Hammer Jam?
 
-### Next article: Base Building 101 (after Upgrade Order is cleared)
+### Best Pets: Adrian's calls (Oct 10, 2026)
+
+Draft at `site/articles/coc/best-pets.html` (noindex; `articles.json` remains
+`soon` until review). Working card title: **Which Pet Should You Upgrade First
+at Each Town Hall?** The article is primarily an upgrade-priority guide, with a
+compact hero-pairing reference added from Adrian's current recommendations.
+Keep both formats: one overall S–C pet table, ordered S at the top through
+C at the bottom, plus a Town Hall section for TH14–18. The table uses the
+`.ap-tiers` style from Equipment Tier List and shows an image and a short reason
+for every pet.
+
+- Pairing reference ranks heroes for each pet, strongest fit first: L.A.S.S.I:
+  Royal Champion, King; Electro Owl: Warden, Minion Prince; Mighty Yak: King,
+  Queen; Unicorn: Queen, Warden; Frosty: Queen, King, Warden; Diggy: Royal
+  Champion, Queen, Warden, King; Poison Lizard: Warden, King, Queen, Royal
+  Champion; Phoenix: King, Royal Champion, Minion Prince, Dragon Duke, Queen;
+  Spirit Fox: Royal Champion, Dragon Duke, King; Angry Jelly: King, Warden,
+  Dragon Duke, Queen, Minion Prince; Sneezy and Greedy Raven: Warden, Queen,
+  Minion Prince. Adrian repeated Queen in the latest Frosty list; retain Warden
+  from his prior Frosty pairing list unless he corrects it.
+
+- Overall tiers: **S** Phoenix, Spirit Fox; **A** Angry Jelly, Frosty, Sneezy,
+  Greedy Raven; **B** Electro Owl, Unicorn, Diggy; **C** L.A.S.S.I, Mighty Yak,
+  Poison Lizard. Keep Frosty at the top of A: it is underrated, especially for
+  funneling, where it gives a hero more independence.
+- Unicorn is useful at TH14 and TH15 despite its B overall tier. Poison Lizard
+  is the lowest-priority pet.
+- Greedy Raven is a strong Warden-charge pick and also works for Queen charges.
+  It clears trash buildings quickly, especially high-HP storages, making the
+  charge noticeably faster.
+- Sneezy is no longer recommended for Warden charges. Its projectiles no longer
+  trigger Air Mines and can lure Clan Castle troops toward the Warden. Recommend
+  Greedy Raven for those charges instead; keep Sneezy in A for other uses unless
+  Adrian changes its overall tier.
+- Real secret: unlock pets as you advance, then spend Dark Elixir on the pets
+  that improve the attacks you actually use. Do not max every pet by default.
+- Include the Army Maker quicklink. Use the pet icon assets in
+  `docs/coc-image-library.md`, plus Town Hall renders in the TH14–18 headings.
+  Banner and two body images still need screenshots/art; SHOT notes are in the
+  draft.
+
+### Next article: Base Building 101 (after Best Pets is reviewed)
 
 Start by asking Adrian (section 1.2): tool quicklinks (probably the TH
 layouts pages), the real secret, what to cover and what to skip.

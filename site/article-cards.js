@@ -1,11 +1,14 @@
 // Article cards and feed, built from /articles.json (styles: article-cards.css).
 //   <div class="art-track" id="X" data-game="coc">  -> horizontal strip of cards
+//        + data-live (written ones only), data-order="random" (shuffled per visit)
 //   <div class="art-feed" data-game="coc|all">       -> stacked feed rows (/articles/)
 //   <input id="artSearch">                           -> filters the feed as you type
 //   <div id="artFilters">                            -> game chips (built here, one per game with articles)
 //   <details id="apToc">                             -> article contents + scroll-spy
 //   <div class="art-next" data-article="<id>">       -> "Read next" card for another article
 //   <div class="art-nav" data-for="X">‹ ›</div>      -> scrolls strip X one card at a time
+//   <article class="ap">                             -> right column (.ap-side: contents) and 4 random
+//                                                       "Related articles" at the bottom, from the address
 //   <div class="art-spot" data-game="coc">          -> newest live article big + the next three as rows (/coc/)
 //   <span class="art-spot-count" data-game="coc">   -> "All N articles"
 (function () {
@@ -26,12 +29,22 @@
         (a.status !== 'live' ? '<span class="art-soon">Coming soon</span>' : '') + '</div>' : '') + '</div>';
   }
 
-  // Strip card: category (and "Coming soon") on the picture's top right, no
-  // game name -- strips only sit on their own game's page (Adrian, Oct 2026).
+  // Strip card: Parcore watermark on the picture's top left, category (and
+  // "Coming soon") top right; title, dek and month under it. No game name --
+  // strips only sit on their own game's page (Adrian, Oct 2026).
   function card(a) {
+    const date = a.status === 'live' && a.date ? `<time class="art-date" datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '';
     return shell(a, 'art-card',
-      media(a, 'art-media') +
-      `<div class="art-body"><h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p></div>`);
+      media(a, 'art-media').replace('<div class="art-chips">', '<span class="as-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span><div class="art-chips">') +
+      `<div class="art-body"><h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p>${date}</div>`);
+  }
+  // Fisher-Yates: data-order="random" strips come out in a new order every visit.
+  function shuffle(list) {
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
   }
 
   // Feed row (ONE Esports-style list): picture left; title with the
@@ -47,6 +60,29 @@
       media(a, 'art-row-media', false).replace(/<\/div>$/, cat + '</div>') +
       `<div class="art-row-body"><div class="art-row-top"><h2 class="art-title">${esc(a.title)}</h2><span class="art-tag">${esc(a.category)}</span></div>` +
       `<p class="art-dek">${esc(a.dek)}</p><p class="art-row-meta">${meta}</p></div>`);
+  }
+
+  // Hub lead (/articles/ #artLead): the newest live article as a cover, the
+  // next three as compact rows beside it. Its picture also tints the page
+  // behind it (--lead-img, articles.css). Returns how many it shows.
+  function lead(el, live, games) {
+    const top = live.slice(0, 4);
+    if (!top.length) return 0;
+    const [a, ...rest] = top;
+    const game = (x) => esc((games[x.game] || {}).name || x.game);
+    const when = (x) => (x.date ? ` · <time datetime="${esc(x.date)}">${fmtDate(x.date)}</time>` : '');
+    el.style.setProperty('--lead-img', `url("${esc(a.image)}")`);
+    el.innerHTML =
+      `<a class="ah-cover" href="${esc(a.link)}"><div class="ah-cover-media"><img src="${esc(a.image)}" alt="" fetchpriority="high" decoding="async">` +
+      `<span class="art-row-cat">${esc(a.category)}</span></div>` +
+      `<div class="ah-cover-body"><h2>${esc(a.title)}</h2><p class="ah-cover-dek">${esc(a.dek)}</p>` +
+      `<p class="art-row-meta">${game(a)}${when(a)}</p></div></a>` +
+      (rest.length ? '<div class="ah-also"><h2>Also new</h2><ul>' + rest.map((x) =>
+        `<li><a href="${esc(x.link)}"><span class="ah-also-media"><img src="${esc(x.image)}" alt="" decoding="async"></span>` +
+        `<span class="ah-also-body"><span class="ah-also-title">${esc(x.title)}</span>` +
+        `<span class="art-row-meta"><span class="art-tag">${esc(x.category)}</span>${when(x)}</span></span></a></li>`).join('') +
+        '</ul></div>' : '');
+    return top.length;
   }
 
   function arrows(nav) {
@@ -77,6 +113,11 @@
     const text = items.map((a) => [a.title, a.dek, a.category, (games[a.game] || {}).name].join(' ').toLowerCase());
     const params = new URLSearchParams(location.search);
     let game = params.get('game') || 'all';
+    // The lead block takes the first items (newest live ones) and always stays;
+    // the grid skips them until a filter or search is on, then lists every match.
+    const leadEl = document.getElementById('artLead');
+    const nLead = leadEl ? lead(leadEl, live, games) : 0;
+    const head = document.getElementById('artFeedHead');
 
     // Game chips: "All" + one per game that has at least one article, plus
     // the game in the address if it has none yet (the bottom nav's related
@@ -104,14 +145,17 @@
 
     function run() {
       const q = search ? search.value.trim().toLowerCase() : '';
+      const plain = game === 'all' && !q;
       let shown = 0;
       rows.forEach((r, i) => {
         const hit = (game === 'all' || items[i].game === game) && (!q || q.split(/\s+/).every((w) => text[i].includes(w)));
-        r.hidden = !hit;
-        shown += hit;
+        r.hidden = !hit || (plain && i < nLead);
+        shown += !r.hidden;
       });
+      if (leadEl) leadEl.hidden = !nLead;
+      if (head) head.textContent = plain && nLead ? 'More articles' : q ? `${shown} result${shown === 1 ? '' : 's'}` : 'All articles';
       if (empty) {
-        empty.hidden = shown > 0;
+        empty.hidden = shown > 0 || (plain && nLead > 0);
         empty.textContent = shown ? '' : q ? `No articles match "${search.value.trim()}".`
           : `No ${game !== 'all' && games[game] ? games[game].name + ' ' : ''}articles yet.`;
       }
@@ -171,6 +215,45 @@
   const toc = document.getElementById('apToc');
   if (toc) scrollSpy(toc);
 
+  // Article page: wrap the contents in the right column now (not after the
+  // fetch) so the layout doesn't jump.
+  const art = document.querySelector('article.ap');
+  let side = null;
+  if (art && toc) {
+    // .ap-side is the column (ends with the article body); the sticky panel
+    // inside it stops there instead of sliding over the bottom sections.
+    const col = document.createElement('div');
+    col.className = 'ap-side';
+    side = document.createElement('div');
+    side.className = 'ap-panel';
+    toc.before(col);
+    col.append(side);
+    side.append(toc);
+    // Scrollbar shows only while the panel is being scrolled (articles.css).
+    let hideBar;
+    side.addEventListener('scroll', () => {
+      side.classList.add('is-scrolling');
+      clearTimeout(hideBar);
+      hideBar = setTimeout(() => side.classList.remove('is-scrolling'), 900);
+    }, { passive: true });
+  }
+
+  // The article's own game and id come from its address: /articles/<game>/<id>.
+  function articleExtras(all) {
+    const [, , game, id] = location.pathname.replace(/\.html$/, '').split('/');
+    const others = all.filter((a) => a.game === game && a.status === 'live' && a.id !== id);
+    if (!others.length) return;
+    const img = (a) => `<img src="${esc(a.image)}" alt="" loading="lazy" decoding="async">`;
+    // Related: 4 random ones from the same game, a new pick every visit
+    // (file order doesn't matter). Phones show them 2x2 (articles.css).
+    const latest = document.createElement('section');
+    latest.className = 'ap-latest';
+    latest.innerHTML = '<h2>Related articles</h2><div class="ap-latest-list">' + shuffle(others.slice()).slice(0, 4).map((a) =>
+      `<a href="${esc(a.link)}">${img(a)}<h3>${esc(a.title)}</h3>` +
+      `<span class="ap-latest-meta">${esc(a.category)}${a.date ? ' · ' + fmtDate(a.date) : ''}</span></a>`).join('') + '</div>';
+    art.append(latest);
+  }
+
   // "Read next" card inside an article: one row pointing at another article.
   // Greyed with "Coming soon" until that article is live, then a link.
   function next(el, a, gameName) {
@@ -211,7 +294,7 @@
   const spots = document.querySelectorAll('.art-spot[data-game]');
   const feeds = document.querySelectorAll('.art-feed[data-game]');
   const nexts = document.querySelectorAll('.art-next[data-article]');
-  if (!strips.length && !spots.length && !feeds.length && !nexts.length) {
+  if (!strips.length && !spots.length && !feeds.length && !nexts.length && !art) {
     document.querySelectorAll('.art-nav[data-for]').forEach(arrows);
     return;
   }
@@ -223,7 +306,10 @@
       const all = (data.articles || []).map((a) => Object.assign({ link: '/articles/' + a.game + '/' + a.id }, a));
       const pick = (g) => (g === 'all' ? all : all.filter((a) => a.game === g));
       strips.forEach((el) => {
-        el.innerHTML = pick(el.dataset.game).map(card).join('');
+        // data-live: written articles only (no greyed "Coming soon" cards).
+        let list = pick(el.dataset.game).filter((a) => !('live' in el.dataset) || a.status === 'live');
+        if (el.dataset.order === 'random') list = shuffle(list.slice());
+        el.innerHTML = list.map(card).join('');
       });
       spots.forEach((el) => spot(el, pick(el.dataset.game)));
       document.querySelectorAll('.art-spot-count[data-game]').forEach((el) => {
@@ -234,7 +320,19 @@
         const a = all.find((x) => x.id === el.dataset.article);
         if (a) next(el, a, (games[a.game] || {}).name || a.game);
       });
+      if (art) articleExtras(all);
       document.querySelectorAll('.art-nav[data-for]').forEach(arrows);
     })
     .catch((err) => console.error('articles.json failed to load:', err));
 })();
+
+// "View all" under a long article table (.ap-rows): opens the hidden rows.
+document.querySelectorAll('.ap-rows-more').forEach((btn) => {
+  const box = document.getElementById(btn.getAttribute('aria-controls'));
+  if (!box) return;
+  btn.addEventListener('click', () => {
+    const open = box.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open);
+    btn.textContent = open ? 'Show fewer' : btn.dataset.more;
+  });
+});

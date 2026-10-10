@@ -367,7 +367,7 @@ body { visibility: hidden; }
    sidebar/content boundary now, so this can stay this quiet. */
 .sidebar,
 .sidebar * {
-    font-family: 'Oxanium', sans-serif;
+    font-family: 'Sora', sans-serif !important; /* TRY: sidebar font. Back to 'Oxanium' (no !important) to undo. */
   }
 .sidebar::-webkit-scrollbar {width: 5px;}
 .sidebar::-webkit-scrollbar-track {background: transparent;}
@@ -2262,6 +2262,7 @@ controls there. */
   left: calc((var(--sb-inset) + 4px) / -2);
 }
 
+
 /* 5. ICONS.
       Game icons carried box-shadow: 0 0 0 2px #1e1f22 -- a hard ring in a
       colour matching no surface in the sidebar, so it read as a halo rather
@@ -2337,6 +2338,36 @@ controls there. */
   outline: 2px solid var(--sb-accent);
   outline-offset: -2px;
   border-radius: var(--sb-radius);
+}
+
+/* SPACING, one system (Oct 2026 tidy-up). Every row, icon and section label
+   starts on the same line, and the gutter is equal on both sides so the
+   active pill sits centred. Numbers measured in headless Chrome.
+   - Labels (FEATURED, TRIPLE A GAMES) start at inset + the row's 10px
+     padding, i.e. exactly over the icons. The old fixed 22px put FEATURED
+     4px left of everything else.
+   - Triple-A rows join the same grid as the games: their extra 8px indent
+     made two sibling sections look unrelated and wrapped long names.
+   - Each label sits 17px above its first icon and ~36px below the group
+     edge or divider above it. TRIPLE A GAMES had 28px / 41px. */
+.sidebar .games-container::before { margin-left: calc(var(--sb-inset) + 10px); }
+.sidebar .triple-a-container { margin-top: 8px; }
+.sidebar .triple-a-header { padding: 16px 10px 9px; margin-bottom: 0; }
+.sidebar .triple-a-list .triple-a-game { margin: 0 var(--sb-inset) 4px; padding: 9px 10px; }
+/* A name too long for the row ends in "..." instead of wrapping to two lines. */
+.sidebar .game span,
+.sidebar .top-box-item span,
+.sidebar .triple-a-game span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Desktop: 10px more room on both sides (phones: none). Inset drops 16 -> 14
+   so rows stay wide enough for the longest names: 24px gutters either side. The
+   raised top group still reaches both edges, and the accent bar re-centres in
+   the gutter by itself. */
+@media (min-width: 971px) {
+  .sidebar { --sb-pad: 10px; --sb-inset: 14px; padding-left: var(--sb-pad); padding-right: var(--sb-pad); }
+  .sidebar .top-box { margin-left: calc(-1 * var(--sb-pad)); margin-right: calc(-1 * var(--sb-pad)); padding-left: var(--sb-pad); padding-right: var(--sb-pad); }
+  .sidebar a.active::before,
+  .sidebar .game.active::before { left: calc((var(--sb-inset) + var(--sb-pad) + 4px) / -2); }
 }
 
 /* 8. MOBILE.

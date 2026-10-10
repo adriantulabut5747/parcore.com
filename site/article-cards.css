@@ -250,28 +250,26 @@ a.art-card:hover .art-media img {
   min-height: 280px;
 }
 
-/* ---- Feed rows (/articles/) ------------------------------------------
-   ONE Esports-style list (Adrian's pick, Oct 2026): picture left; game ·
-   category and the date on top; then title and dek. Rows are split by a
-   hairline, no card boxes. Phones (Oct 2026, Adrian's pick): picture on
-   top, full width, with the category on it top right; the title runs in
-   full under it, never cut off. */
+/* ---- Feed (/articles/, /articles/coc/) ---------------------------------
+   A grid of cards (Adrian's pick, Oct 9 2026; was one ONE Esports-style
+   list whose rows ran ~1000px wide with the tag stranded at the far right).
+   Picture on top with the category on it (top right) and the Parcore
+   watermark (top left); title in full, never cut off; dek; game and month.
+   No card boxes: the rounded picture is the card. 3 across at most (the
+   .ah column caps at 1240px), 2 on small laptops, 1 on phones. */
 .art-feed {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 44px 28px;
+  align-items: start;
 }
 .art-row {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 22px;
-  align-items: start;
-  padding: 22px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
   color: inherit;
   text-decoration: none;
-}
-.art-row:first-child {
-  padding-top: 4px;
 }
 .art-row[hidden] {
   display: none;
@@ -279,9 +277,11 @@ a.art-card:hover .art-media img {
 .art-row-media {
   position: relative;
   aspect-ratio: 16 / 9;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: #0c0d0f;
+  box-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.9);
+  transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .art-row-media img {
   width: 100%;
@@ -289,6 +289,10 @@ a.art-card:hover .art-media img {
   object-fit: cover;
   display: block;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+a.art-row:hover .art-row-media {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 36px -18px rgba(0, 0, 0, 0.95);
 }
 a.art-row:hover .art-row-media img {
   transform: scale(1.04);
@@ -301,27 +305,18 @@ a.art-row:hover .art-title {
 }
 a.art-row:focus-visible {
   outline: 2px solid #c23b3b;
-  outline-offset: 4px;
-  border-radius: 10px;
+  outline-offset: 6px;
+  border-radius: 12px;
 }
 .art-row-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 2px;
+  gap: 7px;
 }
-.art-row-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-.art-row .art-tag {
-  flex: 0 0 auto;
-  margin-top: 5px; /* lines up with the title's first line */
-  font: 800 10px/1 'Oxanium', sans-serif;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+/* The tag beside the title is the old list's; the chip on the picture
+   replaced it. */
+.art-row .art-row-top .art-tag {
+  display: none;
 }
 .art-row-meta {
   margin: 2px 0 0;
@@ -330,8 +325,12 @@ a.art-row:focus-visible {
 }
 .art-row-meta time { font: inherit; }
 .art-row .art-title {
-  font-size: 19px;
-  line-height: 1.35;
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  font-size: 17px;
+  line-height: 1.4;
+  text-wrap: pretty;
 }
 .art-row .art-dek {
   margin: 0;
@@ -346,50 +345,39 @@ a.art-row:focus-visible {
 .art-row.is-soon .art-dek {
   color: #80858c;
 }
+/* Category chip on the picture, top right (also the hub cover's). */
 .art-row-cat {
-  display: none;
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  z-index: 1;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(10, 10, 12, 0.62);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font: 800 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #e0605f;
+  pointer-events: none;
 }
 @media (max-width: 970px) {
-  .art-row {
+  /* Phones: one column, rows split by a hairline as before. */
+  .art-feed {
     grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .art-row {
     gap: 12px;
-    padding: 18px 0 20px;
+    padding: 20px 0 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .art-row-media {
-    border-radius: 12px;
-  }
-  .art-row .art-row-top .art-tag {
-    display: none;
-  }
-  .art-row-cat {
-    display: block;
-    position: absolute;
-    top: 9px;
-    right: 9px;
-    z-index: 1;
-    padding: 5px 8px;
-    border-radius: 6px;
-    background: rgba(10, 10, 12, 0.62);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    font: 800 10px/1 'Oxanium', sans-serif;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: #e0605f;
-    pointer-events: none;
+  .art-row:first-child {
+    padding-top: 4px;
   }
   .art-row-body {
     gap: 6px;
-    padding-top: 0;
-  }
-  .art-row .art-title {
-    display: block;
-    overflow: visible;
-    -webkit-line-clamp: unset;
-    font-size: 17px;
-  }
-  .art-row .art-dek {
-    font-size: 14px;
   }
 }
 
@@ -439,7 +427,8 @@ a.art-next-card:hover > svg { color: #fff; transform: translateX(3px); }
    Not on the pictures inside an article. Page overlay only: the image files
    stay clean. */
 .art-media::before,
-.art-row-media::before {
+.art-row-media::before,
+.ah-cover-media::before {
   content: '';
   position: absolute;
   top: 13px;
@@ -452,7 +441,8 @@ a.art-next-card:hover > svg { color: #fff; transform: translateX(3px); }
   pointer-events: none;
 }
 .art-media::after,
-.art-row-media::after {
+.art-row-media::after,
+.ah-cover-media::after {
   content: 'Parcore';
   position: absolute;
   top: 9px;
@@ -649,4 +639,32 @@ a.art-next-card:hover > svg { color: #fff; transform: translateX(3px); }
   .as-feat .as-wm { padding: 3px; }
   .as-feat .as-wm span { display: none; }
   .as-row-title { font-size: 14px; }
+}
+
+/* Strip card extras (Oct 2026): the Parcore watermark on the picture (same
+   chip as the spotlight's .as-wm, a size down) and the month under the dek,
+   pinned to the card's foot so the dates line up across the row. */
+.art-card .as-wm {
+  top: 10px;
+  left: 10px;
+  gap: 6px;
+  padding: 2px 10px 2px 2px;
+  font-size: 11.5px;
+}
+.art-card .as-wm img {
+  width: 20px;
+  height: 20px;
+}
+.art-chips {
+  top: 10px;
+  right: 10px;
+}
+.art-body {
+  flex: 1;
+}
+.art-date {
+  margin-top: auto;
+  padding-top: 6px;
+  font: 600 11.5px/1.3 'Sora', sans-serif;
+  color: #80858c;
 }

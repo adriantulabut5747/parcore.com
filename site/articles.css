@@ -28,7 +28,9 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   flex: 1 1 auto;
   overflow-y: auto;
   padding-top: var(--topbar-height, 52px);
-  background: #141517;
+  /* Darker base + faint grey glow from the top. It stays put while the article
+     scrolls: .coc-main is the scroller, and a scroller's own background doesn't move. */
+  background: radial-gradient(90% 60% at 50% 0%, rgba(255, 255, 255, 0.045), transparent 70%), #0d0e10;
 }
 @media (min-width: 971px) {
   .sidebar { margin-top: var(--topbar-height, 40px); }
@@ -105,11 +107,15 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 ::selection { background: rgba(194, 59, 59, 0.45); color: #fff; }
 
 /* ---- Hub (/articles/, /articles/coc/) ---- */
+/* Side gutters = the CoC lobby's page column (--coc-side in coc-hub-menus.css,
+   which these pages don't load -- keep the two in step). Phones: 5%, below. */
 .ah {
+  --ah-side: clamp(24px, 8.5vw, 168px);
   width: 100%;
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 104px 24px 80px; /* 48px is the bar (see --topbar-height) */
+  padding: 104px var(--ah-side) 80px; /* 48px is the bar (see --topbar-height) */
+}
+@media (max-width: 1500px) {
+  .ah { --ah-side: clamp(24px, 6.5vw, 96px); }
 }
 .ah-head {
   display: flex;
@@ -184,6 +190,219 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-filters button:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
 .ah-filters span { margin-left: 6px; color: #7a7d82; font-weight: 500; }
 
+/* Column cap: content never runs wider than 1240px, so the grid stays at
+   3 across and the masthead's search doesn't drift off to the far right. */
+.ah { max-width: calc(1240px + 2 * var(--ah-side)); margin-inline: auto; }
+
+/* ---- Header band (/articles/ only, Oct 9 2026) ----
+   Modelled on Riot's support-site header (Adrian's reference): a short
+   brushed band with a torn bottom edge. Charcoal a step lighter than the
+   sidebar, a few muted red streaks (bright red was too loud next to the
+   dark sidebar, Adrian). Desktop: text starts at the content column's left
+   edge (same inset as .ah); phones: centred. The art is an inline SVG drawn
+   by _tools/articles-band.py, sliced from the bottom so narrow screens crop
+   its sides instead of squashing the streaks. */
+.ah-band {
+  --ah-side: clamp(24px, 8.5vw, 168px);
+  position: relative;
+  /* top: the band starts ~40px up behind the fixed bar; bottom: room for the torn edge */
+  padding: 86px max(var(--ah-side), (100% - 1240px) / 2) 72px;
+  isolation: isolate;
+}
+@media (max-width: 1500px) {
+  .ah-band { --ah-side: clamp(24px, 6.5vw, 96px); }
+}
+.ah-band-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.ah-band-title {
+  font: 900 clamp(26px, 2.6vw, 38px) / 1.05 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+.ah-band-sub {
+  max-width: 72ch;
+  margin-top: 10px;
+  font: 400 15px / 1.55 'Sora', sans-serif;
+  text-wrap: pretty;
+  color: #b4b8be;
+}
+/* The art's bottom strip under the tear is transparent (room for the
+   splinters + shadow); pull the content up over it. */
+.ah-band { margin-bottom: -8px; }
+.ah-band + .ah { padding-top: 0; }
+@media (max-width: 970px) {
+  .ah-band { padding: 64px 20px 58px; text-align: center; margin-bottom: -14px; }
+  .ah-band-title { font-size: clamp(24px, 7vw, 32px); text-wrap: balance; }
+  .ah-band-sub { margin: 10px auto 0; font-size: 14px; }
+}
+
+/* ---- Hub lead (/articles/ only, Oct 9 2026) ----
+   The newest live article as a cover with the next three beside it
+   (#artLead, built by article-cards.js). The cover's own picture, blurred,
+   tints the page behind it (::before, --lead-img); that glow and the cover
+   settling in on load are the page's one authored motion. */
+.ah-lead {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
+  gap: 32px;
+  margin-bottom: 72px;
+  isolation: isolate;
+}
+.ah-lead[hidden] { display: none; }
+.ah-lead::before {
+  content: '';
+  position: absolute;
+  inset: -120px -8% -60px;
+  z-index: -1;
+  background: var(--lead-img) center / cover no-repeat;
+  filter: blur(80px) saturate(1.4);
+  opacity: 0.3;
+  -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent);
+  mask-image: radial-gradient(closest-side, #000 35%, transparent);
+  pointer-events: none;
+  animation: ah-glow-in 1.4s ease-out both;
+}
+@keyframes ah-glow-in { from { opacity: 0; } }
+
+.ah-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0c0d0f;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
+}
+.ah-cover-media { position: absolute; inset: 0; }
+.ah-cover-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: ah-cover-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes ah-cover-in { from { transform: scale(1.06); } }
+.ah-cover:hover .ah-cover-media img { transform: scale(1.03); }
+.ah-cover .art-row-cat { top: 14px; right: 14px; padding: 6px 10px; font-size: 11px; }
+.ah-cover-body {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 140px 36px 30px;
+  /* Scrim: the art stays bright up top, the text sits on near-black. */
+  background: linear-gradient(to top, rgba(7, 8, 10, 0.97) 0%, rgba(7, 8, 10, 0.86) 38%, rgba(7, 8, 10, 0) 100%);
+}
+.ah-cover-body h2 {
+  max-width: 24ch;
+  font: 700 clamp(22px, 2.3vw, 34px) / 1.15 'Sora', sans-serif;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: #fff;
+}
+.ah-cover:hover h2 { text-decoration: underline; text-decoration-color: rgba(224, 96, 95, 0.75); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.ah-cover-dek { font: 400 16px/1.45 'Sora', sans-serif; color: #c8cbcd; }
+.ah-cover .art-row-meta { color: #949ba4; }
+.ah-cover:focus-visible { outline: 2px solid #c23b3b; outline-offset: 4px; }
+
+/* "Also new": the next three, compact rows filling the cover's height. */
+.ah-also { display: flex; flex-direction: column; min-width: 0; }
+.ah-also h2 {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font: 900 13px/1 'Orbitron', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #eceef1;
+}
+.ah-also ul { list-style: none; flex: 1; display: grid; grid-auto-rows: 1fr; }
+.ah-also li + li { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.ah-also a {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  padding: 16px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.ah-also-media {
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #0c0d0f;
+}
+.ah-also-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.ah-also a:hover img { transform: scale(1.05); }
+.ah-also-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ah-also-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font: 600 15px/1.4 'Sora', sans-serif;
+  text-wrap: pretty;
+  color: #e4e6e9;
+  transition: color 0.2s;
+}
+.ah-also a:hover .ah-also-title { color: #fff; }
+.ah-also .art-row-meta { margin: 0; }
+.ah-also .art-tag { font: 800 10px/1 'Oxanium', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+.ah-also a:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; border-radius: 10px; }
+
+/* Grid header: heading + a hairline to the edge; under it the game chips
+   (left) and the search (right), Adrian's pick. */
+.ah-feed-head { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.ah-feed-head h2 {
+  flex: 0 0 auto;
+  font: 900 18px/1 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #eceef1;
+}
+.ah-feed-head::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
+.ah-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+.ah-tools .ah-filters { margin-bottom: 0; }
+.ah-tools .ah-search { flex: 0 1 300px; }
+
+@media (min-width: 971px) and (max-width: 1280px) {
+  .ah-lead { grid-template-columns: minmax(0, 1fr); }
+  .ah-also ul { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 24px; }
+  .ah-also li + li { border-top: 0; }
+  .ah-also a { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ah-lead::before, .ah-cover-media img { animation: none; }
+}
+@media (max-width: 970px) {
+  .ah-lead { grid-template-columns: minmax(0, 1fr); gap: 26px; margin-bottom: 48px; }
+  /* Phones: picture on top, text under it (an overlay would cover most of
+     a 16:9 picture this narrow). */
+  .ah-cover { aspect-ratio: auto; border-radius: 14px; background: #141519; }
+  .ah-cover-media { position: relative; aspect-ratio: 16 / 9; }
+  .ah-cover-body { position: static; padding: 18px 18px 20px; background: none; gap: 8px; }
+  .ah-cover-body h2 { font-size: 22px; }
+  .ah-cover-dek { font-size: 15px; }
+  .ah-also a { grid-template-columns: 116px minmax(0, 1fr); gap: 14px; padding: 14px 0; }
+  .ah-also-title { font-size: 14px; }
+  .ah-feed-head { margin-bottom: 14px; }
+  .ah-tools { flex-direction: column-reverse; align-items: stretch; gap: 14px; margin-bottom: 18px; }
+  .ah-tools .ah-search { flex-basis: auto; }
+}
+
 .ah-empty {
   padding: 40px 0;
   font: 400 14px 'Sora', sans-serif;
@@ -202,21 +421,117 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
    collapsible box. The breadcrumb lives in the secondary top bar. */
 .ap {
   width: 100%;
-  max-width: 1080px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 88px 24px 96px; /* 48px is the bar (see --topbar-height) */
   display: grid;
-  grid-template-columns: minmax(0, 700px) 220px;
+  grid-template-columns: minmax(0, 760px) 300px;
   justify-content: center;
   column-gap: 56px;
 }
 
-.ap-toc {
+/* Right column (.ap-side, made by article-cards.js around #apToc): the
+   contents, a <details> dropdown. It scrolls on its own when both are open and taller than the
+   screen, since a sticky box taller than the screen would hide its bottom. */
+.ap-side {
   grid-column: 2;
-  grid-row: 2 / span 3;
-  align-self: start;
+  grid-row: 2 / span 2; /* header + body; "More for" and "Related articles" run full width below */
+}
+/* Sticky inside .ap-side, so it stops where the article body ends. */
+.ap-panel {
   position: sticky;
-  top: 88px; /* below the 64px bar (.coc-main scrolls under it) */
+  /* 24px under the 64px bar, and max-height leaves the same 24px at the
+     bottom. Sticky counts from inside .coc-main's padding-top (16px on
+     desktop), so 72 + 16 = 88 = 64 + 24. */
+  top: 72px;
+  max-height: calc(100vh - 112px);
+  overflow-y: auto;
+  padding-right: 10px; /* room for the scrollbar */
+  /* Scrollbar: always takes its thin lane (so nothing shifts) but stays
+     invisible; article-cards.js adds .is-scrolling while you scroll it. */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.ap-panel.is-scrolling { scrollbar-color: rgba(255, 255, 255, 0.14) transparent; }
+.ap-panel > details { padding: 16px 0; }
+.ap-panel > details:first-child { padding-top: 0; }
+.ap-panel > details:last-child { padding-bottom: 0; }
+.ap-panel > details + details { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+
+/* Small laptops: a slimmer right column so the article text keeps ~440px. */
+@media (min-width: 971px) and (max-width: 1280px) {
+  .ap { grid-template-columns: minmax(0, 760px) 260px; column-gap: 36px; }
+}
+/* Desktop only: phones keep the contents box's own header (+ / −). */
+@media (min-width: 971px) {
+  .ap-panel > details > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 0 14px;
+    font: 800 11px/1 'Oxanium', sans-serif;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #8b9097;
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.2s;
+  }
+  .ap-panel > details > summary:hover { color: #fff; }
+  .ap-panel > details > summary::-webkit-details-marker { display: none; }
+  .ap-panel > details > summary::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    margin-right: 3px;
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.2s;
+  }
+  .ap-panel > details[open] > summary::after { transform: translateY(1px) rotate(-135deg); }
+  .ap-panel .ap-toc-label { display: none; }
+}
+
+.ap-latest-list img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #1c1d22; /* fills the box while the picture loads */
+  outline: 1px solid rgba(255, 255, 255, 0.06);
+  outline-offset: -1px;
+}
+.ap-latest-list h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-wrap: pretty;
+  color: #d9dce0;
+  transition: color 0.2s;
+}
+.ap-latest-list a:hover h3 { color: #fff; }
+
+/* "Related articles" (article-cards.js): the bottom row, across both columns
+   like "More for" above it. */
+.ap-more { grid-column: 1 / -1; min-width: 0; }
+.ap-latest { grid-column: 1 / -1; min-width: 0; margin-top: 56px; padding-top: 28px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.ap-latest h2 {
+  font: 800 12px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8b9097;
+}
+.ap-latest-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 20px; margin-top: 18px; }
+.ap-latest-list a { display: flex; flex-direction: column; text-decoration: none; border-radius: 12px; }
+.ap-latest-list img { border-radius: 12px; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.ap-latest-list h3 { margin-top: 12px; font: 650 15px/1.4 'Sora', sans-serif; }
+.ap-latest-meta { margin-top: 6px; font: 500 12px/1.3 'Sora', sans-serif; color: #7a7f87; }
+.ap-latest-list a:hover img { transform: translateY(-3px); }
+.ap-latest-list a:focus-visible, .ap-panel > details > summary:focus-visible {
+  outline: 2px solid #c23b3b;
+  outline-offset: 4px;
 }
 .ap-toc summary {
   display: none;
@@ -248,7 +563,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 /* Scroll-spy (article-cards.js): the section you're reading. */
 .ap-toc a.is-current { color: #fff; border-left-color: #c23b3b; }
 
-.ap-header, .ap-body, .ap-more { grid-column: 1; min-width: 0; }
+.ap-header, .ap-body { grid-column: 1; min-width: 0; }
 /* Header, Minecraft.net style: a wide banner over both columns with the
    category tag sitting on its bottom edge, then the author block (avatar +
    "Written by / Published") beside the title. Phones: banner edge to edge,
@@ -503,9 +818,16 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   .ap-body p, .ap-body li { font-size: 16px; }
   .ap-body h2 { font-size: 21px; margin-top: 40px; }
   .ap-more-list { grid-template-columns: 1fr; }
+  /* Phones: the column is just the contents box (no panel, no related). */
+  .ap-panel { position: static; max-height: none; overflow: visible; padding: 0; }
+  .ap-panel > details { padding: 0; }
+  .ap-latest-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+  .ap-latest-list h3 { font-size: 14px; -webkit-line-clamp: 3; }
+  .ap-latest-list img { border-radius: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ap-more-list a { transition: none; }
+  .ap-more-list a, .ap-latest-list img, .ap-panel > details > summary::after { transition: none; }
+  .ap-latest-list a:hover img { transform: none; }
 }
 
 /* Town Hall headings in the upgrade-order article: the TH picture before the text. */
@@ -530,6 +852,10 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-forms > div { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px 12px; border-radius: 12px; background: #16171b; }
 .ap-forms img { width: 100%; max-width: 120px; height: 110px; object-fit: contain; }
 .ap-forms span { font-size: 12.5px; color: #8b9097; text-align: center; }
+/* Always three across, phones included (the 6th Builder gear ups). */
+.ap-forms.ap-forms-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ap-forms-3 > div { padding: 12px 6px 10px; }
+.ap-forms-3 img { height: 90px; }
 
 /* A small building render (not a full-width screenshot). */
 .ap-fig-sm img { max-width: 220px; margin: 0 auto; background: none; }
@@ -538,6 +864,8 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .ap-chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 999px; background: #16171b; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 14px; font-weight: 600; color: #e6e8eb; }
 .ap-chip img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.ap-pet-ranking { margin: 0; padding-left: 22px; color: #d5d7dc; font-size: 14px; line-height: 1.55; }
+.ap-pet-ranking li::marker { color: #e0605f; font-weight: 800; }
 
 /* A defense name with its picture inside a table cell. */
 .ap-def { white-space: nowrap; font-weight: 650; color: #fff; }
@@ -592,3 +920,26 @@ img.ap-eq-epic { background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f
 @media (max-width: 970px) {
   [data-game-nav]:not(:has(.bn-bar)) .pf-footer { padding-bottom: 32px; }
 }
+
+/* Long tables: the first 8 rows show, a button opens the rest
+   (farming's league bonus table). Toggled by article-cards.js. */
+.ap-rows:not(.is-open) tbody tr:nth-child(n + 9) { display: none; }
+.ap-rows .ap-def img { width: 32px; height: 32px; }
+.ap-rows td { vertical-align: middle; }
+.ap-rows-more {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ap-rows-more:hover { background: rgba(194, 59, 59, 0.18); border-color: rgba(194, 59, 59, 0.55); }
+.ap-rows-more:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
