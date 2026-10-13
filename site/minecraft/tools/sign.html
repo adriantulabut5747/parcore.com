@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Sign Generator | Parchrome</title>
+<meta name="description" content="Make Minecraft signs and hanging signs with dye colours, glow ink, both sides and click commands, drawn the way the game draws them. /give, /setblock and /data.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/mc-java.html">
+<meta property="og:title" content="Minecraft Vanilla — Parchrome">
+<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
+<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261012cr">
+<link rel="stylesheet" href="/mc-java.css?v=20261012cr">
+<link rel="stylesheet" href="/coc-cards.css?v=20261013t1">
+<link rel="stylesheet" href="/mc-home.css?v=20261014nd">
+
+
+</head>
+<body class="mc-home">  
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/minecraft.png" alt="TH10 Icon" class="th-icon" loading="lazy" decoding="async">
+    <div class="secondary-content">
+          <!-- Desktop shows just the section name; mobile adds the hardcoded
+               "you are here" crumb. Structure mirrors the HWR bar so the two
+               read identically, but the group is static here rather than
+               driven by a scroll-spy. -->
+          <span class="secondary-content-desktop">Minecraft</span>
+          <span class="secondary-content-mobile">
+            <span class="sc-mobile-text">Minecraft</span>
+            <span class="sc-mobile-group">Tools</span>
+          </span>
+        </div>
+  </div>
+    <div class="stb-divider" aria-hidden="true"></div>
+  <!-- hwr's own strip markup, ids and all: 11layout.js wires the arrows by
+       these ids, and the CSS deciding how the two strips share the bar is
+       keyed to these wrappers. Sections left, editions right, both filled
+       from mc-contents.json by the nav script below. -->
+  <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+  <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+  <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
+       from hwr-categories.json on the hwr pages. This bar holds the Minecraft
+       editions instead, so it opts out of being rebuilt. -->
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
+    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"></div>
+    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" loading="lazy" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <!-- HERO v2 — see the "HERO v2" block in mc-java.css. The edition wordmark
+         swaps per edition (Bedrock / Story / Dungeons logos are already in
+         minecrafticons/); the live version pills keep the original hvs-* ids so
+         the Mojang piston-meta fetch in mc-java.js drives them unchanged. -->
+    <div class="coc-content">
+      <!-- MINECRAFT JAVA HOME v2 (Oct 12 2026): centered frame, bone bands,
+           podium, command terminal, server standings. Styles: mc-home.css,
+           behaviour (copy, tabs, block reveals): mc-home.js. mc-java.js still
+           fills the nav strip (.mc-mobile-nav), the hvs-* versions,
+           #vt-sb-latest and #server-row: keep those ids. -->
+      <div class="mch">
+      <!-- Banner (Oct 12): the page header over the forest shot, with the live
+           Java versions (hvs-* ids, filled by mc-java.js). Parcorp Village,
+           the old featured banner, is #2 in Top 10 Worlds. -->
+      <header class="mch-hero mch-hero--page">
+        <!-- Background clip: Pinterest pin 605452743702191634 (736x414, its largest size). Muted, looped; the JPG is its first frame and the reduced-motion fallback. --><video class="mch-hero-bg" src="/minecrafticons/mc-java-banner.mp4" poster="/minecrafticons/mc-java-banner.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+        <div class="mch-frame mch-hero-inner">
+          <div class="mch-hero-main">
+            <h1 class="mch-hero-title">Sign<span>Maker.</span></h1>
+            <p class="mch-hero-copy">Signs and hanging signs in every wood, with dye colours, glow ink and click commands, drawn like in game.</p>
+            <div class="mch-hero-foot">
+              <a class="mch-hero-cta" href="#mc-tool">Write a sign<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <a class="mct-back" href="/minecraft/tools/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>All tools</a>
+              <dl class="mch-hero-stats mch-hero-ver" id="hero-version-strip" aria-label="Current Java versions">
+                <div><dt>Release</dt><dd id="hvs-release-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-release-updated"></dd></div>
+                <div><dt>Snapshot</dt><dd id="hvs-snapshot-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-snapshot-updated"></dd></div>
+              </dl>
+            </div>
+          </div>
+          <!-- From Mojang: the three newest Java posts (data-count) (#vt-sb-latest, filled by
+               mc-java.js); "All updates" opens the full feed (#vtModal). -->
+          <aside class="mch-hero-news" aria-labelledby="mc-wire-t">
+            <div class="mch-hero-news-head"><h2 id="mc-wire-t"><i class="mch-live" aria-hidden="true"></i>From Mojang</h2><button type="button" class="mch-more" onclick="openVtFeed()">All updates<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+            <div class="vt-sb-latest mch-wire-list" id="vt-sb-latest" data-count="5"><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div></div>
+          </aside>
+        </div>
+      </header>
+
+
+      <!-- SIGN GENERATOR (Oct 13 2026): mc-sign.js + mc-font.js + mc-text.js. Sign art,
+           colours and line widths from the 26.3 game files. Left: wood, kind, lines,
+           dye, glow ink, wax. Right (sticky): the sign, flipping to its back, and the
+           /give, /setblock or /data command. Styles: SIGN block in mc-home.css (.sgn-*). -->
+      <div class="mch-ch mch-ch--surface" id="ch-tool" role="region" aria-label="Sign generator">
+        <div class="mch-frame">
+          <nav class="mc-mobile-nav mch-nav" aria-label="Tools"><div class="mc-mobile-nav-header"></div></nav><hr class="mch-nav-rule">
+        <section class="mch-sec" id="mc-tool" aria-labelledby="mc-tool-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-tool-t">Write the <em>sign.</em></h3><p class="mch-sec-sub">Four lines a side, in the colours a dye gives. The sign on the right is drawn the way the game draws it.</p></div></header>
+
+          <div class="mct-gen pt-gen">
+            <div class="mct-build pt-build">
+              <div class="pt-panel">
+                <div class="pt-head">
+                  <h4 class="pt-h">Wood</h4>
+                  <div class="pt-filter" id="sgnKind" role="group" aria-label="Kind" data-v1>
+                    <button type="button" data-kind="sign" aria-pressed="true">Sign</button><button type="button" data-kind="hanging" aria-pressed="false">Hanging sign</button>
+                  </div>
+                </div>
+                <div class="pt-slots sgn-woods" id="sgnWood" role="group" aria-label="Wood"></div>
+              </div>
+
+              <div class="pt-panel">
+                <div class="pt-head">
+                  <h4 class="pt-h">Lines</h4>
+                  <div class="pt-filter" id="sgnSideTabs" role="group" aria-label="Side" hidden>
+                    <button type="button" data-side="front" aria-pressed="true">Front</button><button type="button" data-side="back" aria-pressed="false">Back</button>
+                  </div>
+                </div>
+                <ol class="sgn-lines" id="sgnLines"></ol>
+                <label class="pt-toggle" data-v1><input type="checkbox" id="sgnBackOn"><span></span>Write on the back too</label>
+              </div>
+
+              <div class="pt-panel">
+                <h4 class="pt-h">Dye and ink <span class="pt-opt">for this side</span></h4>
+                <div class="pt-slots bcn-row" id="sgnDye" role="group" aria-label="Text colour"></div>
+                <div class="pt-slots fwk-fx fwk-fx--2">
+                  <button type="button" class="pt-slot pt-slot--item" id="sgnGlow" aria-pressed="false"><img src="/minecrafticons/items/glow_ink_sac.png" alt=""><span>Glow ink</span></button>
+                  <button type="button" class="pt-slot pt-slot--item" id="sgnWax" aria-pressed="false" data-v1><img src="/minecrafticons/items/honeycomb.png" alt=""><span>Waxed, can't edit</span></button>
+                </div>
+              </div>
+
+              <div class="pt-panel">
+                <h4 class="pt-h">Placing it</h4>
+                <div class="pt-seg" id="sgnMount" role="group" aria-label="Where it hangs">
+                  <button type="button" data-mount="stand" aria-pressed="true">On the ground</button><button type="button" data-mount="wall" aria-pressed="false">On a wall</button>
+                </div>
+                <div class="cir-size" id="sgnRotWrap">
+                  <label class="pt-lbl" for="sgnRot">Faces <b id="sgnRotV">N (8)</b></label>
+                  <input type="range" class="cir-layer" id="sgnRot" min="0" max="15" value="8">
+                </div>
+                <div class="pt-seg" id="sgnFace" role="group" aria-label="Wall facing">
+                  <button type="button" data-face="north" aria-pressed="true">North</button><button type="button" data-face="east" aria-pressed="false">East</button><button type="button" data-face="south" aria-pressed="false">South</button><button type="button" data-face="west" aria-pressed="false">West</button>
+                </div>
+              </div>
+            </div>
+
+            <aside class="mct-out pt-out" aria-label="Result">
+              <div class="sgn-stage">
+                <span class="bcn-out-k" id="sgnFlipK">Front</span>
+                <div class="sgn-card" id="sgnCard" title="Click to turn it round">
+                  <div class="sgn-face sgn-face--front"><canvas id="sgnFront" aria-label="Front of the sign"></canvas></div>
+                  <div class="sgn-face sgn-face--back"><canvas id="sgnBack" aria-label="Back of the sign"></canvas></div>
+                </div>
+              </div>
+              <div class="pt-cmd">
+                <div class="pt-cmd-head fwk-heads">
+                  <div class="pt-ver" id="sgnOut" role="group" aria-label="Command">
+                    <button type="button" data-out="give" aria-pressed="true">Give the sign</button><button type="button" data-out="place" aria-pressed="false">Place it</button><button type="button" data-out="data" aria-pressed="false">Change a sign</button>
+                  </div>
+                  <div class="pt-ver" id="sgnVer" role="group" aria-label="Game version">
+                    <button type="button" data-ver="3" aria-pressed="true">1.21.5+</button><button type="button" data-ver="2" aria-pressed="false">1.20.5 – 1.21.4</button><button type="button" data-ver="1" aria-pressed="false">1.20 – 1.20.4</button><button type="button" data-ver="0" aria-pressed="false">1.14 – 1.19</button>
+                  </div>
+                </div>
+                <div class="bcn-pos" id="sgnPos" hidden>
+                  <span class="pt-lbl">At</span>
+                  <input class="pt-input" id="sgnX" type="text" placeholder="X" aria-label="X" autocomplete="off">
+                  <input class="pt-input" id="sgnY" type="text" placeholder="Y" aria-label="Y" autocomplete="off">
+                  <input class="pt-input" id="sgnZ" type="text" placeholder="Z" aria-label="Z" autocomplete="off">
+                </div>
+                <div class="mch-term mct-term pt-term">
+                  <code class="mct-code" id="sgnCmd"></code>
+                  <div class="mct-term-foot">
+                    <span class="mct-meta" id="sgnMeta" role="status" aria-live="polite"></span>
+                    <button type="button" class="mch-copy pt-copy" id="sgnCopy" data-copy="" aria-label="Copy the command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
+                  </div>
+                </div>
+                <div class="pt-send" id="sgnSend">
+                  <label class="pt-mini">Give to
+                    <select class="pt-input" id="sgnTarget">
+                      <option value="@p">@p, nearest player</option>
+                      <option value="@s">@s, yourself</option>
+                      <option value="@a">@a, everyone</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <ul class="pt-notes" id="sgnNotes"></ul>
+            </aside>
+          </div>
+        </section>
+        </div>
+      </div>
+
+
+
+
+
+      </div>
+
+      <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY LIGHTBOX (banners) -->
+<div id="gal-lightbox" onclick="closeLightbox()">
+  <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
+  <div id="gal-lb-inner" onclick="event.stopPropagation()">
+    <img id="gal-lb-img" alt="" loading="lazy" decoding="async">
+    <div id="gal-lb-copybox">
+      <div id="gal-lb-name"></div>
+      <div id="gal-lb-code"></div>
+      <button id="gal-lb-copy-btn" onclick="galCopyCmd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+        Copy Command
+      </button>
+      <div id="gal-lb-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PALETTE LIGHTBOX -->
+<div id="pal-lightbox" onclick="closePalette()">
+  <button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+  <!-- Prev/next were only ever built on the worlds and seeds pages. The grids
+       here are galleries too, so they get the same controls; palLightboxNav()
+       is shared and needs these ids to exist before it can be called. -->
+  <button id="pal-lb-prev" onclick="event.stopPropagation();palLightboxNav(-1)" aria-label="Previous image">&#8249;</button>
+  <button id="pal-lb-next" onclick="event.stopPropagation();palLightboxNav(1)" aria-label="Next image">&#8250;</button>
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" alt="" loading="lazy" decoding="async">
+  </div>
+  <div id="pal-lb-bar">
+    <div id="pal-lb-title"></div>
+    <div id="pal-lb-count"></div>
+  </div>
+</div>
+
+<!-- COMMAND MODAL -->
+<div class="cmd-modal-backdrop" id="cmdModal" onclick="closeCmdOutside(event)">
+  <div class="cmd-modal">
+    <button class="cmd-modal-close" onclick="closeCmd()">✕</button>
+    <div class="cmd-modal-title" id="cmdModalTitle"></div>
+    <div class="cmd-modal-sub" id="cmdModalSub">Command</div>
+    <div class="cmd-code-box" id="cmdModalCode"></div>
+    <button class="cmd-copy-btn" onclick="copyCmd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+      Copy Command
+    </button>
+    <div class="cmd-copy-feedback" id="cmdFeedback"></div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+        <div class="more-sheet-title">Minecraft</div>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"><!-- rendered from mc-contents.json --></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+</div>
+
+<script src="/11layout.js?v=20261010a"></script>
+
+<script src="/mc-java.js?v=20261013pd"></script>
+<script src="/mc-font.js?v=20261013n9" defer></script>
+<script src="/mc-text.js?v=20261013n9" defer></script>
+<script src="/mc-sign.js?v=20261013n9" defer></script>
+<script src="/mc-home.js?v=20261014nd" defer></script>
+<!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
+<div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
+  <div class="vt-modal-panel" onclick="event.stopPropagation()">
+    <div class="vt-modal-head">
+      <div>
+        <div class="vt-modal-title">Recent Updates</div>
+        <div class="vt-modal-sub">Official Java patch notes from Mojang</div>
+      </div>
+      <button type="button" class="vt-modal-close" onclick="closeVtFeed()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="vt-modal-body">
+      <div class="vt-feed-list" id="vt-modal-list">
+        <div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

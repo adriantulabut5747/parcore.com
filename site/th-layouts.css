@@ -45,7 +45,7 @@
 .card-media {
   position: relative;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 0;
 }
 .card-media img.zoomable {
   display: block;
@@ -68,469 +68,13 @@
     transform 0.15s ease;
 }
 
-/* ARMY CARD (thNN-army.html) -- the layout card with a name row on top:
-   Legend I / II / III badge for the top 3 (th-layouts.js RANK_ICONS),
-   then the army's name. Sora, like the rest of the page text. The row
-   sits in the card's padding, 10px above the image. */
-.army-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 28px;
-  margin: 0 2px 10px;
-}
-.army-rank {
-  flex: none;
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-.army-name {
-  margin: 0;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-family: 'Sora', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: #e6e7ea;
-}
-/* "#1" / "#2" / "#3" after the name: the same red pill as the desktop
-   page pill (.t18-page), so the rank reads at a glance. */
-.army-rank-tag {
-  flex: none;
-  padding: 4px 8px 3px;
-  border: 1px solid rgba(224, 99, 99, 0.45);
-  border-radius: 999px;
-  background: rgba(194, 59, 59, 0.14);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 1px;
-  color: #e06363;
-}
-/* Pen, top-right: opens this army in the army maker to edit it
-   (th-layouts.js armyCardHtml). Same key face as the card's heart / share
-   buttons, pushed to the row's right end. */
-.army-edit {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  margin-left: auto;
-  border-radius: 8px;
-  background: var(--key-face);
-  box-shadow: var(--key-soft);
-  color: #8b9099;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
-}
-.army-edit:hover {
-  background: var(--key-face-hover);
-  color: var(--text-main);
-}
-.army-edit:active {
-  transform: translateY(1px);
-  box-shadow: var(--key-soft-pressed);
-}
-.army-edit:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 2px;
-}
-.army-edit .bar-ico {
-  width: 16px;
-  height: 16px;
-}
-
-/* ARMY SHEET -- the army drawn from its Copy Army link (th-layouts.js
-   sheetHtml), in place of the old screenshot. Laid out like the in-game
-   army screen at every size: heroes on the left (4 in a row), troops /
-   spells + siege / clan castle stacked on the right.
-   It sits straight on the card's own #121316 -- no panel of its own --
-   and uses one raised grey for every tile, so the only colour on the
-   card comes from the unit art itself.
-   Sizes follow the card's own width (container units, cqi), not the
-   screen's, so a 340px phone card and a 730px tablet card are the same
-   picture at different scales -- about 190px tall on a phone. The hero
-   column stretches to the units column's height. */
-.army-card:has(.has-sheet) {
-  width: 100%; /* the card is centred with margin:auto, so it sizes to its content; a container-query box has none */
-}
-/* .has-sheet: whatever holds a sheet -- the card's picture frame, or the
-   army maker's "Your army" box. Sizes inside follow its width (cqi).
-   (.card-media.has-sheet keeps the card's own .card-media rules from
-   winning.) */
-.has-sheet,
-.card-media.has-sheet {
-  container-type: inline-size;
-  overflow: visible;
-  border-radius: 0;
-  --as-raise: #1b1d22;
-  --as-raise-2: #202329;
-  --as-red: #e06363; /* the rank pill's red (.army-rank-tag): used numbers, Warden mode, the named tile */
-}
-.army-sheet {
-  --as-tile: clamp(28px, 8cqi, 42px);
-  --as-gap: clamp(3px, 0.9cqi, 6px);
-  --as-cgap: clamp(10px, 3cqi, 18px);
-  display: grid;
-  /* Heroes get 44% for 3 or 4 slots. Fewer slots get a narrower column at
-     the same per-hero width as 3 (TH8 1/3 of it, TH9-10 2/3), so a 2-hero
-     card doesn't stretch each portrait to half the column; the units take
-     the rest. Each hero also stops at ~74px, so a wide single-column card
-     (tablets) keeps tall portraits instead of squat ones. */
-  grid-template-columns:
-    minmax(
-      0,
-      min(
-        calc((100% - var(--as-cgap)) * 0.44 * min(var(--slots, 4), 3) / 3),
-        calc(var(--slots, 4) * 74px + (var(--slots, 4) - 1) * var(--as-gap))
-      )
-    )
-    minmax(0, 1fr);
-  gap: var(--as-cgap);
-}
-.as-units {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: clamp(6px, 2cqi, 12px);
-  min-width: 0;
-}
-/* Group heading: name left, used/max right. On hover / tap the name
-   swaps for the unit's (.is-name), so it reads brighter. */
-.as-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  min-height: 15px;
-  margin: 0 1px 4px;
-}
-/* Icon + label. The icons are the game's header pictures, redrawn as
-   muted grey line icons so they don't add colour. */
-.as-title {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-}
-.as-ico {
-  flex: none;
-  width: 13px;
-  height: 13px;
-  fill: none;
-  color: #6d7178; /* the castle's flag and the ram's head are filled with it */
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.as-label {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-family: 'Sora', sans-serif;
-  font-size: clamp(11px, 2.8cqi, 12px);
-  font-weight: 500;
-  line-height: 15px;
-  color: var(--t18-muted, #9ea3ab);
-}
-.as-label.is-name {
-  color: #f2f3f5;
-}
-.as-cap {
-  flex: none;
-  font-family: 'Oxanium', sans-serif;
-  font-size: clamp(11px, 2.8cqi, 12px);
-  font-weight: 600;
-  line-height: 15px;
-  font-variant-numeric: tabular-nums;
-  color: #8b9099;
-}
-.as-cap b {
-  font-weight: 700;
-  color: var(--as-red);
-}
-
-/* Heroes: one column per hero slot of this Town Hall (--slots), so every
-   card's portraits are the same size; unused slots show an empty frame.
-   The column fills the units column's height: the portrait takes what
-   the equipment under it leaves. */
-.as-heroes {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.as-hero-row {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(var(--slots, 4), minmax(0, 1fr));
-  gap: var(--as-gap);
-}
-.as-hero {
-  display: flex;
-  flex-direction: column;
-  gap: var(--as-gap);
-  min-width: 0;
-}
-.as-portrait {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  border-radius: 7px;
-  /* a soft light behind the head, falling off to the tile grey */
-  background: radial-gradient(130% 75% at 50% 26%, #2c2f37 0%, #1d1f24 55%, #16181b 100%);
-  --ht: 0.63; /* head size (3 eye-spacings), as a share of the portrait's width */
-  --ey: 0.7; /* eye line, in portrait widths from the top */
-}
-/* The hero render, sized and placed from its face (th-layouts.js
-   HERO_FACE: --fx / --fy eyes, --hh head height, all fractions of the
-   image), so every hero's head is the same size with the eyes on the
-   same line, centred. Margins in % are of the portrait's width, which is
-   what lets one formula work at every card size. */
-.as-portrait > .as-art {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  max-width: none;
-  width: calc(var(--ht) / var(--hh) * 100%);
-  height: auto;
-  margin-left: calc(var(--fx) * var(--ht) / var(--hh) * -100%);
-  margin-top: calc(var(--ey) * 100% - var(--fy) * var(--ht) / var(--hh) * 100%);
-}
-/* Shade over the art: dark from the bottom (so the pet strip and its
-   edges sit in shadow, not on a bright body) and a faint light on the
-   upper middle. Above the hero, under the pet, banner and mode icon. */
-.as-portrait::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
-    linear-gradient(0deg, rgba(9, 10, 12, 0.96) 0%, rgba(9, 10, 12, 0.7) 26%, rgba(9, 10, 12, 0) 56%);
-  pointer-events: none;
-}
-.as-portrait > .as-pet,
-.as-portrait > .as-banner,
-.as-portrait > .as-mode {
-  z-index: 2;
-}
-.as-portrait::after {
-  z-index: 3;
-}
-.as-empty .as-portrait {
-  background: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-.as-empty .as-portrait::before {
-  display: none;
-}
-/* The hero's own banner, top-left, like the flag over its Hero Hall. */
-.as-banner {
-  position: absolute;
-  top: 0;
-  left: 3px;
-  width: 30%;
-  max-width: 24px;
-  height: auto;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
-}
-/* Grand Warden's air / ground mode, from the link's "m1": a boot or a
-   wing in the top-right corner, where the game puts its boot. */
-.as-mode {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  display: grid;
-  place-items: center;
-  width: clamp(15px, 4.2cqi, 20px);
-  aspect-ratio: 1;
-  border: 1px solid rgba(224, 99, 99, 0.45);
-  border-radius: 5px;
-  background: rgba(38, 14, 15, 0.9);
-  color: var(--as-red);
-}
-.as-mode svg {
-  width: 72%;
-  height: 72%;
-  fill: currentColor;
-}
-/* Pet: a wide strip across the bottom of the portrait, like in-game,
-   with the pet zoomed in to fill it. */
-.as-portrait .as-pet {
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  bottom: 3px;
-  width: auto;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  border-radius: 5px;
-  background: rgba(18, 19, 22, 0.88);
-}
-.as-portrait .as-pet > img {
-  object-fit: cover;
-  object-position: var(--pf, 50% 35%); /* the pet's face, th-layouts.js PET_FOCUS */
-  transform: scale(1.25);
-  transform-origin: var(--pf, 50% 35%);
-}
-/* Equipment: the two pieces side by side under the portrait, like
-   in-game -- small on a phone card, but it leaves the portrait the
-   height (stacked, they outgrew the hero art). */
-.as-gear {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--as-gap);
-}
-.as-gear .as-tile {
-  width: auto;
-  height: auto;
-  aspect-ratio: 1;
-  border-radius: 4px;
-}
-/* The phone-only copy of the pet (th-layouts.js heroCol). */
-.as-gear .as-pet-side {
-  display: none;
-}
-/* Equipment rarity, as in-game: blue for common, purple for epic. */
-/* Deep tones with a lit top edge, so the rarity reads but the icon, not
-   its background, is what the eye lands on. */
-.as-gear .as-common {
-  background: radial-gradient(120% 90% at 50% 0%, #2f5c9c 0%, #1b3560 60%, #142645 100%);
-}
-.as-gear .as-epic {
-  background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f2068 60%, #2c1649 100%);
-}
-
-/* Tiles: one grey for troops, spells, pets and equipment alike. */
-.as-tile {
-  position: relative;
-  flex: none;
-  display: block;
-  width: var(--as-tile);
-  height: var(--as-tile);
-  border-radius: 6px;
-  background: var(--as-raise);
-  /* a dark hairline round every tile, so neighbours read as separate cards */
-  box-shadow: 0 0 0 1px #0a0b0d;
-}
-.as-tile > img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.as-n {
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  padding: 0 3px;
-  border-radius: 4px;
-  background: rgba(10, 11, 13, 0.75);
-  font-family: 'Oxanium', sans-serif;
-  font-size: clamp(10px, 2.3cqi, 11px);
-  font-weight: 700;
-  line-height: 1.3;
-  font-variant-numeric: tabular-nums;
-  color: #f2f3f5;
-}
-
-/* The tile (or portrait) whose name is showing in the heading: a red
-   ring, drawn on top of the art so the picture can't cover it. */
-.as-tile::after,
-.as-portrait::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  /* a light inner edge: the card's rim */
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.13);
-  transition: box-shadow 0.15s ease-out;
-  pointer-events: none;
-}
-.as-tile.is-on::after,
-.as-portrait.is-on::after {
-  box-shadow: inset 0 0 0 1.5px var(--as-red);
-}
-
-/* A row that doesn't fit scrolls sideways (every screen size), with a
-   thin scrollbar so mouse users can see there's more, and a fade on the
-   side that has more (.more-l / .more-r, set by th-layouts.js). The
-   padding / negative margin keep the scrollbar from adding height. */
-.as-row {
-  display: flex;
-  isolation: isolate;
-  min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  padding-bottom: 5px;
-  margin-bottom: -5px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
-}
-.as-row::-webkit-scrollbar {
-  height: 3px;
-}
-.as-row::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.16);
-}
-.as-row.more-r {
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
-}
-.as-row.more-l {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px);
-  mask-image: linear-gradient(90deg, transparent, #000 24px);
-}
-.as-row.more-l.more-r {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
-}
-
-/* Tiles overlap a little, each one sitting over the right edge of the
-   one before (in-game look), with a soft shadow on its left edge so the
-   seam reads. The 4px matches OVERLAP in th-layouts.js. */
-.as-row > .as-tile + .as-tile {
-  margin-left: -4px;
-  box-shadow:
-    0 0 0 1px #0a0b0d,
-    -3px 0 6px rgba(0, 0, 0, 0.7);
-}
-/* Empty places (th-layouts.js fillRow): a darker box than the card,
-   under the units so the last unit's edge stays on top. */
-.as-row > .as-tile.as-ph {
-  z-index: -1;
-  background: #0c0d0f;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
-}
-.as-ph::after {
-  display: none;
-}
-
-/* Super troops: the count chip turns red, so they stand out at a
-   glance without adding anything to the tile. */
-.as-tile.is-super .as-n {
-  background: #c23b3b;
-}
 
 /* LOADING SKELETON (.is-skel): the sheet's layout with grey blocks that
    shimmer while the armies load. One soft highlight sweeps across each
    block; no motion for people who ask for less. */
 .sk {
   display: block;
-  border-radius: 6px;
+  border-radius: 0;
   background: linear-gradient(100deg, #1a1c20 30%, #25282e 50%, #1a1c20 70%) 0 0 / 300% 100%;
   animation: sk-sweep 1.5s ease-in-out infinite;
 }
@@ -551,13 +95,13 @@
   height: 11px;
   max-width: 100%;
   margin: 2px 0;
-  border-radius: 4px;
+  border-radius: 0;
 }
 .sk-dot {
   flex: none;
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  border-radius: 0;
 }
 .sk-name {
   width: 46%;
@@ -571,13 +115,13 @@
 /* a base layout's screenshot (almost all 16:9) */
 .sk-shot {
   aspect-ratio: 16 / 9;
-  border-radius: 6px;
+  border-radius: 0;
 }
 /* Placeholder button row: the real .card-bar grid (heart, Copy Layout,
    share) with shimmer blocks in the cells. */
 .card-bar > .sk {
   height: var(--bar-h);
-  border-radius: 8px;
+  border-radius: 0;
 }
 .card-bar > .sk-copy {
   width: 170px;
@@ -590,514 +134,15 @@
 .sk-bar {
   height: 40px;
   margin-top: 14px;
-  border-radius: 10px;
-}
-.army-sheet.is-skel .as-row {
-  overflow: hidden;
-}
-.army-sheet.is-skel .as-tile.sk {
-  box-shadow: 0 0 0 1px #0a0b0d;
-}
-.army-sheet.is-skel .as-tile.sk::after {
-  display: none;
-}
-.army-sheet.is-skel .as-portrait.sk {
-  /* the empty-hero rules (background: none) would otherwise win */
-  background: linear-gradient(100deg, #1a1c20 30%, #25282e 50%, #1a1c20 70%) 0 0 / 300% 100%;
-  box-shadow: none;
-}
-.army-sheet.is-skel .as-portrait.sk::before,
-.army-sheet.is-skel .as-portrait.sk::after {
-  display: none;
-}
-.army-sheet.is-skel .as-hero.as-empty {
-  box-shadow: none;
-}
-.is-skel-card .army-head {
-  align-items: center;
-}
-.sk-fail {
-  grid-column: 1 / -1;
-  padding: 40px 0;
-  font-family: 'Sora', sans-serif;
-  font-size: 13px;
-  color: #8b9099;
-  text-align: center;
-}
-
-/* EDIT MODE (army maker, .is-edit): the same sheet, but every box is a
-   button -- a unit removes one, a hero's portrait removes the hero, a pet
-   or equipment box opens its picker, the Warden's corner icon switches
-   air / ground. Hovering shows the red ring and the name, as on the cards. */
-.army-sheet button.as-tile,
-.army-sheet button.as-portrait,
-.army-sheet button.as-mode {
-  -webkit-appearance: none;
-  appearance: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.army-sheet.is-edit [data-sheet] {
-  cursor: pointer;
-}
-.army-sheet.is-edit .as-portrait[data-sheet]:focus-visible,
-.army-sheet button.as-tile:focus-visible,
-.army-sheet button.as-mode:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.7);
-  outline-offset: 1px;
-}
-@media (hover: hover) {
-  .army-sheet button.as-tile:hover {
-    filter: brightness(1.12);
-  }
-}
-.army-sheet button.as-tile:active {
-  transform: scale(0.95);
-}
-/* An empty pet / equipment slot, or an empty hero slot: a dark box with a
-   "+", the same tone as the empty places in the unit rows. */
-.army-sheet .as-tile.as-open {
-  background: #0c0d0f;
-}
-.as-tile.as-open .as-plus {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-}
-/* The empty pet band inside the portrait (wide, side-by-side sheets;
-   stacked ones show the pet in the column beside the portrait). */
-.army-sheet .as-portrait .as-pet.as-open {
-  background: rgba(12, 13, 15, 0.82);
-}
-.as-plus {
-  width: 46%;
-  max-width: 18px;
-  height: auto;
-  aspect-ratio: 1;
-  fill: none;
-  stroke: #6d7178;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-}
-.as-hero.as-empty button.as-portrait {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  background: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-.as-hero.as-empty button.as-portrait::before {
-  display: none;
-}
-@media (hover: hover) {
-  .as-hero.as-empty button.as-portrait:hover .as-plus,
-  .army-sheet .as-tile.as-open:hover .as-plus {
-    stroke: #c9ccd1;
-  }
-}
-
-/* Clan castle row (and the phones' Army row): each kind starts a little
-   apart from the one before. */
-.as-cc .as-row > .as-kind:not(:first-child),
-.as-army .as-row > .as-kind:not(:first-child) {
-  margin-left: 6px;
-}
-
-/* The Army row (troops + spells + siege in one) is the phone layout's;
-   desktop keeps the separate rows. */
-.as-army {
-  display: none;
-}
-
-/* Spells beside siege: spells take the room, siege sizes to its tiles
-   (and scrolls if it must). */
-.as-pair {
-  display: flex;
-  gap: clamp(8px, 2.4cqi, 12px);
-  min-width: 0;
-}
-.as-pair > .as-group {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-.as-pair > .as-group:first-child {
-  flex: 1 1 0; /* width from the pair, not its tiles, so empty places can fill it */
-}
-.as-pair > .as-sieges {
-  flex: none;
-}
-
-/* PHONES: heroes on top, units below. Side by side, a ~340px phone card
-   left 35px portraits, 15px equipment and 9px text -- too small to read.
-   Stacked, each gets the card's full width. Decided by the screen, not
-   the card: desktop's two-per-row cards are as narrow as a phone's but
-   keep heroes on the left. */
-@media (max-width: 640px) {
-  .army-card:has(.has-sheet) {
-    /* a little more width: 6px into the page gutter each side, and a
-       slimmer card padding */
-    width: calc(100% + 12px);
-    max-width: none;
-    margin-inline: -6px;
-    padding-inline: 9px;
-  }
-  .army-sheet {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    --as-tile: 40px;
-    --as-gap: 5px;
-  }
-  /* Cards, stacked (his pick, Oct 2026): one Army row (troops, then
-     spells, then siege), then heroes, then the clan castle. .as-units
-     steps aside (display: contents) so its rows and the heroes line up
-     as one column; only the look moves -- the markup keeps heroes first,
-     so desktop's left column is untouched. The army maker (.is-stack)
-     keeps its own order and separate rows. */
-  .army-sheet:not(.is-stack) .as-units {
-    display: contents;
-  }
-  .army-sheet:not(.is-stack) .as-army {
-    display: block;
-    order: 0;
-  }
-  .army-sheet:not(.is-stack) .as-troops,
-  .army-sheet:not(.is-stack) .as-pair {
-    display: none;
-  }
-  .army-sheet:not(.is-stack) .as-heroes {
-    order: 1;
-  }
-  .army-sheet:not(.is-stack) .as-cc {
-    order: 2;
-  }
-  .as-hero-row {
-    flex: none;
-  }
-  /* Each hero is one short card: a thin portrait on the left, and on its
-     right a column of the pet and the two equipment pieces, stacked. The
-     column's three squares set the card's height (about 100px on a 390px
-     phone), and the portrait stretches to match. */
-  .as-hero-row {
-    gap: 6px;
-    /* always a quarter of the row, so a TH9 card's two heroes are the
-       same size as a TH18 card's four (not half the card each) */
-    grid-template-columns: repeat(var(--slots, 4), calc((100% - 18px) / 4));
-    justify-content: start;
-  }
-  .as-hero {
-    flex-direction: row;
-    gap: 3px;
-    padding: 3px;
-    overflow: hidden;
-    border-radius: 10px;
-    background: #101114;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.07),
-      0 4px 10px rgba(0, 0, 0, 0.35);
-  }
-  .as-hero.as-empty {
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-    background: none;
-    min-height: 100px;
-  }
-  .as-portrait {
-    flex: 1 1 0;
-    min-width: 0;
-    border-radius: 7px;
-    --ht: 0.67; /* thin portrait: the head fills most of its width */
-    --ey: 0.9;
-  }
-  /* no pet band over the portrait here, so a lighter fade at its foot */
-  .as-portrait::before {
-    background:
-      radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
-      linear-gradient(0deg, rgba(9, 10, 12, 0.6) 0%, rgba(9, 10, 12, 0) 40%);
-  }
-  .as-portrait .as-pet {
-    display: none;
-  }
-  .as-gear {
-    flex: none;
-    width: 40%;
-    grid-template-columns: 1fr;
-    align-content: start;
-    gap: 3px;
-  }
-  .as-gear .as-pet-side {
-    display: block;
-    background: #1d1f24;
-  }
-  .as-gear .as-tile {
-    border-radius: 6px;
-  }
-  .as-banner {
-    left: 3px;
-    width: 34%;
-  }
-  .as-mode {
-    top: 2px;
-    right: 2px;
-    width: 16px;
-  }
-  .as-head {
-    margin-bottom: 6px;
-  }
-  .as-label,
-  .as-cap {
-    font-size: 12.5px;
-  }
-  .as-ico {
-    width: 14px;
-    height: 14px;
-  }
-  .as-n {
-    font-size: 11px;
-  }
-  .as-units {
-    gap: 12px;
-  }
-}
-
-/* STACKED (the army maker, .is-stack): the phone arrangement at every
-   width -- heroes on top as short cards (portrait + pet / equipment
-   column), troops / spells / clan castle below. Same rules as the PHONES
-   block above, scoped to the class. On a wide box the hero row is capped
-   so the four cards stay card-sized. */
-.army-sheet.is-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  --as-tile: 40px;
-  --as-gap: 5px;
-}
-.army-sheet.is-stack .as-hero-row {
-  flex: none;
-}
-.army-sheet.is-stack .as-hero-row {
-  gap: 6px;
-  /* always a quarter of the row, so a TH9 card's two heroes are the
-       same size as a TH18 card's four (not half the card each) */
-  grid-template-columns: repeat(var(--slots, 4), calc((100% - 18px) / 4));
-  justify-content: start;
-}
-.army-sheet.is-stack .as-hero {
-  flex-direction: row;
-  gap: 3px;
-  padding: 3px;
-  overflow: hidden;
-  border-radius: 10px;
-  background: #101114;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 4px 10px rgba(0, 0, 0, 0.35);
-}
-.army-sheet.is-stack .as-hero.as-empty {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  background: none;
-  min-height: 100px;
-}
-.army-sheet.is-stack .as-portrait {
-  flex: 1 1 0;
-  min-width: 0;
-  border-radius: 7px;
-  --ht: 0.67; /* thin portrait: the head fills most of its width */
-  --ey: 0.9;
-}
-.army-sheet.is-stack .as-portrait::before {
-  background:
-    radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
-    linear-gradient(0deg, rgba(9, 10, 12, 0.6) 0%, rgba(9, 10, 12, 0) 40%);
-}
-.army-sheet.is-stack .as-portrait .as-pet {
-  display: none;
-}
-.army-sheet.is-stack .as-gear {
-  flex: none;
-  width: 40%;
-  grid-template-columns: 1fr;
-  align-content: start;
-  gap: 3px;
-}
-.army-sheet.is-stack .as-gear .as-pet-side {
-  display: block;
-  background: #1d1f24;
-}
-.army-sheet.is-stack .as-gear .as-tile {
-  border-radius: 6px;
-}
-.army-sheet.is-stack .as-banner {
-  left: 3px;
-  width: 34%;
-}
-.army-sheet.is-stack .as-mode {
-  top: 2px;
-  right: 2px;
-  width: 16px;
-}
-.army-sheet.is-stack .as-head {
-  margin-bottom: 6px;
-}
-.army-sheet.is-stack .as-label,
-.army-sheet.is-stack .as-cap {
-  font-size: 12.5px;
-}
-.army-sheet.is-stack .as-ico {
-  width: 14px;
-  height: 14px;
-}
-.army-sheet.is-stack .as-n {
-  font-size: 11px;
-}
-.army-sheet.is-stack .as-units {
-  gap: 12px;
-}
-.army-sheet.is-stack .as-hero-row {
-  max-width: 380px; /* four panels, ~88px each */
-}
-/* Unit boxes in the maker: the same size as the Pick units tiles below
-   (57px; cards use 33-42px) -- you tap them here. */
-.army-sheet.is-stack {
-  --as-tile: 57px;
-}
-/* Phones: the same size as the Pick units tiles there (7 to a row, 6px
-   gaps) -- the sheet's box is the same width as that grid. */
-@media (max-width: 640px) {
-  .army-sheet.is-stack {
-    --as-tile: calc((100cqi - 36px) / 7);
-  }
-}
-/* Maker: each hero is one tall panel, like the in-game army screen --
-   the hero's art fills it from the top, the pet sits in a rounded box
-   set into the lower part of the art, and the two equipment pieces sit
-   in a row at the foot, all inside the same panel. */
-.army-sheet.is-stack .as-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0 0 5px;
-  overflow: hidden;
-  border-radius: 10px;
-  /* the panel: a soft light behind the head, falling off to the tile grey */
-  background: radial-gradient(140% 55% at 50% 22%, #2c2f37 0%, #1b1d22 60%, #141518 100%);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 6px 14px rgba(0, 0, 0, 0.4);
-  aspect-ratio: 10 / 29; /* tall, like the game's hero panel: room for the body */
-}
-.army-sheet.is-stack .as-portrait {
-  flex: 1 1 auto;
-  min-height: 0;
-  aspect-ratio: auto;
   border-radius: 0;
-  background: none;
-  box-shadow: none;
-  --ht: 0.5;
-  --ey: 0.78;
 }
-/* a gentle fade at the art's foot, so the pet box and equipment sit on it */
-.army-sheet.is-stack .as-portrait::before {
-  background:
-    radial-gradient(80% 40% at 50% 26%, rgba(255, 255, 255, 0.06), transparent 70%),
-    linear-gradient(0deg, rgba(14, 15, 18, 0.9) 0%, rgba(14, 15, 18, 0.35) 22%, rgba(14, 15, 18, 0) 42%);
-}
-/* the pet: a rounded box inset into the bottom of the art */
-.army-sheet.is-stack .as-portrait .as-pet {
-  display: block;
-  left: 5px;
-  right: 5px;
-  bottom: 5px; /* same inset as the sides */
-  width: auto;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  border-radius: 7px;
-  background: rgba(16, 17, 21, 0.62);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-.army-sheet.is-stack .as-portrait .as-pet > img {
-  transform: none;
-}
-.army-sheet.is-stack .as-portrait .as-pet.as-open {
-  background: rgba(16, 17, 21, 0.62);
-}
-/* equipment: two squares at the foot of the panel */
-.army-sheet.is-stack .as-gear {
-  flex: none;
-  width: auto;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  padding: 0 5px;
-}
-.army-sheet.is-stack .as-gear .as-tile {
-  border-radius: 6px;
-}
-.army-sheet.is-stack .as-gear .as-pet-side {
-  display: none;
-}
-.army-sheet.is-stack .as-banner {
-  top: 0;
-  left: 5px;
-  width: 26%;
-  max-width: 24px;
-}
-.army-sheet.is-stack .as-mode {
-  top: 4px;
-  right: 4px;
-}
-/* An empty hero slot: the panel's outline with a "+". */
-.army-sheet.is-stack .as-hero.as-empty {
-  min-height: 0;
-  padding: 0;
-  background: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-.army-sheet.is-stack .as-hero.as-empty .as-portrait {
-  height: 100%;
-}
-/* Maker in a wide box (760px+, decided by the box, not the screen):
-   heroes on the left, troops / spells / clan castle on the right, like
-   the game. The hero panels stretch to the units' height. Narrower boxes
-   keep heroes on top. */
-@container (min-width: 760px) {
-  .army-sheet.is-stack {
-    display: grid;
-    /* a slim hero column (four ~83px panels), the rest for the units */
-    grid-template-columns: 350px minmax(0, 1fr);
-    gap: 22px;
-    align-items: start;
-  }
-  .army-sheet.is-stack .as-heroes {
-    display: flex;
-    flex-direction: column;
-  }
-  .army-sheet.is-stack .as-hero-row {
-    flex: 1;
-    max-width: none;
-  }
-  .army-sheet.is-stack .as-hero {
-    aspect-ratio: 10 / 29;
-  }
-}
-@media (max-width: 970px) {
-  .army-name {
-    font-size: 14px;
-  }
-}
-
 /* Corner chrome: badge top-right, clan banner top-left. Same height,
    radius, fill and hairline so the two read as one set. */
 .image-badge,
 .image-logo {
   top: 10px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow:
     0 3px 10px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -1114,7 +159,7 @@
   right: 10px;
   height: 26px;
   padding: 0 9px;
-  border-radius: 6px;
+  border-radius: 0;
   font-family: 'Oxanium', sans-serif;
   font-size: 11px;
   font-weight: 800;
@@ -1142,7 +187,7 @@
   width: 22px;
   height: 22px;
   margin: 0;
-  border-radius: 5px;
+  border-radius: 0;
 }
 .cc-popup {
   top: 44px;
@@ -1195,7 +240,7 @@
 .th-cc:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 0;
 }
 
 /* A compact cluster in the middle of the card: heart, Copy Layout,
@@ -1225,7 +270,7 @@
 .layout-link {
   box-sizing: border-box;
   height: var(--bar-h);
-  border-radius: 8px;
+  border-radius: 0;
   border: 0;
   background: none;
   box-shadow: none;
@@ -1372,7 +417,7 @@
   z-index: 20;
   width: 220px;
   padding: 6px;
-  border-radius: 12px;
+  border-radius: 0;
   background: rgba(20, 21, 26, 0.97);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
@@ -1390,7 +435,7 @@
   width: 100%;
   padding: 9px 10px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: none;
   color: #d5d8de;
   font-family: 'Oxanium', sans-serif;
@@ -1759,7 +804,7 @@
   top: 0;
   height: 2px;
   width: 0;
-  border-radius: 2px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.11); /* fainter than before (.18) */
   will-change: transform;
   transition: opacity 0.6s ease;
@@ -1994,7 +1039,7 @@ html.loaded {
   margin-top: 20px;
   padding: 28px 32px;
   border: 1px solid var(--t18-line);
-  border-radius: 16px;
+  border-radius: 0;
   background: var(--t18-surface);
 }
 
@@ -2122,7 +1167,7 @@ html.loaded {
 .tb-fact {
   padding: 5px 9px 4px;
   border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 7px;
+  border-radius: 0;
   background: rgba(18, 19, 22, 0.72);
   font-family: 'Oxanium', sans-serif;
   font-size: 11px;
@@ -2154,7 +1199,7 @@ html.loaded {
   height: 34px;
   padding: 0 12px 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 9px;
+  border-radius: 0;
   background: rgba(10, 10, 12, 0.55);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -2211,7 +1256,7 @@ html.loaded {
     min-height: 0;
     margin-top: 12px;
     padding: 18px 16px 16px;
-    border-radius: 14px;
+    border-radius: 0;
   }
   /* The art runs the full width behind the text here, dimmed on the left
      where the words are. The ::before overlay below darkens it further so
@@ -2242,7 +1287,7 @@ html.loaded {
     width: 30px;
     height: 30px;
     padding: 0;
-    border-radius: 8px;
+    border-radius: 0;
   }
   .tb-back svg {
     width: 15px;
@@ -2337,7 +1382,7 @@ html.loaded {
 .t18-dyk {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  border-radius: 6px;
+  border-radius: 0;
 }
 .t18-dyk:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.75);
@@ -2436,7 +1481,7 @@ html.loaded {
   overflow: hidden;
   background: #15161a;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
   color: #dcddde;
 }
@@ -2486,7 +1531,7 @@ html.loaded {
   height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
@@ -2528,7 +1573,7 @@ html.loaded {
 .coc-content .share-panel {
   background: #15161a;
   border: 1px solid #3a3d44;
-  border-radius: 8px;
+  border-radius: 0;
 }
 
 /* Moved to coc-clan-clock.css (shared with /coc/), Sep 2026: the Live events label and the clan card's red glow + title. */
@@ -2559,7 +1604,7 @@ html.loaded {
   min-width: 36px;
   height: 36px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 0;
   background: rgba(11, 11, 12, 0.8);
   color: var(--text-muted);
   font-family: 'Oxanium', sans-serif;
@@ -2587,7 +1632,7 @@ html.loaded {
   padding: 0 8px;
   background: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 11px;
   letter-spacing: 1.3px;
   text-transform: uppercase;
@@ -2611,7 +1656,7 @@ html.loaded {
   gap: 8px;
   min-height: 40px;
   padding: 0 10px;
-  border-radius: 8px;
+  border-radius: 0;
   background: rgba(11, 11, 12, 0.8);
   border: 0;
   box-shadow: none;
@@ -2748,7 +1793,7 @@ html.loaded {
   padding: 0 8px;
   background: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 11px;
   letter-spacing: 1.3px;
   text-transform: uppercase;
@@ -2804,7 +1849,7 @@ html.loaded {
 .th-soon {
   margin-top: 16px;
   padding: 48px 32px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: radial-gradient(60% 90% at 50% 0%, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0) 70%), #121316;
   text-align: center;
@@ -2815,7 +1860,7 @@ html.loaded {
   width: 56px;
   height: 56px;
   margin-bottom: 18px;
-  border-radius: 14px;
+  border-radius: 0;
   background: #1a1b1f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #e06363;
@@ -2859,7 +1904,7 @@ html.loaded {
   align-items: center;
   min-height: 40px;
   padding: 0 18px;
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--ghost-bg);
   border: 1px solid var(--ghost-border);
   color: #c9ccd2;
@@ -2913,7 +1958,7 @@ html.loaded {
   right: 10px;
   z-index: 2;
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: 0;
   font-family: 'Oxanium', sans-serif;
   font-size: 11px;
   font-weight: 800;
@@ -2991,22 +2036,6 @@ html.loaded {
   margin-bottom: 12px;
 }
 
-/* Army rows: the 3px scrollbar they were drawn with. Chrome ignores the
-   ::-webkit-scrollbar styling as soon as scrollbar-width is set (11layout.css
-   sets "thin" on everything), and drew its own ~11px bar -- the grey line
-   under long troop rows, which also made those cards taller. So
-   scrollbar-width goes back to auto where ::-webkit-scrollbar works
-   (Chrome, Edge, Safari); Firefox keeps "thin". */
-@supports selector(::-webkit-scrollbar) {
-  .as-row {
-    scrollbar-width: auto;
-    scrollbar-color: auto;
-  }
-}
-.as-row::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 /* ---- Articles from Parcore (Oct 2026) -------------------------------------
    Above the FAQ on the TH layouts / army pages, in the clan card's old spot.
    Header = the FAQ's small caps (same .cc-label classes) with "View all
@@ -3052,7 +2081,7 @@ html.loaded {
 .t18-art-all:focus-visible {
   outline: 2px solid #c23b3b;
   outline-offset: 4px;
-  border-radius: 4px;
+  border-radius: 0;
 }
 .t18-articles .art-track {
   --art-side: 0px;

@@ -127,6 +127,11 @@ What this means when writing:
    "Should You Rush Town Hall?" → *"Only if everything else is maxed."*
 3. **"Not X. Y." contrast lines.** "Your goal is not perfect attacks. Your
    goal is fast rewards." The strongest line type there is.
+   **But clarity beats punch (Adrian, Oct 11 2026):** he found clipped lines
+   like "Not low-level heroes. Max-level heroes, when it counts." and "A
+   rushed hero is a low-level hero. Potions fix that." confusing. Every line
+   must state its point in full sentences: what to do, when, and why. Don't
+   save words; fragments and riddles are out.
 4. **Rule-of-thumb numbers are wanted:** "at least 150 points per attack",
    "save Books for 7–8 day timers". A player can apply them; they don't go
    stale like costs do.
@@ -211,7 +216,7 @@ In page order:
    - the **"real secret"** in its own section, said plainly (Hammer Jam: "The
      Real Secret: Builder Potions");
    - the recurring sections that fit (3b.5).
-7. **Photos: 3–4 max** in the body (banner not counted), only where a picture
+7. **Photos: 4–7** (Adrian, Oct 11 2026; looping clips count as photos) in the body (banner not counted), only where a picture
    proves or shows something (section 5b).
 8. **"Read next" card** wherever another article is the natural next step.
 9. **FAQ**: 3 Google-worded questions, `<h2 id="faq">FAQ</h2>` + contents row.
@@ -296,7 +301,7 @@ every section or two, never under every paragraph.
   (Town Halls, defenses), or the article's own folder for new ones.
 - **Level / stage rows** (`.ap-forms`): a building's looks side by side.
 - **Pictures inside tables** (`.ap-def`): a 40px render before the name.
-- These small icons don't count toward the 3–4 photo limit; that limit is
+- These small icons don't count toward the 4–7 photo range; that limit is
   for full-width screenshots.
 
 ### A photo must prove or show something
@@ -448,7 +453,7 @@ every 11layout link site-wide (CLAUDE.md rule).
 - [ ] Card title without the game name; `<title>` with it; dek 3–7 words, not echoing the title, no slop words
 - [ ] Byline Parcore, "Published <Mon> <Year>", "Updated for <Year>"
 - [ ] Every `<h2>` has an id and a contents row (incl. FAQ and Summary)
-- [ ] 3–4 body photos max, each with SHOT note or real image + caption + alt; tool links carry their icon
+- [ ] 4–7 body photos, each with SHOT note or real image + caption + alt; tool links carry their icon
 - [ ] FAQ (3 Google-worded questions), Summary card at the end, closing line
 - [ ] No emojis, no plugs, no overpromises, no first person
 - [ ] "Read next" card where it helps
@@ -477,10 +482,10 @@ every 11layout link site-wide (CLAUDE.md rule).
 | 3 | upgrade-order | Guide | What to Upgrade First at Every Town Hall (The Full Upgrade Order) | Every hammer swing counts. | **live, noindex** (awaiting Adrian's fact-check) |
 | 4 | crafted-defenses-season-4 | Guide | Cake-A-Pult Is Here: Crafted Defenses Season 4 Explained | Your heroes have a new problem. | **live, noindex** (draft, awaiting Adrian) |
 | 5 | rushing-meta | Guide | Rushing Is the New Meta: Here's Why Everyone's Doing It | Max less. Reach the top sooner. | **live** |
-| 6 | best-pets | Guide | Which Pet Should You Upgrade First at Each Town Hall? | Spend Dark Elixir where it counts. | soon; selected next, draft noindex |
+| 6 | best-pets | Guide | Which Pet Should You Upgrade First at Each Town Hall? | Spend Dark Elixir where it counts. | **live** (Oct 11; indexed; banner/thumb in, 6 body photos still placeholders) |
 | 7 | base-building | Guide | Base Building 101: Layouts That Hold Up in Real Attacks | Stop giving away free triples. | soon |
-| 8 | sixth-builder | Guide | The Fastest Way to Unlock Your 6th Builder | One more hammer, zero excuses. | **live** (Oct 9; placeholder images, 4 SHOTs pending) |
-| 9 | farming | Guide | Why Are We Farming With Valkyries Instead of Sneaky Goblins? | Stop Clearing the Whole Base | **live, noindex** (Oct 9; awaiting fact-check; 3 SHOTs pending) |
+| 8 | sixth-builder | Guide | The Fastest Way to Unlock Your 6th Builder | One more hammer, zero excuses. | **live** (Oct 9; real photos + looping surrender clip in, Oct 11) |
+| 9 | farming | Guide | Why Are We Farming With Valkyries Instead of Sneaky Goblins? | Stop Clearing the Whole Base | **live, noindex** (Oct 9; awaiting fact-check; real photos + looping Valkyrie clip (mp4, plays like a GIF) in, Oct 11) |
 | 10 | clan-games | Event | Clan Games: Max Out 4,000 Points Without the Grind | 4,000 points, no sweat. | **live** |
 | 11 | troop-tier-list | Tier List | Troop Tier List: Who Actually Carries | S tier or straight to the bench. | soon |
 | 12 | best-hero-skins | Skins | The Best Hero Skins Ever Released, Ranked | Pure drip, properly ranked. | soon |
@@ -507,7 +512,7 @@ phones stack the reason under the name). Ore facts come from
 `coc-equipment.json`: Commons max at 18 with no Starry Ore, Epics go to 27 at
 about double the Shiny/Glowy plus Starry; all 42 maxed > 1.6M Shiny.
 No "More for" box (one tool link, inline).  His answers (same day): Queen's third pair is Monolith Arrow + **Action
-Figure**; the ranking is "overall, every Town Hall once unlocked"; each pair
+Figure**; the ranking was "overall, every Town Hall once unlocked" (replaced Oct 11 2026 after a review: now "for war attacks with high-level heroes", not a fixed order); each pair
 has his one-line "when to use" note under it (King, Queen, Warden, Prince);
 RC and Duke notes added later the same day; Haste Vial + Hog Rider Doll
 dropped (RC keeps two pairs). Only C-tier pieces (Rage Vial, Life Gem) sit in
@@ -516,7 +521,7 @@ Banner and thumbnail (Adrian's pick, an exception to "official key art"): his
 42-piece board from the tier list maker, rendered by headless Chrome with the
 board lifted onto a plain background (every row on one line), centred so it
 survives the 21:9 desktop crop, the 2:1 phone crop and the 16:9 card.
-Pairs list the higher-tier piece first (his "consistency" call). Piece reasons were aligned to his notes
+Oct 11 2026 review fixes (Adrian approved): Hog Rider **Puppet** (the site data still says "Doll"); leaderboard = one signal, not proof; Spiky Ball "two of his three pairs"; Stick Horse (getting there) vs Rage Vial (burst on ability, with the Gauntlet); Monolith Arrow 14% up to 180 housing space, 5% above 250; pair notes say "can", not guaranteed results. Oct 11 2026 re-rank (Adrian): King A Snake Bracelet/Stick Horse, Gauntlet to B, Vampstache above Barbarian Puppet; Queen A = Monolith, Mirror, Healer Puppet; Warden S = Eternal Tome + Rage Gem, Fireball A, Heroic Torch B under Healing Tome; RC A = Seeking Shield, Electro Boots, Frost Flake B; Prince A = Dark Crown, Meteor Staff, Henchmen B; Duke A = Rocket Backpack, Electro Fangs. S tiers now 5 Commons + 3 Epics. The banner/thumb board image predates this re-rank. Pairs list the higher-tier piece first (his "consistency" call). Piece reasons were aligned to his notes
 (Heroic Torch = Bowlers/Throwers/Electro Titans, Healing Tome = Dragons and
 Dragon Riders, Life Gem = Thrower attacks, Monolith Arrow = Queen Charges).
 
@@ -527,9 +532,7 @@ Added outside the list (Blueprint CoC's topic, rewritten and expanded; their
 shown **in full** (all 9 module tables, Adrian's pick: an exception to "stats
 general"). Tables are generated by a script from the wiki data, so totals match
 (67d 13h per defense). Real secret: **Hitpoints above 2,400 so the Giant Arrow
-can't snipe it** (module level 4 = 2,500 HP, TH14). Ranking: Cake-A-Pult >
-Hot Candle > Hero Hunter (almost nobody uses it); Hot Candle still good at
-TH11–13. No tool links, no "More for" box. Building renders from the wiki in
+can't snipe it** (module level 4 = 2,500 HP, TH14). Ranking (Oct 11 2026, Adrian): **Cake-A-Pult and Hot Candle tied** at the top (TH11–18), Hero Hunter clearly below; no "almost nobody uses it" claim. Hitpoints advice = as far as your TH allows (module cap TH11 1, TH12 2, TH13 3; level 4 needs TH14). No tool links, no "More for" box. Building renders from the wiki in
 `site/clashofclans/articles/crafted-defenses-season-4/`. Banner/thumbnail:
 Supercell's Cake-A-Pult key art (media.ffycdn.net), banner 1920 + thumb 800.
 Icon chips: Archer Queen + Giant Arrow (real secret), Healers/Golems/Balloons
@@ -554,16 +557,15 @@ Common Mistakes to Avoid → FAQ → Summary.
   every war; the item is "Power Potion", no s). Best time to move up: just before Hammer Jam.
 - **No Town Hall weapon priority** below TH17 (TH12+ already has it). TH17:
   upgrade the Town Hall weapon (levels 1–5) before the Monolith.
-- **Defense order TH11–18:** Eagle Artillery → Monolith (+ Spell Towers at
-  TH15) → merged defenses (TH16–18) → Inferno Towers → Scattershots → X-Bows
-  and Air Defenses (equal) → other defenses → traps. **TH18: Logger first, then Longshot and
-  Smasher.**
+- **Defense order (Oct 11 2026, Adrian):** Air Defense always before Wizard Towers (TH5–9). TH11–16: Eagle Artillery → Monolith (+ Spell Towers at TH15) → merged defenses → Inferno Towers / Scattershots (Scattershots first at TH13–14; TH14 = Eagle Artillery → Builder's Huts to at least level 1 → Scattershots → Infernos) → X-Bows and Air Defenses (never say "equal priority") → other defenses → traps. **No Eagle Artillery at TH17–18.** TH17: Town Hall weapon first. TH18: Logger → Longshot and Smasher → Revenge Tower and Super Wizard Tower.
+- **Traps = their own item after Defenses in every TH list** (Adrian, Oct 11 2026), only the traps that TH has: Giga Bomb (TH17+) → Tornado Trap (only if it has an upgrade) → Hidden Teslas → Skeleton Traps → Seeking Air Mines (black) → Air Bombs (red, kill Healers) → Giant Bombs → Spring Traps → Bombs. Hidden Tesla lives here, not in TH7's defense list.
+- **Item 2 of every list (TH4+):** new-hero Town Halls (4, 8, 9, 11, 13, 15) = "Hero Hall, Clan Castle and Army Camps."; others = "Clan Castle and Army Camps, Hero Hall." **TH16 skips the Clan Castle** (its upgrade only adds a siege machine slot nobody uses): listed below offense as "skip it", with a line explaining why. Dragon Duke unlocks at TH15 (Hero Hall 9).
 - Pets covered (Pet House = second Laboratory), Hero Equipment not; Read
   next → best-pets. Builder Base skipped.
 - Banner and thumbnail: the official TH18 key art; body photo: Adrian's
   rushed-base screenshot.
 
-Heroes stay top priority at every TH (Adrian): "keep a builder on a hero"
+Oct 11 2026 review fixes (Adrian approved): labelled a general plan for war players, not universal; TH lists are for developing each level, not the fastest route; **Clan Castle and Army Camps named right after the Laboratory in every TH list** (exception to "offense buildings stay general"); Rage Spell at TH7 (wiki); King usable in attacks from TH4 since May 26 2026, upgraded from TH7 after his Hero Banner; TH18 Guardians explained (one defends at a time, builder to upgrade, can't defend in multiplayer while upgrading); Revenge Tower + Super Wizard Tower after the Guardians (placement unconfirmed by Adrian); rushing con no longer claims war/CWL match you against stronger bases; Hammer Jam timing = "can pay off". Heroes stay top priority at every TH (Adrian): "keep a builder on a hero"
 holds from TH7 up. Unverified facts: Clan Castle at
 TH3, Balloons at TH4, Rage at TH6, Minion Prince at TH9, TH14 Builder's Huts,
 Hero Hall raising hero max levels. Remove `noindex` once cleared.
@@ -578,6 +580,12 @@ worth it; Gold Pass stacks multiplicatively (50% + 20% = 60%, not 70%);
 expected early November 2026. The secret: **Builder Potions bought with CWL
 League Medals in the League Shop, never Hammers**; drink them while every
 builder is busy. Real banner, thumbnail and 4 screenshots are in.
+
+### Hammer Jam: Oct 11 2026 fixes (Adrian)
+
+- Walls: free a builder **only while grinding walls**, not for the whole event.
+- Discount counts only for upgrades started during the event; a running upgrade keeps full price and timer.
+- New section "Research Potions for the Laboratory": 24× for one hour; worth double during the event because timers are halved. Spend Raid Medals on Research Potions; Laboratory and pet upgrades are 50% off in cost and time.
 
 ### Hammer Jam: still to do (Adrian approved the patterns, not yet applied)
 
@@ -624,10 +632,42 @@ for every pet.
 - Greedy Raven is a strong Warden-charge pick and also works for Queen charges.
   It clears trash buildings quickly, especially high-HP storages, making the
   charge noticeably faster.
-- Sneezy is no longer recommended for Warden charges. Its projectiles no longer
-  trigger Air Mines and can lure Clan Castle troops toward the Warden. Recommend
-  Greedy Raven for those charges instead; keep Sneezy in A for other uses unless
-  Adrian changes its overall tier.
+- Sneezy is no longer recommended for Warden charges. **Correction (Oct 11
+  2026, Adrian):** it is Sneezy's **Boogers** that no longer trigger traps (not
+  "projectiles", not "Air Mines"): "Sneezy's Boogers no longer trigger traps,
+  which removes one reason to pair her with a Warden charge." The Boogers can
+  also lure Clan Castle troops toward the Warden. **Update (Oct 11):** Sneezy is
+  the **second option** for Warden charges, Greedy Raven first. The big downside:
+  Boogers trigger the Clan Castle when they enter its range. Keep Sneezy in A.
+- **Oct 11 re-rank (Adrian):** real secret is now **"Frosty Is Underrated"**
+  (S tier, last in S; works with **any hero**; upgrade right after Phoenix).
+  Within-tier order now matters (listed strongest first): S Phoenix, Spirit
+  Fox, Frosty; B Unicorn, Diggy, Electro Owl; C Mighty Yak, L.A.S.S.I, Poison
+  Lizard. Pairings added: Unicorn → King (3rd), Diggy → Minion Prince (5th),
+  Frosty → all six heroes. **TH14: max Unicorn only** (Adrian, Oct 11); the TH15 pets
+  replace the other three, Dark Elixir goes to heroes. Staying long at TH14 =
+  may upgrade a few, but strongly discouraged: move up, **TH14 → TH15 is the
+  biggest power spike in the game**. Completion players: Electro Owl → Mighty
+  Yak → L.A.S.S.I. "Most players walk past Frosty… Top players don't." approved.
+- **Banner/thumb (Oct 11):** Frosty (Adrian's 2400px cutout) stepping out of a dimmed,
+  blurred grid of the other 11 pet tiles with one empty glowing slot; title "THE PET /
+  EVERYONE / SKIPS" + "TOP PLAYERS DON'T" (Orbitron, the canvas thumbnail style). Artboard
+  `BestPets.dc.html` in the "Article Thumbnails" Claude Design canvas; files in
+  `site/clashofclans/articles/best-pets/`. Phoenix + S-box idea dropped (title points to Frosty).
+- **Angry Jelly** (Adrian, Oct 11): its hero targets only defenses for about 30
+  seconds. Unlocks TH16 (fact); Greedy Raven TH18 (fact).
+- **Frosty is not a blanket "yes"** (Adrian, Oct 11): worth upgrading when the
+  attack uses a hero funnel or distraction (it makes a single hero more
+  independent); other pets come first for other armies.
+- **Unlock timing comes before tiers** (Adrian, Oct 11): the tiers assume every
+  pet is unlocked. The article has a "When Does Each Pet Unlock?" table (TH14
+  Unicorn/Owl/L.A.S.S.I/Yak, TH15 Phoenix/Frosty/Diggy/Lizard, TH16 Spirit
+  Fox/Angry Jelly, TH17 Sneezy, TH18 Greedy Raven) with an upgrade-first chain
+  per TH; the FAQ answers by Town Hall (Unicorn TH14, Phoenix TH15, Spirit Fox
+  TH16).
+- Oct 11 rewrite: 6 photo slots (Pet House screen, Phoenix save, Frosty funnel,
+  Spirit Fox invisibility, Sneezy Boogers pulling CC, Greedy Raven charge), all
+  placeholders with SHOT notes; pairings table reordered to tier order.
 - Real secret: unlock pets as you advance, then spend Dark Elixir on the pets
   that improve the attacks you actually use. Do not max every pet by default.
 - Include the Army Maker quicklink. Use the pet icon assets in
@@ -635,7 +675,54 @@ for every pet.
   Banner and two body images still need screenshots/art; SHOT notes are in the
   draft.
 
+### 6th Builder: Adrian's calls (Oct 11, 2026)
+
+- In-game names: **B.O.B Control** (100,000 Builder Gold), **B.O.T.O's Shack** (1,000 gems).
+- Hero split 23/22 is proven by a table (wiki costs: both heroes cost the same per
+  level from 16 up; BM levels 16–20 take 4d vs the Copter's 5d, so the extra level
+  goes on the Battle Machine). Time, not Elixir, is the real argument: 35 vs 75 days.
+- Electro Fire Wizard starts at 17 = one upgrade to 18. Example table of starting levels (wiki): Baby Dragon 5, Power P.E.K.K.A 13, Hog Glider 15, EFW 17. Wiki says BB troops max at 20, not 18: "max" claim removed pending Adrian.
+- One-troop surrender farming: only when only Elixir upgrades are left **and** the
+  reader doesn't mind losing trophies (trophies → league → Star Bonus size).
+- "99 days" in the title: considered and dropped.
+
+### Farming: fixes (Oct 11, 2026)
+
+- League bonus scales with destruction: a 50% win pays **80%**, full bonus at 70%+
+  (wiki, Multiplayer Battles). The article says so wherever it mentions the bonus.
+- Loot per attack (500,000) and storage-fill times are **estimates**, shown as an
+  attacks-to-fill table (300k/500k/700k); minutes are the best case.
+- Rage Gem = Warden, upgrade first for this attack. Dragon Duke is the 4th hero (Royal Champion dropped),
+  Rocket Backpack + Electro Fangs. Army cards (army-sheet.js) show his two links; text matches them.
+
+### Meteorite Builder Skin: rewrite (Oct 12, 2026, awaiting Adrian)
+
+`site/articles/coc/meteorite-builder-skin.html` (noindex, `articles.json` "soon").
+Facts from Supercell's TH18 update notes: 3,200 stones, once, covers every Builder;
+10 per Supercharge level, 8 per module level; removed upgrades were converted **once,
+at launch** (the old draft wrongly said it keeps happening). Real secret reworded:
+"Temporary upgrades, permanent stones" (also the new dek). Adrian confirmed (Oct 12):
+Supercharge = building maxed for its TH (2–3 levels); **Fancy Shop shows at TH12–18
+only** (verified in game; web sources saying TH16/17 are wrong); 5,000-stone cap;
+Crafted Statue and Builder Bust both 500; Charge Effect can't be removed; an upgrade
+still running at season end pays nothing. 5 photo slots are placeholders.
+
 ### Next article: Base Building 101 (after Best Pets is reviewed)
 
 Start by asking Adrian (section 1.2): tool quicklinks (probably the TH
 layouts pages), the real secret, what to cover and what to skip.
+
+### Clan Games: fixes (Oct 11, 2026)
+
+- Troop, spell and siege training times were removed in 2025: no "queue the next army" advice.
+- 150 points per attack is a **rule of thumb** (≈27 attacks to 4,000), not a game rule.
+- Super Troop challenges (1,500 points) **don't appear every Clan Games**: always "when one shows up".
+- Banner/thumb (Adrian's pick): the Strongman render from the Clash wiki on a plain dark background (#111113),
+  not key art. Reward chips (Book/Hammer of Building, Builder/Hero/Power Potion) are wiki icons in the article folder.
+  Body pictures = three own infographics (no current in-game screenshots exist anywhere; the wiki/Supercell
+  ones are 2017-2019 with old caps): points-per-attack (secret section), leave-at-one-star (attack section),
+  reward-priority (rewards). Rendered from HTML in headless Chrome, 1600px. Swap for his screenshots if he takes them.
+- Stray "(150 Points)" removed; noindex removed (Adrian, Oct 11): the article is indexed.
+- Each infographic also exists as an HTML block right above its figure (`.ap-viz` + `.ap-bars` / `.ap-meter` /
+  `.ap-steps`, articles.css "Chart blocks"), Adrian's pick. Titles plain white except the rewards one
+  ("Resources last." stays red). The figures stay until he swaps in his own images.

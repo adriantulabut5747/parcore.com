@@ -63,7 +63,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
     height: 32px;
     margin-left: auto;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
+    border-radius: 0;
     background: rgba(255, 255, 255, 0.04);
     color: #d4d7db;
     cursor: pointer;
@@ -79,7 +79,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
     overflow-y: auto;
     padding: 14px 14px 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    border-radius: 0;
     background: #1a1b1f;
     box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.85);
     z-index: 50;
@@ -154,7 +154,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   height: 40px;
   padding: 0 12px 0 36px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 0;
   background: #1b1c20;
   color: #fff;
   font: 400 14px 'Sora', sans-serif;
@@ -174,7 +174,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   height: 34px;
   padding: 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  border-radius: 0;
   background: #1b1c20;
   color: #a9adb3;
   font: 600 13px 'Sora', sans-serif;
@@ -274,15 +274,14 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-cover {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 9;
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
-  background: #0c0d0f;
+  background: #141519;
   color: inherit;
   text-decoration: none;
   box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
 }
-.ah-cover-media { position: absolute; inset: 0; }
+.ah-cover-media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #0c0d0f; }
 .ah-cover-media img {
   width: 100%;
   height: 100%;
@@ -295,23 +294,21 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-cover:hover .ah-cover-media img { transform: scale(1.03); }
 .ah-cover .art-row-cat { top: 14px; right: 14px; padding: 6px 10px; font-size: 11px; }
 .ah-cover-body {
-  position: absolute;
-  inset: auto 0 0 0;
+  /* Text under the picture, not over it (Oct 11 2026, Adrian's pick): the
+     thumbnails carry their own titles, so an overlay would cover them. */
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 140px 36px 30px;
-  /* Scrim: the art stays bright up top, the text sits on near-black. */
-  background: linear-gradient(to top, rgba(7, 8, 10, 0.97) 0%, rgba(7, 8, 10, 0.86) 38%, rgba(7, 8, 10, 0) 100%);
+  padding: 22px 28px 26px;
 }
 .ah-cover-body h2 {
   max-width: 24ch;
-  font: 700 clamp(22px, 2.3vw, 34px) / 1.15 'Sora', sans-serif;
+  font: 700 clamp(22px, 2vw, 30px) / 1.15 'Sora', sans-serif;
   letter-spacing: -0.02em;
   text-wrap: balance;
   color: #fff;
 }
-.ah-cover:hover h2 { text-decoration: underline; text-decoration-color: rgba(224, 96, 95, 0.75); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.ah-cover h2, .ah-cover:hover h2 { text-decoration: none; }
 .ah-cover-dek { font: 400 16px/1.45 'Sora', sans-serif; color: #c8cbcd; }
 .ah-cover .art-row-meta { color: #949ba4; }
 .ah-cover:focus-visible { outline: 2px solid #c23b3b; outline-offset: 4px; }
@@ -341,7 +338,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-also-media {
   display: block;
   aspect-ratio: 16 / 9;
-  border-radius: 9px;
+  border-radius: 0;
   overflow: hidden;
   background: #0c0d0f;
 }
@@ -361,7 +358,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-also a:hover .ah-also-title { color: #fff; }
 .ah-also .art-row-meta { margin: 0; }
 .ah-also .art-tag { font: 800 10px/1 'Oxanium', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
-.ah-also a:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; border-radius: 10px; }
+.ah-also a:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; border-radius: 0; }
 
 /* Grid header: heading + a hairline to the edge; under it the game chips
    (left) and the search (right), Adrian's pick. */
@@ -389,11 +386,8 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 }
 @media (max-width: 970px) {
   .ah-lead { grid-template-columns: minmax(0, 1fr); gap: 26px; margin-bottom: 48px; }
-  /* Phones: picture on top, text under it (an overlay would cover most of
-     a 16:9 picture this narrow). */
-  .ah-cover { aspect-ratio: auto; border-radius: 14px; background: #141519; }
-  .ah-cover-media { position: relative; aspect-ratio: 16 / 9; }
-  .ah-cover-body { position: static; padding: 18px 18px 20px; background: none; gap: 8px; }
+  .ah-cover { border-radius: 0; }
+  .ah-cover-body { padding: 18px 18px 20px; gap: 8px; }
   .ah-cover-body h2 { font-size: 22px; }
   .ah-cover-dek { font-size: 15px; }
   .ah-also a { grid-template-columns: 116px minmax(0, 1fr); gap: 14px; padding: 14px 0; }
@@ -524,8 +518,8 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   color: #8b9097;
 }
 .ap-latest-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 20px; margin-top: 18px; }
-.ap-latest-list a { display: flex; flex-direction: column; text-decoration: none; border-radius: 12px; }
-.ap-latest-list img { border-radius: 12px; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.ap-latest-list a { display: flex; flex-direction: column; text-decoration: none; border-radius: 0; }
+.ap-latest-list img { border-radius: 0; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .ap-latest-list h3 { margin-top: 12px; font: 650 15px/1.4 'Sora', sans-serif; }
 .ap-latest-meta { margin-top: 6px; font: 500 12px/1.3 'Sora', sans-serif; color: #7a7f87; }
 .ap-latest-list a:hover img { transform: translateY(-3px); }
@@ -579,7 +573,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   height: auto; /* the width/height attributes would otherwise win over aspect-ratio */
   aspect-ratio: 21 / 9;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 0;
   background: #0c0d0f;
 }
 .ap-tag {
@@ -588,7 +582,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   bottom: 0;
   transform: translate(-50%, 50%);
   padding: 7px 12px;
-  border-radius: 3px;
+  border-radius: 0;
   background: #fff;
   color: #111214;
   font: 800 12px/1 'Oxanium', sans-serif;
@@ -612,7 +606,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-avatar {
   width: 96px;
   height: 96px;
-  border-radius: 18px;
+  border-radius: 0;
   object-fit: cover;
   box-shadow: 0 0 0 2px #141517, 0 0 0 3px rgba(255, 255, 255, 0.14), 0 10px 24px -10px rgba(0, 0, 0, 0.8);
 }
@@ -665,6 +659,10 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   text-underline-offset: 3px;
 }
 .ap-body a:hover { text-decoration-color: #e0605f; }
+/* Related-article cards are whole-card links, so keep their text clean. */
+.ap-body a.art-next-card,
+.ap-body a.art-next-card:hover,
+.ap-body a.art-next-card:focus-visible { text-decoration: none; }
 .ap-body ul, .ap-body ol { padding-left: 22px; }
 .ap-body li + li { margin-top: 8px; }
 .ap-body li::marker { color: #e0605f; }
@@ -673,11 +671,12 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 /* Real screenshots show whole at their own shape (no crop: a 16:9 frame
    cut off the League Shop prices); width/height attributes keep the space
    reserved while they load. */
-.ap-fig img {
+.ap-fig img,
+.ap-fig video {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 12px;
+  border-radius: 0;
   background: #0c0d0f;
 }
 /* Caption: one line saying what the photo shows (every body photo has one). */
@@ -690,7 +689,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 }
 
 /* Tables: scroll sideways on phones instead of squashing. */
-.ap-table { overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+.ap-table { overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 0; }
 .ap-table table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .ap-table th, .ap-table td { padding: 12px 16px; text-align: left; vertical-align: top; line-height: 1.5; }
 .ap-table th {
@@ -707,7 +706,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 /* Callout ("Key point") */
 .ap-note {
   padding: 18px 20px;
-  border-radius: 12px;
+  border-radius: 0;
   background: #1b1c20;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -726,7 +725,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-summary {
   scroll-margin-top: 96px;
   padding: 20px 22px;
-  border-radius: 14px;
+  border-radius: 0;
   border: 1px solid rgba(194, 59, 59, 0.35);
   background: linear-gradient(180deg, rgba(194, 59, 59, 0.1), rgba(194, 59, 59, 0.03)), #18191c;
 }
@@ -748,7 +747,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   align-items: center;
   gap: 6px;
   padding: 1px 8px 1px 3px;
-  border-radius: 7px;
+  border-radius: 0;
   background: rgba(194, 59, 59, 0.12);
   text-decoration: none;
   white-space: nowrap;
@@ -771,7 +770,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   flex-direction: column;
   gap: 4px;
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: #1a1b1f;
   color: #fff;
@@ -798,7 +797,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
     position: static;
     margin: 24px 0 8px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    border-radius: 0;
     background: #1a1b1f;
   }
   .ap-toc summary {
@@ -823,7 +822,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   .ap-panel > details { padding: 0; }
   .ap-latest-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
   .ap-latest-list h3 { font-size: 14px; -webkit-line-clamp: 3; }
-  .ap-latest-list img { border-radius: 10px; }
+  .ap-latest-list img { border-radius: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ap-more-list a, .ap-latest-list img, .ap-panel > details > summary::after { transition: none; }
@@ -849,7 +848,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 
 /* A building's looks side by side (level forms, melt stages). */
 .ap-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
-.ap-forms > div { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px 12px; border-radius: 12px; background: #16171b; }
+.ap-forms > div { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px 12px; border-radius: 0; background: #16171b; }
 .ap-forms img { width: 100%; max-width: 120px; height: 110px; object-fit: contain; }
 .ap-forms span { font-size: 12.5px; color: #8b9097; text-align: center; }
 /* Always three across, phones included (the 6th Builder gear ups). */
@@ -862,8 +861,8 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 
 /* Game-icon chips (unit library pictures next to the text that names them). */
 .ap-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.ap-chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 999px; background: #16171b; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 14px; font-weight: 600; color: #e6e8eb; }
-.ap-chip img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.ap-chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 0; background: #16171b; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 14px; font-weight: 600; color: #e6e8eb; }
+.ap-chip img { width: 36px; height: 36px; border-radius: 0; object-fit: cover; }
 .ap-pet-ranking { margin: 0; padding-left: 22px; color: #d5d7dc; font-size: 14px; line-height: 1.55; }
 .ap-pet-ranking li::marker { color: #e0605f; font-weight: 800; }
 
@@ -881,7 +880,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   width: 34px;
   height: 34px;
   border: 1px solid rgba(var(--t), 0.4);
-  border-radius: 9px;
+  border-radius: 0;
   background: radial-gradient(circle at 50% 30%, rgba(var(--t), 0.3), rgba(var(--t), 0.05) 72%), #17181c;
   color: rgb(var(--t));
   font: 900 15px/1 'Orbitron', sans-serif;
@@ -892,7 +891,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-tier-c { --t: 120, 194, 92; }
 .ap-tier-d { --t: 64, 184, 140; }
 .ap-tiers td:first-child { width: 1%; }
-.ap-def img.ap-eq-common, .ap-def img.ap-eq-epic { padding: 3px; border-radius: 8px; }
+.ap-def img.ap-eq-common, .ap-def img.ap-eq-epic { padding: 3px; border-radius: 0; }
 img.ap-eq-common { background: radial-gradient(120% 90% at 50% 0%, #2f5c9c 0%, #1b3560 60%, #142645 100%); }
 img.ap-eq-epic { background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f2068 60%, #2c1649 100%); }
 .ap-chip img.ap-eq-common, .ap-chip img.ap-eq-epic { padding: 3px; object-fit: contain; }
@@ -932,7 +931,7 @@ img.ap-eq-epic { background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f
   margin-top: 10px;
   padding: 11px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.04);
   color: #fff;
   font: inherit;
@@ -943,3 +942,101 @@ img.ap-eq-epic { background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f
 }
 .ap-rows-more:hover { background: rgba(194, 59, 59, 0.18); border-color: rgba(194, 59, 59, 0.55); }
 .ap-rows-more:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
+
+/* Army cards in articles (farming): the army page's card -- name row +
+   army sheet (army-sheet.css / .js) -- with Copy Army and a link to the
+   TH armies page. Key face = the army page's buttons (th-layouts.css). */
+.ap-army {
+  --key-face: linear-gradient(180deg, #26282e, #1b1c21);
+  --key-face-hover: linear-gradient(180deg, #31343b, #24262b);
+  --key-soft: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 10px -4px rgba(0, 0, 0, 0.45);
+  --key-soft-pressed: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+  padding: 12px 12px 14px;
+  border-radius: 0;
+  background: #121316;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.ap-army-sheet:empty { min-height: 190px; }
+.ap-army-bar { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+/* Article armies come without clan castle troops: drop the empty row. */
+.ap-army .as-cc { display: none; }
+/* ...and Siege takes its place as its own row (Spells above it), so the units
+   column keeps the army page's height and the hero portraits aren't squashed. */
+.ap-army .as-pair { flex-direction: column; }
+.ap-body .ap-army-bar a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 22px;
+  border-radius: 0;
+  background: var(--key-face);
+  box-shadow: var(--key-soft);
+  font: 700 12px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ap-body .ap-army-bar .ap-army-copy { min-width: 170px; color: #c9ccd2; }
+.ap-body .ap-army-bar .ap-army-more { color: #8b9099; }
+.ap-body .ap-army-bar a:hover { background: var(--key-face-hover); color: #fff; }
+.ap-body .ap-army-bar a:active { transform: translateY(1px); box-shadow: var(--key-soft-pressed); }
+@media (max-width: 640px) {
+  /* Phones: both buttons share one row, half each. */
+  .ap-body .ap-army-bar a { flex: 1 1 0; min-width: 0; padding: 0 10px; }
+  .ap-body .ap-army-bar .ap-army-copy { min-width: 0; }
+}
+
+/* ---- Chart blocks (clan-games, Oct 2026) -----------------------------------
+   Infographics built in HTML instead of images: .ap-viz is the card,
+   .ap-bars a "per attack" bar chart, .ap-meter a 0–100% bar with a marker,
+   .ap-steps numbered priority cards. Bar widths are set inline (true scale). */
+.ap-viz { padding: 26px 24px 24px; border-radius: 0; background: #141417; border: 1px solid rgba(255, 255, 255, 0.07); }
+.ap-viz-title { font: 800 26px/1.15 'Oxanium', sans-serif; color: #fff; }
+.ap-viz-title em { font-style: normal; color: #e0605f; }
+.ap-viz-sub { margin-top: 6px; font-size: 14px; color: #8b9097; }
+
+.ap-bars { margin-top: 22px; display: grid; gap: 20px; }
+.ap-bar-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.ap-bar-head b { font: 700 19px/1 'Oxanium', sans-serif; color: #fff; display: inline-flex; align-items: center; gap: 4px; }
+.ap-bar-head b img { width: 20px; height: auto; }
+.ap-pips { display: flex; gap: 4px; }
+.ap-pips img { width: 24px; height: 24px; padding: 2px; border-radius: 0; background: #26262c; border: 1px solid #36363e; }
+.ap-verdict { margin-left: auto; font: 800 15px/1 'Oxanium', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #7d7d86; }
+.ap-bar-good .ap-verdict { color: #e0605f; }
+.ap-bar-track { position: relative; height: 44px; border-radius: 0; background: #1d1d22; }
+.ap-bar-fill { height: 100%; border-radius: 0; background: #3a3a42; color: #d5d7dc; display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; font: 700 15px/1 'Oxanium', sans-serif; white-space: nowrap; }
+.ap-bar-good .ap-bar-fill { background: #c23b3b; color: #fff; }
+.ap-bar-track::after { content: ''; position: absolute; left: var(--mark); top: -5px; bottom: -5px; border-left: 2px dashed #f2c14e; }
+.ap-bars-key { font-size: 13px; font-weight: 600; color: #f2c14e; }
+
+.ap-meter { margin-top: 64px; position: relative; }
+.ap-meter-track { display: flex; height: 50px; border-radius: 0; overflow: hidden; }
+.ap-meter-track span { flex: 1; display: flex; align-items: center; padding: 0 14px; font: 700 15px/1.1 'Oxanium', sans-serif; }
+.ap-meter-done { background: #c23b3b; color: #fff; }
+.ap-meter-rest { justify-content: center; color: #7d7d86; background: repeating-linear-gradient(135deg, #1c1c20 0 10px, #232328 10px 20px); }
+.ap-meter-flag { position: absolute; left: 50%; bottom: calc(100% + 12px); transform: translateX(-50%); padding: 7px 12px; border-radius: 0; background: #f2c14e; color: #111113; font: 800 14px/1 'Oxanium', sans-serif; white-space: nowrap; }
+.ap-meter::before { content: ''; position: absolute; left: 50%; top: -12px; bottom: -8px; border-left: 3px solid #f2c14e; }
+.ap-meter-ticks { display: flex; justify-content: space-between; margin-top: 8px; font: 600 13px/1 'Oxanium', sans-serif; color: #7d7d86; }
+.ap-meter-or { margin-top: 18px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #c9c9d0; }
+.ap-meter-or img { width: 44px; height: 44px; object-fit: contain; }
+.ap-meter-or strong { color: #fff; }
+
+.ap-steps { margin-top: 30px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 12px; padding: 0; list-style: none; }
+.ap-body .ap-steps { padding: 0; }
+.ap-body .ap-steps li + li { margin-top: 0; }
+.ap-steps li { position: relative; padding: 24px 10px 16px; border-radius: 0; background: #1c1c20; text-align: center; }
+.ap-steps li::before { counter-increment: apstep; content: counter(apstep); position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 0; background: #c23b3b; display: grid; place-items: center; font: 800 14px/1 'Oxanium', sans-serif; color: #fff; }
+.ap-steps { counter-reset: apstep; }
+.ap-steps-pics { height: 52px; display: flex; justify-content: center; align-items: center; gap: 4px; }
+.ap-steps-pics img { height: 48px; width: auto; }
+.ap-steps b { display: block; margin-top: 10px; font: 700 15px/1.2 'Oxanium', sans-serif; color: #fff; }
+.ap-steps span { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.4; color: #8b9097; }
+.ap-steps .ap-steps-last { opacity: 0.6; }
+@media (max-width: 640px) {
+  .ap-viz { padding: 20px 16px 18px; }
+  .ap-viz-title { font-size: 21px; }
+  .ap-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

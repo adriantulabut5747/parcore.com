@@ -29,8 +29,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261010a">
-<link rel="stylesheet" href="/mc-java.css">
+<link rel="stylesheet" href="/11layout.css?v=20261012cr">
+<link rel="stylesheet" href="/mc-java.css?v=20261012cr">
+<link rel="stylesheet" href="/article-cards.css?v=20261012sq">
+<link rel="stylesheet" href="/mc-home.css?v=20261014nd">
 
 
 </head>
@@ -129,440 +131,158 @@
          swaps per edition (Bedrock / Story / Dungeons logos are already in
          minecrafticons/); the live version pills keep the original hvs-* ids so
          the Mojang piston-meta fetch in mc-java.js drives them unchanged. -->
-    <div class="hero-section hero-v2">
-      <img class="hero-video" src="/minecrafticons/minecarftearth.jpg" alt="" fetchpriority="high" decoding="async">
-      <div class="hero-overlay">
-        <div class="hero-content">
-          <div class="hero-eyebrow"><span class="hero-eyebrow-lead">Play more</span><span class="hero-eyebrow-sep">&middot;</span><span class="hero-eyebrow-em">Search less</span></div>
-          <h1 class="hero-title"><img src="/minecrafticons/Minecraft-Vanilla-Logo-removebg-preview.png" class="hero-minecraft" alt="Minecraft"></h1>
-          <p class="hero-tagline">Everything for Minecraft Java, in one place. Seeds, packs, shaders, mods and tools — every one tried before it got listed.</p>
-          <div class="hero-live" id="hero-version-strip">
-            <span class="hero-live-item">
-              <span class="hero-live-dot"></span>
-              <span class="hero-live-label">Release</span>
-              <span class="hero-live-version" id="hvs-release-version">—</span>
-              <span class="hero-live-updated" id="hvs-release-updated">loading…</span>
-            </span>
-            <span class="hero-live-item">
-              <span class="hero-live-dot"></span>
-              <span class="hero-live-label">Snapshot</span>
-              <span class="hero-live-version" id="hvs-snapshot-version">—</span>
-              <span class="hero-live-updated" id="hvs-snapshot-updated">loading…</span>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
     <div class="coc-content">
-      <div class="top-vignette"></div>
-
-      <!-- MOBILE NAV -->
-      <div class="mc-mobile-nav">
-        <div class="mc-mobile-nav-header">
-          <div class="mc-mobile-nav-line"></div>
-          <div class="mc-mobile-nav-title">Discover Categories</div>
-          <div class="mc-mobile-nav-line"></div>
+      <!-- MINECRAFT JAVA HOME v2 (Oct 12 2026): centered frame, bone bands,
+           podium, command terminal, server standings. Styles: mc-home.css,
+           behaviour (copy, tabs, block reveals): mc-home.js. mc-java.js still
+           fills the nav strip (.mc-mobile-nav), the hvs-* versions,
+           #vt-sb-latest and #server-row: keep those ids. -->
+      <div class="mch">
+      <!-- Banner (Oct 12): the page header over the forest shot, with the live
+           Java versions (hvs-* ids, filled by mc-java.js). Parcorp Village,
+           the old featured banner, is #2 in Top 10 Worlds. -->
+      <header class="mch-hero mch-hero--page">
+        <!-- Background clip: Pinterest pin 605452743702191634 (736x414, its largest size). Muted, looped; the JPG is its first frame and the reduced-motion fallback. --><video class="mch-hero-bg" src="/minecrafticons/mc-java-banner.mp4" poster="/minecrafticons/mc-java-banner.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+        <div class="mch-frame mch-hero-inner">
+          <div class="mch-hero-main">
+            <h1 class="mch-hero-title">Minecraft<span>Discover.</span></h1>
+            <p class="mch-hero-copy">Worlds, packs, shaders, commands and tools for Java Edition, each one tried before it got listed.</p>
+            <div class="mch-hero-foot">
+              <a class="mch-hero-cta" href="/minecraft/java/worlds">Browse worlds<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <dl class="mch-hero-stats mch-hero-ver" id="hero-version-strip" aria-label="Current Java versions">
+                <div><dt>Release</dt><dd id="hvs-release-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-release-updated"></dd></div>
+                <div><dt>Snapshot</dt><dd id="hvs-snapshot-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-snapshot-updated"></dd></div>
+              </dl>
+            </div>
+          </div>
+          <!-- From Mojang: the three newest Java posts (data-count) (#vt-sb-latest, filled by
+               mc-java.js); "All updates" opens the full feed (#vtModal). -->
+          <aside class="mch-hero-news" aria-labelledby="mc-wire-t">
+            <div class="mch-hero-news-head"><h2 id="mc-wire-t"><i class="mch-live" aria-hidden="true"></i>From Mojang</h2><button type="button" class="mch-more" onclick="openVtFeed()">All updates<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+            <div class="vt-sb-latest mch-wire-list" id="vt-sb-latest" data-count="5"><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div></div>
+          </aside>
         </div>
-        <!-- items rendered from mc-contents.json -->
+      </header>
+
+
+      <!-- Java chapters share a subtle background treatment; section titles carry the headings. -->
+      <div class="mch-ch mch-ch--surface" id="ch-guides" role="region" aria-label="Guides">
+        <div class="mch-frame">
+          <nav class="mc-mobile-nav mch-nav" aria-label="Java sections"><div class="mc-mobile-nav-header"></div></nav><hr class="mch-nav-rule">
+
+        </div>
+        <!-- JAVA GUIDES: Minecraft articles from /articles.json. -->
+        <section class="as-band mch-art" id="mc-articles" aria-labelledby="asTitle">
+          <div class="lob-head lob-head--row">
+            <h3 class="lob-title" id="asTitle">Popular <em>articles.</em></h3>
+            <a class="lob-go" href="/articles/">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+          <div class="art-track" id="mcArticles" data-game="minecraft" data-variant="slide"></div>
+          <div class="art-pager">
+            <div class="art-progress" data-for="mcArticles" aria-hidden="true"><span></span></div>
+            <div class="art-nav" data-for="mcArticles">
+              <button type="button" aria-label="Previous article">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+              </button>
+              <button type="button" aria-label="Next article">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
-      <div class="mc-dirt-fade"></div>
 
-      <!-- WRAPPER -->
-      <div class="mc-content-wrapper">
-        <!-- LEFT: all sections -->
-        <div class="mc-col" style="flex:1; min-width:0; padding-bottom:100px;">
+      <!-- Play sits on a lighter ground with a rule on top: the break after the guides. -->
+      <div class="mch-ch mch-ch--play" id="ch-play" role="region" aria-label="Play">
+        <div class="mch-frame">
+        <section class="mch-sec" id="mc-worlds" aria-labelledby="mc-worlds-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-worlds-t">Popular <em>worlds.</em></h3><p class="mch-sec-sub">Maps ready for your saves folder.</p></div><div class="mch-sec-act"><a class="mch-more" href="/minecraft/java/worlds">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header>
+          <div class="mch-podium"><a class="mch-pod is-first" href="https://hielkemaps.com/maps/parkour-spiral" target="_blank" rel="noopener"><div class="mch-pod-media mch-reveal"><img src="https://hielkemaps.com/media/maps/parkour-spiral/thumbnail.jpg" alt="" loading="lazy" decoding="async"></div><div class="mch-pod-body"><span class="mch-rank" aria-label="Rank 1">01</span><div class="mch-pod-text"><h3 class="mch-pod-name">Parkour Spiral</h3><p class="mch-pod-desc">The ultimate spiral parkour challenge</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=hielkemaps.com&sz=64" alt="" loading="lazy"><b>Hielkemaps</b></span></div></div></a><a class="mch-pod is-side" href="/minecraft/java/worlds"><div class="mch-pod-media mch-reveal"><img src="/minecrafticons/hardcoreparcore-compresso.jpg" alt="" loading="lazy" decoding="async"></div><div class="mch-pod-body"><span class="mch-rank" aria-label="Rank 2">02</span><div class="mch-pod-text"><h3 class="mch-pod-name">Parcorp Village</h3><p class="mch-pod-desc">3000 Days Hardcore World by ACP</p><span class="mch-src"><img src="/icons/home.jpg" alt="" loading="lazy"><b>Parcore</b></span></div></div></a><a class="mch-pod is-side" href="https://hermitcraft.com/" target="_blank" rel="noopener"><div class="mch-pod-media mch-reveal"><img src="/minecrafticons/hermitcraft-compresso.jpg" alt="" loading="lazy" decoding="async"></div><div class="mch-pod-body"><span class="mch-rank" aria-label="Rank 3">03</span><div class="mch-pod-text"><h3 class="mch-pod-name">Hermitcraft</h3><p class="mch-pod-desc">A server full of massive creations</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=hermitcraft.com&sz=64" alt="" loading="lazy"><b>Hermitcraft</b></span></div></div></a></div><ol class="mch-list" start="4"><li><a class="mch-lr" href="https://www.curseforge.com/minecraft/worlds/oneblock" target="_blank" rel="noopener"><span class="mch-lr-rank">04</span><img class="mch-lr-img" src="/minecrafticons/oneblockskyblock.jpg" alt="" loading="lazy" decoding="async"><span class="mch-lr-text"><span class="mch-lr-name">One Block Skyblock</span><span class="mch-lr-desc">Start with one block (Tiny Takeover)</span></span><span class="mch-lr-src">CurseForge</span><span class="mch-lr-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a></li><li><a class="mch-lr" href="https://www.planetminecraft.com/project/mosslorn-1000x1000-custom-abandoned-city-map-with-loot-lore-and-hundreds-of-secrets-to-find/" target="_blank" rel="noopener"><span class="mch-lr-rank">05</span><img class="mch-lr-img" src="/minecrafticons/mosslorn-compresso.webp" alt="" loading="lazy" decoding="async"><span class="mch-lr-text"><span class="mch-lr-name">[Mosslorn] Overgrown City</span><span class="mch-lr-desc">Explore a ruined city full of secrets</span></span><span class="mch-lr-src">PMC</span><span class="mch-lr-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a></li><li><a class="mch-lr" href="https://www.planetminecraft.com/project/gotham-city-by-flowzzy/" target="_blank" rel="noopener"><span class="mch-lr-rank">06</span><img class="mch-lr-img" src="/minecrafticons/gothamcity.webp" alt="" loading="lazy" decoding="async"><span class="mch-lr-text"><span class="mch-lr-name">Gotham City</span><span class="mch-lr-desc">Gotham City inspired by Arkham games</span></span><span class="mch-lr-src">PMC</span><span class="mch-lr-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a></li><li><a class="mch-lr" href="https://www.mediafire.com/file/5uik0uao8c69t8a/Korea+University+Campus+in+Seoul,+South+Korea.rar/file" target="_blank" rel="noopener"><span class="mch-lr-rank">07</span><img class="mch-lr-img" src="/minecrafticons/koreaimage.webp" alt="" loading="lazy" decoding="async"><span class="mch-lr-text"><span class="mch-lr-name">Korea University Campus</span><span class="mch-lr-desc">Explore a detailed campus built among rolling hills</span></span><span class="mch-lr-src">MediaFire</span><span class="mch-lr-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a></li><li><a class="mch-lr" href="https://www.planetminecraft.com/project/atheria-v2-0/" target="_blank" rel="noopener"><span class="mch-lr-rank">08</span><img class="mch-lr-img" src="/minecrafticons/atheria.jpg" alt="" loading="lazy" decoding="async"><span class="mch-lr-text"><span class="mch-lr-name">Atheria (v2.06)</span><span class="mch-lr-desc">Explore a growing city full of landmarks</span></span><span class="mch-lr-src">PMC</span><span class="mch-lr-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a></li><li><a class="mch-lr" href="https://www.planetminecraft.com/project/stonehill-castle-4407920/" target="_blank" rel="noopener"><span class="mch-lr-rank">09</span><img class="mch-lr-img" src="/minecrafticons/stonehill.jpg" alt="" loading="lazy" decoding="async"><span class="mch-lr-text"><span class="mch-lr-name">Stonehill Castle</span><span class="mch-lr-desc">A royal fortress full of secrets</span></span><span class="mch-lr-src">PMC</span><span class="mch-lr-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a></li></ol>
+        </section>
 
-          <!-- MAPS -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Top 10 Worlds (maps)</div>
-              </div>
-              <div class="cf-section-subtitle-row">
-                <div class="cf-section-subtitle">Maps ready for your saves folder.</div>
-                <div class="cf-section-header-right">
-                  <a href="/minecraft/java/worlds" class="cf-view-all">View more</a>
-                  <button class="cf-arrow" onclick="scrollRow('maps-row', -1)">‹</button>
-                  <button class="cf-arrow" onclick="scrollRow('maps-row', 1)">›</button>
-                </div>
-              </div>
-            </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="maps-row">
-                <a class="cf-card" href="https://hielkemaps.com/maps/parkour-spiral" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://hielkemaps.com/media/maps/parkour-spiral/thumbnail.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Parkour Spiral</div><div class="cf-card-author">The ultimate spiral parkour challenge</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="/minecraft/java/worlds" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="/minecrafticons/hardcoreparcore-compresso.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Parcorp Village</div><div class="cf-card-author">3000 Days Hardcore World by ACP</div><div class="cf-card-meta"><img src="/icons/home.jpg" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Parcore</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/worlds/oneblock" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="/minecrafticons/oneblockskyblock.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">One Block Skyblock</div><div class="cf-card-author">Start with one block (Tiny Takeover)</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=hielkemaps.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Hielkemaps</span></div></div></a>
-                <a class="cf-card" href="https://hermitcraft.com/" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="/minecrafticons/hermitcraft-compresso.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Hermitcraft</div><div class="cf-card-author">A server full of massive creations</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=hermitcraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Hermitcraft</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/mosslorn-1000x1000-custom-abandoned-city-map-with-loot-lore-and-hundreds-of-secrets-to-find/" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="/minecrafticons/mosslorn-compresso.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">[Mosslorn] Overgrown City</div><div class="cf-card-author">Explore a ruined city full of secrets</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/gotham-city-by-flowzzy/" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="/minecrafticons/gothamcity.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Gotham City</div><div class="cf-card-author">Gotham City inspired by Arkham games</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.mediafire.com/file/5uik0uao8c69t8a/Korea+University+Campus+in+Seoul,+South+Korea.rar/file" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="/minecrafticons/koreaimage.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Korea University Campus</div><div class="cf-card-author">Explore a detailed campus built among rolling hills</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=mediafire.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Media Fire</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/atheria-v2-0/" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="/minecrafticons/atheria.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Atheria (v2.06)</div><div class="cf-card-author">Explore a growing city full of landmarks</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/stonehill-castle-4407920/" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="/minecrafticons/stonehill.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Stonehill Castle</div><div class="cf-card-author">A royal fortress full of secrets</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/project/zaxestas/" target="_blank"><span class="cf-card-rank top3">#10</span><img class="cf-card-img" src="/minecrafticons/zaxestas1.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Zaxestas</div><div class="cf-card-author">Advanced Survival Map with enhanced terrain</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-              </div>
-            </div>
-          </div>
+        </div>
+      </div>
 
-          <!-- COMMANDS -->
-          <div class="cf-section-header">
-            <div class="cf-section-title-row">
-            <div class="cf-section-title">most copied Commands</div>
-            </div>
-            <div class="cf-section-subtitle-row">
-              <div class="cf-section-subtitle">Gear, mob and world commands.</div>
-              <div class="cf-section-header-right"><a href="/minecraft/java/commands" class="cf-view-all">View more</a></div>
-            </div>
-          </div>
-          
-          <div class="cmd-grid">
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="/minecrafticons/netheritesword.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">One Shot Anything</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Super Pickaxe" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd='give @a netherite_pickaxe[custom_name=["",{"text":"God Pickaxe","bold":true,"color":"yellow"}],lore=[[{"text":"insta mine unli range","color":"yellow"}]],enchantments={efficiency:3,silk_touch:1,unbreaking:4},attribute_modifiers=[{type:block_break_speed,amount:1024,operation:add_value,id:"1778783273551"},{type:attack_speed,amount:1024,operation:add_value,id:"1778783273552"},{type:mining_efficiency,amount:1024,operation:add_value,id:"1778783273553"},{type:block_interaction_range,amount:64,operation:add_value,id:"1778783273554"},{type:submerged_mining_speed,amount:9,operation:add_value,id:"1778783273555"}]]'><img class="cmd-icon" src="/minecrafticons/netheritepickaxe.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">Super Pickaxe</div><div class="cmd-sub">Insta Mine • Long Range</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Super Fast Horse" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd='give @a stick[custom_name=["",{"text":"KNOCKBACK STICK","bold":true,"color":"dark_purple"}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:"1778780766940"}]]'><img class="cmd-icon" src="/minecrafticons/saddle.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Horse</div><div class="cmd-sub">Summons Super Fast Horse</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Knockback Stick" data-sub="Sting like a bee" data-cmd='give @a stick[custom_name=["",{"text":"KNOCKBACK STICK","bold":true,"color":"dark_purple"}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:"1778780766940"}]]'><img class="cmd-icon" src="/minecrafticons/enchanted stick.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">Knockback Stick</div><div class="cmd-sub">Enemies Go Weeeeee</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="Immortal Wolf" data-sub="Makes your wolf invincible" data-cmd="/effect give @e[type=wolf,sort=nearest,limit=1] resistance 999999 255 true"><img class="cmd-icon" src="/minecrafticons/babywolf.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">Immortal Wolf</div><div class="cmd-sub">Unkillable Doggo</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="/icons/placeholder.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="/icons/placeholder.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-            <div class="cmd-box" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1"><img class="cmd-icon" src="/icons/placeholder.png" alt="" loading="lazy" decoding="async"><div class="cmd-info"><div class="cmd-name">God Sword</div><div class="cmd-sub">1000 Sharpness blade</div></div><div class="cmd-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
-          </div>
+      <div class="mch-ch mch-ch--stone" id="ch-customize" role="region" aria-label="Customize">
+        <div class="mch-frame">
 
-          <!-- MINECRAFT SERVERS -->
-          <div class="cf-section-header">
-            <div class="cf-section-title-row">
-            <div class="cf-section-title">Top servers</div>
-            </div>
-            <div class="cf-section-subtitle-row">
-              <div class="cf-section-subtitle">Live player counts for public servers.</div>
-              <div class="cf-section-header-right">
-                <a href="#" class="cf-view-all">View more</a>
-                <button class="cf-arrow" onclick="scrollRow('server-row', -1)">‹</button>
-                <button class="cf-arrow" onclick="scrollRow('server-row', 1)">›</button>
-              </div>
-            </div>
-          </div>
+        <!-- Packs and shaders (Oct 13): two rows that scroll sideways at every width
+             (.mch-mods--row); the arrows are article-cards.js's .art-nav. Shaders 07-10
+             come from mc-shaders.json, in that file's order. -->
+        <section class="mch-sec" id="mc-mods" aria-labelledby="mc-mods-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-mods-t">Popular <em>R-Packs.</em></h3><p class="mch-sec-sub">Textures and models that change how blocks, mobs and items look.</p></div><div class="mch-sec-act"><div class="art-nav mch-row-nav" data-for="mcPacksRow"><button type="button" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button type="button" aria-label="Scroll on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><a class="mch-more" href="/minecraft/java/resource-packs">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header>
+          <div class="mch-mods mch-mods--row" id="mcPacksRow"><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/fresh-animations" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1402/911/256/256/638909354589974674.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">01</span></div><h3 class="mch-mod-name">Fresh Animations</h3><p class="mch-mod-desc">Make your game like the trailers!</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://vanillatweaks.net/picker/resource-packs/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/vanillatweaks.jpg" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">02</span></div><h3 class="mch-mod-name">Vanilla Tweaks</h3><p class="mch-mod-desc">Pick-and-mix resource and data packs</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" alt="" loading="lazy"><b>Vanilla Tweaks</b></span></a><a class="mch-mod" href="https://modrinth.com/resourcepack/better-leaves" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/uvpymuxq/fe1a61998ae57dc6ad1a4bb028334c3c3925d22f_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">03</span></div><h3 class="mch-mod-name">Motschen's Better Leaves</h3><p class="mch-mod-desc">Better Leaves adds additional layers</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/resourcepack/x-ray" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/u6RWzf7M/4ae5ff97cec3ed2c62f07ce0a4984b7fbc78c2d9_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">04</span></div><h3 class="mch-mod-name">X Ray | Spectator</h3><p class="mch-mod-desc">Best X ray texture Pack For Minecraft</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/fresh-moves" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/985/357/256/256/638494820573552980.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">05</span></div><h3 class="mch-mod-name">Fresh Moves</h3><p class="mch-mod-desc">Gives fancy animations to the player entity.</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.planetminecraft.com/texture-pack/modernarch-realism-1-13-1-14-512x512/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/compressed-modernarch.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">06</span></div><h3 class="mch-mod-name">ModernArch</h3><p class="mch-mod-desc">Contains 3D models, 1024x resolution</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="" loading="lazy"><b>PMC</b></span></a><a class="mch-mod" href="https://www.planetminecraft.com/texture-pack/rename-items/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/renameitems.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">07</span></div><h3 class="mch-mod-name">Rename Items</h3><p class="mch-mod-desc">Unlock custom textures by renaming items</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="" loading="lazy"><b>PMC</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/stay-true" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/274/491/256/256/637258639542653246.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">08</span></div><h3 class="mch-mod-name">Stay True</h3><p class="mch-mod-desc">Upgraded foliage, leaves and plants.</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.planetminecraft.com/texture-pack/redstone-tweaks/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/redstonetweaks.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">09</span></div><h3 class="mch-mod-name">Redstone Tweaks</h3><p class="mch-mod-desc">Visual upgrades for redstone builds</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="" loading="lazy"><b>PMC</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/low-on-fire" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/494/548/64/64/637806308919001110.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">10</span></div><h3 class="mch-mod-name">Low on Fire</h3><p class="mch-mod-desc">Low fire on your screen! Vanilla Friendly</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a></div>
+        </section>
 
-          <div class="cf-scroll-wrapper">
-            <div class="cf-row" id="server-row">
-              <!-- server cards are injected here by JS, ranked by live player count -->
-              <div class="server-card server-card-loading"><div class="server-spinner"></div><span>Loading live server stats…</span></div>
-            </div>
-          </div>
+        <section class="mch-sec" id="mc-shaders" aria-labelledby="mc-shaders-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-shaders-t">Popular <em>shaders.</em></h3><p class="mch-sec-sub">Lighting, shadows and skies, from light ones to heavy ones.</p></div><div class="mch-sec-act"><div class="art-nav mch-row-nav" data-for="mcShadersRow"><button type="button" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button type="button" aria-label="Scroll on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><a class="mch-more" href="/minecraft/java/shaders">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header>
+          <div class="mch-mods mch-mods--row" id="mcShadersRow"><a class="mch-mod" href="https://modrinth.com/shader/bsl-shaders" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/Q1vvjJYV/2a611a3cb434fb52fb81fa5dace13c5d8b67e55d_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">01</span></div><h3 class="mch-mod-name">BSL Shaders</h3><p class="mch-mod-desc">Real-time lighting and stunning sky effects</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://minecraftshader.com/sildurs-vibrant-shaders/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://minecraftshader.com/wp-content/uploads/2021/11/sildurs-vibrant-shaders.jpg.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">02</span></div><h3 class="mch-mod-name">Sildurs Vibrant Shaders</h3><p class="mch-mod-desc">Improved visuals with dynamic shadows</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=minecraftshader.com&sz=64" alt="" loading="lazy"><b>MC Shaders</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/complementary-reimagined" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">03</span></div><h3 class="mch-mod-name">Complementary Shaders</h3><p class="mch-mod-desc">Preserving the elements of Minecraft</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/nostalgia-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/xEItlMn3/49ba53348dd4902ad2a3ae49cc643550ead201bc.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">04</span></div><h3 class="mch-mod-name">Nostalgia Shaders</h3><p class="mch-mod-desc">Classic shaders with a modern visual style</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/mellow" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/BUxf36AP/b2cc2e9b97e5e0c4c7fcd89b7e295f29a29b9c6d_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">05</span></div><h3 class="mch-mod-name">Mellow Shaders</h3><p class="mch-mod-desc">Shaderpack with a painterly aesthetic</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/super-duper-vanilla" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/LMIZZNxZ/5d09a380b6da014dcbca683879cdfb4a94603cf8_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">06</span></div><h3 class="mch-mod-name">Super Duper Vanilla</h3><p class="mch-mod-desc">Inspired by Super Duper Graphics style</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/bliss-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/ZvMtQlho/90145c971ea24387775108fc86c89bed9bd2c8f1_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">07</span></div><h3 class="mch-mod-name">Bliss Shaders</h3><p class="mch-mod-desc">Fantasy-styled with heavy scene variation and customization</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/solas-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/EpQFjzrQ/e3efc6ba7a63f9e1cf473a794d0224a6daf243c7_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">08</span></div><h3 class="mch-mod-name">Solas Shader</h3><p class="mch-mod-desc">Colored lighting and vibrant fancy visuals</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/photon-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/lLqFfGNs/39cb5f12e7dcc68d6cb666f225fcb2b801dd70fb_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">09</span></div><h3 class="mch-mod-name">Photon Shaders</h3><p class="mch-mod-desc">Gameplay-focused, semi-realistic sky and lighting</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/vanilla-plus-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/EPsIYDj1/ebc9166345b79c602c18df0dc9f7c4c68d28e998_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">10</span></div><h3 class="mch-mod-name">Vanilla Plus Shader</h3><p class="mch-mod-desc">Modern visual overhaul that stays faithful to vanilla</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a></div>
+        </section>
 
-          <!-- RESOURCE PACKS -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Top 10 ResourcePacks</div>
-              </div>
-              <div class="cf-section-subtitle-row">
-                <div class="cf-section-subtitle">Packs that change how the game looks.</div>
-                <div class="cf-section-header-right">
-                  <a href="/minecraft/java/resource-packs" class="cf-view-all">View more</a>
-                  <button class="cf-arrow" onclick="scrollRow('resourcepackrow-row', -1)">‹</button>
-                  <button class="cf-arrow" onclick="scrollRow('resourcepackrow-row', 1)">›</button>
-                </div>
-              </div>
-            </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="resourcepackrow-row">
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-animations" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/1402/911/256/256/638909354589974674.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Fresh Animations</div><div class="cf-card-author">Make your game like the trailers!</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="https://vanillatweaks.net/picker/resource-packs/" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="/minecrafticons/vanillatweaks.jpg" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Vanilla Tweaks</div><div class="cf-card-author">offers various resource packs and data packs</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Vanilla Tweaks</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/resourcepack/better-leaves" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/uvpymuxq/fe1a61998ae57dc6ad1a4bb028334c3c3925d22f_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Motschen's Better Leaves</div><div class="cf-card-author">Better Leaves adds additional layers</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/resourcepack/x-ray-(-spectator-toggle-able-)" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/2P3I5T3N/c2387e642a8d5952b7eba3397328c2a1296e64fd_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">X Ray | Spectator</div><div class="cf-card-author">Best X ray texture Pack For Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/fresh-moves" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/985/357/256/256/638494820573552980.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Fresh Moves</div><div class="cf-card-author">Gives fancy animations to the player entity.</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/modernarch-realism-1-13-1-14-512x512/" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="/minecrafticons/compressed-modernarch.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">ModernArch</div><div class="cf-card-author">Contains 3D models, 1024x resolution</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/rename-items/" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="/minecrafticons/renameitems.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Rename Items</div><div class="cf-card-author">Unlock custom textures by renaming items</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/stay-true" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/274/491/256/256/637258639542653246.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Stay True</div><div class="cf-card-author">Upgraded foliage, leaves and plants.</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
-                <a class="cf-card" href="https://www.planetminecraft.com/texture-pack/redstone-tweaks/" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="/minecrafticons/redstonetweaks.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Redstone Tweaks</div><div class="cf-card-author">Visual upgrades for redstone builds</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">PMC</span></div></div></a>
-                <a class="cf-card" href="https://www.curseforge.com/minecraft/texture-packs/low-on-fire" target="_blank"><span class="cf-card-rank top3">#10</span><img class="cf-card-img" src="https://media.forgecdn.net/avatars/thumbnails/494/548/64/64/637806308919001110.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Low on Fire</div><div class="cf-card-author">Low fire on your screen! Vanilla Friendly</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Curse Forge</span></div></div></a>
-              </div>
-            </div>
-          </div>
-
-          <!-- SHADERS -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Top 10 Shaders</div>
-              </div>
-              <div class="cf-section-subtitle-row">
-                <div class="cf-section-subtitle">Lighting, shadow and water overhauls.</div>
-                <div class="cf-section-header-right">
-                  <a href="/minecraft/java/shaders" class="cf-view-all">View more</a>
-                  <button class="cf-arrow" onclick="scrollRow('shaders-row', -1)">‹</button>
-                  <button class="cf-arrow" onclick="scrollRow('shaders-row', 1)">›</button>
-                </div>
-              </div>
-            </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="shaders-row">
-                <a class="cf-card" href="https://modrinth.com/shader/bsl-shaders" target="_blank"><span class="cf-card-rank top3">#1</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/Q1vvjJYV/2a611a3cb434fb52fb81fa5dace13c5d8b67e55d_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">BSL Shaders</div><div class="cf-card-author">Real-time lighting and stunning sky effects</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://minecraftshader.com/sildurs-vibrant-shaders/" target="_blank"><span class="cf-card-rank top3">#2</span><img class="cf-card-img" src="https://minecraftshader.com/wp-content/uploads/2021/11/sildurs-vibrant-shaders.jpg.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Sildurs Vibrant Shaders</div><div class="cf-card-author">Improved visuals with dynamic shadows</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=minecraftshader.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">MC Shaders</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#3</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/nostalgia-shader" target="_blank"><span class="cf-card-rank top3">#4</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/xEItlMn3/49ba53348dd4902ad2a3ae49cc643550ead201bc.png" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Nostalgia Shaders</div><div class="cf-card-author">Classic shaders with a modern visual style</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/mellow" target="_blank"><span class="cf-card-rank top3">#5</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/BUxf36AP/b2cc2e9b97e5e0c4c7fcd89b7e295f29a29b9c6d_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Mellow Shaders</div><div class="cf-card-author">Shaderpack with a painterly aesthetic</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/super-duper-vanilla" target="_blank"><span class="cf-card-rank top3">#6</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/LMIZZNxZ/5d09a380b6da014dcbca683879cdfb4a94603cf8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Super Duper Vanilla</div><div class="cf-card-author">Inspired by Super Duper Graphics style</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#7</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#8</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-                <a class="cf-card" href="https://modrinth.com/shader/complementary-reimagined" target="_blank"><span class="cf-card-rank top3">#9</span><img class="cf-card-img" src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><div class="cf-card-body"><div class="cf-card-name">Complementary Shaders</div><div class="cf-card-author">Preserving the elements of Minecraft</div><div class="cf-card-meta"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" class="cf-source-icon" alt="" loading="lazy" decoding="async"><span class="cf-card-tag">Modrinth</span></div></div></a>
-              </div>
-            </div>
-          </div>
-
-          <!-- BANNERS/SHIELDS GALLERY -->
-          <!-- CURATED INTRO BANNER -->
-          <div class="curated-banner-wrap">
-            <div class="curated-banner">
-              <div class="curated-banner-img">
-                <img src="/minecrafticons/minecraft fox.jpg" alt="" loading="lazy" decoding="async">
-              </div>
-              <div class="curated-banner-text">
-                <div class="curated-banner-eyebrow">Minecraft Curated Resources</div>
-                <div class="curated-banner-title">Play more.<span class="curated-banner-title-em">Search less.</span></div>
-                <p class="curated-banner-tagline">Every link on this page was opened and played before it made the list. Handpicked by Parcore, so you skip the junk part.</p>
-                <div class="curated-banner-badges">
-                  <div class="skin-result-badge"><span class="skin-result-badge-dot"></span>Curated</div>
-                  <div class="skin-result-badge"><span class="skin-result-badge-dot"></span>Tested</div>
-                  <div class="skin-result-badge"><span class="skin-result-badge-dot"></span>Trusted</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Popular Banners/Shields</div>
-              </div>
-              <div class="cf-section-subtitle-row">
-                <div class="cf-section-subtitle">Banner designs with give commands.</div>
-                <div class="cf-section-header-right">
-                  <a href="#" class="cf-view-all">View more</a>
-                  <button class="cf-arrow" onclick="scrollRow('gallery-row', -1)">‹</button>
-                  <button class="cf-arrow" onclick="scrollRow('gallery-row', 1)">›</button>
-                </div>
-              </div>
-            </div>
-            <div class="cf-scroll-wrapper">
-              <div class="cf-row" id="gallery-row">
-                <div class="gal-card" onclick="openLightbox(this)" data-full="/minecrafticons/banners/mcb-bowl.jpg" data-name="Bowl Banner" data-cmd='/give @p minecraft:black_banner[banner_patterns=[{"pattern":"stripe_downleft","color":"red"},{"pattern":"cross","color":"black"},{"pattern":"creeper","color":"white"},{"pattern":"circle","color":"light_gray"},{"pattern":"globe","color":"white"},{"pattern":"skull","color":"white"},{"pattern":"stripe_middle","color":"brown"},{"pattern":"half_horizontal_bottom","color":"red"},{"pattern":"curly_border","color":"black"},{"pattern":"stripe_bottom","color":"black"}]] 1'><img src="/minecrafticons/banners/mcbi-bowl.png" alt="" loading="lazy" decoding="async"></div>
-                <div class="gal-card" onclick="openLightbox(this)" data-full="/minecrafticons/banners/mcb-door.jpg" data-name="Door Banner" data-cmd="/give @p minecraft:banner{...}"><img src="/minecrafticons/banners/mcbi-door.png" alt="" loading="lazy" decoding="async"></div>
-                <div class="gal-card" onclick="openLightbox(this)" data-full="/minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="/minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
-                                <div class="gal-card" onclick="openLightbox(this)" data-full="/minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="/minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
-
-                                                <div class="gal-card" onclick="openLightbox(this)" data-full="/minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="/minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
-
-                                                                <div class="gal-card" onclick="openLightbox(this)" data-full="/minecrafticons/banners/mcbi-bunny.jpg" data-name="Cool Bunny" data-cmd='give @p minecraft:white_banner[banner_patterns=[{"pattern":"minecraft:stripe_top","color":"pink"},{"pattern":"minecraft:triangle_top","color":"light_blue"},{"pattern":"minecraft:cross","color":"white"},{"pattern":"minecraft:stripe_middle","color":"black"},{"pattern":"minecraft:triangle_bottom","color":"white"},{"pattern":"minecraft:curly_border","color":"light_blue"}]]'><img src="/minecrafticons/banners/mcbi-bunny.png" alt="" loading="lazy" decoding="async"></div>
-
-              </div>
-            </div>
-          </div>
-
-          <!-- COLOR PALETTES -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Color Palettes</div>
-              </div>
-              <div class="cf-section-subtitle">Block sets and hex references.</div>
-            </div>
-            <div class="pal-grid-wrapper">
-              <div class="pal-grid" id="palette-row">
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/pallete 1.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/pallete 1.jpg" alt="Color Gradient" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Color Gradient</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/pallete 2.jpg" data-name="Complete Color Collection" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/pallete 2.jpg" alt="Complete Collection" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Complete Collection</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/pallete 3.jpg" data-name="Hex Color Palette" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/pallete 3.jpg" alt="Hex Block Palette" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Hex Block Palette</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/pallete 4.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/pallete 4.jpg" alt="Block Palette" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Block Palette</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/pallete 5.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/pallete 5.jpg" alt="Color Wheel" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Color Wheel</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/color pallete 5.webp" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/color pallete 5.webp" alt="Color Spectrum" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Color Spectrum</div></div>
-
-                <div class="pal-card pal-card-wide" onclick="openPalette(this)" data-full="/minecrafticons/pins/blockcolorapp.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/blockcolorapp.jpg" alt="blockcolor.app" loading="lazy" decoding="async">
-                  <a class="pal-ext-link" href="https://blockcolors.app/" target="_blank" rel="noopener" aria-label="Open blockcolor.app in a new tab" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">blockcolor.app</div></div>
-
-              </div>
-            </div>
-          </div>
-
-          <!-- Armour tunic colors -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Armour colors</div>
-              </div>
-              <div class="cf-section-subtitle">Leather dye and trim colour codes.</div>
-            </div>
-            <div class="pal-grid-wrapper">
-              <div class="pal-grid" id="leather-row">
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/clothescolors.jfif" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/clothescolors.jfif" alt="Leather Tunic Colors" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Leather Tunic Colors</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/armor trim colors.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/armor trim colors.jpg" alt="Colored Armor Trims" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Colored Armor Trims</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/text color.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/text color.jpg" alt="Text Color Code" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Text Color Code</div></div>
-
-               </div>
-            </div>
-          </div>
-
-          <!-- Miscellanous -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Guides</div>
-              </div>
-              <div class="cf-section-subtitle">Charts for ores, circles and food.</div>
-            </div>
-            <div class="pal-grid-wrapper">
-              <div class="pal-grid" id="misc-row">
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/ore distribution.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/ore distribution.jpg" alt="Ore distribution" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Ore distribution</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/minecraft circles.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/minecraft circles.jpg" alt="Circle Guide" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Circle Guide</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/food web.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/food web.jpg" alt="Food Web" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Food Web</div></div>
-
-                <div class="pal-card" onclick="openPalette(this)" data-full="/minecrafticons/pins/letters & numbers guide.jpg" data-cmd="">
-                  <div class="pal-card-media"><img src="/minecrafticons/pins/letters & numbers guide.jpg" alt="Letters & Numbers" loading="lazy" decoding="async">
-                  <div class="pal-zoom-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div></div>
-                  <div class="pal-card-label">Letters & Numbers</div></div>
-
-               </div>
-            </div>
-          </div>
-
-          <!-- SKIN LOOKUP -->
-          <div class="cf-section">
-            <div class="cf-section-header">
-              <div class="cf-section-title-row">
-              <div class="cf-section-title">Player Skin Lookup</div>
-              </div>
-              <div class="cf-section-subtitle">Find and download any player skin.</div>
-            </div>
-
-            <div class="skin-lookup">
-              <div class="skin-search-box">
-                <div class="skin-search-left">
-                  <p class="skin-search-intro">Search for any Java Edition player by username to view their skin, head render, and download links.</p>
-                  <form class="skin-search-bar" id="skin-search-form">
-                    <svg class="skin-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input type="text" id="skin-search-input" class="skin-search-input" placeholder="Enter a Java username…" autocomplete="off" maxlength="16">
-                    <button type="button" id="skin-clear-btn" class="skin-search-clear-btn" aria-label="Clear">✕</button>
-                    <button type="submit" class="skin-search-btn">Search</button>
-                  </form>
-                </div>
-                <div class="skin-search-banner">
-                  <img class="skin-search-banner-img" src="https://i.pinimg.com/736x/a5/f5/6b/a5f56b77dcf08b177bab95ce8f0b3c7c.jpg" alt="" loading="lazy" decoding="async">
-                </div>
-              </div>
-
-              <div id="skin-result" class="skin-result"></div>
-            </div>
-          </div>
+        <section class="mch-sec" id="mc-modpacks" aria-labelledby="mc-modpacks-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-modpacks-t">Popular <em>modpacks.</em></h3><p class="mch-sec-sub">Whole sets of mods in one download, from adventure packs to skyblock.</p></div><div class="mch-sec-act"><div class="art-nav mch-row-nav" data-for="mcModpacksRow"><button type="button" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button type="button" aria-label="Scroll on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><a class="mch-more" href="/minecraft/java/mods">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header>
+          <!-- First 10 of mc-modpacks.json "modpacks", in that file's order. -->
+          <div class="mch-mods mch-mods--row" id="mcModpacksRow"><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/better-mc-forge-bmc4" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1095/963/256/256/638641361377079410.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">01</span></div><h3 class="mch-mod-name">Better MC [FORGE] BMC4</h3><p class="mch-mod-desc">A kitchen-sink pack packed with quality-of-life mods and new biomes to explore</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/homestead-cozy" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1336/95/256/256/638868484880282584.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">02</span></div><h3 class="mch-mod-name">Homestead: Cozy</h3><p class="mch-mod-desc">A relaxing cottage-core survival pack focused on farming, décor, and peaceful progression</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/create-ultimate-selection-2" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1394/588/256/256/638904163435529465.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">03</span></div><h3 class="mch-mod-name">Create: Ultimate Selection 2</h3><p class="mch-mod-desc">Build sprawling factories and automate everything with the Create mod at its center</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/otherworld-dnd" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1604/132/256/256/639036063530941198.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">04</span></div><h3 class="mch-mod-name">Otherworld: DnD</h3><p class="mch-mod-desc">A D&amp;D-inspired RPG modpack with spells, classes, dungeons, and legendary loot</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/beyond-depth" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/1750/700/639114276202065882.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">05</span></div><h3 class="mch-mod-name">Beyond Depth</h3><p class="mch-mod-desc">Dive into revamped cave systems with new ores, mobs, and underground biomes</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/better-oneblock" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1551/613/256/256/639007047544599113_animated.gif" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">06</span></div><h3 class="mch-mod-name">Better OneBlock</h3><p class="mch-mod-desc">The classic OneBlock skyblock experience reimagined with mod progression and custom phases</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/dungeon-heroes" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/939/312/256/256/638419035171069148.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">07</span></div><h3 class="mch-mod-name">Dungeon Heroes</h3><p class="mch-mod-desc">Hero classes, skill trees, and boss dungeons in a full RPG overhaul of vanilla</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/zombiemania" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1854/104/256/256/639165491163621475_animated.gif" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">08</span></div><h3 class="mch-mod-name">ZombieMania</h3><p class="mch-mod-desc">Survive waves of undead hordes in a hardcore zombie apocalypse overhaul</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/restlesshorizons" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/1794/859/639136983596579775.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">09</span></div><h3 class="mch-mod-name">Restless Horizons</h3><p class="mch-mod-desc">Open-world exploration pack with new dimensions, structures, and epic bosses</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/better-adventures-plus" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1606/687/256/256/639037309955176837.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">10</span></div><h3 class="mch-mod-name">Better Adventures+</h3><p class="mch-mod-desc">Enhances vanilla exploration with richer biomes, villages, and world structures</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a></div>
+        </section>
 
         </div>
 
-        <!-- RIGHT SIDEBAR -->
-        <div class="mc-right-sidebar">
-          <div class="mc-right-sidebar-inner" id="rightSidebar">
 
+      </div>
 
-            <!-- Box 2: adaptive -- live Java version status (same
-                 piston-meta feed as the hero strip, its own independent
-                 fetch) plus a vertical "Browse Categories" card list --
-                 one card per other MC page, background image = that
-                 page's own hero photo, count fit to however much
-                 height is actually free (mcFitSidebarCategories in
-                 mc-java.js). The earlier On This Page / Continue
-                 Browsing widgets are still fully implemented
-                 (mcInitSidebarJumpNav / mcInitSidebarRecent) but not
-                 mounted here for now -- three adaptive-height widgets
-                 stacked in one box fights the category list for the
-                 exact space it needs to size itself against; add their
-                 markup back below the divider if you want them
-                 alongside this instead of in place of it. -->
-            <div class="mc-sidebar-panel">
-              <div class="mc-sb-cat-title">Latest Release</div>
-              <div class="mc-sb-version">
-                <div class="mc-sb-version-row">
-                  <span class="mc-sb-version-dot"></span>
-                  <span class="mc-sb-version-label">Release</span>
-                  <span class="mc-sb-version-num" id="mcsb-release-version">—</span>
-                  <span class="mc-sb-version-updated" id="mcsb-release-updated"></span>
-                </div>
-                <div class="mc-sb-version-row">
-                  <span class="mc-sb-version-dot is-snapshot"></span>
-                  <span class="mc-sb-version-label">Snapshot</span>
-                  <span class="mc-sb-version-num" id="mcsb-snapshot-version">—</span>
-                  <span class="mc-sb-version-updated" id="mcsb-snapshot-updated"></span>
-                </div>
-              </div>
+      <div class="mch-ch mch-ch--deepslate" id="ch-build" role="region" aria-label="Build">
+        <div class="mch-frame">
 
-              <div class="mc-sb-divider"></div>
+        <section class="mch-sec" id="mc-commands" aria-labelledby="mc-commands-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-commands-t">Popular <em>commands.</em></h3><p class="mch-sec-sub">Gear, mob and world commands, ready to paste.</p></div><div class="mch-sec-act"><a class="mch-more" href="/minecraft/java/commands">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header>
+          <div class="mch-term"><div class="mch-term-bar"><span class="mch-term-hint">Tap Copy, paste into chat or a command block</span></div><ul class="mch-term-list" id="homeCmdList"><li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/netheritesword.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="God Sword" data-sub="1000 Sharpness blade" data-cmd="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1">God Sword<span>One Shot Anything</span></button><code class="mch-term-code">/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1</code></div><button type="button" class="mch-copy" data-copy="/give @p minecraft:diamond_sword{Enchantments:[{id:sharpness,lvl:1000}]} 1" aria-label="Copy the God Sword command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li><li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/netheritepickaxe.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Super Pickaxe" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd="give @a netherite_pickaxe[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;God Pickaxe&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;yellow&quot;}],lore=[[{&quot;text&quot;:&quot;insta mine unli range&quot;,&quot;color&quot;:&quot;yellow&quot;}]],enchantments={efficiency:3,silk_touch:1,unbreaking:4},attribute_modifiers=[{type:block_break_speed,amount:1024,operation:add_value,id:&quot;1778783273551&quot;},{type:attack_speed,amount:1024,operation:add_value,id:&quot;1778783273552&quot;},{type:mining_efficiency,amount:1024,operation:add_value,id:&quot;1778783273553&quot;},{type:block_interaction_range,amount:64,operation:add_value,id:&quot;1778783273554&quot;},{type:submerged_mining_speed,amount:9,operation:add_value,id:&quot;1778783273555&quot;}]]">Super Pickaxe<span>Insta Mine • Long Range</span></button><code class="mch-term-code">give @a netherite_pickaxe[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;God Pickaxe&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;yellow&quot;}],lore=[[{&quot;text&quot;:&quot;insta mine unli range&quot;,&quot;color&quot;:&quot;yellow&quot;}]],enchantments={efficiency:3,silk_touch:1,unbreaking:4},attribute_modifiers=[{type:block_break_speed,amount:1024,operation:add_value,id:&quot;1778783273551&quot;},{type:attack_speed,amount:1024,operation:add_value,id:&quot;1778783273552&quot;},{type:mining_efficiency,amount:1024,operation:add_value,id:&quot;1778783273553&quot;},{type:block_interaction_range,amount:64,operation:add_value,id:&quot;1778783273554&quot;},{type:submerged_mining_speed,amount:9,operation:add_value,id:&quot;1778783273555&quot;}]]</code></div><button type="button" class="mch-copy" data-copy="give @a netherite_pickaxe[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;God Pickaxe&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;yellow&quot;}],lore=[[{&quot;text&quot;:&quot;insta mine unli range&quot;,&quot;color&quot;:&quot;yellow&quot;}]],enchantments={efficiency:3,silk_touch:1,unbreaking:4},attribute_modifiers=[{type:block_break_speed,amount:1024,operation:add_value,id:&quot;1778783273551&quot;},{type:attack_speed,amount:1024,operation:add_value,id:&quot;1778783273552&quot;},{type:mining_efficiency,amount:1024,operation:add_value,id:&quot;1778783273553&quot;},{type:block_interaction_range,amount:64,operation:add_value,id:&quot;1778783273554&quot;},{type:submerged_mining_speed,amount:9,operation:add_value,id:&quot;1778783273555&quot;}]]" aria-label="Copy the Super Pickaxe command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li><li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/saddle.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Super Fast Horse" data-sub="DISCLAIMER! ONLY WORKS ON COMMAND BLOCK!" data-cmd="give @a stick[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;KNOCKBACK STICK&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;dark_purple&quot;}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:&quot;1778780766940&quot;}]]">God Horse<span>Summons Super Fast Horse</span></button><code class="mch-term-code">give @a stick[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;KNOCKBACK STICK&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;dark_purple&quot;}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:&quot;1778780766940&quot;}]]</code></div><button type="button" class="mch-copy" data-copy="give @a stick[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;KNOCKBACK STICK&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;dark_purple&quot;}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:&quot;1778780766940&quot;}]]" aria-label="Copy the God Horse command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li><li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/enchanted stick.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Knockback Stick" data-sub="Sting like a bee" data-cmd="give @a stick[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;KNOCKBACK STICK&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;dark_purple&quot;}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:&quot;1778780766940&quot;}]]">Knockback Stick<span>Enemies Go Weeeeee</span></button><code class="mch-term-code">give @a stick[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;KNOCKBACK STICK&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;dark_purple&quot;}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:&quot;1778780766940&quot;}]]</code></div><button type="button" class="mch-copy" data-copy="give @a stick[custom_name=[&quot;&quot;,{&quot;text&quot;:&quot;KNOCKBACK STICK&quot;,&quot;bold&quot;:true,&quot;color&quot;:&quot;dark_purple&quot;}],rarity=epic,enchantable={value:1},enchantment_glint_override=true,enchantments={knockback:20},attribute_modifiers=[{type:entity_interaction_range,amount:64,operation:add_value,id:&quot;1778780766940&quot;}]]" aria-label="Copy the Knockback Stick command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li><li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/babywolf.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Immortal Wolf" data-sub="Makes your wolf invincible" data-cmd="/effect give @e[type=wolf,sort=nearest,limit=1] resistance 999999 255 true">Immortal Wolf<span>Unkillable Doggo</span></button><code class="mch-term-code">/effect give @e[type=wolf,sort=nearest,limit=1] resistance 999999 255 true</code></div><button type="button" class="mch-copy" data-copy="/effect give @e[type=wolf,sort=nearest,limit=1] resistance 999999 255 true" aria-label="Copy the Immortal Wolf command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li></ul><div class="mch-chatline" aria-hidden="true"><span class="mch-chatline-text">/</span><i class="mch-caret"></i></div></div>
+        </section>
 
-              <div class="mc-sb-cat">
-                <div class="mc-sb-cat-title">Browse Categories</div>
-                <div class="mc-sb-cat-list" id="mcsbCatList"></div>
-              </div>
+        <section class="mch-sec" id="mc-servers" aria-labelledby="mc-servers-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-servers-t">Popular <em>servers.</em></h3><p class="mch-sec-sub">Ranked by players online right now.</p></div><span class="mch-sec-meta"><i class="mch-live" aria-hidden="true"></i>Live</span></header>
+          <div class="mch-standings" role="table" aria-label="Popular servers by live players">
+              <div class="mch-st-head" role="row"><span role="columnheader">#</span><span role="columnheader">Server</span><span role="columnheader" class="mch-st-mode">Mode</span><span role="columnheader">Players online</span><span role="columnheader" class="mch-st-status">Status</span></div>
+              <div id="server-row" class="mch-st-body"><div class="mch-st-loading">Checking live player counts&hellip;</div></div>
             </div>
-            <!-- Latest Mojang patch note. Rendered by mcInitVersionFeed() in
-                 mc-java.js; "View more" opens #vtModal with the full feed. -->
-            <div class="mc-sidebar-ad-box">
-              <div class="vt-sb-head">
-                <div class="mc-sb-cat-title">From Mojang</div>
-                <button type="button" class="vt-sb-more" onclick="openVtFeed()">View more</button>
-              </div>
-              <div class="vt-sb-latest" id="vt-sb-latest">
-                <div class="vt-feed-skel"></div>
-              </div>
-            </div>
+        </section>
 
+        <section class="mch-sec" id="mc-refs" aria-labelledby="mc-refs-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-refs-t">Reference <em>charts.</em></h3><p class="mch-sec-sub">Palettes, colour codes and building guides. Pick one to read it here, or open it full size to zoom in.</p></div></header>
+          <!-- Reference desk (Oct 12): list left, the whole chart uncropped right.
+               Items keep .pal-card + data-full + .pal-card-label so the shared
+               lightbox (mcHomeOpenPalette in mc-java.js) pages through all 14.
+               Phones skip the preview and open the lightbox. Behaviour: mc-home.js. -->
+          <div class="mch-ref">
+            <div class="mch-ref-list" aria-label="Charts">
+              <h4 class="mch-ref-group">Armour &amp; text<span>3</span></h4><div class="mch-ref-row"><button type="button" class="pal-card mch-ref-item is-on" aria-pressed="true" data-full="/minecrafticons/clothescolors.jfif" data-group="Armour &amp; text" data-desc="The tunic colours you get from each dye mix."><img src="/minecrafticons/clothescolors.jfif" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Leather armour dyes</span><small>The tunic colours you get from each dye mix.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/armor trim colors.jpg" data-group="Armour &amp; text" data-desc="Every trim pattern, Spire to Sentry, in every material."><img src="/minecrafticons/pins/armor trim colors.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Armour trims</span><small>Every trim pattern, Spire to Sentry, in every material.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/text color.jpg" data-group="Armour &amp; text" data-desc="The 16 chat and sign colours, &sect;0 to &sect;f."><img src="/minecrafticons/pins/text color.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Text colour codes</span><small>The 16 chat and sign colours, &sect;0 to &sect;f.</small></span></button></div><h4 class="mch-ref-group">Colour palettes<span>7</span></h4><div class="mch-ref-row"><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/pallete 1.jpg" data-group="Colour palettes" data-desc="Blocks lined up by colour, light to dark."><img src="/minecrafticons/pins/pallete 1.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Block gradients</span><small>Blocks lined up by colour, light to dark.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/pallete 2.jpg" data-group="Colour palettes" data-desc="Every block up to Trails &amp; Tales, grouped by colour."><img src="/minecrafticons/pins/pallete 2.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Trails &amp; Tales palette</span><small>Every block up to Trails &amp; Tales, grouped by colour.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/pallete 3.jpg" data-group="Colour palettes" data-desc="Block faces sorted by hue, from dark to light."><img src="/minecrafticons/pins/pallete 3.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Hex palette</span><small>Block faces sorted by hue, from dark to light.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/pallete 4.jpg" data-group="Colour palettes" data-desc="Short runs of matching blocks for walls and floors."><img src="/minecrafticons/pins/pallete 4.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Colour bars</span><small>Short runs of matching blocks for walls and floors.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/pallete 5.jpg" data-group="Colour palettes" data-desc="A ring of blocks that runs round the colour wheel."><img src="/minecrafticons/pins/pallete 5.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Colour wheel</span><small>A ring of blocks that runs round the colour wheel.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/color pallete 5.webp" data-group="Colour palettes" data-desc="Every block placed by hue and brightness."><img src="/minecrafticons/pins/color pallete 5.webp" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Colour spectrum</span><small>Every block placed by hue and brightness.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/blockcolorapp.jpg" data-group="Colour palettes" data-desc="Pick any colour and get the blocks that match it." data-link="https://blockcolors.app/"><img src="/minecrafticons/pins/blockcolorapp.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">blockcolors.app</span><small>Pick any colour and get the blocks that match it.</small></span></button></div><h4 class="mch-ref-group">Building guides<span>4</span></h4><div class="mch-ref-row"><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/ore distribution.jpg" data-group="Building guides" data-desc="The Y levels where each ore spawns (1.18 and later)."><img src="/minecrafticons/pins/ore distribution.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Ore distribution</span><small>The Y levels where each ore spawns (1.18 and later).</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/minecraft circles.jpg" data-group="Building guides" data-desc="Block circles from 3 to 45 wide, ready to copy."><img src="/minecrafticons/pins/minecraft circles.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Circle guide</span><small>Block circles from 3 to 45 wide, ready to copy.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/food web.jpg" data-group="Building guides" data-desc="Which mobs hunt which, and what each one eats."><img src="/minecrafticons/pins/food web.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Food web</span><small>Which mobs hunt which, and what each one eats.</small></span></button><button type="button" class="pal-card mch-ref-item" aria-pressed="false" data-full="/minecrafticons/pins/letters & numbers guide.jpg" data-group="Building guides" data-desc="A block font for A to Z and 0 to 9."><img src="/minecrafticons/pins/letters & numbers guide.jpg" alt="" loading="lazy" decoding="async"><span class="mch-ref-text"><span class="pal-card-label">Letters &amp; numbers</span><small>A block font for A to Z and 0 to 9.</small></span></button>
+            </div></div>
+            <figure class="mch-ref-view">
+              <button type="button" class="mch-ref-stage" id="refOpen" aria-label="Open Leather armour dyes full size"><img id="refImg" src="/minecrafticons/clothescolors.jfif" alt="Leather armour dyes" decoding="async"></button>
+              <figcaption class="mch-ref-cap">
+                <div class="mch-ref-cap-text"><span class="mch-ref-cap-group" id="refGroup">Armour &amp; text</span><b id="refName">Leather armour dyes</b><span id="refDesc">The tunic colours you get from each dye mix.</span></div>
+                <div class="mch-ref-cap-acts"><a class="mch-more" id="refLink" href="https://blockcolors.app/" target="_blank" rel="noopener" hidden>Open site<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a><button type="button" class="mch-copy" id="refZoom"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg><span>Full size</span></button></div>
+              </figcaption>
+            </figure>
           </div>
+        </section>
         </div>
+      </div>
+
+      <div class="mch-ch mch-ch--bedrock" id="ch-learn" role="region" aria-label="Learn">
+        <div class="mch-frame">
+        <!-- RELEASE TIMELINE (Oct 12): every "release" in Mojang's version list
+             (piston-meta, the feed the hero reads), one block per release, stacked
+             by year. Red = a new major version. Behaviour: mc-home.js. -->
+        <section class="mch-sec" id="mc-releases" aria-labelledby="mc-releases-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-releases-t">Every Java <em>release.</em></h3><p class="mch-sec-sub" id="tlSub">Every release since 1.0, from Mojang's own version list.</p></div></header>
+          <div class="mch-tl">
+            <div class="mch-tl-scroll"><div class="mch-tl-chart" id="tlChart" role="list" aria-label="Java releases by year"></div></div>
+            <p class="mch-tl-read" id="tlRead" aria-live="polite">&nbsp;</p>
+            <ul class="mch-tl-key" aria-hidden="true"><li><i class="is-major"></i>Major version</li><li><i></i>Update or fix</li></ul>
+          </div>
+        </section>
+        </div>
+      </div>
 
       </div>
 
@@ -678,7 +398,10 @@
 
 <script src="/11layout.js?v=20261010a"></script>
 
-<script src="/mc-java.js"></script>
+<script src="/mc-java.js?v=20261013pd"></script>
+<script src="/mc-commands.js?v=20261013c1" defer></script>
+<script src="/mc-home.js?v=20261014nd" defer></script>
+<script src="/article-cards.js?v=20261013ar" defer></script>
 <!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
 <div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
   <div class="vt-modal-panel" onclick="event.stopPropagation()">

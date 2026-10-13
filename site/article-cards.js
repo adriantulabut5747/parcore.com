@@ -6,10 +6,11 @@
 //   <div id="artFilters">                            -> game chips (built here, one per game with articles)
 //   <details id="apToc">                             -> article contents + scroll-spy
 //   <div class="art-next" data-article="<id>">       -> "Read next" card for another article
+//        + data-variant="slide": borderless slides, category | month over the title (/coc/ lobby)
 //   <div class="art-nav" data-for="X">‹ ›</div>      -> scrolls strip X one card at a time
+//   <div class="art-progress" data-for="X"><span>    -> line that fills as strip X scrolls (optional)
 //   <article class="ap">                             -> right column (.ap-side: contents) and 4 random
 //                                                       "Related articles" at the bottom, from the address
-//   <div class="art-spot" data-game="coc">          -> newest live article big + the next three as rows (/coc/)
 //   <span class="art-spot-count" data-game="coc">   -> "All N articles"
 (function () {
   const esc = (t) => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
@@ -35,8 +36,20 @@
   function card(a) {
     const date = a.status === 'live' && a.date ? `<time class="art-date" datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '';
     return shell(a, 'art-card',
-      media(a, 'art-media').replace('<div class="art-chips">', '<span class="as-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span><div class="art-chips">') +
+      media(a, 'art-media').replace('<div class="art-chips">', '<span class="asp-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span><div class="art-chips">') +
       `<div class="art-body"><h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p>${date}</div>`);
+  }
+  // Lobby slide (playvalorant.com "The latest" layout, Adrian's pick, Oct 2026):
+  // picture (watermark from the CSS), then CATEGORY | month, title, dek.
+  function slide(a) {
+    const date = a.date ? `<time datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '';
+    // Not written yet (no data-live on the strip, e.g. /minecraft/java/): a
+    // greyed block with "Coming soon" in place of the month, not a link.
+    const soon = a.status !== 'live';
+    return shell(a, 'art-slide',
+      `<div class="art-row-media"><img src="${esc(a.image)}" alt="" loading="lazy" decoding="async"></div>` +
+      `<p class="art-slide-meta"><span>${esc(a.category)}</span>${soon ? '<span class="art-slide-soon">Coming soon</span>' : date}</p>` +
+      `<h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p>`);
   }
   // Fisher-Yates: data-order="random" strips come out in a new order every visit.
   function shuffle(list) {
@@ -89,10 +102,20 @@
     const track = document.getElementById(nav.dataset.for);
     const [prev, next] = nav.querySelectorAll('button');
     if (!track || !prev || !next) return;
-    const step = () => (track.firstElementChild ? track.firstElementChild.offsetWidth : 0) + parseFloat(getComputedStyle(track).columnGap || 0);
+    // One card = the distance between two cards' starts. (Reading columnGap
+    // broke on phones: there it computes to a calc() string, parseFloat gave
+    // NaN, and scrollBy(NaN) did nothing.)
+    const step = () => {
+      const [a, b] = track.children;
+      return a ? (b ? b.offsetLeft - a.offsetLeft : a.offsetWidth) : 0;
+    };
+    // Progress line: the share of the strip seen so far (what's on screen
+    // counts), so it starts part-filled and is full at the last card.
+    const bar = document.querySelector(`.art-progress[data-for="${nav.dataset.for}"] span`);
     const sync = () => {
       prev.disabled = track.scrollLeft < 4;
       next.disabled = track.scrollLeft > track.scrollWidth - track.clientWidth - 4;
+      if (bar && track.scrollWidth) bar.style.transform = `scaleX(${Math.min(1, (track.scrollLeft + track.clientWidth) / track.scrollWidth)})`;
     };
     prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
     next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
@@ -107,6 +130,9 @@
     const empty = document.getElementById('artEmpty');
     // Live first, newest first; then the coming-soon ones in file order.
     const live = list.filter((a) => a.status === 'live').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    // "lead": true in articles.json pins an article to the top (the cover) here too.
+    const pin = live.findIndex((a) => a.lead);
+    if (pin > 0) live.unshift(live.splice(pin, 1)[0]);
     const items = live.concat(list.filter((a) => a.status !== 'live'));
     el.innerHTML = items.map((a) => row(a, (games[a.game] || {}).name || a.game)).join('');
     const rows = [...el.children];
@@ -266,35 +292,10 @@
       (live ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' : '</div>');
   }
 
-  // Spotlight (the /coc/ lobby): the newest live article big on the left with
-  // its category on the picture ("New ·" for two weeks after its date), the
-  // next three as rows on the right. Ties on date keep file order.
-  function spot(el, list) {
-    const live = list.filter((a) => a.status === 'live').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-    if (!live.length) return;
-    // "lead": true in articles.json pins an article to the top here only
-    // (the /articles/ feed and the strips keep their own order).
-    const pin = live.findIndex((a) => a.lead);
-    if (pin > 0) live.unshift(live.splice(pin, 1)[0]);
-    const [f, ...rest] = live;
-    const fresh = f.date && Date.now() - new Date(f.date + 'T00:00:00') < 14 * 864e5;
-    el.innerHTML =
-      `<a class="as-feat" href="${esc(f.link)}"><div class="as-feat-media"><img src="${esc(f.image)}" alt="" loading="lazy" decoding="async">` +
-      '<span class="as-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span>' +
-      `<span class="as-label">${fresh ? 'New · ' : ''}${esc(f.category)}</span></div>` +
-      `<div class="as-feat-body"><h3 class="as-feat-title">${esc(f.title)}</h3><p class="as-feat-dek">${esc(f.dek)}</p></div></a>` +
-      // The lead again as a plain row: phones show this instead of the big picture.
-      '<div class="as-list">' + [f].concat(rest.slice(0, 3)).map((a, i) =>
-        `<a class="as-row${i ? '' : ' as-row--lead'}" href="${esc(a.link)}"><span class="as-row-media"><img src="${esc(a.image)}" alt="" loading="lazy" decoding="async">` +
-        '<span class="as-wm"><img src="/icons/home.jpg" alt=""></span></span>' +
-        `<div class="as-row-body"><span class="as-row-cat">${esc(a.category)}</span><h3 class="as-row-title">${esc(a.title)}</h3></div></a>`).join('') + '</div>';
-  }
-
   const strips = document.querySelectorAll('.art-track[data-game]');
-  const spots = document.querySelectorAll('.art-spot[data-game]');
   const feeds = document.querySelectorAll('.art-feed[data-game]');
   const nexts = document.querySelectorAll('.art-next[data-article]');
-  if (!strips.length && !spots.length && !feeds.length && !nexts.length && !art) {
+  if (!strips.length && !feeds.length && !nexts.length && !art) {
     document.querySelectorAll('.art-nav[data-for]').forEach(arrows);
     return;
   }
@@ -309,9 +310,14 @@
         // data-live: written articles only (no greyed "Coming soon" cards).
         let list = pick(el.dataset.game).filter((a) => !('live' in el.dataset) || a.status === 'live');
         if (el.dataset.order === 'random') list = shuffle(list.slice());
-        el.innerHTML = list.map(card).join('');
+        // Slides: newest first ("lead": true pins one to the front).
+        if (el.dataset.variant === 'slide') {
+          list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+          const pin = list.findIndex((a) => a.lead);
+          if (pin > 0) list.unshift(list.splice(pin, 1)[0]);
+          el.innerHTML = list.map(slide).join('');
+        } else el.innerHTML = list.map(card).join('');
       });
-      spots.forEach((el) => spot(el, pick(el.dataset.game)));
       document.querySelectorAll('.art-spot-count[data-game]').forEach((el) => {
         el.textContent = 'All ' + pick(el.dataset.game).length + ' articles';
       });

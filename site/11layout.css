@@ -271,7 +271,7 @@ body { visibility: hidden; }
   --sb-label:   rgba(255,255,255,0.48);
   --sb-accent:  rgb(194,59,59);
   --sb-inset:   16px;
-  --sb-radius:  8px;
+  --sb-radius:  0;
 
   /* Width of .coc-main's scrollbar. The fixed bars are inset by this so
      they stop at the scroll container's content edge instead of running
@@ -299,7 +299,7 @@ body { visibility: hidden; }
 /* Global scrollbar (Chrome, Edge, Safari) */
 ::-webkit-scrollbar { width: 10px;}
 ::-webkit-scrollbar-track { background: #121318; /* dark background */}
-::-webkit-scrollbar-thumb { background: #2f3136;   border-radius: 10px; border: 2px solid #121318; }
+::-webkit-scrollbar-thumb { background: #2f3136;   border-radius: 0; border: 2px solid #121318; }
 ::-webkit-scrollbar-thumb:hover { background: #3a3d43;}
 * { scrollbar-width: thin; scrollbar-color: #2f3136 #121318;/* Firefox */}
 
@@ -371,7 +371,7 @@ body { visibility: hidden; }
   }
 .sidebar::-webkit-scrollbar {width: 5px;}
 .sidebar::-webkit-scrollbar-track {background: transparent;}
-.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; border: none; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 0; border: none; }
 .sidebar::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,0.22);}
 /* Active background + accent bar now live in one place: the "== SIDEBAR ==" block
    further down (search --sb-inset). Kept here only as the anchor comment so a
@@ -944,7 +944,7 @@ body.search-modal-open .coc-main {
    Featured Topics (index.html adds its groups, "+N more" and logos). */
 .ft-tile {
   position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 9px 14px;
-  border-radius: 8px; overflow: hidden; isolation: isolate; background: #1b1b1e; color: #fff; text-decoration: none;
+  border-radius: 0; overflow: hidden; isolation: isolate; background: #1b1b1e; color: #fff; text-decoration: none;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 .ft-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
@@ -952,7 +952,7 @@ body.search-modal-open .coc-main {
 .ft-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(20, 20, 22, 0.96) 0%, rgba(20, 20, 22, 0.85) 45%, rgba(20, 20, 22, 0.45) 100%); }
 .ft-name { font: 700 14.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* game logo before the name (search results, where games are mixed) */
-.ft-name-logo { display: inline-block; width: 16px; height: 16px; margin-right: 7px; border-radius: 4px; object-fit: cover; vertical-align: -3px; }
+.ft-name-logo { display: inline-block; width: 16px; height: 16px; margin-right: 7px; border-radius: 0; object-fit: cover; vertical-align: -3px; }
 .ft-sub { margin-top: 3px; font: 500 11.5px/1.3 'Sora', sans-serif; color: #9a9ca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
 a.ft-tile:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
@@ -1077,10 +1077,13 @@ body {
   width: 34px;
   height: 34px;
   margin-left: -17px;
-  border-radius: 50%;
-  background: #1c1c1c; /* darker gray, matches the site's icon-frame/bookmark-btn circles */
-  border: 1px solid rgba(255,255,255,0.1); /* gives it a proper "circled" ring, same language as .web-icon-wrap / .web-bookmark-btn */
-  box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+  /* Octagon (Oct 12): the site went square, a square badge read as a
+     stray box. clip-path cuts a CSS border off at the diagonals, so the
+     ring is this element's background and the fill is ::before, inset 1px
+     with the same shape. (clip-path also clips box-shadow -- none here.) */
+  --ptr-oct: polygon(29.3% 0, 70.7% 0, 100% 29.3%, 100% 70.7%, 70.7% 100%, 29.3% 100%, 0 70.7%, 0 29.3%);
+  clip-path: var(--ptr-oct);
+  background: rgba(255,255,255,0.14); /* the ring */
   opacity: 0;
   display: flex;
   align-items: center;
@@ -1090,14 +1093,24 @@ body {
   z-index: 100000;
   transition: opacity .15s ease, background-color .15s ease, border-color .15s ease;
 }
+#ptr-indicator::before{
+  content: "";
+  position: absolute;
+  inset: 1px;
+  clip-path: var(--ptr-oct);
+  background: #1c1c1c;
+  transition: background-color .15s ease;
+}
 #ptr-indicator svg{
+  position: relative;
   width: 16px;
   height: 16px;
   color: var(--accent); /* red arrow (brand accent) instead of white */
   transition: transform .15s ease;
 }
 #ptr-indicator.ptr-visible{ opacity: 1; }
-#ptr-indicator.ptr-ready{ background: #262626; border-color: rgba(255,255,255,0.18); }
+#ptr-indicator.ptr-ready{ background: rgba(255,255,255,0.24); }
+#ptr-indicator.ptr-ready::before{ background: #262626; }
 #ptr-indicator.ptr-loading svg{
   animation: ptr-spin 0.7s linear infinite;
 }
@@ -1277,7 +1290,7 @@ body {
     width: 34px;
     height: 34px;
     border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 50%;
+    border-radius: 0;
     color: var(--text-main);
     transition:
       border-color 0.2s ease,
@@ -2964,7 +2977,7 @@ controls there. */
 
 /* Game-nav entries with "img" (11layout.js iconSvg): game icons in the
    bottom nav and More sheet. Grey at rest, colour when active. */
-.gn-pic { object-fit: cover; border-radius: 6px; flex-shrink: 0; filter: grayscale(1) brightness(0.8); opacity: 0.6; transition: filter 0.2s ease, opacity 0.2s ease; }
+.gn-pic { object-fit: cover; border-radius: 0; flex-shrink: 0; filter: grayscale(1) brightness(0.8); opacity: 0.6; transition: filter 0.2s ease, opacity 0.2s ease; }
 .active > .gn-pic { filter: none; opacity: 1; }
 .bn-item img.gn-pic { width: 22px; height: 22px; }
 .th-mini img.gn-pic { width: 34px; height: 34px; padding: 0; object-fit: cover; border-radius: 9px; } /* game icons fill the tile (.th-mini img pads line icons) */

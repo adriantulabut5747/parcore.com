@@ -194,32 +194,34 @@ if (mcOn('home')) {
       }
     }
 
+    // Standings row (Oct 12 v2): rank | icon + name + IP | mode | players
+    // bar | status. The bar is players / max; servers without a max get none.
     function renderCard(server, rank) {
       const a = document.createElement('a');
-      a.className = 'server-card';
+      a.className = 'mch-st-row' + (server.online ? '' : ' is-offline');
       a.href = server.link;
       a.target = '_blank';
       a.rel = 'noopener';
+      a.setAttribute('role', 'row');
 
-      const rankBadge = `<span class="cf-card-rank ${rank <= 3 ? 'top3' : ''}">#${rank}</span>`;
-      const dotClass = server.online ? 'online' : 'offline';
-      const playersText = server.online
-        ? `${server.players.toLocaleString()}${server.maxPlayers ? ' / ' + server.maxPlayers.toLocaleString() : ''} online`
-        : 'Offline';
+      const pct = server.online && server.maxPlayers
+        ? Math.max(2, Math.min(100, Math.round(server.players / server.maxPlayers * 100))) : 0;
+      const players = server.online
+        ? `<b>${server.players.toLocaleString()}</b>${server.maxPlayers ? '<span> / ' + server.maxPlayers.toLocaleString() + '</span>' : ''}`
+        : '<span>&mdash;</span>';
 
       a.innerHTML = `
-        ${rankBadge}
-        <div class="server-card-img-wrap">
-          <span class="server-status-dot ${dotClass}"></span>
-          <img class="server-card-img" src="${iconUrl(server.ip)}" alt="" loading="lazy" onerror="this.style.opacity=0">
-        </div>
-        <div class="server-card-body">
-          <div class="server-card-name">${server.name}</div>
-          <div class="server-card-ip">${server.ip}</div>
-          <div class="server-card-meta ${server.online ? '' : 'offline'}">
-            <span class="live-dot"></span><span>${playersText}</span>
-          </div>
-        </div>
+        <span class="mch-st-rank" role="cell">${String(rank).padStart(2, '0')}</span>
+        <span class="mch-st-server" role="cell">
+          <img src="${iconUrl(server.ip)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+          <span><b>${server.name}</b><small>${server.ip}</small></span>
+        </span>
+        <span class="mch-st-mode" role="cell">${server.tag}</span>
+        <span class="mch-st-players" role="cell">
+          <span class="mch-st-count">${players}</span>
+          <span class="mch-st-bar"><i style="width:${pct}%"></i></span>
+        </span>
+        <span class="mch-st-status" role="cell"><i></i>${server.online ? 'Online' : 'Offline'}</span>
       `;
       return a;
     }
@@ -233,7 +235,7 @@ if (mcOn('home')) {
       row.innerHTML = '';
 
       if (results.every(r => r.error)) {
-        row.innerHTML = `<div class="server-card-error">Couldn't reach live server stats right now — try refreshing.</div>`;
+        row.innerHTML = `<div class="mch-st-loading">Couldn't reach live server stats right now. Try refreshing.</div>`;
         return;
       }
 
@@ -588,7 +590,8 @@ if (mcOn('home')) {
       var entries = (data.entries || []).filter(isJava).slice(0, 12);
       if (!entries.length) throw new Error('no entries');
       // Two newest in the sidebar; the rest are behind "View more".
-      if (sbEl) sbEl.innerHTML = entries.slice(0, 2)
+      // data-count on the list sets how many (the Java home shows 4).
+      if (sbEl) sbEl.innerHTML = entries.slice(0, +sbEl.dataset.count || 2)
         .map(function (e) { return rowHtml(e, true); }).join('');
       if (listEl) listEl.innerHTML = entries
         .map(function (e) { return rowHtml(e, false); }).join('');
@@ -886,7 +889,8 @@ function mcHomeOpenPalette(el) {
   // Scoped to the clicked card's own .pal-grid, not the whole page: the three
   // grids here are Palettes, Armour colours and Guides, and sliding from a
   // colour wheel into a food-web chart would read as a bug.
-  const grid = el.closest('.pal-grid');
+  // .mch-ref-list: the reference desk on /minecraft/java/ (Oct 12).
+  const grid = el.closest('.pal-grid, .mch-ref-list, .mch-shots');
   const cards = grid ? Array.from(grid.querySelectorAll('.pal-card')) : [el];
   palCurrentSlides = cards.map(function (c) {
     const i = c.querySelector('img');
@@ -1605,6 +1609,9 @@ if (mcOn('seeds')) {
        it doesn't read "Seeds (1)" on the default view. */
     var crumb = document.querySelector('.sc-mobile-group');
     if (crumb) crumb.textContent = 'Seeds' + (page > 1 ? ' (' + page + ')' : '');
+    // The breadcrumb (renderCrumbs, below) replaced that title: its last step too.
+    var step = document.querySelector('.stb-crumbs [aria-current]');
+    if (step && crumb) step.textContent = crumb.textContent;
   }
 
   function showCards(cards, shouldScroll) {
@@ -2408,6 +2415,8 @@ document.addEventListener('keydown', function(e){
   const currentPage = normalizePage(window.location.pathname);
   const isCurrent = (item) => {
     const link = typeof item === 'string' ? item : item.link;
+    // A jump to a section of a page ("/minecraft/java/#mc-skins") isn't that page.
+    if (String(link || '').includes('#')) return false;
     if (normalizePage(link) === currentPage) return true;
     const activeOn = typeof item === 'object' && item.activeOn;
     return Array.isArray(activeOn) && activeOn.some((p) => normalizePage(p) === currentPage);
@@ -2420,40 +2429,51 @@ document.addEventListener('keydown', function(e){
   }
 
   // ---- item renderers ----
-  function heroTabHtml(item) {
+  // Pages not built yet ("soon": true in mc-contents.json, Oct 2026) render
+  // as a greyed <span>, not a link: their old links pointed at icon PNGs,
+  // '#' or pages that 404. Same idea as game-nav.json's "soon".
+  const isSoon = (item) => item.soon || !item.link || item.link === '#';
+  function navItem(item, cls, inner) {
+    if (isSoon(item)) return `<span class="${cls} is-soon" aria-disabled="true" title="Coming soon">${inner}</span>`;
     const active = isCurrent(item) ? ' active' : '';
-    return `<a href="${escapeHtml(item.link)}" class="hero-tab${active}">
-      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}"><span>${escapeHtml(item.name)}</span>
-    </a>`;
+    return `<a href="${escapeHtml(item.link)}" class="${cls}${active}">${inner}</a>`;
+  }
+
+  function heroTabHtml(item) {
+    return navItem(item, 'hero-tab', `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}"><span>${escapeHtml(item.name)}</span>`);
   }
 
   function mobileNavItemHtml(item) {
-    const active = isCurrent(item) ? ' active' : '';
-    return `<a href="${escapeHtml(item.link)}" class="mc-mobile-nav-item${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+    // The icon's own wrapper carries it as a CSS mask too, so the selected
+    // slot's enchant glint (mc-home.css, HOTBAR) shines on the item, not the box.
+    const src = escapeHtml(item.image);
+    return navItem(item, 'mc-mobile-nav-item', `<span class="mc-slot-ico" style="--icon:url('${src}')"><img src="${src}" alt=""></span><span class="mc-slot-name">${escapeHtml(item.name)}</span>`);
   }
 
   function moreAppGridItemHtml(item) {
-    const active = isCurrent(item) ? ' active' : '';
-    return `<a href="${escapeHtml(item.link)}" class="more-app-grid-item${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+    return navItem(item, 'more-app-grid-item', `<img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
   }
 
   function dsnLinkHtml(item) {
-    const active = isCurrent(item) ? ' active' : '';
     // hwr's chip classes, styled once in 11layout.css, so the bar matches
-    return `<a href="${escapeHtml(item.link)}" class="dsn-chip${active}"><img class="dsn-chip-icon" src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+    return navItem(item, 'dsn-chip', `<img class="dsn-chip-icon" src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
   }
 
   // Sections use hwr's .dsn-chip; the destinations on the right use its
   // .stb-hub-link -- the same split hwr makes between its own two strips.
   function stbHubLinkHtml(item) {
-    const active = isCurrent(item) ? ' active' : '';
-    return `<a href="${escapeHtml(item.link)}" class="stb-hub-link${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+    return navItem(item, 'stb-hub-link', `<img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
   }
 
   function bnItemHtml(item) {
-    const active = isCurrent(item) ? ' active' : '';
-    return `<a href="${escapeHtml(item.link)}" class="bn-item${active}"><img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}</a>`;
+    return navItem(item, 'bn-item', `<img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
   }
+
+  // Tools is its own tab (Oct 13 2026), so its pages list the tools in the
+  // section strips instead of the Java sections. data.tools mirrors the
+  // static cards on /minecraft/tools/: add a tool in both places.
+  const onToolsPage = (data) => Array.isArray(data.tools) && data.heroTabs.some((t) => t.name === 'Tools' && isCurrent(t));
+  const toMenu = (list) => list.filter((c) => !isSoon(c)).map((c) => ({ href: c.link, icon: c.image, name: c.name, sub: c.subtitle }));
 
   // ---- section renderers ----
   function renderHeroTabs(data) {
@@ -2466,13 +2486,10 @@ document.addEventListener('keydown', function(e){
     const bar = document.getElementById('bottomNav');
     if (!bar || !data.heroTabs) return;
     const moreWrap = document.getElementById('bnMoreWrap');
-    const [java, bedrock, story, dungeons] = data.heroTabs;
-    bar.innerHTML = '';
-    if (java) bar.insertAdjacentHTML('beforeend', bnItemHtml(java));
-    if (bedrock) bar.insertAdjacentHTML('beforeend', bnItemHtml(bedrock));
+    // Two tabs, More, two tabs (Minecraft, Tools | Story, Dungeons).
+    bar.innerHTML = data.heroTabs.slice(0, 2).map(bnItemHtml).join('');
     if (moreWrap) bar.appendChild(moreWrap);
-    if (story) bar.insertAdjacentHTML('beforeend', bnItemHtml(story));
-    if (dungeons) bar.insertAdjacentHTML('beforeend', bnItemHtml(dungeons));
+    bar.insertAdjacentHTML('beforeend', data.heroTabs.slice(2, 4).map(bnItemHtml).join(''));
   }
 
   function renderMobileNav(data) {
@@ -2482,7 +2499,43 @@ document.addEventListener('keydown', function(e){
     const header = nav.querySelector('.mc-mobile-nav-header');
     nav.innerHTML = '';
     if (header) nav.appendChild(header);
-    nav.insertAdjacentHTML('beforeend', data.mobileNav.map(mobileNavItemHtml).join(''));
+    nav.insertAdjacentHTML('beforeend', (onToolsPage(data) ? data.tools : data.mobileNav).map(mobileNavItemHtml).join(''));
+    // Phones scroll this strip: bring the current page's slot to the middle.
+    const on = nav.querySelector('.mc-mobile-nav-item.active');
+    if (on) nav.scrollLeft += on.getBoundingClientRect().left - nav.getBoundingClientRect().left - (nav.clientWidth - on.offsetWidth) / 2;
+  }
+
+  // Breadcrumb (Oct 13): Clash's trail (thz-script.js buildCrumbs; CSS is
+  // 11layout.css BREADCRUMB) on phones and desktop, every step a link:
+  //   Minecraft > Worlds   Minecraft > Tools > Banner Maker
+  // "Minecraft" is the Discover page, which itself reads "Minecraft Java and
+  // Bedrock". A page missing from mc-contents.json (hcpc) names itself from
+  // its static .sc-mobile-group text.
+  function renderCrumbs(data) {
+    const box = document.querySelector('.secondary-left .secondary-content');
+    const home = data.heroTabs && data.heroTabs[0];
+    if (!box || !home || box.querySelector('.stb-crumbs')) return;
+    const tools = data.heroTabs.find((t) => t.name === 'Tools');
+    const tool = (data.tools || []).find((t) => !isSoon(t) && isCurrent(t.link));
+    const section = (data.mobileNav || []).find((t) => !isSoon(t) && isCurrent(t.link));
+    let trail = [{ text: home.name, href: home.link }];
+    if (isCurrent(home.link)) trail = [{ text: 'Minecraft Java and Bedrock', href: home.link }];
+    else if (tools && (tool || isCurrent(tools.link))) {
+      trail.push({ text: tools.name, href: tools.link });
+      if (tool) trail.push({ text: tool.crumbText || tool.name, href: tool.link });
+    } else if (section) trail.push({ text: section.crumbText || section.name, href: section.link });
+    else {
+      const own = document.querySelector('.sc-mobile-group');
+      if (own) trail.push({ text: own.textContent.trim(), href: location.pathname });
+    }
+    const nav = document.createElement('nav');
+    nav.className = 'stb-crumbs';
+    nav.setAttribute('aria-label', 'Breadcrumb');
+    nav.innerHTML = trail
+      .map((c, i) => `<a href="${escapeHtml(c.href)}"${i === trail.length - 1 ? ' aria-current="page"' : ''}>${escapeHtml(c.text)}</a>`)
+      .join('<span class="stb-crumb-sep" aria-hidden="true">›</span>');
+    box.appendChild(nav);
+    box.classList.add('has-crumbs');
   }
 
   // Same sheet hwr builds: one row per edition, each folding open to that
@@ -2509,19 +2562,21 @@ document.addEventListener('keydown', function(e){
       const active = isCurrent(ed) ? ' active' : '';
 
       const toc = items.map((it) => {
+        const inner = `<img class="stb-toc-icon" src="${escapeHtml(it.image)}" alt="">` +
+          `<span class="stb-toc-name">${escapeHtml(it.name)}</span>`;
+        if (isSoon(it)) return `<span class="stb-toc-card is-soon" aria-disabled="true">${inner}</span>`;
         const cur = isCurrent(it) ? ' is-current' : '';
-        return `<a href="${escapeHtml(it.link)}" class="stb-toc-card${cur}">` +
-          `<img class="stb-toc-icon" src="${escapeHtml(it.image)}" alt="">` +
-          `<span class="stb-toc-name">${escapeHtml(it.name)}</span>` +
-          `</a>`;
+        return `<a href="${escapeHtml(it.link)}" class="stb-toc-card${cur}">${inner}</a>`;
       }).join('');
 
       html += `<div class="th-mini-wrap${open}">` +
         `<div class="th-mini-toggle${active}">` +
-        `<a href="${escapeHtml(ed.link || '#')}" class="th-mini th-mini-link${active}">` +
+        (isSoon(ed)
+          ? `<span class="th-mini th-mini-link is-soon" aria-disabled="true">`
+          : `<a href="${escapeHtml(ed.link)}" class="th-mini th-mini-link${active}">`) +
         `<img src="${escapeHtml(ed.image || '')}" alt="">` +
         `<span>${escapeHtml(title)}</span>` +
-        `</a>` +
+        (isSoon(ed) ? `</span>` : `</a>`) +
         `<button type="button" class="th-mini-chevron-btn" onclick="toggleThMiniDropdown(this)" aria-label="Toggle ${escapeHtml(title)} sections">` +
         `<svg class="th-mini-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` +
         `</button>` +
@@ -2540,7 +2595,7 @@ document.addEventListener('keydown', function(e){
     // uses for its categories and its hub destinations.
     const sections = document.getElementById('dsnCategoriesScroll');
     const dests = document.getElementById('stbHubNavScroll');
-    if (sections) sections.innerHTML = categories.map(dsnLinkHtml).join('');
+    if (sections) sections.innerHTML = (onToolsPage(data) ? data.tools : categories).map(dsnLinkHtml).join('');
     if (dests) dests.innerHTML = editions.map(stbHubLinkHtml).join('');
     // scrollWidth is only meaningful once the chips exist -- the same
     // re-measure hwr's renderCategoryNav() does after it injects.
@@ -2554,9 +2609,12 @@ document.addEventListener('keydown', function(e){
     const attachMenu = () =>
       dests && window.stbHubMenus &&
       window.stbHubMenus(dests, {
-        keyOf: (link) => (/^\/minecraft\/java\/?$/.test(link.getAttribute('href') || '') ? 'java' : ''),
-        labels: { java: 'Java sections' },
-        lists: { java: categories.map((c) => ({ href: c.link, icon: c.image, name: c.name, sub: c.subtitle })) },
+        keyOf: (link) => {
+          const href = link.getAttribute('href') || '';
+          return /^\/minecraft\/java\/?$/.test(href) ? 'java' : /^\/minecraft\/tools\/?$/.test(href) ? 'tools' : '';
+        },
+        labels: { java: 'Java sections', tools: 'Tools' },
+        lists: { java: toMenu(categories), tools: toMenu(data.tools || []) },
       });
     if (window.stbHubMenus) attachMenu();
     else document.addEventListener('DOMContentLoaded', attachMenu);
@@ -2567,6 +2625,7 @@ document.addEventListener('keydown', function(e){
     renderHeroTabs(data);
     renderBottomNav(data);
     renderMobileNav(data);
+    renderCrumbs(data);
     renderMoreSheet(data);
     renderDesktopSubNav(data);
     document.dispatchEvent(new CustomEvent('nav-data-ready', { detail: data }));
