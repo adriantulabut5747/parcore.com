@@ -8,6 +8,7 @@
                    the one command works across the whole range)
      java    /effect give lines, one per effect (no item)
      bedrock /effect lines with Bedrock's names (Bedrock has no custom potion /give)
+     cloud   /summon area_effect_cloud (Oct 19): the effects, radius, time and a particle colour of its own
    FX (ids, names, colours, good/bad, instant) was read from the 26.3 game files:
    MobEffects.class + lang/en_us.json; Bedrock names from Mojang's bedrock-samples
    command metadata.    The bottle colour is the game's own mix (PotionContents): each visible effect's
@@ -83,7 +84,8 @@
   };
 
   // fx[id] = { lvl: 1-255, sec: seconds, inf: bool }; order = ids in the order they were added
-  var s = { ver: 2, out: 'give', type: 'potion', fx: {}, order: [], cat: '', parts: 'normal', icon: true, color: '', ncolor: '' };
+  // pcolor = the effect cloud's particle colour ('' = the potion's)
+  var s = { ver: 2, out: 'give', type: 'potion', fx: {}, order: [], cat: '', parts: 'normal', icon: true, color: '', ncolor: '', pcolor: '' };
   var $ = function (id) { return document.getElementById(id); };
 
   function esc(t) {
@@ -226,6 +228,48 @@
   // ---- commands ----
   function sq(t) { return "'" + t.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'"; }
   function sbyte(n) { return (n > 127 ? n - 256 : n) + 'b'; }
+  // One effect, old NBT (1.14 - 1.20.4: Id number up to 1.20.1, id name from 1.20.2, both written)
+  function effOld(e) {
+    var t = ticks(e), o = ['Id:' + e.num + 'b', 'id:"minecraft:' + e.id + '"'];
+    if (s.fx[e.id].lvl > 1) o.push('Amplifier:' + sbyte(s.fx[e.id].lvl - 1));
+    o.push('Duration:' + (t === INF ? 2147483647 : t));
+    if (s.parts === 'faint') o.push('Ambient:1b');
+    if (s.parts === 'none') o.push('ShowParticles:0b');
+    if (!s.icon) o.push('ShowIcon:0b');
+    return '{' + o.join(',') + '}';
+  }
+  // potion_contents fields (1.20.5+): the bottle colour and the effects
+  function contents() {
+    var pc = [], list = picked();
+    if (s.color) pc.push('custom_color:' + parseInt(s.color, 16));
+    if (list.length) pc.push('custom_effects:[' + list.map(function (e) {
+      var o = ['id:"minecraft:' + e.id + '"'];
+      if (s.fx[e.id].lvl > 1) o.push('amplifier:' + (s.fx[e.id].lvl - 1));
+      o.push('duration:' + ticks(e));
+      if (s.parts === 'faint') o.push('ambient:true');
+      if (s.parts === 'none') o.push('show_particles:false');
+      if (!s.icon) o.push('show_icon:false');
+      return '{' + o.join(',') + '}';
+    }).join(',') + ']');
+    return pc;
+  }
+  // ---- effect cloud (Oct 19): the one thing in the game whose particle colour is its own setting ----
+  // A summoned area_effect_cloud gives its effects to whatever stands in it. Its swirls are entity_effect
+  // particles: custom_particle (1.21.5+) / Particle (1.20.5+) take any colour; before 1.20.5, Color did.
+  function rgbF(hex) { var n = parseInt(hex, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255].map(function (v) { return +(v / 255).toFixed(3) + 'f'; }).join(','); }
+  function cloudCmd() {
+    var r = Math.min(32, Math.max(0.5, +$('ptRadius').value || 3)), sec = Math.max(1, +$('ptCloudSec').value || 30), list = picked();
+    var d = ['Radius:' + r + 'f', 'Duration:' + Math.min(2147483647, Math.round(sec * 20))];
+    if (s.ver === 0) {
+      if (list.length) d.push('Effects:[' + list.map(effOld).join(',') + ']');
+      if (s.pcolor || s.color) d.push('Color:' + parseInt(s.pcolor || s.color, 16));
+    } else {
+      var pc = contents();
+      if (pc.length) d.push('potion_contents:{' + pc.join(',') + '}');
+      if (s.pcolor) d.push((s.ver === 2 ? 'custom_particle' : 'Particle') + ':{type:"minecraft:entity_effect",color:[' + rgbF(s.pcolor) + ',1f]}');
+    }
+    return '/summon minecraft:area_effect_cloud ~ ~ ~ {' + d.join(',') + '}';
+  }
   function giveCmd() {
     var name = $('ptName').value.trim();
     var lore = $('ptLore').value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
@@ -238,15 +282,7 @@
 
     if (s.ver === 0) {
       var parts = [];
-      if (list.length) parts.push('CustomPotionEffects:[' + list.map(function (e) {
-        var t = ticks(e), o = ['Id:' + e.num + 'b', 'id:"minecraft:' + e.id + '"'];
-        if (s.fx[e.id].lvl > 1) o.push('Amplifier:' + sbyte(s.fx[e.id].lvl - 1));
-        o.push('Duration:' + (t === INF ? 2147483647 : t));
-        if (s.parts === 'faint') o.push('Ambient:1b');
-        if (s.parts === 'none') o.push('ShowParticles:0b');
-        if (!s.icon) o.push('ShowIcon:0b');
-        return '{' + o.join(',') + '}';
-      }).join(',') + ']');
+      if (list.length) parts.push('CustomPotionEffects:[' + list.map(effOld).join(',') + ']');
       if (s.color) parts.push('CustomPotionColor:' + col);
       var disp = [];
       if (name) disp.push('Name:' + sq(JSON.stringify(nameObj)));
@@ -254,17 +290,7 @@
       if (disp.length) parts.push('display:{' + disp.join(',') + '}');
       item = 'minecraft:' + s.type + (parts.length ? '{' + parts.join(',') + '}' : '');
     } else {
-      var pc = [];
-      if (s.color) pc.push('custom_color:' + col);
-      if (list.length) pc.push('custom_effects:[' + list.map(function (e) {
-        var o = ['id:"minecraft:' + e.id + '"'];
-        if (s.fx[e.id].lvl > 1) o.push('amplifier:' + (s.fx[e.id].lvl - 1));
-        o.push('duration:' + ticks(e));
-        if (s.parts === 'faint') o.push('ambient:true');
-        if (s.parts === 'none') o.push('show_particles:false');
-        if (!s.icon) o.push('show_icon:false');
-        return '{' + o.join(',') + '}';
-      }).join(',') + ']');
+      var pc = contents();
       var comps = [];
       if (pc.length) comps.push('potion_contents={' + pc.join(',') + '}');
       if (name) comps.push('custom_name=' + (s.ver === 2 ? JSON.stringify(nameObj) : sq(JSON.stringify(nameObj))));
@@ -316,16 +342,20 @@
   function render() {
     var list = picked();
     var hex = mix();
-    var out = s.out === 'give' ? giveCmd() : s.out === 'java' ? javaCmd() : bedrockCmd();
+    var out = s.out === 'give' ? giveCmd() : s.out === 'cloud' ? cloudCmd() : s.out === 'java' ? javaCmd() : bedrockCmd();
     $('ptCmd').textContent = out || (list.length ? 'None of these effects exist on Bedrock.' : 'Add an effect to get a command.');
     $('ptCmd').classList.toggle('is-empty', !out);
     $('ptCopy').setAttribute('data-copy', out);
     $('ptCopy').disabled = !out;
     var lines = out ? out.split('\n') : [];
     var longest = Math.max.apply(null, lines.map(function (l) { return l.length; }).concat(0));
-    $('ptMeta').innerHTML = !out ? '' : (s.out === 'give' ? out.length + ' characters' : lines.length + (lines.length === 1 ? ' command' : ' commands')) +
+    $('ptMeta').innerHTML = !out ? '' : (s.out === 'give' || s.out === 'cloud' ? out.length + ' characters' : lines.length + (lines.length === 1 ? ' command' : ' commands')) +
       (longest > 256 ? ' <span class="mch-term-flags"><em class="is-block">Command block only</em></span>' : '');
     $('ptHex').textContent = '#' + hex;
+    $('ptPHex').textContent = '#' + (s.pcolor || hex);
+    // while a colour is automatic its box shows the mix too, so the picker opens on the colour in use
+    if (!s.color) $('ptColor').value = '#' + hex;
+    if (!s.pcolor) $('ptPColor').value = '#' + hex;
 
     var name = $('ptName').value.trim();
     var tip = '<div><b style="color:#' + (COLORS[s.ncolor] || 'ffffff') + '">' + esc(name || type().empty) + '</b>';
@@ -340,9 +370,12 @@
     var notes = [];
     if (s.out === 'give' && type().scale < 1) notes.push(type().id === 'tipped_arrow' ? 'An arrow passes on 1/8 of each time, so the tooltip shows the shorter time.' : 'A lingering cloud passes on 1/4 of each time, so the tooltip shows the shorter time.');
     if (s.out === 'give' && s.parts === 'none' && !s.color && list.length) notes.push('With particles off the game mixes no colour, so the bottle stays water blue. Pick a colour to change it.');
+    if (s.out === 'give' && /splash|lingering/.test(s.type) && list.length) notes.push('Its splash' + (s.type === 'lingering_potion' ? ' and cloud' : '') + ' use the bottle colour. For particles in a colour of their own, make an Effect cloud.');
+    if (s.out === 'cloud') notes.push('Players and mobs standing in the cloud get its effects until it runs out.');
+    if (s.out === 'cloud' && s.pcolor && s.ver === 0) notes.push('Before 1.20.5 the cloud has one colour, so the particle colour is used for it.');
     if (s.out === 'give' && !name && list.length) notes.push('Without a name the game calls it ' + type().empty + '.');
     if (s.out === 'give' && list.some(function (e) { return s.fx[e.id].lvl > 6; })) notes.push('The game has no numeral above VI, so higher levels show as potion.potency.N in the tooltip.');
-    if (s.out !== 'give' && list.length) notes.push('Run each line on its own, or put one in each command block. /effect can\'t make particles faint or hide the icon.');
+    if ((s.out === 'java' || s.out === 'bedrock') && list.length) notes.push('Run each line on its own, or put one in each command block. /effect can\'t make particles faint or hide the icon.');
     if (s.out === 'bedrock') {
       var skip = list.filter(function (e) { return !e.br; });
       if (skip.length) notes.push(skip.map(function (e) { return e.name; }).join(', ') + ' ' + (skip.length > 1 ? 'are' : 'is') + ' Java only, so ' + (skip.length > 1 ? 'they are' : 'it is') + ' left out.');
@@ -369,9 +402,12 @@
       render();
     });
   }
+  // data-give-only: the potion item only, unless it also has data-cloud. data-cloud-only / data-no-cloud: the cloud.
   function setOut() {
-    document.querySelectorAll('[data-give-only]').forEach(function (el) { el.hidden = s.out !== 'give'; });
-    if (s.out !== 'give' && s.parts === 'faint') { s.parts = 'normal'; press($('ptParts'), 'data-parts', 'normal'); }
+    document.querySelectorAll('[data-give-only]').forEach(function (el) { el.hidden = !(s.out === 'give' || s.out === 'cloud' && el.hasAttribute('data-cloud')); });
+    document.querySelectorAll('[data-cloud-only]').forEach(function (el) { el.hidden = s.out !== 'cloud'; });
+    document.querySelectorAll('[data-no-cloud]').forEach(function (el) { el.hidden = s.out === 'cloud'; });
+    if (s.out !== 'give' && s.out !== 'cloud' && s.parts === 'faint') { s.parts = 'normal'; press($('ptParts'), 'data-parts', 'normal'); }
     $('ptVer').hidden = s.out === 'bedrock';
     $('ptVerK').hidden = s.out !== 'bedrock';
   }
@@ -462,8 +498,17 @@
     s.color = this.value.slice(1);
     render();
   });
+  $('ptPAuto').addEventListener('change', function () {
+    s.pcolor = this.checked ? '' : $('ptPColor').value.slice(1);
+    render();
+  });
+  $('ptPColor').addEventListener('input', function () {
+    $('ptPAuto').checked = false;
+    s.pcolor = this.value.slice(1);
+    render();
+  });
   $('ptIcon').addEventListener('change', function () { s.icon = this.checked; render(); });
-  ['ptName', 'ptLore', 'ptCount', 'ptTarget'].forEach(function (id) {
+  ['ptName', 'ptLore', 'ptCount', 'ptTarget', 'ptRadius', 'ptCloudSec'].forEach(function (id) {
     $(id).addEventListener('input', render);
   });
 

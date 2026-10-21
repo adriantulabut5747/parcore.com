@@ -707,10 +707,64 @@ only** (verified in game; web sources saying TH16/17 are wrong); 5,000-stone cap
 Crafted Statue and Builder Bust both 500; Charge Effect can't be removed; an upgrade
 still running at season end pays nothing. 5 photo slots are placeholders.
 
-### Next article: Base Building 101 (after Best Pets is reviewed)
+### Base Building 101: Adrian's calls (Oct 15, 2026)
 
-Start by asking Adrian (section 1.2): tool quicklinks (probably the TH
-layouts pages), the real secret, what to cover and what to skip.
+Draft: `site/articles/coc/base-building.html` (noindex; `articles.json`
+remains `soon`). Scope = war bases only. Include quicklinks to every TH8–18
+layout page. The real secret is dead zones; cover every supplied topic,
+including Queen-range spacing, Eagle placement, Flame Flinger coverage,
+broken-wall pathing, traps, Clan Castle placement, and Spell Tower priorities
+(Rage → Invisibility → Poison). Use the Archer Queen placeholder for the
+banner and all seven body image slots. The banner/thumb and body images still
+need Adrian's screenshots/art before the article can go live.
+
+Rewritten Oct 15, 2026 (Adrian: "make it professional and clear"): 12 rules, each
+tightened to 2-3 short paragraphs. New rules built from Adrian's own war-base notes:
+Rule 5 (Town Hall off the siege path: Log Launcher / Wall Wrecker drive at the Town Hall),
+Air Sweepers aimed at the routes to key defenses (in Rule 8), Rule 12 (test in a friendly
+challenge). Eagle placement split into its own rule (4); TH spacing is a table (Rule 3).
+Read next = best-layouts.
+
+Adrian's layout rules: four open tiles on a straight approach before the fifth
+tile (the wall); use two wall pieces diagonally. Leave the Eagle Artillery
+opposite the Town Hall when they are separate. TH17 merges it into the Inferno
+Artillery Town Hall weapon, so this rule changes at TH17. Spread high-impact
+defenses, use deliberate dead zones and broken-wall openings to disrupt
+funnels, and place traps on predicted troop paths. Factual review still needed
+for the exact diagonal spacing, trap combinations, and which defenses can
+reach a parked Flame Flinger on each layout.
+
+### Troop tier list: rebuilt Oct 15, 2026
+
+Tiers = Adrian's own list (tier list maker link under the board on the page; 49 troops).
+Top: a picture board (`.ap-tierboard`, same look as the maker), each icon jumps to its
+troop. S to C troops: picture, name, **why it's in that tier** (not what the troop does),
+one + and one − line (`.ap-troop`, `.ap-pc`). D to F: picture + one line (`.ap-troop.is-short`).
+Real secret: "Flexibility Beats Raw Power" (Adrian's pick). Adrian's own reasons for
+S and A (Healer, Dragon, Thrower, Balloon, Headhunter, Super Wall Breaker) are the
+model: say why the troop matters in an attack, in plain words.
+
+### War bases (best-layouts): Oct 15, 2026
+
+Title "The War Bases Behind a 50-Win Streak" (Adrian: the streak is real), dek
+"Copy them before your next war." The id stays `best-layouts`. One base per Town Hall,
+TH9 to TH13 live, TH14 to TH18 still "coming soon" (one line each, dimmed picker tile).
+
+- Each base reads like the rest of the article, no box (Adrian, Oct 15): the
+  screenshot as a normal `.ap-fig`, a dark **Copy Layout** button (the in-game
+  link) on its bottom-right corner (`.ap-fig-link`), the Clan Castle as the
+  caption, then the reasons as a bullet list with bold leads. The button is
+  placed and sized in % of the picture so it **always covers the "AC.Parcore"
+  watermark** (Adrian's pick); smaller on phones. A red button and a
+  "THNN Layouts" button that led to the layouts page were both tried and
+  rejected. A ready-to-copy base sits in a comment above the TH9 section.
+  Town Halls without a base get one line: "The Town Hall NN base is coming soon."
+- Bases come from the layouts pages: same picture
+  (`/clashofclans/home/thNN-N_watermarked.webp`) and link as that base's JSON entry.
+  **Exception to 5b:** these screenshots keep their baked-in watermark (Adrian's pick).
+- The Clan Castle must match the base's `cc` in `thNN-layouts.json`, and it must
+  fit that Town Hall's Clan Castle space (`coc-army-data.json` townHalls.cc).
+  TH9 base 4 changed to 1 Furnace + 12 Archers on both pages.
 
 ### Clan Games: fixes (Oct 11, 2026)
 
@@ -726,3 +780,54 @@ layouts pages), the real secret, what to cover and what to skip.
 - Each infographic also exists as an HTML block right above its figure (`.ap-viz` + `.ap-bars` / `.ap-meter` /
   `.ap-steps`, articles.css "Chart blocks"), Adrian's pick. Titles plain white except the rewards one
   ("Resources last." stays red). The figures stay until he swaps in his own images.
+
+### First Hardcore World (Minecraft): Oct 15, 2026
+
+The site's first Minecraft article: `site/articles/minecraft/first-hardcore-world.html`
+(noindex, `articles.json` "live" so it shows in the feed for review). Adrian's calls:
+
+- Scope = the first phase of hardcore, not a day count. Card title changed to
+  **"Your First Hardcore World: Surviving the Early Game"** (id unchanged). Java **and**
+  Bedrock; every difference is written inline (shield: F + right-click on Java, crouch on Bedrock).
+- Structure: six milestones (First Night → Food → Stone, Then Iron → Shield → Base → Full Iron),
+  plus What Changes in Hardcore, Before You Press Create, Stop Dying Like This, FAQ, Summary.
+- Real secret: **shield before armor** (Milestone 4). Iron budget chart (`.ap-steps`): shield 1 →
+  bucket 3 → pickaxe 3 → chestplate 8 → leggings 7 → boots 4 → helmet 5 → sword 2 = 33 ingots.
+- Links: seeds page, Nether coordinate calculator, and the 3,000-day world (HCPC) **as a link only**
+  in "More for Minecraft". It is not used as a credential in the text.
+- Mojang footer line ("NOT AN OFFICIAL MINECRAFT PRODUCT…"): offered, Adrian said **not now**.
+- Minecraft article images live in `site/minecrafticons/articles/<id>/`. Item icons are the game's
+  own 16px textures from the local 26.3 jar, drawn sharp by `.ap-pixel` (articles.css). Placeholder:
+  `placeholder.webp` in the article folder. 6 photo slots with SHOT notes, awaiting Adrian's screenshots.
+- Banner/thumb: "BLOCK / WHAT KILLS / FIRST." (Adrian's pick) + "Creepers. Arrows. One iron ingot."
+  Template `_tools/thumbs/first-hardcore-world.html`; `render.py first-hardcore-world` writes banner
+  (1920) + thumb (800). Shield taking two arrows and a creeper blast, all game sprites.
+- Nav: `game-nav.json` "articles-minecraft" (Minecraft + Genshin Impact in the middle). No
+  /articles/minecraft/ hub yet: the breadcrumb links `/articles/?game=minecraft`.
+- To check with Adrian: H1 wording (starts with the game name); facts flagged in the handoff.
+
+### 3x3 Piston Door (Minecraft): Oct 15, 2026
+
+`site/articles/minecraft/3x3-piston-door.html` (noindex, "live" for review). Adrian's calls:
+
+- **Zraft's design, credited by name only, no link, at the very bottom of the article**
+  (`.ap-credit`, after "More for Minecraft"). Exception to "no credits to other creators" for
+  builds that aren't ours. Java Edition only. **No real-secret section** (Adrian: "there's no secret").
+- **3D build viewer** (`site/mc-build.js` + `mc-build.css`, three.js 0.160.0 from jsDelivr via an
+  importmap in the page head). Reusable: `<div class="mcb" data-build="/mc-build-<id>.json"
+  data-materials="<chips id>">`. Rotate/zoom (pan off), hover or tap = outline + label + facing arrow,
+  "Facing arrows" (all at once), "Hide frame blocks" (building blocks become faint outlines),
+  Layers slider (bottom-up), Closed/Open switch (only when the JSON has an open state),
+  materials chips counted from the closed build. Labels say left/right as seen from the
+  front = the north side (the side the droppers face).
+- **Data:** Adrian saves the build with a Structure Block; `python _tools/mcbuild/build.py <id>
+  <closed.nbt> [open.nbt]` writes `site/mc-build-<id>.json` and copies the .nbt files to
+  `site/minecrafticons/builds/<id>/` (download button). 26.x files use `id`/`properties` in the
+  palette (older: `Name`/`Properties`); the reader handles both. Textures: the game's own, from the
+  local 26.3 jar, in `site/minecrafticons/builds/textures/`.
+- Source files (Oct 15, re-saved with the lever inside, 9x9x1): `New World (2)` →
+  `3x3-door-close.nbt` + `3x3-door-open.nbt`. The lever is ON when the door is closed and OFF
+  when open. Both states are in the viewer; the banner art was re-rendered from the new model.
+- Banner/thumb: "3X3 DOOR / ONE WALL / THICK." + "11 sticky pistons · 10 observers", art = the
+  viewer's own render (`_tools/thumbs/assets/mc/door-render.png`). Headline not yet approved.
+- 3 photo slots (repeaters close-up, door open, Structure Block Load screen) with SHOT notes.

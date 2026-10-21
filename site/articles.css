@@ -274,12 +274,9 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-cover {
   position: relative;
   display: block;
-  border-radius: 0;
-  overflow: hidden;
   background: #141519;
   color: inherit;
   text-decoration: none;
-  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
 }
 .ah-cover-media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #0c0d0f; }
 .ah-cover-media img {
@@ -312,6 +309,21 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-cover-dek { font: 400 16px/1.45 'Sora', sans-serif; color: #c8cbcd; }
 .ah-cover .art-row-meta { color: #949ba4; }
 .ah-cover:focus-visible { outline: 2px solid #c23b3b; outline-offset: 4px; }
+a.ah-cover:hover {
+  border-color: var(--lb-edge);
+  background-color: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+}
+a.ah-cover {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.ah-cover {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+}
 
 /* "Also new": the next three, compact rows filling the cover's height. */
 .ah-also { display: flex; flex-direction: column; min-width: 0; }
@@ -338,9 +350,10 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-also-media {
   display: block;
   aspect-ratio: 16 / 9;
-  border-radius: 0;
   overflow: hidden;
   background: #0c0d0f;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
 }
 .ah-also-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
 .ah-also a:hover img { transform: scale(1.05); }
@@ -374,6 +387,16 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ah-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
 .ah-tools .ah-filters { margin-bottom: 0; }
 .ah-tools .ah-search { flex: 0 1 300px; }
+#artSearch:focus {
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
+}
+#artSearch {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
 
 @media (min-width: 971px) and (max-width: 1280px) {
   .ah-lead { grid-template-columns: minmax(0, 1fr); }
@@ -386,7 +409,6 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 }
 @media (max-width: 970px) {
   .ah-lead { grid-template-columns: minmax(0, 1fr); gap: 26px; margin-bottom: 48px; }
-  .ah-cover { border-radius: 0; }
   .ah-cover-body { padding: 18px 18px 20px; gap: 8px; }
   .ah-cover-body h2 { font-size: 22px; }
   .ah-cover-dek { font-size: 15px; }
@@ -403,7 +425,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
   color: #8b9097;
 }
 @media (max-width: 970px) {
-  .ah { padding: 66px 5% 96px; } /* clears the 38px secondary bar */
+  .ah { padding: 60px 5% 96px; } /* clears the 32px secondary bar */
   .ah-head { flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 18px; }
   .ah-search { flex-basis: auto; }
   .ah-search input { font-size: 16px; } /* 16px stops iOS zooming in on focus */
@@ -783,7 +805,7 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-more-list a:hover { border-color: rgba(194, 59, 59, 0.6); transform: translateY(-2px); }
 
 @media (max-width: 970px) {
-  .ap { display: block; padding: 38px 5% 104px; } /* banner sits flush under the 38px secondary bar */
+  .ap { display: block; padding: 32px 5% 104px; } /* banner sits flush under the 32px secondary bar */
   /* Edge to edge: cancel .ap's 5% side padding (5% of the page = 5.5556%
      of .ap's content box). */
   .ap-banner { margin: 0 -5.5556% 36px; }
@@ -863,6 +885,11 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .ap-chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 0; background: #16171b; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 14px; font-weight: 600; color: #e6e8eb; }
 .ap-chip img { width: 36px; height: 36px; border-radius: 0; object-fit: cover; }
+/* Minecraft articles: the game's 16px item textures, scaled up without blur. */
+.ap-pixel img[src$=".png"] { image-rendering: pixelated; }
+.ap-pixel .ap-chip img { padding: 4px; background: #222228; }
+/* Credit for a build's original designer: quiet, at the very end of the article (Adrian, Oct 2026). */
+.ap-credit { margin-top: 28px; font: 400 13px/1.4 'Sora', sans-serif; color: #7d7d86; }
 .ap-pet-ranking { margin: 0; padding-left: 22px; color: #d5d7dc; font-size: 14px; line-height: 1.55; }
 .ap-pet-ranking li::marker { color: #e0605f; font-weight: 800; }
 
@@ -890,6 +917,8 @@ body { height: 100vh; background: var(--bg-main); color: var(--text-main); displ
 .ap-tier-b { --t: 222, 190, 72; }
 .ap-tier-c { --t: 120, 194, 92; }
 .ap-tier-d { --t: 64, 184, 140; }
+.ap-tier-e { --t: 84, 156, 232; }
+.ap-tier-f { --t: 160, 116, 232; }
 .ap-tiers td:first-child { width: 1%; }
 .ap-def img.ap-eq-common, .ap-def img.ap-eq-epic { padding: 3px; border-radius: 0; }
 img.ap-eq-common { background: radial-gradient(120% 90% at 50% 0%, #2f5c9c 0%, #1b3560 60%, #142645 100%); }
@@ -1039,4 +1068,114 @@ img.ap-eq-epic { background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f
   .ap-viz { padding: 20px 16px 18px; }
   .ap-viz-title { font-size: 21px; }
   .ap-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* An article whose body opens with a paragraph (not an h2): the h2's 52px
+   top margin is what normally separates the header from the body. */
+.ap-body > p:first-child { margin-top: 44px; }
+@media (max-width: 970px) { .ap-body > p:first-child { margin-top: 24px; } }
+
+/* "Pick your Town Hall" strip (best-layouts): TH renders that jump to each
+   section. Five across, so TH9-18 is two even rows at any width. */
+.ap-thpick ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 0; list-style: none; }
+.ap-body .ap-thpick li { margin: 0; font-size: 14px; line-height: 1; }
+.ap-body .ap-thpick a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #141518;
+  color: #e6e8eb;
+  font-weight: 650;
+  text-decoration: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.ap-thpick img { width: 56px; height: 56px; object-fit: contain; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.ap-body .ap-thpick a:hover { border-color: rgba(194, 59, 59, 0.6); background: #18191d; }
+.ap-thpick a:hover img { transform: translateY(-3px); }
+.ap-thpick a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Base screenshots (best-layouts): Copy Layout sits on the picture's
+   bottom-right corner, sized in % of the picture so it always covers the
+   baked-in "AC.Parcore" watermark (x 77.5-98.5%, y 92.4-97.3% of every
+   screenshot). Solid background so none of the watermark shows through. */
+.ap-fig-frame { position: relative; }
+.ap-body .ap-fig-link {
+  position: absolute;
+  right: 1%;
+  bottom: 1.5%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 23%;
+  min-height: 40px;
+  padding: 0 14px;
+  background: #0c0d0f;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.7);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.ap-fig-link svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.ap-body .ap-fig-link:hover { background: #c23b3b; border-color: #c23b3b; }
+.ap-fig-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .ap-thpick ul { gap: 6px; }
+  .ap-body .ap-thpick a { padding: 10px 2px 9px; font-size: 13px; }
+  .ap-thpick img { width: 40px; height: 40px; }
+  .ap-body .ap-fig-link { gap: 6px; min-height: 28px; padding: 0 9px; font-size: 12px; }
+  .ap-fig-link svg { width: 13px; height: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ap-thpick img, .ap-thpick a, .ap-fig-link { transition: none; }
+  .ap-thpick a:hover img { transform: none; }
+}
+
+/* Troop tier list (Oct 15 2026): a picture board like the tier list maker
+   (each icon jumps to its troop), then one entry per troop: picture, name,
+   why it's in that tier, + and − lines. */
+.ap-tierboard { display: grid; gap: 6px; }
+.ap-tb-row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 6px; }
+.ap-tb-row > .ap-tier { width: auto; height: auto; min-height: 58px; font-size: 20px; }
+.ap-tb-icons { display: flex; flex-wrap: wrap; align-content: center; gap: 6px; padding: 6px; border: 1px solid rgba(255, 255, 255, 0.06); background: #141518; }
+.ap-tb-icons a { display: block; width: 44px; height: 44px; border: 1px solid rgba(255, 255, 255, 0.1); background: #1a1b1f; transition: border-color 0.2s, transform 0.2s; }
+.ap-tb-icons img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ap-tb-icons a:hover { border-color: rgba(255, 255, 255, 0.5); transform: translateY(-2px); }
+.ap-tb-icons a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ap-body .ap-tb-link { margin-top: 10px; font-size: 14px; color: #8b9097; }
+.ap-body h2.ap-tier-h { display: flex; align-items: center; gap: 12px; }
+.ap-tier-h .ap-tier { flex: none; }
+.ap-troop { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 14px; align-items: start; scroll-margin-top: 96px; }
+.ap-body .ap-troop { margin-top: 24px; }
+.ap-troop > img { width: 48px; height: 48px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); background: #1a1b1f; }
+.ap-body .ap-troop h3 { margin: 0; font-size: 18px; line-height: 1.3; }
+.ap-body .ap-troop p { margin-top: 4px; font-size: 16px; line-height: 1.6; }
+.ap-body .ap-pc { margin-top: 8px; padding: 0; list-style: none; }
+.ap-body .ap-pc li { position: relative; margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.5; color: #b9bdc4; }
+.ap-body .ap-pc li + li { margin-top: 4px; }
+.ap-pc li::before { content: '+'; position: absolute; left: 2px; color: #78c25c; font-weight: 800; }
+.ap-pc li.con::before { content: '\2212'; color: #e0605f; }
+@media (max-width: 600px) {
+  .ap-tierboard { gap: 4px; }
+  .ap-tb-row { grid-template-columns: 38px minmax(0, 1fr); gap: 4px; }
+  .ap-tb-row > .ap-tier { min-height: 44px; font-size: 15px; }
+  .ap-tb-icons { gap: 4px; padding: 4px; }
+  .ap-tb-icons a { width: 34px; height: 34px; }
+  .ap-body .ap-troop { margin-top: 18px; }
+  .ap-troop { grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; }
+  .ap-troop > img { width: 40px; height: 40px; }
+  .ap-body .ap-troop h3 { font-size: 17px; }
+  .ap-body .ap-troop p { font-size: 15px; line-height: 1.55; }
+  .ap-body .ap-pc li { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ap-tb-icons a { transition: none; }
+  .ap-tb-icons a:hover { transform: none; }
 }

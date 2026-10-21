@@ -1134,24 +1134,6 @@
     toast(skipped.length ? 'Loaded. Left out: ' + skipped.join(', ') : 'Army loaded');
   });
 
-  // ---- "Tools" highlighted in the navs ---------------------------------------
-  // The army maker is one of the Tools, but the nav scripts only light up
-  // the link whose href is this page, and none is. So light Tools here:
-  // the bottom nav's (thz-script.js clears it on load) and the top bar's hub link (th-layouts.js builds that
-  // strip after a fetch -- the observer catches it arriving).
-  function markTools() {
-    document.querySelectorAll('.bn-item[data-role]').forEach(function (a) {
-      a.classList.toggle('active', a.dataset.role === 'bn-guides');
-    });
-    document.querySelectorAll('#stbHubNavScroll .stb-hub-link').forEach(function (a) {
-      a.classList.toggle('active', /coctools\.html$/.test(a.getAttribute('href') || ''));
-    });
-  }
-  markTools();
-  document.addEventListener('parchome:coc-nav-ready', markTools);
-  var hub = document.getElementById('stbHubNavScroll');
-  if (hub && window.MutationObserver) new MutationObserver(markTools).observe(hub, { childList: true });
-
   // ---- Start --------------------------------------------------------------
   // The army sheet comes from th-layouts.js, which loads after this file,
   // so wait for the page's scripts to finish before asking for it.

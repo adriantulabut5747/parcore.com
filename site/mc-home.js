@@ -53,7 +53,8 @@
       t.addEventListener('keydown', function (e) {
         var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
         if (!d) return;
-        var next = tabs[(i + d + tabs.length) % tabs.length];
+        var next = tabs[(i + d + tabs.length) % tabs.length], j = i + d;
+        while (next.hidden && next !== t) { j += d; next = tabs[(j + tabs.length) % tabs.length]; } // skip tabs a page has hidden
         select(next);
         next.focus();
       });

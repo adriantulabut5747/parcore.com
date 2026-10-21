@@ -218,9 +218,9 @@ function cocPagePath(u) {
             var terms = sec.terms.filter((t) => !q || (t.term + ' ' + (t.abbr || '') + ' ' + t.def).toLowerCase().indexOf(q) !== -1);
             if (!terms.length) return;
             html +=
-              '<section class="gd-gloss"><h3 class="gd-gloss-head"><img src="' +
+              '<section class="gd-gloss"><h3 class="gd-gloss-head"><span class="gd-gloss-ico"><img src="' +
               esc(sec.icon) +
-              '" alt="" width="28" height="28">' +
+              '" alt="" width="26" height="26"></span>' +
               esc(sec.label) +
               '<span class="gd-gloss-n">' +
               terms.length +
@@ -229,10 +229,10 @@ function cocPagePath(u) {
                 .map(
                   (t) =>
                     '<div class="gd-term"><dt>' +
-                    esc(t.term) +
-                    (t.abbr ? ' <span class="gd-abbr">' + esc(t.abbr) + '</span>' : '') +
+                    hl(t.term, q) +
+                    (t.abbr ? ' <span class="gd-abbr">' + hl(t.abbr, q) + '</span>' : '') +
                     '</dt><dd>' +
-                    esc(t.def) +
+                    hl(t.def, q) +
                     '</dd></div>',
                 )
                 .join('') +
@@ -241,6 +241,19 @@ function cocPagePath(u) {
           glossList.innerHTML = html;
           empty.hidden = !!html;
           $('#glossQ').textContent = input.value.trim();
+        }
+        // Escaped text with each case-insensitive hit of q wrapped in <mark>.
+        function hl(text, q) {
+          if (!q) return esc(text);
+          var low = text.toLowerCase();
+          var out = '';
+          var i = 0;
+          var j;
+          while ((j = low.indexOf(q, i)) !== -1) {
+            out += esc(text.slice(i, j)) + '<mark>' + esc(text.slice(j, j + q.length)) + '</mark>';
+            i = j + q.length;
+          }
+          return out + esc(text.slice(i));
         }
         input.addEventListener('input', render);
         render();

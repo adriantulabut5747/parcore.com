@@ -270,9 +270,7 @@ function cocPagePath(u) {
 
 // Secondary top bar (desktop): dsn-chip Town Hall row + stb-hub-link row,
 // both built from coc-nav-data.json. No dropdown any more -- each TH chip
-// links straight to that TH's layouts page (layoutHref). Reuses the same
-// arrow/scroll wiring hwr's strips use (window.updateDsnScrollArrows /
-// window.updateStbHubNavArrows, both exposed by 11layout.js). Identical
+// links straight to that TH's layouts page (layoutHref). Identical
 // to /coc/'s copy of this script.
 (function initCocSecondaryTopBar() {
   var dsnScroll = document.getElementById('dsnCategoriesScroll');
@@ -308,7 +306,6 @@ function cocPagePath(u) {
     function fit() {
       box.classList.remove('is-tight');
       if (box.scrollWidth > box.clientWidth + 1) box.classList.add('is-tight');
-      if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
     }
     fit();
     if (window.ResizeObserver) new ResizeObserver(fit).observe(box);
@@ -365,7 +362,6 @@ function cocPagePath(u) {
           })
           .join('');
         fitLabels(dsnScroll);
-        if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
       } else if (dsnScroll && Array.isArray(data.townhalls)) {
         var onArmy = data.townhalls.some(function (t) {
           return normalize(t.armyHref) === currentPage;
@@ -389,7 +385,6 @@ function cocPagePath(u) {
             );
           })
           .join('');
-        if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
       }
 
       if (hubScroll && data.primaryNav) {
@@ -428,7 +423,6 @@ function cocPagePath(u) {
             );
           })
           .join('');
-        if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
       }
     })
     .catch(function (err) {

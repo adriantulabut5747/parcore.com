@@ -1,15 +1,24 @@
 /* =======================================================================
-   EQUIPMENT TIER LIST MAKER (/coc/tools/equipment-tier-list)
-   Built from coc-equipment.json. The rows on the page ARE the state, and
-   every change copies them into the address (replaceState):
-     ?r=S:fireball,spiky-ball&r=Ore first:vampstache&r=B:&hero=2
+   TIER LIST MAKER (/coc/tools/tier-list) -- troops or hero equipment, one
+   list at a time (merged Oct 21 2026; was troop-tier-list +
+   equipment-tier-list, two near-copies of this file).
+   ?type=equipment picks the equipment list; no type = troops. An old shared
+   link without a type still opens the right list: equipment ids are names
+   ("fireball"), troop ids are numbers, and only equipment links use ?hero=.
+   LIST below holds everything that differs between the two.
+   The rows on the page ARE the state, and every change copies them into the
+   address (replaceState):
+     ?r=S:0,7&r=Favorites:12&cat=dark
+     ?type=equipment&r=S:fireball,spiky-ball&r=B:&hero=2
    one r per row, top to bottom: "name:ids". The name is split off at the
-   LAST colon (ids never contain one). No r at all = the default S-D board.
-   So "Copy link" just copies the address, and the article's "Make your own"
-   link pre-fills a ranking. A row's colour goes by its position (PAL),
+   LAST colon (ids never contain one). No r at all = the default board.
+   So "Copy link" just copies the address, and the articles' "Open this
+   list" links pre-fill a ranking. A row's colour goes by its position (PAL),
    so it isn't stored.
    Moving: drag (mouse at once, touch after a 200ms hold so a swipe still
    scrolls the page), or tap a piece then tap a tier / the pool.
+   Switching lists (the Troops / Equipment keys) is a page load; with
+   anything ranked it asks first, since only one board exists at a time.
    ======================================================================= */
 (function () {
   var NAMES = 'SABCDEFGHI';
@@ -30,60 +39,126 @@
   var MAX = PAL.length;
   var NAME_MAX = 20;
   var DIR = '/clashofclans/coctools/units/';
+
+  var q0 = new URLSearchParams(location.search);
+  var TYPE =
+    q0.get('type') === 'equipment' ||
+    (!q0.get('type') && (q0.has('hero') || q0.getAll('r').some((v) => /[a-z]/.test(v.slice(v.lastIndexOf(':') + 1)))))
+      ? 'equipment'
+      : 'troops';
+  var CATS = [
+    ['', 'All troops'],
+    ['elixir', 'Elixir'],
+    ['dark', 'Dark Elixir'],
+    ['super', 'Super Troops'],
+  ];
+  var LIST = {
+    troops: {
+      src: '/coc-army-data.json',
+      items: (d) => d.troops,
+      rows: 7, // S to F
+      param: 'cat',
+      valid: (d, v) => CATS.some((c) => c[0] && c[0] === v),
+      chips: () =>
+        CATS.map(
+          (c) =>
+            '<button type="button" class="am-btn gd-chip" data-filter="' + c[0] + '" aria-pressed="' + !c[0] + '">' + c[1] + '</button>',
+        ).join(''),
+      tags: (e) => (e.dark ? 'dark' : 'elixir') + (e.super ? ' super' : ''),
+      what: 'troop',
+      title: () => 'CLASH OF CLANS TROOPS ',
+      file: 'troop-tier-list.png',
+    },
+    equipment: {
+      src: '/coc-equipment.json',
+      items: (d) => d.equipment,
+      rows: 5, // S to D
+      param: 'hero',
+      valid: (d, v) => !!d.heroes[v],
+      chips: (d) =>
+        '<button type="button" class="am-btn gd-chip" data-filter="" aria-pressed="true">All</button>' +
+        Object.keys(d.heroes)
+          .map(
+            (k) =>
+              '<button type="button" class="am-btn gd-chip tl-hero" data-filter="' +
+              k +
+              '" aria-pressed="false" title="' +
+              esc(d.heroes[k].name) +
+              '" aria-label="' +
+              esc(d.heroes[k].name) +
+              '"><img src="' +
+              DIR +
+              esc(d.heroes[k].img) +
+              '" alt="" width="96" height="96"><span>' +
+              esc(d.heroes[k].name) +
+              '</span></button>',
+          )
+          .join(''),
+      tags: (e) => String(e.hero),
+      what: 'piece',
+      title: (d, f) => (f ? d.heroes[f].name : 'Equipment').toUpperCase() + ' ',
+      file: 'equipment-tier-list.png',
+    },
+  }[TYPE];
+  var LAST = NAMES[LIST.rows - 1];
+
   var box = document.getElementById('tierlist');
   var board = document.getElementById('tlBoard');
   var addBtn = document.getElementById('tlAdd');
   var pool = document.getElementById('tlPool');
-  var heroBox = document.getElementById('tlHeroes');
+  var chipBox = document.getElementById('tlHeroes');
   var data,
     byId = {};
-  var hero = ''; // '' = all heroes
+  var filter = ''; // '' = everything
   var picked = null; // tile chosen by a tap, waiting for a tier
 
   var esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   var rows = () => [...board.querySelectorAll('.tl-row')];
   var tileEl = (id) => box.querySelector('.tl-tile[data-id="' + id + '"]');
+  var ranked = () => rows().some((r) => r.querySelector('.tl-zone').children.length);
 
-  fetch('/coc-equipment.json')
+  // This list's copy and keys; the other list's [data-mode] blocks hide.
+  box.dataset.type = TYPE;
+  document.querySelectorAll('[data-mode]').forEach((el) => (el.hidden = el.dataset.mode !== TYPE));
+  document.querySelectorAll('.tl-modes [data-type]').forEach((b) => {
+    b.classList.toggle('active', b.dataset.type === TYPE);
+    b.setAttribute('aria-pressed', b.dataset.type === TYPE);
+    b.addEventListener('click', async () => {
+      if (b.dataset.type === TYPE) return;
+      var other = b.dataset.type === 'equipment' ? 'equipment' : 'troops';
+      if (
+        ranked() &&
+        !(await ask(
+          'Switch to ' + other + '?',
+          'One list at a time: your ' + TYPE + ' tier list will be cleared. Copy its link first if you want to keep it.',
+          'Switch',
+        ))
+      )
+        return;
+      location.href = location.pathname + (other === 'equipment' ? '?type=equipment' : '');
+    });
+  });
+
+  fetch(LIST.src)
     .then((r) => r.json())
     .then((d) => {
       data = d;
-      d.equipment.forEach((e) => (byId[e.id] = e));
-      document.getElementById('tlCount').textContent = d.equipment.length;
+      LIST.items(d).forEach((e) => (byId[e.id] = e));
       build();
-      load(new URLSearchParams(location.search));
+      load(q0);
     });
 
   function build() {
-    var heroes = data.heroes;
-    heroBox.innerHTML =
-      '<button type="button" class="am-btn gd-chip" data-hero="" aria-pressed="true">All</button>' +
-      Object.keys(heroes)
-        .map(
-          (k) =>
-            '<button type="button" class="am-btn gd-chip tl-hero" data-hero="' +
-            k +
-            '" aria-pressed="false" title="' +
-            esc(heroes[k].name) +
-            '" aria-label="' +
-            esc(heroes[k].name) +
-            '"><img src="' +
-            DIR +
-            esc(heroes[k].img) +
-            '" alt="" width="96" height="96"><span>' +
-            esc(heroes[k].name) +
-            '</span></button>',
-        )
-        .join('');
-    pool.innerHTML = data.equipment
+    chipBox.innerHTML = LIST.chips(data);
+    pool.innerHTML = LIST.items(data)
       .map(
         (e) =>
           '<button type="button" class="tl-tile ' +
           (e.rarity === 'Epic' ? 'tl-epic' : 'tl-common') +
           '" data-id="' +
           e.id +
-          '" data-hero="' +
-          e.hero +
+          '" data-tags="' +
+          LIST.tags(e) +
           '" title="' +
           esc(e.name) +
           '" aria-label="' +
@@ -91,15 +166,15 @@
           '"><img src="' +
           DIR +
           esc(e.img) +
-          '" alt="" width="128" height="128" draggable="false"><img class="tl-badge" src="' +
-          DIR +
-          esc(heroes[e.hero].img) +
-          '" alt="" draggable="false"></button>',
+          '" alt="" width="128" height="128" draggable="false">' +
+          (TYPE === 'equipment' ? '<img class="tl-badge" src="' + DIR + esc(data.heroes[e.hero].img) + '" alt="" draggable="false">' : '') +
+          '</button>',
       )
       .join('');
   }
 
   // ---- rows ---------------------------------------------------------------
+  // The remove key sits inside the row, at the slot's top right.
   function addRow(name) {
     var row = document.createElement('div');
     row.className = 'tl-row';
@@ -127,7 +202,7 @@
   }
   function defaultRows() {
     rows().forEach((r) => r.remove());
-    for (var i = 0; i < 5; i++) addRow(NAMES[i]);
+    for (var i = 0; i < LIST.rows; i++) addRow(NAMES[i]);
   }
   addBtn.addEventListener('click', () => {
     if (rows().length >= MAX) return;
@@ -193,34 +268,36 @@
       });
     });
     refresh();
-    setHero(data.heroes[q.get('hero')] ? q.get('hero') : '');
+    var f = q.get(LIST.param);
+    setFilter(f && LIST.valid(data, f) ? f : '');
   }
   function save() {
     var q = new URLSearchParams();
+    if (TYPE === 'equipment') q.set('type', 'equipment');
     var list = rows().map((r) => ({
       name: r.querySelector('.tl-name').textContent.trim(),
       ids: [...r.querySelector('.tl-zone').children].map((x) => x.dataset.id).join(','),
     }));
-    var pristine = list.length === 5 && list.every((r, i) => r.name === NAMES[i] && !r.ids);
+    var pristine = list.length === LIST.rows && list.every((r, i) => r.name === NAMES[i] && !r.ids);
     if (!pristine) list.forEach((r) => q.append('r', r.name + ':' + r.ids));
-    if (hero) q.set('hero', hero);
+    if (filter) q.set(LIST.param, filter);
     var qs = q.toString().replace(/%2C/g, ',').replace(/%3A/g, ':'); // readable share link
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
     var left = [...pool.children].filter((x) => !x.hidden).length;
     document.getElementById('tlLeft').textContent = left ? '(' + left + ')' : '';
   }
 
-  function setHero(h) {
-    hero = h;
-    heroBox.querySelectorAll('.gd-chip').forEach((b) => b.setAttribute('aria-pressed', b.dataset.hero === h));
-    box.querySelectorAll('.tl-tile').forEach((t) => (t.hidden = !!h && t.dataset.hero !== h));
-    box.classList.toggle('tl-one-hero', !!h);
+  function setFilter(f) {
+    filter = f;
+    chipBox.querySelectorAll('.gd-chip').forEach((b) => b.setAttribute('aria-pressed', b.dataset.filter === f));
+    box.querySelectorAll('.tl-tile').forEach((t) => (t.hidden = !!f && !t.dataset.tags.split(' ').includes(f)));
+    box.classList.toggle('tl-one-hero', !!f);
     if (picked && picked.hidden) pick(null);
     save();
   }
-  heroBox.addEventListener('click', (e) => {
+  chipBox.addEventListener('click', (e) => {
     var b = e.target.closest('.gd-chip');
-    if (b) setHero(b.dataset.hero);
+    if (b) setFilter(b.dataset.filter);
   });
 
   // ---- moving -------------------------------------------------------------
@@ -362,14 +439,20 @@
       q = new URL(/^r=/.test(text) ? '?' + text : text, location.href).searchParams;
     } catch (err) {}
     if (!q || !q.getAll('r').length) return toast("That doesn't look like a tier list link");
-    var ranked = rows().some((r) => r.querySelector('.tl-zone').children.length);
-    (ranked
-      ? ask('Replace your tier list?', 'The link\u2019s list takes the place of the one on the board now.', 'Replace')
+    // A link for the other list opens that list (it replaces this board).
+    var ids = q.getAll('r').flatMap((v) => v.slice(v.lastIndexOf(':') + 1).split(',').filter(Boolean));
+    if (ids.length && !ids.some((id) => byId[id])) {
+      q.set('type', TYPE === 'troops' ? 'equipment' : 'troops');
+      if (q.get('type') === 'troops') q.delete('type');
+    }
+    var elsewhere = (q.get('type') || 'troops') !== TYPE;
+    (ranked()
+      ? ask('Replace your tier list?', 'The link’s list takes the place of the one on the board now.', 'Replace')
       : Promise.resolve(true)
-    ).then((ok) => ok && importList(q, input));
+    ).then((ok) => ok && (elsewhere ? (location.href = location.pathname + '?' + q) : importList(q, input)));
   });
   function importList(q, input) {
-    data.equipment.forEach((eq) => pool.appendChild(tileEl(eq.id)));
+    LIST.items(data).forEach((eq) => pool.appendChild(tileEl(eq.id)));
     rows().forEach((r) => r.remove());
     pick(null);
     load(q);
@@ -407,11 +490,11 @@
   document.getElementById('tlReset').addEventListener('click', async () => {
     var ok = await ask(
       'Reset your tier list?',
-      'Every piece goes back to Unranked and the tiers go back to S to D. This can\u2019t be undone.',
+      'Every ' + LIST.what + ' goes back to Unranked and the tiers go back to S to ' + LAST + '. This can’t be undone.',
       'Reset',
     );
     if (!ok) return;
-    data.equipment.forEach((e) => pool.appendChild(tileEl(e.id)));
+    LIST.items(data).forEach((e) => pool.appendChild(tileEl(e.id)));
     defaultRows();
     pick(null);
     refresh();
@@ -437,8 +520,13 @@
 
   // ---- the picture: drawn on a canvas in the page's own look -------------------
   var rgba = (rgb, a) => 'rgba(' + rgb + ',' + a + ')';
-  // The army cards' rarity colours (.as-common / .as-epic), as canvas gradients.
-  var RARITY = { Common: ['#2f5c9c', '#1b3560', '#142645'], Epic: ['#6e3aa6', '#3f2068', '#2c1649'] };
+  // Tile faces: equipment in the army cards' rarity colours (.as-common /
+  // .as-epic), troops in the army maker's neutral raised grey.
+  var FACE = {
+    Common: ['#2f5c9c', '#1b3560', '#142645'],
+    Epic: ['#6e3aa6', '#3f2068', '#2c1649'],
+    troop: ['#2c2f36', '#1e2025', '#16171b'],
+  };
   function wrap(x, text, maxW) {
     var lines = [''];
     text.split(' ').forEach((w) => {
@@ -471,14 +559,19 @@
     var sx = PAD + LABEL + RGAP,
       sw = W - PAD - sx;
     var per = Math.floor((sw - 16 + GAP) / (T + GAP));
-    var rs = rows();
-    var list = rs.map((r, i) => ({
+    var list = rows().map((r, i) => ({
       rgb: PAL[i],
       name: r.querySelector('.tl-name').textContent.trim().toUpperCase(),
       tiles: [...r.querySelector('.tl-zone').children].filter((t) => !t.hidden).map((t) => byId[t.dataset.id]),
     }));
+    var badge = (e) => (TYPE === 'equipment' && !filter ? DIR + data.heroes[e.hero].img : '');
     var srcs = new Set();
-    list.forEach((r) => r.tiles.forEach((e) => srcs.add(DIR + e.img).add(DIR + data.heroes[e.hero].img)));
+    list.forEach((r) =>
+      r.tiles.forEach((e) => {
+        srcs.add(DIR + e.img);
+        if (badge(e)) srcs.add(badge(e));
+      }),
+    );
     var imgs = {};
     btn.disabled = true;
     Promise.all(
@@ -516,7 +609,7 @@
       x.textBaseline = 'middle';
       // Title: the banner's Orbitron caps, "TIER LIST" in red.
       x.font = '900 40px Orbitron';
-      var t1 = (hero ? data.heroes[hero].name : 'Equipment').toUpperCase() + ' ';
+      var t1 = LIST.title(data, filter);
       x.fillStyle = '#eff2f5';
       x.fillText(t1, PAD, TOP / 2);
       x.fillStyle = '#c23b3b';
@@ -528,8 +621,8 @@
         var g = x.createRadialGradient(cx, y + r.rh * 0.3, 4, cx, y + r.rh * 0.3, LABEL * 0.8);
         g.addColorStop(0, rgba(r.rgb, 0.3));
         g.addColorStop(1, rgba(r.rgb, 0.05));
-        card(x, PAD, y, LABEL, r.rh, 12, '#141518', 'rgba(255,255,255,0.06)');
-        card(x, PAD, y, LABEL, r.rh, 12, g, rgba(r.rgb, 0.4));
+        card(x, PAD, y, LABEL, r.rh, 8, '#141518', 'rgba(255,255,255,0.06)');
+        card(x, PAD, y, LABEL, r.rh, 8, g, rgba(r.rgb, 0.4));
         x.fillStyle = rgba(r.rgb, 1);
         x.textAlign = 'center';
         x.font = r.font;
@@ -537,21 +630,21 @@
         r.lines.forEach((l, i) => x.fillText(l, cx, y + r.rh / 2 + (i - (r.lines.length - 1) / 2) * 20));
         x.letterSpacing = '0px';
         x.textAlign = 'left';
-        // slot: the dark card with a hairline
-        card(x, sx, y, sw, r.rh, 12, 'rgba(0,0,0,0.28)', 'rgba(255,255,255,0.06)');
+        // slot: the sunken well
+        card(x, sx, y, sw, r.rh, 8, '#121317', '#060708');
         r.tiles.forEach((e, i) => {
           var tx = sx + 8 + (i % per) * (T + GAP);
           var ty = y + GAP + 4 + Math.floor(i / per) * (T + GAP);
-          var rc = RARITY[e.rarity] || RARITY.Common;
+          var fc = TYPE === 'equipment' ? FACE[e.rarity] || FACE.Common : FACE.troop;
           var tg = x.createRadialGradient(tx + T / 2, ty, 0, tx + T / 2, ty, T * 1.1);
-          tg.addColorStop(0, rc[0]);
-          tg.addColorStop(0.6, rc[1]);
-          tg.addColorStop(1, rc[2]);
-          card(x, tx, ty, T, T, 10, tg, 'rgba(255,255,255,0.06)');
+          tg.addColorStop(0, fc[0]);
+          tg.addColorStop(0.6, fc[1]);
+          tg.addColorStop(1, fc[2]);
+          card(x, tx, ty, T, T, 6, tg, '#060708');
           var im = imgs[DIR + e.img];
           if (im.naturalWidth) x.drawImage(im, tx + 6, ty + 6, T - 12, T - 12);
-          var hb = imgs[DIR + data.heroes[e.hero].img];
-          if (!hero && hb.naturalWidth) x.drawImage(hb, tx + T - 28, ty + T - 28, 26, 26);
+          var hb = badge(e) && imgs[badge(e)];
+          if (hb && hb.naturalWidth) x.drawImage(hb, tx + T - 28, ty + T - 28, 26, 26);
         });
         y += r.rh + RGAP;
       });
@@ -561,11 +654,11 @@
       x.fillText('PARCHROME', PAD, H - FOOT / 2);
       var bw = x.measureText('PARCHROME  ').width;
       x.fillStyle = '#6d7178';
-      x.fillText('MAKE YOURS: PARCHROME.NETLIFY.APP/COC/TOOLS/EQUIPMENT-TIER-LIST', PAD + bw, H - FOOT / 2);
+      x.fillText('MAKE YOURS: PARCHROME.NETLIFY.APP/COC/TOOLS/TIER-LIST', PAD + bw, H - FOOT / 2);
       c.toBlob((b) => {
         var a = document.createElement('a');
         a.href = URL.createObjectURL(b);
-        a.download = 'equipment-tier-list.png';
+        a.download = LIST.file;
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
         btn.disabled = false;

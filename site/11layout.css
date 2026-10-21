@@ -261,17 +261,62 @@ body { visibility: hidden; }
   /* Chrome surface tokens. Declared on :root rather than .sidebar because
      the secondary top bar uses them too and is not a descendant of the
      sidebar, so it could never have inherited them from there. */
-  --sb-base:    #0f0f10;
-  --sb-raised:  #16161a;
-  --sb-line:    rgba(255,255,255,0.09);
-  --sb-hover:   rgba(255,255,255,0.055);
+  /* Cool dark since the RAISED UI pass (Oct 2026; was #0f0f10 / #16161a). */
+  --sb-base:    #121317;
+  --sb-raised:  #141417;
+  --sb-line:    rgba(255,255,255,0.07);
+  --sb-hover:   rgba(255,255,255,0.05);
   /* 0.48, not the 0.32 this started at. Section labels are 10px, and at
      0.32 they measured 2.92:1 against both surfaces -- WCAG AA wants 4.5:1
      for small text. 0.45 is the threshold; 0.48 gives ~4.98:1 on both. */
   --sb-label:   rgba(255,255,255,0.48);
   --sb-accent:  rgb(194,59,59);
   --sb-inset:   16px;
-  --sb-radius:  0;
+  --sb-radius:  6px;
+
+  /* RAISED UI tokens (Oct 2026, the laby.net look). Every box, button and field
+       on the site is built from three recipes:
+         box  - solid fill, 2px --lb-edge, faint light ring + brighter top line, soft drop
+         key  - a button: same edge + a darker 3px ledge at the bottom; grey, or --lb-red
+                for a page's main action
+         well - sunken (inputs, search, regions inside a box): darker fill, shadow inside the top
+       "You are here" in navigation (bars, sidebar, bottom bar, tile strips) is a lifted
+       grey key; a picked tab / chip / page number in content is --lb-pick: an
+       off-white key with dark text (--lb-pick-ink). Red is kept for main actions.
+       Clash of Clans pages don't use --lb-pick: their tabs and chips are a well at
+       rest and the grey key when picked (th-layouts.css "TABS + CARD ACTIONS"). */
+  --lb-box: #141518;
+  --lb-box2: #1c1d21;
+  --lb-box-hover: #202128;
+  --lb-well: #121317;
+  --lb-raise: #2a2c35;
+  --lb-raise-hover: #32343e;
+  --lb-edge: #060708;
+  --lb-r: 6px;
+  /* Well depth: the sunken look of CoC's resting surfaces and the More sheet
+     tiles (coc-more.css, CoC + Minecraft). Pair with a 2px --lb-edge border
+     and --lb-well. Was in coc-hub-menus.css, which Minecraft doesn't load. */
+  --card-well: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  --lb-red: #c23b3b;
+  --lb-red-hover: #d04545;
+  --lb-red-edge: #320b0d;
+  --lb-red-text: #e86a6a;
+  --lb-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lb-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 10px 24px -12px rgba(0, 0, 0, 0.85);
+  --lb-shadow-hover: inset 0 0 0 1px rgba(255, 255, 255, 0.11), inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 16px 30px -14px rgba(0, 0, 0, 0.9);
+  --lb-btn: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -3px 0 rgba(0, 0, 0, 0.32), 0 2px 6px -2px rgba(0, 0, 0, 0.6);
+  --lb-btn-down: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.32);
+  --lb-btn-red: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -3px 0 rgba(0, 0, 0, 0.28), 0 2px 8px -2px rgba(0, 0, 0, 0.6);
+  --lb-ring-btn: inset 0 0 0 2px var(--lb-edge), inset 0 3px 0 rgba(255, 255, 255, 0.1), inset 0 -5px 0 rgba(0, 0, 0, 0.3);
+  --lb-ring-red: inset 0 0 0 2px var(--lb-red-edge), inset 0 3px 0 rgba(255, 255, 255, 0.26), inset 0 -5px 0 rgba(0, 0, 0, 0.26);
+  --lb-ring-well: inset 0 0 0 2px var(--lb-edge), inset 0 4px 0 rgba(0, 0, 0, 0.35);
+  --lb-pick: #e6e8ec;
+  --lb-pick-hover: #f3f4f6;
+  --lb-pick-edge: var(--lb-edge);
+  --lb-pick-ink: #14151a;
+  --lb-pick-shadow: inset 0 1px 0 #fff, inset 0 -3px 0 rgba(0, 0, 0, 0.22), 0 2px 6px -2px rgba(0, 0, 0, 0.6);
+  --lb-row: rgba(255, 255, 255, 0.03);
+  --lb-row-ring: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 
   /* Width of .coc-main's scrollbar. The fixed bars are inset by this so
      they stop at the scroll container's content edge instead of running
@@ -294,6 +339,27 @@ body { visibility: hidden; }
   --sidebar-font-lg: clamp(16px, 1.1vw, 21px);   /* top-box items, games, triple-a header */
   --sidebar-font-sm: clamp(14px, 0.85vw, 17px);  /* triple-a game rows */
   --sidebar-icon-lg: clamp(26px, 2vw, 35px);     /* topbox / game / triple-a icons */
+
+  /* TYPE SCALE (Oct 21 2026). Page text reads these instead of its own px
+     sizes, so one change here resizes every page that uses them. rem, not em:
+     1rem is always the root's 16px, while em is the parent's size and
+     compounds when text nests (.lob-sub > span). Phone values are below. */
+  --fs-title: clamp(1.75rem, 2.45vw, 2.25rem); /* section titles: 28-36px */
+  --fs-sub: 0.9375rem;                         /* text under a section title: 15px */
+  --fs-card: 1.125rem;                         /* card titles: 18px */
+  --fs-body: 0.875rem;                         /* card / body text: 14px */
+  --fs-label: 0.6875rem;                       /* chips, kickers, small labels: 11px */
+}
+/* Phones: the title stays ~1.4x the 13px text under it (it was 15px over
+   13px, so the subtitle outweighed it). 10px is the floor for any label. */
+@media (max-width: 970px) {
+  :root {
+    --fs-title: 1.125rem;  /* 18px */
+    --fs-sub: 0.8125rem;   /* 13px */
+    --fs-card: 1.0625rem;  /* 17px */
+    --fs-body: 0.8125rem;  /* 13px */
+    --fs-label: 0.625rem;  /* 10px */
+  }
 }
 
 /* Global scrollbar (Chrome, Edge, Safari) */
@@ -318,6 +384,10 @@ body { visibility: hidden; }
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   margin-left: 8px;}
 .hamburger span {
   height: 2px;
@@ -358,7 +428,8 @@ body { visibility: hidden; }
   display: flex;
   flex-direction: column;
   height: calc(100vh - 52px); /* full height minus topbar */
-  border-right: 1px solid rgba(255,255,255,0.06);}
+
+  border-right: 2px solid var(--lb-edge);}
 .sidebar > * { flex-shrink: 0; } /* Global scrollbar (Chrome, Edge, Safari) */
 /* Thin, near-invisible at rest — the track matches the sidebar bg so
    there's no boxed-in look, and the thumb only brightens on hover so
@@ -390,7 +461,7 @@ body { visibility: hidden; }
     box-shadow: 0 0 0 2px var(--accent);}
 
 /* Top box */
-.top-box {display:flex; flex-direction:column; gap:12px; padding:16px 12px; background-color:#171716ee; margin-bottom:14px;
+.top-box {display:flex; flex-direction:column; gap:12px; padding:16px 12px; background-color:#7a7a74ee; margin-bottom:14px;
    transition:background 0.25s ease; color:var(--text-secondary);}
 .top-box-item {display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:6px; cursor:pointer;
    font-size:var(--sidebar-font-lg); color:var(--text-secondary); margin-left: 5px; font-family: 'oxanium'; font-weight: 500;}
@@ -531,11 +602,9 @@ body { visibility: hidden; }
    ============================================================ */
 .top-bar {
   height: 52px;
-  background: var(--bg-tertiary);
   display: flex;
   align-items: center;
   padding: 0 14px;
-  border-bottom: 1px solid #0d0d0d;
   position: fixed;        
   top: 0;
   left: 0;
@@ -544,7 +613,10 @@ body { visibility: hidden; }
   padding: 5px;
   transform: translateY(0);
   transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;}
+  will-change: transform;
+  background: var(--lb-box);
+  border-bottom: 2px solid var(--lb-edge);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05);}
 /* top-bar-title is an <a> here (links back to /) — reset
    link defaults so it keeps looking exactly like the plain div it
    used to be. */
@@ -637,21 +709,22 @@ body { visibility: hidden; }
      the bar and the sidebar's top group read as one continuous chrome layer
      around the content, rather than two near-but-not-equal surfaces (27 vs
      22) at different temperatures. */
-  background: var(--sb-raised);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
   z-index: 15;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   color: #b3b3b3;
   font-weight: 500;
   font-size: 14px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); /* Safari support */
   transform: translateY(0);
   transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
+  background: var(--lb-box2);
+  border-bottom: 2px solid var(--lb-edge);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 18px -10px rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* Takes over the primary .top-bar's spot at the very top of the screen
@@ -710,7 +783,6 @@ body { visibility: hidden; }
        Same reasoning as there: the old #1b1c18 -> #252621 was olive (green
        minus blue = +4 on both stops) against a neutral sidebar and a red
        accent, and its left-to-right ramp answered to nothing in the layout. */
-    background: var(--sb-raised);
   }
   /* 14px was competing with the nav chips beside it; the page title should
      sit under them in the hierarchy, not level with them. */
@@ -774,7 +846,7 @@ body { visibility: hidden; }
       left: 0;
       width: 100%;                /* full width on mobile */
       padding: 0 10px;
-      height: 38px;
+      height: 32px;
       justify-content: space-between;  /* keeps left and right separated */
       font-size: 12px;}
 
@@ -944,8 +1016,13 @@ body.search-modal-open .coc-main {
    Featured Topics (index.html adds its groups, "+N more" and logos). */
 .ft-tile {
   position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 9px 14px;
-  border-radius: 0; overflow: hidden; isolation: isolate; background: #1b1b1e; color: #fff; text-decoration: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+overflow: hidden; isolation: isolate;text-decoration: none;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .ft-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
 /* dark on the left where the text sits, art showing through on the right */
@@ -955,8 +1032,19 @@ body.search-modal-open .coc-main {
 .ft-name-logo { display: inline-block; width: 16px; height: 16px; margin-right: 7px; border-radius: 0; object-fit: cover; vertical-align: -3px; }
 .ft-sub { margin-top: 3px; font: 500 11.5px/1.3 'Sora', sans-serif; color: #9a9ca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
-a.ft-tile:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
-a.ft-tile:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+.ft-tile:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.ft-tile:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.ft-tile:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
 /* coming soon: not a link, greyed out */
 .ft-soon .ft-art { filter: grayscale(1); opacity: 0.3; }
 .ft-soon .ft-name { color: rgba(255, 255, 255, 0.6); }
@@ -1359,88 +1447,6 @@ body {
 }
 
 /* ============================================================
-   HORIZONTAL SCROLL ARROWS — SHARED
-   ============================================================
-   Moved here from hwr-css.css. Paired with initHScrollArrows() in
-   11layout.js. */
-     .dsn-scroll-btn {
-       position: absolute;
-       top: 50%;
-       transform: translateY(-50%);
-       width: 26px;
-       height: 26px;
-       border-radius: 50%;
-       border: 1px solid rgba(255, 255, 255, 0.08);
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       background: rgba(20, 20, 22, 0.55);
-       color: rgba(255, 255, 255, 0.55);
-       opacity: 1;
-       cursor: pointer;
-       z-index: 5;
-       transition: opacity .2s ease, background .15s ease, color .15s ease;
-     }
-
-     .dsn-scroll-btn:hover {
-       background: rgba(30, 30, 33, 0.8);
-       color: #fff;
-     }
-
-     .dsn-scroll-btn:active {
-       transform: translateY(-50%) scale(0.92);
-     }
-
-     .dsn-scroll-btn svg {
-       width: 13px;
-       height: 13px;
-       stroke: currentColor;
-     }
-
-     .dsn-scroll-left {
-       left: 2px;
-     }
-
-     .dsn-scroll-right {
-       right: 2px;
-     }
-
-     /* Not needed = not there. These arrows used to stay put at 25%
-opacity, which still reserved their gutter (and the matching edge
-fade) on a strip that had nothing to scroll. Taken out of the box
-model entirely now; .no-arrow-left/.no-arrow-right below reclaim
-the gutter + fade on whichever side lost its arrow. Both are
-toggled together by initHScrollArrows() (hwr-js.js). */
-     .dsn-scroll-btn.is-hidden {
-       display: none;
-     }
-
-     .dsn-categories-scroll.no-arrow-left {
-       padding-left: 0;
-     }
-
-     .dsn-categories-scroll.no-arrow-right {
-       padding-right: 0;
-     }
-
-     /* Edge fades follow the arrows: a side only keeps its fade while
-something is still scrolled off past it. */
-     .dsn-categories-scroll.no-arrow-left:not(.no-arrow-right) {
-       -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
-       mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 24px), transparent 100%);
-     }
-
-     .dsn-categories-scroll.no-arrow-right:not(.no-arrow-left) {
-       -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
-       mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 100%);
-     }
-
-     .dsn-categories-scroll.no-arrow-left.no-arrow-right {
-       -webkit-mask-image: none;
-       mask-image: none;
-     }
-
-/* ============================================================
    NAV CHIPS — SHARED
    ============================================================
    Moved here from hwr-css.css. Used by hwr's category strip and by the
@@ -1826,7 +1832,7 @@ removing the color doesn't shift the row's padding/alignment. */
    SECONDARY TOP BAR — STRIP SYSTEM (moved verbatim from hwr-css.css)
    ============================================================
    .stb-dsn-wrap holds the page's own sections; .stb-hub-nav the fixed
-   destinations on the right. Each is a scroll strip between two arrows.
+   destinations on the right. Each is a plain scroll strip (no arrows).
    The min-width:1401px rule is the important one: above that width the hub
    strip stops splitting the bar evenly and takes only what it needs, giving
    all the slack (and any scrolling) to the sections strip. Below it, the
@@ -1840,9 +1846,6 @@ removing the color doesn't shift the row's padding/alignment. */
          overflow-x: auto;
          scroll-behavior: smooth;
          scrollbar-width: none;
-         padding: 0 28px;
-         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
-         mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
        }
 
        .dsn-categories-scroll::-webkit-scrollbar {
@@ -1869,24 +1872,6 @@ removing the color doesn't shift the row's padding/alignment. */
        overflow: hidden;
      }
 
-     .stb-dsn-wrap .dsn-categories-scroll,
-     .stb-hub-nav .dsn-categories-scroll {
-       padding: 0 24px;
-       gap: 8px;
-     }
-
-     /* Same "reclaim the gutter once the arrow is gone" rule as the base
-.dsn-categories-scroll one, restated at this selector's specificity
-so it actually beats the padding shorthand right above. */
-     .stb-dsn-wrap .dsn-categories-scroll.no-arrow-left,
-     .stb-hub-nav .dsn-categories-scroll.no-arrow-left {
-       padding-left: 0;
-     }
-
-     .stb-dsn-wrap .dsn-categories-scroll.no-arrow-right,
-     .stb-hub-nav .dsn-categories-scroll.no-arrow-right {
-       padding-right: 0;
-     }
 
      .stb-dsn-wrap .dsn-chip {
        padding: 5px 13px;
@@ -1897,28 +1882,6 @@ so it actually beats the padding shorthand right above. */
      .stb-dsn-wrap .dsn-chip-icon {
        width: 14px;
        height: 14px;
-     }
-
-     .stb-dsn-wrap .dsn-scroll-btn,
-     .stb-hub-nav .dsn-scroll-btn {
-       width: 22px;
-       height: 22px;
-     }
-
-     .stb-dsn-wrap .dsn-scroll-btn svg,
-     .stb-hub-nav .dsn-scroll-btn svg {
-       width: 11px;
-       height: 11px;
-     }
-
-     .stb-dsn-wrap .dsn-scroll-left,
-     .stb-hub-nav .dsn-scroll-left {
-       left: 0;
-     }
-
-     .stb-dsn-wrap .dsn-scroll-right,
-     .stb-hub-nav .dsn-scroll-right {
-       right: 0;
      }
 
      /* .stb-hub-link sits inside .stb-hub-nav's own scroll strip
@@ -2092,8 +2055,8 @@ controls there. */
   z-index:5;
   margin:-8px -16px 0;
   padding:8px 16px 4px;
-  background:#161618;
   border-radius:20px 20px 0 0;
+  background: var(--lb-box);
 }
 
 /* Moved onto the wrapper's padding-bottom above. Left on the header it
@@ -2131,7 +2094,6 @@ controls there. */
      sidebar read as a black hairline. Bottom padding gives the list
      somewhere to end instead of colliding with the viewport edge. */
   padding: 0 0 72px;
-  border-right: 1px solid var(--sb-line);
 
   /* No scrollbar. A native one always reserves its lane whether or not the
      thumb is visible, and that empty 11px lane is what made every row look
@@ -2176,6 +2138,7 @@ controls there. */
      .games-container below, which is what lets the divider centre in it. */
   padding: 14px 0 10px;
   margin-bottom: 0;
+  box-shadow: inset 0 -2px 0 var(--lb-edge), inset 0 -3px 0 rgba(255, 255, 255, 0.05);
 }
 /* The divider used to live here, which was the bug: as a child of .top-box it
    was drawn ON the tint, 5px above its bottom edge (measured: hairline at
@@ -2245,10 +2208,11 @@ controls there. */
 .sidebar a.active,
 .sidebar .game.active,
 .sidebar .triple-a-game.active {
-  background: #2b2d31;
-  color: var(--text-main);
   font-weight: 600;
   position: relative;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+  color: #fff;
 }
 /* The accent bar sits centred in the gutter between the sidebar's edge and
    the row -- not jammed against the window edge, and not cramped inside the
@@ -2260,7 +2224,6 @@ controls there. */
    which a hard-coded offset like the original -10px could never do. */
 .sidebar a.active::before,
 .sidebar .game.active::before {
-  display: block;
   /* Geometry and colour are the original's, untouched: 4px wide, 60% tall,
      border-radius 4px on every corner so it reads as a rounded brick rather
      than a stripe, and the original two-stop red. I had slimmed it to 3px,
@@ -2273,6 +2236,7 @@ controls there. */
   /* Only the position differs: centred in the gutter by construction,
      (inset + width) / -2, instead of the original's fixed -10px. */
   left: calc((var(--sb-inset) + 4px) / -2);
+  display: none;
 }
 
 
@@ -2285,6 +2249,7 @@ controls there. */
 .sidebar .tripleimg {
   box-shadow: none;
   border: 1px solid var(--sb-line);
+  border-radius: 4px;
 }
 
 /* 6. TRIPLE A.
@@ -2403,9 +2368,6 @@ controls there. */
       blur's real reach, which in Chrome is about 0.75x the radius rather
       than half: -6px against a 6px blur leaves nothing to spill sideways,
       while the 5px offset keeps the drop underneath. */
-.secondary-top-bar {
-  box-shadow: 0 5px 6px -6px rgba(0,0,0,0.6);
-}
 
 /* Subtle glass on the secondary bar.
 
@@ -2426,12 +2388,6 @@ controls there. */
    blur(16px)/saturate(140%), so the two read as the same material with the
    bottom bar slightly more present. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .secondary-top-bar {
-    /* --sb-raised at 88% */
-    background: rgba(22, 22, 26, 0.88);
-    -webkit-backdrop-filter: blur(14px) saturate(118%);
-    backdrop-filter: blur(14px) saturate(118%);
-  }
 }
 
 /* ── BOTTOM BAR vs THE SIDEBAR DRAWER ───────────────────────────────
@@ -2573,64 +2529,6 @@ controls there. */
   outline: 2px solid rgba(255, 255, 255, 0.35);
   outline-offset: 2px;
 }
-/* ---- Scroll arrows on the top-bar strips (site-wide) ---------------
-   Oct 2026: the dark ringed circles were the heaviest thing on a bar whose
-   chips are now flat. The arrow is just a chevron sitting where the strip
-   fades out -- the fade says "more this way", the chevron says "tap to
-   go". Hover gives the chips' own faint wash. Both edges fade while both
-   arrows are showing (the base rules only faded one side at a time). */
-.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn,
-.secondary-top-bar .stb-hub-nav .dsn-scroll-btn {
-  width: 24px;
-  height: 28px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #8b9099;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn:hover,
-.secondary-top-bar .stb-hub-nav .dsn-scroll-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-main, #eff2f5);
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn:active,
-.secondary-top-bar .stb-hub-nav .dsn-scroll-btn:active {
-  transform: translateY(-50%) scale(0.9);
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn:focus-visible,
-.secondary-top-bar .stb-hub-nav .dsn-scroll-btn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 1px;
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn svg,
-.secondary-top-bar .stb-hub-nav .dsn-scroll-btn svg {
-  width: 14px;
-  height: 14px;
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-scroll-btn svg path,
-.secondary-top-bar .stb-hub-nav .dsn-scroll-btn svg path {
-  stroke-width: 2.2;
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-categories-scroll:not(.no-arrow-left):not(.no-arrow-right),
-.secondary-top-bar .stb-hub-nav .dsn-categories-scroll:not(.no-arrow-left):not(.no-arrow-right) {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, transparent 22px, #000 52px, #000 calc(100% - 52px), transparent calc(100% - 22px));
-  mask-image: linear-gradient(90deg, transparent 0, transparent 22px, #000 52px, #000 calc(100% - 52px), transparent calc(100% - 22px));
-}
-/* Same clear-under-the-arrow fade when only one arrow is showing. */
-.secondary-top-bar .stb-dsn-wrap .dsn-categories-scroll.no-arrow-left:not(.no-arrow-right),
-.secondary-top-bar .stb-hub-nav .dsn-categories-scroll.no-arrow-left:not(.no-arrow-right) {
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 52px), transparent calc(100% - 22px));
-  mask-image: linear-gradient(90deg, #000 calc(100% - 52px), transparent calc(100% - 22px));
-}
-.secondary-top-bar .stb-dsn-wrap .dsn-categories-scroll.no-arrow-right:not(.no-arrow-left),
-.secondary-top-bar .stb-hub-nav .dsn-categories-scroll.no-arrow-right:not(.no-arrow-left) {
-  -webkit-mask-image: linear-gradient(90deg, transparent 22px, #000 52px);
-  mask-image: linear-gradient(90deg, transparent 22px, #000 52px);
-}
-
 .sidebar a.active,
 .sidebar .games-container .game.active,
 .sidebar .triple-a-list .triple-a-game.active {
@@ -2666,15 +2564,13 @@ controls there. */
    set is kept. valorant-*.html don't load this file; their inline copy
    carries the same values. */
 :root .bn-bar {
-  background: var(--sb-raised, #16161a);
-  box-shadow: 0 -5px 6px -6px rgba(0, 0, 0, 0.6);
+  background: var(--lb-box);
+  border-top: 2px solid var(--lb-edge);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 -8px 18px -10px rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root .bn-bar {
-    background: rgba(22, 22, 26, 0.88);
-    -webkit-backdrop-filter: blur(14px) saturate(118%);
-    backdrop-filter: blur(14px) saturate(118%);
-  }
 }
 
 /* BREADCRUMB -- one trail on every CoC page except Clash home
@@ -2784,10 +2680,6 @@ controls there. */
   align-items:center;
   justify-content:space-between;
   padding:0 6px;
-  background:rgba(15,15,16,0.72);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
-  border-top:1px solid rgba(255,255,255,0.06);
   z-index:9999;
   transform:translateY(0);
   transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
@@ -2820,6 +2712,15 @@ controls there. */
 [data-game-nav] .bn-item span{ max-width:100%; padding:0 3px; box-sizing:border-box; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 [data-game-nav] .bn-item.active,
 [data-game-nav] .bn-item:hover{ color:#ffffff; }
+.bn-item.active {
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+  color: #fff;
+}
+.bn-item {
+  margin: 6px 2px;
+  border-radius: 8px;
+}
 
 [data-game-nav] .bn-more-wrap{
   flex:1;
@@ -2840,22 +2741,25 @@ controls there. */
   width:50px;
   height:50px;
   border-radius:50%;
-  border:1.5px solid #3a3a3e;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#232326;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.5),
-    0 0 0 4px rgba(15,15,16,0.72);
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
 }
-[data-game-nav] .bn-more:hover{ background:#28282b; border-color:#48484d; }
 [data-game-nav] .bn-more:active{ transform:translateX(-50%) scale(0.92); }
 [data-game-nav] .bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
-[data-game-nav] .bn-more-wrap.open .bn-more{ background:#2c2c30; border-color:#55555b; }
 [data-game-nav] .bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
+.bn-more:hover,
+.bn-more-wrap.open .bn-more {
+  border: 0;
+  background: var(--lb-raise-hover);
+}
+.bn-more {
+  border: 0;
+  background: var(--lb-raise);
+  box-shadow: inset 0 0 0 2px var(--lb-edge), inset 0 3px 0 rgba(255, 255, 255, 0.12), inset 0 -5px 0 rgba(0, 0, 0, 0.32), 0 0 0 4px var(--lb-box), 0 4px 12px rgba(0, 0, 0, 0.5);
+}
 [data-game-nav] .bn-more-label{
   font-size:10px;
   font-weight:600;
@@ -2892,17 +2796,19 @@ controls there. */
 [data-game-nav] .more-sheet{
   width:100%;
   max-width:600px;
-  background:#161618;
-  border:1px solid #2a2a2e;
-  border-bottom:none;
   border-radius:20px 20px 0 0;
-  box-shadow:0 -8px 30px rgba(0,0,0,0.5);
   transform:translateY(100%);
   transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
   max-height:80vh;
 }
 [data-game-nav] .more-overlay.open .more-sheet{ transform:translateY(0); }
 [data-game-nav] .more-sheet.dragging{ transition:none; }
+.more-sheet {
+  border: 2px solid var(--lb-edge);
+  border-bottom: 0;
+  background: var(--lb-box);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 -16px 40px -12px rgba(0, 0, 0, 0.9);
+}
 [data-game-nav] .more-sheet-handle{
   width:36px; height:4px; border-radius:4px;
   background:#3a3a3e;
@@ -2945,9 +2851,6 @@ controls there. */
 }
 [data-game-nav] .more-sheet-close{
   width:30px; height:30px;
-  border-radius:50%;
-  background:#1f1f22;
-  border:1px solid #2a2a2e;
   display:flex; align-items:center; justify-content:center;
   color:#9a9ba1;
   cursor:pointer;
@@ -2955,6 +2858,12 @@ controls there. */
 }
 [data-game-nav] .more-sheet-close svg{ width:14px; height:14px; }
 [data-game-nav] .more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
+.more-sheet-close {
+  border: 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+}
 [data-game-nav] .more-list{ display:flex; flex-direction:column; padding-top:12px; }
 
 /* Sheet rows carry the page's line icon (an SVG, not an image), in the same
@@ -3029,6 +2938,25 @@ html.no-scroll, html.no-scroll body{ overflow:hidden !important; height:100%; }
 html body .stb-right { display: contents; }        /* /coc/ wraps menus + help; a no-op wrapper */
 html body .stb-search-wrap { display: none; }      /* desktop-only search button (11layout.js adds it) */
 
+/* PAGE COLUMN: the desktop side inset every page lines up on (CoC, CODM,
+   Minecraft, articles' .ah). Read as var(--coc-side) by page CSS and by the
+   bar below. vw on purpose: the bar is position:fixed, so its % would
+   resolve against the viewport anyway -- vw keeps both sides identical. A
+   section whose content sits on a different inset sets --bar-side (Web
+   Resources, CODM attachments/loadouts). Pages that inset by a % of the
+   content column use --col-w: the column's width rebuilt from the viewport
+   (the fixed bar can't see the column itself). Phones leave both unset and
+   keep their own 5% / 10px. */
+@media (min-width: 971px) {
+  :root {
+    --coc-side: clamp(24px, 8.5vw, 168px);
+    --col-w: calc(100vw - max(245px, 16vw) - var(--scrollbar-w, 0px));
+  }
+}
+@media (min-width: 971px) and (max-width: 1500px) {
+  :root { --coc-side: clamp(24px, 6.5vw, 96px); }
+}
+
 @media (min-width: 971px) {
   :root { --topbar-height: 16px; }
   html body .top-bar { display: none; }
@@ -3039,10 +2967,14 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   html body .secondary-top-bar.stb-raised {
     top: 0; height: 64px; transform: none;
     display: flex; align-items: center; justify-content: flex-start; gap: 12px;
-    padding: 0 14px 0 22px;
-    background: var(--sb-raised); box-shadow: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: none; -webkit-backdrop-filter: none;
+    box-sizing: border-box;
+    /* Same inset as the page column (PAGE COLUMN above), so the bar's
+       title and last button sit on the content's left and right edges. */
+    padding: 0 var(--bar-side, var(--coc-side));
+
+    background: var(--lb-box);
+    border-bottom: 2px solid var(--lb-edge);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05), 0 8px 18px -10px rgba(0, 0, 0, 0.8);
   }
   html body .secondary-top-bar .stb-dsn-wrap,
   html body .secondary-top-bar .stb-divider,
@@ -3050,9 +2982,14 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   html body .secondary-top-bar .stb-help-divider { display: none !important; }
 
   /* left: the page title */
-  /* the title keeps its width (up to 45%); a long menu list scrolls instead */
-  html body .secondary-top-bar .secondary-left { order: 0; flex: 0 0 auto; max-width: 45%; min-width: 0; gap: 10px; }
-  html body .secondary-top-bar .th-icon { margin-left: 0; width: 24px; height: 24px; border-radius: 7px; }
+  /* Pinned to the left edge (margin-right:auto pushes the rest right) and
+     never wider than its half of the bar beside the centred menus: --hub-w
+     is the menus' width, set by 11layout.js fitBar. */
+  html body .secondary-top-bar .secondary-left {
+    order: 0; flex: 0 1 auto; min-width: 0; gap: 10px; margin-right: auto;
+    max-width: calc((100% - var(--hub-w, 0px)) / 2 - 12px);
+  }
+  html body .secondary-top-bar .th-icon { margin-left: 0; width: 24px; height: 24px; border-radius: 4px; box-shadow: 0 0 0 2px var(--lb-edge); }
   html body .secondary-top-bar .secondary-content,
   html body .secondary-top-bar .secondary-content * {
     font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #eef0f3;
@@ -3066,30 +3003,84 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   html body .secondary-top-bar .stb-crumbs [aria-current],
   html body .secondary-top-bar .stb-crumbs [aria-current] * { color: #eef0f3; }
 
-  /* right: menus, then search, then the page's own buttons */
-  html body .secondary-top-bar .stb-hub-nav { order: 1; margin-left: auto; flex: 0 1 auto; min-width: 0; }
-  html body .stb-search-wrap { order: 2; display: flex; flex: 0 1 280px; min-width: 160px; }
+  /* centre: the menus sit in the exact middle of the bar, out of the row
+     (left/right 0 + auto margins; not a transform, which would break the
+     position:fixed hover menus inside). They never shrink or scroll. */
+  html body .secondary-top-bar .stb-hub-nav {
+    position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+    width: max-content; margin-inline: auto;
+  }
+  /* right edge: search, then the page's own buttons. The search narrows
+     (to the width that still shows "Search Parchrome") to fit its half --
+     --act-w is the buttons beside it, set by fitBar -- then TIGHT below */
+  html body .stb-search-wrap {
+    order: 2; display: flex; flex: 0 1 280px; min-width: 210px;
+    max-width: calc((100% - var(--hub-w, 0px)) / 2 - 12px - var(--act-w, 0px));
+  }
   html body .secondary-top-bar > .stb-mobile-actions,
   html body .secondary-top-bar > .help-container { order: 3; flex: none; }
+
+  /* Left half: when the breadcrumb is wider than its half, the earlier
+     steps shrink to a few letters + "..." while the page you're on stays
+     whole: "Mine... > Tool... > Mob Summon". A plain title never shrinks.
+     (Each step's floor is set inline by fitBar: 48px or its own width.) */
+  html body .secondary-top-bar .secondary-left > .secondary-content.has-crumbs { flex: 0 1 auto; min-width: 0; }
+  /* a plain title ends in "..." rather than run under the menus (fitBar
+     treats a cut title as overflow, so this is the last resort) */
+  html body .secondary-top-bar .secondary-left > .secondary-content:not(.has-crumbs) {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  html body .secondary-top-bar .stb-crumbs a:not([aria-current]) {
+    flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Right half, TIGHT: fitBar adds .stb-tight when the search + buttons
+     don't fit beside the menus -- the search becomes its icon (same
+     panel, "/" still works). */
+  html body .secondary-top-bar.stb-tight .stb-search-wrap { flex: 0 0 40px; min-width: 40px; max-width: none; }
+  html body .secondary-top-bar.stb-tight .stb-search { justify-content: center; padding: 0; }
+  html body .secondary-top-bar.stb-tight .stb-search span,
+  html body .secondary-top-bar.stb-tight .stb-search kbd { display: none; }
+  /* FLOW: centring doesn't fit even with the search collapsed -- the menus
+     drop back into the row (title | menus | search), so the title and the
+     right side are no longer capped at half the bar each. */
+  html body .secondary-top-bar.stb-flow .stb-hub-nav { position: static; order: 1; width: auto; margin-inline: 0; flex: none; }
+  html body .secondary-top-bar.stb-flow .secondary-left,
+  html body .secondary-top-bar.stb-flow .stb-search-wrap { max-width: none; }
+  /* Still too wide (.stb-icons): menu links other than the current one
+     show only their icon. font-size 0 hides the label (Minecraft's is a
+     bare text node, no span) but keeps it as the link's accessible name;
+     fitBar copies it into a title tooltip. */
+  html body .secondary-top-bar.stb-icons .stb-hub-nav .stb-hub-link:not(.active) { font-size: 0; gap: 0; padding: 0 10px; }
+  html body .secondary-top-bar.stb-icons .stb-hub-nav .stb-hub-link:not(.active) .hub-chev { display: none; }
+  /* ...and only then may the page you're on end in "..." too, rather than
+     be cut mid-letter (narrowest desktops, widest-margin pages) */
+  html body .secondary-top-bar.stb-icons .stb-crumbs [aria-current] {
+    flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  }
 
   /* ---- Menus: grey outline icon + sentence-case label; faint wash on
      hover; the page you're on in white with its icon filled (pages that
      ship an outline/fill pair: .hub-ico / .hub-ico-fill). Icons 20px,
      TikTok-weight 2.25 round strokes. */
-  html body .secondary-top-bar .stb-hub-nav .dsn-categories-scroll { gap: 2px; }
+  html body .secondary-top-bar .stb-hub-nav .dsn-categories-scroll { gap: 4px; }
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link {
-    position: relative; height: 40px; padding: 0 12px; gap: 8px; border: 0; border-radius: 10px;
+    position: relative; height: 40px; padding: 0 12px; gap: 8px; border: 0;
     background: transparent; box-shadow: none;
     font: 500 13.5px/1 'Sora', sans-serif; letter-spacing: -0.005em; text-transform: none;
-    color: #9a9da4; transition: background .2s ease, color .2s ease;
+
+    border-radius: var(--lb-r);
+    color: #a9adb5;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
   }
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link span { font-family: inherit; }
+  /* Flat (Adrian, Oct 2026: no raised key, no red, no underline): hover is
+     a faint wash, and the page you're on is just white and a step bolder,
+     its picture in colour. */
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link:hover,
-  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.is-open { background: rgba(255, 255, 255, 0.06); color: #eceef1; }
-  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active,
-  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover { background: transparent; box-shadow: none; color: #fff; font-weight: 600; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.is-open { background: rgba(255, 255, 255, 0.05); box-shadow: none; color: #fff; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active { background: transparent; box-shadow: none; color: #fff; font-weight: 600; }
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active:hover,
-  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active.is-open { background: rgba(255, 255, 255, 0.06); }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active.is-open { background: rgba(255, 255, 255, 0.05); }
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link svg {
     width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round;
   }
@@ -3098,47 +3089,92 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active .hub-ico:not(:only-of-type) { display: none; }
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link.active .hub-ico-fill { display: block; }
   html body .secondary-top-bar .stb-hub-nav .stb-hub-link .hub-chev { width: 10px; height: 10px; margin-left: -3px; stroke-width: 2.6; opacity: .5; }
-  html body .secondary-top-bar .stb-hub-nav .stb-hub-link:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+  html body .secondary-top-bar .stb-hub-nav .stb-hub-link:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.55); outline-offset: 2px; }
+  .secondary-top-bar .stb-hub-nav .stb-hub-link:active {
+    transform: translateY(1px);
+  }
 
   /* ---- Search: opens the same panel as "/" */
   html body .stb-search {
     display: flex; align-items: center; gap: 10px; width: 100%; height: 40px; padding: 0 8px 0 14px;
-    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;
-    color: #a4a7ae; cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease;
+
+cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease;
+    border: 0;
+    border-radius: var(--lb-r);
+    background: var(--lb-well);
+    box-shadow: var(--lb-ring-well);
+    color: #9ea2aa;
   }
-  html body .stb-search:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.2); color: #d4d6da; }
-  html body .stb-search:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+  html body .stb-search:hover { border: 0; background: #0d0e11; box-shadow: inset 0 0 0 2px #000, inset 0 4px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08); color: #d4d6da; }
+  html body .stb-search:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
   html body .stb-search svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; }
   html body .stb-search span { flex: 1; min-width: 0; text-align: left; font: 400 13.5px/1 'Sora', sans-serif; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   html body .stb-search kbd {
-    flex: none; min-width: 20px; padding: 4px 6px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 5px;
-    font: 600 11px/1 'Sora', sans-serif; color: #a4a7ae; text-align: center; background: rgba(255, 255, 255, 0.04);
+    flex: none; min-width: 20px; padding: 4px 6px;
+    font: 600 11px/1 'Sora', sans-serif;text-align: center;
+    border: 0;
+    border-radius: 4px;
+    background: var(--lb-raise);
+    box-shadow: inset 0 0 0 1px var(--lb-edge), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+    color: #c9ccd2;
   }
 
   /* ---- Page buttons on the right (CoC (i), Web Resources info/settings):
      plain icon buttons in the menus' weight */
   html body .secondary-top-bar .stb-mobile-actions { gap: 4px; }
   html body .secondary-top-bar .stb-icon-btn {
-    width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; color: #9a9da4;
-    transition: background .2s ease, color .2s ease;
+    width: 40px; height: 40px; border: 0;
+    border-radius: var(--lb-r);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-ring-btn);
+    color: #d7dae0;
+    transition: filter 0.15s ease, transform 0.1s ease, color 0.15s ease;
   }
   html body .secondary-top-bar .stb-icon-btn:hover,
   html body .secondary-top-bar .stb-icon-btn[aria-expanded="true"],
-  html body .secondary-top-bar .stb-icon-btn.is-active { background: rgba(255, 255, 255, 0.06); color: #eceef1; border: 0; }
-  html body .secondary-top-bar .stb-icon-btn:focus-visible { outline: 2px solid #e0302f; outline-offset: 2px; }
+  html body .secondary-top-bar .stb-icon-btn.is-active {
+    filter: brightness(1.045);
+    color: #fff;
+  }
+  html body .secondary-top-bar .stb-icon-btn:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
   html body .secondary-top-bar .stb-icon-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.25; }
+  .secondary-top-bar .stb-icon-btn:active {
+    transform: translateY(1px);
+  }
 
-  /* small laptops: menus scroll (their own arrows) before anything is pushed off */
   @media (max-width: 1199px) {
     html body .secondary-top-bar { gap: 8px; }
-    /* small laptops: the search shrinks to its icon (same panel, "/" still
-       works) and the title takes at most a third, so the menus fit */
-    html body .secondary-top-bar .secondary-left { max-width: 34%; }
-    html body .stb-search-wrap { flex: 0 0 40px; min-width: 40px; }
-    html body .stb-search { justify-content: center; padding: 0; }
-    html body .stb-search span,
-    html body .stb-search kbd { display: none; }
   }
+}
+/* Phones: the page buttons (CoC (i), Web Resources info/settings) are a
+   bare icon, no box -- a dim glyph like the top bar's search, one step
+   quieter. 36px tap area; a soft tint only while pressed or open. Overrides
+   the boxed copies in coc-help.css and hwr-css.css. */
+@media (max-width: 970px) {
+  html body .secondary-top-bar .stb-icon-btn {
+    width: 36px; height: 36px; margin-right: -6px;
+    border: 0; border-radius: 50%;
+    background: transparent; box-shadow: none;
+    color: #7d828b;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  /* fill: none -- /coc/ swaps in an (i) with no fill attribute, which
+     otherwise paints the circle solid. The dot is a filled circle in the
+     other copies, so it keeps its own fill. */
+  html body .secondary-top-bar .stb-icon-btn svg {
+    width: 19px; height: 19px; fill: none;
+    stroke: currentColor; stroke-width: 1.9; stroke-linecap: round;
+  }
+  html body .secondary-top-bar .stb-icon-btn svg [fill="currentColor"] { fill: currentColor; }
+  html body .secondary-top-bar .stb-icon-btn:active,
+  html body .secondary-top-bar .stb-icon-btn.is-active,
+  html body .secondary-top-bar .stb-icon-btn[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.07);
+    border: 0;
+    color: #e4e6ea;
+  }
+  html body .secondary-top-bar .stb-icon-btn[aria-expanded="true"] svg,
+  html body .secondary-top-bar .stb-icon-btn.is-active svg { stroke: currentColor; }
 }
 /* The bar 11layout.js builds for pages that have none (the site home):
    desktop only, and the page's content starts below it (64px). */
@@ -3184,20 +3220,18 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   width: 272px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  background: #141519;
-  box-shadow:
-    0 18px 40px -12px rgba(0, 0, 0, 0.85),
-    0 4px 12px rgba(0, 0, 0, 0.35);
   opacity: 0;
   transform: translateY(-6px);
   transition:
     opacity 0.16s ease,
     transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   scrollbar-width: thin;
-  scrollbar-color: #2e3036 transparent;
+  padding: 8px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 8px;
+  background: var(--lb-box);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 20px 40px -12px rgba(0, 0, 0, 0.9), 0 4px 12px rgba(0, 0, 0, 0.4);
+  scrollbar-color: #34363f transparent;
 }
 .stb-dd[hidden] {
   display: none;
@@ -3209,9 +3243,17 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
 .stb-dd--guides {
   width: 300px;
 }
+/* Minecraft Tools (18 tools): three across, read left to right, so the menu
+   is 6 rows tall instead of 18. place() in 11layout.js keeps it on screen. */
+.stb-dd--tools {
+  width: min(840px, calc(100vw - 24px));
+}
+.stb-dd--tools .stb-dd-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 .stb-dd-list {
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
 .stb-dd-row {
@@ -3222,30 +3264,33 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   min-height: 42px;
   padding: 5px 10px 5px 5px;
   line-height: 1.25;
-  border-radius: 8px;
-  color: var(--text-secondary, #c8cbcd);
   text-decoration: none;
   transition:
     background-color 0.12s ease,
     color 0.12s ease;
+  border-radius: var(--lb-r);
+  color: #c9ccd2;
 }
 .stb-dd-row:hover,
 .stb-dd-row:focus-visible {
-  background: var(--flat-hover, #1e1f23);
-  color: var(--text-main, #eff2f5);
   outline: none;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+  color: #fff;
 }
 .stb-dd-row:focus-visible {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 1px;
 }
 /* The page you're on: white text on a soft highlight (same language as
    the bar's active link, no keycap). */
 .stb-dd-row.is-on {
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
   color: #fff;
 }
 .stb-dd-row.is-on:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--lb-raise-hover);
 }
 
 .stb-dd-ico {
@@ -3253,8 +3298,9 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  background: var(--lb-well);
+  box-shadow: inset 0 0 0 1px var(--lb-edge), inset 0 2px 0 rgba(0, 0, 0, 0.35);
 }
 .stb-dd-ico img {
   width: 24px;
@@ -3297,7 +3343,6 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
 /* Coming soon (Player Tracker): the red tag from the Clash home cards. */
 .stb-dd-tag {
   padding: 3px 7px;
-  border-radius: 4px;
   background: #c23b3b;
   font-family: 'Oxanium', sans-serif;
   font-size: 9px;
@@ -3305,6 +3350,8 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   letter-spacing: 1px;
   text-transform: uppercase;
   color: #fff;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--lb-red-edge), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3324,8 +3371,9 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   z-index: 1201;
 }
 .stb-dd-row.has-kids.is-hot {
-  background: var(--flat-hover, #1e1f23);
-  color: var(--text-main, #eff2f5);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+  color: #fff;
 }
 .stb-dd-go {
   width: 14px;
@@ -3349,4 +3397,239 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
 .stb-dd-row.no-ico {
   grid-template-columns: minmax(0, 1fr) auto;
   padding-left: 12px;
+}
+
+/* ============================================================
+   ARTICLE STRIP (Oct 21 2026) -- every page's articles section looks the
+   same: home "Latest Articles", /coc/ + every TH army/layouts page, and
+   /minecraft/java/. Markup (copy from any of those pages):
+     <div class="lob-head lob-head--row"> title + <a class="art-all">All articles</a>
+     <div class="art-track" data-game="coc" data-live data-variant="slide" data-order="random">
+     <div class="art-pager"> .art-progress + .art-nav arrows
+   article-cards.js fills the track from /articles.json (data-game = that
+   game only; data-order "random" on game pages, "json" on home) and drives
+   the arrows + progress line. Base card pieces the slides reuse
+   (.art-row-media, .art-chips, .art-cat, .asp-wm) are in article-cards.css.
+   ============================================================ */
+
+/* "All articles" -- and every Minecraft "View all" / "All ... on Modrinth"
+   section link (Oct 21 2026): one recipe. Desktop: the raised grey key
+   (Minecraft's old .mch-more box). Phones: quiet grey text + arrow,
+   underlined -- the strip is the focus, this is a way out. */
+.art-all {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 2px;
+  font: 500 12px/1 'Sora', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #8a8c93;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+.art-all:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+@media (min-width: 971px) {
+  .art-all {
+    gap: 8px;
+    height: 36px;
+    padding: 0 14px 2px;
+    border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-btn);
+    font: 600 13px/1 'Sora', sans-serif;
+    color: #e6e8ec;
+    text-decoration: none;
+  }
+  .art-all:hover {
+    background: var(--lb-raise-hover);
+  }
+  .art-all:active {
+    transform: translateY(1px);
+    box-shadow: var(--lb-btn-down);
+  }
+}
+.art-all svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), color 0.15s ease;
+}
+.art-all:hover { color: #fff; }
+.art-all:hover svg { transform: translateX(3px); }
+@media (max-width: 970px) {
+  .art-all:hover svg { color: #e86a6a; }
+}
+
+/* Slides: the rounded picture is the card (tags on it), then a one-line
+   title and "Oct 2026 · Clash of Clans". 3 across on desktop, 84% wide on
+   phones so the next one peeks in. Fonts are set on every text element:
+   /coc/'s `* { oxanium }` reset beats inheritance. */
+.art-track[data-variant='slide'] {
+  --art-gap: 28px;
+}
+.art-slide {
+  flex: 0 0 calc((100% - 2 * var(--art-gap)) / 3);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.art-slide .art-row-media { margin-bottom: 12px; }
+a.art-slide:hover .art-row-media {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 36px -18px rgba(0, 0, 0, 0.95);
+}
+a.art-slide:hover .art-row-media img { transform: scale(1.04); }
+a.art-slide:hover .art-title {
+  text-decoration: underline;
+  text-decoration-color: rgba(224, 96, 95, 0.7);
+  text-underline-offset: 4px;
+}
+a.art-slide:focus-visible {
+  outline: 2px solid #c23b3b;
+  outline-offset: 6px;
+  border-radius: 0;
+}
+/* Title on one line (ellipsis), then "Oct 2026 · Clash of Clans" in grey. */
+.art-slide .art-title {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 15px/1.4 'Sora', sans-serif;
+  letter-spacing: -0.01em;
+  color: #eceef1;
+}
+.art-slide-foot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 6px 0 0;
+  font: 500 12px/1.3 'Sora', sans-serif;
+  color: #8b9097;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.art-slide-foot time,
+.art-slide-foot span { font: inherit; }
+.art-slide-foot span { color: #5b5f66; }
+
+/* Progress line + arrows under the strip. */
+.art-pager {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 24px var(--art-side, 5%) 0;
+}
+.art-progress {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.art-progress span {
+  position: absolute;
+  inset: 0;
+  background: #f2f3f5;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.art-pager .art-nav {
+  display: flex;
+  gap: 4px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.art-pager .art-nav button {
+  width: 44px;
+  height: 44px;
+  border-radius: 0;
+  color: #e0605f;
+}
+.art-pager .art-nav button + button { border-left: 0; }
+.art-pager .art-nav svg { width: 24px; height: 24px; }
+.art-pager .art-nav button:hover:not(:disabled) { background: rgba(194, 59, 59, 0.16); color: #ff7a78; }
+.art-pager .art-nav button:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
+.art-pager .art-nav button:disabled { color: rgba(255, 255, 255, 0.2); background: none; }
+
+/* The strip card's tags on the slide picture (Adrian, Oct 21 2026): the
+   Parcore chip (.asp-wm) replaces the CSS watermark, category top right. */
+.art-slide .art-row-media::before,
+.art-slide .art-row-media::after { display: none; }
+.art-slide .asp-wm {
+  top: 10px;
+  left: 10px;
+  gap: 6px;
+  padding: 2px 10px 2px 2px;
+  font-size: 11.5px;
+}
+.art-slide .asp-wm img {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 970px) {
+  /* One slide plus a sliver of the next (84%: a step up from the 78% strip
+     card, Adrian, Oct 21 2026). */
+  .art-track[data-variant='slide'] { --art-gap: 12px; }
+  .art-slide { flex-basis: 84%; }
+  .art-slide .art-row-media { margin-bottom: 10px; }
+  .art-slide .art-title { font-size: 14.5px; }
+  .art-pager { gap: 16px; margin-top: 18px; }
+  /* article-cards.css hides .art-nav on phones (strips swipe); the pager keeps its arrows. */
+  .art-pager .art-nav { display: flex; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-progress span { transition: none; }
+}
+
+/* ============================================================
+   QUIET SUBTITLE (Oct 21 2026) -- the one look for the line under a section
+   title, and for tool-card blurbs: small Sora in a dim grey, so the title
+   carries the section. Used by /coc/ (Town Halls, tracker, equipment, top 10,
+   FAQ), every Minecraft page (.mch-sec-sub) and the tool cards (.tc-desc,
+   coc-cards.css). Restyle here, once; to opt a new subtitle in, add its
+   selector to both lists. `html body` beats the section files' own sizes.
+   ============================================================ */
+html body.coc-home .lob-sub,
+html body.coc-home .lob-sub span,
+html body.coc-home .lb-text,
+html body.coc-home .cl-feature-text,
+html body .mch-sec-sub,
+html body .tc-desc {
+  font: 400 12px/1.5 'Sora', sans-serif;
+  letter-spacing: 0.1px;
+  color: #6f737b;
+}
+html body.coc-home .lob-sub strong {
+  font-weight: 500;
+  color: #8e939b;
+}
+@media (max-width: 970px) {
+  html body.coc-home .lob-sub,
+  html body.coc-home .lob-sub span,
+  html body.coc-home .lb-text,
+  html body.coc-home .cl-feature-text,
+  html body .mch-sec-sub,
+  html body .tc-desc {
+    font-size: 11px;
+  }
 }

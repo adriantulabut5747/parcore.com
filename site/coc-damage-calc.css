@@ -81,9 +81,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 2px;
-  border-radius: 0;
-  background: rgba(11, 11, 12, 0.85);
+  padding: 3px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
 }
 .dc-step button {
   display: grid;
@@ -92,9 +94,10 @@
   height: 28px;
   padding: 0;
   border: 0;
-  border-radius: 0;
-  background: var(--key-face);
-  box-shadow: var(--key-soft);
+  border-radius: 4px;
+  border: 2px solid var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #c8cbcd;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -107,14 +110,15 @@
   height: 13px;
 }
 .dc-step button:hover {
-  background: var(--key-face-hover);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .dc-step button:active {
   transform: translateY(1px);
-  box-shadow: var(--key-soft-pressed);
+  box-shadow: var(--lb-btn-down);
 }
 .dc-step button:disabled {
+  border-color: transparent;
   background: none;
   box-shadow: none;
   color: #3b3e44;
@@ -215,9 +219,10 @@
   height: 32px;
   padding: 0;
   border: 0;
-  border-radius: 0;
-  background: var(--key-face);
-  box-shadow: var(--key-soft);
+  border-radius: 4px;
+  border: 2px solid var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #c8cbcd;
   cursor: pointer;
   transition:
@@ -225,12 +230,12 @@
     color 0.15s ease;
 }
 .dc-add:hover {
-  background: var(--key-face-hover);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .dc-add:active {
   transform: translateY(1px);
-  box-shadow: var(--key-soft-pressed);
+  box-shadow: var(--lb-btn-down);
 }
 
 /* Used: the row opens -- bigger tile with its count chip, the count
@@ -245,7 +250,7 @@
   margin: 4px -10px;
   padding: 12px 10px;
   border-top-color: transparent;
-  border-radius: 0;
+  border-radius: 4px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -385,11 +390,19 @@
 .dc-cats::-webkit-scrollbar {
   display: none;
 }
+/* Same type as every other CoC tool chip (.am-btn / .gd-chip); the
+   look (sunken at rest, grey key when picked) is in th-layouts.css. */
 .dc-cats .am-tab {
   flex: none;
-  flex-direction: row;
   min-height: 36px;
-  padding: 0 13px;
+  padding: 0 14px;
+  font:
+    800 11.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
 }
 .dc-find {
   display: flex;
@@ -400,8 +413,6 @@
   min-width: 0;
   height: 38px;
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 0;
   background: rgba(11, 11, 12, 0.8);
   color: var(--dc-text);
   caret-color: var(--dc-red);
@@ -410,12 +421,17 @@
     sans-serif;
   outline: none;
   transition: border-color 0.2s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .dc-search::placeholder {
   color: var(--dc-faint);
 }
 .dc-search:focus {
-  border-color: rgba(255, 255, 255, 0.24);
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
 }
 .dc-sort {
   display: inline-flex;
@@ -423,10 +439,6 @@
   gap: 7px;
   height: 38px;
   padding: 0 12px;
-  border: 0;
-  border-radius: 0;
-  background: rgba(11, 11, 12, 0.8);
-  color: var(--text-muted, #949ba4);
   font:
     800 11px 'Oxanium',
     sans-serif;
@@ -434,18 +446,17 @@
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .dc-sort:hover {
-  background: var(--flat-hover, #1e1f23);
-  color: #c8cbcd;
-}
-.dc-sort[aria-pressed='true'] {
-  background: var(--key-face);
-  box-shadow: var(--key-edge);
-  color: var(--dc-text);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
 }
 .dc-sort[aria-pressed='true'] svg {
   color: var(--dc-red);
@@ -462,7 +473,7 @@
 }
 .dc-skel {
   aspect-ratio: 3 / 4;
-  border-radius: 0;
+  border-radius: 4px;
   background: linear-gradient(100deg, #141518 30%, #1a1b1f 50%, #141518 70%) 0 0 / 300% 100%;
   animation: dcSkel 1.4s linear infinite;
 }
@@ -475,8 +486,6 @@
   flex-direction: column;
   min-width: 0;
   padding: 7px 7px 0;
-  border: 1px solid var(--dc-edge);
-  border-radius: 0;
   background: var(--dc-card);
   transition: border-color 0.3s ease;
 }
@@ -486,7 +495,7 @@
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 4px;
   background: radial-gradient(62% 52% at 50% 60%, #2a2d34 0%, #1b1d22 70%, #17181c 100%);
 }
 .dc-pic::before {
@@ -496,7 +505,7 @@
   right: 22%;
   bottom: 9%;
   height: 16%;
-  border-radius: 0;
+  border-radius: 4px;
   background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), transparent);
 }
 .dc-pic > img {
@@ -535,18 +544,17 @@
   gap: 3px;
   height: 24px;
   padding: 0 5px 0 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0;
-  background: rgba(12, 13, 15, 0.86);
-  color: #e6e7ea;
   font:
     700 11px 'Oxanium',
     sans-serif;
   letter-spacing: 0.02em;
   cursor: pointer;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .dc-lv svg {
   width: 12px;
@@ -554,16 +562,13 @@
   color: var(--dc-faint);
 }
 .dc-lv:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(30, 32, 37, 0.95);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
 }
 .dc-lv:disabled {
   padding-right: 8px;
   cursor: default;
-}
-.dc-lv:disabled:hover {
-  border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(12, 13, 15, 0.86);
 }
 .dc-lv-step {
   position: absolute;
@@ -572,8 +577,9 @@
   bottom: 5px;
   z-index: 4;
   justify-content: space-between;
-  background: #0c0d0f;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    var(--card-well),
+    0 6px 16px rgba(0, 0, 0, 0.55);
   animation: dcPop 0.18s var(--dc-ease);
 }
 .dc-card.is-open .dc-lv {
@@ -589,7 +595,7 @@
   margin: 0;
   padding: 9px 3px 11px;
   border: 0;
-  border-radius: 0;
+  border-radius: 4px;
   background: none;
   color: inherit;
   text-align: left;
@@ -651,7 +657,7 @@
   height: 6px;
   margin: 6px 0 2px;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 4px;
   background: #0b0c0e;
 }
 .dc-meter i,
@@ -708,7 +714,7 @@
 .dc-bd-sw {
   width: 6px;
   height: 6px;
-  border-radius: 0;
+  border-radius: 4px;
   background: var(--c);
 }
 .dc-bd-name {
@@ -760,7 +766,6 @@
    to spare. The stamp only presses in when a card goes down while you
    watch (.is-fresh) -- never on load, a filter change or a Town Hall swap. */
 .dc-card.is-dead {
-  border-color: rgba(224, 99, 99, 0.42);
   background: linear-gradient(180deg, rgba(224, 99, 99, 0.08), rgba(224, 99, 99, 0) 55%), var(--dc-card);
 }
 .dc-card.is-dead .dc-pic > img {
@@ -784,7 +789,7 @@
   display: block;
   padding: 0.42em 0.8em 0.36em;
   border: 2px solid currentColor;
-  border-radius: 0;
+  border-radius: 4px;
   outline: 1px solid currentColor;
   outline-offset: -5px;
   background: rgba(16, 17, 20, 0.62);
@@ -813,6 +818,13 @@
 /* Your attack can't touch it at all. */
 .dc-card.is-immune .dc-pic > img {
   filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4)) saturate(0.45) brightness(0.6);
+}
+.dc-card {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .dc-card.is-immune .dc-st {
   color: var(--dc-faint);
@@ -974,7 +986,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: 0;
+    border-radius: 4px;
     background: #17181c;
     box-shadow: 0 -10px 36px -8px rgba(0, 0, 0, 0.85);
     transition: bottom 0.3s ease;
@@ -1048,9 +1060,10 @@
     flex: none;
     width: 34px;
     height: 34px;
-    border-radius: 0;
-    background: var(--key-face);
-    box-shadow: var(--key-soft);
+    border-radius: 4px;
+    border: 2px solid var(--lb-edge);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-btn);
     color: #c8cbcd;
     transition: transform 0.3s var(--dc-ease);
   }
@@ -1130,7 +1143,6 @@
   }
   .dc-card {
     padding: 6px 6px 0;
-    border-radius: 0;
   }
   .dc-hp b {
     font-size: 19px;

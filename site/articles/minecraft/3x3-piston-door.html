@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft 3x3 Piston Door (Java): Interactive 3D Build | Parchrome</title>
+<meta name="description" content="Build a 3x3 piston door that fits in a one-block-thick wall. Turn the 3D model, see which way every piston and observer faces, and download the structure file.">
+<link rel="canonical" href="https://parchrome.netlify.app/articles/minecraft/3x3-piston-door">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Sora:wght@400;500;600;650;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261021qs">
+<link rel="stylesheet" href="/article-cards.css?v=20261021as">
+<link rel="stylesheet" href="/articles.css?v=20261021fx">
+<link rel="stylesheet" href="/mc-build.css?v=20261021fx">
+<!-- three.js for the 3D build viewer (mc-build.js), pinned version -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<!-- Articles section, Minecraft. Shell copied from articles/coc/hammer-jam.html;
+     nav comes from game-nav.json "articles-minecraft", cards/feed from articles.json.
+     The 3D model is mc-build.js reading mc-build-3x3-piston-door.json (made from Adrian's
+     structure block save by _tools/mcbuild/build.py). -->
+<body data-game-nav="articles-minecraft">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar: breadcrumb + search, no page strip (data-hub-nav="off").
+     There is no /articles/minecraft/ hub yet, so "Minecraft" opens the filtered feed. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left has-crumbs">
+    <img src="/icons/articles.svg" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content"><a href="/articles/">Articles</a><span class="sc-sep" aria-hidden="true">›</span><a href="/articles/?game=minecraft">Minecraft</a><span class="sc-sep" aria-hidden="true">›</span><span aria-current="page">3x3 Door</span></div>
+    <nav class="stb-crumbs" aria-label="Breadcrumb"><a href="/articles/">Articles</a><span class="stb-crumb-sep" aria-hidden="true">›</span><a href="/articles/?game=minecraft">Minecraft</a><span class="stb-crumb-sep" aria-hidden="true">›</span><span class="stb-crumb-name" aria-current="page">3x3 Piston Door</span></nav>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Article pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+  <!-- Phones: table of contents dropdown (article-cards.js fills it from
+       #apToc and keeps the scroll-spy highlight in sync). -->
+  <button type="button" class="ap-toc-btn" id="apTocBtn" aria-expanded="false" aria-controls="apTocMenu" aria-label="Table of contents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>
+  </button>
+  <div class="ap-toc-menu" id="apTocMenu" hidden></div>
+</div>
+
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+
+<article class="ap ap-pixel">
+  <div class="ap-banner">
+    <img src="/minecrafticons/articles/3x3-piston-door/banner.webp" width="1920" height="1080" alt="A 3x3 piston door built from sticky pistons, observers and iron blocks, inside a single wall" decoding="async" fetchpriority="high">
+    <span class="ap-tag">Guide</span>
+  </div>
+  <header class="ap-header">
+    <div class="ap-author">
+      <img class="ap-avatar" src="/icons/parcore-avatar.webp" alt="Parcore" width="96" height="96" decoding="async">
+      <dl>
+        <dt>Written by</dt><dd>Parcore</dd>
+        <dt>Published</dt><dd><time datetime="2026-10">Oct 2026</time></dd>
+      </dl>
+    </div>
+    <div class="ap-heading">
+      <h1>Minecraft 3x3 Piston Door, Block by Block</h1>
+      <p class="ap-dek">Turn it. Build it. Flip the lever.</p>
+      <p class="ap-read">4 min read · Updated for 2026</p>
+    </div>
+  </header>
+
+  <details class="ap-toc" id="apToc">
+    <summary>Table of contents</summary>
+    <div class="ap-toc-label">Table of contents</div>
+    <ol>
+      <li><a href="#door">What Makes This Door Different?</a></li>
+      <li><a href="#model">The Door in 3D</a></li>
+      <li><a href="#materials">What You Need</a></li>
+      <li><a href="#build">How to Build It</a></li>
+      <li><a href="#load">Skip the Build: Load the Structure</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </details>
+
+  <div class="ap-body">
+    <h2 id="door">What Makes This Door Different?</h2>
+    <p>Most 3x3 piston doors hide a wall of redstone behind them. This one doesn't. Every piston, observer and redstone line sits in the same one-block-thick wall as the door itself.</p>
+    <p>That means it fits into a base wall without digging out the space behind it. This build is for <strong>Java Edition</strong>. Bedrock redstone behaves differently, so the same layout won't work there.</p>
+
+    <h2 id="model">The Door in 3D</h2>
+    <p>Turn the door around and look at it from every side. Hover over any block to see what it is and which way it faces. On a phone, tap the model to unlock it, then tap a block.</p>
+    <div class="mcb" data-build="/mc-build-3x3-piston-door.json?v=20261015b" data-materials="mcbMats"></div>
+    <ul>
+      <li><strong>Facing arrows</strong> shows which way every piston, observer, dropper and repeater points.</li>
+      <li><strong>Hide frame blocks</strong> leaves only the redstone parts, with the door and frame blocks as faint outlines.</li>
+      <li><strong>Layers</strong> builds the door up from the bottom, one row at a time.</li>
+    </ul>
+    <p>Left and right in the labels are as seen from the front: the side the two droppers face.</p>
+
+    <h2 id="materials">What You Need</h2>
+    <p>Counted straight from the model above. The model shows the door and frame as iron blocks; use any solid block you like for those 19 blocks.</p>
+    <div class="ap-chips" id="mcbMats"></div>
+    <p>Nine of your chosen blocks form the door that slides open; the rest make up the frame.</p>
+
+    <h2 id="build">How to Build It</h2>
+    <ol>
+      <li><strong>Start at the bottom.</strong> Drag the Layers slider to 1 and build that row. Then move the slider up one layer at a time and copy each new row.</li>
+      <li><strong>Check every facing as you place it.</strong> Turn on Facing arrows. A piston or observer placed the wrong way is the most common reason a copied door doesn't open.</li>
+      <li><strong>Set the two repeaters.</strong> Both sit in the top row on the right, seen from the front. The outer one is 2 ticks, and the one next to it is 3 ticks. A new repeater starts at 1 tick: right-click it once for 2, twice for 3.</li>
+      <li><strong>Place the lever last,</strong> then flip it to test the door.</li>
+    </ol>
+    <h2 id="load">Skip the Build: Load the Structure</h2>
+    <p>Want the door in your world without building it? Download the structure file and load it with a Structure Block.</p>
+    <div class="mcb-dl"><a class="ap-tool" href="/minecrafticons/builds/3x3-piston-door/3x3-piston-door-closed.nbt" download><img src="/minecrafticons/builds/textures/piston_top_sticky.png" alt="" loading="lazy">Download the door (.nbt)</a></div>
+    <ol>
+      <li>Put the file in your world folder, under <strong>generated/minecraft/structures</strong>. Create the folders if they don't exist.</li>
+      <li>In game, with cheats on, run <strong>/give @s structure_block</strong> and place it.</li>
+      <li>Switch it to <strong>Load</strong> mode and type the name: <strong>3x3-piston-door-closed</strong>.</li>
+      <li>Press <strong>LOAD</strong> once to see the outline, move it if needed, then press <strong>LOAD</strong> again to place the door.</li>
+    </ol>
+    <div class="art-next" data-article="first-hardcore-world" data-label="Read next"></div>
+
+    <h2 id="faq">FAQ</h2>
+    <h3>How do you make a 3x3 piston door in Minecraft?</h3>
+    <p>Build it layer by layer from the bottom, matching every piston and observer's facing, and set the two repeaters to 2 and 3 ticks. Or load the finished door from a structure file with a Structure Block.</p>
+    <h3>What do you need for a 3x3 piston door?</h3>
+    <p>This one uses 11 sticky pistons, 10 observers, 6 redstone dust, 2 droppers, 2 repeaters, a lever and 19 blocks of your choice for the door and frame. The 3D model uses iron blocks as placeholders.</p>
+    <h3>Does a 3x3 piston door work on Bedrock?</h3>
+    <p>Not this one. It is a Java Edition build, and Bedrock redstone behaves differently.</p>
+
+    <div class="ap-summary" id="summary">
+      <b>Summary</b>
+      <ul>
+        <li>The whole door, redstone included, fits inside a one-block-thick wall.</li>
+        <li>Java Edition only.</li>
+        <li>Turn the 3D model, hover a block to see what it is and which way it faces.</li>
+        <li>Build from the bottom up with the Layers slider, and check every facing with the arrows.</li>
+        <li>Repeaters: the outer one on 2 ticks, the inner one on 3.</li>
+        <li>Or download the structure file and load it with a Structure Block.</li>
+      </ul>
+    </div>
+    <p>One wall thick. Nine blocks wide open.</p>
+  </div>
+
+  <aside class="ap-more">
+    <h2>More for Minecraft</h2>
+    <div class="ap-more-list">
+      <a href="/minecraft/java/commands"><img src="/minecrafticons/articles/3x3-piston-door/command_block_front.png" alt="" loading="lazy">Commands<span>Every command worth knowing, ready to copy.</span></a>
+      <a href="/minecraft/java/worlds"><img src="/minecrafticons/articles/3x3-piston-door/grass_block_side.png" alt="" loading="lazy">Worlds<span>Download a world and jump straight in.</span></a>
+      <a href="/minecraft/java/seeds"><img src="/minecrafticons/articles/3x3-piston-door/wheat_seeds.png" alt="" loading="lazy">Seeds<span>Start your next world somewhere worth it.</span></a>
+    </div>
+  </aside>
+  <p class="ap-credit">Door design by Zraft.</p>
+</article>
+<script>
+  // Contents: always open on desktop (a sticky column there), a collapsible
+  // box on phones.
+  if (matchMedia('(min-width: 971px)').matches) document.getElementById('apToc').open = true;
+</script>
+
+
+<footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+</div>  </div>
+
+<!-- No bottom nav or More sheet on article pages (Adrian, Oct 2026). -->
+<script src="/11layout.js?v=20261021tb1"></script>
+<script src="/article-cards.js?v=20261021as" defer></script>
+<script type="module" src="/mc-build.js?v=20261015c"></script>
+</body>
+</html>

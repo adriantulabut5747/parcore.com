@@ -1,0 +1,872 @@
+/* MINECRAFT HERO + SECTION TABS -- one file for every Minecraft banner (Java pages, tools). See the TABS block at the end. */
+/* ---- HERO ---------------------------------------------------
+   Full-bleed featured world. The bottom edge steps up in blocks on
+   the right (clip-path), so the photo ends like a Minecraft cliff. */
+.mch-hero {
+  --step: clamp(14px, 1.6vw, 24px);
+  position: relative;
+  display: block;
+  min-height: clamp(460px, 40vw, 620px);
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b0c0e;
+  color: #fff;
+  text-decoration: none;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--step) * 3), 91% calc(100% - var(--step) * 3),
+    91% calc(100% - var(--step) * 2), 82% calc(100% - var(--step) * 2), 82% calc(100% - var(--step)),
+    73% calc(100% - var(--step)), 73% 100%, 0 100%);
+}
+.mch-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  transform: scale(1.02);
+  transition: transform 0.9s var(--mch-ease);
+}
+.mch-hero:hover .mch-hero-bg {
+  transform: scale(1.05);
+}
+.mch-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(100deg, rgba(9, 9, 10, 0.95) 0%, rgba(9, 9, 10, 0.86) 34%, rgba(9, 9, 10, 0.45) 64%, rgba(9, 9, 10, 0.15) 100%),
+    linear-gradient(0deg, rgba(9, 9, 10, 0.7) 0%, rgba(9, 9, 10, 0) 45%);
+}
+.mch-hero:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -6px;
+}
+.mch-hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-height: inherit;
+  padding-top: 96px;
+  padding-bottom: calc(var(--step) * 3 + 40px);
+  /* border-box (so min-height can inherit the hero's), so the width cap
+     has to include the side padding to line up with .mch-frame below. */
+  box-sizing: border-box;
+}
+.mch-hero-heart {
+  fill: var(--mch-red) !important;
+  stroke: none !important;
+  animation: mch-beat 2.6s ease-in-out infinite;
+}
+.mch-hero-title {
+  margin: 22px 0 0;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: clamp(33px, 3.6vw, 60px); /* = /coc/ .ch-title */
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+}
+.mch-hero-title span {
+  display: block;
+  font-family: inherit !important;
+  color: var(--mch-red);
+}
+.mch-hero-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+  margin-top: 30px;
+}
+.mch-hero-stats {
+  display: flex;
+  margin: 0;
+}
+.mch-hero-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  padding: 0 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
+.mch-hero-stats > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.mch-hero-stats dt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+.mch-hero-stats dd {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+}
+.mch-hero-stats .is-zero dd,
+.mch-hero-stats .is-zero dt {
+  color: var(--mch-red);
+}
+@media (max-width: 970px) {
+  .mch-hero {
+    --step: 12px;
+    min-height: 0;
+    margin-top: 32px; /* the secondary bar overlaps the top of .coc-main */
+  }
+  .mch-hero::after {
+    background: linear-gradient(0deg, rgba(9, 9, 10, 0.97) 34%, rgba(9, 9, 10, 0.7) 64%, rgba(9, 9, 10, 0.3) 100%);
+  }
+  .mch-hero-inner {
+    padding-top: 180px;
+    padding-bottom: calc(var(--step) * 3 + 24px);
+  }
+  .mch-hero-title {
+    margin-top: 16px;
+    font-size: 32px; /* = /coc/ .ch-title on phones */
+    letter-spacing: -0.5px;
+  }
+  .mch-hero-foot {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 22px;
+    width: 100%;
+    margin-top: 22px;
+  }
+  .mch-hero-stats dd {
+    font-size: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mch-hero-heart {
+    animation: none;
+  }
+  .mch-hero-bg {
+    transition: none;
+  }
+  .mch-hero:hover .mch-hero-bg {
+    transform: none;
+  }
+}
+/* ---- PAGE BANNER (Oct 12): the hero as the page header ------------------
+   Forest shot (minecrafticons/mc-java-banner.jpg, 736px wide: soft when
+   stretched, so the scrim stays heavy on the left where the type sits).
+   Not a link any more; the CTA is. Versions sit where the stats were. */
+.mch-hero--page {
+  min-height: clamp(420px, 34vw, 540px);
+}
+.mch-hero--page .mch-hero-bg {
+  object-position: center 55%;
+}
+/* Tool pages' Creaking image: crop near its top so the mob's head clears the bar. */
+.mch-hero--page .mch-hero-bg[src$='mc-tools-banner.webp'] {
+  object-position: center 10%;
+}
+.mch-hero--page:hover .mch-hero-bg {
+  transform: scale(1.02);
+}
+.mch-hero-ver > div {
+  flex-direction: column;
+  gap: 5px;
+}
+.mch-hero-ver dd {
+  font-size: 19px;
+}
+.mch-hero-ver .mch-hero-age {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+.mch-hero-age .hlu-long {
+  display: none;
+}
+.mch-hero-age .hlu-short {
+  display: inline;
+}
+@media (max-width: 970px) {
+  .mch-hero--page {
+    min-height: 0;
+  }
+  .mch-hero--page .mch-hero-inner {
+    padding-top: 150px;
+    padding-bottom: 44px;
+  }
+  .mch-hero-ver dd {
+    font-size: 16px;
+  }
+}
+/* The forest shot is already dark: a lighter scrim than the old hero's,
+   dark only behind the text column on the left. */
+.mch-hero--page::after {
+  background:
+    linear-gradient(90deg, rgba(9, 9, 10, 0.86) 0%, rgba(9, 9, 10, 0.6) 32%, rgba(9, 9, 10, 0.1) 62%, rgba(9, 9, 10, 0) 100%),
+    linear-gradient(0deg, rgba(9, 9, 10, 0.55) 0%, rgba(9, 9, 10, 0) 40%);
+}
+.mch-hero--page .mch-hero-bg {
+  filter: brightness(1.15) saturate(1.1);
+}
+@media (max-width: 970px) {
+  .mch-hero--page::after {
+    background: linear-gradient(0deg, rgba(9, 9, 10, 0.95) 30%, rgba(9, 9, 10, 0.5) 62%, rgba(9, 9, 10, 0.05) 100%);
+  }
+}
+.mch-hero-inner {
+  box-sizing: border-box;
+}
+/* ---- BANNER v3 (Oct 12) ------------------------------------------------
+   Flat bottom edge (the stepped block cut is gone), a soft fade into the
+   page instead. Two columns inside the page width: the title block left,
+   "From Mojang" (moved up from under the banner) right. Grass block in the
+   eyebrow marks it as Java Edition. */
+.mch-hero,
+.mch-hero--page {
+  clip-path: none;
+  min-height: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.mch-hero--page::after {
+  background:
+    linear-gradient(90deg, rgba(13, 14, 16, 0.9) 0%, rgba(13, 14, 16, 0.62) 34%, rgba(13, 14, 16, 0.2) 60%, rgba(13, 14, 16, 0.55) 100%),
+    linear-gradient(0deg, #0d0e10 0%, rgba(13, 14, 16, 0) 38%);
+}
+.mch-hero--page .mch-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  align-items: end;
+  gap: 48px;
+  padding-top: 112px;
+  padding-bottom: 56px;
+}
+.mch-hero-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+/* From Mojang panel. */
+.mch-hero-news {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+}
+.mch-hero-news-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.mch-hero-news-head h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font: 900 13px/1 'Orbitron', sans-serif !important;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #eceef1;
+}
+.mch-hero-news .mch-more {
+  font-size: 13px;
+}
+.mch .mch-hero-news .mch-wire-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mch .mch-hero-news .vt-log-row {
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 14px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(13, 14, 16, 0.82);
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
+}
+.mch .mch-hero-news .vt-log-row:hover {
+  background: rgba(20, 21, 25, 0.92);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.mch .mch-hero-news .vt-log-thumb {
+  width: 104px;
+  height: 58px;
+}
+.mch .mch-hero-news .vt-log-headline {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 14px;
+}
+.mch .mch-hero-news .vt-feed-skel {
+  height: 80px;
+}
+@media (max-width: 1199px) {
+  .mch-hero--page .mch-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    padding-top: 88px;
+    padding-bottom: 40px;
+  }
+  .mch-hero-news {
+    max-width: 720px;
+  }
+  .mch .mch-hero-news .mch-wire-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 970px) {
+  .mch-hero--page::after {
+    background: linear-gradient(0deg, #0d0e10 8%, rgba(13, 14, 16, 0.86) 45%, rgba(13, 14, 16, 0.35) 80%, rgba(13, 14, 16, 0.15) 100%);
+  }
+  .mch-hero--page .mch-hero-inner {
+    gap: 28px;
+    padding-top: 140px;
+    padding-bottom: 28px;
+  }
+  .mch .mch-hero-news .mch-wire-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mch .mch-hero-news .vt-log-row {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+  .mch .mch-hero-news .vt-log-thumb {
+    width: 92px;
+    height: 52px;
+  }
+}
+@media (max-width: 1199px) {
+  .mch-hero--page .mch-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* ---- BANNER SIZE (Oct 12) ---------------------------------------------
+   One step up from the original, not a full screen: fits the title block
+   and the three news cards with room to breathe. */
+.mch-hero--page .mch-hero-inner {
+  min-height: clamp(460px, 34vw, 560px);
+  padding-top: clamp(96px, 7vw, 120px);
+  padding-bottom: clamp(72px, 6vw, 96px);
+  align-items: end;
+}
+.mch-hero--page .mch-hero-title {
+  font-size: clamp(38px, 3.8vw, 62px);
+}
+@media (max-width: 1199px) {
+  .mch-hero--page .mch-hero-inner {
+    min-height: 0;
+  }
+}
+@media (max-width: 970px) {
+  .mch-hero--page .mch-hero-inner {
+    padding-top: 150px;
+  }
+  .mch-hero--page .mch-hero-title {
+    font-size: 34px;
+  }
+}
+@media (min-width: 1200px) and (max-width: 1600px) {
+  .mch-hero--page .mch-hero-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    gap: 32px;
+  }
+}
+@media (min-width: 1200px) and (max-width: 1440px) {
+  .mch-hero--page .mch-hero-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(290px, 330px);
+  }
+}
+@media (max-width: 970px) {
+  .mch-hero--page .mch-hero-inner {
+    gap: 0;
+    padding-top: 64px;
+    padding-bottom: 22px;
+  }
+  .mch-hero--page .mch-hero-title {
+    font-size: 30px;
+  }
+  .mch-hero--page .mch-hero-foot {
+    margin-top: 16px;
+  }
+  .mch-hero--page .mch-hero-inner > .mch-hero-news {
+    display: none;
+  }
+}
+/* From Mojang: the list loads five (data-count); the hero column shows three,
+   phones (moved under the page by mc-home.js) show all five. */
+.mch-hero-inner .mch-wire-list > :nth-child(n + 4) {
+  display: none;
+}
+/* ---- DISCOVER HEADLINE (Oct 20 2026) --------------------------------------
+   "Find your next / world." -- the red word cycles through the hotbar's
+   sections (inline script in minecraft/java/index.html) with a chat caret
+   after it. Swap = a short drop out / rise in; reduced motion keeps word one. */
+.mch-hero-cycle {
+  display: flex !important;
+  align-items: baseline;
+  gap: 0.08em;
+}
+.mch-hero-cycle b {
+  font-weight: inherit;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+}
+.mch-hero-cycle b.is-out {
+  transform: translateY(0.3em);
+  opacity: 0;
+}
+.mch-hero-caret {
+  display: inline-block;
+  width: 0.42em;
+  height: 0.09em;
+  background: currentColor;
+  animation: mch-caret 1.1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mch-hero-caret { animation: none; }
+}
+/* ---- Fixes (Oct 20 2026) ---------------------------------------------------
+   Version ages read "updated 35 days ago" everywhere (the bare "35d" said
+   nothing). Popular articles keep "View all" on the title's row on phones.
+   Phones can't hover, so the greyed hotbar icons never lit up: lift them. */
+.mch-hero-age .hlu-long { display: inline; }
+.mch-hero-age .hlu-short { display: none; }
+
+
+/* ---- TABS (Oct 21 2026; tray Oct 21 2026) ----------------------------------
+   The CoC TH pages' Layouts / Army / Tools recipe (th-layouts.css "TABS + CARD
+   ACTIONS") as one control: a single sunken well (the tray) holds every tab, and
+   the page you're on rises out of it as the raised grey key. Eight separate wells
+   floating on the banner photo read as loose blobs; one tray reads as one piece
+   of UI. Oxanium caps, the page's More-sheet picture on the left, tabs sized to
+   their text (8-19 of them). "Soon" pages are dimmed spans. mc-java.js fills
+   .mch-nav (renderMobileNav): the Java sections, or on tool pages "All tools" +
+   every tool. The tray sits across the banner's bottom hairline, half on the
+   photo and half on the page: the negative margin below is half its height
+   (--mch-tray-h), so the banner ends at the tray's middle. That needs the banner
+   to stop clipping (overflow visible), so its photo loses the 2% zoom that the
+   clip used to hide. Desktop: the full page column, tabs sharing out the spare width, scrolling inside itself, with
+   arrows (from mc-java.js) while more tabs sit past a side. Phones: edge to edge,
+   tabs running off the screen so it reads as a strip you can scroll. */
+.mch-hero--page {
+  overflow: visible;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.mch-hero--page .mch-hero-bg,
+.mch-hero--page:hover .mch-hero-bg {
+  transform: none;
+}
+.mch-hero--page .mch-hero-inner {
+  padding-bottom: 28px;
+}
+.mch-hero-tabs {
+  --mch-tray: var(--lb-well, #121317);
+  --mch-tray-h: 68px; /* 48px tab + 2x8px padding + 2x2px edge */
+  position: relative;
+  z-index: 2;
+  margin-bottom: calc(var(--mch-tray-h) / -2 - 1px); /* -1px: the hairline */
+}
+.mch-nav {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px;
+  border: 2px solid var(--lb-edge, #060708);
+  border-radius: calc(var(--lb-r, 6px) + 3px);
+  background: var(--mch-tray);
+  box-shadow:
+    inset 0 3px 0 rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 24px -10px rgba(0, 0, 0, 0.7);
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.mch-nav::-webkit-scrollbar {
+  display: none;
+}
+.mch-nav-tab {
+  display: flex;
+  flex: 1 0 auto; /* share out spare width; never squash (scrolls instead) */
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 0 11px 0 8px; /* icon side a touch tighter: the picture carries its own air */
+  border: 2px solid transparent; /* the picked key's edge, reserved so nothing shifts */
+  border-radius: var(--lb-r, 6px);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  color: #8b9099;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.mch-nav-tab img {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+a.mch-nav-tab:hover {
+  background: #1a1b21;
+  color: #c9ccd2;
+}
+.mch-nav-tab.active,
+a.mch-nav-tab.active:hover {
+  border-color: var(--lb-edge, #060708);
+  background: var(--lb-raise, #2a2c35);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+a.mch-nav-tab.active:hover {
+  background: var(--lb-raise-hover, #32343e);
+}
+.mch-nav-tab.is-soon {
+  color: #5d616b;
+  cursor: default;
+}
+.mch-nav-tab.is-soon img {
+  opacity: 0.45;
+  filter: saturate(0.4);
+}
+.mch-nav-tab:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+@media (max-width: 970px) {
+  .mch-hero--page .mch-hero-inner {
+    padding-bottom: 16px;
+  }
+  /* Edge to edge: the frame's side padding moves inside the tray, so the first
+     tab still lines up with the title (--coc-side is a %, of the same width). */
+  .mch-hero-tabs {
+    --mch-tray-h: 60px; /* 44px tab + 2x6px padding + 2x2px edge */
+    padding-inline: 0;
+  }
+  .mch-nav {
+    padding: 6px var(--coc-side);
+    border-inline: 0;
+    border-radius: 0;
+  }
+  .mch-hero-tabs .mch-nav-arrow--l {
+    left: 0;
+    border-radius: 0;
+  }
+  .mch-hero-tabs .mch-nav-arrow--r {
+    right: 0;
+    border-radius: 0;
+  }
+  .mch-nav-tab {
+    flex: none;
+    min-height: 44px;
+    padding: 0 9px 0 7px;
+  }
+  .mch-nav-tab img {
+    width: 20px;
+    height: 20px;
+  }
+}
+/* Scroll arrows: inside the tray's edge, a fade into the tray with a chevron. */
+.mch-nav-arrow {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  display: flex;
+  align-items: center;
+  width: 56px;
+  padding: 0 8px;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+}
+.mch-nav-arrow[hidden] {
+  display: none;
+}
+.mch-nav-arrow--l {
+  left: calc(var(--coc-side) + 2px);
+  justify-content: flex-start;
+  border-radius: var(--lb-r, 6px) 0 0 var(--lb-r, 6px);
+  background: linear-gradient(90deg, var(--mch-tray) 50%, transparent);
+}
+.mch-nav-arrow--r {
+  right: calc(var(--coc-side) + 2px);
+  justify-content: flex-end;
+  border-radius: 0 var(--lb-r, 6px) var(--lb-r, 6px) 0;
+  background: linear-gradient(270deg, var(--mch-tray) 50%, transparent);
+}
+.mch-nav-arrow svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+}
+.mch-nav-arrow:hover svg {
+  color: var(--mch-red);
+}
+@media (hover: none) {
+  .mch-nav-arrow {
+    display: none;
+  }
+}
+
+/* ---- SLIM BANNER (Oct 21 2026) ----------------------------------------------
+   From Mojang loses its box: header row (title | plain "All updates ->" link, red
+   arrow) over a hairline, then the news cards as they were. The description line
+   is gone from the markup; the versions sit under the title instead. Desktop: the
+   whole banner, tabs included, shows 510px (or more if the content needs it);
+   phones keep their own spacing. */
+.mch-hero-news {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+.mch-hero-news .mch-more,
+.mch-hero-news .mch-more:hover {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.mch-hero-news .mch-more {
+  color: #e6e8ec;
+}
+.mch-hero-news .mch-more:hover {
+  color: #fff;
+}
+.mch-hero-news .mch-more svg {
+  color: var(--mch-red);
+}
+@media (min-width: 971px) {
+  .mch-hero--page {
+    display: flex;
+    flex-direction: column;
+    min-height: 558px; /* 510px visible: its top 48px sits under the 64px desktop bar */
+  }
+  /* Title block and From Mojang centred in the visible band between the bar and
+     the tabs: the extra 48px on top is the part hidden under the bar. */
+  .mch-hero--page .mch-hero-inner {
+    flex: 1;
+    min-height: 0;
+    align-items: center;
+    align-content: center;
+    padding-top: calc(48px + 28px);
+    padding-bottom: 28px;
+  }
+}
+/* Phones: a taller banner, about 340px (was 64px top / 14px bottom), title block
+   centred between the bar and the tabs. Top is 18px less than bottom because the
+   title's line box adds that much space above the letters. */
+@media (max-width: 970px) {
+  .mch-hero--page .mch-hero-inner {
+    padding-top: 67px;
+    padding-bottom: 85px;
+  }
+}
+
+/* ---- GROUND (Oct 21 2026) --------------------------------------------------
+   Everything under the banner wears /coc/'s .layouts-box ground (coc/index.html):
+   near-black #0a0a0b with the same film grain, lit from the top by a wide grey
+   glow and a whisper of the #c23b3b accent. CoC paints those glows on the
+   section's own background; here the section under the banner differs per page,
+   so the banner hangs them below its bottom hairline as ::before, sent behind
+   the page content (z-index -1). For that the banner must not be a stacking
+   context (no isolation / z-index on .mch-hero--page; its photo, scrim, text and
+   tray stack inside .coc-content instead) and .coc-content must be one. The tool
+   pages (.mt-page) keep minecraft.net's #171615: their #0e0d0d boxes would sink
+   into this black. */
+body.mc-home:not(.mt-page) .coc-main,
+body.mc-home:not(.mt-page) .coc-content {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='-0.215'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E") 0 0 / 220px 220px,
+    #0a0a0b;
+}
+/* Discover's chapter bands (mc-home.css CHAPTERS) each painted #0d0e10 over it:
+   they go see-through so the one ground + glow shows. Their edges stay. The
+   Play chapter keeps its deepslate pit (Adrian's pick). */
+body.mc-home:not(.mt-page) .mch-ch:not(.mch-ch--play) {
+  background: transparent;
+}
+/* Popular commands / servers (Build chapter): one subtle step lighter than
+   the ground (Adrian, Oct 21 2026). */
+body.mc-home:not(.mt-page) .mch-ch.mch-ch--deepslate {
+  background: rgba(255, 255, 255, 0.03);
+}
+/* mc-java.css's 80% black sheet over .coc-content (the old dirt wallpaper's
+   dimmer; mc-tool.css drops it too) was hidden under those bands. */
+body.mc-home:not(.mt-page) .coc-content::before {
+  display: none;
+}
+body.mc-home .coc-content {
+  isolation: isolate;
+}
+body.mc-home .mch-hero--page {
+  isolation: auto;
+}
+
+/* ---- SPACE UNDER THE TABS (Oct 21 2026) -------------------------------------
+   One rhythm on every Minecraft page: the first thing under the tray (a section
+   title, the Worlds feature card, a tool box) starts 64px below the tray's bottom
+   edge on desktop, 40px on phones. The pages' own first-section spacing was set
+   for a banner with nothing hanging off it; the tray now eats half of it, so the
+   banner adds the difference back as margin. Measured per page type (title-first
+   pages 51 / 16px before, Mob Summon's box 18 / 18px). */
+body.mc-home .mch-hero--page {
+  margin-bottom: 13px;
+}
+body.mc-home.mt-page .mch-hero--page {
+  margin-bottom: 46px;
+}
+@media (max-width: 970px) {
+  body.mc-home .mch-hero--page,
+  body.mc-home.mt-page .mch-hero--page {
+    margin-bottom: 23px;
+  }
+}
+/* The tools lobby has no tray (its tools are the page): the same 64 / 40px,
+   measured from the banner's bottom line instead (85 / 46px before). */
+body.mc-home .mch-hero--page:not(:has(.mch-hero-tabs)) {
+  margin-bottom: -21px;
+}
+@media (max-width: 970px) {
+  body.mc-home .mch-hero--page:not(:has(.mch-hero-tabs)) {
+    margin-bottom: -6px;
+  }
+}
+
+/* ---- BACK TO ALL TOOLS (Oct 21 2026) ----------------------------------------
+   Above the title on every tool page (added by mc-java.js renderMobileNav): the
+   lobby is the tools' parent, so it's a way back, not one of the tabs. Same
+   sunken well + Oxanium caps as the tabs, small, with a back arrow. */
+.mch-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  margin-bottom: 20px;
+  padding: 0 12px 0 9px;
+  border: 2px solid var(--lb-edge, #060708);
+  border-radius: var(--lb-r, 6px);
+  background: var(--lb-well, #121317);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #8b9099;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.mch-back svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s ease;
+}
+.mch-back:hover {
+  background: #1a1b21;
+  color: #fff;
+}
+.mch-back:hover svg {
+  color: var(--mch-red);
+  transform: translateX(-2px);
+}
+.mch-back:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+@media (max-width: 970px) {
+  .mch-back {
+    margin-bottom: 14px;
+  }
+}
+body.mc-home:not(.mt-page) .mch-hero--page::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  height: 700px;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 520px at 50% 0%, rgba(194, 59, 59, 0.07), transparent 60%),
+    radial-gradient(90% 700px at 50% 0%, rgba(255, 255, 255, 0.035), transparent 70%);
+}
+
+/* ---- EYEBROW (Oct 21 2026) -------------------------------------------------
+   "Curated Minecraft resources" over every banner title (Adrian). Kept quiet on
+   purpose: small spaced caps at half strength, led by a grass-block pixel
+   (green top, dirt bottom) instead of a coloured pill. */
+.mch-hero--page .mch-hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font: 600 11px/1 'Sora', sans-serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(230, 232, 236, 0.55);
+}
+.mch-hero--page .mch-hero-eyebrow::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(#6aa84f 0 45%, #7a5534 45%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+  opacity: 0.85;
+}
+@media (max-width: 970px) {
+  .mch-hero--page .mch-hero-eyebrow {
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+  }
+  .mch-hero--page .mch-hero-eyebrow::before {
+    width: 7px;
+    height: 7px;
+  }
+}

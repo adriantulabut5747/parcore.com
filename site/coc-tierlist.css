@@ -1,26 +1,37 @@
 /* =======================================================================
-   TIER LIST MAKER (/coc/tools/equipment-tier-list).
-   Built from the site's own parts, nothing new: the army maker's box and
-   keycap buttons (.am, .am-btn, .gd-chip), the Equipment page's dark
-   cards with a hairline (.gd-eq), the banner's Orbitron caps, and the
-   tool cards' red glow (.tc-card / .tc-icon in coc-cards.css), and the
-   army cards' equipment rarity colours (.as-common / .as-epic in
-   th-layouts.css).
+   TIER LIST MAKER (/coc/tools/tier-list) -- troops or hero equipment
+   (merged Oct 21 2026; coc-trooptierlist.css is gone).
+   Built from the site's own parts: the army maker's box and keys (.am,
+   .am-btn, .gd-chip), the TH pages' Layouts / Army / Tools keys for the
+   Troops / Equipment switch (.first-layer, th-layouts.css), the layout
+   cards' well for every slot, the banner's Orbitron caps and the tool
+   cards' red glow (coc-cards.css) on each tier's plate.
    Each row has its own colour, --tl-rgb (PAL in coc-tierlist.js, which
-   the downloaded picture uses too), drawn the way the tool card draws
-   its red: a soft glow in a dark card, a tinted hairline, coloured text.
+   the downloaded picture uses too). #tierlist[data-type] says which list
+   is on: equipment tiles wear the army cards' rarity colours (.as-common /
+   .as-epic), troop tiles the army maker's neutral raised grey.
    ======================================================================= */
 .tl {
   --tl-tile: 64px;
   --tl-label: 112px;
   --tl-red: 194, 59, 59; /* #c23b3b, the site accent */
 }
-/* Hero chips: one line that scrolls sideways (no scrollbar). The bottom
-   padding keeps the keycap's 3px edge from being clipped. */
+/* Blocks for the other list (title, intro, "More on", FAQ) hide. */
+.coc-content [data-mode][hidden] {
+  display: none;
+}
+
+/* Troops / Equipment: the TH pages' first-layer keys (look in th-layouts.css). */
+.tl-modes {
+  margin: 20px 0 0;
+}
+
+/* Filter chips: one line that scrolls sideways (no scrollbar). The bottom
+   padding keeps the key's 3px edge from being clipped. */
 .tl-heroes {
   flex-wrap: nowrap;
-  margin-top: 18px;
-  padding-bottom: 4px;
+  margin-top: 14px;
+  padding: 2px 2px 4px;
   overflow-x: auto;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
@@ -38,7 +49,7 @@
 .tl-hero img {
   width: 26px;
   height: 26px;
-  border-radius: 0;
+  border-radius: 4px;
   object-fit: cover;
   filter: grayscale(1);
   opacity: 0.7;
@@ -52,39 +63,47 @@
   opacity: 1;
 }
 
-/* ---- Board: one row = label card + slot card ---- */
+/* ---- Board: one row = label plate + slot, full width ---- */
 .tl-board {
   display: grid;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 16px;
 }
 .tl-row {
+  position: relative; /* the remove key sits in the slot's top right */
   display: grid;
-  grid-template-columns: var(--tl-label) 1fr auto;
+  grid-template-columns: var(--tl-label) 1fr;
   align-items: stretch;
   gap: 8px;
 }
 
-/* Label: the tool card icon's glow, in the row's own colour. */
+/* Label: the tool card icon's glow, in the row's own colour, on a box. */
 .tl-plate {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(var(--tl-tile) + 18px);
+  min-height: calc(var(--tl-tile) + 22px);
   padding: 8px 10px;
-  border: 1px solid rgba(var(--tl-rgb), 0.4);
-  border-radius: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
   background:
     radial-gradient(circle at 50% 30%, rgba(var(--tl-rgb), 0.3), rgba(var(--tl-rgb), 0.05) 72%),
     linear-gradient(180deg, #17181c 0%, #131417 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--tl-rgb), 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 18px -12px rgba(0, 0, 0, 0.85);
   cursor: text;
-  transition: border-color 0.2s;
+  transition: box-shadow 0.2s;
 }
 .tl-plate:hover {
-  border-color: rgba(var(--tl-rgb), 0.65);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--tl-rgb), 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 18px -12px rgba(0, 0, 0, 0.85);
 }
 .tl-plate:focus-within {
-  outline: 2px solid #c23b3b;
+  outline: 2px solid #e6e8ec;
   outline-offset: 2px;
 }
 .tl-name {
@@ -101,7 +120,7 @@
   outline: none;
   caret-color: #eff2f5;
 }
-/* A renamed tier: the keycap label type (Oxanium caps). */
+/* A renamed tier: the key label type (Oxanium caps). */
 .tl-name.tl-long {
   font-family: 'Oxanium', sans-serif;
   font-size: 12px;
@@ -109,76 +128,76 @@
   letter-spacing: 1.3px;
 }
 
-/* Slot: the Equipment page's dark card. */
+/* Slot: the layout cards' well. The right padding keeps tiles clear of
+   the remove key; the bottom padding is a strip that's always empty, so a
+   full row can still be tapped to drop a picked piece into it. */
 .tl-zone {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 8px;
   min-width: 0;
-  min-height: calc(var(--tl-tile) + 18px);
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.22);
-  transition:
-    border-color 0.15s,
-    background 0.15s;
+  min-height: calc(var(--tl-tile) + 22px);
+  padding: 8px 44px 14px 8px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  transition: background-color 0.15s;
 }
 .tl-over,
 .tl-picking .tl-row:hover .tl-zone,
 .tl-picking .tl-pool:hover {
-  border-color: rgba(var(--tl-rgb, var(--tl-red)), 0.55);
-  background: rgba(var(--tl-rgb, var(--tl-red)), 0.06);
+  background: rgba(var(--tl-rgb, var(--tl-red)), 0.08);
+  box-shadow:
+    var(--card-well),
+    inset 0 0 0 1px rgba(var(--tl-rgb, var(--tl-red)), 0.55);
 }
 .tl-picking .tl-row,
 .tl-picking .tl-pool {
   cursor: pointer;
 }
 
-/* Remove: a small flat key at the row's end, red on hover. */
+/* Remove: a small grey key in the slot's top right corner, red X on hover. */
 .tl-del {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: grid;
   place-items: center;
-  align-self: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--am-faint);
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #8b9099;
   cursor: pointer;
-  opacity: 0;
   transition:
-    opacity 0.15s,
     color 0.15s,
-    background 0.15s;
+    background-color 0.15s,
+    transform 0.1s;
 }
 .tl-del svg {
-  width: 16px;
-  height: 16px;
-}
-.tl-row:hover .tl-del,
-.tl-del:focus-visible {
-  opacity: 1;
+  width: 14px;
+  height: 14px;
 }
 .tl-del:hover {
-  background: var(--flat-hover, #1e1f23);
-  color: #e06363;
+  background: var(--lb-raise-hover);
+  color: #e86a6a;
+}
+.tl-del:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
 }
 .tl-del:focus-visible {
-  outline: 2px solid #c23b3b;
+  outline: 2px solid #e6e8ec;
   outline-offset: 2px;
 }
-@media (hover: none) {
-  .tl-del {
-    opacity: 1;
-  }
-}
-/* The last row can't go; keep its column so rows stay aligned. */
+/* The last row can't go. */
 .tl-one-row .tl-del {
-  visibility: hidden;
+  display: none;
 }
 
 .tl-add {
@@ -191,7 +210,6 @@
 /* ---- Pool ---- */
 .tl-pool-head {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -200,49 +218,59 @@
   border-top: 1px solid var(--am-line);
 }
 .tl-pool-label {
+  flex: none;
   margin: 0;
   color: var(--am-text);
   font-family: 'Sora', sans-serif;
   font-size: 16px;
   font-weight: 700;
+  white-space: nowrap;
 }
 .tl-pool-label span {
   color: var(--am-muted);
   font-weight: 500;
 }
+/* Reset, Copy link, Download image: always one row, never wrapping. */
 .tl-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  min-width: 0;
+}
+.tl-actions .am-btn {
+  min-width: 0;
+  white-space: nowrap;
 }
 .tl-pool {
   margin-top: 12px;
+  padding-right: 8px;
 }
 
-/* ---- Pieces ---- */
+/* ---- Pieces: small raised keys ---- */
 .tl-tile {
   position: relative;
   flex: none;
   width: var(--tl-tile);
   height: var(--tl-tile);
   padding: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: var(--am-tile, #1f2025);
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: radial-gradient(120% 90% at 50% 0%, #2c2f36 0%, #1e2025 60%, #16171b 100%);
+  box-shadow: var(--lb-btn);
   cursor: grab;
   touch-action: manipulation;
   -webkit-touch-callout: none;
   user-select: none;
   transition:
-    border-color 0.15s,
+    filter 0.15s,
     transform 0.15s,
     opacity 0.15s;
 }
 /* Equipment rarity: the army cards' blue common / purple epic. */
-.tl-tile.tl-common {
+.tl[data-type='equipment'] .tl-tile.tl-common {
   background: radial-gradient(120% 90% at 50% 0%, #2f5c9c 0%, #1b3560 60%, #142645 100%);
 }
-.tl-tile.tl-epic {
+.tl[data-type='equipment'] .tl-tile.tl-epic {
   background: radial-gradient(120% 90% at 50% 0%, #6e3aa6 0%, #3f2068 60%, #2c1649 100%);
 }
 .tl-tile[hidden] {
@@ -267,17 +295,16 @@
   display: none;
 }
 .tl-tile:hover {
-  border-color: rgba(255, 255, 255, 0.18);
+  filter: brightness(1.12);
 }
 .tl-tile:focus-visible {
-  outline: 2px solid #c23b3b;
+  outline: 2px solid #e6e8ec;
   outline-offset: 2px;
 }
 .tl-tile.is-picked {
-  border-color: #c23b3b;
   box-shadow:
-    0 0 0 1px #c23b3b,
-    0 0 16px rgba(var(--tl-red), 0.45);
+    var(--lb-btn),
+    0 0 0 2px #c23b3b;
   transform: translateY(-2px);
 }
 .tl-tile.is-dragging {
@@ -288,8 +315,9 @@
   top: 0;
   left: 0;
   z-index: 9999;
-  border-color: #c23b3b;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    var(--lb-btn),
+    0 14px 30px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   transition: none;
 }
@@ -297,16 +325,19 @@
 @media (max-width: 600px) {
   .tl {
     --tl-tile: 50px;
-    --tl-label: 70px;
+    --tl-label: 64px;
   }
   .tl-row {
     gap: 6px;
   }
+  /* a deeper always-empty strip on phones: a fingertip, not a cursor */
   .tl-zone {
     gap: 6px;
-    padding: 6px;
+    min-height: calc(var(--tl-tile) + 34px);
+    padding: 6px 36px 28px 6px;
   }
   .tl-plate {
+    min-height: calc(var(--tl-tile) + 34px);
     padding: 6px 3px;
   }
   .tl-name {
@@ -318,7 +349,40 @@
     overflow-wrap: break-word;
   }
   .tl-del {
+    top: 6px;
+    right: 6px;
     width: 26px;
+    height: 26px;
+  }
+  .tl-pool {
+    padding: 6px;
+  }
+  /* Unranked over the three buttons, which share one row in equal parts */
+  .tl-pool-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .tl-actions {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 1.35fr;
+    gap: 6px;
+  }
+  .tl-actions .am-btn {
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 6px;
+    font-size: 10px;
+    letter-spacing: 0.6px;
+  }
+  .tl-actions .am-btn-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+@media (max-width: 400px) {
+  .tl-actions .am-ico {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -329,8 +393,9 @@
   }
 }
 
-/* ---- More on equipment (above the FAQ): the article card, then the two
-   tool cards (.art-next-card in article-cards.css, .tc-card in coc-cards.css). ---- */
+/* ---- More on troops / equipment (above the FAQ): the article card, then
+   the two tool cards (.art-next-card in article-cards.css, .tc-card in
+   coc-cards.css). ---- */
 .tl-more {
   display: grid;
   gap: 12px;

@@ -13,18 +13,21 @@
    (FireworkParticles), sizes and timing are approximate.
    Copy buttons: mc-home.js. Styles: FIREWORK block in mc-home.css (.fwk-*). */
 (function () {
-  var sky = document.getElementById('fwkSky');
-  if (!sky) return;
-  var $ = function (id) { return document.getElementById(id); };
-  var D = McDyes;
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var SHAPES = [
+  // Shared with the Mob Summon tool (Oct 19: a mob can drop a rocket or a star): the shapes and the explosion NBT,
+  // old (Explosions) and new (explosions). exNew / exOld are hoisted, so this runs before the page check.
+  window.McFirework = { SHAPES: null, exNew: exNew, exOld: exOld };
+  var SHAPES = window.McFirework.SHAPES = [
     { id: 'small_ball', n: 0, name: 'Small Ball', item: null, icon: 'firework_star' },
     { id: 'large_ball', n: 1, name: 'Large Ball', item: 'fire_charge', icon: 'fire_charge' },
     { id: 'star', n: 2, name: 'Star-shaped', item: 'gold_nugget', icon: 'gold_nugget' },
     { id: 'creeper', n: 3, name: 'Creeper-shaped', item: 'creeper_head', icon: 'creeper' },
     { id: 'burst', n: 4, name: 'Burst', item: 'feather', icon: 'feather' }
   ];
+  var sky = document.getElementById('fwkSky');
+  if (!sky) return;
+  var $ = function (id) { return document.getElementById(id); };
+  var D = McDyes;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var COLORS = {
     white: 'ffffff', gray: 'aaaaaa', dark_gray: '555555', black: '000000', red: 'ff5555', dark_red: 'aa0000', gold: 'ffaa00', yellow: 'ffff55',
     green: '55ff55', dark_green: '00aa00', aqua: '55ffff', dark_aqua: '00aaaa', blue: '5555ff', dark_blue: '0000aa', light_purple: 'ff55ff', dark_purple: 'aa00aa'

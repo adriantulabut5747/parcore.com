@@ -1,6 +1,7 @@
 // Article cards and feed, built from /articles.json (styles: article-cards.css).
 //   <div class="art-track" id="X" data-game="coc">  -> horizontal strip of cards
 //        + data-live (written ones only), data-order="random" (shuffled per visit)
+//          or data-order="json" (slides keep articles.json's order, not newest first)
 //   <div class="art-feed" data-game="coc|all">       -> stacked feed rows (/articles/)
 //   <input id="artSearch">                           -> filters the feed as you type
 //   <div id="artFilters">                            -> game chips (built here, one per game with articles)
@@ -16,6 +17,9 @@
   const esc = (t) => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   // Month + year only ("Oct 2026"): articles say when, not the exact day (Adrian's rule).
   const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  // Parcore watermark chip (favicon + name), top left of strip pictures.
+  const WM = '<span class="asp-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span>';
 
   // Live = a link; soon = a greyed block with the badge.
   function shell(a, cls, inner) {
@@ -36,20 +40,21 @@
   function card(a) {
     const date = a.status === 'live' && a.date ? `<time class="art-date" datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '';
     return shell(a, 'art-card',
-      media(a, 'art-media').replace('<div class="art-chips">', '<span class="asp-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span><div class="art-chips">') +
+      media(a, 'art-media').replace('<div class="art-chips">', WM + '<div class="art-chips">') +
       `<div class="art-body"><h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p>${date}</div>`);
   }
-  // Lobby slide (playvalorant.com "The latest" layout, Adrian's pick, Oct 2026):
-  // picture (watermark from the CSS), then CATEGORY | month, title, dek.
-  function slide(a) {
-    const date = a.date ? `<time datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '';
+  // Strip slide (Adrian, Oct 21 2026): the picture wears the tags (Parcore
+  // chip top left, red category top right); under it the title, then
+  // "Oct 2026 · Clash of Clans". No dek -- kept short on purpose.
+  function slide(a, gameName) {
     // Not written yet (no data-live on the strip, e.g. /minecraft/java/): a
-    // greyed block with "Coming soon" in place of the month, not a link.
+    // greyed block, not a link; the "Coming soon" chip on the picture says so.
     const soon = a.status !== 'live';
+    const date = !soon && a.date ? `<time datetime="${esc(a.date)}">${fmtDate(a.date)}</time>` : '';
     return shell(a, 'art-slide',
-      `<div class="art-row-media"><img src="${esc(a.image)}" alt="" loading="lazy" decoding="async"></div>` +
-      `<p class="art-slide-meta"><span>${esc(a.category)}</span>${soon ? '<span class="art-slide-soon">Coming soon</span>' : date}</p>` +
-      `<h3 class="art-title">${esc(a.title)}</h3><p class="art-dek">${esc(a.dek)}</p>`);
+      media(a, 'art-row-media').replace('<div class="art-chips">', WM + '<div class="art-chips">') +
+      `<h3 class="art-title">${esc(a.title)}</h3>` +
+      `<p class="art-slide-foot">${date}${date && gameName ? '<span aria-hidden="true">·</span>' : ''}${gameName ? esc(gameName) : ''}</p>`);
   }
   // Fisher-Yates: data-order="random" strips come out in a new order every visit.
   function shuffle(list) {
@@ -109,13 +114,21 @@
       const [a, b] = track.children;
       return a ? (b ? b.offsetLeft - a.offsetLeft : a.offsetWidth) : 0;
     };
-    // Progress line: the share of the strip seen so far (what's on screen
-    // counts), so it starts part-filled and is full at the last card.
+    // Progress line (Adrian, Oct 21 2026): empty on the first card; one card
+    // in it shows the share on screen (what used to be the starting fill),
+    // then grows evenly to full at the last card.
     const bar = document.querySelector(`.art-progress[data-for="${nav.dataset.for}"] span`);
     const sync = () => {
+      const max = track.scrollWidth - track.clientWidth;
       prev.disabled = track.scrollLeft < 4;
-      next.disabled = track.scrollLeft > track.scrollWidth - track.clientWidth - 4;
-      if (bar && track.scrollWidth) bar.style.transform = `scaleX(${Math.min(1, (track.scrollLeft + track.clientWidth) / track.scrollWidth)})`;
+      next.disabled = track.scrollLeft > max - 4;
+      if (!bar || !track.scrollWidth) return;
+      const i = step() ? track.scrollLeft / step() : 0; // cards scrolled past
+      const n = step() ? max / step() : 0; // cards it takes to reach the end
+      const first = track.clientWidth / track.scrollWidth;
+      let fill = n <= 0 ? 1 : i < 1 ? i * first : n <= 1 ? 1 : first + ((1 - first) * (i - 1)) / (n - 1);
+      if (track.scrollLeft > max - 4 || i > n - 0.02) fill = 1;
+      bar.style.transform = `scaleX(${Math.max(0, Math.min(1, fill))})`;
     };
     prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
     next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
@@ -310,12 +323,16 @@
         // data-live: written articles only (no greyed "Coming soon" cards).
         let list = pick(el.dataset.game).filter((a) => !('live' in el.dataset) || a.status === 'live');
         if (el.dataset.order === 'random') list = shuffle(list.slice());
-        // Slides: newest first ("lead": true pins one to the front).
+        // Slides: newest first ("lead": true pins one to the front), unless
+        // data-order says otherwise: "json" keeps articles.json's own order
+        // (home page), "random" keeps the shuffle (every game page).
         if (el.dataset.variant === 'slide') {
-          list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-          const pin = list.findIndex((a) => a.lead);
-          if (pin > 0) list.unshift(list.splice(pin, 1)[0]);
-          el.innerHTML = list.map(slide).join('');
+          if (!el.dataset.order) {
+            list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            const pin = list.findIndex((a) => a.lead);
+            if (pin > 0) list.unshift(list.splice(pin, 1)[0]);
+          }
+          el.innerHTML = list.map((a) => slide(a, (games[a.game] || {}).name)).join('');
         } else el.innerHTML = list.map(card).join('');
       });
       document.querySelectorAll('.art-spot-count[data-game]').forEach((el) => {

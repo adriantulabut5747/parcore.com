@@ -1,0 +1,44 @@
+/* 3D build viewer (mc-build.js). Same surface as the article chart blocks (.ap-viz):
+   flat #141417 card, hairline border, square corners, Oxanium controls, red = active. */
+.mcb { margin: 28px 0; background: #141417; border: 1px solid rgba(255, 255, 255, 0.07); }
+.mcb button { font: 600 13px/1 'Oxanium', sans-serif; color: #d5d7dc; background: #1c1c20; border: 1px solid rgba(255, 255, 255, 0.08); padding: 9px 13px; cursor: pointer; transition: border-color 0.15s, background 0.15s, color 0.15s; }
+.mcb button:hover { border-color: rgba(194, 59, 59, 0.6); }
+.mcb button[aria-pressed='true'] { background: rgba(194, 59, 59, 0.18); border-color: #c23b3b; color: #fff; }
+.mcb button:focus-visible, .mcb input:focus-visible { outline: 2px solid #c23b3b; outline-offset: 2px; }
+
+.mcb-bar, .mcb-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px; }
+.mcb-bar { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.mcb-foot { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.mcb-seg { display: flex; }
+.mcb-seg button + button { margin-left: -1px; }
+.mcb-seg[hidden] { display: none; }
+.mcb-togs { display: flex; gap: 8px; margin-left: auto; }
+
+.mcb-stage { position: relative; height: 540px; background: radial-gradient(60% 55% at 50% 45%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 70%); }
+.mcb-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.mcb-stage canvas:active { cursor: grabbing; }
+.mcb-tip { position: absolute; z-index: 2; pointer-events: none; max-width: 260px; padding: 9px 11px; background: #0d0d0f; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
+.mcb-tip b { display: block; font: 700 14px/1.2 'Oxanium', sans-serif; color: #fff; }
+.mcb-tip span { display: block; margin-top: 4px; font: 400 13px/1.35 'Sora', sans-serif; color: #c9c9d0; }
+.mcb-hint { position: absolute; left: 12px; bottom: 10px; font: 500 12px/1 'Sora', sans-serif; color: #7d7d86; pointer-events: none; transition: opacity 0.4s; }
+.mcb-hint.is-gone { opacity: 0; }
+.mcb-unlock { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: rgba(13, 13, 15, 0.35) !important; border: 0 !important; touch-action: pan-y; }
+.mcb-unlock span { padding: 11px 18px; background: #c23b3b; color: #fff; font: 700 14px/1 'Oxanium', sans-serif; letter-spacing: 0.02em; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45); }
+.mcb-done { position: absolute; top: 10px; right: 10px; z-index: 3; }
+.mcb-unlock[hidden], .mcb-done[hidden] { display: none; }
+.mcb-err { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #8b9097; }
+
+.mcb-layer { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px; font: 600 13px/1 'Oxanium', sans-serif; color: #8b9097; }
+.mcb-layer input { flex: 1; max-width: 320px; accent-color: #c23b3b; }
+.mcb-lval { min-width: 52px; color: #fff; font-variant-numeric: tabular-nums; }
+
+.mcb-dl { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+@media (max-width: 600px) {
+  .mcb-stage { height: 440px; }
+  .mcb-togs { margin-left: 0; }
+  .mcb button { padding: 9px 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mcb button, .mcb-hint { transition: none; }
+}

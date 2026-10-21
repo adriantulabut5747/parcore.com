@@ -2418,6 +2418,10 @@ document.addEventListener('keydown', function(e){
     // A jump to a section of a page ("/minecraft/java/#mc-skins") isn't that page.
     if (String(link || '').includes('#')) return false;
     if (normalizePage(link) === currentPage) return true;
+    // activePrefix: lit on every page under that folder (Tools on every
+    // /minecraft/tools/<tool>), same as sidebar.json's.
+    const prefix = typeof item === 'object' && item.activePrefix && normalizePage(item.activePrefix);
+    if (prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/'))) return true;
     const activeOn = typeof item === 'object' && item.activeOn;
     return Array.isArray(activeOn) && activeOn.some((p) => normalizePage(p) === currentPage);
   };
@@ -2492,7 +2496,47 @@ document.addEventListener('keydown', function(e){
     bar.insertAdjacentHTML('beforeend', data.heroTabs.slice(2, 4).map(bnItemHtml).join(''));
   }
 
+  // Banner tabs (Oct 21 2026, games.gg-style): text only, at the foot of every
+  // Minecraft banner (.mch-nav, styled in mc-hero.css "TABS"). Tool pages list
+  // the tools, led by the hub the way games.gg leads with "Overview".
+  function heroNavTabHtml(item) {
+    // Same picture as the More sheet; "All tools" borrows the Tools anvil.
+    const img = item.image || '/minecrafticons/anvil.png';
+    const html = navItem(item, 'mch-nav-tab', `<img src="${escapeHtml(img)}" alt="" width="20" height="20">${escapeHtml(item.name)}`);
+    return isCurrent(item) && !isSoon(item) ? html.replace('<a ', '<a aria-current="page" ') : html;
+  }
+
   function renderMobileNav(data) {
+    const tabs = document.querySelector('.mch-nav');
+    if (tabs && data.mobileNav) {
+      const onTool = onToolsPage(data);
+      const list = onTool ? data.tools : data.mobileNav;
+      // Tool pages: the lobby is their parent, not a tab -- a back button above
+      // the banner title leads there instead (mc-hero.css BACK TO ALL TOOLS).
+      const title = onTool && document.querySelector('.mch-hero--page .mch-hero-title');
+      if (title && !title.parentElement.querySelector('.mch-back')) {
+        (title.parentElement.querySelector('.mch-hero-eyebrow') || title).insertAdjacentHTML('beforebegin', '<a class="mch-back" href="/minecraft/tools/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>All tools</a>');
+      }
+      tabs.innerHTML = list.map(heroNavTabHtml).join('');
+      const cur = tabs.querySelector('.active');
+      if (cur) tabs.scrollLeft += cur.getBoundingClientRect().left - tabs.getBoundingClientRect().left - (tabs.clientWidth - cur.offsetWidth) / 2;
+      // One row that scrolls: arrows show only while more tabs sit off that side
+      // (mouse users; touch hides them in CSS). Keyboard focus scrolls on its own.
+      const chev = (d) => `<button type="button" class="mch-nav-arrow mch-nav-arrow--${d}" tabindex="-1" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="${d === 'l' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
+      tabs.insertAdjacentHTML('afterend', chev('l') + chev('r'));
+      const [left, right] = tabs.parentElement.querySelectorAll('.mch-nav-arrow');
+      const sync = () => {
+        left.hidden = tabs.scrollLeft < 2;
+        right.hidden = tabs.scrollLeft + tabs.clientWidth > tabs.scrollWidth - 2;
+      };
+      left.onclick = () => tabs.scrollBy({ left: -tabs.clientWidth * 0.7, behavior: 'smooth' });
+      right.onclick = () => tabs.scrollBy({ left: tabs.clientWidth * 0.7, behavior: 'smooth' });
+      tabs.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', sync);
+      sync();
+      return;
+    }
+    // Old strip (hcpc.html only).
     const nav = document.querySelector('.mc-mobile-nav');
     if (!nav || !data.mobileNav) return;
     // Keep the header row (the "Discover Categories" divider), replace only the item links.
@@ -2508,8 +2552,8 @@ document.addEventListener('keydown', function(e){
   // Breadcrumb (Oct 13): Clash's trail (thz-script.js buildCrumbs; CSS is
   // 11layout.css BREADCRUMB) on phones and desktop, every step a link:
   //   Minecraft > Worlds   Minecraft > Tools > Banner Maker
-  // "Minecraft" is the Discover page, which itself reads "Minecraft Java and
-  // Bedrock". A page missing from mc-contents.json (hcpc) names itself from
+  // "Minecraft" is the Discover page, which itself reads "Minecraft Java
+  // Edition". A page missing from mc-contents.json (hcpc) names itself from
   // its static .sc-mobile-group text.
   function renderCrumbs(data) {
     const box = document.querySelector('.secondary-left .secondary-content');
@@ -2519,7 +2563,7 @@ document.addEventListener('keydown', function(e){
     const tool = (data.tools || []).find((t) => !isSoon(t) && isCurrent(t.link));
     const section = (data.mobileNav || []).find((t) => !isSoon(t) && isCurrent(t.link));
     let trail = [{ text: home.name, href: home.link }];
-    if (isCurrent(home.link)) trail = [{ text: 'Minecraft Java and Bedrock', href: home.link }];
+    if (isCurrent(home.link)) trail = [{ text: 'Minecraft Java Edition', href: home.link }];
     else if (tools && (tool || isCurrent(tools.link))) {
       trail.push({ text: tools.name, href: tools.link });
       if (tool) trail.push({ text: tool.crumbText || tool.name, href: tool.link });
@@ -2538,53 +2582,28 @@ document.addEventListener('keydown', function(e){
     box.classList.add('has-crumbs');
   }
 
-  // Same sheet hwr builds: one row per edition, each folding open to that
-  // edition's own sections. The row for the edition you are on starts open.
-  // Structure and classes are hwr's (.th-mini-wrap / .th-mini-toggle /
-  // .th-mini-dropdown / .stb-toc-card), styled once in 11layout.css and
-  // toggled by toggleThMiniDropdown() in 11layout.js.
+  // More sheet (Oct 21 2026): the Clash sheet's body -- labelled sections of
+  // two-across tiles, wells at rest, the page you're on the raised grey key.
+  // Same .mx classes and markup as coc-more.js, styled once in coc-more.css.
+  // Java = the built sections, Tools = the tools A-Z, then the editions not
+  // built yet as greyed tiles.
   function renderMoreSheet(data) {
     const list = document.querySelector('.more-list');
-    if (!list || !data.moreSheet) return;
-
-    // moreSheet is keyed by edition name; the icon and link for the row
-    // itself come from the edition entries, matched on name. "Story Mode"
-    // there is "Story" here, so match on the leading word too.
-    const editions = (data.desktopSubNav && data.desktopSubNav.editions) || data.heroTabs || [];
-    const editionFor = (title) => editions.find((e) =>
-      e.name === title || title.split(' ')[0] === e.name) || {};
-
-    let html = '';
-    Object.keys(data.moreSheet).forEach((title) => {
-      const items = data.moreSheet[title] || [];
-      const ed = editionFor(title);
-      const open = isCurrent(ed) ? ' open' : '';
-      const active = isCurrent(ed) ? ' active' : '';
-
-      const toc = items.map((it) => {
-        const inner = `<img class="stb-toc-icon" src="${escapeHtml(it.image)}" alt="">` +
-          `<span class="stb-toc-name">${escapeHtml(it.name)}</span>`;
-        if (isSoon(it)) return `<span class="stb-toc-card is-soon" aria-disabled="true">${inner}</span>`;
-        const cur = isCurrent(it) ? ' is-current' : '';
-        return `<a href="${escapeHtml(it.link)}" class="stb-toc-card${cur}">${inner}</a>`;
-      }).join('');
-
-      html += `<div class="th-mini-wrap${open}">` +
-        `<div class="th-mini-toggle${active}">` +
-        (isSoon(ed)
-          ? `<span class="th-mini th-mini-link is-soon" aria-disabled="true">`
-          : `<a href="${escapeHtml(ed.link)}" class="th-mini th-mini-link${active}">`) +
-        `<img src="${escapeHtml(ed.image || '')}" alt="">` +
-        `<span>${escapeHtml(title)}</span>` +
-        (isSoon(ed) ? `</span>` : `</a>`) +
-        `<button type="button" class="th-mini-chevron-btn" onclick="toggleThMiniDropdown(this)" aria-label="Toggle ${escapeHtml(title)} sections">` +
-        `<svg class="th-mini-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` +
-        `</button>` +
-        `</div>` +
-        `<div class="th-mini-dropdown"><div class="th-mini-dropdown-inner"><div class="stb-toc-grid stb-toc-grid-2col">${toc}</div></div></div>` +
-        `</div>`;
-    });
-    list.innerHTML = `<div class="th-mini-grid">${html}</div>`;
+    if (!list) return;
+    const tile = (it) => navItem(it, 'mx-tool',
+      `<span class="mx-tool-ico"><img src="${escapeHtml(it.image)}" alt=""></span>` +
+      `<span class="mx-tool-name">${escapeHtml(it.sheetName || it.name)}</span>`);
+    const sec = (label, items) => items.length
+      ? `<section class="mx-sec"><div class="mx-head"><h3 class="mx-label">${label}</h3></div>` +
+        `<div class="mx-tools">${items.map(tile).join('')}</div></section>`
+      : '';
+    list.classList.add('mx');
+    list.innerHTML =
+      sec('Java', (data.mobileNav || []).filter((it) => !isSoon(it))) +
+      sec('Tools', data.tools || []) +
+      sec('Coming soon', (data.heroTabs || []).filter(isSoon));
+    const count = document.querySelector('[data-role="more-count"]');
+    if (count) count.textContent = list.querySelectorAll('a.mx-tool').length + ' pages';
   }
 
   function renderDesktopSubNav(data) {
@@ -2599,8 +2618,6 @@ document.addEventListener('keydown', function(e){
     if (dests) dests.innerHTML = editions.map(stbHubLinkHtml).join('');
     // scrollWidth is only meaningful once the chips exist -- the same
     // re-measure hwr's renderCategoryNav() does after it injects.
-    if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
-    if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
     // Desktop: the sections strip is hidden (one-bar layout, 11layout.css),
     // so hovering "Java" lists them instead -- the shared menu engine
     // (window.stbHubMenus in 11layout.js), same as the Clash menus.

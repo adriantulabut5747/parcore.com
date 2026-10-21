@@ -1,15 +1,91 @@
 /* Player Tracker (Oct 2026): search on /coc/tools/player-tracker, profile at
-   /coc/player/<TAG>. Built by coc-tracker.js. Same material as the TH18
-   pages (th-layouts.css): #121316 panels, hairline borders, one red accent,
-   Orbitron headings, Oxanium labels, Sora text. Buttons reuse .th-soon-btn. */
+   /coc/player/<TAG>. Built by coc-tracker.js. Orbitron headings, Oxanium
+   labels, Sora text, one red accent. Buttons reuse .th-soon-btn.
+   Raised UI (Oct 21 2026), the same three recipes as every CoC page:
+   - box (panels: search, header, groups, members table, war cards):
+     2px --lb-edge, --lb-r, --lb-box, --lb-shadow;
+   - well (fields, the header's number trays, lists inside a box):
+     2px --lb-edge, --lb-well, --card-well;
+   - tabs / switches / day chips: a well at rest, the raised grey key
+     (--lb-raise + --lb-btn) when picked -- the TH18 layouts tabs'
+     recipe (th-layouts.css "TABS + CARD ACTIONS"). */
 
 .pt-search,
 .pt-head,
 .pt-group,
-.pt-recent {
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
+.pt-recent,
+.pt-table-wrap,
+.pt-wars,
+.pt-wms,
+.pt-mu,
+.pt-sk-card {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+
+/* Tabs, switches, day chips and war sides: one look. */
+.pt-mode button,
+.pt-quick-mode button,
+.pt-tabs button,
+.pt-days button,
+.pt-war-sides button {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
+  font:
+    800 12px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+.pt-mode button:hover,
+.pt-quick-mode button:hover,
+.pt-tabs button:hover,
+.pt-days button:hover:not(:disabled),
+.pt-war-sides button:hover {
+  background: #17181d;
+  color: #c9ccd2;
+}
+.pt-mode button[aria-checked='true'],
+.pt-quick-mode button[aria-checked='true'],
+.pt-tabs button[aria-selected='true'],
+.pt-days button[aria-selected='true'],
+.pt-war-sides button[aria-selected='true'] {
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.pt-mode button[aria-checked='true']:hover,
+.pt-quick-mode button[aria-checked='true']:hover,
+.pt-tabs button[aria-selected='true']:hover,
+.pt-days button[aria-selected='true']:hover,
+.pt-war-sides button[aria-selected='true']:hover {
+  background: var(--lb-raise-hover);
+}
+.pt-mode button:active,
+.pt-quick-mode button:active,
+.pt-tabs button:active,
+.pt-days button:active:not(:disabled),
+.pt-war-sides button:active {
+  transform: translateY(1px);
+}
+.pt-mode button:focus-visible,
+.pt-quick-mode button:focus-visible,
+.pt-tabs button:focus-visible,
+.pt-days button:focus-visible,
+.pt-war-sides button:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
 }
 
 /* ---- Search -----------------------------------------------------------
@@ -20,11 +96,13 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(180px, 34%); /* the art never squeezes the field */
   overflow: hidden;
-  margin: 16px 0 0;
-  background: #121316;
+  margin: 32px 0 0;
 }
 .pt-search-main {
-  padding: 24px 32px 26px;
+  padding: 24px 24px 26px;
+}
+.pt-search-title {
+  margin: 0 0 16px;
 }
 .pt-search-art {
   position: relative;
@@ -44,10 +122,29 @@
   object-position: 58% 100%;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5));
 }
+/* The search bar: one sunken field holding the "#", the input and the
+   Look up key (it was a field and a separate button side by side). */
 .pt-form {
   display: flex;
-  gap: 10px;
-  margin: 16px 0 0;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 5px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  transition: box-shadow 0.15s ease;
+}
+.pt-form:focus-within {
+  box-shadow:
+    var(--card-well),
+    0 0 0 2px var(--lb-red-text);
+}
+.pt-form:has(input[aria-invalid='true']) {
+  box-shadow:
+    var(--card-well),
+    0 0 0 2px #e06363;
 }
 .pt-field {
   position: relative;
@@ -56,7 +153,7 @@
 }
 .pt-field-hash {
   position: absolute;
-  left: 18px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   font:
@@ -67,43 +164,33 @@
 }
 .pt-field input {
   width: 100%;
-  height: 48px;
-  padding: 0 16px 0 40px;
-  border-radius: 0;
-  border: 1px solid #3a3d44;
-  background: #0b0c0e;
+  height: 46px;
+  padding: 0 12px 0 36px;
+  border: 0;
+  background: none;
   color: #f2f3f5;
   font:
-    700 19px 'Oxanium',
+    700 18px 'Oxanium',
     sans-serif;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   caret-color: #e06363;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
 }
 .pt-field input::placeholder {
   color: #6d7178;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font:
+    400 15px 'Sora',
+    sans-serif;
+  letter-spacing: 0;
   text-transform: none;
-}
-.pt-field input:hover {
-  border-color: #4a4e56;
 }
 .pt-field input:focus {
   outline: none;
-  border-color: #c23b3b;
-  box-shadow: 0 0 0 3px rgba(194, 59, 59, 0.22);
-}
-.pt-field input[aria-invalid='true'] {
-  border-color: #e06363;
 }
 .pt-form .th-soon-btn {
-  min-height: 48px;
-  padding: 0 24px;
-  border-radius: 0;
+  flex: none;
+  min-height: 46px;
+  padding: 0 22px;
   font-size: 12.5px;
   cursor: pointer;
 }
@@ -117,9 +204,7 @@
 }
 .pt-help {
   max-width: 62ch;
-  margin: 20px 0 0;
-  padding-top: 16px;
-  border-top: 1px solid #23252a;
+  margin: 16px 0 0;
   font:
     400 13px/1.6 'Sora',
     sans-serif;
@@ -134,8 +219,8 @@
 }
 
 .pt-recent {
-  margin: 12px 0 0;
-  padding: 20px 20px 12px;
+  margin: 16px 0 0;
+  padding: 20px 20px 14px;
 }
 .pt-recent h2 {
   margin: 0 0 8px;
@@ -165,7 +250,7 @@
   column-gap: 12px;
   row-gap: 1px;
   padding: 8px;
-  border-radius: 0;
+  border-radius: 4px;
   color: #e9eaed;
   text-decoration: none;
 }
@@ -218,56 +303,43 @@
   z-index: 5; /* the dropdown opens over the header below */
   margin-top: 16px;
 }
+/* Player / Clan keys, then one sunken field (glyph, input, red go key). */
 .pt-quick {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 46px;
-  padding: 4px 4px 4px 4px;
-  border-radius: 0;
-  border: 1px solid #2a2c30;
-  background: #0b0c0e;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
-}
-.pt-quick:focus-within {
-  border-color: #c23b3b;
-  box-shadow: 0 0 0 3px rgba(194, 59, 59, 0.18);
+  align-items: stretch;
+  gap: 8px;
+  height: 48px;
 }
 .pt-quick-mode {
   display: flex;
   flex: none;
-  gap: 2px;
-  height: 100%;
-  padding: 3px;
-  border-radius: 0;
-  background: #16171b;
+  gap: 6px;
 }
 .pt-quick-mode button {
-  padding: 0 12px;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  color: #8d929a;
-  font:
-    800 10.5px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-  cursor: pointer;
+  padding: 0 16px;
+  font-size: 11px;
 }
-.pt-quick-mode button:hover {
-  color: #e9eaed;
+.pt-quick-field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 4px 4px 4px 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  transition: box-shadow 0.15s ease;
 }
-.pt-quick-mode button[aria-checked='true'] {
-  background: #2a2c32;
-  color: #f2f3f5;
+.pt-quick-field:focus-within {
+  box-shadow:
+    var(--card-well),
+    0 0 0 2px var(--lb-red-text);
 }
-.pt-quick-mode button:focus-visible,
 .pt-quick-go:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.4);
-  outline-offset: 1px;
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
 }
 .pt-quick-ico {
   flex: none;
@@ -300,17 +372,23 @@
   display: grid;
   flex: none;
   place-items: center;
-  width: 38px;
+  width: 40px;
   height: 100%;
-  border: 0;
-  border-radius: 0;
-  background: #c23b3b;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: 4px;
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
   color: #fff;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
 }
 .pt-quick-go:hover {
-  background: #d04747;
+  background: var(--lb-red-hover);
+}
+.pt-quick-go:active {
+  transform: translateY(1px);
 }
 .pt-quick-go svg {
   width: 16px;
@@ -328,17 +406,20 @@
    Same rows as the search page (.pt-recent-row, .pt-result). */
 .pt-quick-panel {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
   right: 0;
   max-height: min(420px, 60vh);
   overflow-y: auto;
   overscroll-behavior: contain; /* reaching the end doesn't scroll (or refresh) the page */
   padding: 6px;
-  border-radius: 0;
-  border: 1px solid #2a2c30;
-  background: #101114;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box2);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 22px 44px -10px rgba(0, 0, 0, 0.9);
 }
 .pt-quick-head {
   margin: 6px 8px 4px;
@@ -373,7 +454,7 @@
 .pt-sk {
   display: block;
   height: 12px;
-  border-radius: 0;
+  border-radius: 4px;
   background: linear-gradient(90deg, #1a1b1f 0%, #1a1b1f 35%, #25272d 50%, #1a1b1f 65%, #1a1b1f 100%) 0 0 / 300% 100%;
   animation: pt-shimmer 1.6s linear infinite;
 }
@@ -386,16 +467,13 @@
   }
 }
 .pt-sk-quick {
-  height: 46px;
-  border-radius: 0;
+  height: 48px;
+  border-radius: var(--lb-r);
 }
 .pt-sk-card {
   display: grid;
   gap: 14px;
   padding: 22px 24px;
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: #121316;
 }
 .pt-sk-head {
   grid-template-columns: auto minmax(0, 1fr);
@@ -405,7 +483,7 @@
 .pt-sk-th {
   width: 88px;
   height: 88px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .pt-sk-lines {
   display: grid;
@@ -436,11 +514,11 @@
 .pt-sk-tile {
   width: 56px;
   height: 56px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .pt-sk-row {
   height: 40px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 @media (prefers-reduced-motion: reduce) {
   .pt-sk {
@@ -466,7 +544,7 @@
     'facts facts facts';
   gap: 16px 24px;
   align-items: center;
-  background: radial-gradient(60% 140% at 0% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 65%), #121316;
+  background-image: radial-gradient(60% 140% at 0% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 65%);
 }
 /* Player header: the burning battlefield (clashofclans/tracker-battlefield.webp)
    under a heavy dark wash -- near-black on the left where the name sits,
@@ -476,7 +554,6 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border-color: rgba(255, 255, 255, 0.09);
   background: #0c0c0e;
 }
 .pt-head--player::before {
@@ -488,9 +565,6 @@
     linear-gradient(90deg, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.82) 34%, rgba(10, 10, 12, 0.42) 72%, rgba(10, 10, 12, 0.28) 100%),
     linear-gradient(0deg, rgba(10, 10, 12, 0.9) 0%, rgba(10, 10, 12, 0.6) 34%, rgba(10, 10, 12, 0) 70%),
     url('/clashofclans/tracker-battlefield.webp') 72% 62% / cover no-repeat;
-}
-.pt-head--player .pt-head-facts {
-  border-top-color: rgba(255, 255, 255, 0.1);
 }
 .pt-head--player .pt-facts dt {
   color: #a3a8b0; /* a step lighter: it sits on the picture now */
@@ -546,21 +620,29 @@
   color: #9ea3ab;
 }
 .pt-copy {
-  padding: 3px 9px;
-  border-radius: 0;
-  border: 1px solid #3a3d44;
-  background: transparent;
-  color: #c9ccd2;
+  padding: 5px 10px 4px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
   font:
     800 10.5px 'Oxanium',
     sans-serif;
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
 }
 .pt-copy:hover {
-  border-color: #5a5e66;
+  background: var(--lb-raise-hover);
   color: #fff;
+}
+.pt-copy:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
 }
 .pt-share {
   display: inline-flex;
@@ -615,49 +697,60 @@
   object-fit: contain;
 }
 /* ---- Profile: facts (the numbers, inside the header) ----------------
-   Two short rows instead of a table: a row title on the left, then the
-   numbers side by side, each over its small label, split by hairlines. */
+   One sunken tray per group (All time / This season; Clan / War /
+   Requirements): the group's name in a column on the left, then the
+   numbers in even cells, each over its label, split by faint rules. The
+   tray is see-through, so the player header's picture still shows. */
 .pt-head-facts {
   grid-area: facts;
   display: grid;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid #23252a;
+  gap: 8px;
+  margin-top: 4px;
 }
 .pt-facts {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
+  grid-template-columns: 124px minmax(0, 1fr);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(6, 7, 9, 0.55);
+  box-shadow: var(--card-well);
 }
 .pt-facts-h {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   font:
-    800 10.5px 'Oxanium',
+    800 11px 'Oxanium',
     sans-serif;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #e06363;
+  color: #c9ccd2;
 }
 .pt-facts dl {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   margin: 0;
 }
 .pt-facts dl > div {
   display: flex;
   flex-direction: column;
-  padding: 0 18px;
-  border-left: 1px solid #23252a;
+  justify-content: center;
+  min-width: 0;
+  padding: 12px 16px;
 }
-.pt-facts dl > div:first-child {
-  padding-left: 0;
-  border-left: 0;
+.pt-facts dl > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 .pt-facts dd {
   order: -1; /* number on top, label under it, numbers aligned along the row */
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font:
-    700 17px 'Oxanium',
+    700 18px 'Oxanium',
     sans-serif;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
@@ -673,45 +766,28 @@
 }
 
 /* ---- Profile: tabs ---------------------------------------------------- */
+/* Equal keys across the width, like the TH pages' Layouts / Army / Tools. */
 .pt-tabs {
   display: flex;
-  gap: 4px;
-  margin: 24px 0 12px;
-  border-bottom: 1px solid #2a2c30;
+  gap: 8px;
+  margin: 20px 0 14px;
+  padding: 2px 2px 4px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .pt-tabs button {
-  flex: none;
-  padding: 10px 14px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  background: none;
-  color: #9ea3ab;
-  font:
-    800 12px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  cursor: pointer;
+  flex: 1 0 auto;
+  min-height: 48px;
+  padding: 0 18px;
 }
-.pt-tabs button:hover {
-  color: #e9eaed;
-}
-.pt-tabs button[aria-selected='true'] {
-  color: #f2f3f5;
-  border-bottom-color: #c23b3b;
-}
-.pt-tabs button:focus-visible,
 .pt-copy:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline: 2px solid #e6e8ec;
   outline-offset: 2px;
 }
 
 /* ---- Profile: groups and tiles --------------------------------------- */
 .pt-group {
-  padding: 16px 18px 18px;
+  padding: 18px 20px 20px;
   margin-bottom: 12px;
 }
 .pt-group-head {
@@ -747,17 +823,20 @@
   position: relative;
   display: grid;
   place-items: center;
+  overflow: hidden;
   width: 56px;
   height: 56px;
-  border-radius: 0;
+  border-radius: 4px;
   background: linear-gradient(180deg, #26282e, #1b1c21);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 0 2px var(--lb-edge),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .pt-tile-art img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .pt-tile-initials {
   font:
@@ -767,11 +846,11 @@
 }
 .pt-lvl {
   position: absolute;
-  left: 3px;
-  bottom: 3px;
+  left: 2px;
+  bottom: 2px;
   min-width: 20px;
   padding: 1px 4px;
-  border-radius: 0;
+  border-radius: 4px;
   background: rgba(10, 10, 12, 0.88);
   color: #f2f3f5;
   font:
@@ -788,7 +867,9 @@
   letter-spacing: 0.6px;
 }
 .pt-tile.is-active .pt-tile-art {
-  box-shadow: 0 0 0 2px #c23b3b;
+  box-shadow:
+    0 0 0 2px var(--lb-edge),
+    0 0 0 4px #c23b3b;
 }
 .pt-tile--lg .pt-tile-art {
   width: 72px;
@@ -797,7 +878,7 @@
 .pt-tile--sm .pt-tile-art {
   width: 40px;
   height: 40px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .pt-tile--sm .pt-lvl {
   font-size: 10px;
@@ -921,47 +1002,15 @@
 /* ---- Search: Player / Clan switch and clan results -------------------- */
 .pt-mode {
   display: inline-flex;
-  gap: 2px;
-  margin-top: 0;
-  padding: 3px;
-  border-radius: 0;
-  background: #0b0c0e;
-  border: 1px solid #2a2c30;
+  gap: 8px;
 }
 .pt-mode button {
-  min-width: 96px;
-  padding: 8px 16px;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  color: #8d929a;
-  font:
-    800 11.5px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-.pt-mode button:hover {
-  color: #e9eaed;
-}
-.pt-mode button[aria-checked='true'] {
-  background: linear-gradient(180deg, #2c2e35, #1f2126);
-  color: #f2f3f5;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-}
-.pt-mode button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 2px;
-}
-.pt-mode + .pt-form {
-  margin-top: 14px;
+  min-width: 112px;
+  min-height: 42px;
+  padding: 0 18px;
 }
 .pt-form.is-clan .pt-field input {
-  padding-left: 16px;
+  padding-left: 12px;
   text-transform: none;
   letter-spacing: 0.3px;
 }
@@ -971,11 +1020,12 @@
   max-height: 420px;
   overflow-y: auto;
   overscroll-behavior: contain; /* reaching the end doesn't scroll (or refresh) the page */
-  margin: 14px 0 0;
-  padding: 4px;
-  border-radius: 0;
-  border: 1px solid #23252a;
-  background: #0d0e10;
+  margin: 12px 0 0;
+  padding: 6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
   text-align: left;
 }
 /* Scroll lists: a fade on the edge that has more (coc-tracker.js
@@ -1020,7 +1070,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 10px;
-  border-radius: 0;
+  border-radius: 4px;
   color: #e9eaed;
   text-decoration: none;
 }
@@ -1123,23 +1173,29 @@
 /* members: a sortable table; the name links to the player's profile */
 .pt-table-wrap {
   overflow-x: auto;
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
+  padding: 8px;
 }
 .pt-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font:
     400 14px 'Sora',
     sans-serif;
   color: #c9ccd2;
 }
+/* the heading row is a sunken strip: dark lip on top, rounded ends */
 .pt-table th {
   padding: 0;
-  background: #16171b;
-  border-bottom: 1px solid #2a2c30;
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
   text-align: right;
+}
+.pt-table th:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.pt-table th:last-child {
+  border-radius: 0 4px 4px 0;
 }
 .pt-table th button {
   width: 100%;
@@ -1182,8 +1238,8 @@
   outline-offset: -2px;
 }
 .pt-table td {
-  padding: 9px 14px;
-  border-bottom: 1px solid #1d1f23;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   text-align: right;
   font-family: 'Oxanium', sans-serif;
   font-weight: 700;
@@ -1194,7 +1250,13 @@
   border-bottom: 0;
 }
 .pt-table tbody tr:hover td {
-  background: #17181c;
+  background: var(--lb-box-hover);
+}
+.pt-table tbody tr:hover td:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.pt-table tbody tr:hover td:last-child {
+  border-radius: 0 4px 4px 0;
 }
 .pt-table .pt-col-rank {
   width: 1%;
@@ -1240,18 +1302,15 @@
 .pt-wars {
   list-style: none;
   margin: 0;
-  padding: 0;
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
+  padding: 4px 6px;
 }
 .pt-war {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr) auto 64px;
   gap: 14px;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #1d1f23;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 .pt-war:last-child {
   border-bottom: 0;
@@ -1259,7 +1318,7 @@
 .pt-war-res {
   justify-self: start;
   padding: 4px 9px;
-  border-radius: 0;
+  border-radius: 4px;
   font:
     800 10.5px 'Oxanium',
     sans-serif;
@@ -1336,42 +1395,22 @@
 }
 .pt-days {
   display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 2px 2px 4px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .pt-days button {
   position: relative;
   flex: none;
-  padding: 9px 14px;
-  border-radius: 0;
-  border: 1px solid #2a2c30;
-  background: #121316;
-  color: #9ea3ab;
-  font:
-    800 11.5px 'Oxanium',
-    sans-serif;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-.pt-days button:hover:not(:disabled) {
-  color: #f2f3f5;
-  border-color: #3a3d44;
-}
-.pt-days button[aria-selected='true'] {
-  background: linear-gradient(180deg, #2c2e35, #1f2126);
-  border-color: #3a3d44;
-  color: #f2f3f5;
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 11.5px;
 }
 .pt-days button:disabled {
   opacity: 0.4;
   cursor: default;
-}
-.pt-days button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: 2px;
 }
 /* result dot on each day: red = won, grey = lost, outline = drawn, ring = live */
 .pt-days i {
@@ -1379,7 +1418,7 @@
   width: 6px;
   height: 6px;
   margin-left: 7px;
-  border-radius: 0;
+  border-radius: 50%;
   vertical-align: 1px;
   background: #5a5e66;
 }
@@ -1392,9 +1431,10 @@
 .pt-missing {
   margin-top: 12px;
   padding: 12px 16px;
-  border-radius: 0;
-  border: 1px solid rgba(224, 99, 99, 0.25);
-  background: rgba(194, 59, 59, 0.07);
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: rgba(194, 59, 59, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .pt-missing h3 {
   margin: 0 0 4px;
@@ -1419,50 +1459,36 @@
 
 .pt-war-sides {
   display: flex;
-  margin: 16px 0 8px;
-  border-bottom: 1px solid #2a2c30;
+  gap: 8px;
+  margin: 16px 0 10px;
 }
 .pt-war-sides button {
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  background: none;
+  min-height: 44px;
+  padding: 0 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #9ea3ab;
   font:
     600 14px 'Sora',
     sans-serif;
-  cursor: pointer;
-}
-.pt-war-sides button[aria-selected='true'] {
-  color: #f2f3f5;
-  border-bottom-color: #c23b3b;
-}
-.pt-war-sides button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
-  outline-offset: -2px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .pt-wms {
   list-style: none;
   margin: 0;
-  padding: 0;
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
+  padding: 4px 6px;
 }
 .pt-wm {
   display: grid;
   grid-template-columns: 26px 34px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid #1d1f23;
+  padding: 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 .pt-wm:last-child {
   border-bottom: 0;
@@ -1515,7 +1541,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  border-radius: 0;
+  border-radius: 4px;
   background: #1a1b1f;
   font:
     700 12px 'Oxanium',
@@ -1584,7 +1610,7 @@
 .pt-ev-dot {
   width: 8px;
   height: 8px;
-  border-radius: 0;
+  border-radius: 50%;
   background: #5a5e66;
 }
 .pt-events li.is-join .pt-ev-dot,
@@ -1625,26 +1651,29 @@
 
 /* recorded wars: the war-log row as a button that opens the full war */
 .pt-wars--rec {
+  padding: 0;
   border: 0;
   background: none;
+  box-shadow: none;
 }
 .pt-wars--rec > li {
-  border-bottom: 1px solid #1d1f23;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 .pt-wars--rec > li:last-child {
   border-bottom: 0;
 }
 .pt-wars--rec button.pt-war {
   width: 100%;
-  padding: 12px 4px;
+  padding: 12px 8px;
   border: 0;
+  border-radius: 4px;
   background: none;
   text-align: left;
   color: inherit;
   cursor: pointer;
 }
 .pt-wars--rec button.pt-war:hover {
-  background: #17181c;
+  background: var(--lb-box-hover);
 }
 .pt-wars--rec button.pt-war:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.35);
@@ -1664,7 +1693,7 @@
 /* ---- Town Hall progress + rushed check (profile, Home village tab) ------ */
 .pt-group-head .pt-verdict {
   padding: 4px 10px;
-  border-radius: 0;
+  border-radius: 4px;
   background: rgba(194, 59, 59, 0.16);
   color: #f08a8a;
   font:
@@ -1725,7 +1754,7 @@
 }
 .pt-pg-bar {
   height: 3px;
-  border-radius: 0;
+  border-radius: 4px;
   background: #23252a;
   overflow: hidden;
 }
@@ -1806,10 +1835,13 @@
   gap: 4px 24px;
   margin-top: 12px;
   padding: 18px 24px 22px;
-  border-radius: 0;
-  border: 1px solid rgba(224, 99, 99, 0.28);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
   background: #0c0c0e;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    inset 0 0 0 1px rgba(224, 99, 99, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 14px 34px -12px rgba(0, 0, 0, 0.85);
 }
 .pt-live::before {
   content: '';
@@ -1823,7 +1855,7 @@
     url('/clashofclans/tracker-battlefield.webp') 50% 70% / cover no-repeat;
 }
 .pt-live.is-prep {
-  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: var(--lb-shadow);
 }
 .pt-live-top {
   grid-area: top;
@@ -1865,7 +1897,7 @@
   flex: none;
   width: 8px;
   height: 8px;
-  border-radius: 0;
+  border-radius: 50%;
   background: #9ea3ab;
 }
 .pt-live.is-battle .pt-live-dot {
@@ -1963,12 +1995,10 @@
   min-height: 44px;
   margin-top: 10px;
   padding: 0 20px 0 24px;
-  border: 0;
-  border-radius: 0;
-  background: #c23b3b;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 8px 22px rgba(194, 59, 59, 0.38);
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
   color: #fff;
   font:
     800 12.5px 'Oxanium',
@@ -1991,16 +2021,13 @@
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .pt-live-cta:hover {
-  background: #d04747;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 10px 26px rgba(194, 59, 59, 0.5);
+  background: var(--lb-red-hover);
 }
 .pt-live-cta:hover svg {
   transform: translateX(3px);
 }
 .pt-live-cta:active {
-  background: #a93232;
+  transform: translateY(1px);
 }
 .pt-live-cta:focus-visible {
   outline: 2px solid #fff;
@@ -2136,13 +2163,6 @@
       'desc desc'
       'facts facts';
   }
-  .pt-mode {
-    display: flex;
-  }
-  .pt-mode button {
-    flex: 1;
-    min-width: 0;
-  }
   .pt-table {
     font-size: 13px;
   }
@@ -2202,11 +2222,19 @@
     padding-right: 104px;
   }
   .pt-quick {
-    gap: 8px;
+    gap: 6px;
+    height: 46px;
+  }
+  .pt-quick-mode {
+    gap: 4px;
   }
   .pt-quick-mode button {
     padding: 0 9px;
     font-size: 10px;
+    letter-spacing: 0.8px;
+  }
+  .pt-quick-field {
+    padding-left: 10px;
   }
   .pt-quick-ico {
     display: none;
@@ -2229,15 +2257,18 @@
     width: 48px;
     height: 48px;
   }
-  .pt-form {
-    flex-direction: column;
-  }
   .pt-form .th-soon-btn {
-    justify-content: center;
-    min-height: 48px;
+    padding: 0 14px;
   }
   .pt-field input {
-    height: 48px;
+    font-size: 16px; /* 16px+ so iOS doesn't zoom into the field */
+  }
+  .pt-mode {
+    display: flex;
+  }
+  .pt-mode button {
+    flex: 1;
+    min-width: 0;
   }
   .pt-head {
     margin-top: 12px;
@@ -2264,27 +2295,53 @@
     width: 36px;
     height: 36px;
   }
+  /* the group name becomes a strip on top; the numbers three to a row */
   .pt-facts {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr);
   }
-  /* each row stays on one line: equal columns, labels may wrap */
+  .pt-facts-h {
+    padding: 8px 12px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 10.5px;
+  }
   .pt-facts dl {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .pt-facts dl > div {
-    padding: 0 8px;
+    padding: 10px 12px;
+  }
+  .pt-facts dl > div + div {
+    border-left: 0;
+  }
+  .pt-facts dl > div:not(:nth-child(3n + 1)) {
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .pt-facts dl > div:nth-child(n + 4) {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
   .pt-facts dd {
-    font-size: 14.5px;
+    font-size: 15px;
   }
   .pt-facts dt {
     white-space: normal;
   }
   .pt-group {
     padding: 14px 12px 14px;
+  }
+  .pt-tabs {
+    gap: 6px;
+    margin: 16px 0 12px;
+  }
+  .pt-tabs button {
+    min-height: 44px;
+    padding: 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+  }
+  .pt-table-wrap {
+    padding: 4px;
   }
   .pt-tile-art {
     width: 48px;
@@ -2324,16 +2381,13 @@
    roster) at the bottom. Replaced the old score box + "War stats" table,
    which repeated the live banner above. Built by warView in coc-tracker.js. */
 .pt-mu {
-  padding: 16px 20px 20px;
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #121316;
+  padding: 18px 20px 20px;
 }
 .pt-mu.is-win {
-  background: radial-gradient(70% 90px at 50% 0%, rgba(92, 201, 138, 0.12), rgba(92, 201, 138, 0) 100%), #121316;
+  background-image: radial-gradient(70% 90px at 50% 0%, rgba(92, 201, 138, 0.12), rgba(92, 201, 138, 0) 100%);
 }
 .pt-mu.is-lose {
-  background: radial-gradient(70% 90px at 50% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 100%), #121316;
+  background-image: radial-gradient(70% 90px at 50% 0%, rgba(194, 59, 59, 0.14), rgba(194, 59, 59, 0) 100%);
 }
 .pt-mu-head {
   display: flex;
@@ -2481,7 +2535,7 @@
   display: flex;
   height: 6px;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 4px;
   background: #1d1f23;
 }
 .pt-mu-bar:first-child {
@@ -2490,7 +2544,7 @@
 .pt-mu-bar i {
   display: block;
   height: 100%;
-  border-radius: 0;
+  border-radius: 4px;
   background: #e06363;
 }
 .pt-mu-bar + .pt-mu-bar i {
@@ -2526,7 +2580,7 @@
   align-items: center;
   gap: 4px;
   padding: 3px 9px 3px 4px;
-  border-radius: 0;
+  border-radius: 4px;
   background: #1b1d22;
   font:
     700 11.5px 'Oxanium',
@@ -2572,7 +2626,7 @@
   content: '';
   width: 10px;
   height: 10px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .pt-race-key .is-up::before {
   background: #5cc98a;
@@ -2593,7 +2647,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .pt-race li.is-us {
   background: rgba(224, 99, 99, 0.06);
@@ -2604,7 +2658,7 @@
   place-items: center;
   width: 26px;
   height: 26px;
-  border-radius: 0;
+  border-radius: 4px;
   background: #1b1d22;
   font:
     700 13px 'Oxanium',
@@ -2647,13 +2701,13 @@
 .pt-race-track {
   height: 8px;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 4px;
   background: #1b1d22;
 }
 .pt-race-track i {
   display: block;
   height: 100%;
-  border-radius: 0;
+  border-radius: 4px;
   background: linear-gradient(90deg, #4a4e56, #9ea3ab);
 }
 .pt-race li.is-us .pt-race-track i {

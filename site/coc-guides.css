@@ -7,9 +7,11 @@
    only for small accents (epic pills, the open tile's ring).
    ======================================================================= */
 
-.gd .gd-part {
-  margin-top: 20px;
-  padding-top: 20px;
+.gd-part {
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .gd-empty {
   margin: 8px 2px;
@@ -32,30 +34,28 @@
   min-height: 36px;
   padding: 0 14px;
 }
-.gd-chip[aria-pressed='true'] {
-  background: var(--key-face);
-  box-shadow: var(--key-edge);
-  color: var(--text-main, #eff2f5);
-}
 
 /* Inputs: the army maker's paste box look. */
 .gd-input {
   width: 100%;
   height: 40px;
   padding: 0 12px;
-  border: 1px solid #2a2c31;
-  border-radius: 0;
   background: #0e0f12;
   color: #d5d8de;
   font-family: 'Sora', sans-serif;
   font-size: 13px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .gd-input::placeholder {
   color: var(--am-faint);
 }
 .gd-input:focus {
   outline: none;
-  border-color: #5a5e66;
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
 }
 select.gd-input {
   cursor: pointer;
@@ -74,7 +74,7 @@ select.gd-input {
   gap: 3px;
   padding: 12px 14px;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.25);
 }
 .gd-stat-k {
@@ -120,8 +120,10 @@ select.gd-input {
 /* Tables (equipment levels, wall breakdown): scroll sideways on phones. */
 .gd-table-wrap {
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .gd-table {
   width: 100%;
@@ -172,76 +174,170 @@ select.gd-input {
   margin-top: 10px;
 }
 
-/* ---- Glossary ------------------------------------------------------------------- */
+/* ---- Glossary (redesigned Oct 21 2026) -------------------------------------------
+   A field manual, not a table. Search + topic chips on one row; then each
+   topic: its icon on a small raised key and an Orbitron heading (the
+   trackers' group heads), over one sunken well (--card-well) holding the
+   terms as a two-column ledger. A term is Oxanium, its short form a small
+   grey key, the meaning in Sora under it. Search hits get <mark> (hl() in
+   coc-guides.js). No outer well around all of this any more (wells inside
+   a well read muddy): the page's .am box is the only frame. */
+.gd-gloss-body {
+  margin-top: 22px;
+}
 .gd-gloss-tools {
   display: grid;
-  gap: 12px;
-  margin-bottom: 18px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 26px;
+}
+.gd-gloss-tools .gd-chips {
+  flex-wrap: nowrap;
+}
+/* the search field with a magnifier drawn in (no extra markup) */
+#glossSearch {
+  height: 42px;
+  padding-left: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b9099' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px 50%;
+  background-size: 16px;
 }
 .gd-gloss + .gd-gloss {
-  margin-top: 18px;
+  margin-top: 28px;
 }
 .gd-gloss-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 0 0 8px;
-  font-family: 'Sora', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--am-text);
+  gap: 12px;
+  margin: 0 0 12px;
+  font:
+    900 15px 'Orbitron',
+    sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #f2f3f5;
 }
-.gd-gloss-head img {
-  width: 28px;
-  height: 28px;
-  border-radius: 0;
+.gd-gloss-ico {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+}
+.gd-gloss-ico img {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
   object-fit: contain;
 }
 .gd-gloss-n {
-  padding: 2px 8px;
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.06);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
+  margin-left: 2px;
+  font:
+    700 12px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.04em;
   color: var(--am-muted);
 }
 .gd-gloss-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
 }
+/* The ledger's lines: a rule above every pair after the first and one
+   down the middle; a lone last term spans both columns. */
 .gd-term {
   display: grid;
-  grid-template-columns: 170px 1fr;
-  gap: 14px;
-  padding: 12px 14px;
+  align-content: start;
+  gap: 6px;
+  padding: 16px 20px 18px;
 }
-.gd-term + .gd-term {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+.gd-term:nth-child(n + 3) {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.gd-term:nth-child(2n) {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+.gd-term:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 .gd-term dt {
-  font-family: 'Sora', sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--am-text);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font:
+    800 16px/1.25 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.01em;
+  color: #fff;
 }
 .gd-term dd {
+  max-width: 62ch;
   margin: 0;
-  font-family: 'Sora', sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--am-muted);
+  font:
+    400 13.5px/1.6 'Sora',
+    sans-serif;
+  color: #a7abb3;
 }
 .gd-abbr {
-  padding: 1px 6px;
-  border-radius: 0;
-  background: var(--key-face);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  color: #d5d8de;
+  padding: 3px 7px 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font:
+    800 10px 'Oxanium',
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e6e8ec;
+}
+.gd-gloss mark {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: rgba(194, 59, 59, 0.38);
+  color: #fff;
+}
+@media (max-width: 970px) {
+  .gd-gloss-body {
+    margin-top: 18px;
+  }
+  .gd-gloss-tools {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 20px;
+  }
+  .gd-gloss-tools .gd-chips {
+    overflow-x: auto;
+    padding: 2px 2px 4px;
+    margin: -2px -2px -4px;
+    scrollbar-width: none;
+  }
+  .gd-gloss-tools .gd-chip {
+    flex: none;
+  }
+  .gd-gloss-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gd-term {
+    padding: 14px 16px 16px;
+  }
+  .gd-term:nth-child(n + 2) {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .gd-term:nth-child(2n) {
+    border-left: 0;
+  }
 }
 
 /* ---- Equipment --------------------------------------------------------------------- */
@@ -266,35 +362,51 @@ select.gd-input {
   grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
   gap: 10px;
 }
-/* A tile: the equipment, its hero in the corner, name, and rarity. */
+/* A tile: the equipment, its hero in the corner, name, and rarity. A
+   raised box (Oct 21 2026) lifted off the section's well; the open one
+   gets a red rim. */
 .gd-eq {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   min-width: 0;
-  padding: 10px 6px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.22);
+  padding: 12px 6px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box2);
+  box-shadow: var(--lb-shadow);
   color: inherit;
   cursor: pointer;
   transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .gd-eq:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+  transform: translateY(-2px);
+}
+.gd-eq:active {
+  transform: translateY(0);
 }
 .gd-eq:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline: 2px solid #e6e8ec;
   outline-offset: 2px;
 }
 .gd-eq.is-open {
-  border-color: rgba(224, 99, 99, 0.6);
-  background: rgba(194, 59, 59, 0.08);
+  background: var(--lb-box-hover);
+  box-shadow:
+    inset 0 0 0 2px rgba(224, 99, 99, 0.7),
+    var(--lb-shadow);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gd-eq,
+  .gd-eq:hover {
+    transform: none;
+  }
 }
 .gd-eq-pic {
   position: relative;
@@ -314,7 +426,7 @@ select.gd-input {
   width: 24px;
   height: 24px;
   border: 1.5px solid #141518;
-  border-radius: 0;
+  border-radius: 4px;
   object-fit: cover;
   background: #1f2025;
 }
@@ -343,9 +455,10 @@ select.gd-input {
 .gd-eq-panel {
   grid-column: 1 / -1;
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0;
-  background: #0e0f12;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
   scroll-margin: 90px;
 }
 .gd-eq-top {
@@ -381,7 +494,7 @@ select.gd-input {
   align-items: center;
   gap: 6px;
   padding: 3px 9px 3px 7px;
-  border-radius: 0;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.06);
   font-family: 'Oxanium', sans-serif;
   font-size: 11px;
@@ -392,7 +505,7 @@ select.gd-input {
 .gd-pill img {
   width: 18px;
   height: 18px;
-  border-radius: 0;
+  border-radius: 4px;
   object-fit: cover;
 }
 .gd-pill.is-epic {
@@ -487,7 +600,7 @@ select.gd-input {
 .gd-tips li {
   position: relative;
   padding: 10px 12px 10px 30px;
-  border-radius: 0;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.03);
   font-family: 'Sora', sans-serif;
   font-size: 13px;
@@ -504,7 +617,7 @@ select.gd-input {
   top: 17px;
   width: 6px;
   height: 6px;
-  border-radius: 0;
+  border-radius: 4px;
   background: #c23b3b;
 }
 
@@ -520,7 +633,7 @@ select.gd-input {
 .gd-shots img {
   display: block;
   width: 100%;
-  border-radius: 0;
+  border-radius: 4px;
   cursor: zoom-in;
 }
 .gd-shots figcaption {
@@ -591,17 +704,19 @@ select.gd-input {
   scroll-snap-type: x proximity;
   scroll-padding-inline: 8px;
   padding: 6px 4px 10px;
-  border: 1px solid #23252a;
-  border-radius: 0;
   background: #0e0f12;
   scrollbar-width: thin;
   scrollbar-color: #2e3036 transparent;
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .wl-row::-webkit-scrollbar {
   height: 6px;
 }
 .wl-row::-webkit-scrollbar-thumb {
-  border-radius: 0;
+  border-radius: 4px;
   background: #2e3036;
 }
 /* Edge fades on whichever side has more walls (.more-l / .more-r, set by
@@ -626,7 +741,7 @@ select.gd-input {
   gap: 3px;
   width: 60px;
   padding: 7px 0 8px;
-  border-radius: 0;
+  border-radius: 4px;
   scroll-snap-align: center;
   cursor: pointer;
   transition:
@@ -661,8 +776,9 @@ select.gd-input {
   }
 }
 .wl-tile:has(input:checked) {
-  background: var(--key-face);
-  box-shadow: var(--key-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
 }
 .wl-tile:has(input:checked) img {
   transform: translateY(-3px) scale(1.08);
@@ -691,7 +807,7 @@ select.gd-input {
 /* Target row: the path. Tiles sit edge to edge, so the tint and the rail
    run unbroken from the first wall you'll pay for to the target. */
 .wl-tile.is-path {
-  border-radius: 0;
+  border-radius: 0; /* the middle of the strip; its two ends round below */
   background: rgba(194, 59, 59, 0.1);
 }
 .wl-tile.is-path::after {
@@ -704,23 +820,23 @@ select.gd-input {
   background: #c23b3b;
 }
 .wl-tile:not(.is-path) + .wl-tile.is-path {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border-radius: var(--lb-r) 0 0 var(--lb-r);
 }
 .wl-tile:not(.is-path) + .wl-tile.is-path::after {
   left: 6px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .wl-tile.is-path.is-end {
-  border-radius: 0;
-  background: var(--key-face);
+  border-radius: 0 var(--lb-r) var(--lb-r) 0;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
 }
 .wl-tile.is-path.is-end::after {
   right: 6px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .wl-tile:not(.is-path) + .wl-tile.is-path.is-end {
-  border-radius: 0;
+  border-radius: var(--lb-r);
 }
 .wl-tile.is-path .wl-tile-n {
   color: #e7c3c3;
@@ -731,8 +847,8 @@ select.gd-input {
 .wl-opts {
   display: grid;
   align-items: start;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.65fr);
+  gap: 14px 20px;
 }
 .wl-quick {
   display: flex;
@@ -743,11 +859,6 @@ select.gd-input {
   min-height: 34px;
   padding: 0 8px;
   font-size: 12px;
-}
-.wl-chip[aria-pressed='true'] {
-  background: var(--key-face);
-  box-shadow: var(--key-edge);
-  color: var(--text-main, #eff2f5);
 }
 /* Gold Pass: a fieldset of four radios drawn as one segmented bar; the
    checked one is the raised key, in gold once a discount is on. */
@@ -773,9 +884,10 @@ select.gd-input {
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
   padding: 4px;
-  border: 1px solid #2a2c31;
-  border-radius: 0;
-  background: #0e0f12;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
 }
 .wl-seg label {
   position: relative;
@@ -788,8 +900,8 @@ select.gd-input {
 .wl-seg span {
   display: grid;
   place-items: center;
-  height: 32px;
-  border-radius: 0;
+  height: 34px;
+  border-radius: 4px;
   font-family: 'Oxanium', sans-serif;
   font-size: 13px;
   font-weight: 700;
@@ -806,15 +918,12 @@ select.gd-input {
   }
 }
 .wl-seg input:checked + span {
-  background: var(--key-face);
-  box-shadow: var(--key-edge);
-  color: var(--text-main, #eff2f5);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
 }
+/* a discount that's on: the same grey key, its number in gold */
 .wl-seg input:not([value='0']):checked + span {
-  background: linear-gradient(#3a2f12, #2a220d);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 214, 102, 0.25),
-    0 2px 0 #171207;
   color: #ffd66b;
 }
 .wl-seg input:focus-visible + span {
@@ -824,14 +933,16 @@ select.gd-input {
 .wl-seg-2 {
   grid-template-columns: 1fr 1fr;
 }
-/* Discounts: Gold Pass and Hammer Jam stacked, then one live line that
-   explains how they combine (#wallDisc, written by coc-guides.js). */
+/* Discounts: Gold Pass and Hammer Jam sit in .wl-opts' grid as its 2nd
+   and 3rd columns (.wl-disc is only a wrapper), and the live line that
+   explains how they combine (#wallDisc, written by coc-guides.js) runs
+   under all three. Was two columns: walls left, both discounts stacked
+   right, which left a hole under the walls. */
 .wl-disc {
-  display: grid;
-  gap: 14px;
-  align-content: start;
+  display: contents;
 }
 .wl-disc-note {
+  grid-column: 1 / -1;
   margin: 0 2px;
   font-family: 'Sora', sans-serif;
   font-size: 12px;
@@ -869,10 +980,12 @@ select.gd-input {
 .wl-result {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 0;
   background: rgba(0, 0, 0, 0.28);
   overflow: hidden;
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .wl-total {
   display: grid;
@@ -917,7 +1030,7 @@ select.gd-input {
   justify-self: start;
   margin-top: 6px;
   padding: 4px 10px;
-  border-radius: 0;
+  border-radius: 4px;
   background: rgba(255, 214, 107, 0.12);
   font-family: 'Oxanium', sans-serif;
   font-size: 12px;
@@ -991,7 +1104,7 @@ select.gd-input {
   top: 0.62em;
   width: 5px;
   height: 5px;
-  border-radius: 0;
+  border-radius: 4px;
   background: #e06363;
 }
 .wl-sub-gp {
@@ -1191,9 +1304,10 @@ select.gd-input {
 }
 .gd-sk-list {
   display: block;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
 }
 .gd-sk-row {
   display: grid;
@@ -1207,7 +1321,7 @@ select.gd-input {
 .gd-sk-pic {
   width: 64px;
   height: 64px;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .gd-eq.gd-skel .sk-line {
   margin: 0 auto;

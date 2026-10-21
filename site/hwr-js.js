@@ -2446,19 +2446,6 @@ try {
         handle.addEventListener('pointercancel', onPointerUp);
       })();
 
-      // ===================================================
-      // SHARED — wires up a left/right-arrow horizontal scroll strip.
-      // Used by both the desktop sub-nav category chips and the
-      // Web Resources hub nav (Lobby/Bookmark/Contribute/Glossary),
-      // which get squeezed at the same narrower widths and need the
-      // exact same "hide the arrow you can't use" behavior. Returns
-      // the updateArrows function so callers can re-run it after
-      // injecting content whose width wasn't known up front.
-      // ===================================================
-      // initHScrollArrows() and the two strip wirings that used to live here
-      // now live in 11layout.js, so the Minecraft/Clash bars can use the same
-      // implementation instead of a second copy. window.updateDsnScrollArrows
-      // is still set there and is still called from renderCategoryNav() below.
 
       // ===================================================
       // DESKTOP CATEGORY HOVER PANEL — one shared popover, reused for every
@@ -2739,7 +2726,6 @@ try {
 
         // Re-run the bits that depend on these elements existing
         highlightActiveNavItems();
-        if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
 
         // Only now do BOTH the desktop .nav-chip rows (built earlier, in the
         // other HwrCategoriesPromise.then handler above) and these mobile

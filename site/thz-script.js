@@ -771,9 +771,9 @@ if (document.readyState === 'loading') {
       })
     );
   }
-  // On any tool page (live or upcoming), the Tools links light up.
+  // On any tool page (live or upcoming) and the Tools hub itself, the Tools links light up.
   function inTools(data) {
-    return data.guides.concat(data.upcoming || []).some(onTool);
+    return currentPage === cocPagePath(data.primaryNav.guides.href) || data.guides.concat(data.upcoming || []).some(onTool);
   }
 
   function el(tag, className) {

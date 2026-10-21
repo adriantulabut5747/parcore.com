@@ -1,0 +1,92 @@
+<!doctype html>
+<!-- Banner + thumbnail: Articles > Minecraft > Your First Hardcore World.
+     Render: python _tools/thumbs/render.py first-hardcore-world
+       -> site/minecrafticons/articles/first-hardcore-world/banner.webp (1920) + thumb.webp (800)
+     Laid out at 1280x720 like the other templates; render.py shoots it at 1.5x for the 1920 banner.
+     Idea: the article's real secret. The shield takes the hits that end hardcore worlds:
+     two arrows stuck in it and one glancing off, a creeper blast bursting at its edge.
+     Every sprite is the game's own 16px texture (26.3 jar, assets/mc/), scaled with
+     image-rendering: pixelated so the pixels stay square. -->
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: #111113; }
+  .stage { position: relative; width: 1280px; height: 720px; overflow: hidden; isolation: isolate;
+    background: linear-gradient(180deg, #151518 0%, #0e0e10 100%); }
+  img { position: absolute; image-rendering: pixelated; display: block; }
+
+  /* faint diagonal slabs, the family background */
+  .slab { position: absolute; top: -200px; height: 1200px; transform: skewX(-24deg); }
+  .s1 { left: 560px; width: 260px; background: rgba(255, 255, 255, 0.022); }
+  .s2 { left: 900px; width: 120px; background: rgba(255, 255, 255, 0.016); }
+  .s3 { left: 1180px; width: 300px; background: rgba(194, 59, 59, 0.05); }
+
+  /* soft white/red glow behind the shield */
+  .glow { position: absolute; left: 570px; top: 50px; width: 660px; height: 640px;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.16), rgba(194, 59, 59, 0.24) 42%, rgba(194, 59, 59, 0) 100%); }
+
+  /* creeper: dim, behind the blast (8x8 face of the 64x32 skin, scaled 20x) */
+  .creeper-wrap { position: absolute; left: 1060px; top: 100px; width: 176px; height: 176px; overflow: hidden; }
+  .creeper-wrap img { left: -176px; top: -176px; width: 1408px; height: 704px; filter: brightness(0.46) saturate(0.85); }
+
+  /* explosion puffs: explosion_3-5.png are white masks; the game tints them grey and bunches them, so do the same */
+  .puff { filter: brightness(var(--b, 0.8)) drop-shadow(0 0 18px rgba(194, 59, 59, 0.55)); }
+
+  .shield { left: 740px; top: 140px; width: 390px; height: 390px; transform: rotate(-7deg);
+    filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 46px rgba(255, 255, 255, 0.14)); }
+
+  /* arrows: texture head points up-left after the flip, so they fly in from the right */
+  .arrow { width: 128px; height: 128px; transform: scaleX(-1); filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.6)); }
+  .glance { transform: rotate(160deg); opacity: 0.85; }
+
+  /* art group pulled in from the edges: right margin ~ the headline's 64px left margin,
+     top clear of the card's category chip (top-right) */
+  .art { position: absolute; inset: 0; transform: translate(-60px, 30px) scale(0.88); transform-origin: 1216px 380px; }
+
+  .copy { position: absolute; left: 64px; top: 50%; transform: translateY(-58%); font-family: 'Orbitron', sans-serif; font-weight: 900; text-transform: uppercase; }
+  .l1 { font-size: 78px; line-height: 0.98; color: #a9abb1; letter-spacing: 0.01em; }
+  .l2 { font-size: 78px; line-height: 0.98; color: #ffffff; letter-spacing: 0.01em; }
+  .l3 { font-size: 118px; line-height: 0.98; color: #c23b3b; letter-spacing: 0.005em; margin-top: 4px; }
+  .sub { position: relative; margin-top: 22px; font-weight: 700; font-size: 30.7px; letter-spacing: 0.02em; color: #e6e7ea;
+    display: flex; align-items: center; gap: 14px; }
+  .sub img { position: static; width: 32px; height: 32px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="slab s1"></div><div class="slab s2"></div><div class="slab s3"></div>
+  <div class="glow"></div>
+
+  <div class="art">
+  <div class="creeper-wrap"><img src="assets/mc/creeper.png" alt=""></div>
+
+  <img class="puff" src="assets/mc/explosion_4.png" style="left:958px; top:148px; width:255px; height:255px; --b:0.72" alt="">
+  <img class="puff" src="assets/mc/explosion_5.png" style="left:1036px; top:206px; width:217px; height:217px; --b:0.85" alt="">
+  <img class="puff" src="assets/mc/explosion_3.png" style="left:993px; top:283px; width:231px; height:231px; --b:0.6" alt="">
+  <img class="puff" src="assets/mc/explosion_5.png" style="left:1074px; top:134px; width:176px; height:176px; --b:0.55" alt="">
+  <img class="puff" src="assets/mc/explosion_4.png" style="left:1097px; top:307px; width:163px; height:163px; --b:0.7" alt="">
+  <img class="puff" src="assets/mc/explosion_5.png" style="left:964px; top:374px; width:176px; height:176px; --b:0.5" alt="">
+  <img class="puff" src="assets/mc/explosion_3.png" style="left:1135px; top:235px; width:122px; height:122px; --b:0.48" alt="">
+  <img class="puff" src="assets/mc/explosion_5.png" style="left:1065px; top:415px; width:122px; height:122px; --b:0.42" alt="">
+  <img class="puff" src="assets/mc/explosion_5.png" style="left:1131px; top:101px; width:95px; height:95px; --b:0.4" alt="">
+  <img class="puff" src="assets/mc/explosion_4.png" style="left:1172px; top:362px; width:88px; height:88px; --b:0.38" alt="">
+
+  <img class="shield" src="assets/mc/shield.png" alt="">
+
+  <img class="arrow" src="assets/mc/arrow.png" style="left:1028px; top:196px;" alt="">
+  <img class="arrow" src="assets/mc/arrow.png" style="left:1020px; top:372px; width:112px; height:112px;" alt="">
+  <img class="arrow glance" src="assets/mc/arrow.png" style="left:1070px; top:500px; width:88px; height:88px;" alt="">
+  </div>
+
+  <div class="copy">
+    <div class="l1">Block</div>
+    <div class="l2">What kills</div>
+    <div class="l3">First.</div>
+    <div class="sub"><img src="assets/mc/hardcore-heart.png" alt="">Creepers. Arrows. One iron ingot.</div>
+  </div>
+</div>
+</body>
+</html>

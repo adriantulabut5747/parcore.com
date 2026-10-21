@@ -85,6 +85,9 @@ function cocPagePath(u) {
           })
           .join(''),
       );
+      // Header count: every page the sheet links to (both TH panels + tools).
+      var count = document.querySelector('[data-role="more-count"]');
+      if (count) count.textContent = document.querySelectorAll('.more-list.mx a').length + ' pages';
     })
     .catch(function (err) {
       console.error('More sheet failed to load:', err);

@@ -8,16 +8,16 @@
 <meta name="description" content="Summon any Minecraft mob with custom health, attributes, armor, weapons, effects and riders. Shows the game's default stats, with /summon, spawn egg and spawner commands.">
 <meta name="theme-color" content="#0e0e0e">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://parchrome1.netlify.app/mc-java.html">
-<meta property="og:title" content="Minecraft Vanilla — Parchrome">
-<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:url" content="https://parchrome1.netlify.app/minecraft/tools/mob">
+<meta property="og:title" content="Minecraft Mob Summon Generator | Parchrome">
+<meta property="og:description" content="Build a Minecraft mob summon command with custom stats, gear, effects and riders.">
 <meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:site_name" content="Parchrome">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
-<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:title" content="Minecraft Mob Summon Generator | Parchrome">
+<meta name="twitter:description" content="Build a Minecraft mob summon command with custom stats, gear, effects and riders.">
 <meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,15 +28,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261012cr">
-<link rel="stylesheet" href="/mc-java.css?v=20261012cr">
-<link rel="stylesheet" href="/coc-cards.css?v=20261013t1">
-<link rel="stylesheet" href="/mc-home.css?v=20261014nd">
+<link rel="stylesheet" href="/11layout.css?v=20261021qs">
+<link rel="stylesheet" href="/mc-java.css?v=20261020bn">
+<link rel="stylesheet" href="/coc-more.css?v=20261021hd">
+<link rel="stylesheet" href="/coc-cards.css?v=20261021tm">
+<link rel="stylesheet" href="/mc-home.css?v=20261021cn">
+<link rel="stylesheet" href="/mc-hero.css?v=20261021eyb">
+<link rel="stylesheet" href="/mc-tool.css?v=20261021ph">
 
 
 </head>
-<body class="mc-home">  
+<body class="mc-home mt-page">
 
   <div id="page-loader">
   <div class="parchrome-fade">
@@ -48,14 +50,14 @@
 <!-- Top Nav -->
 <div class="top-bar">
   <div class="top-bar-left-avatar"></div>
-  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+  <button type="button" class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
     <span></span><span></span><span></span>
-  </div>
+  </button>
   <div class="top-bar-title">
     <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
     Parchrome
   </div>
-  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+  <button type="button" id="search-btn" onclick="toggleSearch()" aria-label="Search" aria-expanded="false" aria-controls="search-overlay" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
     <span id="search-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
         <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
@@ -96,18 +98,14 @@
        keyed to these wrappers. Sections left, editions right, both filled
        from mc-contents.json by the nav script below. -->
   <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
-    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="dsnScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="dsnCategoriesScroll"></div>
-    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="dsnScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
   </nav>
   <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
   <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
        from hwr-categories.json on the hwr pages. This bar holds the Minecraft
        editions instead, so it opts out of being rebuilt. -->
   <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
-    <button type="button" class="dsn-scroll-btn dsn-scroll-left is-hidden" id="hubScrollLeft" aria-label="Scroll left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="dsn-categories-scroll no-arrow-left no-arrow-right" id="stbHubNavScroll"></div>
-    <button type="button" class="dsn-scroll-btn dsn-scroll-right is-hidden" id="hubScrollRight" aria-label="Scroll right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
   </nav>
 
 </div>
@@ -127,29 +125,25 @@
   </div>
 
   <div class="coc-main">
-    <!-- HERO v2 — see the "HERO v2" block in mc-java.css. The edition wordmark
-         swaps per edition (Bedrock / Story / Dungeons logos are already in
-         minecrafticons/); the live version pills keep the original hvs-* ids so
-         the Mojang piston-meta fetch in mc-java.js drives them unchanged. -->
     <div class="coc-content">
-      <!-- MINECRAFT JAVA HOME v2 (Oct 12 2026): centered frame, bone bands,
-           podium, command terminal, server standings. Styles: mc-home.css,
-           behaviour (copy, tabs, block reveals): mc-home.js. mc-java.js still
-           fills the nav strip (.mc-mobile-nav), the hvs-* versions,
-           #vt-sb-latest and #server-row: keep those ids. -->
       <div class="mch">
+      <!-- TOOL PAGE v4 (Oct 18 2026). Everything inside the page is mt-* (mc-tool.css), so none of
+           the shared pt-/mct- tool styles in mc-home.css reach it. Hooks the scripts need: every id,
+           every data-* attribute, .mch-tabs / .mch-tab (the tab engine in mc-home.js) and .mch-copy
+           (the copy engine). The banner + section tabs are the shared ones
+           (mc-hero.css), back since Oct 21.
+           Desktop: settings (left) | preview + command (right, sticky, sized to the window).
+           Phones: preview, settings, command; the preview has its own Copy. -->
       <!-- Banner (Oct 12): the page header over the forest shot, with the live
            Java versions (hvs-* ids, filled by mc-java.js). Parcorp Village,
            the old featured banner, is #2 in Top 10 Worlds. -->
       <header class="mch-hero mch-hero--page">
-        <!-- Background clip: Pinterest pin 605452743702191634 (736x414, its largest size). Muted, looped; the JPG is its first frame and the reduced-motion fallback. --><video class="mch-hero-bg" src="/minecrafticons/mc-java-banner.mp4" poster="/minecrafticons/mc-java-banner.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+        <!-- Background: still image (Creaking render, 1200x675 WebP), shared by every tool page. --><img class="mch-hero-bg" src="/minecrafticons/mc-tools-banner.webp" alt="" width="1200" height="675" fetchpriority="high">
         <div class="mch-frame mch-hero-inner">
           <div class="mch-hero-main">
+            <p class="mch-hero-eyebrow">Curated Minecraft resources</p>
             <h1 class="mch-hero-title">Mob<span>Summon.</span></h1>
-            <p class="mch-hero-copy">Any mob with your own stats, gear, effects and riders, previewed before you summon it.</p>
             <div class="mch-hero-foot">
-              <a class="mch-hero-cta" href="#mc-tool">Build a mob<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-              <a class="mct-back" href="/minecraft/tools/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>All tools</a>
               <dl class="mch-hero-stats mch-hero-ver" id="hero-version-strip" aria-label="Current Java versions">
                 <div><dt>Release</dt><dd id="hvs-release-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-release-updated"></dd></div>
                 <div><dt>Snapshot</dt><dd id="hvs-snapshot-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-snapshot-updated"></dd></div>
@@ -163,150 +157,357 @@
             <div class="vt-sb-latest mch-wire-list" id="vt-sb-latest" data-count="5"><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div></div>
           </aside>
         </div>
+        <!-- Section tabs (Oct 21 2026): filled by mc-java.js renderMobileNav, styled in mc-hero.css TABS. -->
+        <div class="mch-frame mch-hero-tabs"><nav class="mch-nav" aria-label="Tools"></nav></div>
       </header>
 
-
-      <!-- MOB SUMMON (Oct 13 2026): mc-mob.js + mc-mobs.json (mobs, default attributes and
-           effects read from the 26.3 game files). Left: mob, basics, its own options,
-           attributes, equipment doll, effects, riders. Right (sticky): 3D or spawn egg card,
-           stats, gear, rider stack, and the /summon, egg, spawner or Bedrock command.
-           Styles: MOB block at the end of mc-home.css (.mob-*). -->
-      <div class="mch-ch mch-ch--surface" id="ch-tool" role="region" aria-label="Mob summon generator">
-        <div class="mch-frame">
-          <nav class="mc-mobile-nav mch-nav" aria-label="Tools"><div class="mc-mobile-nav-header"></div></nav><hr class="mch-nav-rule">
-        <section class="mch-sec" id="mc-tool" aria-labelledby="mc-tool-t">
-          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-tool-t">Build a <em>boss.</em></h3><p class="mch-sec-sub">Pick any mob, change its stats and gear, then summon it. Every number shows the game's default next to it.</p></div></header>
-
-          <div class="mct-gen pt-gen">
-            <div class="mct-build pt-build">
-              <div class="pt-panel">
-                <div class="pt-head">
-                  <h4 class="pt-h">Mob</h4>
-                  <div class="pt-filter" id="mobGrp" role="group" aria-label="Show">
-                    <button type="button" data-grp="" aria-pressed="true">All</button><button type="button" data-grp="hostile" aria-pressed="false">Hostile</button><button type="button" data-grp="boss" aria-pressed="false">Bosses</button><button type="button" data-grp="animal" aria-pressed="false">Animals</button><button type="button" data-grp="water" aria-pressed="false">Water</button><button type="button" data-grp="other" aria-pressed="false">Other</button>
-                  </div>
-                </div>
-                <label class="pt-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="mobFind" type="search" placeholder="Search 91 mobs" autocomplete="off" spellcheck="false" aria-label="Search mobs"></label>
-                <div class="pt-browse mob-browse" id="mobList"></div>
-              </div>
-
-              <div class="pt-panel" id="mobBasics">
-                <h4 class="pt-h">Name and behaviour</h4>
-                <div class="txe-two">
-                  <div><label class="pt-lbl" for="mobName">Name</label><input class="pt-input" id="mobName" type="text" maxlength="50" placeholder="No name" spellcheck="false"></div>
-                  <div><label class="pt-lbl" for="mobHealth">Health now <span class="pt-opt">half hearts</span></label><input class="pt-input" id="mobHealth" type="number" min="1" step="any" placeholder="Full"></div>
-                </div>
-                <div class="pt-swatches" id="mobNameColor" role="group" aria-label="Name colour"></div>
-                <label class="pt-toggle"><input type="checkbox" id="mobShowName" checked><span></span>Always show the name</label>
-                <div class="mob-flags">
-                  <label class="pt-toggle"><input type="checkbox" data-flag="PersistenceRequired" checked><span></span>Never despawns</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="NoAI"><span></span>No AI (stands still)</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="Invulnerable"><span></span>Can't be hurt</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="Silent"><span></span>Silent</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="Glowing"><span></span>Glowing outline</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="NoGravity"><span></span>No gravity</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="CanPickUpLoot"><span></span>Picks up items</label>
-                  <label class="pt-toggle"><input type="checkbox" data-flag="LeftHanded"><span></span>Left handed</label>
-                </div>
-                <div class="txe-two">
-                  <div><label class="pt-lbl" for="mobFire">On fire for <span class="pt-opt">seconds</span></label><input class="pt-input" id="mobFire" type="number" min="0" placeholder="0"></div>
-                  <div><label class="pt-lbl" for="mobTags">Tags <span class="pt-opt">for /tag and selectors</span></label><input class="pt-input" id="mobTags" type="text" placeholder="boss arena1" spellcheck="false"></div>
-                </div>
-              </div>
-
-              <div class="pt-panel" id="mobOptsWrap">
-                <h4 class="pt-h" id="mobOptsH">Options</h4>
-                <div class="mob-opts" id="mobOpts"></div>
-              </div>
-
-              <div class="pt-panel">
-                <h4 class="pt-h">Attributes <span class="pt-opt">leave empty for the default</span></h4>
-                <div class="mob-attrs" id="mobAttrs"></div>
-                <p class="crd-hint" id="mobRandom" hidden>This mob rolls its own health, speed and jump when it spawns.</p>
-              </div>
-
-              <div class="pt-panel">
-                <div class="pt-head">
-                  <h4 class="pt-h">Equipment</h4>
-                  <div class="bcn-own-acts"><button type="button" class="pt-link" id="mobGear">Full best gear</button><button type="button" class="pt-link" id="mobGearClear">Clear</button></div>
-                </div>
-                <div class="mob-eqwrap">
-                  <div class="mob-doll" id="mobDoll"></div>
-                  <div class="mob-eqside">
-                    <span class="pt-lbl" id="mobPickK">Head</span>
-                    <div class="pt-slots mob-items" id="mobPick" role="group" aria-label="Item for this slot"></div>
-                    <div class="mob-eqopts" id="mobEqOpts">
-                      <label class="pt-toggle"><input type="checkbox" id="mobEnch"><span></span><span id="mobEnchK">Enchanted</span></label>
-                      <label class="pt-toggle"><input type="checkbox" id="mobUnb"><span></span>Unbreakable</label>
-                      <div class="cir-size">
-                        <label class="pt-lbl" for="mobDrop">Drops when killed: <b id="mobDropV">Game default (8.5%)</b> <button type="button" class="pt-link" id="mobDropReset">Reset</button></label>
-                        <input type="range" class="cir-layer" id="mobDrop" min="0" max="100" step="0.5" value="8.5">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="pt-panel pt-two">
-                <div class="pt-field">
-                  <h4 class="pt-h">Effects</h4>
-                  <ul class="mob-fxlist" id="mobFx"></ul>
-                  <select class="pt-input" id="mobFxAdd" aria-label="Add an effect"></select>
-                </div>
-                <div class="pt-field">
-                  <h4 class="pt-h">Riders <span class="pt-opt">top first</span></h4>
-                  <ul class="mob-riders" id="mobRiders"></ul>
-                  <select class="pt-input" id="mobRiderAdd" aria-label="Put a mob on top"></select>
+      <div class="mch-frame mt-wrap">
+        <!-- MOB SUMMON (Oct 13 2026): mc-mob.js + mc-mobs.json (mobs, default attributes and effects
+             read from the 26.3 game files). 3D preview: mc-mob3d.js. -->
+        <section class="mt-app" id="mc-tool" aria-label="Mob summon generator">
+          <div class="mt-box mt-set">
+            <!-- Build bar (moved into the settings box Oct 19): the current mob (a button: egg in an
+                 inventory slot) and Share / Reset. "Change mob" opens the mob picker dialog (#mtPickDlg).
+                 A rider's Edit moves .mt-set into #mtRiderDlg, so the dialog hides this bar. -->
+            <div class="mt-picker" role="group" aria-label="Mob">
+              <div class="mt-pick-row">
+                <button type="button" class="mt-pick-toggle" id="mtPickToggle" aria-haspopup="dialog" aria-controls="mtPickDlg">
+                  <span class="mt-well"><img id="mtPickEgg" src="/minecrafticons/eggs/villager.png" alt="" width="32" height="32"></span>
+                  <span class="mt-pick-cur" id="mtPickCur"></span>
+                  <span class="mt-pick-act"><span>Change mob</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></span>
+                </button>
+                <div class="mt-pick-acts">
+                  <button type="button" class="mt-btn" id="mtShare"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Share build</span></button>
+                  <button type="button" class="mt-btn" id="mtReset"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/></svg><span>Reset</span></button>
                 </div>
               </div>
             </div>
+            <div class="mch-tabs mt-tabs" role="tablist" aria-label="Mob settings">
+              <button type="button" class="mch-tab is-on" role="tab" id="mtTabDet" aria-selected="true" aria-controls="mtPanDet"><img src="/minecrafticons/items/name_tag.png" alt="" width="20" height="20"><span>Details</span></button>
+              <button type="button" class="mch-tab" role="tab" id="mtTabTr" aria-selected="false" aria-controls="mtPanTr" tabindex="-1" hidden><img src="/minecrafticons/items/emerald.png" alt="" width="20" height="20"><span>Trades</span><b class="mt-n" id="mtNTr"></b></button>
+              <button type="button" class="mch-tab" role="tab" id="mtTabSt" aria-selected="false" aria-controls="mtPanSt" tabindex="-1"><img src="/minecrafticons/gui/heart_full.png" alt="" width="20" height="20"><span>Stats</span><b class="mt-n" id="mtNSt"></b></button>
+              <button type="button" class="mch-tab" role="tab" id="mtTabGr" aria-selected="false" aria-controls="mtPanGr" tabindex="-1"><img src="/minecrafticons/items/iron_chestplate.png" alt="" width="20" height="20"><span>Gear</span><b class="mt-n" id="mtNGr"></b></button>
+              <button type="button" class="mch-tab" role="tab" id="mtTabFx" aria-selected="false" aria-controls="mtPanFx" tabindex="-1"><img src="/minecrafticons/items/potion.png" alt="" width="20" height="20"><span>Effects</span><b class="mt-n" id="mtNFx"></b></button>
+            </div>
 
-            <aside class="mct-out pt-out" aria-label="Result">
-              <div class="mob-stage" id="mobStage">
-                <canvas id="mob3d" aria-label="3D preview of the mob. Drag to turn."></canvas>
-                <div class="mob-card">
-                  <img class="mob-egg" id="mobEgg" alt="">
-                </div>
-                <div class="mob-name"><b id="mobCardName"></b><span id="mobCardType"></span></div>
-                <div class="mob-tower" id="mobTower" hidden></div>
-              </div>
-              <div class="mob-under">
-                <dl class="cir-stats mob-stats" id="mobStats"></dl>
-                <div class="mob-eqrow" id="mobEqRow"></div>
-              </div>
-              <div class="pt-cmd">
-                <div class="pt-cmd-head fwk-heads">
-                  <div class="pt-ver" id="mobOut" role="group" aria-label="Command">
-                    <button type="button" data-out="summon" aria-pressed="true">Summon</button><button type="button" data-out="egg" aria-pressed="false">Spawn egg</button><button type="button" data-out="spawner" aria-pressed="false">Spawner</button><button type="button" data-out="bedrock" aria-pressed="false">Bedrock</button>
+            <!-- Details: the picked mob's own options first, then name, behaviour, extras. -->
+            <div class="mt-pan" id="mtPanDet" role="tabpanel" aria-labelledby="mtTabDet">
+              <div class="mt-stack" id="mobBasics">
+                <fieldset class="mt-fs" id="mobOptsWrap">
+                  <legend class="mt-lg" id="mobOptsH">Options</legend>
+                  <div class="mt-optset" id="mobOpts"></div>
+                </fieldset>
+                <!-- Name tag editor (Oct 18): style buttons (each wears its § code), the name typed in its
+                     own colour and style, then the colour tray. Styles cover the whole name. -->
+                <fieldset class="mt-fs">
+                  <legend class="mt-lg">Name tag</legend>
+                  <div class="mt-ned">
+                    <div class="mt-ned-bar" id="mobNameFmt" role="group" aria-label="Name style">
+                      <button type="button" class="mt-ned-b" data-fmt="bold" data-code="l" aria-pressed="false" title="Bold"><b>B</b></button>
+                      <button type="button" class="mt-ned-b" data-fmt="italic" data-code="o" aria-pressed="false" title="Italic"><i>I</i></button>
+                      <button type="button" class="mt-ned-b" data-fmt="underlined" data-code="n" aria-pressed="false" title="Underline"><u>U</u></button>
+                      <button type="button" class="mt-ned-b" data-fmt="strikethrough" data-code="m" aria-pressed="false" title="Strikethrough"><s>S</s></button>
+                      <button type="button" class="mt-ned-b mt-ned-obf" data-fmt="obfuscated" data-code="k" aria-pressed="false" title="Scrambled (the letters keep changing)"><span aria-hidden="true">?#</span><span class="mt-vh">Scrambled</span></button>
+                      <span class="mt-ned-sep" aria-hidden="true"></span>
+                      <label class="mt-ned-t" title="Always show the name, not only when you look at the mob"><input type="checkbox" id="mobShowName"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Always show</span></label>
+                      <button type="button" class="mt-ned-b mt-ned-clear" id="mobNameClear" title="Clear the style and colour"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h11M10.5 6l-3 12M15 14l5 5M20 14l-5 5"/></svg><span class="mt-vh">Clear style</span></button>
+                    </div>
+                    <input class="mt-ned-in" id="mobName" type="text" maxlength="50" placeholder="Type a name…" spellcheck="false" aria-label="Name">
+                    <div class="mt-ned-pal">
+                      <span class="mt-l" id="mtColL">Colour</span>
+                      <div class="mt-sws" id="mobNameColor" role="group" aria-labelledby="mtColL"></div>
+                    </div>
                   </div>
-                  <div class="pt-ver" id="mobVer" role="group" aria-label="Game version">
-                    <button type="button" data-ver="3" aria-pressed="true">1.21.5+</button><button type="button" data-ver="2" aria-pressed="false">1.21.2 – 1.21.4</button><button type="button" data-ver="1" aria-pressed="false">1.20.5 – 1.21.1</button><button type="button" data-ver="0" aria-pressed="false">1.16 – 1.20.4</button>
+                  <!-- Names the game treats specially (mc-mob.js TRICKS): one click names the mob. -->
+                  <div class="mt-tricks" id="mobTricks" role="group" aria-label="Name tricks"></div>
+                </fieldset>
+                <fieldset class="mt-fs">
+                  <legend class="mt-lg">Behaviour</legend>
+                  <div class="mt-grid3">
+                    <label class="mt-tg"><input type="checkbox" data-flag="PersistenceRequired"><span class="mt-sw" aria-hidden="true"></span>Never despawns</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="NoAI"><span class="mt-sw" aria-hidden="true"></span>No AI (stands still)</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="Invulnerable"><span class="mt-sw" aria-hidden="true"></span>Can't be hurt</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="Silent"><span class="mt-sw" aria-hidden="true"></span>Silent</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="Glowing"><span class="mt-sw" aria-hidden="true"></span>Glowing outline</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="NoGravity"><span class="mt-sw" aria-hidden="true"></span>No gravity</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="CanPickUpLoot"><span class="mt-sw" aria-hidden="true"></span>Picks up items</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="LeftHanded"><span class="mt-sw" aria-hidden="true"></span>Left handed</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="FallFlying"><span class="mt-sw" aria-hidden="true"></span>Gliding (elytra pose)</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="HasVisualFire"><span class="mt-sw" aria-hidden="true"></span>Looks on fire (no damage)</label>
+                    <label class="mt-tg"><input type="checkbox" data-flag="OnGround"><span class="mt-sw" aria-hidden="true"></span>On ground</label>
                   </div>
+                </fieldset>
+                <!-- Extra (Oct 19 adds): death loot table (suggestions from mc-mob-lists.json), air, freezing,
+                     facing and a push. data-x inputs write s.x (mc-mob.js XKEYS). -->
+                <fieldset class="mt-fs" id="mobExtra">
+                  <legend class="mt-lg">Extra</legend>
+                  <div class="mt-grid3 mt-opts">
+                    <div class="mt-f"><label class="mt-l" for="mobHealth">Health now <span class="mt-u">half hearts</span></label><input class="mt-in" id="mobHealth" type="number" min="1" step="any" placeholder="Full"></div>
+                    <div class="mt-f"><label class="mt-l" for="mobFire">On fire for <span class="mt-u">seconds</span></label><input class="mt-in" id="mobFire" type="number" min="0" placeholder="0"></div>
+                    <div class="mt-f"><label class="mt-l" for="mobTags">Tags <span class="mt-u">for /tag and selectors</span></label><input class="mt-in" id="mobTags" type="text" placeholder="boss arena1" spellcheck="false"></div>
+                    <div class="mt-f mt-f--wide">
+                      <label class="mt-l" for="mobLoot">Drops when killed <span class="mt-u">a loot table, blank = its own drops</span></label>
+                      <div class="mt-loot"><input class="mt-in" id="mobLoot" type="text" list="mobLootList" placeholder="entities/wither_skeleton" spellcheck="false" autocomplete="off"><button type="button" class="mt-link" id="mobLootNone">No drops</button></div>
+                      <datalist id="mobLootList"></datalist>
+                    </div>
+                    <div class="mt-f"><label class="mt-l" for="mobAir">Air <span class="mt-u">300 = full</span></label><input class="mt-in" id="mobAir" data-x="air" type="number" step="1" placeholder="300"></div>
+                    <div class="mt-f"><label class="mt-l" for="mobFrozen">Frozen <span class="mt-u">ticks, 140 = fully</span></label><input class="mt-in" id="mobFrozen" data-x="frozen" type="number" min="0" step="1" placeholder="0"></div>
+                    <div class="mt-f">
+                      <span class="mt-l" id="mobRotL">Facing <span class="mt-u">0 = south, tilt -90 up to 90 down</span></span>
+                      <div class="mt-time" role="group" aria-labelledby="mobRotL">
+                        <label><input class="mt-in" id="mobYaw" data-x="yaw" type="number" step="any" placeholder="0" aria-label="Facing, degrees (0 = south)"><span>deg</span></label>
+                        <label><input class="mt-in" id="mobPitch" data-x="pitch" type="number" min="-90" max="90" step="any" placeholder="0" aria-label="Head tilt, degrees (-90 up, 90 down)"><span>tilt</span></label>
+                      </div>
+                    </div>
+                    <div class="mt-f mt-f--wide">
+                      <span class="mt-l" id="mobMotL">Launch it <span class="mt-u">blocks per tick, y = up</span></span>
+                      <div class="mt-time mt-time--3" role="group" aria-labelledby="mobMotL">
+                        <label><span>x</span><input class="mt-in" data-x="mx" type="number" step="any" placeholder="0" aria-label="Launch speed east (x)"></label>
+                        <label><span>y</span><input class="mt-in" data-x="my" type="number" step="any" placeholder="0" aria-label="Launch speed up (y)"></label>
+                        <label><span>z</span><input class="mt-in" data-x="mz" type="number" step="any" placeholder="0" aria-label="Launch speed south (z)"></label>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+
+            <!-- Stats: tick rows. Typing an amount ticks the row; the game default sits on the right. -->
+            <div class="mt-pan" id="mtPanSt" role="tabpanel" aria-labelledby="mtTabSt" hidden>
+              <div class="mt-bar"><p class="mt-hint">Tick a stat to change it. The game's default is on the right.</p><button type="button" class="mt-link" id="mobAttrClear">Clear all</button></div>
+              <ul class="mt-ticks" id="mobAttrs"></ul>
+              <p class="mt-note" id="mobRandom" hidden>This mob rolls its own health, speed and jump when it spawns.</p>
+            </div>
+
+            <!-- Gear: six slots (+ saddle / body, + the drop slots), the items for the picked slot, then that item's own
+                 settings. Drop slots (Oct 19) are the saddle / body slots a mob never shows: free for loot (mc-mob.js dropSlots). -->
+            <div class="mt-pan" id="mtPanGr" role="tabpanel" aria-labelledby="mtTabGr" hidden>
+              <div class="mt-bar"><p class="mt-hint">Pick a slot, then an item for it.</p><div class="mt-acts"><button type="button" class="mt-link" id="mobGear">Full best gear</button><button type="button" class="mt-link" id="mobGearClear">Clear</button></div></div>
+              <div class="mt-slots" id="mobDoll" role="group" aria-label="Equipment slots"></div>
+              <!-- The item editor: edits the picked slot's item, or (moved into the editor dialog) an item inside storage.
+                   mc-mob.js it() is the item it works on. -->
+              <div class="mt-itemed" id="mobItemEd">
+              <div class="mt-f">
+                <span class="mt-l"><span id="mobPickK">Head</span>: <b class="mt-pick-name" id="mtPickName">nothing</b></span>
+                <div class="mt-items" id="mobPick" role="group" aria-label="Item for this slot"></div>
+              </div>
+              <!-- Dye (Oct 19): leather armor, leather horse armor and wolf armor. Undyed, the 16 dyes, or any
+                   colour (the + box). mc-mob.js drawDye; written as dyed_color. -->
+              <div class="mt-f mt-dye" id="mobDyeWrap" hidden>
+                <span class="mt-l" id="mobDyeL">Dye: <b class="mt-pick-name" id="mobDyeV">Undyed</b></span>
+                <div class="mt-dyes" id="mobDye" role="group" aria-labelledby="mobDyeL"></div>
+              </div>
+              <!-- Trim (Oct 19): any helmet, chestplate, leggings or boots. Off until switched on, then the 18 smithing
+                   templates and the 11 materials. mc-mob.js drawTrim; written as minecraft:trim, drawn on the 3D armor. -->
+              <div class="mt-f mt-trim" id="mobTrimWrap" hidden>
+                <label class="mt-tg"><input type="checkbox" id="mobTrimOn"><span class="mt-sw" aria-hidden="true"></span>Armor trim</label>
+                <div class="mt-stack" id="mobTrimSet" hidden>
+                  <div class="mt-f"><span class="mt-l" id="mobTrimPL">Pattern: <b class="mt-pick-name" id="mobTrimPV"></b></span><div class="mt-items" id="mobTrimP" role="group" aria-labelledby="mobTrimPL"></div></div>
+                  <div class="mt-f"><span class="mt-l" id="mobTrimML">Material: <b class="mt-pick-name" id="mobTrimMV"></b></span><div class="mt-items" id="mobTrimM" role="group" aria-labelledby="mobTrimML"></div></div>
                 </div>
-                <div class="bcn-pos mob-sp" id="mobSpawner" hidden>
-                  <label class="pt-mini">Mobs per spawn <input class="pt-input" id="mobSpCount" type="number" min="1" placeholder="4"></label>
-                  <label class="pt-mini">Player within <input class="pt-input" id="mobSpRange" type="number" min="1" placeholder="16"></label>
-                  <label class="pt-mini">Max nearby <input class="pt-input" id="mobSpMax" type="number" min="1" placeholder="6"></label>
+              </div>
+              <!-- Player head owner (moved up out of Options, Oct 19): any Java name, looked up like "Tamed by" so you
+                   see the face and whether that player exists. mc-mob.js drawOwner; the 3D head wears their skin. -->
+              <div class="mt-f mt-player" id="mobOwnerWrap" hidden>
+                <label class="mt-l" for="mobOwner">Whose head <span class="mt-u">any Java username</span></label>
+                <div class="mt-player-in"><span class="mt-well"><img id="mobOwnerHead" src="/minecrafticons/items/player_head.png" alt="" width="24" height="24"></span>
+                  <input class="mt-in" id="mobOwner" type="text" maxlength="16" placeholder="Grian" autocomplete="off" spellcheck="false" aria-describedby="mobOwnerSt"></div>
+                <small class="mt-player-st" id="mobOwnerSt" role="status"></small>
+              </div>
+              <!-- Spawn egg (Oct 19): the mob inside it, edited like a rider (a mob frame in the editor dialog). -->
+              <div class="mt-f" id="mobEggWrap" hidden>
+                <span class="mt-l">Mob inside</span>
+                <div class="mt-li mt-li--rider"><button type="button" class="mt-rider" id="mobEggEdit"><img id="mobEggImg" src="/minecrafticons/eggs/zombie.png" alt=""><span class="mt-rider-t"><b id="mobEggName">Zombie</b><small id="mobEggSum"></small></span><span class="mt-rider-go">Edit mob<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button></div>
+              </div>
+              <!-- Storage (Oct 19): chests, barrels, shulker boxes, dispensers, droppers, hoppers, crafters, bundles. A slot
+                   opens that item in the editor dialog, with everything an item has (its own storage too). -->
+              <div class="mt-f mt-inv" id="mobInvWrap" hidden>
+                <div class="mt-l-row"><span class="mt-l" id="mobInvL">Inside: <b class="mt-pick-name" id="mobInvN"></b></span><button type="button" class="mt-link" id="mobInvClear">Empty it</button></div>
+                <div class="mt-inv-grid" id="mobInv" role="group" aria-labelledby="mobInvL"></div>
+              </div>
+              <!-- Fireworks (Oct 19): a rocket's flight + explosions, or a firework star's one explosion. Shapes, colours
+                   and the NBT come from the firework generator (mc-firework.js McFirework, mc-dyes.js). -->
+              <div class="mt-f mt-fw" id="mobFwWrap" hidden>
+                <div class="mt-f" id="mobFwFlightWrap"><span class="mt-l" id="mobFwFlightL">Flight duration</span>
+                  <div class="mt-seg" id="mobFwFlight" role="group" aria-labelledby="mobFwFlightL"><button type="button" data-flight="1" aria-pressed="true">1</button><button type="button" data-flight="2" aria-pressed="false">2</button><button type="button" data-flight="3" aria-pressed="false">3</button></div>
                 </div>
-                <div class="mch-term mct-term pt-term">
-                  <code class="mct-code" id="mobCmd"></code>
-                  <div class="mct-term-foot">
-                    <span class="mct-meta" id="mobMeta" role="status" aria-live="polite"></span>
-                    <button type="button" class="mch-copy pt-copy" id="mobCopy" data-copy="" aria-label="Copy the command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
+                <ol class="mt-fwx-list" id="mobFwEx"></ol>
+                <button type="button" class="mt-link" id="mobFwAdd">+ Add explosion</button>
+              </div>
+              <div class="mt-qty" id="mobQty">
+                <div class="mt-f"><label class="mt-l" for="mobCount">Count</label><span class="mt-step"><button type="button" data-step="-1" aria-label="One fewer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button><input class="mt-in" id="mobCount" type="number" min="1" max="99" step="1" value="1" inputmode="numeric"><button type="button" data-step="1" aria-label="One more"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M12 6v12"/></svg></button></span></div>
+                <label class="mt-f" id="mobDropWrap"><span class="mt-l">Drop chance</span><span class="mt-pct"><input class="mt-in" id="mobDropPct" type="number" min="0" max="100" step="0.5" placeholder="8.5"><i aria-hidden="true">%</i></span></label>
+                <!-- Always = a drop chance above 1 (the game writes 2.0): drops on any death, at full durability.
+                     Up to 100% only drops when a player killed the mob (Mob.dropCustomDeathLoot, DropChances.isPreserved). -->
+                <label class="mt-tg mt-always" id="mobAlwaysWrap"><input type="checkbox" id="mobAlways"><span class="mt-sw" aria-hidden="true"></span><span>Always drops <span class="mt-u">any death, full durability</span></span></label>
+              </div>
+              <div class="mt-item" id="mobEqOpts">
+                <div class="mch-tabs mt-seg mt-subtabs" role="tablist" aria-label="Item settings">
+                  <button type="button" class="mch-tab is-on" role="tab" id="mobTabEn" aria-selected="true" aria-controls="mobPanEn">Enchantments<b class="mt-n" id="mobEnN"></b></button>
+                  <button type="button" class="mch-tab" role="tab" id="mobTabAt" aria-selected="false" aria-controls="mobPanAt" tabindex="-1">Attributes<b class="mt-n" id="mobItAtN"></b></button>
+                  <button type="button" class="mch-tab" role="tab" id="mobTabOp" aria-selected="false" aria-controls="mobPanOp" tabindex="-1">Options</button>
+                </div>
+                <div class="mt-subpan" id="mobPanEn" role="tabpanel" aria-labelledby="mobTabEn">
+                  <div class="mt-bar"><p class="mt-hint" id="mobEnHint"></p><div class="mt-acts">
+                    <button type="button" class="mt-link" id="mobEnMax" title="Tick everything this item takes, at its normal top level">Game max</button>
+                    <button type="button" class="mt-link" id="mobEn255" title="Set every ticked enchantment to level 255">Push to 255</button>
+                    <button type="button" class="mt-link" id="mobEnClear">Clear</button>
+                  </div></div>
+                  <ul class="mt-ticks" id="mobEnList"></ul>
+                </div>
+                <div class="mt-subpan" id="mobPanAt" role="tabpanel" aria-labelledby="mobTabAt" hidden>
+                  <p class="mt-hint" id="mobItAtHint"></p>
+                  <ul class="mt-ticks" id="mobItAttrs"></ul>
+                </div>
+                <div class="mt-subpan mt-stack" id="mobPanOp" role="tabpanel" aria-labelledby="mobTabOp" hidden>
+                  <div class="mt-f"><label class="mt-l" for="mobItName">Item name <span class="mt-u">blank = its own name</span></label><input class="mt-in" id="mobItName" type="text" maxlength="50" autocomplete="off"></div>
+                  <div class="mt-grid2">
+                    <label class="mt-tg" id="mobGlintWrap"><input type="checkbox" id="mobGlint"><span class="mt-sw" aria-hidden="true"></span>Enchantment glint</label>
+                    <label class="mt-tg"><input type="checkbox" id="mobUnb"><span class="mt-sw" aria-hidden="true"></span>Unbreakable</label>
                   </div>
                 </div>
               </div>
-              <ul class="pt-notes" id="mobNotes"></ul>
-            </aside>
+              </div>
+            </div>
+
+            <!-- Trades (villager + wandering trader only, mc-mob.js drawTrades). Each trade is drawn like a
+                 row of the game's trade screen: cost, second cost, arrow, the bigger result slot. The count is
+                 typed into the slot's corner, where the game prints stack sizes. -->
+            <div class="mt-pan" id="mtPanTr" role="tabpanel" aria-labelledby="mtTabTr" hidden>
+              <p class="mt-hint">Top to bottom, as they appear in the trade list. Leave the second cost empty for a one-item trade.</p>
+              <ol class="mt-trades" id="mobTrades"></ol>
+              <button type="button" class="mt-link mt-tr-add" id="mobTrAdd">+ Add trade</button>
+            </div>
+
+            <!-- Effects + riders, one above the other (Oct 19: an effect row now has level, time and particles).
+                 Particles that aren't None show on the 3D preview in the effect's colour (mc-mob3d.js). -->
+            <div class="mt-pan" id="mtPanFx" role="tabpanel" aria-labelledby="mtTabFx" hidden>
+              <div class="mt-stack">
+                <fieldset class="mt-fs">
+                  <legend class="mt-lg">Effects</legend>
+                  <ul class="mt-list" id="mobFx"></ul>
+                  <select class="mt-in mt-add" id="mobFxAdd" aria-label="Add an effect"></select>
+                </fieldset>
+                <!-- Riders and mounts (mounts Oct 19): the whole stack top first, this page's mob marked in it.
+                     A mob added on top rides the highest one; one added underneath carries the lowest. The lowest
+                     mount is what the command summons (mc-mob.js command0). -->
+                <fieldset class="mt-fs mt-riders" id="mobRidersWrap">
+                  <legend class="mt-lg">Riders and mounts <span class="mt-u">top first</span></legend>
+                  <ul class="mt-list" id="mobRiders"></ul>
+                  <div class="mt-grid2 mt-stack-add">
+                    <button type="button" class="mt-btn" id="mobRiderAdd" aria-haspopup="dialog" aria-controls="mtPickDlg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Put a mob on top</span></button>
+                    <button type="button" class="mt-btn" id="mobMountAdd" aria-haspopup="dialog" aria-controls="mtPickDlg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Put a mob underneath</span></button>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
           </div>
+
+          <aside class="mt-out" aria-label="Result">
+            <div class="mt-box mt-prev">
+              <div class="mt-stage" id="mobStage">
+                <!-- mc-mob3d.js sizes the 3D view to the canvas's parent (.mt-view) and puts .no-3d on it.
+                     The view starts below a strip at the top, so the name tag sits over the head like in game. -->
+                <!-- is-loading: mc-mob3d.js holds a model back until its textures are in; .mt-load shows if that takes a moment. -->
+                <div class="mt-view is-3d is-loading">
+                  <canvas id="mob3d" tabindex="0" aria-label="3D preview of the mob. Use the left and right arrow keys to turn."></canvas>
+                  <div class="mt-load" aria-hidden="true"><i></i><i></i><i></i></div>
+                  <div class="mt-card"><img class="mt-egg" id="mobEgg" alt=""></div>
+                </div>
+                <b class="mt-nametag" id="mobCardName" hidden></b>
+                <button type="button" class="mch-copy mt-qcopy" id="mobQCopy" data-copy="" aria-label="Copy the command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
+                <div class="mt-hud">
+                  <span class="mt-type" id="mobCardType"></span>
+                  <span class="mt-pips" id="mobArmor" aria-hidden="true"></span>
+                  <span class="mt-pips" id="mobHearts" aria-hidden="true"></span>
+                </div>
+                <span class="mt-drag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>Drag to turn</span>
+              </div>
+              <dl class="mt-stats" id="mobStats"></dl>
+            </div>
+            <div class="mt-box mt-cmd">
+              <div class="mt-seg" id="mobOut" role="group" aria-label="Command type">
+                <button type="button" data-out="summon" aria-pressed="true">Summon</button><button type="button" data-out="egg" aria-pressed="false">Spawn egg</button><button type="button" data-out="spawner" aria-pressed="false">Spawner</button><button type="button" data-out="bedrock" aria-pressed="false">Bedrock</button>
+              </div>
+              <label class="mt-ver-pick" id="mobVer"><span class="mt-l">Java version</span>
+                <select class="mt-in" id="mobVerSel"><option value="3" selected>1.21.5 and newer (26.x too)</option><option value="2">1.21.2 to 1.21.4</option><option value="1">1.20.5 to 1.21.1</option><option value="0">1.16 to 1.20.4</option></select>
+              </label>
+              <div class="mt-grid3 mt-sp" id="mobSpawner" hidden>
+                <label class="mt-f"><span class="mt-l">Mobs per spawn</span><input class="mt-in" id="mobSpCount" type="number" min="1" placeholder="4"></label>
+                <label class="mt-f"><span class="mt-l">Player within</span><input class="mt-in" id="mobSpRange" type="number" min="1" placeholder="16"></label>
+                <label class="mt-f"><span class="mt-l">Max nearby</span><input class="mt-in" id="mobSpMax" type="number" min="1" placeholder="6"></label>
+              </div>
+              <code class="mt-code" id="mobCmd" tabindex="0" aria-label="Command">Loading…</code>
+              <div class="mt-meta-row">
+                <span class="mt-meta" id="mobMeta"></span>
+                <button type="button" class="mt-more" id="mtCodeMore" aria-expanded="false" aria-controls="mobCmd" hidden>Show all</button>
+              </div>
+              <button type="button" class="mch-copy mt-copy" id="mobCopy" data-copy="" aria-label="Copy the command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
+              <ul class="mt-notes" id="mobNotes"></ul>
+              <p class="mt-vh" id="mtLive" aria-live="polite"></p>
+            </div>
+          </aside>
         </section>
-        </div>
+
+        <!-- Mob picker (Oct 18): a native modal dialog -- Esc, focus trap and backdrop come free.
+             Filter buttons set the group (mc-mob.js s.grp), the search narrows it, picking a mob
+             changes it and closes the dialog. -->
+        <dialog class="mt-box mt-dlg" id="mtPickDlg" aria-labelledby="mtPickDlgH">
+          <div class="mt-dlg-head">
+            <h2 class="mt-dlg-h" id="mtPickDlgH">Pick a mob</h2>
+            <button type="button" class="mt-x mt-dlg-x" id="mtPickClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </div>
+          <div class="mt-dlg-tools">
+            <div class="mt-seg mt-filt" id="mobFilt" role="group" aria-label="Filter mobs">
+              <button type="button" data-grp="" aria-pressed="true">All<b class="mt-fc" data-n=""></b></button><button type="button" data-grp="hostile" aria-pressed="false">Hostile<b class="mt-fc" data-n="hostile"></b></button><button type="button" data-grp="boss" aria-pressed="false">Bosses<b class="mt-fc" data-n="boss"></b></button><button type="button" data-grp="animal" aria-pressed="false">Animals<b class="mt-fc" data-n="animal"></b></button><button type="button" data-grp="water" aria-pressed="false">Water<b class="mt-fc" data-n="water"></b></button><button type="button" data-grp="other" aria-pressed="false">Other<b class="mt-fc" data-n="other"></b></button>
+            </div>
+            <label class="mt-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="mobFind" type="search" placeholder="Search mobs" autocomplete="off" spellcheck="false" aria-label="Search mobs"></label>
+          </div>
+          <div class="mt-mobs" id="mobList"><p class="mt-empty">Loading the mob list…</p></div>
+          <p class="mt-vh" id="mobListStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+        </dialog>
+
+        <!-- Item picker (Oct 19): "More" in the Gear tab. Every item in the game (mc-item-ids.json) for the armor
+             and hand slots -- a mob can wear glass or hold dirt. Search narrows it, picking one fills the slot and
+             closes it. The foot names the item under the pointer, like the creative inventory's tooltip. -->
+        <dialog class="mt-box mt-dlg mt-idlg" id="mtItemDlg" aria-labelledby="mtItemDlgH">
+          <div class="mt-dlg-head">
+            <h2 class="mt-dlg-h" id="mtItemDlgH">Any item: <span id="mtItemSlot">Main hand</span></h2>
+            <button type="button" class="mt-x mt-dlg-x" id="mtItemClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </div>
+          <div class="mt-dlg-tools mt-idlg-tools">
+            <label class="mt-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="itemFind" type="search" placeholder="Search items and blocks" autocomplete="off" spellcheck="false" aria-label="Search items and blocks" aria-describedby="itemHint"></label>
+            <p class="mt-hint" id="itemHint"></p>
+          </div>
+          <div class="mt-iall" id="itemList" role="group" aria-label="Items"></div>
+          <div class="mt-idlg-foot">
+            <span class="mt-idlg-name" id="itemName" aria-hidden="true"></span>
+            <span class="mt-idlg-n" id="itemCount" role="status" aria-live="polite"></span>
+          </div>
+        </dialog>
+
+        <!-- Editor dialog (Oct 19): a stack of frames (mc-mob.js pushFrame). A mob frame (rider, mount, a spawn egg's
+             mob) moves the settings tabs (.mt-set) and the preview (.mt-prev) in here and points the page at that mob;
+             an item frame (a slot inside storage) moves just the item editor (#mobItemEd). Back pops one frame,
+             Done / Esc closes them all and moves everything back. -->
+        <dialog class="mt-box mt-dlg mt-rdlg" id="mtRiderDlg" aria-labelledby="mtRiderH">
+          <div class="mt-dlg-head mt-rdlg-head">
+            <button type="button" class="mt-x mt-rdlg-back" id="mtRiderBack" aria-label="Back" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+            <span class="mt-well"><img id="mtRiderEgg" src="/minecrafticons/eggs/zombie.png" alt="" width="28" height="28"></span>
+            <div class="mt-rdlg-who">
+              <h2 class="mt-dlg-h" id="mtRiderH">Rider</h2>
+              <p class="mt-rdlg-k" id="mtRiderK"></p>
+            </div>
+            <button type="button" class="mt-btn" id="mtRiderChange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span>Change mob</span></button>
+            <button type="button" class="mt-x mt-dlg-x" id="mtRiderClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </div>
+          <div class="mt-rdlg-body" id="mtRiderBody"></div>
+          <div class="mt-rdlg-foot">
+            <p class="mt-hint">Every change goes straight into the command.</p>
+            <button type="button" class="mt-btn mt-btn--go" id="mtRiderDone">Done</button>
+          </div>
+        </dialog>
       </div>
-
-
-
-
-
       </div>
 
       <footer class="pf-footer">
@@ -394,8 +595,8 @@
     <div class="more-sheet-scroll">
       <div class="more-sheet-top">
         <div class="more-sheet-handle"></div>
-        <div class="more-sheet-header">
-        <div class="more-sheet-title">Minecraft</div>
+        <div class="more-sheet-header mx-hdr">
+        <span class="mx-hdr-ico"><img src="/minecrafticons/minecraft-block-logo.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Minecraft Pages</span><span class="mx-hdr-count" data-role="more-count"></span></span>
         <div class="more-sheet-close" onclick="closeMoreMenu()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </div>
@@ -419,11 +620,16 @@
 
 </div>
 
-<script src="/11layout.js?v=20261010a"></script>
+<script src="/11layout.js?v=20261021tb1"></script>
 
-<script src="/mc-java.js?v=20261013pd"></script>
-<script src="/mc-mob.js?v=20261014n11" defer></script>
-<script src="/mc-home.js?v=20261014nd" defer></script>
+<script src="/mc-java.js?v=20261021eyb"></script>
+<script src="/mc-items.js?v=20261018a" defer></script>
+<script src="/mc-mob3d.js?v=20261019v16" defer></script>
+<script src="/mc-font.js?v=20261013n9" defer></script>
+<script src="/mc-dyes.js?v=20261013t5" defer></script>
+<script src="/mc-firework.js?v=20261019a" defer></script>
+<script src="/mc-mob.js?v=20261019v20" defer></script>
+<script src="/mc-home.js?v=20261018tr" defer></script>
 <!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
 <div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
   <div class="vt-modal-panel" onclick="event.stopPropagation()">

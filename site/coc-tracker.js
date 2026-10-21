@@ -437,10 +437,11 @@
     );
   }
 
-  // One labelled row of numbers ("All time: 238 XP level | 2,071 war stars
-  // ..."). The profile header has two (all time, this season); the Builder
-  // Base tab has one. dt comes first for screen readers; CSS shows the
-  // number above its label.
+  // One labelled tray of numbers ("All time: 238 XP level | 2,071 war stars
+  // ..."): the group's name in a column on the left, then one even cell per
+  // number. The profile header has two (all time, this season), the clan
+  // header three; the Builder Base tab has one. dt comes first for screen
+  // readers; CSS shows the number above its label.
   function facts(title, rows) {
     return (
       '<div class="pt-facts"><span class="pt-facts-h">' +
@@ -832,10 +833,10 @@
       radio('clan', 'Clan') +
       '</div><label class="pt-sr" for="ptQuick">Search another ' +
       what +
-      '</label><svg class="pt-quick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>' +
+      '</label><div class="pt-quick-field"><svg class="pt-quick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>' +
       '<input id="ptQuick" type="text" autocomplete="off" spellcheck="false" placeholder="" aria-controls="ptQuickPanel" />' +
       '<button type="submit" class="pt-quick-go" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg></button>' +
-      '</form><div class="pt-quick-panel" id="ptQuickPanel" hidden><p class="pt-quick-head"></p><ul class="pt-quick-list" aria-live="polite"></ul></div></div>'
+      '</div></form><div class="pt-quick-panel" id="ptQuickPanel" hidden><p class="pt-quick-head"></p><ul class="pt-quick-list" aria-live="polite"></ul></div></div>'
     );
   }
 
@@ -2359,10 +2360,10 @@
           full ? ['Drawn', num(c.warTies)] : null,
           full ? ['Lost', num(c.warLosses)] : null,
           ['Win streak', num(c.warWinStreak)],
-          ['Wars', WAR_FREQ[c.warFrequency] || 'Not set'],
+          ['War frequency', WAR_FREQ[c.warFrequency] || 'Not set'],
         ].filter(Boolean),
       ) +
-      facts('To join', [
+      facts('Requirements', [
         ['Town Hall', c.requiredTownhallLevel ? c.requiredTownhallLevel + '<i>+</i>' : 'Any'],
         ['Trophies', num(c.requiredTrophies)],
         ['Builder trophies', num(c.requiredBuilderBaseTrophies)],

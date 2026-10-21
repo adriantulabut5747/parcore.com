@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Hardcore Guide: How to Survive the Early Game | Parchrome</title>
+<meta name="description" content="How to survive the start of a Minecraft hardcore world on Java and Bedrock: the first night, food, iron, a safe base, and why your first iron ingot belongs in a shield.">
+<link rel="canonical" href="https://parchrome.netlify.app/articles/minecraft/first-hardcore-world">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Sora:wght@400;500;600;650;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261021qs">
+<link rel="stylesheet" href="/article-cards.css?v=20261021as">
+<link rel="stylesheet" href="/articles.css?v=20261021fx">
+</head>
+<!-- Articles section, Minecraft. Shell copied from articles/coc/hammer-jam.html;
+     nav comes from game-nav.json "articles-minecraft", cards/feed from articles.json.
+     Item icons are the game's own 16px textures (pulled from the 26.3 jar), drawn
+     pixel-sharp by .ap-pixel in articles.css. -->
+<body data-game-nav="articles-minecraft">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar: breadcrumb + search, no page strip (data-hub-nav="off").
+     There is no /articles/minecraft/ hub yet, so "Minecraft" opens the filtered feed. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left has-crumbs">
+    <img src="/icons/articles.svg" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content"><a href="/articles/">Articles</a><span class="sc-sep" aria-hidden="true">›</span><a href="/articles/?game=minecraft">Minecraft</a><span class="sc-sep" aria-hidden="true">›</span><span aria-current="page">Hardcore</span></div>
+    <nav class="stb-crumbs" aria-label="Breadcrumb"><a href="/articles/">Articles</a><span class="stb-crumb-sep" aria-hidden="true">›</span><a href="/articles/?game=minecraft">Minecraft</a><span class="stb-crumb-sep" aria-hidden="true">›</span><span class="stb-crumb-name" aria-current="page">First Hardcore World</span></nav>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Article pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+  <!-- Phones: table of contents dropdown (article-cards.js fills it from
+       #apToc and keeps the scroll-spy highlight in sync). -->
+  <button type="button" class="ap-toc-btn" id="apTocBtn" aria-expanded="false" aria-controls="apTocMenu" aria-label="Table of contents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>
+  </button>
+  <div class="ap-toc-menu" id="apTocMenu" hidden></div>
+</div>
+
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+
+<article class="ap ap-pixel">
+  <div class="ap-banner">
+    <img src="/minecrafticons/articles/first-hardcore-world/banner.webp" width="1920" height="1080" alt="Block what kills first: a Minecraft shield glowing beside the headline" decoding="async" fetchpriority="high">
+    <span class="ap-tag">Guide</span>
+  </div>
+  <header class="ap-header">
+    <div class="ap-author">
+      <img class="ap-avatar" src="/icons/parcore-avatar.webp" alt="Parcore" width="96" height="96" decoding="async">
+      <dl>
+        <dt>Written by</dt><dd>Parcore</dd>
+        <dt>Published</dt><dd><time datetime="2026-10">Oct 2026</time></dd>
+      </dl>
+    </div>
+    <div class="ap-heading">
+      <h1>Minecraft Hardcore: Surviving the Early Game in Your First World</h1>
+      <p class="ap-dek">One life. Spend it well.</p>
+      <p class="ap-read">8 min read · Updated for 2026</p>
+    </div>
+  </header>
+
+  <details class="ap-toc" id="apToc">
+    <summary>Table of contents</summary>
+    <div class="ap-toc-label">Table of contents</div>
+    <ol>
+      <li><a href="#hardcore">What Changes in Hardcore?</a></li>
+      <li><a href="#before">Before You Press Create</a></li>
+      <li><a href="#first-night">Milestone 1: Survive the First Night</a></li>
+      <li><a href="#food">Milestone 2: Food That Won't Run Out</a></li>
+      <li><a href="#iron">Milestone 3: Stone, Then Iron</a></li>
+      <li><a href="#shield">Milestone 4: Shield Before Armor</a></li>
+      <li><a href="#base">Milestone 5: A Base Mobs Can't Reach</a></li>
+      <li><a href="#full-iron">Milestone 6: Full Iron</a></li>
+      <li><a href="#mistakes">Stop Dying Like This</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </details>
+
+  <div class="ap-body">
+    <h2 id="hardcore">What Changes in Hardcore?</h2>
+    <p>Hardcore worlds rarely end at the Ender Dragon. They end on day two, in a dark cave, at half a heart, because of one fight that never needed to happen.</p>
+    <p>Hardcore is survival with one life. The difficulty is locked to Hard and can't be changed. When you die, the world is over for you. This guide covers the part that kills the most worlds: the start, from the first tree to a full set of iron. It works on Java and Bedrock, and every place where the two play differently is pointed out.</p>
+    <p>Hard difficulty changes three things that matter right away:</p>
+    <ul>
+      <li><strong>Mobs hit harder.</strong> A creeper blast at close range can take most of your health, even in armor.</li>
+      <li><strong>Hunger can kill you.</strong> On Hard, an empty hunger bar keeps hurting you until you die.</li>
+      <li><strong>Zombies break wooden doors.</strong> A wooden door is not a safe door on Hard.</li>
+    </ul>
+
+    <h2 id="before">Before You Press Create</h2>
+    <p>Your seed decides how hard the first hour is. Pick one that starts you near a village and open, flat land. A village gives you beds, food, a few chests and shelter on the first night. The <a class="ap-tool" href="/minecraft/java/seeds"><img src="/minecrafticons/articles/first-hardcore-world/wheat_seeds.png" alt="" loading="lazy">seeds page</a> lists starting points worth using.</p>
+    <p>Turn on coordinates before you start. On Bedrock, switch on <strong>Show Coordinates</strong> in the world settings. On Java, they are on the F3 screen. Write down your spawn point and your base as soon as you have one. Getting lost at night is how many hardcore worlds end.</p>
+    <div class="art-next" data-article="best-seeds-26" data-label="Read next"></div>
+
+    <h2 id="first-night">Milestone 1: Survive the First Night</h2>
+    <p>The first night has one goal: be safe before dark. A day lasts about 10 minutes, so use them in this order:</p>
+    <ol>
+      <li><strong>Wood.</strong> Collect at least 20 logs. Make a crafting table and a wooden pickaxe.</li>
+      <li><strong>Stone tools.</strong> Mine a few stone blocks right away and make a stone pickaxe, sword and axe. Wooden tools are only there to get you stone.</li>
+      <li><strong>Three wool for a bed.</strong> Three sheep give you a bed. A bed lets you skip the night, and sleeping is the safest thing you can do in hardcore.</li>
+      <li><strong>Food on the way.</strong> Kill any cows, pigs or sheep you pass. You will cook them later.</li>
+    </ol>
+    <div class="ap-chips"><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/stone_pickaxe.png" alt="" width="36" height="36" loading="lazy" decoding="async">Stone Pickaxe</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/stone_sword.png" alt="" width="36" height="36" loading="lazy" decoding="async">Stone Sword</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/white_wool.png" alt="" width="36" height="36" loading="lazy" decoding="async">3 Wool</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/cooked_beef.png" alt="" width="36" height="36" loading="lazy" decoding="async">Meat</span></div>
+    <p>No sheep by sunset? Dig three blocks into a hillside and close the hole behind you. Spend the night mining stone inside. Don't stand in the open, and don't explore in the dark. Nothing you find at night is worth the risk.</p>
+    <!-- SHOT: a small shelter dug into a hillside at night: a bed, a crafting table, a torch on the wall, the entrance sealed with a block. -->
+    <figure class="ap-fig"><img src="/minecrafticons/articles/first-hardcore-world/placeholder.webp" width="1600" height="900" alt="A small shelter dug into a hillside with a bed, a crafting table and a torch" loading="lazy" decoding="async"><figcaption>Three blocks into a hill, a bed and a torch. That is a safe first night.</figcaption></figure>
+    <p>Sleep every night after that too. Sleeping skips the dark, and skipping it for three nights in a row brings Phantoms, which attack from the sky.</p>
+
+    <h2 id="food">Milestone 2: Food That Won't Run Out</h2>
+    <p>Health only comes back while your hunger bar is nearly full. Keep it full, and you heal between fights by yourself. Let it drop, and every hit stays with you.</p>
+    <ul>
+      <li><strong>Cook everything.</strong> Cooked meat fills you up far more than raw meat. Build a furnace on day one and burn coal or charcoal.</li>
+      <li><strong>Start a wheat farm.</strong> Break grass for seeds, till the dirt next to water and plant them. Three wheat make one bread.</li>
+      <li><strong>Pen two cows.</strong> Feed them wheat to breed more. A small herd is steak and leather you never have to hunt for again.</li>
+      <li><strong>Carry at least 16 cooked food</strong> every time you leave your base.</li>
+    </ul>
+    <div class="ap-chips"><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/cooked_beef.png" alt="" width="36" height="36" loading="lazy" decoding="async">Steak</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/bread.png" alt="" width="36" height="36" loading="lazy" decoding="async">Bread</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/wheat.png" alt="" width="36" height="36" loading="lazy" decoding="async">Wheat</span></div>
+    <!-- SHOT: a small wheat farm beside a fenced pen with a few cows, daytime, base in the background. -->
+    <figure class="ap-fig"><img src="/minecrafticons/articles/first-hardcore-world/placeholder.webp" width="1600" height="900" alt="A small wheat farm next to a fenced cow pen" loading="lazy" decoding="async"><figcaption>Wheat feeds the cows, and the cows feed you.</figcaption></figure>
+    <p>Skip rotten flesh, raw chicken and spider eyes. They can poison you or make you hungry faster, and you can't afford either in hardcore.</p>
+
+    <h2 id="iron">Milestone 3: Stone, Then Iron</h2>
+    <p>Iron is the turning point of the early game. Everything that keeps you alive from here on costs iron.</p>
+    <ul>
+      <li><strong>Look before you dig.</strong> Iron often shows in cliff faces and at the mouths of caves. Mine what you can reach from the edge, in daylight.</li>
+      <li><strong>Then branch mine.</strong> Dig a staircase down to around Y 16, where iron is common. Dig one long tunnel two blocks high, then side tunnels every three blocks.</li>
+      <li><strong>Torches always on your right</strong> on the way in. On the way out, keep them on your left and you can't get lost.</li>
+      <li><strong>Mine coal as you go.</strong> You need it for torches and to smelt your iron.</li>
+    </ul>
+    <!-- SHOT: a branch mine tunnel, two blocks high, torches on the right wall, an iron ore vein visible in a side tunnel. -->
+    <figure class="ap-fig"><img src="/minecrafticons/articles/first-hardcore-world/placeholder.webp" width="1600" height="900" alt="A lit branch mine tunnel with iron ore in a side tunnel" loading="lazy" decoding="async"><figcaption>A branch mine: two blocks high, torches on the right, side tunnels every three blocks.</figcaption></figure>
+    <p>A branch mine is slower than caving, but you choose every block you break. In a cave, the cave chooses for you: skeletons in the dark, drops you can't see, creepers behind every corner. Caves come after the early game, with full iron and a shield.</p>
+
+    <h2 id="shield">Milestone 4: Shield Before Armor</h2>
+    <p>This is the real secret of the early game. Your first iron ingot is not for armor. It is for a shield.</p>
+    <p>Early on, the hits that end hardcore worlds come from creepers and skeletons. A raised shield blocks all damage from a creeper blast, an arrow or a melee hit coming from the front. Armor only reduces that damage. A shield costs one iron ingot and six planks. A full set of iron armor costs 24 ingots.</p>
+    <div class="ap-chips"><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/shield.png" alt="" width="36" height="36" loading="lazy" decoding="async">Shield</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/iron_ingot.png" alt="" width="36" height="36" loading="lazy" decoding="async">1 Iron Ingot</span></div>
+    <ul>
+      <li><strong>Hold it in your off-hand.</strong> On Java, press F to swap it there and hold right-click to raise it. On Bedrock, put it in the off-hand slot and crouch to raise it.</li>
+      <li><strong>Creeper hissing? Shield up and face it.</strong> The blast hits the shield instead of you.</li>
+      <li><strong>Skeletons:</strong> raise the shield and walk straight at them. Lower it only to hit.</li>
+    </ul>
+    <!-- SHOT: first person, shield raised, a creeper exploding right in front of the player with full health showing in the hotbar. -->
+    <figure class="ap-fig"><img src="/minecrafticons/articles/first-hardcore-world/placeholder.webp" width="1600" height="900" alt="A creeper exploding against a raised shield, the player's health still full" loading="lazy" decoding="async"><figcaption>A creeper blast against a raised shield. Full health afterwards.</figcaption></figure>
+    <div class="ap-note">
+      <b>Know its limits</b>
+      <p>A shield only covers the front. An axe hit knocks it down for a few seconds, and Vindicators carry axes, so walk away from them. It does nothing against falls, lava or hunger.</p>
+    </div>
+
+    <h2 id="base">Milestone 5: A Base Mobs Can't Reach</h2>
+    <p>A base in hardcore has one job: nothing gets in while you sleep. It doesn't need to look good yet.</p>
+    <ul>
+      <li><strong>No wooden doors.</strong> Zombies break them on Hard. Use a fence gate, or an iron door with a button.</li>
+      <li><strong>Light everything.</strong> Mobs spawn in the dark, so light the inside and the ground around your base.</li>
+      <li><strong>Put a lip on the walls.</strong> Spiders climb straight up. One row of blocks sticking out at the top stops them.</li>
+      <li><strong>Keep the bed inside.</strong> You can't sleep with monsters nearby, and you don't want to step outside to try.</li>
+    </ul>
+    <div class="ap-chips"><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/iron_door.png" alt="" width="36" height="36" loading="lazy" decoding="async">Iron Door</span><span class="ap-chip"><img src="/minecrafticons/articles/first-hardcore-world/torch.png" alt="" width="36" height="36" loading="lazy" decoding="async">Torches</span></div>
+    <!-- SHOT: the base entrance at dusk: a fence gate or iron door, torches around the outside, the wall lip visible at the top. -->
+    <figure class="ap-fig"><img src="/minecrafticons/articles/first-hardcore-world/placeholder.webp" width="1600" height="900" alt="A base entrance with a fence gate, torches outside and a wall lip at the top" loading="lazy" decoding="async"><figcaption>A fence gate, torches all around and a lip on the wall.</figcaption></figure>
+
+    <h2 id="full-iron">Milestone 6: Full Iron</h2>
+    <p>Full iron is where the early game ends. Spend your iron in this order: the cheapest thing that saves your life first, the most expensive armor piece last.</p>
+    <div class="ap-viz" role="img" aria-label="Spend your first 33 iron ingots in this order: shield, 1 ingot; bucket, 3; iron pickaxe, 3; chestplate, 8; leggings, 7; boots, 4; helmet, 5; sword, 2.">
+      <div class="ap-viz-title">Your first <em>33 iron ingots</em></div>
+      <p class="ap-viz-sub">Spend them in this order</p>
+      <ol class="ap-steps">
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/shield.png" alt="" loading="lazy" decoding="async"></div><b>Shield</b><span>1 ingot · blocks blasts and arrows</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/water_bucket.png" alt="" loading="lazy" decoding="async"></div><b>Bucket</b><span>3 ingots · water for lava and fire</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/iron_pickaxe.png" alt="" loading="lazy" decoding="async"></div><b>Pickaxe</b><span>3 ingots · mines gold and diamonds</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/iron_chestplate.png" alt="" loading="lazy" decoding="async"></div><b>Chestplate</b><span>8 ingots · the most protection</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/iron_leggings.png" alt="" loading="lazy" decoding="async"></div><b>Leggings</b><span>7 ingots</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/iron_boots.png" alt="" loading="lazy" decoding="async"></div><b>Boots</b><span>4 ingots</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/iron_helmet.png" alt="" loading="lazy" decoding="async"></div><b>Helmet</b><span>5 ingots</span></li>
+        <li><div class="ap-steps-pics"><img src="/minecrafticons/articles/first-hardcore-world/iron_sword.png" alt="" loading="lazy" decoding="async"></div><b>Sword</b><span>2 ingots · stone is one point weaker</span></li>
+      </ol>
+    </div>
+    <p>The bucket comes second because a water bucket turns lava into stone and puts out fire. The armor order follows protection per ingot: the chestplate gives the most for its cost, and the helmet gives the least. The iron sword comes last because a stone sword is only one damage point weaker.</p>
+    <div class="ap-note">
+      <b>Cheat sheet: you are out of the early game when you have</b>
+      <p>Full iron armor · a shield · an iron pickaxe · a water bucket · 16 or more cooked food · a bed · a lit base with a fence gate or iron door · your coordinates written down.</p>
+    </div>
+    <!-- SHOT: the inventory screen with the full early-game kit: iron armor on, shield in the off-hand, iron pickaxe, water bucket, a stack of cooked food, torches. -->
+    <figure class="ap-fig"><img src="/minecrafticons/articles/first-hardcore-world/placeholder.webp" width="1600" height="900" alt="Inventory with full iron armor, a shield in the off-hand, an iron pickaxe, a water bucket and cooked food" loading="lazy" decoding="async"><figcaption>The full early-game kit. Everything after this is a new phase.</figcaption></figure>
+    <p>Next come caving, an enchanting table and the Nether. When you build your first portal, the <a class="ap-tool" href="/minecraft/tools/coordinates"><img src="/minecrafticons/articles/first-hardcore-world/compass.png" alt="" loading="lazy">Nether coordinate calculator</a> tells you where it comes out.</p>
+
+    <h2 id="mistakes">Stop Dying Like This</h2>
+    <ul>
+      <li><strong>Digging straight down.</strong> You can drop into a cave, a mob or a lava lake. Dig down in a staircase so you can always see the block you step onto.</li>
+      <li><strong>Mining the block above your head.</strong> Gravel and sand fall, and they can suffocate you. Look at the ceiling before you break into it.</li>
+      <li><strong>Breaking into lava.</strong> If you hear popping or see an orange glow, stop. Carry a water bucket from the moment you have three spare iron.</li>
+      <li><strong>Fighting at night.</strong> Nothing you get at night is worth your one life. Sleep, or wait it out inside.</li>
+      <li><strong>Looking at Endermen.</strong> Eye contact makes them attack, and they hit hard. If one is angry, stand under a roof two blocks high. It can't fit under it.</li>
+      <li><strong>Sprinting near ledges.</strong> Fall damage is the quietest way to lose a hardcore world. Walk near cliffs and ravines, and never jump down more than a few blocks.</li>
+      <li><strong>Walking in with low food.</strong> An empty hunger bar stops your healing. Eat before every trip, not during the fight.</li>
+    </ul>
+
+    <h2 id="faq">FAQ</h2>
+    <h3>What should you do first in Minecraft hardcore?</h3>
+    <p>Get wood, make stone tools and find three sheep for a bed before the first night. After that, cook your food, mine iron and craft a shield with your first iron ingot.</p>
+    <h3>How do you survive the first night in Minecraft hardcore?</h3>
+    <p>Sleep through it in a bed. If you have no bed, dig into a hillside, seal the entrance and mine stone inside until morning.</p>
+    <h3>What happens when you die in Minecraft hardcore?</h3>
+    <p>The world is over for you. You can look around it in spectator mode, but you can't play in it again.</p>
+
+    <div class="ap-summary" id="summary">
+      <b>Summary</b>
+      <ul>
+        <li>Hardcore locks the world to Hard: mobs hit harder, hunger can kill you and zombies break wooden doors.</li>
+        <li>Pick a seed near a village and turn on coordinates before you start.</li>
+        <li>First night: wood, stone tools and three wool for a bed. Sleep every night after that.</li>
+        <li>Keep your hunger bar full, cook everything and carry at least 16 cooked food.</li>
+        <li>Branch mine for iron around Y 16. Caves come after full iron.</li>
+        <li><strong>The secret:</strong> your first iron ingot goes into a shield. It blocks creeper blasts and arrows from the front, which armor only reduces.</li>
+        <li>Iron order: shield → bucket → pickaxe → chestplate → leggings → boots → helmet → sword. 33 ingots in all.</li>
+        <li>Base: a fence gate or iron door, light everywhere, a lip on the walls.</li>
+      </ul>
+    </div>
+    <p>One life, one iron ingot. Spend the ingot on a shield.</p>
+  </div>
+
+  <aside class="ap-more">
+    <h2>More for Minecraft</h2>
+    <div class="ap-more-list">
+      <a href="/minecraft/java/hcpc"><img src="/minecrafticons/articles/first-hardcore-world/hardcore-heart.png" alt="" loading="lazy">A 3,000-day hardcore world<span>Walk through a world that never died.</span></a>
+      <a href="/minecraft/java/seeds"><img src="/minecrafticons/articles/first-hardcore-world/wheat_seeds.png" alt="" loading="lazy">Seeds<span>Start your next world somewhere worth it.</span></a>
+      <a href="/minecraft/tools/coordinates"><img src="/minecrafticons/articles/first-hardcore-world/compass.png" alt="" loading="lazy">Nether coordinate calculator<span>Line up your portals between worlds.</span></a>
+    </div>
+  </aside>
+</article>
+<script>
+  // Contents: always open on desktop (a sticky column there), a collapsible
+  // box on phones.
+  if (matchMedia('(min-width: 971px)').matches) document.getElementById('apToc').open = true;
+</script>
+
+
+<footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+</div>  </div>
+
+<!-- No bottom nav or More sheet on article pages (Adrian, Oct 2026). -->
+<script src="/11layout.js?v=20261021tb1"></script>
+<script src="/article-cards.js?v=20261021as" defer></script>
+</body>
+</html>

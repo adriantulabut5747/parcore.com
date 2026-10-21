@@ -66,16 +66,78 @@
     el.hidden = false;
   }
 
+  // Region picker (Oct 21 2026): a native select's open list can't be
+  // styled (it showed the OS's white list with a blue row), so on screen
+  // it's the army maker's drop-down -- the raised .am-th key and its
+  // .am-pop menu (coc-armymaker.css). The select stays, hidden, as the
+  // state: picking an option sets it and fires its change event. Returns
+  // sync(), which redraws the key after the select's value is set in code.
+  function regionPicker(sel) {
+    var wrap = document.createElement('div');
+    wrap.className = 'am-ths st-region';
+    wrap.innerHTML =
+      '<button type="button" class="am-th" aria-haspopup="listbox" aria-expanded="false" aria-controls="stRegionMenu"><span></span>' +
+      '<svg class="am-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>' +
+      '<div class="am-pop am-th-menu" id="stRegionMenu" role="listbox" aria-label="Region" hidden>' +
+      [...sel.options]
+        .map((o) => '<button type="button" role="option" class="am-th-opt" data-v="' + o.value + '"><span>' + o.textContent + '</span></button>')
+        .join('') +
+      '</div>';
+    sel.hidden = true;
+    sel.after(wrap);
+    var btn = wrap.firstChild;
+    var menu = wrap.lastChild;
+    var opts = [...menu.children];
+    function show(open) {
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', open);
+      if (open) menu.querySelector('.is-on').focus({ preventScroll: true });
+    }
+    btn.addEventListener('click', () => show(menu.hidden));
+    menu.addEventListener('click', (e) => {
+      var b = e.target.closest('.am-th-opt');
+      if (!b) return;
+      show(false);
+      btn.focus();
+      if (b.dataset.v === sel.value) return;
+      sel.value = b.dataset.v;
+      sel.dispatchEvent(new Event('change'));
+    });
+    document.addEventListener('click', (e) => !wrap.contains(e.target) && show(false));
+    wrap.addEventListener('keydown', (e) => {
+      if (menu.hidden) return;
+      if (e.key === 'Escape') {
+        show(false);
+        btn.focus();
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        var i = opts.indexOf(document.activeElement) + (e.key === 'ArrowDown' ? 1 : -1);
+        opts[(i + opts.length) % opts.length].focus();
+      }
+    });
+    return function sync() {
+      var name = sel.selectedOptions[0].textContent;
+      btn.firstChild.textContent = name;
+      btn.setAttribute('aria-label', 'Region: ' + name + ', change region');
+      opts.forEach((b) => {
+        b.classList.toggle('is-on', b.dataset.v === sel.value);
+        b.setAttribute('aria-selected', b.dataset.v === sel.value);
+      });
+    };
+  }
+
   function leaderboards(data) {
     var tabsEl = $('#stTabs');
     var list = $('#stList');
     var more = $('#stMore');
     var regionEl = $('#stRegion');
+    var syncRegion = regionPicker(regionEl);
     var tabs, tab, shown;
 
     function setRegion(region) {
       tabs = REGIONS[region];
       regionEl.value = region;
+      syncRegion();
       // One board (World) needs no tabs.
       tabsEl.hidden = tabs.length < 2;
       tabsEl.innerHTML = tabs

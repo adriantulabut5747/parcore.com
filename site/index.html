@@ -32,7 +32,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/11layout.css?v=20261012cr">
+<link rel="stylesheet" href="/11layout.css?v=20261021qs">
+<link rel="stylesheet" href="/article-cards.css?v=20261021as">
 
 <!-- ============================================================
      HOME PAGE STYLES (one block, Oct 2026 rebuild)
@@ -109,15 +110,9 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   text-transform: uppercase;
   color: var(--hm-text);
 }
-/* Section title box: same look as the CoC home's .layouts-title-box
-   ("Featured Townhalls"): gradient Orbitron title, grey subtitle, a full-width
-   hairline and a short glowing red stub on its left end. */
+/* Section title box: gradient Orbitron title over a grey subtitle. No rule
+   under it (the hairline + red stub were dropped, Adrian, Oct 21 2026). */
 .hm-head { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 12px 0; margin-bottom: 24px; }
-.hm-head::before {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
-  background: rgba(255, 255, 255, 0.12);
-}
-.hm-head::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2.5px; background: #c23b3b; box-shadow: 0 0 8px rgba(194, 59, 59, 0.7); }
 .hm-head .hm-title {
   margin: 0; font: 900 clamp(15px, 2vw, 26px)/1.15 'Orbitron', sans-serif; letter-spacing: 1px;
   background: linear-gradient(90deg, #ffffff, #c0c9d4); -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -125,7 +120,6 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .hm-head-sub { margin: 0; font: 400 12px/1.5 'Sora', sans-serif; letter-spacing: 0.2px; color: #7a7d82; }
 @media (max-width: 970px) {
   .hm-head { margin-bottom: 18px; }
-  .hm-head::after { width: 40px; }
   .hm-head-sub { font-size: 11px; }
 }
 .hm-lede { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--hm-muted); max-width: 60ch; }
@@ -133,7 +127,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 /* Buttons */
 .hm-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; border-radius: 0; cursor: pointer;
+  padding: 12px 20px; border-radius: var(--lb-r); cursor: pointer;
   font: 600 14px/1 'Sora', sans-serif; color: #fff; text-decoration: none; white-space: nowrap;
   background: linear-gradient(180deg, #b0343d 0%, #8a2730 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -144,8 +138,8 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .hm-btn:active { transform: translateY(0); }
 .hm-btn[disabled] { opacity: 0.6; cursor: progress; transform: none; }
 .hm-btn svg { width: 16px; height: 16px; }
-.hm-btn-ghost { background: rgba(255, 255, 255, 0.06); border-color: var(--hm-line-2); box-shadow: none; }
-.hm-btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+.hm-btn-ghost { border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-raise); box-shadow: var(--lb-btn); color: #e6e8ec; transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease; }
+.hm-btn-ghost:hover { border-color: var(--lb-edge); background: var(--lb-raise-hover); color: #fff; }
 .hm-btn-sm { padding: 9px 14px; font-size: 13px; }
 
 /* ============================================================
@@ -207,7 +201,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   background-clip: text; -webkit-background-clip: text; color: transparent;
 }
 .hero-title-beta {
-  flex: none; margin-bottom: 8px; padding: 5px 8px 4px; border-radius: 0;
+  flex: none; margin-bottom: 8px; padding: 5px 8px 4px; border-radius: var(--lb-r);
   font: 800 clamp(10px, 0.8vw, 12px)/1 'Sora', sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
   color: #ff5874; background: rgba(222, 16, 56, 0.12); border: 1px solid rgba(222, 16, 56, 0.55);
 }
@@ -244,18 +238,20 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 /* ---- Hero search bar ---- */
 .hero-searchbar-wrap {
   display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 20px;
-  background: #131315; border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 0;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 32px rgba(0, 0, 0, 0.5);
+  background: #131315;
   max-width: 440px; width: 100%; position: relative;
   transition: border-color 0.2s ease, box-shadow 0.25s ease;
   scroll-margin-top: 57px; /* 52px fixed top bar + 5px gap when scrollIntoView runs */
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .hero-searchbar-wrap { cursor: pointer; }
-.hero-searchbar-wrap:hover { border-color: rgba(255, 255, 255, 0.16); }
 .hero-searchbar { cursor: pointer; pointer-events: none; }
 .hero-searchbar-wrap:focus-within {
-  border-color: rgba(194, 59, 59, 0.75);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 14px 34px rgba(0, 0, 0, 0.55), 0 0 0 3px rgba(194, 59, 59, 0.18);
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
 }
 .hero-searchbar {
   background: transparent; border: none; outline: none; color: #fff; caret-color: var(--hm-red);
@@ -263,30 +259,32 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 }
 .hero-searchbar::placeholder { color: rgba(255, 255, 255, 0.5); }
 .hero-searchbar-btn {
-  flex-shrink: 0; width: 40px; height: 40px; border-radius: 0; cursor: pointer;
-  background: var(--hm-accent-deep); border: 1px solid rgba(255, 255, 255, 0.06); color: #fff;
+  flex-shrink: 0; width: 40px; height: 40px;cursor: pointer;
+
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s ease, transform 0.15s ease;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
 }
-.hero-searchbar-btn:hover { background: #a80f2d; }
+.hero-searchbar-btn:hover { border-color: var(--lb-red-edge); background: var(--lb-red-hover); }
 .hero-searchbar-btn:active { transform: scale(0.94); }
 .hero-searchbar-btn svg { width: 17px; height: 17px; }
 @media (max-width: 970px) {
   /* same width as the cards below (page gutter to gutter), a touch shorter */
-  .hero-searchbar-wrap { max-width: 100%; width: 100%; margin: 0 auto; padding: 5px 5px 5px 16px; border-radius: 0; }
+  .hero-searchbar-wrap { max-width: 100%; width: 100%; margin: 0 auto; padding: 5px 5px 5px 16px;}
   .hero-searchbar { font-size: 14.5px; }
-  .hero-searchbar-btn { width: 36px; height: 36px; border-radius: 0; }
+  .hero-searchbar-btn { width: 36px; height: 36px;}
 }
 
 /* Featured Games "show more" button only -- the search overlay's "Loading more..."
    sentinel shares the class and keeps its plain-text look from 11layout.css. */
-#ggMore {
-  display: block; margin: 32px auto 0; padding: 10px 28px; cursor: pointer;
-  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 0;
-  color: #c8cbcd; font: 600 14px 'Sora', sans-serif; letter-spacing: 0.5px;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-#ggMore:hover { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.24); }
+/* Layout only: the grey key look comes from .hero-search-viewmore (an id
+   rule here used to beat it and left the button flat and square). */
+#ggMore { display: block; margin: 32px auto 0; padding: 11px 28px; cursor: pointer; font: 600 14px 'Sora', sans-serif; letter-spacing: 0.3px; }
+#ggMore:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
 
 /* ============================================================
    JUMP TO A GAME: the old Popular Topics section's look (smoke at the
@@ -314,8 +312,8 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
     var(--hm-grain),
     url("/icons/smoke-epek.webp") bottom center / 100% auto no-repeat,
     linear-gradient(180deg, #181818 0%, #0f0d0d 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  border-bottom: 2px solid var(--lb-edge);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .hm-jump::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -329,7 +327,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
    reduced motion. */
 .hm-jump > .hm-embers { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .hm-ember {
-  position: absolute; bottom: 0; width: var(--s); height: var(--s); border-radius: 0; opacity: 0;
+  position: absolute; bottom: 0; width: var(--s); height: var(--s); border-radius: var(--lb-r); opacity: 0;
   background: #ffb066; box-shadow: 0 0 6px 1px rgba(255, 110, 40, 0.7);
   animation: hmEmber var(--d) linear var(--w) infinite;
 }
@@ -348,17 +346,17 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .hm-pt { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; list-style: none; }
 .hm-pt-card { display: block; text-decoration: none; color: inherit; }
 .hm-pt-dots { display: none; }
-.hm-pt-img { position: relative; aspect-ratio: 2 / 1; border-radius: 0; overflow: hidden; background: #1a1a1a; }
+.hm-pt-img { position: relative; aspect-ratio: 2 / 1; border-radius: var(--lb-r); overflow: hidden; background: #1a1a1a; }
 .hm-pt-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.88) contrast(1.05); transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.3s ease; }
 .hm-pt-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.75) 100%); pointer-events: none; }
 .hm-pt-card:hover .hm-pt-img img { transform: scale(1.07); filter: brightness(1.05) contrast(1.05); }
 .hm-pt-tag {
-  position: absolute; top: 10px; left: 10px; z-index: 2; padding: 5px 10px; border-radius: 0;
+  position: absolute; top: 10px; left: 10px; z-index: 2; padding: 5px 10px; border-radius: var(--lb-r);
   font: 800 10px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #fff;
   background: linear-gradient(90deg, #2b0707, #5f0808);
 }
 .hm-pt-badge {
-  position: absolute; left: 10px; bottom: 10px; z-index: 2; width: 38px; height: 38px; border-radius: 0; overflow: hidden;
+  position: absolute; left: 10px; bottom: 10px; z-index: 2; width: 38px; height: 38px; border-radius: var(--lb-r); overflow: hidden;
   background: #161616; border: 2px solid rgba(255, 255, 255, 0.15); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
@@ -380,7 +378,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   .hm-pt::-webkit-scrollbar { display: none; }
   .hm-pt > li { flex: 0 0 86%; min-width: 0; scroll-snap-align: start; }
   .hm-pt-dots { display: flex; justify-content: center; gap: 8px; }
-  .hm-pt-dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 0; background: rgba(255, 255, 255, 0.25); cursor: pointer; transition: background 0.2s ease; }
+  .hm-pt-dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: var(--lb-r); background: rgba(255, 255, 255, 0.25); cursor: pointer; transition: background 0.2s ease; }
   .hm-pt-dot.is-on { background: var(--hm-accent); }
   .hm-pt-badge { width: 34px; height: 34px; left: 10px; bottom: 10px; }
   .hm-pt-tag { top: 8px; left: 8px; padding: 4px 7px; font-size: 9px; }
@@ -406,24 +404,39 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
    FEATURED TOPICS: one group per section, compact text tiles with the
    page's art faded in behind them (game.guide style).
    ============================================================ */
-.hm-ft { padding: 64px var(--hm-gut) 72px; background: var(--hm-grain), var(--hm-bg-deep); border-top: 1px solid var(--hm-line); }
+/* Raised band: box fill, dark edges, a light line inside the top, a drop
+   onto the next section (z-index keeps it over that neighbour). */
+.hm-ft {
+  position: relative; z-index: 1; padding: 64px var(--hm-gut) 72px;
+  background: var(--hm-grain), var(--lb-box);
+  border-bottom: 2px solid var(--lb-edge); /* top edge = Latest Guides' bottom edge */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 14px 28px -14px rgba(0, 0, 0, 0.9);
+}
 /* groups are spaced well apart so each reads as its own block */
 .ft-group { margin-top: 28px; }
 .ft-group + .ft-group { margin-top: 40px; }
 .ft-group h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 700 17px/1.2 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff; }
 .ft-group h3 a { color: inherit; text-decoration: none; }
-.ft-logo { flex: none; width: 24px; height: 24px; border-radius: 0; object-fit: cover; }
+.ft-logo { flex: none; width: 24px; height: 24px; border-radius: var(--lb-r); object-fit: cover; }
 .ft-group h3 a:hover { color: #ff5874; }
 .ft-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; list-style: none; }
 /* The tile itself (.ft-tile, .ft-art, .ft-name, .ft-sub, .ft-soon) lives in
    11layout.css: the top-bar search results use the same tile. */
 /* "+N more": the last visible slot of a long group (16th on desktop, 10th on
    phones) opens the rest; same tile, dashed edge so it reads as an action */
-.ft-tile.ft-more { width: 100%; border: 0; cursor: pointer; font: inherit; text-align: left; background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
-.ft-tile.ft-more::before { display: none; }
-.ft-tile.ft-more:hover { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
+/* "Show N more": a quiet text row under the grid, not a tile -- it isn't
+   the focal point (Adrian, Oct 21 2026). Grey text + chevron; brightens on hover. */
+.ft-more-li { grid-column: 1 / -1; display: flex; justify-content: center; }
+.ft-more {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 6px 10px;
+  border: 0; border-radius: var(--lb-r); background: none; cursor: pointer;
+  font: 500 12.5px/1 'Sora', sans-serif; color: var(--hm-dim); transition: color 0.15s ease, background-color 0.15s ease;
+}
+.ft-more svg { width: 14px; height: 14px; transition: transform 0.2s var(--lb-ease); }
+.ft-more:hover { color: #e6e8ec; background: rgba(255, 255, 255, 0.04); }
+.ft-more:hover svg { transform: translateY(2px); }
 .ft-more:focus-visible { outline: 2px solid var(--hm-red); outline-offset: 2px; }
-.ft-ph { min-height: 56px; border-radius: 0; background: linear-gradient(90deg, #18181b 25%, #222226 50%, #18181b 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+.ft-ph { min-height: 56px; border-radius: var(--lb-r); background: linear-gradient(90deg, #18181b 25%, #222226 50%, #18181b 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
 @media (max-width: 970px) {
   .hm-ft { padding: 44px var(--hm-gut) 48px; }
   .ft-group { margin-top: 22px; }
@@ -431,10 +444,6 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   .ft-group h3 { font-size: 15.5px; margin-bottom: 12px; }
   .ft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   /* phones: "+N more" gets its own full-width row under the 5 rows of tiles */
-  .ft-more-li { grid-column: 1 / -1; }
-  .ft-tile.ft-more { min-height: 34px; padding: 0 12px; align-items: center; background: none; }
-  .ft-more .ft-name { font-size: 12.5px; font-weight: 600; color: #c8cbcd; }
-  .ft-more .ft-sub { display: none; }
 }
 
 /* ============================================================
@@ -450,33 +459,33 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 }
 .hm-laptop { position: absolute; left: 11%; top: 13%; width: 82%; }
 .hm-laptop-lid {
-  position: relative; padding: 2.2% 2.2% 3%; border-radius: 0;
+  position: relative; padding: 2.2% 2.2% 3%; border-radius: var(--lb-r);
   background: #161618; border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 40px 60px -30px rgba(0, 0, 0, 0.95);
 }
-.hm-laptop-lid::before { content: ""; position: absolute; top: 0.9%; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 0; background: #2c2c30; }
-.hm-laptop-screen { aspect-ratio: 16 / 10; overflow: hidden; border-radius: 0; background: #0c0c0d; }
+.hm-laptop-lid::before { content: ""; position: absolute; top: 0.9%; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: var(--lb-r); background: #2c2c30; }
+.hm-laptop-screen { aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--lb-r); background: #0c0c0d; }
 .hm-laptop-screen img, .hm-phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 .hm-laptop-base {
   position: relative; width: 116%; margin-left: -8%; height: 16px;
   background: linear-gradient(180deg, #e4e6ea 0%, #b9bcc3 45%, #8b8f97 100%);
-  border-radius: 0;
+  border-radius: var(--lb-r);
   box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.9);
 }
-.hm-laptop-base::before { content: ""; position: absolute; top: 0; left: 50%; width: 16%; height: 6px; margin-left: -8%; border-radius: 0; background: #9a9ea6; }
+.hm-laptop-base::before { content: ""; position: absolute; top: 0; left: 50%; width: 16%; height: 6px; margin-left: -8%; border-radius: var(--lb-r); background: #9a9ea6; }
 .hm-phone {
   position: absolute; right: 0; bottom: 2%; width: 21%; aspect-ratio: 9 / 19.5;
-  padding: 2.2%; border-radius: 0; background: #161618; border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2.2%; border-radius: var(--lb-r); background: #161618; border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: -24px 30px 50px -20px rgba(0, 0, 0, 0.95);
 }
-.hm-phone img { border-radius: 0; }
+.hm-phone img { border-radius: var(--lb-r); }
 .hm-about-title { font: 700 clamp(26px, 2.7vw, 40px)/1.12 'Sora', sans-serif; letter-spacing: -0.025em; color: #fff; text-wrap: balance; }
 .hm-about-copy p { margin-top: 16px; font-size: 15.5px; line-height: 1.7; color: #c3c5ca; max-width: 58ch; }
 .hm-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 .hm-about-points { list-style: none; margin-top: 18px; display: grid; gap: 12px; max-width: 58ch; }
 .hm-about-points li { position: relative; padding-left: 28px; font-size: 15px; line-height: 1.6; color: #c3c5ca; }
 .hm-about-points li::before {
-  content: ""; position: absolute; left: 0; top: 0.32em; width: 17px; height: 17px; border-radius: 0;
+  content: ""; position: absolute; left: 0; top: 0.32em; width: 17px; height: 17px; border-radius: var(--lb-r);
   background: rgba(222, 16, 56, 0.16) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff5874' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 11px no-repeat;
 }
 .hm-about-points b { color: #fff; font-weight: 600; }
@@ -494,14 +503,20 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 /* Why players use Parchrome: heading on the left, the four promises as a
    ruled 2x2 list on the right (hairlines, small inline icons, no tiles). */
 .hm-perks {
-  margin-top: 80px; padding-top: 44px; border-top: 1px solid var(--hm-line);
+  margin-top: 28px; padding: clamp(24px, 3vw, 40px);
   display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 2fr); gap: clamp(28px, 4vw, 72px); align-items: start;
+}
+.hm-perks {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .hm-perks-head { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
 .hm-perks-head h3 { font: 800 clamp(18px, 1.8vw, 24px)/1.25 'Orbitron', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; color: var(--hm-text); }
 .hm-perks-list { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 56px); }
-.hm-perks-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 14px; padding: 24px 0; border-top: 1px solid var(--hm-line); }
-.hm-perks-list li:nth-child(-n+2) { padding-top: 0; border-top: 0; }
+.hm-perks-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 14px; padding: 24px 0; border-top: 1px solid var(--lb-edge); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+.hm-perks-list li:nth-child(-n+2) { padding-top: 0; border-top: 0; box-shadow: none; }
 .hm-perk-icon { grid-row: span 2; width: 22px; height: 22px; margin-top: 1px; color: var(--hm-accent); }
 .hm-perk-icon svg { width: 22px; height: 22px; display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .hm-perks-list h4 { font: 700 17px/1.3 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff; }
@@ -511,13 +526,13 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   .hm-about-grid { grid-template-columns: 1fr; gap: 28px; }
   .hm-about-copy p, .hm-about-points li { font-size: 14px; }
   .hm-actions .hm-btn { flex: 1 1 auto; }
-  .hm-phone { border-radius: 0; }
-  .hm-phone img { border-radius: 0; }
+  .hm-phone { border-radius: var(--lb-r); }
+  .hm-phone img { border-radius: var(--lb-r); }
   .hm-laptop-base { height: 10px; }
-  .hm-perks { grid-template-columns: 1fr; gap: 24px; margin-top: 48px; padding-top: 32px; }
+  .hm-perks { grid-template-columns: 1fr; gap: 20px; margin-top: 16px; padding: 22px 18px; }
   .hm-perks-list { grid-template-columns: 1fr; }
   .hm-perks-list li { padding: 18px 0; }
-  .hm-perks-list li:nth-child(2) { padding-top: 18px; border-top: 1px solid var(--hm-line); }
+  .hm-perks-list li:nth-child(2) { padding-top: 18px; border-top: 1px solid var(--lb-edge); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
   .hm-perks-list h4 { font-size: 15.5px; }
   .hm-perks-list p { font-size: 13.5px; }
 }
@@ -525,42 +540,57 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 /* ============================================================
    FEEDBACK + FAQ
    ============================================================ */
-.hm-help { background: var(--hm-grain), var(--hm-bg); padding: 72px var(--hm-gut) 80px; border-top: 1px solid var(--hm-line); }
+.hm-help { background: var(--hm-grain), var(--hm-bg); padding: 72px var(--hm-gut) 80px; border-top: 2px solid var(--lb-edge); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
 .hm-help-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 4vw, 64px); align-items: start; }
-.hm-fb-box { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 0; background: var(--hm-panel); border: 1px solid var(--hm-line); }
-.hm-seg { display: flex; gap: 4px; padding: 4px; border: 0; border-radius: 0; background: #0c0c0d; }
+.hm-fb-box { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; padding: 18px;background: var(--hm-panel);}
+.hm-fb-box {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.hm-seg { display: flex; gap: 4px; padding: 4px; border: 0; border-radius: var(--lb-r); background: #0c0c0d; }
 .hm-seg label { flex: 1; position: relative; }
 .hm-seg input, .hm-stars input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
-.hm-seg span { display: block; padding: 10px 6px; border-radius: 0; text-align: center; font: 600 13px/1.2 'Sora', sans-serif; color: var(--hm-muted); transition: background 0.2s ease, color 0.2s ease; }
+.hm-seg span { display: block; padding: 10px 6px; border-radius: var(--lb-r); text-align: center; font: 600 13px/1.2 'Sora', sans-serif; color: var(--hm-muted); transition: background 0.2s ease, color 0.2s ease; }
 .hm-seg input:checked + span { background: #26262a; color: #fff; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset; }
 .hm-seg input:focus-visible + span, .hm-stars input:focus-visible + svg { outline: 2px solid var(--hm-red); outline-offset: 2px; }
 .hm-stars { display: flex; gap: 4px; border: 0; }
 .hm-stars[hidden] { display: none; }
 .hm-stars label { position: relative; width: 36px; height: 36px; display: grid; place-items: center; }
-.hm-stars svg { width: 28px; height: 28px; fill: #33343a; transition: fill 0.15s ease, transform 0.2s var(--hm-ease); border-radius: 0; }
+.hm-stars svg { width: 28px; height: 28px; fill: #33343a; transition: fill 0.15s ease, transform 0.2s var(--hm-ease); border-radius: var(--lb-r); }
 .hm-stars label.is-on svg { fill: #f2b01e; }
 .hm-stars label:hover svg { transform: scale(1.1); }
 .hm-field {
-  width: 100%; padding: 12px 14px; border-radius: 0; border: 1px solid var(--hm-line-2);
+  width: 100%; padding: 12px 14px;
   background: #0c0c0d; color: #fff; caret-color: var(--hm-red);
   font: 400 14px/1.5 'Sora', sans-serif; transition: border-color 0.2s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .hm-field::placeholder { color: #8a8c93; }
-.hm-field:focus { outline: none; border-color: rgba(224, 48, 47, 0.7); }
+.hm-field:focus { outline: none; border-color: #000; box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text); }
 textarea.hm-field { min-height: 116px; resize: vertical; }
 .hm-fb-row { display: flex; gap: 10px; }
 .hm-fb-row .hm-field { flex: 1; min-width: 0; }
 
 .hm-faq-list { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
-.hm-q { border-radius: 0; background: var(--hm-panel); border: 1px solid var(--hm-line); transition: border-color 0.2s ease; }
-.hm-q[open] { border-color: rgba(224, 48, 47, 0.32); }
+.hm-q {background: var(--hm-panel);transition: border-color 0.2s ease; }
 .hm-q summary {
   list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 16px 18px; font: 600 14.5px/1.4 'Sora', sans-serif; color: #eceef0; border-radius: 0;
+  padding: 16px 18px; font: 600 14.5px/1.4 'Sora', sans-serif; color: #eceef0; border-radius: var(--lb-r);
 }
 .hm-q summary::-webkit-details-marker { display: none; }
 .hm-q summary svg { width: 18px; height: 18px; flex: none; color: #8a8c93; transition: transform 0.35s var(--hm-ease), color 0.2s ease; }
 .hm-q[open] summary svg { transform: rotate(180deg); color: var(--hm-red-soft); }
+.hm-q {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
 .hm-q::details-content { block-size: 0; overflow: hidden; transition: block-size 0.35s var(--hm-ease), content-visibility 0.35s allow-discrete; }
 .hm-q[open]::details-content { block-size: auto; }
 .hm-a { padding: 0 18px 18px; font-size: 14px; line-height: 1.7; color: #b9bbc1; }
@@ -576,20 +606,188 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 
 /* ---- Modal (native <dialog>) for the feedback form's messages ---- */
 .hm-modal {
-  margin: auto; width: min(360px, 88vw); padding: 26px 22px 20px; border-radius: 0; text-align: center;
+  margin: auto; width: min(360px, 88vw); padding: 26px 22px 20px; border-radius: var(--lb-r); text-align: center;
   background: #151517; color: #fff; border: 1px solid var(--hm-line-2);
   box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9);
 }
 .hm-modal::backdrop { background: rgba(0, 0, 0, 0.62); }
-.hm-modal-icon { width: 46px; height: 46px; margin: 0 auto 14px; border-radius: 0; display: grid; place-items: center; background: rgba(224, 48, 47, 0.15); color: var(--hm-red-soft); }
+.hm-modal-icon { width: 46px; height: 46px; margin: 0 auto 14px; border-radius: var(--lb-r); display: grid; place-items: center; background: rgba(224, 48, 47, 0.15); color: var(--hm-red-soft); }
 .hm-modal-icon.is-success { background: rgba(52, 168, 96, 0.16); color: #57d68d; }
 .hm-modal-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .hm-modal p { font-size: 14.5px; line-height: 1.55; color: #d7d8db; }
 .hm-modal form { margin-top: 18px; }
 .hm-modal .hm-btn { width: 100%; }
+.hm-btn:not(.hm-btn-ghost):hover {
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red-hover);
+}
+.hm-btn:not(.hm-btn-ghost) {
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+}
+
+/* ============================================================
+   RAISED PASS (Oct 21 2026): every piece below wears one of the three
+   recipes from 11layout.css (box / key / well, --lb-* tokens). Corners
+   are var(--lb-r) unless a piece is tiny (4px) or a dot (round). The hero
+   search bar is the model: a well with a red key inside.
+   ============================================================ */
+/* tiny chips and dots */
+.hero-title-beta, .hm-pt-tag, .gg-pill { border-radius: 4px; }
+.hm-ember, .hm-laptop-lid::before { border-radius: 50%; }
+.hm-pt-dot { border-radius: 999px; transition: background 0.2s ease, width 0.25s var(--hm-ease); }
+.hm-pt-dot.is-on { width: 20px; }
+.ft-logo, .gg-icon { border-radius: 5px; }
+.gg-meta::before { border-radius: 2px; }
+.pf-to-top-ring { border-radius: var(--lb-r); } /* shared footer: rounded here only */
+
+/* Recently Added: each card is a box; the art sits inside with a 4px inset */
+.hm-pt-card {
+  height: 100%; padding: 4px;
+  border: 2px solid var(--lb-edge); border-radius: calc(var(--lb-r) + 4px);
+  background: var(--lb-box); box-shadow: var(--lb-shadow);
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.hm-pt-card:hover { transform: translateY(-3px); background: var(--lb-box-hover); box-shadow: var(--lb-shadow-hover); }
+.hm-pt-img { border-radius: var(--lb-r); }
+.hm-pt-info { padding: 10px 8px 8px; }
+.hm-pt-tag { background: var(--lb-red); box-shadow: var(--lb-btn-red); border: 1px solid var(--lb-red-edge); }
+.hm-pt-badge { border-radius: 7px; border: 2px solid var(--lb-edge); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 10px rgba(0, 0, 0, 0.5); }
+.hm-pt-card:hover .hm-pt-badge { border-color: var(--lb-edge); }
+@media (max-width: 970px) {
+  .hm-pt-info { left: 4px; right: 4px; bottom: 4px; padding: 0 12px 10px 54px; }
+  .hm-pt-img::after { border-radius: var(--lb-r); }
+  .hm-pt-dots { margin-top: 2px; }
+}
+
+/* Featured Games: the "Coming soon" pill is a small well */
+.gg-pill { background: rgba(10, 11, 13, 0.82); border: 1px solid var(--lb-edge); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.gg-ph, .ft-ph { border: 2px solid var(--lb-edge); }
+
+/* Featured Topics: the band is raised, each group a well sunk into it
+   (the /coc/ articles band's recipe), its tiles the raised grey keys */
+.ft-group {
+  padding: 18px 20px 20px;
+  border: 2px solid var(--lb-edge); border-radius: var(--lb-r);
+  background: #0f1014; box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.ft-group + .ft-group { margin-top: 16px; }
+.ft-group h3 { justify-content: space-between; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--lb-edge); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05); }
+.ft-group h3 .ft-h-name { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ft-count {
+  flex: none; padding: 5px 10px; border-radius: 999px;
+  font: 600 11.5px/1 'Sora', sans-serif; color: var(--hm-muted);
+  border: 1px solid var(--lb-edge); background: var(--lb-box); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+/* two groups side by side when both are short (CODM/Genshin/Tekken/Valorant) */
+@media (min-width: 1200px) {
+  #ftGroups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  #ftGroups > .ft-group { margin: 0; }
+  #ftGroups > .ft-wide { grid-column: 1 / -1; }
+  #ftGroups > :not(.ft-wide) .ft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 970px) {
+  .ft-group { padding: 14px 12px 12px; }
+  .ft-group + .ft-group { margin-top: 12px; }
+  .ft-group h3 { padding-bottom: 12px; margin-bottom: 12px; }
+}
+
+/* Numbers band: four wells inside one box, filled from the site's JSON */
+.hm-stats {
+  margin-top: 72px; padding: 8px; list-style: none;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+  border: 2px solid var(--lb-edge); border-radius: calc(var(--lb-r) + 4px);
+  background: var(--lb-box); box-shadow: var(--lb-shadow);
+}
+.hm-stat {
+  display: flex; flex-direction: column; gap: 6px; padding: 18px 20px;
+  border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well);
+}
+.hm-stat b { font: 800 clamp(24px, 2.4vw, 34px)/1 'Orbitron', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.hm-stat span { font: 500 13px/1.35 'Sora', sans-serif; color: var(--hm-muted); }
+.hm-stat a { color: inherit; text-decoration: none; }
+.hm-stat a:hover { color: #fff; }
+@media (max-width: 970px) {
+  .hm-stats { margin-top: 44px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hm-stat { padding: 14px; }
+  .hm-stat span { font-size: 12px; }
+}
+
+/* About mockup: rounded devices */
+.hm-laptop-lid { border-radius: 12px 12px 4px 4px; border: 2px solid var(--lb-edge); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 40px 60px -30px rgba(0, 0, 0, 0.95); }
+.hm-laptop-screen { border-radius: 4px; }
+.hm-laptop-base { border-radius: 2px 2px 14px 14px; }
+.hm-laptop-base::before { border-radius: 0 0 6px 6px; }
+.hm-phone { border-radius: 18px; border: 2px solid var(--lb-edge); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), -24px 30px 50px -20px rgba(0, 0, 0, 0.95); }
+.hm-phone img { border-radius: 11px; }
+.hm-about-points li::before { border-radius: 5px; }
+
+/* Perks: the icon sits in a small well */
+.hm-perks-list li { grid-template-columns: 40px minmax(0, 1fr); }
+.hm-perk-icon {
+  width: 40px; height: 40px; margin-top: 0; display: grid; place-items: center;
+  border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well);
+}
+.hm-perk-icon svg { width: 19px; height: 19px; }
+.hm-perks-list h4 { padding-top: 2px; }
+.hm-perks-list li:nth-last-child(-n+2) { padding-bottom: 0; }
+.hm-perks-head p { font-size: 14px; line-height: 1.6; color: var(--hm-muted); max-width: 32ch; }
+@media (max-width: 970px) {
+  .hm-perks-list li:nth-last-child(2) { padding-bottom: 18px; }
+}
+
+/* Latest guides: the /coc/ "Clash guides." band -- a sunken band (dark
+   edges, dark lip inside the top, light line under the bottom), slides
+   with the progress line + red arrows under them (article-cards.css). */
+.hm-latest {
+  position: relative; z-index: 2; padding: 56px var(--hm-gut) 52px; --art-side: 0px;
+  background: var(--hm-grain), #0f1014;
+  border-top: 2px solid var(--lb-edge); border-bottom: 2px solid var(--lb-edge);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.hm-latest-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.hm-latest-head .hm-head { margin-bottom: 0; padding: 0; min-width: 0; }
+.hm-latest .art-track { padding-top: 4px; }
+.hm-latest .art-pager { margin-top: 16px; }
+@media (max-width: 970px) {
+  .hm-latest { padding: 40px var(--hm-gut) 36px; }
+  .hm-latest-head { margin-bottom: 14px; }
+  .hm-latest .art-track { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; }
+}
+
+/* Feedback: the type switch is a well, the picked type a light key */
+.hm-seg { padding: 4px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
+.hm-seg span { border: 2px solid transparent; border-radius: 5px; }
+.hm-seg label:hover input:not(:checked) + span { color: #fff; }
+/* picked = the dark grey key (Adrian: no white buttons here, Oct 21 2026) */
+.hm-seg input:checked + span { border-color: var(--lb-edge); background: var(--lb-raise); color: #fff; box-shadow: var(--lb-btn); }
+/* the three types always share one line ("Report a bug" used to wrap on phones) */
+.hm-seg span { white-space: nowrap; }
+@media (max-width: 970px) {
+  .hm-seg { gap: 2px; padding: 3px; }
+  .hm-seg span { padding: 9px 2px; font-size: clamp(11px, 3.2vw, 13px); }
+}
+.hm-stars { padding: 6px 8px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); align-self: flex-start; }
+.hm-stars svg { border-radius: 0; }
+.hm-fb-box { padding: 20px; }
+@media (max-width: 970px) { .hm-fb-box { padding: 14px; } }
+
+/* FAQ: lifts on hover, open one reads as pressed in */
+.hm-q { transition: background-color 0.2s ease, box-shadow 0.2s ease; }
+.hm-q:hover { background-color: var(--lb-box-hover); box-shadow: var(--lb-shadow-hover); }
+.hm-q[open] { background-color: var(--lb-box-hover); }
+.hm-q summary { border-radius: var(--lb-r); }
+
+/* Modal: a box */
+.hm-modal { border: 2px solid var(--lb-edge); background: var(--lb-box); box-shadow: var(--lb-shadow), 0 30px 60px -20px rgba(0, 0, 0, 0.9); }
+.hm-modal-icon { border-radius: 50%; }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-content > * { animation: none; }
+  .hm-pt-card, .hm-q { transition: none; }
   .hm-anim .hm-shape, .hm-anim .hm-laptop, .hm-anim .hm-phone { transition: none; }
   .hm-live:has(.is-live) .hm-live-dot { animation: none; }
   .ft-ph { animation: none; }
@@ -770,9 +968,12 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   </section>
 
   <style>
+  /* Raised band (box fill + a light line inside the top). The edge above
+     it is the smoke section's bottom edge, the one below is Latest Guides'. */
   .gg-section {
-    padding: 56px 10% 48px;
-    background: var(--hm-grain), #0f0f10;
+    padding: 56px 10% 56px;
+    background: var(--hm-grain), var(--lb-box);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
   }
   .gg-grid {
     display: grid;
@@ -787,13 +988,10 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     position: relative;
     display: block;
     aspect-ratio: 20 / 29; /* playzip's 1 : 1.45 */
-    border-radius: 0;
-    overflow: hidden;
     isolation: isolate;
     background: #18181b;
     color: #fff;
     text-decoration: none;
-    box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.8);
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .gg-card[hidden] { display: none; }
@@ -832,7 +1030,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     flex: none;
     width: 26px;
     height: 26px;
-    border-radius: 0;
+    border-radius: var(--lb-r);
     object-fit: cover;
     background: #222226;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 4px 10px rgba(0, 0, 0, 0.45);
@@ -845,7 +1043,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     width: 28px;
     height: 2px;
     margin-bottom: 9px;
-    border-radius: 0;
+    border-radius: var(--lb-r);
     background: #e0302f;
     transform: scaleX(0);
     transform-origin: left;
@@ -871,7 +1069,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 
   a.gg-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 22px 36px -16px rgba(0, 0, 0, 0.9);
   }
   a.gg-card:hover .gg-art { transform: scale(1.05); }
   a.gg-card:hover .gg-meta::before,
@@ -879,6 +1076,26 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   a.gg-card:focus-visible {
     outline: 2px solid #e0302f;
     outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    a.gg-card:hover {
+      transform: translateY(-3px);
+    }
+  }
+  a.gg-card:hover {
+    border-color: var(--lb-edge);
+    background-color: var(--lb-box-hover);
+    box-shadow: var(--lb-shadow-hover);
+  }
+  a.gg-card {
+    transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+  .gg-card {
+    border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
+    background-color: var(--lb-box);
+    box-shadow: var(--lb-shadow);
+    overflow: hidden;
   }
 
   /* Coming soon: not a link, art in greyscale, pill in the corner. */
@@ -892,7 +1109,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     left: 12px;
     z-index: 2;
     padding: 5px 9px;
-    border-radius: 0;
+    border-radius: var(--lb-r);
     background: rgba(9, 9, 10, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.14);
     font: 700 10px/1 'Sora', sans-serif;
@@ -903,6 +1120,19 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 
   .gg-ph { background: linear-gradient(90deg, #18181b 25%, #222226 50%, #18181b 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
   .gg-ph::after { display: none; }
+  .hero-search-viewmore:hover {
+    border-color: var(--lb-edge);
+    background: var(--lb-raise-hover);
+    color: #fff;
+  }
+  .hero-search-viewmore {
+    border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-btn);
+    color: #e6e8ec;
+    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  }
 
   @media (max-width: 970px) {
     .gg-section { padding: 56px 5% 36px; }
@@ -910,7 +1140,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     .gg-meta { padding: 0 10px 11px; }
     .gg-meta::before { margin-bottom: 7px; }
     .gg-row { gap: 7px; }
-    .gg-icon { width: 24px; height: 24px; border-radius: 0; }
+    .gg-icon { width: 24px; height: 24px; border-radius: var(--lb-r); }
     .gg-name { font-size: 12.5px; }
     .gg-sub { font-size: 10px; margin-top: 2px; }
     .gg-pill { top: 9px; left: 9px; font-size: 9px; padding: 4px 7px; }
@@ -923,6 +1153,26 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     .gg-ph { animation: none; }
   }
   </style>
+
+  <!-- ---- LATEST ARTICLES: every live article, built by article-cards.js from
+       /articles.json, in that file's order (data-order="json") (same cards as /coc/ and /articles/). Publishing an
+       article there puts it here too. ---- -->
+  <section class="hm-latest" id="latest" aria-labelledby="latestTitle">
+    <div class="hm-in">
+      <div class="hm-latest-head">
+        <div class="hm-head"><h2 class="hm-title" id="latestTitle">Latest Articles</h2></div>
+        <a class="art-all" href="/articles/">All articles<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="art-track" id="hmArticles" data-game="all" data-live data-variant="slide" data-order="json"></div>
+      <div class="art-pager">
+        <div class="art-progress" data-for="hmArticles" aria-hidden="true"><span></span></div>
+        <div class="art-nav" data-for="hmArticles">
+          <button type="button" aria-label="Previous article"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <button type="button" aria-label="Next article"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ---- FEATURED TOPICS: one group of compact tiles per section (Web
        Resources, then the games in sidebar order). Built from home.json
@@ -975,9 +1225,20 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     </div>
 
     <div class="hm-in">
+      <!-- Numbers band: real counts only, read from the JSON the site already
+           runs on (sidebar.json, home.json groups, articles.json,
+           hwr-websites.json) by the page script. "–" until loaded. -->
+      <ul class="hm-stats" id="hmStats" aria-label="Parchrome in numbers">
+        <li class="hm-stat"><b data-stat="games">–</b><span>games with guides</span></li>
+        <li class="hm-stat"><b data-stat="pages">–</b><span>guides and tools</span></li>
+        <li class="hm-stat"><b data-stat="sites">–</b><span><a href="/web-resources/">websites tested</a></span></li>
+        <li class="hm-stat"><b data-stat="articles">–</b><span><a href="/articles/">articles written</a></span></li>
+      </ul>
+
       <div class="hm-perks">
         <div class="hm-perks-head">
           <h3>Why players use Parchrome</h3>
+          <p>Four promises every page on the site is held to.</p>
           <a class="hm-btn hm-btn-sm hm-btn-ghost" href="#feedback">Request a guide</a>
         </div>
         <ul class="hm-perks-list">
@@ -1104,7 +1365,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 </div><!-- /.main -->
 
 <!-- Sidebar, top-bar search, scroll-to-top, pull-to-refresh: all shared, from 11layout.js. -->
-<script src="/11layout.js?v=20261010a"></script>
+<script src="/11layout.js?v=20261021tb1"></script>
 <script>
 /* ============================================================
    HOME PAGE SCRIPT (Oct 2026 rebuild). Needs 11layout.js first
@@ -1294,26 +1555,26 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
       return li;
     }
 
-    // Long groups show 4 rows on desktop (the 16th slot is a "+N more" tile)
-    // and 5 rows on phones (10 tiles, then "+N more" as a full-width row).
+    // Long groups show 4 full rows on desktop (16 tiles) and 5 on phones
+    // (10), then a quiet "Show N more" text row under the grid.
     const phone = window.matchMedia('(max-width: 970px)');
     const clamps = [];
     function clamp(grid) {
       const items = [...grid.children];
       const li = el('li', 'ft-more-li');
-      const btn = el('button', 'ft-tile ft-more');
+      const btn = el('button', 'ft-more');
       btn.type = 'button';
-      const name = el('span', 'ft-name');
-      btn.append(name, el('span', 'ft-sub', 'Show all'));
+      const name = el('span');
+      btn.append(name);
+      btn.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
       li.appendChild(btn);
       function lay() {
-        // desktop: the 16th slot becomes the button; phones: 10 tiles, then the button as its own row
-        const shown = phone.matches ? 10 : 15;
+        const shown = phone.matches ? 10 : 16;
         const extra = items.length - shown;
-        const on = phone.matches ? extra > 0 : extra > 1;
+        const on = extra > 0;
         items.forEach((x, i) => { x.hidden = on && i >= shown; });
         li.hidden = !on;
-        name.textContent = '+' + extra + ' more';
+        name.textContent = 'Show ' + extra + ' more';
         if (on) grid.insertBefore(li, items[shown] || null);
       }
       btn.addEventListener('click', () => {
@@ -1330,14 +1591,18 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     loadFeaturedGroups().then(all => all.map(g => {
       const tiles = g.tiles;
       if (!tiles.length) return null;
-      const wrap = el('div', 'ft-group');
+      // short groups (8 or fewer) pair up two to a row on wide screens
+      const wrap = el('div', tiles.length > 8 ? 'ft-group ft-wide' : 'ft-group');
       const h = el('h3');
-      if (g.icon) h.appendChild(img(g.icon, 'ft-logo', 24, 24));
+      const name = el('span', 'ft-h-name');
+      if (g.icon) name.appendChild(img(g.icon, 'ft-logo', 24, 24));
       if (g.link) {
         const a = el('a', null, g.title);
         a.href = g.link;
-        h.appendChild(a);
-      } else h.append(g.title);
+        name.appendChild(a);
+      } else name.append(g.title);
+      const live = tiles.filter(t => !t.soon).length;
+      h.append(name, el('span', 'ft-count', live < tiles.length ? live + ' live · ' + (tiles.length - live) + ' soon' : live + ' live'));
       const grid = el('ul', 'ft-grid');
       grid.setAttribute('aria-label', g.title);
       grid.append(...tiles.map(tile));
@@ -1350,6 +1615,21 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     }).catch(() => {
       host.replaceChildren(el('p', 'hm-lede', 'Featured topics did not load. Refresh the page to try again.'));
     });
+  })();
+
+  // ---------- NUMBERS BAND: real counts from the site's own JSON. The
+  // 150 KB websites list is only fetched once the band is near the screen.
+  (function () {
+    const band = document.getElementById('hmStats');
+    if (!band) return;
+    const set = (k, n) => { const b = band.querySelector('[data-stat="' + k + '"]'); if (b && n) b.textContent = n.toLocaleString('en-US'); };
+    loadSidebarData().then(d => set('games', (d.games || []).filter(e => e.card && !e.card.soon).length)).catch(() => {});
+    loadFeaturedGroups().then(all => set('pages', all.reduce((n, g) => n + g.tiles.filter(t => !t.soon).length, 0))).catch(() => {});
+    getJSON('/articles.json').then(d => set('articles', (d.articles || []).filter(a => a.status === 'live').length)).catch(() => {});
+    const sites = () => getJSON('/hwr-websites.json').then(d => set('sites', d.length)).catch(() => {});
+    if (!('IntersectionObserver' in window)) return sites();
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); sites(); } }, { rootMargin: '400px 0px' });
+    io.observe(band);
   })();
 
   // ---------- GAME GUIDES: one portrait card per sidebar.json entry with a
@@ -1548,6 +1828,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   })();
 })();
 </script>
+<script src="/article-cards.js?v=20261021as" defer></script>
 <!-- Firebase (feedback form only): deferred, so it never blocks the page. -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js" defer></script>

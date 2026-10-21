@@ -231,6 +231,9 @@ function toggleSidebar() {
   const burger = document.getElementById('hamburger');
   sidebar.classList.toggle('active');
   burger.classList.toggle('active');
+  const isOpen = sidebar.classList.contains('active');
+  burger.setAttribute('aria-expanded', String(isOpen));
+  burger.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
 
   // Mobile-only: darken the background and lock page scroll while the
   // sidebar is open. Desktop auto-opens the sidebar via this same
@@ -396,17 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Only strips that aren't self-managed (Minecraft fills its own with its
     // editions; it only lets this build its bottom bar).
     if (buildHubStrip) {
-      // Every hwr page's hub nav is now the same three-part structure:
-      // left arrow + #stbHubNavScroll strip + right arrow. Fill the strip,
-      // never the <nav> itself, or the arrows get wiped out with the old
-      // links (which is exactly what /web-resources/bookmarks used to have to
-      // patch around). The `|| stbHubNav` fallback keeps this working on
-      // any page that still ships the flat, arrow-less markup.
+      // Fill the #stbHubNavScroll strip inside the <nav>; the `|| stbHubNav`
+      // fallback covers a page that ships the nav without the strip.
       const hubStrip = stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav;
       hubStrip.innerHTML = items.map(item => itemHtml(item, 'stb-hub-link')).join('');
-      // Arrow visibility depends on scrollWidth, which isn't known until
-      // the links above actually exist — re-measure now that they do.
-      if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
 
       // Web Resources menu: hovering "Resources" lists the categories, and
       // hovering a category lists that page's sections (its table of
@@ -800,7 +796,10 @@ let searchModalHistoryState = false; // tracks whether we've pushed a history en
 
 function openSearch() {
   searchoverlay.style.display = 'block';
-  document.getElementById('search-btn').classList.add('active'); // morphs the icon into an ✖, same pattern as the hamburger menu
+  const searchBtn = document.getElementById('search-btn');
+  searchBtn.classList.add('active'); // morphs the icon into an ✖, same pattern as the hamburger menu
+  searchBtn.setAttribute('aria-expanded', 'true');
+  searchBtn.setAttribute('aria-label', 'Close search');
   document.body.classList.add('search-modal-open'); // prevents the page behind the modal from scrolling
   if (window.bnHideNav) window.bnHideNav();
   searchinput.focus();
@@ -821,7 +820,10 @@ function closeSearch(fromPopstate) {
   searchinput.value = '';
   resultsContainer.innerHTML = '';
   searchoverlay.style.display = 'none';
-  document.getElementById('search-btn').classList.remove('active');
+  const searchBtn = document.getElementById('search-btn');
+  searchBtn.classList.remove('active');
+  searchBtn.setAttribute('aria-expanded', 'false');
+  searchBtn.setAttribute('aria-label', 'Search');
   document.body.classList.remove('search-modal-open');
   if (window.bnResyncAfterModal) window.bnResyncAfterModal();
 
@@ -920,6 +922,78 @@ document.addEventListener('DOMContentLoaded', function () {
       b.removeAttribute('onclick');
       b.addEventListener('click', () => openSearch());
     });
+
+    // Desktop layout (11layout.css ONE DESKTOP BAR): title/breadcrumb on the
+    // left edge, menus in the centre, search + buttons on the right edge.
+    // Each half gives way on its own: the breadcrumb shortens by itself
+    // (CSS, capped at its half via --hub-w); the right half gets .stb-tight
+    // (search -> icon). If either half still overflows, .stb-icons shows the
+    // other menu links as icons only. The menus never scroll. Re-checked
+    // whenever the bar or anything in it changes size (menus and crumbs are
+    // filled in later).
+    const hub = bar.querySelector('.stb-hub-nav');
+    const left = bar.querySelector('.secondary-left');
+    // Right-side items: the bar's children minus the title and menus, looking
+    // inside display:contents wrappers (/coc/'s .stb-right holds the (i)).
+    const rightItems = () => Array.from(bar.children)
+      .flatMap(c => (getComputedStyle(c).display === 'contents' ? Array.from(c.children) : [c]))
+      .filter(c => c !== hub && c !== left && c.offsetWidth);
+    // --hub-w caps the title at its half; --act-w (the buttons beside the
+    // search, plus gaps) lets the search narrow to fit the right half.
+    const setHubWidth = () => {
+      const gap = parseFloat(getComputedStyle(bar).columnGap) || 0;
+      const act = rightItems().filter(c => !c.classList.contains('stb-search-wrap')).reduce((w, c) => w + c.offsetWidth + gap, 0);
+      bar.style.setProperty('--hub-w', (hub ? hub.offsetWidth : 0) + 'px');
+      bar.style.setProperty('--act-w', act + 'px');
+    };
+    // Left half overflows = a breadcrumb clipped even with its steps at their
+    // shortest, or a plain title cut short ("...").
+    const clipped = n => n.getClientRects().length && n.scrollWidth > n.clientWidth + 1;
+    const leftOverflows = () =>
+      (left && left.scrollWidth > left.clientWidth + 1) ||
+      Array.from(bar.querySelectorAll('.stb-crumbs, .secondary-left > .secondary-content:not(.has-crumbs)')).some(clipped);
+    // Right half overflows = a right-side item past the bar's padding or
+    // within 12px of the menus. (Rects, not scrollWidth, which would also
+    // count popovers inside the bar.)
+    const rightOverflows = () => {
+      const b = bar.getBoundingClientRect();
+      const edge = b.right - parseFloat(getComputedStyle(bar).paddingRight) + 1;
+      const h = hub && hub.offsetWidth ? hub.getBoundingClientRect() : null;
+      return rightItems().some(c => {
+        const r = c.getBoundingClientRect();
+        return r.right > edge || (h && r.left < h.right + 11);
+      });
+    };
+    // Steps, each only if the previous one wasn't enough:
+    // 1) .stb-tight  search -> icon (only when the right half overflows)
+    // 2) .stb-flow   the menus leave the centre and sit in the row (title |
+    //                menus | search), so neither half is capped at 50%
+    // 3) .stb-icons  the other menu links show only their icon
+    const overflowing = () => rightOverflows() || leftOverflows();
+    const fitBar = () => {
+      bar.classList.remove('stb-tight', 'stb-flow', 'stb-icons');
+      setHubWidth();
+      // A shortened crumb keeps ~4 letters + "..." (48px), or its own width
+      // if it's shorter than that -- a CSS min-width would pad "Tools" out.
+      bar.querySelectorAll('.stb-crumbs a:not([aria-current])').forEach(a => {
+        a.style.minWidth = '';
+        a.style.minWidth = Math.min(a.scrollWidth, 48) + 'px';
+      });
+      if (rightOverflows()) bar.classList.add('stb-tight');
+      if (!overflowing()) return;
+      bar.classList.add('stb-flow');
+      if (!overflowing()) return;
+      bar.classList.add('stb-icons');
+      setHubWidth();
+      bar.querySelectorAll('.stb-hub-link:not([title])').forEach(a => { a.title = a.textContent.trim(); });
+    };
+    if (window.ResizeObserver) {
+      // The menus are out of the row, so filling them resizes nothing else:
+      // watch them (and the title) directly, as well as the right side.
+      const ro = new ResizeObserver(fitBar);
+      [bar, hub, left, ...rightItems()].forEach(el => el && ro.observe(el));
+    }
+    fitBar();
   }
   resultsContainer = document.getElementById('search-results');
   searchinput = document.getElementById('search-input');
@@ -1214,10 +1288,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const topBar = document.querySelector('.top-bar');
   const secondaryBar = document.getElementById('secondary-top-bar');
   const cocMain = document.querySelector('.coc-main');
-  if(!topBar) return;
+  // TEST SWITCH (Oct 21 2026): false = the phone top bar stays put on scroll,
+  // on every page. Set back to true to bring the auto-hide back.
+  const TOP_BAR_AUTO_HIDE = false;
+  if(!topBar || !TOP_BAR_AUTO_HIDE) return;
 
   const DOWN_HIDE_THRESHOLD = 70; // px scrolled down before the bar hides
-  const UP_SHOW_THRESHOLD   = 55; // px scrolled up before the bar reappears
+  const UP_SHOW_THRESHOLD  = 55; // px scrolled up before the bar reappears
   const TOP_REVEAL_ZONE     = 40; // always shown within this many px of the top
 
   // Auto-hide is a mobile-only pattern (matches .bn-bar's own 970px
@@ -1557,116 +1634,6 @@ window.toggleMoreAcc = toggleMoreAcc;
     .catch(function(err) {
       console.error('Failed to load sidebar.json', err);
     });
-})();
-
-/* ============================================================
-   HORIZONTAL SCROLL ARROWS — SHARED
-   ============================================================
-   Moved here from hwr-js.js. Arrows appear only while there is something
-   to scroll to on that side and are display:none otherwise, so a strip
-   that fits gives back the gutter and the edge fade. A vertical wheel over
-   a strip scrolls it sideways rather than throwing the page. */
-function initHScrollArrows(scrollEl, leftBtn, rightBtn) {
-  if (!scrollEl || !leftBtn || !rightBtn) return null;
-
-  function updateArrows() {
-    var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
-    var hideLeft = scrollEl.scrollLeft <= 4;
-    var hideRight = scrollEl.scrollLeft >= maxScroll - 4 || maxScroll <= 0;
-    leftBtn.classList.toggle('is-hidden', hideLeft);
-    rightBtn.classList.toggle('is-hidden', hideRight);
-    // .is-hidden is display:none now, so a strip whose arrow just went
-    // away has to give back the gutter (and edge fade) it was holding
-    // open for it — otherwise the chips sit inset against nothing.
-    scrollEl.classList.toggle('no-arrow-left', hideLeft);
-    scrollEl.classList.toggle('no-arrow-right', hideRight);
-  }
-  leftBtn.addEventListener('click', function(e) {
-    e.stopPropagation(); // don't let this bubble to .secondary-top-bar's click→scrollToTop handler (11layout.js)
-    scrollEl.scrollBy({
-      left: -220,
-      behavior: 'smooth'
-    });
-  });
-  rightBtn.addEventListener('click', function(e) {
-    e.stopPropagation(); // don't let this bubble to .secondary-top-bar's click→scrollToTop handler (11layout.js)
-    scrollEl.scrollBy({
-      left: 220,
-      behavior: 'smooth'
-    });
-  });
-  // WHEEL -> HORIZONTAL. A vertical wheel over the strip scrolls it
-  // sideways instead of scrolling the page, so you never have to aim
-  // for the little arrows. The wheel is trapped for as long as the
-  // cursor is over the strip -- including at either end and when the
-  // strip doesn't overflow at all -- so a flick over the bar can't
-  // accidentally throw the page.
-  //
-  // deltaY drives it; a real horizontal wheel/trackpad gesture (deltaX)
-  // wins when it's the larger of the two. deltaMode is normalized
-  // because Firefox reports lines (1) or pages (2), not pixels (0).
-  // behavior:'auto' is explicit -- .dsn-categories-scroll sets
-  // scroll-behavior:smooth in CSS, which would otherwise ease every
-  // notch and make this lag behind the wheel instead of tracking it 1:1.
-  scrollEl.addEventListener('wheel', function(e) {
-    e.preventDefault();
-    var unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? scrollEl.clientWidth : 1;
-    var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    scrollEl.scrollBy({
-      left: delta * unit,
-      behavior: 'auto'
-    });
-  }, {
-    passive: false
-  });
-
-  scrollEl.addEventListener('scroll', updateArrows, {
-    passive: true
-  });
-  window.addEventListener('resize', updateArrows);
-  // Re-check whenever the strip's own content changes size, not just when
-  // the user scrolls or the window resizes. renderCategoryNav() (hwr-js.js)
-  // already calls updateArrows() right after it injects the chips, so this
-  // is redundant on a fast connection -- but on a slow one, or if a webfont
-  // swaps in and reflows the chip widths after that call already ran, the
-  // strip can end up overflowing with no arrow shown until the next scroll
-  // or resize event happens to fire updateArrows() again. A ResizeObserver
-  // catches that content-driven case directly, so the arrow is correct the
-  // moment it's actually needed instead of only after the user's first
-  // scroll accidentally re-triggers the check.
-  if (window.ResizeObserver) {
-    new ResizeObserver(updateArrows).observe(scrollEl);
-  }
-  updateArrows();
-  return updateArrows;
-}
-
-// Shared so anything that injects into one of these strips later
-// (e.g. 11layout.js's initHubNav(), which populates #stbHubNavScroll
-// from an async fetch) can re-measure the same way instead of
-// shipping its own copy of this logic.
-window.initHScrollArrows = initHScrollArrows;
-
-// DESKTOP SUB NAV — horizontal category strip scroll arrows
-(function initDsnCategoriesScroll() {
-  // Exposed so renderCategoryNav() can re-check arrow visibility right
-  // after the chips are injected from hwr-categories.json (scrollWidth
-  // isn't known until the new chips actually exist in the DOM).
-  window.updateDsnScrollArrows = initHScrollArrows(
-    document.getElementById('dsnCategoriesScroll'),
-    document.getElementById('dsnScrollLeft'),
-    document.getElementById('dsnScrollRight')
-  );
-})();
-
-// WEB RESOURCES HUB NAV — same scroll-arrow treatment, same
-// shrink-to-crushed problem at narrower widths as the strip above.
-(function initStbHubNavScroll() {
-  window.updateStbHubNavArrows = initHScrollArrows(
-    document.getElementById('stbHubNavScroll'),
-    document.getElementById('hubScrollLeft'),
-    document.getElementById('hubScrollRight')
-  );
 })();
 
 /* More-sheet row dropdowns. Moved here from hwr-js.js: every page that

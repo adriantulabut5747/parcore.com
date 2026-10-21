@@ -270,46 +270,39 @@
 .layout-link {
   box-sizing: border-box;
   height: var(--bar-h);
-  border-radius: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
 }
 /* Heart and share: same key face + soft shadow as Copy Layout, so the
    three read as one row of buttons. */
 .corner-like,
 .card-share {
-  background: var(--key-face);
-  box-shadow: var(--key-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
   width: 100%;
   padding: 0 8px;
-  color: #8b9099;
   font-family: 'Oxanium', sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    transform 0.1s ease,
-    box-shadow 0.1s ease;
   -webkit-tap-highlight-color: transparent;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .corner-like:hover,
-.card-share:hover,
-.card-share[aria-expanded='true'] {
-  background: var(--key-face-hover);
-  color: var(--text-main);
+.card-share:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
 }
 .corner-like:active,
 .card-share:active {
   transform: translateY(1px);
-  box-shadow: var(--key-soft-pressed);
-  transition-duration: 0s;
+  box-shadow: var(--lb-btn-down);
 }
 .corner-like:focus-visible,
 .card-share:focus-visible {
@@ -341,9 +334,6 @@
    (amber -> orange, #heartActiveFill at the top of the body) with a
    soft warm glow -- the one warm accent on the card, and only once the
    visitor has lit it. Icon: Lucide "flame" (ISC licence). */
-.corner-like.is-liked {
-  color: #fff;
-}
 .corner-like.is-liked .like-heart {
   fill: url(#heartActiveFill);
   stroke: #ffb26b;
@@ -374,7 +364,6 @@
   justify-content: center;
   min-width: 170px; /* a fixed, comfortable width -- not stretched to the card */
   padding: 0 24px;
-  color: #c9ccd2; /* a step lighter than heart/share: the primary */
   font-family: 'Oxanium', sans-serif;
   font-weight: var(--ghost-font-weight);
   font-size: var(--ghost-font-size);
@@ -386,26 +375,24 @@
      instead of the hard 3px dark edge: a light top edge, a 1px contact
      shadow and a faint blur under it. Hover is one step lighter; a press
      sinks it 1px. */
-  background: var(--key-face);
-  border: 0;
-  box-shadow: var(--key-soft);
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    transform 0.1s ease,
-    box-shadow 0.1s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .layout-link:hover {
-  background: var(--key-face-hover);
-  color: var(--text-main);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
 }
 .layout-link:active {
   transform: translateY(1px);
-  box-shadow: var(--key-soft-pressed);
-  transition-duration: 0s;
+  box-shadow: var(--lb-btn-down);
 }
 .layout-link:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 
@@ -493,15 +480,16 @@
   animation: base-glow 1.6s ease-in-out 2;
 }
 @keyframes base-glow {
+  /* keeps the well's inner shadow (--card-well) under the glow */
   0%,
   100% {
     box-shadow:
-      0 6px 18px rgba(0, 0, 0, 0.35),
+      var(--card-well, 0 6px 18px rgba(0, 0, 0, 0.35)),
       0 0 0 0 rgba(255, 255, 255, 0);
   }
   50% {
     box-shadow:
-      0 6px 18px rgba(0, 0, 0, 0.35),
+      var(--card-well, 0 6px 18px rgba(0, 0, 0, 0.35)),
       0 0 0 2px rgba(255, 255, 255, 0.45);
   }
 }
@@ -509,11 +497,6 @@
   .corner-like.just-liked .like-heart,
   .discord-card.is-target {
     animation: none;
-  }
-  .discord-card.is-target {
-    box-shadow:
-      0 6px 18px rgba(0, 0, 0, 0.35),
-      0 0 0 2px rgba(255, 255, 255, 0.45);
   }
 }
 
@@ -663,13 +646,6 @@
       flat rgba(22,22,26,0.88) + blur that coc-home actually shows.
       coc-home never hits this because it doesn't load 1coclayouts.css
       at all. Re-assert 11layout.css's colour so this page matches. */
-@media (min-width: 971px) {
-  .secondary-top-bar {
-    background: rgba(22, 22, 26, 0.88);
-    -webkit-backdrop-filter: blur(14px) saturate(118%);
-    backdrop-filter: blur(14px) saturate(118%);
-  }
-}
 
 /* 2) Scrollbar overlap -- 11layout.css insets the bar by --scrollbar-w
    so it stops at .coc-main's content edge instead of running under the
@@ -1004,6 +980,8 @@ html.loaded {
    secondary top bar, sidebar and bottom nav keep their own styles.
    ======================================================================= */
 .coc-content {
+  /* --card-well (the sunken depth of cards, tabs, chips, page numbers) is
+     in coc-hub-menus.css :root, shared with the More sheet's tiles */
   --t18-red: #c23b3b;
   --t18-red-2: #d04747;
   --t18-red-deep: #5a1616;
@@ -1032,15 +1010,19 @@ html.loaded {
 .tb {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   display: flex;
   align-items: center;
   min-height: 196px;
   margin-top: 20px;
   padding: 28px 32px;
-  border: 1px solid var(--t18-line);
-  border-radius: 0;
   background: var(--t18-surface);
+}
+.tb {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 
 /* The picture fills the right two-thirds and fades out to the left, so
@@ -1198,9 +1180,6 @@ html.loaded {
   gap: 8px;
   height: 34px;
   padding: 0 12px 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 0;
-  background: rgba(10, 10, 12, 0.55);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   font-family: 'Oxanium', sans-serif;
@@ -1210,11 +1189,12 @@ html.loaded {
   letter-spacing: 1px;
   text-transform: uppercase;
   text-decoration: none;
-  color: #e3e5e8;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .tb-back svg {
   flex: none;
@@ -1223,8 +1203,8 @@ html.loaded {
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tb-back:hover {
-  border-color: rgba(224, 99, 99, 0.55);
-  background: rgba(194, 59, 59, 0.22);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .tb-back:hover svg {
@@ -1254,9 +1234,8 @@ html.loaded {
 @media (max-width: 970px) {
   .tb {
     min-height: 0;
-    margin-top: 12px;
+    margin-top: 20px;
     padding: 18px 16px 16px;
-    border-radius: 0;
   }
   /* The art runs the full width behind the text here, dimmed on the left
      where the words are. The ::before overlay below darkens it further so
@@ -1287,7 +1266,6 @@ html.loaded {
     width: 30px;
     height: 30px;
     padding: 0;
-    border-radius: 0;
   }
   .tb-back svg {
     width: 15px;
@@ -1456,17 +1434,6 @@ html.loaded {
    card edge is quieter than the hero's and the screenshot leads. */
 .coc-content .discord-card {
   background: #121316;
-  box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.35),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-  transition:
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
-}
-.coc-content .discord-card:hover {
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 /* CC popover (redesigned Oct 2026): a small panel in the card material,
@@ -1630,16 +1597,9 @@ html.loaded {
 .coc-content .pagination a.next {
   margin-left: 2px;
   padding: 0 8px;
-  background: none;
-  border: 0;
-  border-radius: 0;
   font-size: 11px;
   letter-spacing: 1.3px;
   text-transform: uppercase;
-}
-.coc-content .pagination a.next:hover {
-  background: none;
-  color: var(--text-main);
 }
 
 /* ---- Layouts / Army / Guides tabs + Town Hall chips --------------------
@@ -1748,7 +1708,7 @@ html.loaded {
 }
 @media (max-width: 970px) {
   .coc-main {
-    padding-top: calc(var(--topbar-height, 52px) + 38px);
+    padding-top: calc(var(--topbar-height, 52px) + 32px);
   } /* top bar + secondary bar */
   .coc-content {
     padding-top: 0;
@@ -1791,16 +1751,9 @@ html.loaded {
 .coc-content .pagination a.prev {
   margin-right: 2px;
   padding: 0 8px;
-  background: none;
-  border: 0;
-  border-radius: 0;
   font-size: 11px;
   letter-spacing: 1.3px;
   text-transform: uppercase;
-}
-.coc-content .pagination a.prev:hover {
-  background: none;
-  color: var(--text-main);
 }
 .pagination a.prev svg {
   width: 14px;
@@ -1810,6 +1763,38 @@ html.loaded {
 }
 .pagination a.prev:hover svg {
   transform: translateX(-2px);
+}
+.pagination .page.active {
+  border-color: var(--lb-pick-edge);
+  background: var(--lb-pick);
+  box-shadow: var(--lb-pick-shadow);
+  color: var(--lb-pick-ink);
+}
+.pagination .page:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.pagination .page {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+.pagination .prev:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.pagination .prev {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 /* Phone breadcrumb: "Townhall 18 Layouts / Page 1/2" in the secondary top
@@ -1849,10 +1834,14 @@ html.loaded {
 .th-soon {
   margin-top: 16px;
   padding: 48px 32px;
-  border-radius: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
   background: radial-gradient(60% 90% at 50% 0%, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0) 70%), #121316;
   text-align: center;
+}
+.th-soon {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .th-soon-icon {
   display: inline-grid;
@@ -1904,34 +1893,34 @@ html.loaded {
   align-items: center;
   min-height: 40px;
   padding: 0 18px;
-  border-radius: 0;
-  background: var(--ghost-bg);
-  border: 1px solid var(--ghost-border);
-  color: #c9ccd2;
   font-family: 'Oxanium', sans-serif;
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 1.3px;
   text-transform: uppercase;
   text-decoration: none;
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .th-soon-btn:hover {
-  border-color: var(--ghost-border-hover);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .th-soon-btn--primary {
-  background: var(--key-face);
-  border-color: transparent;
-  box-shadow: var(--key-edge);
-  color: var(--text-main);
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
 }
 .th-soon-btn--primary:hover {
-  background: var(--key-face-hover);
-  border-color: transparent;
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red-hover);
 }
 .th-soon-btn:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.35);
@@ -1996,8 +1985,62 @@ html.loaded {
   gap: 8px;
   margin-bottom: 10px;
 }
+.first-layer > button.active {
+  border-color: var(--lb-pick-edge);
+  background: var(--lb-pick);
+  box-shadow: var(--lb-pick-shadow);
+  color: var(--lb-pick-ink);
+}
+.first-layer > button:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.first-layer > button:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.first-layer > button:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.first-layer > button {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
 .coc-content .second-layer {
   gap: 8px;
+}
+.th-btn.active {
+  border-color: var(--lb-pick-edge);
+  background: var(--lb-pick);
+  box-shadow: var(--lb-pick-shadow);
+  color: var(--lb-pick-ink);
+}
+.th-btn:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.th-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.th-btn:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.th-btn {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .coc-content .th-rail {
   margin-top: 12px;
@@ -2023,6 +2066,28 @@ html.loaded {
 .coc-content .grid-container > .discord-card[hidden] {
   display: none;
 }
+.discord-card:hover {
+  border-color: var(--lb-edge);
+  background-color: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+}
+/* Cards are wells (Oct 2026): Web Resources' submit-field recipe
+   (.stb-form-input in hwr-css.css) -- black edge, a shadow under the top
+   lip, a faint light line below the bottom edge -- so a base sits in a
+   hole cut into the page instead of on it. A hole can't lift, so hover
+   drops 1coclayouts.css's translateY and only lights the floor a touch. */
+.coc-content .grid-container > .discord-card {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.coc-content .grid-container > .discord-card:hover {
+  transform: none;
+  border-color: var(--lb-edge);
+  background: #15161b;
+  box-shadow: var(--card-well);
+}
 .coc-content .grid-container > .discord-card > .card-bar,
 .coc-content .grid-container > .discord-card > .sk-bar {
   margin-top: auto;
@@ -2035,73 +2100,186 @@ html.loaded {
 .coc-content .grid-container > .discord-card > .card-media {
   margin-bottom: 12px;
 }
-
-/* ---- Articles from Parcore (Oct 2026) -------------------------------------
-   Above the FAQ on the TH layouts / army pages, in the clan card's old spot.
-   Header = the FAQ's small caps (same .cc-label classes) with "View all
-   articles" and the ‹ › pair on the right; the strip is article-cards.css's
-   .art-track, shuffled every visit (data-order="random"). Desktop: the strip
-   sits inside the column. Phones: it runs edge to edge and swipes. */
-.t18-articles {
-  margin: 96px 0 0;
+.discord-card .card-media > img {
+  border-radius: 4px 4px 0 0;
 }
-.t18-articles + .t18-faq {
+
+/* ---- Clash guides band (Oct 2026) ----------------------------------------
+   Above the FAQ on the TH layouts / army pages: /coc/'s articles band, its
+   styles shared from coc-hub-menus.css "CLASH GUIDES BAND". Here it sits
+   inside .coc-content, so a negative margin as wide as the column's side
+   padding (--coc-side on desktop, 10px on phones) takes it to full width;
+   its own --coc-side insets then line the title and slides back up with
+   the column. Breaks: 64px above and below on desktop, 56px on phones. */
+.coc-content .as-band {
+  margin: 64px calc(-1 * var(--coc-side, 12%)) 0;
+}
+.as-band + .t18-faq {
   margin-top: 64px;
 }
-.t18-articles .cc-label-row {
-  align-items: center;
-  margin-bottom: 16px;
-}
-.t18-art-tools {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.t18-art-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font: 600 13px/1 'Sora', sans-serif;
-  color: #c9ccd2;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.15s ease;
-}
-.t18-art-all svg {
-  width: 14px;
-  height: 14px;
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.t18-art-all:hover {
-  color: #fff;
-}
-.t18-art-all:hover svg {
-  transform: translateX(3px);
-}
-.t18-art-all:focus-visible {
-  outline: 2px solid #c23b3b;
-  outline-offset: 4px;
-  border-radius: 0;
-}
-.t18-articles .art-track {
-  --art-side: 0px;
-}
 @media (max-width: 970px) {
-  .t18-articles {
-    margin-top: 72px;
+  .coc-content .as-band {
+    margin: 56px -10px 0;
   }
-  .t18-articles + .t18-faq {
+  .as-band + .t18-faq {
     margin-top: 56px;
   }
-  /* Bleed past .coc-content's 10px side padding to the screen edges; the
-     first card still lines up with the FAQ boxes. */
-  .t18-articles .art-track {
-    --art-side: 10px;
-    margin-inline: -10px;
-  }
 }
-@media (prefers-reduced-motion: reduce) {
-  .t18-art-all svg {
-    transition: none;
+
+/* =======================================================================
+   TABS + CARD ACTIONS (Oct 20 2026) -- placed last on purpose: the
+   ".coc-content .first-layer button" rules further up are stronger than the
+   plain ".first-layer > button" ones, so these repeat the .coc-content
+   prefix and win by coming later.
+   Tabs, TH chips and the page numbers under the grid (Prev / 1 2 3 / Next):
+   sunk into the page at rest (the cards' well, --card-well); the picked one
+   is the only raised grey key. No red, so the hero title and NEW badges keep red to
+   themselves. Taller than before (48px tabs, 46px chips; phones 44/42).
+   Card row: the centred cluster (like, Copy, share) as three grey keys,
+   40px tall (phones 38px).
+   Every filter chip on the CoC tools wears the same two states (Oct 21
+   2026; they were grey keys at rest and a white key when picked): tier
+   list categories + heroes (.gd-chip / .tl-hero), glossary and leaderboard
+   filters (.gd-chip), damage calculator categories + sort (.am-tab,
+   .dc-sort), wall counts (.wl-chip). (A drop-down's button, like the army
+   maker's Town Hall .am-th, stays a raised key: it opens a menu.) The
+   trackers' tabs follow it in coc-tracker.css. Add a new chip here.
+   ======================================================================= */
+.coc-content .first-layer > button,
+.coc-content .second-layer button,
+.coc-content .pagination a,
+.coc-content .gd-chip,
+.coc-content .am-tab,
+.coc-content .dc-sort,
+.coc-content .wl-chip {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+.coc-content .first-layer > button {
+  min-height: 48px;
+}
+.coc-content .second-layer button {
+  min-height: 46px;
+}
+.coc-content .first-layer > button:hover,
+.coc-content .second-layer button:hover,
+.coc-content .pagination a:hover,
+.coc-content .gd-chip:hover,
+.coc-content .am-tab:hover,
+.coc-content .dc-sort:hover:not(:disabled),
+.coc-content .wl-chip:hover {
+  border-color: var(--lb-edge);
+  background: #17181d;
+  box-shadow: var(--card-well);
+  color: #c9ccd2;
+}
+.coc-content .first-layer > button.active,
+.coc-content .second-layer button.active,
+.coc-content .pagination a.active,
+.coc-content .gd-chip[aria-pressed='true'],
+.coc-content .am-tab.active,
+.coc-content .dc-sort[aria-pressed='true'],
+.coc-content .wl-chip[aria-pressed='true'] {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.coc-content .first-layer > button.active:hover,
+.coc-content .second-layer button.active:hover,
+.coc-content .pagination a.active:hover,
+.coc-content .gd-chip[aria-pressed='true']:hover,
+.coc-content .am-tab.active:hover,
+.coc-content .dc-sort[aria-pressed='true']:hover,
+.coc-content .wl-chip[aria-pressed='true']:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.coc-content .first-layer > button:active,
+.coc-content .second-layer button:active,
+.coc-content .pagination a:active,
+.coc-content .gd-chip:active,
+.coc-content .am-tab:active,
+.coc-content .dc-sort:active:not(:disabled),
+.coc-content .wl-chip:active {
+  transform: translateY(1px);
+}
+.coc-content .first-layer > button.active:active,
+.coc-content .second-layer button.active:active,
+.coc-content .pagination a.active:active,
+.coc-content .gd-chip[aria-pressed='true']:active,
+.coc-content .am-tab.active:active,
+.coc-content .dc-sort[aria-pressed='true']:active,
+.coc-content .wl-chip[aria-pressed='true']:active {
+  box-shadow: var(--lb-btn-down);
+}
+.coc-content .first-layer > button:focus-visible,
+.coc-content .second-layer button:focus-visible,
+.coc-content .pagination a:focus-visible,
+.coc-content .gd-chip:focus-visible,
+.coc-content .am-tab:focus-visible,
+.coc-content .dc-sort:focus-visible,
+.coc-content .wl-chip:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+}
+
+.coc-content .action-row.card-bar {
+  --bar-h: 40px;
+}
+.coc-content .card-bar .corner-like,
+.coc-content .card-bar .card-share,
+.coc-content .card-bar .layout-link {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+.coc-content .card-bar .corner-like:hover,
+.coc-content .card-bar .card-share:hover,
+.coc-content .card-bar .card-share[aria-expanded='true'],
+.coc-content .card-bar .layout-link:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.coc-content .card-bar .corner-like:active,
+.coc-content .card-bar .card-share:active,
+.coc-content .card-bar .layout-link:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.coc-content .card-bar .corner-like:focus-visible,
+.coc-content .card-bar .card-share:focus-visible,
+.coc-content .card-bar .layout-link:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+}
+/* The share panel opens just above the row: card padding + the 40px row. */
+.coc-content .share-panel {
+  bottom: 68px;
+}
+@media (max-width: 970px) {
+  .coc-content .first-layer > button {
+    min-height: 44px;
+  }
+  .coc-content .second-layer button {
+    min-height: 42px;
+  }
+  .coc-content .action-row.card-bar {
+    --bar-h: 38px;
   }
 }

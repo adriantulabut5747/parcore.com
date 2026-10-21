@@ -1,0 +1,2990 @@
+/* ============================================================
+   MINECRAFT TOOL PAGES v5 (Oct 18 2026) -- body.mt-page
+   Loads after mc-home.css. Mob Summon is the pilot.
+
+   Everything inside the page is mt-* so the shared pt-/mct-/mob- tool
+   styles in mc-home.css never reach it. The scripts' hooks are ids,
+   data-* attributes, .mch-tabs/.mch-tab (tab engine, mc-home.js) and
+   .mch-copy (copy engine) -- those last two are restyled here.
+
+   Look: minecraft.net's marketplace panel (sampled from their page)
+     page   #121317   box  #1b1c22
+     edge   4px, black on top + right, #2a2c33 on left + bottom
+   Inside a box: flat warm-grey controls. One rule for "selected":
+   text buttons turn white with dark text; picture tiles get a white
+   frame. Red is only for Copy, the open tab, switches that are on and
+   stats you changed. Every control shows a white focus ring.
+
+   Layout responds to the tool's own width (container query), so the
+   sidebar being open or not can't squeeze two columns into one.
+   v5: no header box or version chips (Share build / Reset instead), no
+   tracked-caps labels, stats as a plain table, the name tag drawn over
+   the mob like in game, coloured command (.hl-*), full-width Copy.
+   ============================================================ */
+
+body.mt-page {
+  --mt-page: #121317;
+  --mt-box: #1b1c22;
+  --mt-edge-dark: #060708;
+  --mt-edge-light: #2a2c33;
+  --mt-ctl: #2a2c35;
+  --mt-ctl-h: #32343e;
+  --mt-sel: #3a3d48;
+  --mt-line: #2a2c33;
+  --mt-text: #eceef1;
+  --mt-soft: #d4d7dd;
+  --mt-muted: #9ea3ab;
+  --mt-red: #c23b3b; /* danger only: remove, too long, Reset armed */
+  --mt-red-h: #a83131;
+  --mt-on: #f1f2f4;
+  --mt-on-ink: #121317;
+  /* v7: the one accent is the site's red. It marks "on", the open tab and
+     Copy -- nothing decorative. */
+  --mt-accent: #c23b3b;
+  --mt-accent-h: #a83131;
+  --mt-accent-hi: #e0675d; /* top lip of a red button */
+  --mt-accent-lo: #6a1717; /* bottom lip */
+  --mt-accent-ink: #f19595; /* red text on the dark box */
+  --mt-amber: #f0c96a;
+  /* Raised button: light lip on top, dark lip below (minecraft.net's button). */
+  /* Recessed inventory slot: dark edge top/left, light edge bottom/right. */
+  --mt-well: #0c0d10;
+  --mt-r: 6px;
+  --mt-red-edge: #320b0d;
+  --mt-bevel: inset 0 0 0 2px var(--mt-edge-dark), inset 0 3px 0 rgba(255, 255, 255, 0.1), inset 0 -5px 0 rgba(0, 0, 0, 0.3);
+  --mt-bevel-down: inset 0 0 0 2px var(--mt-edge-dark), inset 0 3px 0 rgba(0, 0, 0, 0.35);
+  --mt-bevel-red: inset 0 0 0 2px var(--mt-red-edge), inset 0 3px 0 rgba(255, 255, 255, 0.26), inset 0 -5px 0 rgba(0, 0, 0, 0.26);
+  --mt-well-edge: inset 0 0 0 2px var(--mt-edge-dark), inset 0 4px 0 rgba(0, 0, 0, 0.4);
+}
+body.mt-page .mt-wrap ::selection {
+  background: var(--mt-accent);
+  color: #fff;
+}
+
+body.mc-home.mt-page .coc-main,
+body.mc-home.mt-page .coc-content {
+  background: var(--mt-page);
+}
+/* mc-java.css lays an 80% black sheet over .coc-content (the old dirt
+   wallpaper's dimmer), which turned #121317 into #050404. */
+body.mc-home.mt-page .coc-content::before {
+  display: none;
+}
+
+.mt-box {
+  background: var(--mt-box);
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 10px 24px -12px rgba(0, 0, 0, 0.85);
+}
+
+/* Space under the shared banner (mc-hero.css). */
+body.mc-home.mt-page .mt-wrap {
+  container: mtapp / inline-size; /* queried below; a container can't restyle itself, so it sits here */
+  padding-top: 52px;
+  padding-bottom: 72px;
+  color: var(--mt-text);
+}
+body.mt-page .mt-wrap [hidden] {
+  display: none !important;
+}
+body.mt-page .mt-wrap :focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.mt-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Build bar: the current mob (opens the list) | Share / Reset. The top row of the
+   settings box, over the tabs, split from them by the box's light seam. ---- */
+.mt-picker {
+  padding: 12px;
+  border-bottom: 2px solid var(--mt-edge-light);
+}
+.mt-rdlg .mt-picker {
+  display: none; /* .mt-set travels into the rider dialog; the bar is for the page's own mob */
+}
+.mt-pick-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mt-pick-acts {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.mt-pick-acts .mt-btn {
+  height: 52px;
+}
+.mt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  background: #2a2c35;
+  box-shadow: var(--mt-bevel);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--mt-soft);
+  white-space: nowrap;
+  border-radius: var(--mt-r);
+}
+.mt-btn:active,
+.mt-link:active {
+  box-shadow: var(--mt-bevel-down);
+  transform: translateY(1px);
+}
+.mt-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mt-btn:hover {
+  background: #32343e;
+  color: #fff;
+}
+.mt-btn.is-armed {
+  background: var(--mt-red);
+  color: #fff;
+  box-shadow: var(--mt-bevel-red);
+}
+
+/* An inventory slot: the egg / item sits sunk into the box like in game. */
+.mt-well {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+  border-radius: 4px;
+}
+.mt-well img {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+
+/* The current mob: slot, name + group, "Change". One button. */
+body.mc-home.mt-page .mt-pick-toggle {
+  display: flex;
+  flex: 0 1 380px;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  height: 52px;
+  padding: 0 14px 0 8px;
+  border: 0;
+  background: var(--mt-ctl);
+  box-shadow: var(--mt-bevel);
+  color: var(--mt-soft);
+  text-align: left;
+  border-radius: var(--mt-r);
+}
+.mt-pick-toggle:hover {
+  background: var(--mt-ctl-h);
+}
+.mt-pick-toggle:hover .mt-well {
+  background: #22242b; /* the game's slot hover: the slot lightens */
+}
+.mt-pick-toggle:active {
+  box-shadow: var(--mt-bevel-down);
+}
+@media (prefers-reduced-motion: reduce) {
+  body.mc-home.mt-page .mt-pick-toggle:active {
+    transform: none;
+  }
+}
+body.mc-home.mt-page .mt-pick-toggle:active {
+  transform: translateY(1px);
+}
+.mt-pick-cur {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+.mt-pick-cur b {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-pick-cur span {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--mt-muted);
+}
+.mt-pick-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mt-soft);
+}
+.mt-pick-act svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* ============================================================
+   THE TOOL: settings | sticky preview + command
+   ============================================================ */
+.mt-app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  align-items: start;
+  gap: 16px;
+}
+.mt-set {
+  min-width: 0;
+}
+
+/* ---- shared controls ---- */
+.mt-wrap button,
+.mt-wrap input,
+.mt-wrap select {
+  font-family: 'Sora', sans-serif;
+}
+.mt-wrap button {
+  cursor: pointer;
+}
+.mt-in {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--mt-ctl);
+  font-size: 14px;
+  color: #fff;
+  caret-color: var(--mt-accent-ink);
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: var(--mt-r);
+  background-color: var(--mt-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.mt-in::placeholder {
+  color: #8d929b;
+}
+.mt-in:hover {
+  border-color: #000;
+  background-color: #08090b;
+}
+body.mt-page .mt-wrap .mt-in:focus-visible {
+  border-color: #fff;
+  outline-offset: 0;
+  outline-width: 1px;
+}
+select.mt-in {
+  appearance: none;
+  padding-right: 38px;
+  background: var(--mt-ctl) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23d4d7dd' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center;
+  background-color: var(--mt-well);
+}
+select.mt-in option {
+  background: #2a2c35;
+  color: #fff;
+}
+.mt-f {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+.mt-l {
+  font: 500 12.5px/1.3 'Sora', sans-serif;
+  color: var(--mt-muted);
+}
+.mt-u {
+  margin-left: 4px;
+  font-weight: 400;
+  font-size: 12px;
+  color: #8d929b;
+}
+.mt-l-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mt-l-row b {
+  color: #fff;
+}
+.mt-stack {
+  display: grid;
+  gap: 32px;
+}
+.mt-grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px 16px;
+}
+.mt-grid2--top {
+  align-items: stretch;
+}
+/* Effects | Riders: the list takes the spare height, so both "add" dropdowns sit on one line. */
+.mt-grid2--top > .mt-fs {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.mt-grid3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  align-items: end;
+  gap: 4px 24px;
+}
+/* Mob options (mc-mob.js drawOptions): three groups, one kind of control each -- pickers and numbers,
+   switches, then Baby with its children folded under it. */
+.mt-optset {
+  display: grid;
+  gap: 12px;
+}
+.mt-opts {
+  row-gap: 14px;
+}
+.mt-babyset {
+  display: grid;
+}
+/* A child option: folds shut (0fr) when its parent is off, so it takes no room. Indented to the parent's
+   label, which reads as "belongs to the switch above". The margins inside leave room for focus rings. */
+.mt-kid {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
+}
+.mt-kid.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.mt-kid-in {
+  min-height: 0;
+  overflow: hidden;
+}
+.mt-kid-in > * {
+  margin: 2px 4px 4px 48px;
+}
+.mt-kid-in > .mt-f {
+  max-width: 280px;
+  padding-bottom: 4px;
+}
+.mt-time {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.mt-time label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--mt-muted);
+}
+.mt-time .mt-in {
+  flex: 1;
+  min-width: 0;
+}
+.mt-time--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.mt-time--3 span {
+  width: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mt-soft);
+}
+/* a field across the whole row (loot table, launch) */
+.mt-f--wide {
+  grid-column: 1 / -1;
+}
+.mt-loot {
+  display: flex;
+  gap: 8px;
+}
+.mt-loot .mt-in {
+  flex: 1;
+  min-width: 0;
+}
+.mt-loot .mt-link {
+  flex: none;
+  height: 44px;
+}
+
+/* "Tamed by" / "Trusts": the player's head in a slot, the name, and what the lookup found.
+   A row of its own, so its status line never pushes the fields beside it out of line. */
+.mt-player {
+  grid-column: 1 / -1;
+}
+.mt-player-in {
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mt-player-in .mt-well {
+  width: 44px;
+  height: 44px;
+}
+.mt-player-in .mt-well img {
+  width: 24px;
+  height: 24px;
+}
+.mt-player-st {
+  min-height: 16px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--mt-muted);
+}
+.mt-player-st.is-bad {
+  color: var(--mt-accent-ink);
+}
+
+/* Name tricks: names the game reacts to, one click each */
+.mt-tricks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.mt-tricks .mt-l {
+  margin-right: 4px;
+}
+body.mc-home.mt-page .mt-trick {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  background: var(--mt-ctl);
+  box-shadow: var(--mt-bevel);
+  font-size: 12.5px;
+  color: var(--mt-muted);
+  line-height: 34px;
+  border-radius: var(--mt-r);
+}
+.mt-trick b {
+  font-weight: 700;
+  color: var(--mt-soft);
+}
+.mt-trick:hover {
+  background: var(--mt-ctl-h);
+  color: var(--mt-soft);
+}
+.mt-trick[aria-pressed='true'] {
+  background: var(--mt-sel);
+  box-shadow: var(--mt-bevel-down);
+  color: var(--mt-soft);
+}
+.mt-trick[aria-pressed='true'] b {
+  color: #fff;
+}
+body.mc-home.mt-page .mt-trick[aria-pressed='true'],
+body.mc-home.mt-page .mt-trick[aria-pressed='true']:hover {
+  background: var(--mt-accent);
+  box-shadow: var(--mt-bevel-red);
+  color: #ffe1e1;
+}
+.mt-fs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.mt-lg {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 14px; /* a legend sits outside the fieldset's grid gap */
+  padding: 0;
+  font: 700 16px/1.3 'Sora', sans-serif;
+  color: #fff;
+}
+/* Section heading = bigger + a seam running to the edge; a field label is small and grey. */
+.mt-lg::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: var(--mt-edge-light);
+}
+.mt-lg .mt-u {
+  order: 1;
+}
+.mt-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.mt-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--mt-muted);
+}
+.mt-hint:empty {
+  display: none;
+}
+.mt-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mt-muted);
+}
+.mt-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mt-link {
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  background: var(--mt-ctl);
+  box-shadow: var(--mt-bevel);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mt-soft);
+  white-space: nowrap;
+  border-radius: var(--mt-r);
+}
+.mt-link:hover {
+  background: var(--mt-ctl-h);
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-link:active {
+    transform: none;
+  }
+}
+.mt-empty {
+  margin: 0;
+  padding: 4px 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--mt-muted);
+  list-style: none;
+}
+
+/* Switch: a real checkbox (hidden, still focusable) + a pixel track. */
+.mt-tg {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--mt-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.mt-tg:hover {
+  color: #fff;
+}
+.mt-tg:hover .mt-sw {
+  background: #15161a;
+}
+.mt-tg input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+.mt-sw {
+  position: relative;
+  flex: none;
+  height: 20px;
+  width: 40px;
+  border-radius: 4px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+}
+.mt-sw::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  top: 3px;
+  left: 3px;
+  border-radius: 3px;
+  background: #6b6f7a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.mt-tg input:checked + .mt-sw,
+.mt-tg:hover input:checked + .mt-sw {
+  background: var(--mt-accent);
+  box-shadow: inset 0 0 0 2px var(--mt-red-edge), inset 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+.mt-tg input:checked + .mt-sw::after {
+  background: #fff;
+  box-shadow: inset 0 -2px 0 #c9ccd2, 0 1px 2px rgba(0, 0, 0, 0.5);
+  transform: translateX(20px);
+}
+.mt-tg:has(input:checked) {
+  color: #fff;
+  font-weight: 600;
+}
+.mt-tg:has(input:focus-visible) {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.mt-tg--sm {
+  min-height: 36px;
+  padding: 0 8px;
+  font-size: 12.5px;
+}
+
+/* Segmented row (text buttons): the picked one is white. */
+.mt-seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+}
+body.mc-home.mt-page .mt-seg > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 8px;
+  border: 0;
+  font: 600 13px/1.1 'Sora', sans-serif;
+  color: var(--mt-muted);
+  white-space: nowrap;
+  background: transparent;
+  box-shadow: none;
+  border-radius: var(--mt-r);
+}
+body.mc-home.mt-page .mt-seg > button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+/* Picked = pushed in: sunk below the others, a red floor, white text. */
+body.mc-home.mt-page .mt-seg > button[aria-pressed='true'],
+body.mc-home.mt-page .mt-seg > button.is-on {
+  background: var(--mt-accent);
+  box-shadow: var(--mt-bevel-red);
+  color: #fff;
+}
+
+/* Count badge ("2 set") on tabs. */
+.mt-n {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  background: #3a3d48;
+  font: 700 11.5px/1 'Sora', sans-serif;
+  color: #fff;
+  border-radius: 3px;
+}
+.mt-n:empty {
+  display: none;
+}
+.is-on > .mt-n {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* ---- Main tabs ---- */
+body.mc-home.mt-page .mt-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  margin: 0 12px 4px;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+}
+body.mc-home.mt-page .mt-tabs .mch-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font: 600 14px/1 'Sora', sans-serif;
+  color: var(--mt-muted);
+  height: 44px;
+  border-radius: var(--mt-r);
+}
+body.mc-home.mt-page .mt-tabs .mch-tab img {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  opacity: 0.75;
+}
+body.mc-home.mt-page .mt-tabs .mch-tab > span {
+  min-width: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+body.mc-home.mt-page .mt-tabs .mch-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+body.mc-home.mt-page .mt-tabs .mch-tab.is-on {
+  background: var(--mt-accent);
+  box-shadow: var(--mt-bevel-red);
+  color: #fff;
+}
+body.mc-home.mt-page .mt-tabs .mch-tab.is-on img,
+body.mc-home.mt-page .mt-tabs .mch-tab:hover img {
+  opacity: 1;
+}
+body.mt-page .mt-wrap .mt-tabs .mch-tab:focus-visible {
+  outline-offset: -4px;
+}
+body.mc-home.mt-page .mt-tabs .mch-tab.is-on:hover {
+  background: #d04545;
+}
+
+.mt-pan {
+  display: grid;
+  gap: 16px;
+  padding: 20px 22px 24px;
+}
+.mt-pan > * {
+  min-width: 0; /* the phone chip row scrolls sideways instead of widening the panel */
+}
+/* The item editor (Gear tab, or alone in the editor dialog) spaces its blocks like the panel does */
+.mt-itemed {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.mt-itemed > * {
+  min-width: 0;
+}
+.mt-pct .mt-in:disabled {
+  opacity: 0.4;
+}
+
+/* ---- Mob tab ---- */
+.mt-search {
+  position: relative;
+  flex: 1 1 220px;
+}
+.mt-search svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--mt-muted);
+  stroke-width: 2;
+  pointer-events: none;
+}
+.mt-search input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px 0 42px;
+  border: 2px solid var(--mt-line);
+  border-radius: 0;
+  background: var(--mt-ctl);
+  font-size: 14px;
+  color: #fff;
+}
+.mt-search input::placeholder {
+  color: #8d929b;
+}
+body.mt-page .mt-wrap .mt-search input:focus-visible {
+  border-color: #fff;
+  outline-width: 1px;
+  outline-offset: 0;
+}
+/* ---- Mob picker dialog ----
+   A native <dialog> (showModal): the page dims behind it, Esc closes it, focus
+   stays inside. Head | filters + search | the mob list, which scrolls on its own. */
+.mt-dlg {
+  box-sizing: border-box;
+  width: min(980px, calc(100vw - 32px));
+  max-height: min(82vh, 760px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  color: var(--mt-text);
+  font-family: 'Sora', sans-serif;
+}
+.mt-dlg[open] {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  animation: mt-dlg-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mt-dlg::backdrop {
+  background: rgba(6, 5, 5, 0.74);
+  backdrop-filter: blur(3px);
+}
+@keyframes mt-dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+}
+body:has(.mt-dlg[open]) .coc-main {
+  overflow: hidden; /* the page behind stays put while the picker is open */
+}
+.mt-dlg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 12px 10px 22px;
+}
+.mt-dlg-h {
+  margin: 0;
+  font: 700 18px/1.2 'Sora', sans-serif;
+  color: #fff;
+}
+.mt-dlg-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 22px 14px;
+  border-bottom: 2px solid var(--mt-edge-light);
+}
+.mt-dlg .mt-mobs {
+  overflow-y: auto;
+  padding: 8px 22px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3d48 transparent;
+}
+.mt-dlg :focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.mt-dlg button {
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+}
+/* Item picker ("More" in Gear): search | the inventory grid | the item under the pointer. */
+.mt-idlg {
+  width: min(760px, calc(100vw - 32px));
+}
+.mt-idlg[open] {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+.mt-idlg-tools {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.mt-iall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  align-content: start;
+  gap: 4px;
+  overflow-y: auto;
+  padding: 14px 22px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3d48 transparent;
+}
+.mt-iall .mt-it img {
+  width: 30px;
+  height: 30px;
+}
+.mt-idlg-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 22px;
+  border-top: 2px solid var(--mt-edge-light);
+  font-size: 13px;
+}
+.mt-idlg-name {
+  overflow: hidden;
+  font-weight: 700;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-idlg-n {
+  flex: none;
+  margin-left: auto;
+  color: var(--mt-muted);
+}
+
+/* Filters: the pushed-in switcher, each with its count. */
+.mt-filt {
+  padding: 4px;
+}
+body.mc-home.mt-page .mt-filt > button {
+  gap: 7px;
+}
+.mt-fc {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8d929b;
+}
+[aria-pressed='true'] > .mt-fc {
+  color: var(--mt-accent-ink);
+}
+
+/* ---- Mob list (in the picker dialog): one row per group ---- */
+.mt-mobs .mt-grp {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 10px 0;
+}
+.mt-mobs .mt-grp + .mt-grp {
+  border-top: 2px solid var(--mt-edge-light);
+}
+.mt-mobs .mt-grp-h {
+  padding: 9px 0 0;
+  font-size: 13px;
+}
+/* All filter: A to Z, the letter on the left of its row, no lines between rows */
+.mt-mobs .mt-grp--az {
+  grid-template-columns: 28px minmax(0, 1fr);
+  padding: 4px 0;
+}
+.mt-mobs .mt-grp--az + .mt-grp--az {
+  border-top: 0;
+}
+.mt-mobs .mt-grp--az .mt-grp-h {
+  padding: 7px 0 0;
+  font-size: 16px;
+  color: var(--mt-muted);
+}
+.mt-mobs .mt-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mt-mobs .mt-mob {
+  gap: 7px;
+  min-height: 36px;
+  padding: 3px 10px 3px 6px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.mt-mobs .mt-mob img {
+  width: 22px;
+  height: 22px;
+}
+.mt-mobs .mt-mob span {
+  flex: none;
+}
+.mt-mobs .mt-mob em {
+  align-self: center;
+  margin-left: 2px;
+  font-size: 10px;
+}
+.mt-grp-h {
+  margin: 0;
+  padding: 4px 0 10px;
+  font: 700 14px/1.2 'Sora', sans-serif;
+  color: #fff;
+}
+.mt-grp-h span {
+  margin-left: 6px;
+  font-weight: 400;
+  color: var(--mt-muted);
+}
+.mt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+  gap: 6px;
+}
+.mt-mob {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 10px;
+  border: 4px solid transparent; /* room for the hotbar frame */
+  background: var(--mt-ctl);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--mt-soft);
+  text-align: left;
+}
+.mt-mob img {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+.mt-mob span {
+  flex: 1;
+  min-width: 0;
+}
+.mt-mob em {
+  flex: none;
+  align-self: flex-start;
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--mt-muted);
+}
+.mt-mob:hover {
+  background: var(--mt-ctl-h);
+  color: #fff;
+}
+/* A picked tile wears the game's own hotbar selection frame. */
+.mt-mob[aria-pressed='true'],
+.mt-slot[aria-pressed='true'],
+.mt-it[aria-pressed='true'] {
+  border-image: url('/minecrafticons/gui/hotbar_selection.png') 4 / 4px stretch;
+  image-rendering: pixelated;
+}
+.mt-mob[aria-pressed='true'] {
+  background: var(--mt-sel);
+  color: #fff;
+}
+
+/* ---- Stats / enchantments / item attributes: tick rows ---- */
+.mt-ticks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mt-tick {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px 76px;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 4px 10px 4px 12px;
+  border: 2px solid transparent;
+  background: var(--mt-ctl);
+}
+.mt-tick label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--mt-soft);
+  cursor: pointer;
+}
+.mt-tick label > span {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.mt-tick small {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--mt-muted);
+}
+.mt-tick input[type='checkbox'] {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--mt-accent);
+}
+.mt-num {
+  height: 38px;
+  padding: 0 8px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.mt-def {
+  text-align: right;
+  white-space: nowrap;
+}
+.mt-tick:hover {
+  background: var(--mt-ctl-h);
+}
+.mt-tick.is-on {
+  border-color: var(--mt-accent);
+  background: #221b1a;
+}
+.mt-tick.is-on label {
+  color: #fff;
+}
+
+/* ---- Gear tab ---- */
+.mt-slots {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 6), minmax(0, 1fr)); /* 7 or 8 with a saddle / body slot (mc-mob.js) */
+  gap: 6px;
+}
+.mt-slot {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 10px 4px 8px;
+  border: 4px solid transparent; /* room for the hotbar frame */
+  background: var(--mt-ctl);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mt-muted);
+}
+.mt-slot img,
+.mt-slot i {
+  box-sizing: content-box;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+  image-rendering: pixelated;
+}
+.mt-slot i {
+  display: block;
+}
+.mt-slot:hover {
+  background: var(--mt-ctl-h);
+  color: #fff;
+}
+.mt-slot[aria-pressed='true'] {
+  background: var(--mt-sel);
+  color: #fff;
+}
+.mt-slot.is-ench img,
+.mt-it[aria-pressed='true'] img {
+  filter: drop-shadow(0 0 3px rgba(178, 107, 255, 0.85));
+}
+.mt-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 6px;
+}
+.mt-it {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-height: 48px;
+  padding: 0;
+  border: 4px solid transparent; /* room for the hotbar frame */
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mt-soft);
+}
+.mt-it img {
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated;
+}
+.mt-it:hover {
+  background: #22242b;
+}
+.mt-it[aria-pressed='true'] {
+  background: var(--mt-sel);
+  box-shadow: none;
+  color: #fff;
+}
+.mt-it:not(.mt-it--none)[aria-pressed='true'] img {
+  filter: none;
+}
+/* "More": the last tile, opens every item in the game (#mtItemDlg). Raised like a button, not sunk like a slot. */
+.mt-it--more {
+  gap: 2px;
+  align-content: center;
+  background: var(--mt-ctl);
+  box-shadow: var(--mt-bevel);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--mt-soft);
+}
+.mt-it--more:hover {
+  background: var(--mt-ctl-h);
+  color: #fff;
+}
+.mt-it--more svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+/* Dye row: undyed (the item's icon), the 16 dyes, then any colour (+). */
+/* 18 swatches = two rows of nine at any width */
+.mt-dyes {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 36px));
+  gap: 6px;
+}
+.mt-dyes .mt-swc {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); /* keeps the black and gray dyes off the dark box */
+}
+.mt-swc--undyed {
+  display: grid;
+  place-items: center;
+  border-color: var(--mt-line);
+  background: var(--mt-well);
+}
+.mt-swc--undyed img {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+/* Trim: 18 patterns = two rows of nine (three of six on phones), materials on the same grid */
+.mt-trim .mt-items {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+.mt-trim .mt-it {
+  min-height: 0;
+}
+/* "Mob" tile (drop and storage slots): a spawn egg over the label, raised like More */
+.mt-it--more img {
+  width: 20px;
+  height: 20px;
+}
+/* Storage: the block's slots as on its screen (9 across for a chest, 3 for a dispenser, 5 for a hopper),
+   the stack size in the corner like the game prints it */
+.mt-inv-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 9), minmax(0, 48px));
+  gap: 4px;
+}
+.mt-cell {
+  position: relative;
+  min-height: 0;
+}
+.mt-cell img {
+  width: min(30px, 100%);
+  height: auto;
+}
+.mt-cell b {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 1px 1px 0 #3f3f3f;
+}
+.mt-cell.is-ench img {
+  filter: drop-shadow(0 0 3px rgba(178, 107, 255, 0.85));
+}
+/* A trade's Gives item that is storage: its slots under the trade row (nothing there otherwise) */
+.mt-tinv:empty {
+  display: none;
+}
+/* Always drops: a row of its own under count + drop chance */
+.mt-always {
+  grid-column: 1 / -1;
+}
+.mt-always .mt-u {
+  margin-left: 4px;
+}
+/* Fireworks: one sunk card per explosion */
+.mt-fwx-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mt-fwx {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+}
+.mt-fwx-h {
+  font-size: 13.5px;
+  color: #fff;
+}
+.mt-fw-shapes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+body.mc-home.mt-page .mt-fw-shapes > button {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  height: auto;
+  min-height: 56px;
+  padding: 6px 2px;
+  font-size: 11px;
+  line-height: 1.15;
+}
+.mt-fw-shapes img {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+#mobFwAdd {
+  justify-self: start;
+}
+.mt-swc--any {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border-color: var(--mt-line);
+  background: conic-gradient(#e33, #ec3, #3c5, #3bd, #44e, #c4c, #e33);
+  cursor: pointer;
+}
+.mt-swc--any input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.mt-swc--any svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
+  pointer-events: none;
+}
+.mt-swc--any.is-on {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.mt-swc--any:has(input:focus-visible) {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.mt-pick-name {
+  font-weight: 600;
+  color: #fff;
+}
+.mt-item {
+  display: grid;
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 2px solid var(--mt-edge-light);
+}
+.mt-subpan {
+  display: grid;
+  gap: 12px;
+}
+.mt-range {
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  accent-color: var(--mt-accent);
+}
+
+/* ---- Effects + riders ---- */
+.mt-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mt-li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-height: 48px;
+  padding: 4px 4px 4px 12px;
+  border-radius: var(--mt-r);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.mt-li img {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+.mt-li b {
+  flex: 1 1 90px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+}
+/* Effect row: icon, name, remove; then level | how long | particles. */
+.mt-fx {
+  display: grid;
+  gap: 10px;
+  padding: 8px 6px 14px 14px;
+}
+.mt-fx-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mt-fx-top b {
+  flex: 1;
+}
+/* Level | Lasts on one line; Particles joins them when there's room, else takes the next line whole. */
+.mt-fx-ctl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 14px;
+  padding-right: 8px;
+}
+.mt-fx-lvl {
+  flex: 0 0 76px;
+}
+.mt-fx-dur {
+  flex: 0 1 240px;
+}
+.mt-fx-parts {
+  flex: 1 1 240px;
+}
+.mt-fx-ctl .mt-in {
+  height: 40px;
+  padding: 0 10px;
+}
+.mt-fx-ctl .mt-time {
+  gap: 6px;
+}
+/* the particles' colour, next to their label */
+.mt-fx-parts .mt-l {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mt-fx-parts .mt-l::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: var(--fx);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+.mt-fx-parts .mt-seg {
+  padding: 0;
+  background: none;
+}
+body.mc-home.mt-page .mt-fx-parts .mt-seg > button {
+  height: 40px;
+}
+body.mc-home.mt-page .mt-seg > button[aria-pressed='true']:hover,
+body.mc-home.mt-page .mt-seg > button.is-on:hover {
+  background: #d04545;
+}
+/* Rider row: one button (egg, name, what it has set, Edit), then remove */
+.mt-li--rider {
+  padding: 4px;
+}
+body.mc-home.mt-page .mt-rider {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 4px 10px 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--mt-soft);
+  text-align: left;
+}
+.mt-rider:hover {
+  background: var(--mt-ctl-h);
+}
+.mt-rider > img,
+.mt-li--self > img {
+  width: 26px;
+  height: 26px;
+}
+/* The page's own mob in the stack: sunk like a slot (it isn't edited here), lined up with the rows around it. */
+.mt-li--self {
+  flex-wrap: nowrap;
+  gap: 10px;
+  min-height: 56px;
+  padding: 4px 14px 4px 12px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+}
+.mt-li--self .mt-rider-t b {
+  color: var(--mt-accent-ink);
+}
+.mt-rider-t {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+.mt-rider-t b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+}
+.mt-rider-t small {
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--mt-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-rider-go {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mt-soft);
+}
+.mt-rider-go svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+.mt-rider:hover .mt-rider-go {
+  color: #fff;
+}
+
+.mt-x {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--mt-muted);
+  border-radius: var(--mt-r);
+}
+.mt-x svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+.mt-x:hover {
+  background: rgba(194, 59, 59, 0.2);
+  color: #f08a8a;
+}
+
+/* ---- Name tag editor ----
+   One framed block: the style bar, the name field (black, like the game's
+   chat line, the name drawn in its own colour and style), the colour tray. */
+.mt-ned {
+  overflow: hidden;
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: 8px;
+  background: #16171c;
+}
+.mt-ned:focus-within {
+  border-color: #000;
+}
+.mt-ned-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+}
+.mt-ned-b,
+.mt-ned-t {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 38px;
+  height: 36px;
+  padding: 0 8px;
+  border: 0;
+  background: #2a2c35;
+  box-shadow: var(--mt-bevel);
+  font: 700 15px/1 'Sora', sans-serif;
+  color: var(--mt-soft);
+  cursor: pointer;
+  border-radius: var(--mt-r);
+}
+.mt-ned-b:hover,
+.mt-ned-t:hover {
+  background: #32343e;
+  color: #fff;
+}
+/* Each style button wears the game's § code in its corner (§l bold, §o italic...). */
+.mt-ned-b[data-code]::after {
+  content: '\00a7' attr(data-code);
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font: 600 8.5px/1 var(--mch-mono);
+  color: #7a7f89;
+}
+.mt-ned-b[aria-pressed='true'],
+.mt-ned-t:has(input:checked) {
+  background: var(--mt-accent);
+  box-shadow: var(--mt-bevel-red);
+  color: #fff;
+}
+.mt-ned-b[aria-pressed='true']::after {
+  color: #ffd2d2;
+}
+.mt-ned-obf span[aria-hidden] {
+  font-family: var(--mch-mono);
+  letter-spacing: -0.02em;
+}
+.mt-ned-b svg,
+.mt-ned-t svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-ned-b:active {
+    transform: none;
+  }
+}
+.mt-ned-b:active {
+  transform: translateY(1px);
+}
+.mt-ned-sep {
+  width: 2px;
+  height: 24px;
+  margin: 0 4px;
+  background: var(--mt-line);
+}
+.mt-ned-t {
+  display: inline-flex;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.mt-ned-t input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+.mt-ned-t:has(input:focus-visible) {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.mt-ned-clear {
+  margin-left: auto;
+}
+.mt-ned-in {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  border: 0;
+  border-block: 2px solid var(--mt-line);
+  border-radius: 0;
+  background: #000;
+  font: 600 18px/1 'Sora', sans-serif;
+  color: #fff;
+  caret-color: #fff;
+  text-underline-offset: 4px;
+  border-block-color: var(--mt-edge-dark);
+}
+.mt-ned-in::placeholder {
+  color: #5d626c;
+  font-weight: 500;
+}
+body.mt-page .mt-wrap .mt-ned-in:focus-visible {
+  outline: 0;
+  box-shadow: inset 0 0 0 1px #fff;
+}
+.mt-ned-in.is-dark {
+  -webkit-text-stroke: 0.6px rgba(255, 255, 255, 0.45);
+}
+.mt-ned-pal {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+}
+
+/* ---- Gear: count + drop chance under the items ---- */
+.mt-qty {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 160px));
+  gap: 12px;
+}
+.mt-pct {
+  position: relative;
+  display: block;
+}
+.mt-pct .mt-in {
+  padding-right: 34px;
+}
+.mt-pct i {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--mt-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ---- Trades: each trade drawn like a row of the game's trade screen ----
+   cost | second cost | pixel arrow | the bigger result slot. The count sits in the
+   slot's bottom-right corner in white with the game's drop shadow, and is typed
+   right there. 0 uses turns the arrow into the game's red sold-out cross. */
+.mt-tr-add {
+  justify-self: start; /* under the list, its own size (the panel is a grid) */
+}
+.mt-trades {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mt-trade {
+  display: grid;
+  gap: 12px;
+  padding: 10px 12px 12px 14px;
+  background: var(--mt-ctl);
+}
+.mt-trade-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -2px -6px -8px 0;
+}
+.mt-trade-top b {
+  font-size: 13px;
+  color: var(--mt-muted);
+}
+.mt-trade-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 26px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+.mt-tslot {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.mt-tslot-in {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+/* the cost slots sit 10px lower so all three bottoms (and item fields) line up with the big result slot */
+.mt-tslot:not([data-k='sell']) .mt-twell {
+  margin-top: 10px;
+}
+.mt-tslot-in > .mt-in {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+.mt-twell {
+  position: relative;
+  width: 46px;
+  height: 46px;
+}
+.mt-tslot[data-k='sell'] .mt-twell {
+  width: 56px;
+  height: 56px; /* the result slot is the big one, as in game */
+}
+.mt-twell img {
+  width: 30px;
+  height: 30px;
+}
+.mt-twell em {
+  display: none;
+  font: 700 12px/1 var(--mch-mono);
+  font-style: normal;
+  color: var(--mt-muted);
+}
+.mt-twell:not(:has(img:not([hidden]))) em {
+  display: block;
+  margin-bottom: 8px;
+}
+/* The stack size, as the game prints it: white, grey drop shadow, nothing at 1. */
+.mt-tc {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font: 800 14px/1 'Sora', sans-serif;
+  color: #fff;
+  text-shadow: 2px 2px 0 #3f3f3f;
+  pointer-events: none;
+}
+
+/* ---- - / + stepper (gear count, trade counts) ----
+   Two raised buttons around a sunk number; they press in like the rest, and grey
+   out at the ends (1 and 99). The box still takes typing and the arrow keys. */
+.mt-step {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  width: 100%;
+  height: 40px;
+  border: 2px solid var(--mt-line);
+  background: #000;
+}
+.mt-step:focus-within {
+  border-color: #fff;
+}
+body.mt-page .mt-step .mt-in {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: 700 15px/1 'Sora', sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+body.mt-page .mt-wrap .mt-step .mt-in:focus-visible {
+  outline: 0;
+}
+.mt-step .mt-in::-webkit-inner-spin-button,
+.mt-step .mt-in::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.mt-step button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: #2a2c35;
+  box-shadow: var(--mt-bevel);
+  color: var(--mt-soft);
+}
+.mt-step button:hover:not(:disabled) {
+  background: #32343e;
+  color: #fff;
+}
+.mt-step button:active:not(:disabled) {
+  box-shadow: var(--mt-bevel-down);
+}
+.mt-step button:disabled {
+  color: #4e525d;
+  cursor: default;
+}
+.mt-step svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.6;
+}
+.mt-tarrow {
+  display: grid;
+  place-items: center;
+  height: 46px;
+  margin-top: 33px; /* label + gap + the 10px drop: level with the cost slots */
+}
+.mt-tarrow svg {
+  width: 22px;
+  height: 20px;
+  fill: var(--mt-soft);
+  stroke: none; /* mc-home.css strokes every .mch svg; these are filled pixel shapes */
+  shape-rendering: crispEdges;
+}
+.mt-tarrow.is-out svg {
+  width: 18px;
+  fill: var(--mt-accent);
+}
+.mt-trules summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 4px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mt-soft);
+  list-style: none;
+  cursor: pointer;
+}
+.mt-trules summary::-webkit-details-marker {
+  display: none;
+}
+.mt-trules summary::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(-45deg);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mt-trules[open] summary::before {
+  transform: rotate(45deg);
+}
+.mt-trules summary span {
+  font-weight: 500;
+  color: var(--mt-muted);
+}
+.mt-trules summary:hover {
+  color: #fff;
+}
+.mt-trules .mt-grid3 {
+  padding-top: 10px;
+}
+
+/* ---- Dropdowns (every select.mt-in, built by mc-mob.js ddAll) ----
+   The field: icon + value + chevron. The list: a box from the page's own kit (the
+   bevelled edge, a soft drop shadow), rows with the option's icon (a job's
+   workstation, a biome's block, a badge's material, an effect, a mob egg).
+   The picked row is white and bold with a red tick; the keyboard row is lit. */
+.mt-dd {
+  position: relative;
+  min-width: 0;
+}
+.mt-dd > select {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+body.mc-home.mt-page .mt-dd-btn {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  padding: 0 10px 0 12px;
+  font: 500 14px/1 'Sora', sans-serif;
+  color: #fff;
+  text-align: left;
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: var(--mt-r);
+  background: var(--mt-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.mt-dd-btn:hover {
+  border-color: #000;
+  background: #08090b;
+}
+.mt-dd.is-open .mt-dd-btn {
+  border-color: #fff;
+}
+.mt-dd.is-blank .mt-dd-v {
+  color: var(--mt-muted);
+}
+.mt-dd-ico:empty {
+  display: none;
+}
+.mt-dd-ico img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+.mt-dd-v {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-dd-btn svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--mt-soft);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mt-dd.is-open .mt-dd-btn svg {
+  transform: rotate(180deg);
+}
+.mt-ver-pick .mt-dd {
+  flex: 1;
+}
+body.mc-home.mt-page .mt-ver-pick .mt-dd-btn {
+  height: 40px;
+}
+.mt-pop {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 296px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: 8px;
+  background: var(--mt-box);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 32px rgba(0, 0, 0, 0.6);
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3d48 transparent;
+}
+.mt-dd.is-up .mt-pop {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+.mt-pop:focus {
+  outline: 0;
+}
+.mt-opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 30px 0 8px;
+  font: 500 13.5px/1.2 'Sora', sans-serif;
+  color: var(--mt-soft);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.mt-opt img,
+.mt-opt i {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+.mt-pop:not(:has(img)) .mt-opt i {
+  display: none; /* a list with no icons doesn't keep their space */
+}
+.mt-opt span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-opt b {
+  color: #fff;
+  font-weight: 800;
+}
+.mt-opt.is-blank span {
+  color: var(--mt-muted);
+}
+.mt-opt:hover,
+.mt-opt.is-active {
+  background: var(--mt-ctl-h);
+  color: #fff;
+}
+.mt-opt[aria-selected='true'] {
+  font-weight: 700;
+  color: #fff;
+}
+.mt-opt[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 5px;
+  height: 10px;
+  margin-top: -7px;
+  border: solid var(--mt-accent);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+/* A trade slot's item: a button that opens the item dialog (#mtItemDlg), the slot above it does too */
+.mt-tpick {
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mt-tpick.is-blank {
+  color: var(--mt-muted);
+}
+.mt-twell[data-tpick] {
+  cursor: pointer;
+}
+.mt-tclear {
+  margin-left: 6px;
+  font-size: 12px;
+}
+/* Riders and mounts: two buttons that open the mob picker */
+.mt-stack-add .mt-btn {
+  justify-content: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-btn:active {
+    transform: none;
+  }
+}
+
+/* Name colour swatches */
+.mt-sws {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 34px);
+  gap: 4px;
+  padding: 3px 0;
+}
+.mt-swc {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+}
+.mt-swc--none {
+  background: var(--mt-ctl);
+  border-color: var(--mt-edge-dark);
+}
+.mt-swc[aria-pressed='true'] {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   OUTPUT: preview + command
+   ============================================================ */
+.mt-out {
+  position: sticky;
+  top: 80px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.mt-prev {
+  display: grid;
+  overflow: hidden;
+}
+.mt-stage {
+  position: relative;
+  height: clamp(180px, calc(100vh - 620px), 340px);
+  overflow: hidden;
+  /* A picture of where the mob lives, blurred and darkened ahead of time, so it stands somewhere. */
+  background:
+    radial-gradient(70% 60% at 50% 55%, rgba(27, 28, 34, 0) 40%, rgba(27, 28, 34, 0.85)),
+    linear-gradient(0deg, rgba(27, 28, 34, 0.9), rgba(27, 28, 34, 0) 30%),
+    var(--mt-stage) center 60% / cover,
+    var(--mt-box);
+}
+/* Where the mob lives (mc-mob.js habitat()). Swap a picture by replacing its file. */
+.mt-stage,
+.mt-stage[data-hab='cave'] { --mt-stage: url('/minecrafticons/tools/stage-cave.webp'); }
+.mt-stage[data-hab='overworld'] { --mt-stage: url('/minecrafticons/tools/stage-overworld.webp'); }
+.mt-stage[data-hab='water'] { --mt-stage: url('/minecrafticons/tools/stage-water.webp'); }
+.mt-stage[data-hab='nether'] { --mt-stage: url('/minecrafticons/tools/stage-nether.webp'); }
+.mt-stage[data-hab='village'] { --mt-stage: url('/minecrafticons/tools/stage-village.webp'); }
+/* --mt-strip: the name tag strip over the view. The mob is framed below it (.mt-view), but the canvas
+   runs up through it to the top of the stage, so a held spear or trident isn't cut off (mc-mob3d.js size()). */
+.mt-stage {
+  --mt-strip: 44px;
+}
+.mt-view {
+  position: absolute;
+  inset: var(--mt-strip) 0 0;
+}
+.mt-view canvas {
+  position: absolute;
+  inset: calc(-1 * var(--mt-strip)) 0 0;
+  display: none;
+  width: 100%;
+  height: calc(100% + var(--mt-strip));
+  cursor: grab;
+  touch-action: none; /* swipes turn the mob only: no page scroll, no pull-to-refresh */
+}
+.mt-view.is-3d canvas {
+  display: block;
+  transition: opacity 0.2s ease;
+}
+.mt-card {
+  position: absolute;
+  inset: 0 0 64px;
+  display: none;
+  place-items: center;
+}
+.mt-view.no-3d canvas {
+  display: none;
+}
+/* Loading (mc-mob3d.js .is-loading): three pixels pulsing in turn, in the HUD grey. Waits 250ms before it
+   shows, so a cached mob never flashes it; the mob already on screen dims a little underneath. */
+.mt-load {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.mt-load i {
+  width: 8px;
+  height: 8px;
+  background: #8d929b;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+  animation: mt-pixel 1.05s steps(1, end) infinite;
+}
+.mt-load i:nth-child(2) {
+  animation-delay: 0.35s;
+}
+.mt-load i:nth-child(3) {
+  animation-delay: 0.7s;
+}
+@keyframes mt-pixel {
+  0% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 0.25;
+  }
+}
+.mt-view.is-loading .mt-load {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+.mt-view.is-loading canvas {
+  opacity: 0.45;
+  transition-delay: 0.25s;
+}
+.mt-view.no-3d .mt-load {
+  display: none;
+}
+.mt-view.no-3d .mt-card {
+  display: grid;
+}
+.mt-egg {
+  width: 120px;
+  height: 120px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.6));
+}
+/* The name tag as the game draws it: a dark plate over the mob's head. */
+.mt-nametag {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 1;
+  max-width: calc(100% - 32px);
+  padding: 4px 6px 4px 4px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25); /* the game's see-through plate */
+  font: 600 15px/1.3 'Sora', sans-serif; /* only until mc-font.js draws the canvas */
+  color: #fff;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.mt-nametag canvas {
+  display: block;
+  max-width: 100%;
+  image-rendering: pixelated;
+}
+.mt-nametag.is-faint {
+  opacity: 0.5;
+}
+.mt-hud {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  pointer-events: none;
+}
+.mt-type {
+  display: none; /* the header names the mob now; the script still fills it */
+}
+.mt-pips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px;
+}
+.mt-pips:empty {
+  display: none;
+}
+.mt-pips img {
+  width: 12px;
+  height: 12px;
+  image-rendering: pixelated;
+}
+.mt-pips b {
+  margin-left: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--mt-muted);
+}
+.mt-drag {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1;
+  color: #8d929b;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.is-turned .mt-drag {
+  opacity: 0;
+}
+.mt-drag svg {
+  flex: none;
+}
+.mt-drag svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.mt-view.no-3d ~ .mt-drag {
+  display: none;
+}
+/* Stats: one strip of cells split by seams -- label on top, value, then its unit. */
+.mt-stats {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  margin: 0;
+  border-top: 2px solid var(--mt-edge-light);
+}
+.mt-st {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px 12px;
+}
+.mt-st + .mt-st {
+  border-left: 2px solid var(--mt-edge-light);
+}
+.mt-st dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mt-muted);
+}
+.mt-st dt::before {
+  content: '';
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background: center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.mt-st--hp dt::before { background-image: url('/minecrafticons/gui/heart_full.png'); }
+.mt-st--atk dt::before { background-image: url('/minecrafticons/items/iron_sword.png'); }
+.mt-st--spd dt::before { background-image: url('/minecrafticons/effects/speed.png'); }
+.mt-st--arm dt::before { background-image: url('/minecrafticons/gui/armor_full.png'); }
+.mt-st dd {
+  display: grid;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.mt-st dd small {
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--mt-muted);
+}
+
+.mt-cmd {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+.mt-ver-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mt-ver-pick .mt-l {
+  white-space: nowrap;
+}
+.mt-ver-pick .mt-in {
+  height: 40px;
+}
+.mt-sp .mt-in {
+  height: 40px;
+}
+.mt-sp {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.mt-code {
+  display: block;
+  max-height: 6.4em; /* four lines; "Show all" opens it */
+  padding: 10px 12px;
+  overflow: auto;
+  background: #0a0b0d;
+  font: 12.5px/1.6 var(--mch-mono);
+  color: #d9e1d5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3d48 transparent;
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: var(--mt-r);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.mt-code.is-open {
+  max-height: 45vh;
+}
+/* Command colours: all at least 7:1 on the near-black. */
+.hl-c { color: #fff; font-weight: 700; }
+.hl-i { color: #8fd3ff; }
+.hl-k { color: #e9c46a; }
+.hl-s { color: #a6e3a1; }
+.hl-n { color: #f5a9e0; }
+.mt-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-top: -2px;
+}
+.mt-more {
+  height: 32px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mt-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mt-more:hover {
+  color: #fff;
+}
+.mt-meta {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--mt-muted);
+}
+.mt-meta em {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background: rgba(240, 201, 106, 0.12);
+  font-style: normal;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--mt-amber);
+}
+.mt-meta em.is-bad {
+  background: var(--mt-red);
+  color: #fff;
+}
+/* Copy buttons: .mch-copy keeps the copy engine; the look is ours. */
+body.mc-home.mt-page .mt-wrap .mch-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  height: 44px;
+  min-width: 120px;
+  padding: 0 20px;
+  border: 0;
+  background: var(--mt-accent);
+  font: 700 14px/1 'Sora', sans-serif;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  border-radius: var(--mt-r);
+  box-shadow: var(--mt-bevel-red);
+}
+body.mc-home.mt-page .mt-wrap .mch-copy:active {
+  box-shadow: inset 0 0 0 2px var(--mt-red-edge), inset 0 3px 0 rgba(0, 0, 0, 0.25);
+  transform: translateY(1px);
+}
+body.mc-home.mt-page .mt-wrap .mt-copy {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+}
+body.mc-home.mt-page .mt-wrap .mch-copy:hover {
+  background: #d04545;
+}
+body.mc-home.mt-page .mt-wrap .mch-copy.is-done {
+  background: var(--mt-sel);
+  box-shadow: var(--mt-bevel-down);
+}
+body.mc-home.mt-page .mt-wrap .mch-copy span {
+  display: inline;
+}
+body.mc-home.mt-page .mt-wrap .mch-copy svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.mc-home.mt-page .mt-wrap .mch-copy:active {
+    transform: none;
+  }
+}
+body.mc-home.mt-page .mt-wrap .mt-qcopy {
+  display: none;
+}
+.mt-notes {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mt-notes:empty {
+  display: none;
+}
+.mt-notes li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--mt-muted);
+}
+.mt-notes li::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  background: #e3b341;
+}
+
+/* ============================================================
+   NARROW: one column (phones, tablets, or a squeezed window)
+   Preview first, then the settings, then the command.
+   ============================================================ */
+@container mtapp (max-width: 860px) {
+  .mt-app {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .mt-out {
+    display: contents;
+  }
+  .mt-prev {
+    order: -1;
+  }
+  .mt-cmd {
+    order: 1;
+  }
+  .mt-stage {
+    height: 230px;
+  }
+  body.mc-home.mt-page .mt-wrap .mt-qcopy {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    display: inline-flex;
+    min-width: 0;
+    height: 40px;
+    padding: 0 14px;
+  }
+  .mt-code {
+    max-height: 8em;
+  }
+  .mt-stage {
+    --mt-strip: 58px;
+  }
+  .mt-nametag {
+    top: 17px;
+    max-width: calc(100% - 240px); /* clears the preview's Copy button on both sides */
+  }
+}
+@container mtapp (max-width: 560px) {
+  body.mc-home.mt-page .mt-pick-toggle {
+    flex: 1 1 auto;
+    gap: 10px;
+  }
+  /* Share / Reset (and "Change mob") go icon-only; the words stay for screen readers. */
+  .mt-pick-acts .mt-btn {
+    width: 52px;
+    padding: 0;
+    justify-content: center;
+  }
+  .mt-pick-act > span,
+  .mt-pick-acts .mt-btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .mt-pick-acts .mt-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .mt-mobs .mt-grp {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .mt-mobs .mt-grp-h {
+    padding: 0;
+  }
+  .mt-mobs .mt-grp--az {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+  .mt-mobs .mt-grp--az .mt-grp-h {
+    padding: 7px 0 0;
+  }
+  /* Tabs: icon on top, then the name with its count beside it -- never over the icon. */
+  body.mc-home.mt-page .mt-tabs .mch-tab {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 20px auto;
+    place-content: center;
+    justify-items: center;
+    gap: 6px 5px;
+    height: 62px;
+    padding: 0 2px;
+    font-size: 12px;
+  }
+  body.mc-home.mt-page .mt-tabs .mch-tab img {
+    grid-column: 1 / -1;
+  }
+  body.mc-home.mt-page .mt-tabs .mch-tab:not(:has(.mt-n:not(:empty))) > span {
+    grid-column: 1 / -1;
+  }
+  body.mc-home.mt-page .mt-tabs .mch-tab .mt-n {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+  }
+  .mt-pan {
+    padding: 16px 14px 18px;
+  }
+  .mt-grid2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mt-grid3 {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .mt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mt-slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .mt-ticks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mt-tick {
+    grid-template-columns: minmax(0, 1fr) 80px 68px;
+    gap: 8px;
+  }
+  .mt-seg > button {
+    font-size: 12.5px;
+  }
+  body.mc-home.mt-page .mt-seg > button {
+    padding: 0 4px;
+    font-size: 12.5px;
+  }
+  .mt-sp {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mt-ned-pal {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .mt-trade-row {
+    gap: 8px;
+  }
+  .mt-tslot-in > .mt-in {
+    padding: 0 8px;
+  }
+  .mt-ned-t span {
+    /* the eye alone on phones; the words stay for screen readers */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .mt-st {
+    padding: 9px 10px 10px;
+  }
+  .mt-st dd {
+    font-size: 15px;
+  }
+  /* effect row: level + time on one line, particles under them */
+  .mt-fx {
+    padding: 6px 4px 12px 12px;
+  }
+  .mt-fx-ctl {
+    padding-right: 6px;
+  }
+  .mt-fx-lvl {
+    flex-basis: 70px;
+  }
+  .mt-fx-dur {
+    flex: 1 1 0;
+  }
+  .mt-fx-parts {
+    flex-basis: 100%;
+  }
+  .mt-kid-in > * {
+    margin-left: 48px;
+  }
+}
+
+@media (max-width: 970px) {
+  body.mc-home.mt-page .mt-wrap {
+    padding-top: 48px; /* = .mch-ch--surface on phones (mc-home.css) */
+    padding-bottom: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mt-dlg {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 24px);
+  }
+  .mt-dlg-head {
+    padding: 10px 6px 8px 14px;
+  }
+  .mt-dlg-tools {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 14px 12px;
+  }
+  .mt-filt {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .mt-dlg .mt-mobs {
+    padding: 8px 14px 16px;
+  }
+  .mt-iall {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    padding: 12px 14px 16px;
+  }
+  .mt-idlg-foot {
+    padding: 0 14px;
+  }
+  .mt-trim .mt-items {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .mt-inv-grid {
+    gap: 3px;
+  }
+  body.mc-home.mt-page .mt-fw-shapes > button span {
+    display: none; /* five icons fit a phone; the names don't */
+  }
+  body.mc-home.mt-page .mt-fw-shapes > button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mt-dlg[open] {
+    animation: none;
+  }
+  .mt-load i {
+    animation: none; /* three still pixels still say "loading" */
+  }
+  body.mt-page .mt-wrap *,
+  body.mt-page .mt-wrap *::after {
+    transition: none !important;
+  }
+}
+
+/* ---- Rider dialog (Oct 19) ----
+   The page's own settings box and preview are moved in here while a rider is edited (mc-mob.js editRider),
+   so every control is the same one. Head: the rider and what it sits on | settings + preview | Done. */
+.mt-rdlg {
+  width: min(1240px, calc(100vw - 32px));
+  max-height: min(92vh, 980px);
+}
+.mt-rdlg[open] {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.mt-rdlg-head {
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 12px 10px 12px 16px;
+  border-bottom: 2px solid var(--mt-edge-light);
+}
+.mt-rdlg-who {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+.mt-rdlg-k {
+  margin: 0;
+  overflow: hidden;
+  font-size: 12.5px;
+  color: var(--mt-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-rdlg-head .mt-x {
+  margin-left: 0;
+}
+.mt-rdlg-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  align-items: start;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--mt-page);
+  scrollbar-width: thin;
+  scrollbar-color: #3a3d48 transparent;
+}
+.mt-rdlg-body .mt-prev {
+  position: sticky;
+  top: 0;
+  order: 2; /* the page's narrow layout (container query) moves the preview first; here it sits right */
+}
+.mt-rdlg .mt-riders {
+  display: none; /* riders stack on the page's own mob, not inside a rider */
+}
+/* An item frame (a slot inside storage): just the item editor, so a narrower box */
+.mt-rdlg.is-item {
+  width: min(680px, calc(100vw - 32px));
+}
+.mt-rdlg.is-item .mt-rdlg-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+.mt-rdlg-head .mt-rdlg-back {
+  margin-right: -4px;
+}
+.mt-rdlg-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 2px solid var(--mt-edge-light);
+}
+.mt-rdlg-foot .mt-hint {
+  margin: 0;
+}
+body.mc-home.mt-page .mt-btn--go {
+  min-width: 132px;
+  justify-content: center;
+  background: var(--mt-accent);
+  box-shadow: inset 0 2px 0 var(--mt-accent-hi), inset 0 -4px 0 var(--mt-accent-lo);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+body.mc-home.mt-page .mt-btn--go:hover {
+  background: var(--mt-accent-h);
+}
+@media (max-width: 970px) {
+  .mt-rdlg-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mt-rdlg-body .mt-prev {
+    position: static;
+    order: -1; /* the rider first, then its settings */
+  }
+}
+@media (max-width: 640px) {
+  .mt-rdlg {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+  .mt-rdlg-head {
+    flex-wrap: wrap;
+    padding: 10px 6px 10px 12px;
+  }
+  .mt-rdlg-head .mt-btn {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .mt-rdlg-body {
+    padding: 12px;
+  }
+  .mt-rdlg-foot .mt-hint {
+    display: none;
+  }
+  .mt-rdlg-foot .mt-btn--go {
+    width: 100%;
+  }
+  .mt-slots {
+    grid-template-columns: repeat(var(--nm, 3), minmax(0, 1fr));
+  }
+}

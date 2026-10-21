@@ -15,9 +15,9 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css?v=20261012cr">
+<link rel="stylesheet" href="/11layout.css?v=20261021qs">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
-<link rel="stylesheet" href="/coc-clan-clock.css?v=20261012sq">
+<link rel="stylesheet" href="/coc-clan-clock.css?v=20261020wt">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoC Base Layouts, Army Comps &amp; Tools | Clash of Clans | Parchrome</title>
@@ -313,8 +313,9 @@ margin: auto;
 })();
 </script>
   <link rel="stylesheet" href="/coc-help.css" />
-  <link rel="stylesheet" href="/coc-more.css?v=20261012cr" />
-  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261007s" />
+  <link rel="stylesheet" href="/coc-more.css?v=20261021hd" />
+  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261021fs" />
+  <link rel="stylesheet" href="/tool-cards.css?v=9d01f290" />
 </head>
 <body class="coc-home">
 
@@ -398,13 +399,7 @@ margin: auto;
        the bar's right-hand column on desktop. -->
   <div class="stb-right">
   <div class="stb-hub-nav" id="stbHubNav" data-hub-nav="off">
-    <button class="dsn-scroll-btn dsn-scroll-left" id="hubScrollLeft" aria-label="Scroll left">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
     <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
-    <button class="dsn-scroll-btn dsn-scroll-right" id="hubScrollRight" aria-label="Scroll right">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
   </div>
 
   <div class="help-container">
@@ -442,8 +437,8 @@ Please open this page in Chrome for the best experience.</li><br>
      "Refreshes in" / "Resets in", data-timer="long" spells the units out
      ("2 days 4 hours"). Both sets must stay identical -- the loop slides
      the track by exactly half. The "Live in Clash right now" section below
-     uses the same script. Sits ABOVE the hero, right under the top bar
-     (Oct 12), so it shows on load at every width. -->
+     uses the same script. Sits under the hero at every width (Oct 20;
+     .hero-section has order:-1), at the bottom of the first screen. -->
 <div class="ch-ticker" aria-hidden="true">
   <div class="ch-ticker-viewport">
     <div class="ch-ticker-track">
@@ -1072,19 +1067,26 @@ Please open this page in Chrome for the best experience.</li><br>
 }
 
 .ch-btn-primary {
-  background: #c23b3b;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
   color: #fff;
 }
-.ch-btn-primary:hover { background: #d04343; }
+.ch-btn-primary:hover { border-color: var(--lb-red-edge); background: var(--lb-red-hover); }
 .ch-btn-primary:hover svg { transform: translateY(2px); }
 
 .ch-btn-ghost {
-  background: rgba(12, 12, 14, 0.55);
-  border-color: rgba(255, 255, 255, 0.18);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .ch-btn-ghost:hover {
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .ch-btn:active { transform: scale(0.98); }
@@ -1134,29 +1136,38 @@ Please open this page in Chrome for the best experience.</li><br>
   width: 100%;
   aspect-ratio: 16 / 10;
   padding: 0;
-  border: 1px solid #2a2c30;
-  border-radius: 0;
-  overflow: hidden;
   background: #141517;
   text-decoration: none;
   cursor: pointer;
   font: inherit;
   text-align: left;
-  box-shadow: 0 10px 26px -16px rgba(0, 0, 0, 0.9);
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Accent border on hover -- the reference lights one card's edge in the
    accent, and that is the only place a card ever uses it. */
 .ch-card:hover {
-  border-color: rgba(255, 255, 255, 0.22);
   transform: translateY(-3px);
-  box-shadow: 0 18px 34px -14px rgba(0, 0, 0, 0.8);
 }
 
 .ch-card:focus-visible {
   outline: 2px solid #c23b3b;
   outline-offset: 2px;
+}
+a.ch-card:hover {
+  border-color: var(--lb-edge);
+  background-color: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+}
+a.ch-card {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.ch-card {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 
 .ch-card-img {
@@ -1610,11 +1621,11 @@ Please open this page in Chrome for the best experience.</li><br>
   .hero-overlay {
     align-items: stretch;
     justify-content: stretch;
-    /* 38px clears the secondary top bar that sits over the banner's top
+    /* 32px clears the secondary top bar that sits over the banner's top
        edge (the main top bar is above the banner, not over it). */
     padding: 54px 6% 26px;
-    min-height: calc(100vh - var(--topbar-height, 52px) - 60px - var(--ch-ticker-h) - 38px);
-    min-height: calc(100svh - var(--topbar-height, 52px) - 60px - var(--ch-ticker-h) - 38px);
+    min-height: calc(100vh - var(--topbar-height, 52px) - 60px - var(--ch-ticker-h) - 32px);
+    min-height: calc(100svh - var(--topbar-height, 52px) - 60px - var(--ch-ticker-h) - 32px);
     background:
       radial-gradient(ellipse 62% 40% at 46% 40%,
         rgba(10,10,11,0) 0%,
@@ -2029,14 +2040,10 @@ function warModalEscHandler(e) {
    Statement heading with a red last phrase, like the hero's "DON'T WORK."
    Used by the Town Hall section and the Articles band; .lob-more is the
    "see all" link. font-family is set on every text element: the page's
-   `* { oxanium }` reset beats inheritance. */
-.lob-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 40px;
-  margin: 0 var(--coc-side) 32px;
-}
+   `* { oxanium }` reset beats inheritance.
+   .lob-head, .lob-title, .lob-go and the Articles band (.as-band) live in
+   coc-hub-menus.css "CLASH GUIDES BAND": the TH layouts / army pages show
+   the same band. Only the lobby-only pieces stay here. */
 .lob-head--first { padding-top: 80px; }
 .lob-head-text {
   display: flex;
@@ -2045,26 +2052,10 @@ function warModalEscHandler(e) {
   max-width: 760px;
   min-width: 0;
 }
-.lob-title {
-  margin: 0;
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(19px, 2.2vw, 30px);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.5px;
-  text-transform: uppercase;
-  color: #f2f3f5;
-}
-.lob-title em {
-  font-family: inherit;
-  font-style: normal;
-  color: #c23b3b;
-}
 .lob-sub,
 .lob-sub span {
   margin: 0;
   font-family: 'Sora', sans-serif;
-  font-size: 15px;
   line-height: 1.6;
   color: #a3a7ae;
 }
@@ -2082,12 +2073,16 @@ function warModalEscHandler(e) {
   font-family: 'Sora', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #c9ccd2;
   text-decoration: none;
-  transition: color 0.15s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .lob-more span { font-family: inherit; }
-.lob-more:hover { color: #fff; }
+.lob-more:hover { border-color: var(--lb-edge); background: var(--lb-raise-hover); color: #fff; }
 .lob-more svg {
   width: 15px;
   height: 15px;
@@ -2096,44 +2091,7 @@ function warModalEscHandler(e) {
 .lob-more:hover svg { transform: translateX(3px); }
 .lob-more:focus-visible { outline: 2px solid #c23b3b; outline-offset: 4px; }
 
-/* Title left, "Go to articles" right, one row at every width. */
-.lob-head--row { align-items: center; }
-.lob-go {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Sora', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #e6e8ec;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-.lob-go svg {
-  width: 16px;
-  height: 16px;
-  color: #e05252;
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.lob-go:hover { color: #fff; }
-.lob-go:hover svg { transform: translate(2px, -2px); }
-.lob-go:focus-visible { outline: 2px solid #c23b3b; outline-offset: 4px; }
-
-/* ARTICLES BAND --------------------------------------------------------- */
-/* One step lighter than the page, hairlines top and bottom: its own section
-   between the Town Halls and the tools, without another art background. */
-.as-band {
-  padding: 80px 0;
-  background: #0f1014;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
 @media (max-width: 970px) {
-  .as-band { padding: 56px 0; }
   /* TH18 is a small two-per-row card on phones: its "Latest" tag moves to
      the top-right corner, clear of the Town Hall icon. */
   .layouts-list .th-card .th-tag {
@@ -2143,32 +2101,17 @@ function warModalEscHandler(e) {
     padding: 2px 6px;
     font-size: 8px;
   }
-  .lob-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin: 0 5% 24px;
-  }
-  .lob-head--row { flex-direction: row; align-items: center; gap: 12px; }
-  .lob-go { font-size: 11px; gap: 6px; letter-spacing: 0.5px; }
-  .lob-go svg { width: 14px; height: 14px; }
   .lob-head-text { gap: 8px; }
   .lob-head--first { padding-top: 56px; }
-  .lob-sub,
-  .lob-sub span { font-size: 13px; }
   .lob-sub-more { display: none; }
-}
-/* 360px Androids: keeps "Clash guides." on one line beside the link. */
-@media (max-width: 380px) {
-  .lob-go { font-size: 10px; letter-spacing: 0.3px; }
 }
 
 
 </style>
 <!-- Town Hall + Clash tools cards: shared with /coc/tools/. -->
-<link rel="stylesheet" href="/coc-cards.css?v=20261012sq" />
+<link rel="stylesheet" href="/coc-cards.css?v=20261021tm" />
 <!-- Popular Articles strip: shared with every game section. -->
-<link rel="stylesheet" href="/article-cards.css?v=20261012sq" />
+<link rel="stylesheet" href="/article-cards.css?v=20261021as" />
 <!-- Hero meta + World top 10 sections (after the tracker promo) -->
 <link rel="stylesheet" href="/coc-lobby.css" />
 
@@ -2198,10 +2141,10 @@ function warModalEscHandler(e) {
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   background: #0e0e10;
 }
-/* Desktop: place the ticker after the banner; phones keep it above. */
-@media (min-width: 971px) {
-  .hero-section { order: -1; }
-}
+/* The ticker sits after the banner at every width (Oct 20: phones had it
+   above). On phones the hero carries the 38px that clears the secondary bar
+   overlapping .coc-main (see the 970px block below). */
+.hero-section { order: -1; }
 
 /* The mask lives here, not on .ch-ticker -- on the band it would fade the
    borders and background at the ends too, not just the text. */
@@ -2278,15 +2221,13 @@ function warModalEscHandler(e) {
   to   { transform: translate3d(-50%, 0, 0); }
 }
 
-/* Phones: no ticker (Oct 12). Under the shorter hero it was one more
-   moving strip on the first screen, and the "Live in Clash right now"
-   band at the bottom of the page shows the same timers. */
-/* Phones: same strip, at the top too (Oct 12), under the 38px secondary
-   bar that overlaps .coc-main. Fixed height so the hero can subtract it
-   (see .hero-overlay's min-height in the 970px hero block). */
+/* Phones: same strip under the banner, as on desktop (Oct 20). Fixed
+   height so the hero can subtract it and land the ticker right on the
+   bottom nav on load (see .hero-overlay's min-height in the 970px block). */
 @media (max-width: 970px) {
   :root { --ch-ticker-h: 34px; }
-  .ch-ticker { height: var(--ch-ticker-h); margin-top: 38px; display: flex; align-items: center; }
+  .ch-ticker { height: var(--ch-ticker-h); margin-top: 0; display: flex; align-items: center; }
+  .hero-section { margin-top: 32px; }
   .ch-ticker-viewport { flex: 1; min-width: 0; }
   .ch-ticker-set { padding: 0; }
   .ch-ticker-set span { font-size: 9px; letter-spacing: 1px; margin-right: 28px; }
@@ -2308,7 +2249,7 @@ function warModalEscHandler(e) {
    <div class="lob-head lob-head--first" id="featured-townhalls">
      <div class="lob-head-text">
        <h2 class="lob-title">Featured <em>Town Halls.</em></h2>
-       <p class="lob-sub">Base layouts for Town Hall 9 to 18, designed by <strong>Parcore</strong>, former #1 Legend League player in the Philippine rankings.</p>
+       <p class="lob-sub">Base layouts curated by <strong>Parcore</strong>, former #1 Legend League player in the PH rankings.</p>
      </div>
    </div>
 
@@ -2504,6 +2445,12 @@ function warModalEscHandler(e) {
        Below 1200px none of this applies: laptops get the card grid, phones
        their two-per-row art cards. */
     .pk-view { display: none; }
+    .pk-view {
+      border: 2px solid var(--lb-edge);
+      border-radius: var(--lb-r);
+      background-color: var(--lb-box);
+      box-shadow: var(--lb-shadow);
+    }
     .th-pick { margin-bottom: 80px; }
     .th-pick .layouts-list { margin-top: 0; }
     @media (max-width: 970px) { .th-pick { margin-bottom: 56px; } }
@@ -2521,8 +2468,6 @@ function warModalEscHandler(e) {
         flex-direction: column;
         gap: 0;
         margin: 0;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 0;
         background: #121317;
         overflow: hidden;
       }
@@ -2538,7 +2483,6 @@ function warModalEscHandler(e) {
         align-items: center;
         padding: 0 18px 0 14px;
         border: 0;
-        border-radius: 0;
         background: transparent;
         transition: background 0.15s ease;
       }
@@ -2547,7 +2491,6 @@ function warModalEscHandler(e) {
       .th-pick .th-card::after { display: none; }
       .th-pick .th-card:hover {
         transform: none;
-        box-shadow: none;
         background: #17181c;
       }
       .th-pick .th-card.is-on { background: #202127; }
@@ -2621,8 +2564,6 @@ function warModalEscHandler(e) {
         position: relative;
         min-height: 0;
         overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 0;
         background: #121317;
       }
       .pk-shots { position: relative; flex: 1; min-height: 0; overflow: hidden; }
@@ -2645,7 +2586,12 @@ function warModalEscHandler(e) {
         justify-content: space-between;
         gap: 16px 24px;
         padding: 16px 20px 16px 22px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .pk-info {
+        border: 0;
+        border-radius: var(--lb-r);
+        background-color: rgba(0, 0, 0, 0.25);
+        box-shadow: var(--lb-ring-well);
       }
       .pk-id { display: flex; align-items: center; gap: 16px; min-width: 0; }
       .pk-id img {
@@ -2921,10 +2867,9 @@ function warModalEscHandler(e) {
          "The latest | Go to news page" header. No subtitle: the slides say it. -->
     <div class="lob-head lob-head--row">
       <h2 class="lob-title" id="asTitle">Clash <em>guides.</em></h2>
-      <a class="lob-go" href="/articles/coc/">Go to articles
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M13 4h7v7M20 4l-9 9M10 6H4v14h14v-6"/></svg></a>
+      <a class="art-all" href="/articles/coc/">All articles<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <div class="art-track" id="cocArticles" data-game="coc" data-live data-variant="slide"></div>
+    <div class="art-track" id="cocArticles" data-game="coc" data-live data-variant="slide" data-order="random"></div>
     <div class="art-pager">
       <div class="art-progress" data-for="cocArticles" aria-hidden="true"><span></span></div>
       <div class="art-nav" data-for="cocArticles">
@@ -2938,84 +2883,179 @@ function warModalEscHandler(e) {
     </div>
    </section>
 
-    <!-- PARCHROME TOOLS: the eight destinations are grouped by task, with
-         plain link rows in place of a wall of matching cards. -->
+    <!-- PARCHROME TOOLS: nine animated cards (art = real game pictures +
+         CSS effects). Built by _tools/tool-cards/build_cards.py into
+         /tool-cards.css + /tool-cards.js and the TOOL CARDS block below. -->
     <section class="pt-band" id="clash-tools" aria-labelledby="ptTitle">
     <img class="pt-band-bg" src="/clashofclans/home/army-maker-bg.webp" alt="" loading="lazy" decoding="async">
     <div class="lob-head">
       <div class="lob-head-text">
         <h2 class="lob-title" id="ptTitle">Parchrome <em>tools.</em></h2>
-        <p class="lob-sub">Plan attacks, price upgrades, compare gear, and track players.</p>
       </div>
-      <a class="lob-more" href="/coc/tools/"><span>Browse all tools</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="art-all" href="/coc/tools/">Browse all tools<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
 
-    <div class="pt-tools-grid">
-      <section class="pt-tool-group" aria-labelledby="ptPlanTitle">
-        <h3 class="pt-tool-heading" id="ptPlanTitle">Plan attacks</h3>
-        <div class="pt-tool-list">
-          <a class="pt-tool-link" href="/coc/tools/army-maker">
-            <span class="tc-icon"><img src="/clashofclans/coctools/army-camp.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Army Maker</span><span class="tc-desc">Build an army for TH8 to TH18 and open it straight in the game.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="pt-tool-link" href="/coc/tools/damage-calculator">
-            <span class="tc-icon"><img src="/clashofclans/buildings/cannon/15.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Damage Calculator</span><span class="tc-desc">See what your spells and equipment leave of any building.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-        </div>
-      </section>
+    <!-- TOOL CARDS: generated by _tools/tool-cards/build_cards.py -->
+    <div class="ptc-wrap"><div class="ptc-grid">
+    <a class="ptc ptc-army" href="/coc/tools/army-maker">
+      <div class="ptc-art am-art" data-go="am-go" data-clock="amh-camp" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="am-light"></div><i class="am-mote"></i><i class="am-mote"></i><i class="am-mote"></i></div>
+        <div class="ptc-layer ptc-mid"><div class="am-ring"></div><div class="am-camp"><img loading="lazy" decoding="async" src="/clashofclans/coctools/army-camp.webp" alt=""></div></div>
+        <div class="ptc-layer ptc-near"><img class="am-t am-t0" src="/clashofclans/coctools/units/rocket-balloon.webp" alt=""><img class="am-t am-t1" src="/clashofclans/coctools/units/super-minion.webp" alt=""><img class="am-t am-t2" src="/clashofclans/coctools/units/healer.webp" alt=""></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Army Maker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Build an army for TH8 to TH18 and open it straight in the game.</p>
+      </div>
+    </a>
 
-      <section class="pt-tool-group" aria-labelledby="ptTrackTitle">
-        <h3 class="pt-tool-heading" id="ptTrackTitle">Track players &amp; clans</h3>
-        <div class="pt-tool-list">
-          <a class="pt-tool-link" href="/coc/tools/player-tracker">
-            <span class="tc-icon"><img src="/clashofclans/coctools/legend-league.png" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Player Tracker</span><span class="tc-desc">See a player&rsquo;s heroes and equipment or a clan&rsquo;s war log.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="pt-tool-link" href="/coc/tools/leaderboards">
-            <span class="tc-icon"><img src="/icons/leaderboards.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Leaderboards</span><span class="tc-desc">The world&rsquo;s top 200 players and the Philippines&rsquo; best, updated daily.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+    <a class="ptc ptc-dc" href="/coc/tools/damage-calculator">
+      <div class="ptc-art dc-art" data-go="dc-go" data-clock="dch-hp" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="dc-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="dc-ring"></div>
+          <div class="dc-mono"><img loading="lazy" decoding="async" src="/clashofclans/buildings/monolith/1.webp" alt=""></div>
+          <svg class="dc-bolt" viewBox="0 0 50 76">
+            <path class="glow" pathLength="1" d="M4 0 L15 19 L9 25 L25 45 L19 51 L42 74"/>
+            <path class="core" pathLength="1" d="M4 0 L15 19 L9 25 L25 45 L19 51 L42 74"/>
+          </svg>
         </div>
-      </section>
+        <div class="ptc-layer ptc-near"><div class="dc-bar"><i class="dc-ghost"></i><i class="dc-fill"></i></div><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><div class="dc-stamp"><span>Destroyed</span></div></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Damage Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">See what your spells and equipment leave of any building.</p>
+      </div>
+    </a>
 
-      <section class="pt-tool-group" aria-labelledby="ptUpgradeTitle">
-        <h3 class="pt-tool-heading" id="ptUpgradeTitle">Price upgrades</h3>
-        <div class="pt-tool-list">
-          <a class="pt-tool-link" href="/coc/tools/walls">
-            <span class="tc-icon"><img src="/clashofclans/coctools/th17-wall.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Wall Calculator</span><span class="tc-desc">Check wall costs, including Gold Pass and Hammer Jam savings.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="pt-tool-link" href="/coc/tools/equipment">
-            <span class="tc-icon"><img src="/icons/fireball.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Equipment</span><span class="tc-desc">Stats, ore costs, and tips for all 42 hero items.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+    <a class="ptc ptc-pl" href="/coc/tools/player-tracker">
+      <div class="ptc-art pl-art" data-go="pl-go" data-clock="plh-lens" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="pl-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="pl-scene">
+            <div class="fx-rays pl-rays"></div>
+            <div class="pl-win pl-base"><div class="pl-reel"><img loading="lazy" decoding="async" src="/clashofclans/leagues/legend.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/pekka.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/wizard.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/dragon.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/skeleton.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/titan.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/valkyrie.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/electro.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/archer.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/witch.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/golem.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/barbarian.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/legend.webp" alt=""></div></div>
+            <img class="pl-shine" src="/clashofclans/leagues/legend.webp" alt="">
+            <i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:-5deg;--d:44px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:28deg;--d:45px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:62deg;--d:35px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:81deg;--d:49px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:116deg;--d:38px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:159deg;--d:42px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:186deg;--d:42px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:213deg;--d:37px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:242deg;--d:50px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:270deg;--d:47px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:303deg;--d:35px"></i><i class="fx-st pl-st" style="left:42px;top:56px;width:10px;--r:335deg;--d:45px"></i>
+            <div class="pl-mag"><div class="pl-win"><div class="pl-reel"><img loading="lazy" decoding="async" src="/clashofclans/leagues/legend.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/pekka.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/wizard.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/dragon.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/skeleton.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/titan.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/valkyrie.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/electro.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/archer.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/witch.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/golem.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/barbarian.webp" alt=""><img loading="lazy" decoding="async" src="/clashofclans/leagues/legend.webp" alt=""></div></div></div>
+            <div class="pl-lens"><svg viewBox="0 0 60 60">
+              <path d="M40 40 L55 55" stroke="#060708" stroke-width="9" stroke-linecap="round"/>
+              <path d="M40 40 L55 55" stroke="#5b4636" stroke-width="5.5" stroke-linecap="round"/>
+              <circle cx="24" cy="24" r="21" fill="rgba(190,210,255,.07)" stroke="#060708" stroke-width="6"/>
+              <circle cx="24" cy="24" r="21" fill="none" stroke="#d6d9df" stroke-width="3"/>
+              <path d="M11 17 A14 14 0 0 1 20 10" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+            </svg></div>
+          </div>
         </div>
-      </section>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Player Tracker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Look up any player or clan by tag.</p>
+      </div>
+    </a>
+    <a class="ptc ptc-lr" href="/coc/tools/leaderboards">
+      <div class="ptc-art lr-art" data-go="lr-go" data-clock="lrh-fade" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="lr-glow"></div></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="lr-board">
+            <div class="fx-rays lr-rays"></div>
+            <div class="lr-ranks"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+            <div class="lr-rows">
+              <div class="lr-row lr-a"><i class="lr-name"></i><i class="lr-score"></i></div>
+              <div class="lr-row lr-b"><i class="lr-name" style="width:52%"></i><i class="lr-score"></i></div>
+              <div class="lr-row lr-c"><i class="lr-name" style="width:34%"></i><i class="lr-score"></i></div>
+              <div class="lr-row lr-you"><svg class="lr-crown" viewBox="0 0 20 14"><path d="M1.5 12.5 L2.5 3 L7 7.5 L10 1.5 L13 7.5 L17.5 3 L18.5 12.5 Z" fill="#f3c44e" stroke="#060708" stroke-width="1.6" stroke-linejoin="round"/></svg><b>You</b><span class="lr-up">▲</span><i class="lr-score"></i></div>
+            </div>
+            <i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:-5deg;--d:34px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:24deg;--d:35px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:44deg;--d:40px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:85deg;--d:47px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:108deg;--d:36px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:129deg;--d:37px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:148deg;--d:34px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:175deg;--d:49px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:212deg;--d:47px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:237deg;--d:36px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:254deg;--d:43px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:287deg;--d:47px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:315deg;--d:34px"></i><i class="fx-st lr-st" style="left:70px;top:11px;width:12px;--r:336deg;--d:44px"></i>
+          </div>
+        </div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Leaderboards<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Today’s top 200 in the Philippines and the world.</p>
+      </div>
+    </a>
+    <a class="ptc ptc-wc" href="/coc/tools/walls">
+      <div class="ptc-art wc-art" data-go="wc-go" data-clock="wch-num" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="wc-glow"></div></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="fx-rays wc-rays"></div>
+          <div class="wc-wall">
+            <i class="wc-dust"></i>
+            <img class="wc-18" src="/clashofclans/coctools/walls/wall-18.webp" alt="">
+            <img class="wc-19" src="/clashofclans/coctools/walls/wall-19.webp" alt="">
+            <img class="wc-shine" src="/clashofclans/coctools/walls/wall-19.webp" alt="">
+          </div>
+          <div class="wc-beam"></div>
+          <i class="fx-em wc-em" style="left:68px;top:128px;--dx:7px;--dy:-62px;width:2px;height:2px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:20px;--dy:-63px;width:3px;height:3px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:9px;--dy:-67px;width:2px;height:2px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:-8px;--dy:-66px;width:4px;height:4px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:3px;--dy:-57px;width:2px;height:2px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:14px;--dy:-51px;width:3px;height:3px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:25px;--dy:-63px;width:3px;height:3px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:16px;--dy:-41px;width:4px;height:4px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:-22px;--dy:-39px;width:2px;height:2px"></i>
+        </div>
+        <div class="ptc-layer ptc-near">
+          <div class="wc-tag"><img loading="lazy" decoding="async" src="/clashofclans/coctools/Gold.webp" alt=""><span class="wc-num"></span></div>
+          <span class="wc-old wc-old1">10M</span><span class="wc-old wc-old2">5M</span>
+          <i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:5deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:36deg;--d:21px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:63deg;--d:25px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:107deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:142deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:176deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:220deg;--d:22px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:253deg;--d:25px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:282deg;--d:24px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:329deg;--d:21px"></i>
+          <img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-18px;--dy:-12px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:15px;--dy:-12px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:4px;--dy:-14px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-44px;--dy:-16px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-46px;--dy:-15px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-43px;--dy:-12px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-8px;--dy:-18px">
+          <img class="wc-jam" src="/clashofclans/coctools/walls/hammer-jam.webp" alt="">
+          <img class="wc-gp" src="/clashofclans/coctools/walls/builder-boost.webp" alt="">
+        </div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Wall Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Wall costs, including Gold Pass and Hammer Jam savings.</p>
+      </div>
+    </a>
 
-      <section class="pt-tool-group" aria-labelledby="ptCompareTitle">
-        <h3 class="pt-tool-heading" id="ptCompareTitle">Compare &amp; learn</h3>
-        <div class="pt-tool-list">
-          <a class="pt-tool-link" href="/coc/tools/equipment-tier-list">
-            <span class="tc-icon"><img src="/icons/blacksmith.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Equipment Tier List</span><span class="tc-desc">Rank all 42 hero items from S to D and share your list.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="pt-tool-link" href="/coc/tools/slang">
-            <span class="tc-icon"><img src="/icons/Book_of_Everything.webp" alt="" loading="lazy" decoding="async"></span>
-            <span class="tc-text"><span class="tc-name">Glossary</span><span class="tc-desc">Queen Walk, Lavaloon, and 32 more terms in plain English.</span></span>
-            <svg class="tc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+    <a class="ptc ptc-eq" href="/coc/tools/equipment">
+      <div class="ptc-art eq-art" data-go="eq-go" data-clock="eqh-heat" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="eq-glow"></div><i class="eq-wind" style="left:45px;height:25px;--t:1.68s;--d:-0.96s"></i><i class="eq-wind" style="left:49px;height:27px;--t:1.78s;--d:-1.02s"></i><i class="eq-wind" style="left:68px;height:18px;--t:1.30s;--d:-0.74s"></i><i class="eq-wind" style="left:74px;height:15px;--t:1.78s;--d:-0.46s"></i><i class="eq-wind" style="left:50px;height:15px;--t:1.90s;--d:-1.48s"></i><div class="eq-hot"><i class="eq-wind" style="left:99px;height:16px;--t:0.56s;--d:-2.00s"></i><i class="eq-wind" style="left:47px;height:16px;--t:0.75s;--d:-0.69s"></i><i class="eq-wind" style="left:94px;height:18px;--t:0.84s;--d:-0.64s"></i><i class="eq-wind" style="left:75px;height:29px;--t:0.76s;--d:-1.85s"></i><i class="eq-wind" style="left:82px;height:15px;--t:0.81s;--d:-1.18s"></i><i class="eq-wind" style="left:55px;height:17px;--t:0.80s;--d:-1.17s"></i><i class="eq-wind" style="left:98px;height:26px;--t:0.84s;--d:-1.13s"></i></div></div>
+        <div class="ptc-layer ptc-mid">
+          <i class="eq-trail"></i>
+          <div class="eq-ball"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/fireball.webp" alt=""><i class="eq-core"></i></div>
         </div>
-      </section>
-    </div>
+        <div class="ptc-layer ptc-near"><i class="eq-em" style="left:86px;top:101px;--dx:3px;--dy:-87px;--rot:12deg;--t:1.70s;--d:-0.22s;width:2px;height:2px"></i><i class="eq-ash" style="left:49px;top:92px;--dx:-13px;--dy:-109px;--rot:-1deg;--t:2.68s;--d:-0.05s;width:3px;height:2px"></i><i class="eq-ash" style="left:50px;top:97px;--dx:5px;--dy:-95px;--rot:188deg;--t:2.31s;--d:-0.84s;width:3px;height:2px"></i><i class="eq-em" style="left:61px;top:75px;--dx:7px;--dy:-94px;--rot:-21deg;--t:2.17s;--d:-1.39s;width:2px;height:2px"></i><i class="eq-em" style="left:69px;top:94px;--dx:3px;--dy:-73px;--rot:-30deg;--t:2.22s;--d:-1.26s;width:2px;height:2px"></i><i class="eq-em" style="left:61px;top:84px;--dx:-6px;--dy:-101px;--rot:20deg;--t:1.95s;--d:-0.50s;width:1.5px;height:1.5px"></i><i class="eq-em" style="left:53px;top:97px;--dx:-5px;--dy:-76px;--rot:98deg;--t:2.19s;--d:-0.22s;width:2.5px;height:2.5px"></i><i class="eq-ash" style="left:87px;top:74px;--dx:-15px;--dy:-102px;--rot:75deg;--t:2.10s;--d:-2.04s;width:3px;height:1.5px"></i><i class="eq-em" style="left:88px;top:96px;--dx:15px;--dy:-85px;--rot:-123deg;--t:2.02s;--d:-0.15s;width:2.5px;height:2.5px"></i><i class="eq-em" style="left:78px;top:87px;--dx:-13px;--dy:-92px;--rot:60deg;--t:1.95s;--d:-1.35s;width:2px;height:2px"></i><i class="eq-ash" style="left:65px;top:101px;--dx:-5px;--dy:-106px;--rot:126deg;--t:2.13s;--d:-1.91s;width:3px;height:2px"></i><i class="eq-ash" style="left:86px;top:101px;--dx:1px;--dy:-87px;--rot:-80deg;--t:2.49s;--d:-2.15s;width:3px;height:1.5px"></i><i class="eq-em" style="left:52px;top:92px;--dx:2px;--dy:-103px;--rot:-101deg;--t:2.00s;--d:-1.90s;width:1.5px;height:1.5px"></i><i class="eq-ash" style="left:76px;top:76px;--dx:15px;--dy:-102px;--rot:195deg;--t:2.66s;--d:-0.73s;width:3px;height:2px"></i><div class="eq-hot"><i class="eq-em" style="left:82px;top:78px;--dx:-10px;--dy:-97px;--rot:-163deg;--t:1.40s;--d:-1.06s;width:2px;height:2px"></i><i class="eq-em" style="left:59px;top:102px;--dx:-1px;--dy:-99px;--rot:54deg;--t:0.81s;--d:-0.02s;width:2px;height:2px"></i><i class="eq-em" style="left:78px;top:86px;--dx:14px;--dy:-73px;--rot:104deg;--t:0.98s;--d:-0.83s;width:2px;height:2px"></i><i class="eq-em" style="left:86px;top:74px;--dx:5px;--dy:-71px;--rot:-115deg;--t:1.19s;--d:-0.40s;width:3px;height:3px"></i><i class="eq-ash" style="left:52px;top:93px;--dx:10px;--dy:-110px;--rot:144deg;--t:1.28s;--d:-0.34s;width:3px;height:2px"></i><i class="eq-em" style="left:52px;top:88px;--dx:-11px;--dy:-89px;--rot:68deg;--t:0.89s;--d:-0.87s;width:2px;height:2px"></i><i class="eq-em" style="left:58px;top:88px;--dx:9px;--dy:-73px;--rot:-145deg;--t:0.94s;--d:-0.29s;width:3px;height:3px"></i><i class="eq-em" style="left:64px;top:97px;--dx:-1px;--dy:-103px;--rot:-100deg;--t:1.04s;--d:-0.19s;width:3px;height:3px"></i><i class="eq-em" style="left:62px;top:100px;--dx:-15px;--dy:-105px;--rot:81deg;--t:1.34s;--d:-0.59s;width:2px;height:2px"></i><i class="eq-ash" style="left:88px;top:95px;--dx:1px;--dy:-93px;--rot:-36deg;--t:1.29s;--d:-0.51s;width:2px;height:2px"></i><i class="eq-em" style="left:60px;top:83px;--dx:10px;--dy:-96px;--rot:-193deg;--t:1.34s;--d:-0.35s;width:3px;height:3px"></i><i class="eq-ash" style="left:74px;top:85px;--dx:-7px;--dy:-88px;--rot:71deg;--t:1.04s;--d:-0.38s;width:3px;height:1.5px"></i><i class="eq-em" style="left:49px;top:87px;--dx:9px;--dy:-104px;--rot:12deg;--t:0.84s;--d:-0.76s;width:2px;height:2px"></i><i class="eq-em" style="left:53px;top:98px;--dx:-13px;--dy:-79px;--rot:-191deg;--t:0.87s;--d:-0.84s;width:2.5px;height:2.5px"></i></div></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Equipment<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Stats, ore costs, and tips for all 42 hero items.</p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-tl" href="/coc/tools/tier-list">
+      <div class="ptc-art tl-art" data-go="tl-go" data-clock="tlh-t0" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="tl-glow"></div></div>
+        <div class="ptc-layer ptc-mid"><div class="tl-board tl-troop"><div class="fx-rays tl-rays"></div><div class="tl-row tl-r0"><b class="tl-lab">S</b></div><div class="tl-row tl-r1"><b class="tl-lab">A</b></div><div class="tl-row tl-r2"><b class="tl-lab">B</b></div><span class="tl-tile tl-t0 " style="left:26px;top:1px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/rocket-balloon.webp" alt=""></span><span class="tl-tile tl-t1 " style="left:51px;top:1px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/super-minion.webp" alt=""></span><span class="tl-tile tl-t2 " style="left:76px;top:1px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/healer.webp" alt=""></span><span class="tl-tile tl-t3 " style="left:26px;top:29px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/yeti.webp" alt=""></span><span class="tl-tile tl-t4 " style="left:51px;top:29px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/headhunter.webp" alt=""></span><span class="tl-tile tl-t5 " style="left:76px;top:29px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/ice-golem.webp" alt=""></span><span class="tl-tile tl-t6 " style="left:26px;top:57px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/archer.webp" alt=""></span><span class="tl-tile tl-t7 " style="left:51px;top:57px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/minion.webp" alt=""></span><span class="tl-tile tl-t8 " style="left:76px;top:57px"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/wall-breaker.webp" alt=""></span><i class="tl-glint"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:-1deg;--d:37px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:38deg;--d:36px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:60deg;--d:38px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:84deg;--d:36px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:122deg;--d:41px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:143deg;--d:33px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:173deg;--d:41px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:213deg;--d:29px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:249deg;--d:43px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:273deg;--d:38px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:294deg;--d:29px"></i><i class="fx-st tl-st" style="left:10px;top:12px;width:9px;--r:331deg;--d:30px"></i></div></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Clash Tier List<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Rank anything in Clash from S to F and share your list.</p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-gl" href="/coc/tools/slang">
+      <div class="ptc-art gl-art" data-go="gl-go" data-clock="glh-leaf" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="gl-glow"></div><div class="fx-rays gl-rays"></div></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="gl-stage">
+            <div class="gl-book">
+              <div class="gl-cover"></div>
+              <div class="gl-page gl-pl"><i class="gl-lines"></i></div>
+              <div class="gl-page gl-pr"><b class="gl-term gl-pt0">Queen Walk</b><b class="gl-term gl-pt1">Lavaloon</b><b class="gl-term gl-pt2">Funneling</b><i class="gl-lines"></i><i class="gl-shade"></i></div>
+              <div class="gl-leaf">
+                <div class="gl-face gl-front"><b class="gl-term gl-lt0">Queen Walk</b><b class="gl-term gl-lt1">Lavaloon</b><b class="gl-term gl-lt2">Funneling</b><i class="gl-lines"></i><i class="gl-shade"></i></div>
+                <div class="gl-face gl-back"><i class="gl-lines"></i></div>
+              </div>
+              <i class="gl-ribbon"></i>
+            </div>
+            <i class="fx-em gl-em" style="left:84px;top:22px;--dx:-1px;--dy:-37px;width:3px;height:3px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:-19px;--dy:-24px;width:3px;height:3px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:-1px;--dy:-37px;width:4px;height:4px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:10px;--dy:-36px;width:2px;height:2px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:8px;--dy:-27px;width:4px;height:4px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:-7px;--dy:-31px;width:3px;height:3px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:-23px;--dy:-40px;width:2px;height:2px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:1px;--dy:-40px;width:4px;height:4px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:15px;--dy:-26px;width:2px;height:2px"></i><i class="fx-em gl-em" style="left:84px;top:22px;--dx:17px;--dy:-37px;width:3px;height:3px"></i>
+          </div>
+        </div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Glossary<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc">Queen Walk, Lavaloon, and 32 more terms in plain English.</p>
+      </div>
+    </a>
+    </div></div>
+    <!-- /TOOL CARDS -->
     </section>
 
 <script>
@@ -3067,98 +3107,22 @@ function warModalEscHandler(e) {
   position: relative;
   overflow: hidden;
   padding: 0;
-  /* The page's own dark: the tools band above fades into it, so there is
-     no seam (Oct 2026: the photo + scrim that were here went to .pt-band). */
-  background: #0a0a0b;
-}
-
-/* Page column (--coc-side) so the copy lines up with every other section. */
-.cl-feature-inner {
-  position: relative;
+  /* Sunken band (Oct 21 2026), the "Clash guides." band's recipe
+     (coc-hub-menus.css .as-band): one step lighter than the page, dark
+     edges top and bottom, a dark lip inside the top. The tools band above
+     no longer fades into it. z-index keeps the light line under the bottom
+     edge from being painted over by the next section. */
+  /* The war on the phone's screen, dimmed behind the band: near-solid under
+     the copy, showing through on the phone's side. Layers sit under the
+     inset lip, so the well's edge stays crisp. */
+  background:
+    linear-gradient(90deg, #0f1014 0%, rgba(15, 16, 20, 0.94) 38%, rgba(15, 16, 20, 0.72) 100%),
+    url('/clashofclans/tracker-battlefield.webp') 70% 65% / cover no-repeat,
+    #0f1014;
+  border-top: 2px solid var(--lb-edge);
+  border-bottom: 2px solid var(--lb-edge);
+  box-shadow: var(--card-well);
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: center;
-  gap: 40px;
-  margin: 0 var(--coc-side);
-  min-height: 700px;
-  padding: 96px 0;
-}
-
-.cl-feature-copy {
-  max-width: 520px;
-  min-width: 0;
-}
-
-.cl-feature-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(26px, 2.4vw, 40px);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.3px;
-  text-transform: uppercase;
-  color: #f2f3f5;
-  margin: 0 0 18px;
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-}
-
-/* Same treatment as the hero's red word (.ch-title em): flat accent plus
-   a soft glow, so "Parcore" here and "don't work." up top read as one
-   device. */
-.cl-feature-title em {
-  font-style: normal;
-  color: #c23b3b;
-  text-shadow: 0 0 18px rgba(194, 59, 59, 0.4), 2px 4px 8px rgba(0, 0, 0, 0.4);
-  font-family: Orbitron;
-  letter-spacing: 1.7px;
-   font-size: clamp(28px, 2.4vw, 40px);
-}
-
-/* Price chip inside the CTA. Darker than the button so it reads as a tag
-   on the button, not a second button. */
-.cl-price {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 4px;
-  padding: 3px 8px;
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  font-family: 'Orbitron', sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  line-height: 1;
-  color: #fff;
-}
-
-.cl-feature-text {
-  font-family: 'Sora', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.7;
-  color: #d5d8de;
-  margin: 0;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Reuses the hero's kicker (mono caps, red dots) so the two sections
-   share one voice; only the spacing below it is local. */
-
-.cl-feature-text--sub {
-  margin-top: 12px;
-  font-size: 13.5px;
-  color: #9ea3ab;
-}
-
-/* Button borrows .ch-btn-primary from the hero -- same red, same hard
-   offset shadow -- so "Get your base" reads as the same kind of action
-   as "Browse layouts". */
-.cl-track { margin-top: 28px; max-width: 460px; }
-
-.cl-feature-device {
-  position: relative;
-  min-width: 0;
 }
 
 /* Landscape box. Wider than its column on purpose -- the reference runs
@@ -3546,132 +3510,6 @@ function warModalEscHandler(e) {
   color: #a3a7ae;
 }
 
-/* TRACKER SEARCH ----------------------------------------------------- */
-/* Player / Clan switch, then one bar: "#", the field and a Track button.
-   The bar is near-opaque so it reads over any part of the banner art. */
-.cl-track-modes {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 10px;
-}
-.cl-track-modes button {
-  padding: 7px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0;
-  background: rgba(14, 14, 16, 0.6);
-  color: #a3a7ae;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.3px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-.cl-track-modes button:hover { color: #fff; border-color: rgba(255, 255, 255, 0.24); }
-.cl-track-modes button[aria-checked="true"] {
-  background: #f2f3f5;
-  border-color: #f2f3f5;
-  color: #111214;
-}
-.cl-track-bar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 5px 5px 14px;
-  background: rgba(12, 12, 14, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 0;
-  transition: border-color 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cl-track-bar:focus-within { border-color: rgba(255, 255, 255, 0.42); }
-.cl-track.is-clan .cl-track-hash { display: none; }
-.cl-track-hash {
-  font-family: 'Oxanium', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  color: #6d7178;
-}
-/* 16px+: iOS Safari zooms the page into any smaller input on tap. */
-.cl-track-bar input {
-  flex: 1;
-  min-width: 0;
-  padding: 11px 6px 11px 2px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #f2f3f5;
-  caret-color: #d64545;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-}
-.cl-track:not(.is-clan) .cl-track-bar input { text-transform: uppercase; }
-.cl-track-bar input::placeholder {
-  color: #6d7178;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  text-transform: none;
-}
-.cl-track-go {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 0;
-  background: #c23b3b;
-  color: #fff;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-.cl-track-go svg { width: 14px; height: 14px; transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
-.cl-track-go:hover { background: #d04343; }
-.cl-track-go:hover svg { transform: translateX(3px); }
-.cl-track-go:active { transform: scale(0.97); }
-.cl-track-go[aria-busy="true"] { opacity: 0.7; pointer-events: none; }
-.cl-track-hint {
-  margin: 12px 0 0;
-  font-family: 'Sora', sans-serif;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: #a3a7ae;
-}
-.cl-track-hint.is-error { color: #f0a3a3; }
-.cl-track-try {
-  margin-left: 4px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: #f2f3f5;
-  font: inherit;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.35);
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-.cl-track-try:hover { text-decoration-color: #fff; }
-.cl-track-modes button:focus-visible,
-.cl-track-go:focus-visible,
-.cl-track-try:focus-visible,
-.cl-phone-bar button:focus-visible {
-  outline: 2px solid #f2f3f5;
-  outline-offset: 2px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .cl-phone-results { animation: none; }
-  .cl-phone-shot, .cl-track-go svg { transition: none; }
-}
-
 /* Portrait-shaped wrapper for the portrait frame PNG, rotated to lie
    across the landscape box. Its width is the box's height (380/800 of the
    box width) and aspect-ratio gives it the box's width as its height, so
@@ -3693,47 +3531,6 @@ function warModalEscHandler(e) {
   height: 100%;
 }
 
-@media (max-width: 1150px) {
-  .cl-feature-inner {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 28px;
-    min-height: 0;
-    padding: 72px 0;
-  }
-  .cl-feature-title { font-size: clamp(24px, 3vw, 32px); }
-  .cl-feature-text { font-size: 15px; }
-  .cl-phone { width: 104%; }
-}
-
-@media (max-width: 970px) {
-  .cl-feature-inner {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 30px;
-    margin: 0 5%;
-    padding: 64px 0 60px;
-    text-align: center;
-  }
-  .cl-feature-copy { max-width: 100%; margin: 0 auto; }
-  .cl-feature-title { font-size: clamp(24px, 6.4vw, 30px); margin-bottom: 14px; }
-  .cl-feature-text { font-size: 14px; line-height: 1.65; }
-  .cl-feature-text--sub { font-size: 12.5px; }
-  /* Copy is centred here; the search block centres with it, its insides
-     stay left-aligned. */
-  .cl-track { margin: 24px auto 0; text-align: left; }
-  /* Full width, no run-off, softer tilt: on a phone the phone is the
-     whole row, not a thing peeking in from the side. */
-  /* Centred and fully visible. The desktop rule's left offset was
-     inheriting down here and pushing the phone off the right edge of a
-     phone screen -- a crop that reads as intent on desktop reads as a
-     bug on mobile. */
-  .cl-phone {
-    left: 0;
-    width: 100%;
-    max-width: 440px;
-    margin: 0 auto;
-    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.55));
-  }
-}
 </style>
 
 
@@ -3771,8 +3568,7 @@ function warModalEscHandler(e) {
    --key-* tokens -- keep the two in step. (The hero's two stay red +
    outlined, his call.) Placed after the picker and tracker styles so it
    wins over them. */
-.ch-btn.pk-btn,
-.cl-track .cl-track-go {
+.ch-btn.pk-btn {
   border: 0;
   border-radius: 0;
   background: linear-gradient(180deg, #26282e, #1b1c21);
@@ -3781,18 +3577,15 @@ function warModalEscHandler(e) {
   -webkit-backdrop-filter: none;
           backdrop-filter: none;
 }
-.ch-btn.pk-btn:hover,
-.cl-track .cl-track-go:hover {
+.ch-btn.pk-btn:hover {
   background: linear-gradient(180deg, #31343b, #24262b);
   color: #eff2f5;
 }
-.ch-btn.pk-btn:active,
-.cl-track .cl-track-go:active {
+.ch-btn.pk-btn:active {
   transform: translateY(1px);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
 }
-.ch-btn.pk-btn:focus-visible,
-.cl-track .cl-track-go:focus-visible {
+.ch-btn.pk-btn:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.35);
   outline-offset: 2px;
 }
@@ -3811,23 +3604,52 @@ function warModalEscHandler(e) {
   text-transform: none;
 }
 .ch-btn.pk-btn:hover { background: linear-gradient(180deg, #b83939, #9e2d2d); color: #fff; }
-/* Clan / Player: the TH chips' states -- flat at rest, raised key when on. */
-.cl-track .cl-track-modes button {
-  border: 0;
-  border-radius: 0;
-  background: rgba(11, 11, 12, 0.8);
-  color: #949ba4;
-}
-.cl-track .cl-track-modes button:hover {
-  background: #1e1f23;
-  color: #c8cbcd;
-}
-.cl-track .cl-track-modes button[aria-checked="true"] {
-  background: linear-gradient(180deg, #26282e, #1b1c21);
-  box-shadow: 0 3px 0 #08090a, inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  color: #eff2f5;
-}
 
+/* Keep the featured-base actions together as one small control dock. The
+   raised grey keys match the TH cards; Copy layout carries the CoC red. */
+.pk-actions {
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--lb-r);
+  background: rgba(8, 9, 11, 0.42);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.38);
+}
+.pk-actions .pk-like,
+.pk-actions .pk-all {
+  height: 40px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+  color: #c9ccd2;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.pk-actions .pk-like:hover,
+.pk-actions .pk-all:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.pk-actions .pk-like:focus-visible,
+.pk-actions .pk-all:focus-visible,
+.pk-actions .pk-btn:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.pk-actions .ch-btn.pk-btn {
+  height: 40px;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-ring-red);
+  color: #fff;
+}
+.pk-actions .ch-btn.pk-btn:hover {
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red-hover);
+  color: #fff;
+}
 /* PARCHROME TOOLS BAND (Oct 2026: the art that was behind the tracker).
    Keep the photo as a subdued backdrop for the grouped tool directory.
    The scrim fades the band into the page. */
@@ -3855,75 +3677,14 @@ function warModalEscHandler(e) {
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 22%, rgba(10, 10, 11, 0) 78%, #0a0a0b 100%),
+    linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 22%),
     linear-gradient(to right, rgba(6, 8, 12, 0.9) 0%, rgba(6, 8, 12, 0.82) 40%, rgba(6, 8, 12, 0.72) 75%, rgba(6, 8, 12, 0.68) 100%);
   pointer-events: none;
 }
 
-/* Group by the job each tool does. Rows stay open so the icons and copy,
-   rather than eight repeated panels, set the rhythm. */
-.pt-tools-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 56px;
-  row-gap: 30px;
-  margin: 0 var(--coc-side);
-}
-.pt-tool-group { min-width: 0; }
-.pt-tool-heading {
-  margin: 0;
-  padding: 11px 7px 9px;
-  border-top: 1px solid rgba(255, 255, 255, 0.17);
-  font-family: 'Sora', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.35;
-  color: #d6d8dd;
-}
-.pt-tool-list { display: flex; flex-direction: column; }
+/* The cards themselves live in /tool-cards.css; the band only places the grid. */
+.pt-band .ptc-wrap { margin: 0 var(--coc-side); }
 .pt-band .lob-sub { color: #b5b8c0; }
-.pt-tool-link {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 18px;
-  align-items: center;
-  gap: 14px;
-  min-height: 72px;
-  padding: 9px 7px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.075);
-  color: inherit;
-  text-decoration: none;
-  transition: background-color 160ms ease;
-}
-.pt-tool-link:last-child { border-bottom-color: transparent; }
-.pt-tool-link:active { background: rgba(255, 255, 255, 0.045); }
-.pt-tool-link:focus-visible { outline: 2px solid #c23b3b; outline-offset: -2px; }
-.pt-band .pt-tool-link .tc-icon {
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: #17181b;
-}
-.pt-band .pt-tool-link .tc-icon img { width: 31px; height: 31px; }
-.pt-band .pt-tool-link .tc-name {
-  font-size: 16px;
-  line-height: 1.25;
-  color: #eff1f4;
-}
-.pt-band .pt-tool-link .tc-desc {
-  margin-top: 4px;
-  font-size: 13.5px;
-  line-height: 1.45;
-  color: #b5b8c0;
-}
-.pt-tool-link .tc-arrow {
-  color: #858a92;
-  transition: color 160ms ease, transform 160ms ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .pt-tool-link:hover { background: rgba(255, 255, 255, 0.035); }
-  .pt-tool-link:hover .tc-arrow { color: #e6e8ec; transform: translateX(2px); }
-  .pt-band .lob-more:hover { border-color: rgba(255, 255, 255, 0.42); background: #17181b; color: #fff; }
-}
 
 /* Keep the collection link visible without turning it into another red tile. */
 .pt-band .lob-more {
@@ -3931,215 +3692,269 @@ function warModalEscHandler(e) {
   box-sizing: border-box;
   padding: 0 13px;
   gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(15, 15, 16, 0.72);
-  color: #e0e2e6;
   font-size: 13px;
   font-weight: 600;
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 .pt-band .lob-more:focus-visible { outline: 2px solid #c23b3b; outline-offset: 3px; }
 .pt-band .lob-more svg { width: 16px; height: 16px; }
 @media (max-width: 970px) {
   .pt-band::after {
     background:
-      linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 18%, rgba(10, 10, 11, 0) 85%, #0a0a0b 100%),
+      linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 18%),
       linear-gradient(rgba(6, 8, 12, 0.72), rgba(6, 8, 12, 0.72));
   }
-  .pt-tools-grid { grid-template-columns: 1fr; row-gap: 22px; margin: 0 5%; }
-  .pt-tool-link { min-height: 68px; gap: 12px; }
-  .pt-band .pt-tool-link .tc-icon { width: 40px; height: 40px; }
-  .pt-band .pt-tool-link .tc-icon img { width: 28px; height: 28px; }
-  .pt-band .pt-tool-link .tc-name { font-size: 15px; }
-  .pt-band .pt-tool-link .tc-desc { font-size: 12.5px; }
+  .pt-band .ptc-wrap { margin: 0 5%; }
   .pt-band .lob-more {
     min-height: 40px;
     font-size: 12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pt-band .pt-tool-link,
-  .pt-band .pt-tool-link .tc-arrow,
   .pt-band .lob-more { transition: none; }
-  .pt-band .pt-tool-link:hover .tc-arrow { transform: none; }
 }
 
-/* TRACKER (Oct 2026): left-aligned at every width, the lobby's heading and
-   text sizes (.lob-title / .lob-sub), the 80/56px section rhythm, and the
-   phone kept inside the page column. Overrides the tracker CSS above. */
+/* TRACKER (Oct 21 2026 redesign) -- the one place this section's layout and
+   search console are styled (the phone's insides are the .cl-phone-* rules
+   above). Copy, search, details and phone are four grid items:
+   - desktop: copy / search / details stacked on the left, the phone
+     centred beside them;
+   - phones: copy, phone, search, details -- the results open in the phone,
+     so it sits right above the field instead of a scroll away below it.
+   Raised UI: the search is one box; Clan / Player is the CoC switch (sunken
+   well, the picked side a raised grey key); the field is a well; Track is
+   the red key, the section's one main action. */
 .cl-feature-inner {
-  min-height: 0;
-  gap: 56px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  grid-template-rows: 1fr auto auto auto 1fr;
+  grid-template-areas:
+    '. device'
+    'copy device'
+    'track device'
+    'details device'
+    '. device';
+  column-gap: clamp(40px, 5vw, 64px);
+  margin: 0 var(--coc-side);
+  padding: 96px 0;
+  /* .lb-kicker's colours (coc-lobby.css only sets them on .hm / .gt). */
+  --lb-red-hi: #e05252;
+  --lb-muted: #9aa0a8;
 }
+.cl-feature-copy { grid-area: copy; min-width: 0; }
 .cl-feature-title {
-  font-size: clamp(19px, 2.2vw, 30px);
+  margin: 0 0 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.5px;
-  margin: 0 0 10px;
+  text-transform: uppercase;
+  color: #f2f3f5;
 }
-/* Two deliberate lines: the title can't fit the copy column on one at the
-   lobby heading size, and a break before "or player." beats a stray word. */
-.cl-feature-title { text-shadow: none; }
+/* Two deliberate lines: a break before "or player." beats a stray word.
+   Same white Orbitron as the line above -- the font is set again because
+   /coc/'s `* { Oxanium }` reset beats inheritance. */
 .cl-feature-title em {
   display: block;
-  font-family: inherit;
-  font-size: inherit;
-  letter-spacing: inherit;
-  text-shadow: none;
+  font-family: 'Orbitron', sans-serif;
+  font-style: normal;
+  color: inherit;
 }
 .cl-feature-text {
-  max-width: 440px;
-  font-size: 15px;
+  max-width: 420px;
+  margin: 0;
+  font-family: 'Sora', sans-serif;
   line-height: 1.6;
   color: #a3a7ae;
-  text-shadow: none;
 }
-.cl-track { margin-top: 28px; max-width: 480px; }
-.cl-feature-details {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  max-width: 480px;
-  margin: 30px 0 0;
-  padding: 0;
-  border-top: 1px solid #292a2e;
-  list-style: none;
-}
-.cl-feature-details li {
+
+/* SEARCH CONSOLE */
+.cl-track {
+  grid-area: track;
   min-width: 0;
-  padding: 16px 16px 0 0;
+  margin-top: 28px;
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
-.cl-feature-details li + li {
-  padding-right: 0;
-  padding-left: 16px;
-  border-left: 1px solid #292a2e;
+.cl-track-modes {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 0 12px;
+  padding: 3px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
 }
-.cl-feature-details strong {
-  display: block;
-  margin-bottom: 5px;
-  color: #e6e8ec;
+.cl-track-modes button {
+  min-width: 84px;
+  padding: 7px 16px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #8b9099;
   font-family: 'Sora', sans-serif;
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
-.cl-feature-details span {
-  display: block;
-  color: #8b9098;
-  font-family: 'Sora', sans-serif;
-  font-size: 12px;
-  line-height: 1.55;
+.cl-track-modes button:hover { background: #17181d; color: #c9ccd2; }
+.cl-track-modes button[aria-checked='true'] {
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
 }
-.cl-phone { width: 100%; }
+.cl-track-modes button[aria-checked='true']:hover { background: var(--lb-raise-hover); }
 
-/* SEARCH (Oct 2026, his pick: tabs + clean field). Clan / Player are text
-   tabs with a red underline; below them one plain field -- search icon,
-   input, red Track. Replaces the keycap switch + keycap Track here only. */
-.cl-track .cl-track-modes {
-  gap: 22px;
-  margin: 0 0 12px;
+.cl-track-bar {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  padding: 5px 5px 5px 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.2s var(--lb-ease);
 }
-.cl-track .cl-track-modes button,
-.cl-track .cl-track-modes button:hover,
-.cl-track .cl-track-modes button[aria-checked="true"] {
-  position: relative;
-  padding: 2px 0 8px;
+.cl-track-bar:focus-within { box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text); }
+.cl-track-icon { flex: none; width: 18px; height: 18px; color: #6d7178; }
+.cl-track.is-clan .cl-track-hash { display: none; }
+.cl-track-hash {
+  margin-left: 10px;
+  color: #6d7178;
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+/* 16px: iOS Safari zooms into any smaller input on tap. */
+.cl-track-bar input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 10px;
   border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+  outline: 0;
+  background: transparent;
+  color: #f2f3f5;
+  caret-color: #d64545;
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+.cl-track:not(.is-clan) .cl-track-bar input { padding-left: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+.cl-track-bar input::placeholder { color: #6d7178; font-weight: 400; letter-spacing: 0; text-transform: none; }
+/* Hover goes darker, not lighter: white on a lighter red falls under 4.5:1. */
+.cl-track-go {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
   font-family: 'Sora', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
-.cl-track .cl-track-modes button { color: #8b9098; }
-.cl-track .cl-track-modes button:hover { color: #d5d8de; }
-.cl-track .cl-track-modes button[aria-checked="true"] { color: #f2f3f5; }
-.cl-track .cl-track-modes button[aria-checked="true"]::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  border-radius: 0;
-  background: #c23b3b;
-}
+.cl-track-go svg { width: 15px; height: 15px; transition: transform 0.2s var(--lb-ease); }
+.cl-track-go:hover { background: #b23333; }
+.cl-track-go:hover svg { transform: translateX(2px); }
+.cl-track-go:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
+.cl-track-go[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
 
-.cl-track-bar {
-  gap: 0;
-  height: 54px;
-  padding: 6px 6px 6px 16px;
-  background: #121316;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0;
-}
-.cl-track-bar:focus-within { border-color: rgba(255, 255, 255, 0.32); }
-.cl-track-icon { flex: none; width: 18px; height: 18px; color: #6d7178; }
-.cl-track-hash {
-  margin-left: 10px;
+/* Help on the left, the example on the right; an error replaces both. */
+.cl-track-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 12px 2px 0;
   font-family: 'Sora', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #8b9098;
 }
-/* 16px: iOS zooms into anything smaller. */
-.cl-track-bar input {
-  padding: 0 10px;
-  font-family: 'Sora', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 0;
-}
-.cl-track:not(.is-clan) .cl-track-bar input { padding-left: 2px; letter-spacing: 0.5px; }
-.cl-track-bar input::placeholder { font-weight: 400; color: #6d7178; }
-/* Submit (Oct 2026, distilled): a quiet arrow key inside the field, not a
-   red TRACK slab. Grey while the field is empty; turns red once there is
-   something to search, so the colour says "ready" instead of shouting. */
-.cl-track .cl-track-go,
-.cl-track .cl-track-go:hover,
-.cl-track .cl-track-go:active {
+.cl-track-hint.is-error { color: #f0a3a3; }
+.cl-track-try {
   flex: none;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
   padding: 0;
   border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  color: #8b9098;
-  background: rgba(255, 255, 255, 0.05);
-  transition: background-color 0.18s ease, color 0.18s ease, transform 0.12s ease;
-}
-.cl-track .cl-track-go svg { width: 16px; height: 16px; }
-.cl-track .cl-track-go:hover { color: #f2f3f5; background: rgba(255, 255, 255, 0.1); }
-.cl-track-bar:has(input:not(:placeholder-shown)) .cl-track-go { color: #fff; background: #c23b3b; }
-.cl-track-bar:has(input:not(:placeholder-shown)) .cl-track-go:hover { background: #ad3434; }
-.cl-track .cl-track-go:active { transform: scale(0.94); }
-
-/* Help line: one quiet sentence, the example as a plain link after it. */
-.cl-track-hint {
-  margin-top: 12px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #8b9098;
-}
-.cl-track-try {
-  margin-left: 0;
+  background: none;
   color: #e6e8ec;
+  font: inherit;
   font-weight: 600;
   text-decoration: underline;
   text-decoration-color: rgba(255, 255, 255, 0.3);
   text-underline-offset: 3px;
+  cursor: pointer;
 }
 .cl-track-try:hover { text-decoration-color: #c23b3b; }
+.cl-track-modes button:focus-visible,
+.cl-track-go:focus-visible,
+.cl-track-try:focus-visible,
+.cl-phone-bar button:focus-visible {
+  outline: 2px solid #f2f3f5;
+  outline-offset: 2px;
+}
 
+/* DETAILS: one quiet line under the search, red squares between. */
+.cl-feature-details {
+  grid-area: details;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 16px 2px 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #8b9098;
+}
+.cl-feature-details i { width: 4px; height: 4px; background: #c23b3b; }
+
+/* PHONE PREVIEW, simplified (Oct 21 2026): the star race bar and the
+   attack feed made the small screen read as texture, so the preview shows
+   only the countdown, the two clans and the score, a size up. coc-tracker.js
+   / the script below still build both rows; they're only hidden here. */
+.cl-phone-war .ch-war-race,
+.cl-phone-war .ch-war-feed { display: none; }
+.cl-phone-war .ch-war-body.is-war { padding: 12cqw 5cqw 5cqw; gap: 2.4cqw; }
+.cl-phone-war .is-war .ch-war-team img { width: 14cqw; height: 14cqw; }
+.cl-phone-war .is-war .ch-war-score b { font-size: 9.5cqw; }
+.cl-phone-war-head { padding-top: 3.4cqw; }
+.cl-phone-war-chip {
+  padding: 0.6cqw 1.4cqw;
+  font-size: clamp(7px, 1.45cqw, 9px);
+  letter-spacing: 0.8px;
+}
+
+/* PHONE: centred in its column, full column width. */
+.cl-feature-device {
+  grid-area: device;
+  position: relative;
+  align-self: center;
+  min-width: 0;
+}
+.cl-phone { left: 0; width: 100%; margin: 0; }
 /* The only light in the section: a red glow pooled under the phone, as if
-   the war on its screen were lighting the table. Offset down, not a halo. */
+   the war on its screen were lighting the table. Kept (blur included) inside
+   the section's padding, whose overflow:hidden would cut it in a hard line. */
 .cl-feature-device::before {
-  content: "";
+  content: '';
   position: absolute;
-  /* Kept (blur included) inside the section's bottom padding: it used to
-     reach past the section, whose overflow:hidden cut it in a hard line. */
   left: 4%;
   right: 4%;
   top: 30%;
@@ -4149,47 +3964,39 @@ function warModalEscHandler(e) {
   filter: blur(26px);
   pointer-events: none;
 }
-@media (max-width: 970px) {
+
+/* Stacks below 1100: next to the desktop sidebar two columns leave the
+   phone too small to read. */
+@media (max-width: 1100px) {
   .cl-feature-inner {
-    gap: 36px;
-    margin: 0 5%;
-    padding: 56px 0;
-    text-align: left;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: 'copy' 'device' 'track' 'details';
   }
-  .cl-feature-copy { margin: 0; }
-  .cl-feature-title { margin-bottom: 8px; }
-  .cl-feature-text { font-size: 13px; }
-  .cl-track { margin: 22px 0 0; }
-  .cl-feature-details { margin-top: 26px; }
-  .cl-phone { margin: 0; }
+  .clashguide-container {
+    background:
+      linear-gradient(rgba(15, 16, 20, 0.86), rgba(15, 16, 20, 0.86)),
+      url('/clashofclans/tracker-battlefield.webp') 60% 65% / cover no-repeat,
+      #0f1014;
+  }
+  .cl-feature-device { margin-top: 28px; }
+  .cl-phone { max-width: 560px; }
+  .cl-track { max-width: 560px; margin-top: 24px; }
+}
+@media (max-width: 970px) {
+  .cl-feature-inner { margin: 0 5%; }
+  .cl-track-modes { display: flex; }
+  .cl-track-modes button { flex: 1; }
   .pt-band { padding: 56px 0; }
 }
-/* Bigger section titles on desktop (Oct 2026): the lobby's own headings
-   (.lob-title: Featured Town Halls, Articles, Tools; the tracker) and the
-   live sections' (.lb-title: equipment, top 10, FAQ) at one size. */
-@media (min-width: 971px) {
-  .lob-title,
-  .cl-feature-title,
-  .lb-title { font-size: clamp(28px, 2.6vw, 40px); }
-}
-/* Same on phones (Oct 12): these were 19px while equipment / top 10 / FAQ
-   were 28px, and a two-line 13px subtitle outweighed a 19px title. One
-   size for all, about 2x the subtitle. 6vw so "Clash guides." + its link fit one row at 360px. */
-@media (max-width: 970px) {
-  .lob-title,
-  .cl-feature-title,
-  .lb-title { font-size: clamp(22px, 6vw, 28px); }
-}
-/* Narrow phones: a little less inset so the field keeps its room. */
 @media (max-width: 520px) {
-  .cl-track-bar { padding-left: 14px; }
-  .cl-feature-details { grid-template-columns: minmax(0, 1fr); }
-  .cl-feature-details li { padding: 14px 0; }
-  .cl-feature-details li + li {
-    padding: 14px 0 0;
-    border-top: 1px solid #292a2e;
-    border-left: 0;
-  }
+  .cl-track { padding: 12px; }
+  .cl-track-bar { padding-left: 12px; }
+  .cl-track-go { padding: 0 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cl-phone-results { animation: none; }
+  .cl-phone-shot, .cl-track-go svg { transition: none; }
 }
 </style>
 
@@ -4200,13 +4007,18 @@ function warModalEscHandler(e) {
        above, .pt-band-bg): plain page dark, lit only by the glow under the
        phone (.cl-feature-device::before). -->
   <div class="cl-feature-inner">
+    <!-- Grid items (Oct 21 2026 redesign): copy, search console, details
+         and the phone are siblings so phones can put the phone between the
+         copy and the search (results open right above the field). -->
     <div class="cl-feature-copy">
+      <p class="lb-kicker">Live clan &amp; player tracker</p>
       <h2 class="cl-feature-title">Track any clan <em>or player.</em></h2>
-      <p class="cl-feature-text">Search any clan or player by name or tag.</p>
+      <p class="cl-feature-text">Search by name or tag. Results open on the phone, each one links to the full profile.</p>
+    </div>
 
       <!-- Clan first (Oct 2026): the phone shows a live clan war, so the
            search starts on the same thing. setMode() swaps the hint per mode.
-           Clan / Player are text tabs above one plain search field. -->
+           One raised box: Clan / Player switch, the field, the hint. -->
       <form class="cl-track is-clan" id="clTrack" role="search" novalidate>
         <div class="cl-track-modes" role="radiogroup" aria-label="Search for">
           <button type="button" role="radio" aria-checked="true" data-mode="clan">Clan</button>
@@ -4217,26 +4029,14 @@ function warModalEscHandler(e) {
           <span class="cl-track-hash" aria-hidden="true">#</span>
           <input type="text" id="clTrackInput" aria-label="Clan name or #tag" placeholder="Clan name or #tag" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="50" enterkeyhint="search">
           <button type="submit" class="cl-track-go" aria-label="Track">
+            <span>Track</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </button>
         </div>
-        <p class="cl-track-hint" id="clTrackHint">
-          A clan&rsquo;s tag starts with # and sits under its name in game.
-          <button type="button" class="cl-track-try" data-mode="clan" data-try="#2GYPGPJP9">Try Ascendere</button>
-        </p>
+        <p class="cl-track-hint" id="clTrackHint"><span>The tag sits under the clan&rsquo;s name in game.</span> <button type="button" class="cl-track-try" data-mode="clan" data-try="#2GYPGPJP9">Try Ascendere</button></p>
       </form>
 
-      <ul class="cl-feature-details" aria-label="Tracker details">
-        <li>
-          <strong>Player profiles</strong>
-          <span>Heroes, equipment and achievements</span>
-        </li>
-        <li>
-          <strong>Clan profiles</strong>
-          <span>Members, donations and war log</span>
-        </li>
-      </ul>
-    </div>
+      <p class="cl-feature-details">Live wars <i aria-hidden="true"></i> Clan profiles <i aria-hidden="true"></i> Player profiles</p>
 
     <div class="cl-feature-device">
       <div class="cl-phone">
@@ -4251,7 +4051,7 @@ function warModalEscHandler(e) {
           <a class="cl-phone-shot cl-phone-war" href="/coc/clan/2GYPGPJP9" data-clan-tag="2GYPGPJP9">
             <img class="cl-phone-war-bg" src="/clashofclans/tracker-battlefield.webp" alt="" loading="lazy" decoding="async">
             <span class="cl-embers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            <span class="cl-phone-war-head"><span class="cl-phone-war-chip">Clan tracker</span><span class="cl-phone-war-open">Open full tracker <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
+            <span class="cl-phone-war-head"><span class="cl-phone-war-chip">Live clan war preview</span><span class="cl-phone-war-open">Open full tracker <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
               <span class="ch-war-body is-loading" id="chWar" aria-live="polite">
               <span class="ch-war-top"><i class="ch-sk" style="width:64px"></i></span>
               <span class="ch-war-mid">
@@ -4295,7 +4095,7 @@ function warModalEscHandler(e) {
   // Each mode has its own help line + example; clan's is the one in the markup.
   var HINT = {
     clan: hint.innerHTML,
-    player: 'A player&rsquo;s tag starts with # and sits under the name on the in-game profile. <button type="button" class="cl-track-try" data-mode="player" data-try="LL9PUCG8V">Try #LL9PUCG8V</button>'
+    player: '<span>The tag sits under the name on the player</span> <button type="button" class="cl-track-try" data-mode="player" data-try="LL9PUCG8V">Try #LL9PUCG8V</button>'
   };
   var go = form.querySelector('.cl-track-go');
   var modes = [].slice.call(form.querySelectorAll('.cl-track-modes [role=radio]'));
@@ -4661,7 +4461,7 @@ function warModalEscHandler(e) {
       <!-- A quiet text link (same idea as the Clash tools "View more") and one
            joined ‹ › control. Was a red pill + two round buttons (Oct 2026). -->
       <div class="hm-actions">
-        <a class="lb-more" href="/coc/tools/leaderboards#equipment">All equipment stats <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <a class="art-all" href="/coc/tools/leaderboards#equipment">All equipment stats<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <div class="hm-nav" role="group" aria-label="Scroll heroes">
           <button type="button" id="hmPrev" aria-label="Previous heroes" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
           <button type="button" id="hmNext" aria-label="Next heroes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -4694,7 +4494,7 @@ function warModalEscHandler(e) {
   </div>
 </section>
 <script src="/coc-lobby.js" defer></script>
-<script src="/article-cards.js?v=20261013ar" defer></script>
+<script src="/article-cards.js?v=20261021as" defer></script>
 
 <!-- FAQ: same look as /coc/town-hall-18/layouts's (coc-clan-clock.css), questions
      reworded for the hub page -- visitors reach the Copy Layout buttons
@@ -4929,7 +4729,7 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js?v=20261010a" defer></script>
+<script src="/11layout.js?v=20261021tb1" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
@@ -5341,10 +5141,6 @@ window.addEventListener('popstate', () => {
   align-items:center;
   justify-content:space-between;
   padding:0 6px;
-  background:rgba(15,15,16,0.72);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
-  border-top:1px solid rgba(255,255,255,0.06);
   z-index:9999;
   transform:translateY(0);
   transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
@@ -5395,27 +5191,14 @@ window.addEventListener('popstate', () => {
   width:50px;
   height:50px;
   border-radius:50%;
-  border:1.5px solid #3a3a3e;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#232326;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.5),
-    0 0 0 4px rgba(15,15,16,0.72);
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-}
-.bn-more:hover{
-  background:#28282b;
-  border-color:#48484d;
 }
 .bn-more:active{ transform:translateX(-50%) scale(0.92); }
 .bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
-.bn-more-wrap.open .bn-more{
-  background:#2c2c30;
-  border-color:#55555b;
-}
 .bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
 .bn-more-label{
   font-size:10.5px;
@@ -5453,12 +5236,8 @@ window.addEventListener('popstate', () => {
 .more-sheet{
   width:100%;
   max-width:600px;
-  background:#161618;
-  border:1px solid #2a2a2e;
-  border-bottom:none;
   border-radius:20px 20px 0 0;
   padding:8px 16px 20px;
-  box-shadow:0 -8px 30px rgba(0,0,0,0.5);
   transform:translateY(100%);
   transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
   max-height:80vh;
@@ -5512,16 +5291,13 @@ window.addEventListener('popstate', () => {
 }
 .more-sheet-close{
   width:30px; height:30px;
-  border-radius:50%;
-  background:#1f1f22;
-  border:1px solid #2a2a2e;
   display:flex; align-items:center; justify-content:center;
   color:#9a9ba1;
   cursor:pointer;
   transition:color .15s, border-color .15s, background .15s;
 }
 .more-sheet-close svg{ width:14px; height:14px; }
-.more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
+.more-sheet-close:hover{ color:#fff;}
 .more-list{
   display:flex;
   flex-direction:column;
@@ -6055,8 +5831,8 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
     <div class="more-sheet-scroll">
       <div class="more-sheet-top">
         <div class="more-sheet-handle"></div>
-        <div class="more-sheet-header">
-          <span class="more-sheet-title">Clash of Clans Contents</span>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/coc-nav/lobby.webp" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Clash of Clans Pages</span><span class="mx-hdr-count" data-role="more-count"></span></span>
           <button class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
@@ -6283,9 +6059,7 @@ function cocPagePath(u) {
 
 // Secondary top bar (desktop): dsn-chip Town Hall row + stb-hub-link row,
 // both built from coc-nav-data.json. No dropdown any more -- each TH chip
-// links straight to that TH's layouts page (layoutHref). Reuses the same
-// arrow/scroll wiring hwr's strips use (window.updateDsnScrollArrows /
-// window.updateStbHubNavArrows, both exposed by 11layout.js).
+// links straight to that TH's layouts page (layoutHref).
 (function initCocSecondaryTopBar(){
   var dsnScroll = document.getElementById('dsnCategoriesScroll');
   var hubScroll = document.getElementById('stbHubNavScroll');
@@ -6308,7 +6082,6 @@ function cocPagePath(u) {
             '<img src="' + th.layoutIcon + '" alt="" class="dsn-chip-icon">' +
             '<span>' + th.label + '</span></a>';
         }).join('');
-        if (typeof window.updateDsnScrollArrows === 'function') window.updateDsnScrollArrows();
       }
 
       // stb-hub-link: Lobby / Layouts / Armies / Tools, from primaryNav.
@@ -6327,7 +6100,6 @@ function cocPagePath(u) {
             '<img class="coc-nav-pic hub-pic" src="' + item.icon + '" alt="" aria-hidden="true">' +
             '<span>' + item.label + '</span></a>';
         }).join('');
-        if (typeof window.updateStbHubNavArrows === 'function') window.updateStbHubNavArrows();
       }
     })
     .catch(function(err){ console.error('COC secondary top bar nav failed to load:', err); });
@@ -6341,8 +6113,9 @@ function cocPagePath(u) {
     if (svg) svg.outerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5.5\"/><path d=\"M12 7.7v.1\"/></svg>';
   });
   </script>
-  <script src="/coc-more.js?v=20261006a" defer></script>
+  <script src="/coc-more.js?v=20261021hd" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
+  <script src="/tool-cards.js?v=9d01f290" defer></script>
 <style>
 /* ONE SPACING RHYTHM (Oct 2026, Adrian's pick). Every lobby section, from
    the Town Halls down to the clan card, gets the same --sy top and bottom.
@@ -6365,6 +6138,52 @@ function cocPagePath(u) {
 .coc-main .coc-content .t18-faq { margin-top: var(--sy); margin-bottom: var(--sy); }
 .coc-main .coc-content .ac-card { margin-top: var(--sy); }
 
+/* SECTION TITLES (Oct 21 2026, Adrian): every lobby heading below the hero
+   wears the Minecraft section title (mc-home.css SECTION TITLES): Orbitron
+   900 caps on the --fs-title scale (28-36px desktop, 18px phones), the home
+   page's white-to-grey gradient fill, and the section link (.art-all: raised
+   key on desktop, underlined text on phones) on the same row. Subtitles are
+   gone except the five that explain a feature; those turn small and quiet.
+   Last in the page so it wins over the per-section rules above. */
+html body.coc-home .lob-title,
+html body.coc-home .lb-title,
+html body.coc-home .cl-feature-title,
+html body.coc-home .clan-title,
+html body.coc-home .cc-label {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #ffffff, #c0c9d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* The clan card keeps its own fit-the-card size (coc-lobby.css .lb-clan). */
+html body.coc-home .lob-title,
+html body.coc-home .lb-title,
+html body.coc-home .cl-feature-title,
+html body.coc-home .cc-label {
+  font-size: var(--fs-title);
+}
+/* Live events: was a 10px label with a pulsing dot; now a title, no dot. */
+html body.coc-home .cc-label::before { display: none; }
+html body.coc-home .cc-label-row { align-items: center; margin-bottom: 18px; }
+/* The quiet subtitles: 11layout.css QUIET SUBTITLE. */
+/* Title + link on one row, link vertically centred on the title. */
+html body.coc-home .pt-band .lob-head,
+html body.coc-home .hm-top { align-items: center; }
+@media (max-width: 970px) {
+  html body.coc-home .lob-title,
+  html body.coc-home .lb-title,
+  html body.coc-home .cl-feature-title,
+  html body.coc-home .clan-title,
+  html body.coc-home .cc-label { letter-spacing: 0; }
+  html body.coc-home .pt-band .lob-head { flex-direction: row; justify-content: space-between; gap: 12px; }
+  html body.coc-home .hm-top { display: flex; gap: 12px; }
+  html body.coc-home .hm-actions { margin-top: 0; }
+}
 </style>
 </body>
 </html>

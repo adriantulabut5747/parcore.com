@@ -1,5 +1,7 @@
 /* =======================================================================
-   MORE SHEET BODY -- every CoC page (redesigned Oct 2026).
+   MORE SHEET BODY -- every CoC page (redesigned Oct 2026), and every
+   Minecraft page since Oct 21 2026 (mc-java.js renderMoreSheet: Java /
+   Tools / Coming soon sections of .mx-tool tiles; greyed = .is-soon).
    The sheet itself and its "Clash of Clans Contents" header are unchanged
    (1coclayouts.css; /coc/'s own copy). This is the body only:
 
@@ -14,6 +16,81 @@
    .th-mini / .more-row carry pseudo-element frames and arrows in the
    shared CSS that would otherwise have to be undone one by one.
    ======================================================================= */
+
+/* SHEET HEADER (Oct 21 2026, CoC + Minecraft): the game's nav picture in a
+   sunken well, the title with the real page count under it, the close as a
+   grey key, and a sunken line (edge + light) under the row instead of the
+   old red bar + hairline. Markup: .more-sheet-header.mx-hdr in every page;
+   the count is filled by coc-more.js / mc-java.js renderMoreSheet. The
+   .more-sheet .mx-hdr prefix outranks 1coclayouts.css, mc-java.css and
+   /coc/'s inline copy of the old header. */
+.more-sheet .mx-hdr {
+  justify-content: flex-start;
+  gap: 12px;
+  margin: 0 0 6px;
+  padding: 2px 0 14px;
+  border-bottom: 0;
+  box-shadow:
+    0 1px 0 var(--lb-edge),
+    0 2px 0 rgba(255, 255, 255, 0.04);
+}
+.mx-hdr-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.mx-hdr-ico img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+.mx-hdr-text {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.more-sheet .mx-hdr .more-sheet-title {
+  padding-left: 0;
+  overflow: hidden;
+  font: 800 14px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+.more-sheet .mx-hdr .more-sheet-title::before {
+  display: none;
+}
+.mx-hdr-count {
+  font: 600 11px/1 'Sora', sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #8b9099;
+}
+.mx-hdr-count:empty {
+  display: none;
+}
+.more-sheet .mx-hdr .more-sheet-close {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #c9ccd2;
+}
+.more-sheet .mx-hdr .more-sheet-close:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
 
 .more-list.mx {
   display: flex;
@@ -83,12 +160,11 @@
 }
 
 /* Tiles = the Town Hall chips under the hero (.second-layer buttons,
-   th-layouts.css "Layouts / Army / Tools tabs + Town Hall chips"): flat
-   near-black at rest, a step lighter on hover, and the page you're on is
-   the raised keycap -- top-lit face + a hard 3px dark edge -- a step
-   lighter again on hover. Values written out (not the --key-* tokens):
-   /coc/ doesn't load the file that defines them. The row gap
-   leaves room for the active chip's 3px edge. */
+   th-layouts.css "TABS + CARD ACTIONS"), same recipe (Oct 2026): at rest a
+   well sunk into the sheet (black edge, --card-well from coc-hub-menus.css),
+   a step lighter on hover; the page you're on is the raised grey key
+   (--lb-raise + --lb-btn), a step lighter again on hover. Change one,
+   change both. The row gap leaves room for the active key's ledge. */
 .mx-grid,
 .mx-tools {
   display: grid;
@@ -111,36 +187,46 @@
   min-width: 0;
   height: 42px;
   padding: 0 10px;
-  border: 0;
-  border-radius: 8px;
-  background: rgba(11, 11, 12, 0.8);
-  color: #949ba4;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
   text-decoration: none;
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
   transition:
-    background 0.2s,
-    color 0.2s;
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.1s ease;
 }
 .mx-th {
   justify-content: center;
 }
 .mx-th:hover,
 .mx-tool:hover {
-  background: #1e1f23;
-  color: #c8cbcd;
+  background: #17181d;
+  color: #c9ccd2;
 }
 .mx-th.active,
 .mx-tool.active {
-  background: linear-gradient(180deg, #26282e, #1b1c21);
-  box-shadow:
-    0 3px 0 #08090a,
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  color: #eff2f5;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
 }
 .mx-th.active:hover,
 .mx-tool.active:hover {
-  background: linear-gradient(180deg, #31343b, #24262b);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+/* Not built yet (Minecraft's Story Mode / Dungeons): a dead, dimmed well. */
+.mx-tool.is-soon {
+  opacity: 0.4;
+  cursor: default;
+}
+.mx-tool.is-soon:hover {
+  background: var(--lb-well);
+  color: #8b9099;
 }
 .mx-th:focus-visible,
 .mx-tool:focus-visible {

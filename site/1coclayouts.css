@@ -12,12 +12,9 @@
   justify-content: space-between;
   padding: 0 10px;
   z-index: 15;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   color: #b3b3b3;
   font-weight: 500;
   font-size: 14px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); /* Safari support */
 }
   
 .secondary-top-bar .secondary-left {display: flex; align-items: center;gap: 8px;}
@@ -30,7 +27,6 @@
        secondary bar sat 12px below it with a gap in between. Same value as
        11layout.css -- kept here so the two copies agree. */
     top: 40px;
-    background: linear-gradient(90deg, #1b1c18, #252621);
   }
 }
 
@@ -298,15 +294,11 @@ body {height: 100vh; background: var(--bg-main, #202225); color: var(--text-main
 .discord-card{
   position: relative;
   background: linear-gradient(180deg, #1b1c20 0%, #17181b 100%);
-  border-radius: 0;
   padding: 12px 12px 16px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .discord-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 
@@ -620,14 +612,32 @@ body.no-zoom {
 .pagination a.active:hover{ transform:none; }
 .pagination a.next {
     font-weight: 600;
-    color: var(--text-secondary);
     margin-left: 4px;
     padding-left: 14px;
-    border-left: 1px solid #26262a;
-    border-radius: 0;}
-.pagination a.next:hover{ color: var(--text-main); }
+}
 .pagination a.next svg{ width: 14px; height: 14px; stroke: currentColor; transition: transform .18s ease; }
 .pagination a.next:hover svg{ transform: translateX(2px); }
+.pagination a:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.pagination a:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.pagination .next:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.pagination .next {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
 
 
 
@@ -922,7 +932,7 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain;}
       left: 0;
       width: 100%;                /* full width on mobile */
       padding: 0 10px;
-      height: 38px;
+      height: 32px;
       justify-content: space-between;  /* keeps left and right separated */
       font-size: 12px;}
   .secondary-left {gap: 6px;}
@@ -930,7 +940,6 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain;}
   .help-button { width: 28px; height: 28px;}
   .discord-card {
     padding: 8px 8px 12px;
-    border-radius: 0;
   }
   .discord-card:hover {
     transform: none; /* avoid awkward lift on touch devices */
@@ -1014,10 +1023,6 @@ body.search-modal-open .bn-bar { display: none !important; }
   align-items:center;
   justify-content:space-between;
   padding:0 6px;
-  background:rgba(15,15,16,0.72);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
-  border-top:1px solid rgba(255,255,255,0.06);
   z-index:9999;
   transform:translateY(0);
   transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1069,27 +1074,14 @@ body.search-modal-open .bn-bar { display: none !important; }
   width:50px;
   height:50px;
   border-radius:50%;
-  border:1.5px solid #3a3a3e;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#232326;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.5),
-    0 0 0 4px rgba(15,15,16,0.72);
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-}
-.bn-more:hover{
-  background:#28282b;
-  border-color:#48484d;
 }
 .bn-more:active{ transform:translateX(-50%) scale(0.92); }
 .bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
-.bn-more-wrap.open .bn-more{
-  background:#2c2c30;
-  border-color:#55555b;
-}
 .bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
 .bn-more-label{
   font-size:10px;
@@ -1128,12 +1120,8 @@ body.search-modal-open .bn-bar { display: none !important; }
 .more-sheet{
   width:100%;
   max-width:600px;
-  background:#161618;
-  border:1px solid #2a2a2e;
-  border-bottom:none;
   border-radius:20px 20px 0 0;
   padding:8px 16px 20px;
-  box-shadow:0 -8px 30px rgba(0,0,0,0.5);
   transform:translateY(100%);
   transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
   max-height:80vh;
@@ -1188,16 +1176,13 @@ body.search-modal-open .bn-bar { display: none !important; }
 }
 .more-sheet-close{
   width:30px; height:30px;
-  border-radius:50%;
-  background:#1f1f22;
-  border:1px solid #2a2a2e;
   display:flex; align-items:center; justify-content:center;
   color:#9a9ba1;
   cursor:pointer;
   transition:color .15s, border-color .15s, background .15s;
 }
 .more-sheet-close svg{ width:14px; height:14px; }
-.more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
+.more-sheet-close:hover{ color:#fff;}
 .more-list{
   display:flex;
   flex-direction:column;
@@ -2146,11 +2131,6 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
   height: 18px;
   object-fit: contain;
   flex-shrink: 0;
-}
-
-#sidebar,
-#sidebar * {
-  font-family: 'Oxanium', sans-serif !important;
 }
 
 /* ============================================================

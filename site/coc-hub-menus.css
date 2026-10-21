@@ -4,18 +4,15 @@
    Resources and Minecraft got menus too.
    ======================================================================= */
 
-/* PAGE COLUMN (Oct 2026): the desktop side inset every CoC page lines up on,
-   same as the CODM lobby hero. Was a flat 12%. Lives here because this is the
-   one stylesheet all CoC pages load. Read as var(--coc-side, 12%) by /coc/,
-   th-layouts.css (.coc-content), coc-cards / coc-clan-clock / coc-lobby.
-   Desktop only: below 971px the variable is unset and phones keep their own
-   5% / 10px rules. */
-@media (min-width: 971px) {
-  :root { --coc-side: clamp(24px, 8.5vw, 168px); }
-}
-@media (min-width: 971px) and (max-width: 1500px) {
-  :root { --coc-side: clamp(24px, 6.5vw, 96px); }
-}
+/* --coc-side (the page column) moved to 11layout.css "PAGE COLUMN" so the
+   top bar and every section share it. */
+
+/* WELL DEPTH (Oct 2026): the sunken look of Web Resources' .stb-form-input,
+   for every CoC "resting" surface that sits in a hole: base / army cards,
+   the Layouts / Army / Tools tabs, TH chips and page numbers (th-layouts.css)
+   and the More sheet's TH + tool tiles (coc-more.css). Pair it with
+   border: 2px solid var(--lb-edge) and background: var(--lb-well).
+   --card-well itself lives in 11layout.css :root (Minecraft's More sheet uses it too). */
 
 /* Top-bar chips, hub links and scroll arrows: site-wide in 11layout.css
    (KEYCAP BUTTONS) since Oct 2026, so Web Resources and Minecraft match. */
@@ -62,4 +59,140 @@ html body .secondary-top-bar .stb-hub-nav .stb-hub-link img.hub-pic,
    wrapper must not become its own flex box in .secondary-left. */
 .secondary-left > picture {
   display: contents;
+}
+
+/* ---- CLASH GUIDES BAND (Oct 2026) ----------------------------------------
+   The articles band: /coc/'s "Clash guides." and the same band on every TH
+   layouts / army page. One copy, here, because every CoC page loads this
+   file. A full-width strip one step lighter than the page, hairlines top and
+   bottom; title left, "Go to articles" right (one row at every width), then
+   article-cards.js slides (.art-track[data-variant="slide"]) + .art-pager,
+   styled in article-cards.css. /coc/ keeps its lobby-only head pieces
+   (.lob-head-text, .lob-sub, .lob-more) inline; TH pages pull the band out of
+   their column in th-layouts.css. Minecraft has its own older copy in
+   mc-home.css (its link is a grey key). Fonts are set on every text element:
+   /coc/'s `* { oxanium }` reset beats inheritance. */
+.as-band {
+  --art-side: var(--coc-side, 5%);
+  padding: 64px 0;
+  background: #0f1014;
+  /* the inactive tabs' sunken well (th-layouts.css TABS block): dark edge,
+     a dark lip inside the top, a faint light line under the bottom */
+  border-top: 2px solid var(--lb-edge);
+  border-bottom: 2px solid var(--lb-edge);
+  box-shadow: var(--card-well);
+  /* lifts the band over the next section, so a flush neighbour (/coc/'s
+     photo Tools band) can't paint over the light line under it */
+  position: relative;
+  z-index: 1;
+}
+.lob-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin: 0 var(--coc-side) 32px;
+}
+.lob-head--row {
+  align-items: center;
+}
+.lob-title {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  color: #f2f3f5;
+}
+.lob-title em {
+  font-family: inherit;
+  font-style: normal;
+  color: #fff;
+}
+.lob-go {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #e6e8ec;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.lob-go svg {
+  width: 16px;
+  height: 16px;
+  color: #e05252;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lob-go:hover {
+  color: #fff;
+}
+.lob-go:hover svg {
+  transform: translate(2px, -2px);
+}
+.lob-go:focus-visible {
+  outline: 2px solid #c23b3b;
+  outline-offset: 4px;
+}
+@media (max-width: 970px) {
+  .as-band {
+    padding: 44px 0;
+  }
+  .lob-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0 5% 24px;
+  }
+  .lob-head--row {
+    flex-direction: row;
+    align-items: center;
+  }
+  .lob-go {
+    font-size: 11px;
+    gap: 6px;
+    letter-spacing: 0.5px;
+  }
+  .lob-go svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+/* 360px Androids: keeps "Clash guides." on one line beside the link. */
+@media (max-width: 380px) {
+  .lob-go {
+    font-size: 10px;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* ---- SECTION TYPE (Oct 21 2026) -------------------------------------------
+   The only place CoC section titles ("Featured Town Halls.", "Clash guides.",
+   the lobby's .lb-title ones, the tracker) and the text under them get their
+   size: the type scale in 11layout.css (--fs-title / --fs-sub, phone values
+   at 970px). Don't size them in page CSS again. Every CoC page loads this
+   file; the `html body` prefix beats any page-level size not yet removed.
+   Minecraft's twin is in mc-home.css (not on the scale yet). */
+html body .lob-title,
+html body .lb-title,
+html body .cl-feature-title {
+  font-size: var(--fs-title);
+}
+html body .lob-sub,
+html body .lob-sub span,
+html body .lb-text,
+html body .cl-feature-text {
+  font-size: var(--fs-sub);
+}
+@media (max-width: 970px) {
+  html body .lob-title,
+  html body .lb-title {
+    letter-spacing: 0;
+  }
 }

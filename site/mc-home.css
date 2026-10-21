@@ -68,192 +68,20 @@ body.mc-home ::selection {
   stroke-linecap: square;
   stroke-linejoin: miter;
 }
-/* Side margins = the CoC lobby's (--coc-side, set in coc-hub-menus.css for
-   /coc/; restated below because this page doesn't load that file). */
-body.mc-home {
-  --coc-side: 5%;
-}
-@media (min-width: 971px) {
-  body.mc-home { --coc-side: clamp(24px, 8.5vw, 168px); }
-}
-@media (min-width: 971px) and (max-width: 1500px) {
-  body.mc-home { --coc-side: clamp(24px, 6.5vw, 96px); }
+/* Side margins: desktop --coc-side comes from 11layout.css (PAGE COLUMN);
+   phones get 5% here. */
+@media (max-width: 970px) {
+  body.mc-home { --coc-side: 5%; }
 }
 .mch-frame {
   padding-inline: var(--coc-side);
 }
 
-/* ---- HERO ---------------------------------------------------
-   Full-bleed featured world. The bottom edge steps up in blocks on
-   the right (clip-path), so the photo ends like a Minecraft cliff. */
-.mch-hero {
-  --step: clamp(14px, 1.6vw, 24px);
-  position: relative;
-  display: block;
-  min-height: clamp(460px, 40vw, 620px);
-  overflow: hidden;
-  isolation: isolate;
-  background: #0b0c0e;
-  color: #fff;
-  text-decoration: none;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--step) * 3), 91% calc(100% - var(--step) * 3),
-    91% calc(100% - var(--step) * 2), 82% calc(100% - var(--step) * 2), 82% calc(100% - var(--step)),
-    73% calc(100% - var(--step)), 73% 100%, 0 100%);
-}
-.mch-hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 42%;
-  transform: scale(1.02);
-  transition: transform 0.9s var(--mch-ease);
-}
-.mch-hero:hover .mch-hero-bg {
-  transform: scale(1.05);
-}
-.mch-hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(100deg, rgba(9, 9, 10, 0.95) 0%, rgba(9, 9, 10, 0.86) 34%, rgba(9, 9, 10, 0.45) 64%, rgba(9, 9, 10, 0.15) 100%),
-    linear-gradient(0deg, rgba(9, 9, 10, 0.7) 0%, rgba(9, 9, 10, 0) 45%);
-}
-.mch-hero:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: -6px;
-}
-.mch-hero-inner {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  min-height: inherit;
-  padding-top: 96px;
-  padding-bottom: calc(var(--step) * 3 + 40px);
-  /* border-box (so min-height can inherit the hero's), so the width cap
-     has to include the side padding to line up with .mch-frame below. */
-  box-sizing: border-box;
-}
-.mch-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
-}
-.mch-hero-heart {
-  fill: var(--mch-red) !important;
-  stroke: none !important;
-  animation: mch-beat 2.6s ease-in-out infinite;
-}
 @keyframes mch-beat {
   0%, 72%, 100% { transform: scale(1); }
   78% { transform: scale(1.28); }
   84% { transform: scale(1); }
   90% { transform: scale(1.16); }
-}
-.mch-hero-title {
-  margin: 22px 0 0;
-  font-family: 'Orbitron', sans-serif !important;
-  font-size: clamp(33px, 3.6vw, 60px); /* = /coc/ .ch-title */
-  font-weight: 900;
-  line-height: 1.02;
-  letter-spacing: -1px;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
-}
-.mch-hero-title span {
-  display: block;
-  font-family: inherit !important;
-  color: var(--mch-red);
-}
-.mch-hero-copy {
-  max-width: 44ch;
-  margin: 18px 0 0;
-  font-size: 15.5px;
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.76);
-}
-.mch-hero-foot {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px 40px;
-  margin-top: 30px;
-}
-.mch-hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  height: 46px;
-  padding: 0 22px;
-  background: var(--mch-red);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: #fff;
-  transition: background 0.18s ease;
-}
-.mch-hero-cta svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.2s var(--mch-ease);
-}
-.mch-hero:hover .mch-hero-cta {
-  background: var(--mch-red-hover);
-}
-.mch-hero:hover .mch-hero-cta svg {
-  transform: translateX(3px);
-}
-.mch-hero-stats {
-  display: flex;
-  margin: 0;
-}
-.mch-hero-stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 4px;
-  padding: 0 24px;
-  border-left: 1px solid rgba(255, 255, 255, 0.16);
-}
-.mch-hero-stats > div:first-child {
-  padding-left: 0;
-  border-left: 0;
-}
-.mch-hero-stats dt {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-}
-.mch-hero-stats dd {
-  margin: 0;
-  font-family: 'Orbitron', sans-serif !important;
-  font-size: 19px;
-  font-weight: 800;
-  line-height: 1;
-  color: #fff;
-}
-.mch-hero-stats .is-zero dd,
-.mch-hero-stats .is-zero dt {
-  color: var(--mch-red);
 }
 
 /* ---- PAGE HEAD: title + live release "jersey" ---------------- */
@@ -349,72 +177,6 @@ body.mc-home {
   100% { opacity: 0.25; }
 }
 
-/* ---- NAV STRIP (Java sections) ------------------------------- */
-body.mc-home .mch .mch-nav {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0;
-  margin: 32px 0 0;
-  padding: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  background: none;
-  border: 0;
-  border-top: 1px solid var(--mch-line);
-  border-bottom: 1px solid var(--mch-line);
-}
-body.mc-home .mch .mch-nav::-webkit-scrollbar,
-body.mc-home .mch .mc-mobile-nav-header,
-body.mc-home .mch .mch-nav::before,
-body.mc-home .mch .mch-nav::after {
-  display: none;
-}
-body.mc-home .mch .mc-mobile-nav-item {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  flex: 1 0 auto;
-  gap: 10px;
-  width: auto;
-  height: 56px;
-  margin: 0;
-  padding: 0 18px;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: none;
-  white-space: nowrap;
-  color: var(--mch-muted);
-  text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-body.mc-home .mch .mc-mobile-nav-item img {
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  object-fit: contain;
-  flex: none;
-}
-body.mc-home .mch a.mc-mobile-nav-item:hover {
-  background: var(--mch-surface);
-  color: var(--mch-text);
-}
-body.mc-home .mch .mc-mobile-nav-item.active {
-  color: #fff;
-  box-shadow: inset 0 -2px 0 var(--mch-red);
-}
-body.mc-home .mch .mc-mobile-nav-item.active::after {
-  display: none;
-}
-body.mc-home .mch .mc-mobile-nav-item:focus-visible {
-  outline: 2px solid var(--mch-red);
-  outline-offset: -2px;
-}
 
 /* ---- WIRE: latest Mojang posts --------------------------------- */
 .mch-wire {
@@ -452,14 +214,14 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
   align-items: center;
   margin: 0;
   padding: 12px;
-  border: 1px solid var(--mch-line);
-  background: var(--mch-surface);
   text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
 }
 .mch .mch-wire-list .vt-log-row:hover {
-  background: var(--mch-surface-2);
-  border-color: var(--mch-line-2);
+  background: rgba(255, 255, 255, 0.04);
 }
 .mch .mch-wire-list .vt-log-thumb {
   width: 120px;
@@ -467,6 +229,7 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
   margin: 0;
   overflow: hidden;
   background: #0b0c0e;
+  border-radius: 4px;
 }
 .mch .mch-wire-list .vt-log-thumb img {
   width: 100%;
@@ -514,7 +277,7 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
 .mch-band .mch-sec-title em {
   font-family: inherit !important;
   font-style: normal;
-  color: var(--mch-red);
+  color: #fff;
 }
 .mch-sec-sub {
   margin: 10px 0 0;
@@ -540,55 +303,69 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
   flex: none;
 }
 .mch-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0;
-  border: 0;
-  background: none;
   font-size: 14px; /* = /coc/ .lob-more */
   font-weight: 600;
-  color: #c9ccd2;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 600 13px/1 'Sora', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .mch-more svg {
   width: 14px;
   height: 14px;
-  color: var(--mch-red);
   transition: transform 0.2s var(--mch-ease);
+  color: currentColor;
 }
 .mch-more:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .mch-more:hover svg {
   transform: translateX(3px);
 }
 .mch-arrow {
+  cursor: pointer;
+  width: 36px;
+  padding: 0 0 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--mch-line-2);
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 600 13px/1 'Sora', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .mch-arrow svg {
   width: 18px;
   height: 18px;
 }
-.mch-arrow:hover {
-  background: var(--mch-surface);
-}
 .mch-arrow:disabled {
-  opacity: 0.35;
   cursor: default;
+  opacity: 0.45;
+  box-shadow: var(--lb-btn-down);
 }
 .mch-artnav {
   display: flex;
@@ -600,6 +377,16 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
 .mch-tab:focus-visible,
 .mch-term-name:focus-visible {
   outline: 2px solid var(--mch-red);
+  outline-offset: 2px;
+}
+.mch-tab:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.mch-more:focus-visible,
+.mch-copy:focus-visible,
+.mch-arrow:focus-visible {
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .mch-subhead {
@@ -645,8 +432,6 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
 .mch-pod {
   position: relative;
   display: block;
-  overflow: hidden;
-  background: var(--mch-surface);
   color: #fff;
   text-decoration: none;
 }
@@ -744,8 +529,13 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 32px;
   margin: 24px 0 0;
-  padding: 0;
   list-style: none;
+  padding: 4px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-lr {
   display: grid;
@@ -760,7 +550,7 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
   transition: background 0.15s ease;
 }
 .mch-lr:hover {
-  background: var(--mch-surface);
+  background: rgba(255, 255, 255, 0.035);
 }
 .mch-lr-rank {
   font-family: 'Orbitron', sans-serif !important;
@@ -833,23 +623,7 @@ body.mc-home .mch .mc-mobile-nav-item:focus-visible {
 .mch-band .mch-sec-sub {
   color: var(--mch-ink-muted);
 }
-.mch-band .mch-arrow {
-  border-color: var(--mch-ink-line);
-  color: var(--mch-ink);
-}
-.mch-band .mch-arrow:hover {
-  background: rgba(15, 25, 35, 0.06);
-}
 /* article-cards.css paints its arrows dark; on bone they go outline. */
-.mch-band .art-nav button.mch-arrow {
-  background: transparent;
-  border: 1px solid var(--mch-ink-line);
-  color: var(--mch-ink);
-  box-shadow: none;
-}
-.mch-band .art-nav button.mch-arrow:hover:not(:disabled) {
-  background: rgba(15, 25, 35, 0.06);
-}
 .mch-band--end {
   margin-bottom: 0;
 }
@@ -873,8 +647,6 @@ body.mc-home .mch .mch-articles > * {
 }
 .mch-band .art-card {
   background: transparent;
-  border: 0;
-  box-shadow: none;
   color: var(--mch-ink);
 }
 .mch-band .art-card .art-body {
@@ -894,6 +666,27 @@ body.mc-home .mch .mch-articles > * {
 .mch-band .art-card.is-soon .art-media img {
   filter: grayscale(0.6) brightness(0.8);
 }
+@media (prefers-reduced-motion: reduce) {
+  .mch-art a.art-card:hover {
+    transform: none;
+  }
+}
+.mch-art a.art-card:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+  transform: translateY(-3px);
+}
+.mch-art a.art-card {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.mch-art .art-card {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+}
 .mch-band .art-card.is-soon .art-title {
   color: var(--mch-ink);
 }
@@ -902,10 +695,6 @@ body.mc-home .mch .mch-articles > * {
 }
 
 /* ---- COMMAND TERMINAL ------------------------------------------------ */
-.mch-term {
-  border: 1px solid var(--mch-line-2);
-  background: #0a0b0c;
-}
 .mch-term-bar {
   display: flex;
   align-items: center;
@@ -919,6 +708,8 @@ body.mc-home .mch .mch-articles > * {
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--mch-dim);
+  background: var(--lb-well);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
 }
 .mch-term-bar span {
   font-family: inherit !important;
@@ -976,7 +767,7 @@ body.mc-home .mch .mch-articles > * {
   color: var(--mch-dim);
 }
 .mch-term-name:hover {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-term-code {
   display: block;
@@ -989,37 +780,44 @@ body.mc-home .mch .mch-articles > * {
   color: #c9d1c7;
 }
 .mch-copy {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
-  padding: 0 16px;
-  border: 1px solid var(--mch-line-2);
-  background: transparent;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--mch-text);
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 600 13px/1 'Sora', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .mch-copy svg {
   width: 15px;
   height: 15px;
 }
-.mch-copy:hover {
-  background: var(--mch-surface-2);
-}
 .mch-copy.is-done {
-  background: var(--mch-red);
-  border-color: var(--mch-red);
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
   color: #fff;
 }
 
 /* ---- SERVER STANDINGS -------------------------------------------------- */
 .mch-standings {
-  border-top: 1px solid var(--mch-line-2);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-st-head,
 .mch-st-row {
@@ -1037,6 +835,8 @@ body.mc-home .mch .mch-articles > * {
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--mch-dim);
+  background: var(--lb-well);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
 }
 .mch-st-row {
   min-height: 72px;
@@ -1046,7 +846,7 @@ body.mc-home .mch .mch-articles > * {
   transition: background 0.15s ease;
 }
 .mch-st-row:hover {
-  background: var(--mch-surface);
+  background: rgba(255, 255, 255, 0.035);
 }
 .mch-st-rank {
   font-family: 'Orbitron', sans-serif !important;
@@ -1163,13 +963,15 @@ body.mc-home .mch .mch-articles > * {
   gap: 10px;
   height: 52px;
   padding: 0 22px;
-  border: 0;
-  background: transparent;
   font-size: 14px;
   font-weight: 700;
-  color: var(--mch-muted);
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: inset 0 0 0 2px var(--lb-edge), inset 0 3px 0 rgba(255, 255, 255, 0.06), inset 0 -5px 0 rgba(0, 0, 0, 0.3);
+  color: #a9adb5;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 .mch-tab span {
   min-width: 22px;
@@ -1177,13 +979,6 @@ body.mc-home .mch .mch-articles > * {
   background: var(--mch-surface-2);
   font-size: 11px;
   color: var(--mch-dim);
-}
-.mch-tab:hover {
-  color: var(--mch-text);
-}
-.mch-tab.is-on {
-  color: #fff;
-  box-shadow: inset 0 -2px 0 var(--mch-red);
 }
 .mch-tab.is-on span {
   background: var(--mch-red);
@@ -1247,7 +1042,13 @@ body.mc-home .mch .mch-articles > * {
   transition: color 0.15s ease;
 }
 .mch-mod:hover .mch-mod-name {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
+}
+.mch-mod-author {
+  margin-top: -5px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--lb-red-text);
 }
 .mch-mod-desc {
   display: -webkit-box;
@@ -1300,27 +1101,6 @@ body.mc-home .mch .mch-banners .gal-card img {
 
 /* ---- MID WIDTHS ---------------------------------------------------------- */
 @media (max-width: 1199px) {
-  body.mc-home .mch .mch-nav {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-    border: 0;
-    overflow: visible;
-  }
-  body.mc-home .mch .mc-mobile-nav-item {
-    flex-direction: column;
-    gap: 6px;
-    height: 66px;
-    padding: 8px 6px;
-    background: var(--mch-surface);
-    border: 1px solid var(--mch-line);
-    font-size: 11px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-  }
-  body.mc-home .mch .mc-mobile-nav-item.active {
-    border-color: var(--mch-line-2);
-  }
   .mch-wire {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1357,40 +1137,6 @@ body.mc-home .mch .mch-banners .gal-card img {
   body.mc-home {
     --mch-pad: 5%;
   }
-  .mch-hero {
-    --step: 12px;
-    min-height: 0;
-    margin-top: 38px; /* the secondary bar overlaps the top of .coc-main */
-  }
-  .mch-hero::after {
-    background: linear-gradient(0deg, rgba(9, 9, 10, 0.97) 34%, rgba(9, 9, 10, 0.7) 64%, rgba(9, 9, 10, 0.3) 100%);
-  }
-  .mch-hero-inner {
-    padding-top: 180px;
-    padding-bottom: calc(var(--step) * 3 + 24px);
-  }
-  .mch-hero-title {
-    margin-top: 16px;
-    font-size: 32px; /* = /coc/ .ch-title on phones */
-    letter-spacing: -0.5px;
-  }
-  .mch-hero-copy {
-    margin-top: 14px;
-    font-size: 14px;
-  }
-  .mch-hero-foot {
-    flex-direction: column-reverse;
-    align-items: stretch;
-    gap: 22px;
-    width: 100%;
-    margin-top: 22px;
-  }
-  .mch-hero-cta {
-    justify-content: center;
-  }
-  .mch-hero-stats dd {
-    font-size: 18px;
-  }
   .mch-page {
     flex-direction: column;
     align-items: flex-start;
@@ -1411,13 +1157,6 @@ body.mc-home .mch .mch-banners .gal-card img {
   }
   .mch-jersey-num {
     font-size: 32px;
-  }
-  body.mc-home .mch .mch-nav {
-    margin-top: 24px;
-  }
-  body.mc-home .mch .mc-mobile-nav-item {
-    height: 58px;
-    font-size: 10px;
   }
   .mch .mch-wire-list {
     grid-template-columns: minmax(0, 1fr);
@@ -1514,8 +1253,6 @@ body.mc-home .mch .mch-banners .gal-card img {
   }
   .mch-copy {
     width: 40px;
-    padding: 0;
-    justify-content: center;
   }
   .mch-copy span {
     display: none;
@@ -1572,21 +1309,21 @@ body.mc-home .mch .mch-banners .gal-card img {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mch-hero-heart,
   .mch-live,
-  .mch-st-bar i {
+.mch-st-bar i {
     animation: none;
   }
-  .mch-hero-bg,
   .mch-pod-media img,
-  .mch-mod-media img,
-  .mch-hero-cta svg,
-  .mch-more svg {
+.mch-mod-media img,
+.mch-more svg {
     transition: none;
   }
-  .mch-hero:hover .mch-hero-bg,
   .mch-pod:hover .mch-pod-media img,
-  .mch-mod:hover .mch-mod-media img {
+.mch-mod:hover .mch-mod-media img {
+    transform: none;
+  }
+  .mch-pod:hover,
+  .mch-mods--row .mch-mod:hover {
     transform: none;
   }
 }
@@ -1626,31 +1363,43 @@ body.mc-home .mch .mch-banners .gal-card img {
 .lob-title em {
   font-family: inherit;
   font-style: normal;
-  color: #c23b3b;
+  color: #fff;
 }
 .lob-go {
   flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   font-family: 'Sora', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #e6e8ec;
   text-decoration: none;
-  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 600 13px/1 'Sora', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .lob-go svg {
   width: 16px;
   height: 16px;
-  color: #e05252;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  color: currentColor;
 }
-.lob-go:hover { color: #fff; }
+.lob-go:hover { border-color: var(--lb-edge); background: var(--lb-raise-hover); color: #fff; }
 .lob-go:hover svg { transform: translate(2px, -2px); }
-.lob-go:focus-visible { outline: 2px solid #c23b3b; outline-offset: 4px; }
+.lob-go:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
+.lob-go:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
 /* Coming-soon slides: mc-java.css fades every .is-soon to 0.4; slides only
    grey their picture and swap the month for "Coming soon". */
 body.mc-home .art-slide.is-soon {
@@ -1659,6 +1408,14 @@ body.mc-home .art-slide.is-soon {
 }
 .art-slide.is-soon .art-row-media img {
   filter: grayscale(0.7) brightness(0.65);
+}
+.mch-art a.art-slide:hover .art-row-media {
+  box-shadow: 0 16px 30px -14px rgba(0, 0, 0, 0.9);
+}
+.mch-art .art-row-media {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.85);
 }
 .art-slide.is-soon .art-title {
   color: #c9ccd2;
@@ -1677,11 +1434,11 @@ body.mc-home .art-slide.is-soon {
   .lob-head { gap: 12px; margin: 0 5% 24px; }
   .lob-head--row { flex-direction: row; align-items: center; gap: 12px; }
   .lob-title { font-size: clamp(22px, 6vw, 28px); }
-  .lob-go { font-size: 11px; gap: 6px; letter-spacing: 0.5px; }
+  .lob-go { font-size: 11px;}
   .lob-go svg { width: 14px; height: 14px; }
 }
 @media (max-width: 380px) {
-  .lob-go { font-size: 10px; letter-spacing: 0.3px; }
+  .lob-go { font-size: 10px;}
 }
 
 /* ---- CHARTS: palettes + armor side by side, guides under --------------- */
@@ -1721,101 +1478,12 @@ body.mc-home .mch-charts .mch-chart--wide .pal-grid {
   }
 }
 
-/* ---- PAGE BANNER (Oct 12): the hero as the page header ------------------
-   Forest shot (minecrafticons/mc-java-banner.jpg, 736px wide: soft when
-   stretched, so the scrim stays heavy on the left where the type sits).
-   Not a link any more; the CTA is. Versions sit where the stats were. */
-.mch-hero--page {
-  min-height: clamp(420px, 34vw, 540px);
-}
-.mch-hero--page .mch-hero-bg {
-  object-position: center 55%;
-}
-.mch-hero--page:hover .mch-hero-bg {
-  transform: scale(1.02);
-}
-.mch-hero--page:hover .mch-hero-cta {
-  background: var(--mch-red);
-}
-.mch-hero--page .mch-hero-cta {
-  text-decoration: none;
-}
-.mch-hero--page .mch-hero-cta:hover {
-  background: var(--mch-red-hover);
-}
-.mch-hero--page .mch-hero-cta:hover svg {
-  transform: translateX(3px);
-}
-.mch-hero--page .mch-hero-cta:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
-.mch-hero-badge .mch-live {
-  width: 7px;
-  height: 7px;
-}
-.mch-hero-ver > div {
-  flex-direction: column;
-  gap: 5px;
-}
-.mch-hero-ver dd {
-  font-size: 19px;
-}
-.mch-hero-ver .mch-hero-age {
-  font-family: 'Sora', sans-serif !important;
-  font-size: 11px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-}
-.mch-hero-age .hlu-long {
-  display: none;
-}
-.mch-hero-age .hlu-short {
-  display: inline;
-}
-/* The section tabs now sit straight under the banner. */
-body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
-  margin-top: 0;
-  border-top: 0;
-}
-@media (max-width: 1199px) {
-  body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
-    margin-top: 28px;
-  }
-}
-@media (max-width: 970px) {
-  .mch-hero--page {
-    min-height: 0;
-  }
-  .mch-hero--page .mch-hero-inner {
-    padding-top: 150px;
-    padding-bottom: 44px;
-  }
-  .mch-hero-ver dd {
-    font-size: 16px;
-  }
-}
-/* The forest shot is already dark: a lighter scrim than the old hero's,
-   dark only behind the text column on the left. */
-.mch-hero--page::after {
-  background:
-    linear-gradient(90deg, rgba(9, 9, 10, 0.86) 0%, rgba(9, 9, 10, 0.6) 32%, rgba(9, 9, 10, 0.1) 62%, rgba(9, 9, 10, 0) 100%),
-    linear-gradient(0deg, rgba(9, 9, 10, 0.55) 0%, rgba(9, 9, 10, 0) 40%);
-}
-.mch-hero--page .mch-hero-bg {
-  filter: brightness(1.15) saturate(1.1);
-}
-@media (max-width: 970px) {
-  .mch-hero--page::after {
-    background: linear-gradient(0deg, rgba(9, 9, 10, 0.95) 30%, rgba(9, 9, 10, 0.5) 62%, rgba(9, 9, 10, 0.05) 100%);
-  }
-}
 
 /* =====================================================================
    ARTICLES LANGUAGE (Oct 12): the parts /articles/ already has (articles.css,
    article-cards.css), reused so this page reads as the same site.
      ground     #0d0e10 + the faint grey glow from the top (.coc-main there)
-     column     1240px max, same side gutters (.ah)
+     column     --coc-side gutters, no max width (bar alignment)
      tags       grey #b4b8be plate, dark Oxanium caps (.art-row-cat)
      chips      flat #1b1c20, 1px hairline, red outline + tint when on
                 (.ah-filters button)
@@ -1830,23 +1498,17 @@ body.mc-home .coc-content {
 body.mc-home .coc-content {
   background: transparent;
 }
-.mch-frame,
-.mch-hero-inner {
-  max-width: calc(1240px + 2 * var(--coc-side));
-  margin-inline: auto;
+/* No 1240px column cap (Oct 2026): Minecraft's side margins are exactly
+   --coc-side at every width, same as CoC / CODM, so the top bar (which
+   pads by the same variable) lines up with the content. */
+.mch-frame {
   box-sizing: border-box;
 }
-.as-band .lob-head,
-.as-band .art-track,
-.as-band .art-pager {
-  --art-side: max(var(--coc-side), (100% - 1240px) / 2);
-}
 .as-band .lob-head {
-  margin-inline: max(var(--coc-side), (100% - 1240px) / 2);
+  margin-inline: var(--coc-side);
 }
 
 /* Tags: hero badge, pack/shader ranks, source labels. */
-.mch-hero-badge,
 .mch-mod-rank,
 .mch-src,
 .mch-pod .mch-src {
@@ -1858,14 +1520,6 @@ body.mc-home .coc-content {
   text-transform: uppercase;
   color: #111214;
   box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.6);
-}
-.mch-hero-badge {
-  gap: 7px;
-  padding: 6px 10px;
-  font-size: 11px !important;
-}
-.mch-hero-badge .mch-live {
-  background: #c23b3b;
 }
 .mch-src img {
   display: none; /* the tag names the source; favicons fought the plate */
@@ -1882,46 +1536,6 @@ body.mc-home .coc-content {
   color: #fff;
 }
 
-/* Chips: section strip, Packs/Shaders tabs, copy, arrows. */
-body.mc-home .mch .mch-nav {
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 32px;
-  padding: 0;
-  border: 0;
-  overflow: visible;
-}
-body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
-  margin-top: 32px;
-}
-body.mc-home .mch .mc-mobile-nav-item {
-  flex: 0 0 auto;
-  height: 34px;
-  padding: 0 14px;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #1b1c20;
-  font: 600 13px 'Sora', sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-  color: #a9adb3;
-  box-shadow: none;
-}
-body.mc-home .mch .mc-mobile-nav-item img {
-  width: 18px;
-  height: 18px;
-}
-body.mc-home .mch a.mc-mobile-nav-item:hover {
-  background: #1b1c20;
-  border-color: rgba(255, 255, 255, 0.22);
-  color: #fff;
-}
-body.mc-home .mch .mc-mobile-nav-item.active {
-  border-color: rgba(194, 59, 59, 0.75);
-  background: rgba(194, 59, 59, 0.16);
-  color: #fff;
-  box-shadow: none;
-}
 .mch-tabs {
   gap: 8px;
   border-bottom: 0;
@@ -1929,21 +1543,27 @@ body.mc-home .mch .mc-mobile-nav-item.active {
 .mch-tab {
   height: 34px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #1b1c20;
   font: 600 13px 'Sora', sans-serif;
-  color: #a9adb3;
-  box-shadow: none;
+}
+/* Tabs wear the chip recipe (Oct 21 2026): sunken well at rest, raised grey
+   key when on. Was a white --lb-pick key with white text (unreadable). */
+.mch-tab {
+  border: 2px solid var(--lb-edge);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
 }
 .mch-tab:hover {
-  border-color: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  background: #17181d;
+  color: #c9ccd2;
 }
 .mch-tab.is-on {
-  border-color: rgba(194, 59, 59, 0.75);
-  background: rgba(194, 59, 59, 0.16);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #fff;
-  box-shadow: none;
+}
+.mch-tab.is-on:hover {
+  background: var(--lb-raise-hover);
 }
 .mch-tab span,
 .mch-tab.is-on span {
@@ -1953,28 +1573,24 @@ body.mc-home .mch .mc-mobile-nav-item.active {
   font-weight: 500;
   color: #7a7d82;
 }
-.mch-copy,
-.mch-arrow {
-  height: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #1b1c20;
-  font: 600 13px 'Sora', sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-  color: #a9adb3;
+.mch-tab.is-on span {
+  color: #a7abb3;
 }
-.mch-arrow {
-  width: 34px;
+.mch-tab:active {
+  transform: translateY(1px);
 }
-.mch-copy:hover,
-.mch-arrow:hover {
-  background: #1b1c20;
-  border-color: rgba(255, 255, 255, 0.22);
+.mch-arrow:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.mch-arrow:hover:not(:disabled) {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
-.mch-copy.is-done {
-  border-color: rgba(194, 59, 59, 0.75);
-  background: rgba(194, 59, 59, 0.16);
+.mch-copy:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 
@@ -2007,13 +1623,14 @@ body.mc-home .mch .mc-mobile-nav-item.active {
 /* Panels: Mojang posts, terminal, Top 3 worlds. */
 .mch .mch-wire-list .vt-log-row,
 .mch-term {
-  border: 0;
-  background: #141519;
   box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
 }
-.mch .mch-wire-list .vt-log-row:hover {
-  background: #181a1f;
-  border-color: transparent;
+.mch-term {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-term-bar {
   border-bottom-color: rgba(255, 255, 255, 0.07);
@@ -2032,14 +1649,17 @@ body.mc-home .mch .mc-mobile-nav-item.active {
 .mch-st-row:hover {
   background: #181a1f;
 }
-.mch-pod {
-  background: #141519;
-  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
+@media (min-width: 1200px) {
+  .mch-list > li:nth-last-child(2):nth-child(odd) .mch-lr {
+    border-bottom: 0;
+  }
+}
+.mch-list > li:last-child .mch-lr {
+  border-bottom: 0;
 }
 
 /* Meta + secondary text: the articles greys. */
-.mch-sec-sub,
-.mch-hero-copy {
+.mch-sec-sub {
   color: #b4b8be;
 }
 .mch-lr-desc,
@@ -2063,27 +1683,7 @@ body.mc-home .mch .mc-mobile-nav-item.active {
   letter-spacing: 1.2px;
 }
 
-@media (max-width: 1199px) {
-  body.mc-home .mch .mch-nav {
-    display: flex;
-  }
-  body.mc-home .mch .mc-mobile-nav-item {
-    flex-direction: row;
-    height: 34px;
-    font-size: 13px;
-  }
-}
 @media (max-width: 970px) {
-  body.mc-home .mch .mch-nav {
-    flex-wrap: nowrap;
-    margin-inline: calc(var(--coc-side) * -1);
-    padding-inline: var(--coc-side);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
-    margin-top: 24px;
-  }
   .mch-tabs {
     overflow: visible;
   }
@@ -2092,209 +1692,8 @@ body.mc-home .mch .mc-mobile-nav-item.active {
   }
 }
 
-/* ---- BANNER v3 (Oct 12) ------------------------------------------------
-   Flat bottom edge (the stepped block cut is gone), a soft fade into the
-   page instead. Two columns inside the page width: the title block left,
-   "From Mojang" (moved up from under the banner) right. Grass block in the
-   eyebrow marks it as Java Edition. */
-.mch-hero,
-.mch-hero--page {
-  clip-path: none;
-  min-height: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-.mch-hero--page::after {
-  background:
-    linear-gradient(90deg, rgba(13, 14, 16, 0.9) 0%, rgba(13, 14, 16, 0.62) 34%, rgba(13, 14, 16, 0.2) 60%, rgba(13, 14, 16, 0.55) 100%),
-    linear-gradient(0deg, #0d0e10 0%, rgba(13, 14, 16, 0) 38%);
-}
-.mch-hero--page .mch-hero-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
-  align-items: end;
-  gap: 48px;
-  padding-top: 112px;
-  padding-bottom: 56px;
-}
-.mch-hero-main {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
-}
 
-/* Eyebrow: grass block + "Java Edition" on a dark plate. */
-.mch-hero--page .mch-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 12px 6px 7px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(13, 14, 16, 0.72);
-  box-shadow: none;
-  font: 800 11px/1 'Oxanium', sans-serif !important;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: #e6e8ec;
-}
-.mch-hero-badge img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  image-rendering: pixelated;
-}
-
-/* From Mojang panel. */
-.mch-hero-news {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-.mch-hero-news-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-}
-.mch-hero-news-head h2 {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  margin: 0;
-  font: 900 13px/1 'Orbitron', sans-serif !important;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: #eceef1;
-}
-.mch-hero-news .mch-more {
-  font-size: 13px;
-}
-.mch .mch-hero-news .mch-wire-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.mch .mch-hero-news .vt-log-row {
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: 14px;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(13, 14, 16, 0.82);
-  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
-}
-.mch .mch-hero-news .vt-log-row:hover {
-  background: rgba(20, 21, 25, 0.92);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-.mch .mch-hero-news .vt-log-thumb {
-  width: 104px;
-  height: 58px;
-}
-.mch .mch-hero-news .vt-log-headline {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  font-size: 14px;
-}
-.mch .mch-hero-news .vt-feed-skel {
-  height: 80px;
-}
-
-/* The section strip sits under the banner again. */
-body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
-  margin-top: 28px;
-}
-
-@media (max-width: 1199px) {
-  .mch-hero--page .mch-hero-inner {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 36px;
-    padding-top: 88px;
-    padding-bottom: 40px;
-  }
-  .mch-hero-news {
-    max-width: 720px;
-  }
-  .mch .mch-hero-news .mch-wire-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 970px) {
-  .mch-hero--page::after {
-    background: linear-gradient(0deg, #0d0e10 8%, rgba(13, 14, 16, 0.86) 45%, rgba(13, 14, 16, 0.35) 80%, rgba(13, 14, 16, 0.15) 100%);
-  }
-  .mch-hero--page .mch-hero-inner {
-    gap: 28px;
-    padding-top: 140px;
-    padding-bottom: 28px;
-  }
-  .mch .mch-hero-news .mch-wire-list {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .mch .mch-hero-news .vt-log-row {
-    grid-template-columns: 92px minmax(0, 1fr);
-  }
-  .mch .mch-hero-news .vt-log-thumb {
-    width: 92px;
-    height: 52px;
-  }
-}
-
-@media (max-width: 1199px) {
-  .mch-hero--page .mch-hero-inner {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* ---- BANNER SIZE (Oct 12) ---------------------------------------------
-   One step up from the original, not a full screen: fits the title block
-   and the three news cards with room to breathe. */
-.mch-hero--page .mch-hero-inner {
-  min-height: clamp(460px, 34vw, 560px);
-  padding-top: clamp(96px, 7vw, 120px);
-  padding-bottom: clamp(72px, 6vw, 96px);
-  align-items: end;
-}
-.mch-hero--page .mch-hero-title {
-  font-size: clamp(38px, 3.8vw, 62px);
-}
-.mch-hero--page .mch-hero-copy {
-  max-width: 48ch;
-  font-size: 15.5px;
-}
-@media (max-width: 1199px) {
-  .mch-hero--page .mch-hero-inner {
-    min-height: 0;
-  }
-}
-@media (max-width: 970px) {
-  .mch-hero--page .mch-hero-inner {
-    padding-top: 150px;
-  }
-  .mch-hero--page .mch-hero-title {
-    font-size: 34px;
-  }
-  .mch-hero--page .mch-hero-copy {
-    font-size: 14px;
-  }
-}
 /* Laptop widths: a slightly narrower news column. */
-@media (min-width: 1200px) and (max-width: 1600px) {
-  .mch-hero--page .mch-hero-inner {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
-    gap: 32px;
-  }
-}
-@media (min-width: 1200px) and (max-width: 1440px) {
-  .mch-hero--page .mch-hero-inner {
-    grid-template-columns: minmax(0, 1fr) minmax(290px, 330px);
-  }
-}
 
 /* =====================================================================
    OCT 12 ADDITIONS: chat window, Skin lookup, release
@@ -2363,7 +1762,12 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   background: #141519;
-  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
+}
+.mch-skin {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .mch-skin-stage {
   position: relative;
@@ -2405,17 +1809,21 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   width: 34px;
   height: 34px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #1b1c20;
-  color: #a9adb3;
   cursor: pointer;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .mch-skin-play svg {
   width: 14px;
   height: 14px;
 }
 .mch-skin-play:hover {
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
   color: #fff;
 }
 .mch-skin-tip {
@@ -2477,14 +1885,16 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   gap: 10px;
   height: 48px;
   padding: 0 22px;
-  border: 0;
-  background: var(--mch-red);
   font: 800 12px/1 'Oxanium', sans-serif !important;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #fff;
   cursor: pointer;
   transition: background 0.15s ease;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
 }
 .mch-skin-go svg {
   width: 14px;
@@ -2492,7 +1902,8 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   transition: transform 0.2s var(--mch-ease);
 }
 .mch-skin-go:hover {
-  background: var(--mch-red-hover);
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red-hover);
 }
 .mch-skin-go:hover svg {
   transform: translateX(3px);
@@ -2509,7 +1920,7 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   color: #a3a7ae;
 }
 .mch-skin-msg.is-error {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-skin-picks {
   display: flex;
@@ -2590,8 +2001,10 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   align-items: center;
   gap: 18px 24px;
   padding: 28px 28px 22px;
-  background: #141519;
-  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .mch-tl-scroll {
   grid-column: 1 / -1;
@@ -2631,18 +2044,21 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   color: #fff;
   cursor: pointer;
   transition: background-color 0.12s ease;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.1), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 .mch-tl-blk:hover {
   background: #3b3e45;
 }
 .mch-tl-blk.is-major {
   background: var(--mch-red);
+  box-shadow: inset 0 0 0 1px var(--lb-red-edge), inset 0 2px 0 rgba(255, 255, 255, 0.22), inset 0 -3px 0 rgba(0, 0, 0, 0.25);
 }
 .mch-tl-blk.is-major:hover {
   background: #d24a4a;
 }
 .mch-tl-blk.is-on {
-  box-shadow: inset 0 0 0 2px #fff;
+  box-shadow: inset 0 0 0 2px #fff, inset 0 -3px 0 rgba(0, 0, 0, 0.25);
 }
 .mch-tl-chart.is-pending .mch-tl-blk {
   opacity: 0;
@@ -2688,6 +2104,7 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: #fff;
+  border-radius: 3px;
 }
 .mch-tl-update {
   display: inline-flex;
@@ -2751,9 +2168,12 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
   width: 12px;
   height: 12px;
   background: #3b3e45;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.1), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 .mch-tl-key i.is-major {
   background: var(--mch-red);
+  box-shadow: inset 0 0 0 1px var(--lb-red-edge), inset 0 2px 0 rgba(255, 255, 255, 0.22), inset 0 -3px 0 rgba(0, 0, 0, 0.25);
 }
 
 /* ---- PHONES + TABLETS ------------------------------------------------------ */
@@ -2874,11 +2294,6 @@ body.mc-home .mch .mch-hero + .mch-frame > .mch-nav {
 .mch-ch .mch-frame > .mch-sec:first-of-type {
   margin-top: 48px;
 }
-/* The section strip opens the surface layer. */
-body.mc-home .mch .mch-ch--surface .mch-nav {
-  margin-top: 0;
-  margin-bottom: 56px;
-}
 
 /* Java guides follow Packs & shaders inside Customize. */
 .mch-ch .as-band.mch-art {
@@ -2905,9 +2320,6 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   .mch-ch .as-band.mch-art {
     margin-top: 40px;
   }
-  body.mc-home .mch .mch-ch--surface .mch-nav {
-    margin-bottom: 44px;
-  }
 }
 
 /* ---- REFERENCE DESK -------------------------------------------------------
@@ -2918,15 +2330,15 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   grid-template-columns: minmax(260px, 4fr) minmax(0, 8fr);
   gap: 24px;
 }
-.mch-ref-list,
-.mch-ref-view {
-  background: #141519;
-  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
-}
 .mch-ref-list {
   display: flex;
   flex-direction: column;
-  padding: 6px 0 10px;
+  padding: 8px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch .mch-ref-group {
   display: flex;
@@ -2956,12 +2368,13 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   width: 100%;
   margin: 0;
   padding: 6px 18px;
-  border: 0;
   background: transparent;
   text-align: left;
   color: inherit;
   cursor: pointer;
   transition: background 0.15s ease;
+  border: 2px solid transparent;
+  border-radius: 4px;
 }
 .mch-ref-item img {
   width: 34px;
@@ -2987,14 +2400,15 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   display: none;
 }
 .mch-ref-item:hover {
-  background: #181a1f;
+  background: rgba(255, 255, 255, 0.04);
 }
 .mch-ref-item:hover .pal-card-label {
   color: #fff;
 }
 .mch-ref-item.is-on {
-  background: rgba(194, 59, 59, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(194, 59, 59, 0.6);
+  border-color: var(--lb-red-edge);
+  background: rgba(194, 59, 59, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(232, 106, 106, 0.35);
 }
 .mch-ref-item.is-on .pal-card-label {
   color: #fff;
@@ -3009,6 +2423,11 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   flex-direction: column;
   min-width: 0;
   margin: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-ref-stage {
   display: grid;
@@ -3017,10 +2436,23 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   min-height: 460px;
   padding: 24px;
   border: 0;
-  background: #0d0e10;
   cursor: zoom-in;
+  position: relative;
+  isolation: isolate;
+  background: url('/minecrafticons/map/oak_planks.png') 0 0 / 64px repeat;
+  image-rendering: pixelated;
+}
+/* the in-game map parchment, 9-sliced so the torn edge stays crisp at any width */
+.mch-ref-stage::before {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  z-index: -1;
+  border-image: url('/minecrafticons/map/map_background.png') 6 fill / 24px round;
 }
 .mch-ref-stage img {
+  position: relative;
+  image-rendering: auto;
   display: block;
   max-width: 100%;
   max-height: clamp(420px, 42vw, 640px);
@@ -3062,9 +2494,6 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   align-items: center;
   gap: 18px;
 }
-.mch-ref-cap-acts .mch-more[hidden] {
-  display: none;
-}
 
 @media (max-width: 970px) {
   /* Phones: no preview. The list becomes a two-up grid of cards that open
@@ -3079,9 +2508,6 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    padding: 0;
-    background: none;
-    box-shadow: none;
   }
   .mch .mch-ref-group,
   .mch .mch-ref-group ~ .mch-ref-group {
@@ -3305,9 +2731,16 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
 /* ---- GUIDES -> PLAY BREAK (Oct 13) -----------------------------------------
    Java guides open the page under the section strip; Play (worlds, servers)
    steps up to a lighter ground with a hairline on top, so the jump reads as a
-   new section. Last in the file so it beats the phone pass's article margin. */
+   new section. Last in the file so it beats the phone pass's article margin.
+   Desktop (Oct 21): the strip moved into the banner, so the articles take the
+   same 48px as every page's first section (.mch-sec:first-of-type). */
 .mch-ch--surface .as-band.mch-art {
   margin-top: 0;
+}
+@media (min-width: 971px) {
+  .mch-ch--surface .as-band.mch-art {
+    margin-top: 48px;
+  }
 }
 .mch-ch--play {
   border-top: 1px solid rgba(255, 255, 255, 0.09);
@@ -3316,9 +2749,6 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
     #15171b;
 }
 
-.mch-more[hidden] {
-  display: none;
-}
 
 /* ---- WORLDS PAGE (Oct 13) ---------------------------------------------------
    /minecraft/java/worlds reuses the home's hero, chapter ground and pack cards.
@@ -3339,11 +2769,17 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   position: relative;
   display: block;
   min-height: 380px;
-  overflow: hidden;
   color: var(--mch-text);
   text-decoration: none;
   background: #111316;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+}
+a.mch-feat:hover {
+  box-shadow: var(--lb-shadow-hover);
 }
 .mch-feat-bg {
   position: absolute;
@@ -3381,7 +2817,7 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-feat-title {
   margin: 0;
@@ -3393,7 +2829,7 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
 .mch-feat-title em {
   display: block;
   font-style: normal;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-feat-copy {
   margin: 0;
@@ -3482,14 +2918,16 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   height: 40px;
   padding: 0 12px;
   overflow-x: auto;
-  background: #0d0e10;
-  border: 1px solid var(--mch-line);
   font: 500 13.5px/38px var(--mch-mono) !important;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   scrollbar-width: none;
   color: #e6e8eb;
   user-select: all;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
 }
 .mch-seedacts {
   display: grid;
@@ -3497,7 +2935,6 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   gap: 6px;
 }
 .mch-seedacts .mch-copy {
-  justify-content: center;
   text-decoration: none;
 }
 .mch-maplink {
@@ -3509,7 +2946,11 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   display: grid;
   grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
   background: #141519;
-  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.95);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-sfeat[aria-busy='true'] {
   min-height: 420px;
@@ -3573,6 +3014,7 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   opacity: 0.5;
   cursor: pointer;
   transition: opacity 0.15s ease;
+  border-radius: 4px;
 }
 .mch-sfeat-thumb img {
   width: 100%;
@@ -3650,6 +3092,10 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   position: relative;
   flex: 0 1 420px;
   min-width: 0;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
 }
 .mch-sfind svg {
   position: absolute;
@@ -3680,6 +3126,9 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
 .mch-sfind input:focus {
   border-color: rgba(194, 59, 59, 0.85);
 }
+.mch-sfind:focus-within {
+  box-shadow: var(--lb-ring-well), 0 0 0 2px var(--lb-red-text);
+}
 .mch-scount {
   margin: 0;
   font-size: 13px;
@@ -3687,25 +3136,51 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   color: var(--mch-muted);
   white-space: nowrap;
 }
+/* Filter chips (Oct 21 2026): ONE row that scrolls sideways, never wraps.
+   Same recipe as the More sheet tiles (coc-more.css): a sunken well at rest,
+   a step lighter on hover, the picked one the raised grey key. The bottom
+   padding leaves room for the key's ledge inside the scroll box. */
 .mch-chips {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+  padding-bottom: 4px;
+  /* The row must not hand its full one-line width up to its parent: inside a
+     grid column (the tool panels) it would widen the column and push the
+     whole panel past its box. inline-size containment = it takes the width
+     it is given and scrolls the rest. */
+  contain: inline-size;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #34363f transparent;
+}
+@media (hover: none) {
+  .mch-chips {
+    scrollbar-width: none;
+  }
+  .mch-chips::-webkit-scrollbar {
+    display: none;
+  }
 }
 .mch-chip {
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 36px;
   padding: 0 14px;
-  border: 1px solid var(--mch-line-2);
-  background: transparent;
   font-size: 13px;
   font-weight: 600;
-  color: var(--mch-muted);
+  white-space: nowrap;
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 .mch-chip span {
   font-size: 11px;
@@ -3713,16 +3188,19 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   color: var(--mch-dim);
 }
 .mch-chip:hover {
-  color: #fff;
-  background: var(--mch-surface-2);
+  background: #17181d;
+  color: #c9ccd2;
 }
 .mch-chip[aria-pressed='true'] {
-  border-color: var(--mch-red);
-  background: rgba(194, 59, 59, 0.14);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #fff;
 }
+.mch-chip[aria-pressed='true']:hover {
+  background: var(--lb-raise-hover);
+}
 .mch-chip[aria-pressed='true'] span {
-  color: var(--mch-red-text);
+  color: #a7abb3;
 }
 
 /* Seed cards. */
@@ -3738,12 +3216,14 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   background: #141519;
   scroll-margin-top: 120px;
   transition: box-shadow 0.2s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-scard[hidden] {
   display: none;
-}
-.mch-scard.is-target {
-  box-shadow: 0 0 0 2px var(--mch-red);
 }
 .mch-scard-shot {
   position: relative;
@@ -3873,7 +3353,7 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   display: block;
   margin-bottom: 18px;
   font: 700 30px/1 'Orbitron', sans-serif;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-steps b {
   display: block;
@@ -3887,11 +3367,23 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   line-height: 1.6;
   color: var(--mch-muted);
 }
+.mch-steps > li {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+}
 
 /* Questions: native <details>, one rule between rows. */
 .mch-faq {
   max-width: 860px;
-  border-top: 1px solid var(--mch-line-2);
+  padding: 4px 18px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-faq details {
   border-bottom: 1px solid var(--mch-line-2);
@@ -3916,8 +3408,8 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   flex: none;
   width: 9px;
   height: 9px;
-  border-right: 2px solid var(--mch-red-text);
-  border-bottom: 2px solid var(--mch-red-text);
+  border-right: 2px solid var(--lb-red-text);
+  border-bottom: 2px solid var(--lb-red-text);
   transform: translateY(-3px) rotate(45deg);
   transition: transform 0.2s var(--mch-ease);
 }
@@ -3925,7 +3417,7 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
   transform: translateY(2px) rotate(-135deg);
 }
 .mch-faq summary:hover {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-faq p {
   max-width: 68ch;
@@ -3948,7 +3440,11 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
 .mch-sfeat-thumb:focus-visible,
 .mch-maplink:focus-visible,
 .mch-faq summary:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.mch-chip:focus-visible {
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 
@@ -4002,7 +3498,6 @@ body.mc-home .mch .mch-ch--surface .mch-nav {
 @media (max-width: 970px) {
   .mch-seedacts .mch-copy {
     width: auto;
-    padding: 0 16px;
   }
   .mch-seedacts .mch-copy span {
     display: inline;
@@ -4050,7 +3545,7 @@ a.mch-chip {
   font-size: 13px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-pgroup-head p {
   margin: 0;
@@ -4072,7 +3567,7 @@ a.mch-chip {
   font-family: 'Sora', sans-serif !important;
 }
 .mch-standings--mr .mch-st-row:hover .mch-st-server b {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-standings--mr .mch-st-when {
   font-size: 13px;
@@ -4093,9 +3588,8 @@ a.mch-chip {
   opacity: 0.35;
   cursor: default;
 }
-.mch-chip:disabled:hover {
-  background: transparent;
-  color: var(--mch-muted);
+.mch-chip:active {
+  transform: translateY(1px);
 }
 @media (max-width: 970px) {
   .mch-standings--mr .mch-st-head,
@@ -4119,6 +3613,11 @@ a.mch-chip {
   margin-top: 20px;
   padding: 32px;
   background: #1c1e23;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-order-text h4 {
   margin: 0 0 12px;
@@ -4157,7 +3656,7 @@ a.mch-chip {
   flex: none;
   width: 22px;
   font: 700 14px/1 'Orbitron', sans-serif;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-order-list li:first-child {
   border-color: rgba(194, 59, 59, 0.6);
@@ -4248,15 +3747,15 @@ a.mch-chip {
   background: #1c1e23;
   color: var(--mch-text);
   text-decoration: none;
-  box-shadow: inset 0 2px 0 transparent;
   transition: background 0.15s ease, box-shadow 0.15s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-launcher:hover {
   background: #22252b;
-  box-shadow: inset 0 2px 0 var(--mch-line-2);
-}
-.mch-launcher.is-top {
-  box-shadow: inset 0 2px 0 var(--mch-red);
 }
 .mch-launcher img {
   width: 44px;
@@ -4272,7 +3771,7 @@ a.mch-chip {
   color: var(--mch-dim);
 }
 .mch-launcher.is-top .mch-launcher-tag {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-launcher h3 {
   margin: 0;
@@ -4299,7 +3798,7 @@ a.mch-chip {
 .mch-launcher-go svg {
   width: 14px;
   height: 14px;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-launcher:hover .mch-launcher-go {
   color: #fff;
@@ -4343,7 +3842,7 @@ a.mch-chip {
   color: #fff;
 }
 .mch-ess-item:hover b {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-ess-item small {
   font-size: 13px;
@@ -4377,8 +3876,16 @@ a.mch-chip {
 .mch-launcher:focus-visible,
 .mch-ess-item:focus-visible,
 .mch-linkpill:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
+}
+a.mch-launcher {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+a.mch-launcher:hover {
+  background-color: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+  transform: translateY(-3px);
 }
 
 @media (max-width: 1199px) {
@@ -4461,7 +3968,7 @@ a.mch-chip {
 }
 .mch-tier[data-tier='high'],
 .mch-tier[data-tier='screenshot'] {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-tier.is-inline {
   position: static;
@@ -4496,11 +4003,12 @@ a.mch-chip {
   background: #1c1e23;
   color: var(--mch-text);
   text-decoration: none;
-  box-shadow: inset 0 2px 0 var(--mch-line-2);
   transition: background 0.15s ease;
-}
-.mch-vs-col.is-pick {
-  box-shadow: inset 0 2px 0 var(--mch-red);
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 .mch-vs-col:hover {
   background: #22252b;
@@ -4548,7 +4056,7 @@ a.mch-chip {
   color: #fff;
 }
 .mch-vs-col:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 
@@ -4583,7 +4091,7 @@ a.mch-chip {
   background: #0d0e10;
   border: 1px solid var(--mch-line-2);
   font: 700 18px/1 var(--mch-mono) !important;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-term-top {
   display: flex;
@@ -4606,7 +4114,7 @@ a.mch-chip {
 }
 .mch-term-flags .is-block {
   background: rgba(194, 59, 59, 0.14);
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mch-term-flags .is-new {
   background: rgba(230, 193, 90, 0.12);
@@ -4642,7 +4150,7 @@ a.mch-chip {
 }
 .mch-sel-list dt code {
   font: 600 13.5px/1.5 var(--mch-mono) !important;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
   overflow-wrap: anywhere;
 }
 .mch-sel-list dd {
@@ -4655,6 +4163,14 @@ a.mch-chip {
 /* "Where to paste" panels are info, not links: no hover lift. */
 div.mch-vs-col:hover {
   background: #1c1e23;
+}
+a.mch-vs-col {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+a.mch-vs-col:hover {
+  background-color: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+  transform: translateY(-3px);
 }
 .mch-vs-col .mch-seedrow {
   align-self: stretch;
@@ -4711,7 +4227,6 @@ div.mch-vs-col:hover {
   cursor: default;
 }
 .tc-card.mct-soon:hover {
-  border-color: rgba(255, 255, 255, 0.08);
   transform: none;
 }
 .mct-soon .tc-icon img {
@@ -4721,32 +4236,6 @@ div.mch-vs-col:hover {
   color: #b9bcc2;
 }
 
-.mct-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 46px;
-  margin-left: -28px; /* sits next to the CTA, not 40px away like the stats */
-  padding: 0 18px;
-  border: 1px solid var(--mch-line-2);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--mch-text);
-  transition: background 0.15s ease;
-}
-.mct-back:hover {
-  background: var(--mch-surface-2);
-}
-.mct-back svg {
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-}
 
 .mct-gen {
   display: grid;
@@ -4792,7 +4281,7 @@ div.mch-vs-col:hover {
 }
 #enPicked {
   font-weight: 700;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .mct-acts {
   display: flex;
@@ -4820,26 +4309,32 @@ div.mch-vs-col:hover {
   justify-items: center;
   gap: 6px;
   padding: 12px 4px 10px;
-  border: 1px solid var(--mch-line);
-  background: #0f1013;
+  /* The chip recipe (Oct 21 2026): well at rest, grey key when picked. */
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
   font: 600 11.5px/1.25 'Sora', sans-serif;
-  color: var(--mch-muted);
+  color: #8b9099;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 .mct-item img {
   width: 32px;
   height: 32px;
 }
 .mct-item:hover {
-  background: var(--mch-surface-2);
-  color: #fff;
+  background: #17181d;
+  color: #c9ccd2;
 }
 .mct-item[aria-pressed='true'] {
-  border-color: var(--mch-red);
-  background: rgba(194, 59, 59, 0.14);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #fff;
+}
+.mct-item[aria-pressed='true']:hover {
+  background: var(--lb-raise-hover);
 }
 .mct-mat img {
   width: 20px;
@@ -4905,6 +4400,12 @@ div.mch-vs-col:hover {
   margin: 0;
   accent-color: var(--mch-red);
 }
+.mct-build {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
 .mct-check {
   display: inline-flex;
   align-items: center;
@@ -4925,18 +4426,24 @@ div.mch-vs-col:hover {
   display: block;
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0;
   background: #0d0e10;
   font: 500 14.5px 'Sora', sans-serif;
   color: #fff;
   caret-color: var(--mch-red);
   outline: none;
   resize: vertical;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .mct-input:focus,
 .mct-lvl input:focus {
   border-color: rgba(194, 59, 59, 0.85);
+}
+.mct-input:focus {
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
 }
 .mct-input::placeholder {
   color: #6b6f76;
@@ -4955,8 +4462,10 @@ div.mch-vs-col:hover {
   width: 28px;
   height: 28px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 .mct-sw--none {
   background: #0d0e10;
@@ -5051,6 +4560,62 @@ div.mch-vs-col:hover {
   display: none;
 }
 
+/* Enchanted item form tabs (Oct 15): .mch-tabs look + the mc-home.js engine,
+   which toggles [hidden] on the panels. Panels set display, so [hidden] needs
+   its own rule to still win. */
+.mct-tabs {
+  margin-bottom: 18px;
+}
+.mct-pan {
+  display: grid;
+  gap: 22px;
+}
+.mct-pan[hidden],
+.mct-ench[hidden],
+.mct-acts[hidden],
+.mct-check[hidden] {
+  display: none;
+}
+.mct-pan .mct-ench {
+  margin: 0;
+}
+.mct-acts--end {
+  justify-content: flex-end;
+}
+.mct-opts {
+  gap: 16px;
+}
+.mct-dim {
+  font-size: 12px;
+  color: var(--mch-dim);
+}
+.mct-check:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.mct-num {
+  width: 80px;
+  padding: 9px 10px;
+}
+.mct-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mch-muted);
+}
+.mct-hint:empty {
+  display: none;
+}
+/* "base 4.5" / "default 0.23": wider than the 38px "max 5" column, kept on one line */
+.mct-lvl small.mct-base {
+  width: auto;
+  min-width: 38px;
+  white-space: nowrap;
+}
+.mct-tip .is-gap {
+  margin-top: 8px;
+}
+
 @media (max-width: 1200px) {
   .mct-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5062,11 +4627,15 @@ div.mch-vs-col:hover {
   .mct-ench {
     grid-template-columns: minmax(0, 1fr);
   }
-  .mct-back {
-    margin-left: -8px;
-  }
   .mct-build {
     padding: 16px;
+  }
+  /* Four tabs on one line at phone width (they'd wrap "Options" otherwise). */
+  .mct-tabs {
+    gap: 6px;
+  }
+  .mct-tabs .mch-tab {
+    padding: 0 7px;
   }
   .mct-items {
     grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
@@ -5229,7 +4798,7 @@ div.mch-vs-col:hover {
   color: var(--mch-dim);
 }
 .bn-layer.is-sel .bn-layer-n {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .bn-layer-txt {
   display: flex;
@@ -5304,12 +4873,14 @@ div.mch-vs-col:hover {
 /* ---- the editor (add / edit a layer) ---- */
 .bn-editor {
   padding: 18px;
-  border: 1px solid var(--mch-line-2);
   background: #0d0e10;
   transition: border-color 0.2s ease, background 0.2s ease;
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .bn-editor.is-edit {
-  border-color: rgba(194, 59, 59, 0.7);
   background: linear-gradient(180deg, rgba(194, 59, 59, 0.08), rgba(194, 59, 59, 0) 140px), #0d0e10;
 }
 .bn-editor-head {
@@ -5334,7 +4905,7 @@ div.mch-vs-col:hover {
   color: var(--mch-muted);
 }
 .bn-editor.is-full .bn-editor-head p {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .bn-done {
   flex: none;
@@ -5522,7 +5093,7 @@ div.mch-vs-col:hover {
   flex: none;
   width: 22px;
   font: 700 13px 'Oxanium', sans-serif;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .bn-steps li.is-stop::before {
   content: '!';
@@ -5602,156 +5173,11 @@ div.mch-vs-col:hover {
   }
 }
 
-/* ---- COMPACT HERO ON PHONES (Oct 13) -------------------------------------
-   Every Minecraft page hero (.mch-hero--page). On phones it shrinks to the
-   title, one line and the versions, so the page's content is on the first
-   screen. The CTA and "All tools" go (the section strip under the hero and
-   the bottom nav do that job), and "From Mojang" is moved under the page by
-   mc-home.js (.mct-news). Desktop is untouched. */
-body.mc-home .mch .mct-hub .mch-nav {
-  display: none; /* the hub's list already holds every tool */
-}
 .mct-news {
   padding-block: 36px 8px;
 }
-@media (max-width: 970px) {
-  .mch-hero--page .mch-hero-inner {
-    gap: 0;
-    padding-top: 64px;
-    padding-bottom: 22px;
-  }
-  .mch-hero--page .mch-hero-title {
-    font-size: 30px;
-  }
-  .mch-hero--page .mch-hero-copy {
-    margin-top: 10px;
-    font-size: 14px;
-    line-height: 1.55;
-  }
-  .mch-hero--page .mch-hero-foot {
-    margin-top: 16px;
-  }
-  .mch-hero--page .mch-hero-cta,
-  .mch-hero--page .mct-back,
-  .mch-hero--page .mch-hero-inner > .mch-hero-news {
-    display: none;
-  }
-}
 
-/* ---- HOTBAR (Oct 13, v2) -------------------------------------------------
-   The section strip (.mc-mobile-nav, filled from mc-contents.json by
-   mc-java.js) as the game's hotbar, phones and desktop. One dark bar; each
-   slot is pressed into it (a 2px pixel bevel: dark top-left, faint light
-   bottom-right) with its item greyed, the way an unheld slot reads.
-   The page you are on is the held item: its slot is raised out of the bar
-   (the bevel flips), the item lifts in full colour with one pass of the
-   enchant glint (masked to the icon via --icon, set in mc-java.js), and its
-   name shows in the game's own item tooltip -- the purple-edged box
-   .mct-tip already draws on the tool pages. Names keep the same box size in
-   both states (transparent edge when not held), so nothing shifts.
-   Phones scroll the bar (held slot centred by mc-java.js). */
-body.mc-home .mch .mch-nav {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
-  width: fit-content;
-  max-width: 100%;
-  margin-bottom: 48px;
-  padding: 4px;
-  border: 0;
-  background: #0a0b0d;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-}
-body.mc-home .mch .mc-mobile-nav-item {
-  position: relative;
-  flex: 0 0 auto;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 100px;
-  height: 92px;
-  padding: 0 10px;
-  border: 0;
-  background: #16171b;
-  box-shadow:
-    inset 2px 2px 0 rgba(0, 0, 0, 0.55),
-    inset -2px -2px 0 rgba(255, 255, 255, 0.045);
-  font: 600 12px/1 'Sora', sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-  color: #80848b;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-body.mc-home .mch .mc-slot-ico {
-  position: relative;
-  display: block;
-  width: 34px;
-  height: 34px;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-body.mc-home .mch .mc-mobile-nav-item img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  image-rendering: pixelated;
-  filter: grayscale(0.7) brightness(0.7);
-  transition: filter 0.15s ease;
-}
-body.mc-home .mch .mc-slot-name {
-  padding: 3px 7px 4px;
-  border: 2px solid transparent;
-  white-space: nowrap;
-}
-body.mc-home .mch a.mc-mobile-nav-item:hover {
-  border: 0;
-  background: #1b1c21;
-  color: #dfe2e6;
-}
-body.mc-home .mch a.mc-mobile-nav-item:hover .mc-slot-ico {
-  transform: translateY(-2px);
-}
-body.mc-home .mch a.mc-mobile-nav-item:hover img,
-body.mc-home .mch .mc-mobile-nav-item.active img {
-  filter: none;
-}
-body.mc-home .mch a.mc-mobile-nav-item:active .mc-slot-ico {
-  transform: scale(0.9);
-}
 
-/* The held slot. */
-body.mc-home .mch .mc-mobile-nav-item.active {
-  background: #26272d;
-  box-shadow:
-    inset 2px 2px 0 rgba(255, 255, 255, 0.16),
-    inset -2px -2px 0 rgba(0, 0, 0, 0.5);
-  color: #fff;
-}
-body.mc-home .mch .mc-mobile-nav-item.active::after {
-  display: none;
-}
-body.mc-home .mch .mc-mobile-nav-item.active .mc-slot-ico {
-  transform: translateY(-2px) scale(1.12);
-}
-body.mc-home .mch .mc-mobile-nav-item.active .mc-slot-name {
-  border-color: #25015b;
-  outline: 1px solid #100010;
-  background: rgba(16, 0, 16, 0.94);
-  color: #fff;
-}
-body.mc-home .mch .mc-mobile-nav-item.active .mc-slot-ico::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  -webkit-mask: var(--icon) center / contain no-repeat;
-  mask: var(--icon) center / contain no-repeat;
-  background: linear-gradient(115deg, transparent 38%, rgba(196, 150, 255, 0.85) 50%, transparent 62%) 120% 0 / 300% 100% no-repeat;
-  mix-blend-mode: screen;
-  animation: mc-glint 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
-  pointer-events: none;
-}
 @keyframes mc-glint {
   from {
     background-position: 120% 0;
@@ -5760,51 +5186,7 @@ body.mc-home .mch .mc-mobile-nav-item.active .mc-slot-ico::after {
     background-position: -20% 0;
   }
 }
-body.mc-home .mch .mc-mobile-nav-item.is-soon {
-  opacity: 0.45;
-}
-body.mc-home .mch .mc-mobile-nav-item:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: -2px;
-}
 
-@media (max-width: 970px) {
-  /* Phones: the bar runs edge to edge and scrolls; edges fade. */
-  body.mc-home .mch .mch-nav {
-    width: auto;
-    max-width: none;
-    margin-bottom: 36px;
-    margin-inline: calc(var(--coc-side) * -1);
-    padding: 4px var(--coc-side);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--coc-side), #000 calc(100% - 32px), transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 var(--coc-side), #000 calc(100% - 32px), transparent);
-  }
-  body.mc-home .mch .mc-mobile-nav-item {
-    gap: 6px;
-    min-width: 80px;
-    height: 76px;
-    padding: 0 6px;
-    font-size: 11px;
-  }
-  body.mc-home .mch .mc-slot-ico {
-    width: 28px;
-    height: 28px;
-  }
-  body.mc-home .mch .mc-slot-name {
-    padding: 2px 6px 3px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  body.mc-home .mch .mc-slot-ico,
-  body.mc-home .mch .mc-mobile-nav-item .mc-slot-ico {
-    transition: none;
-    transform: none;
-  }
-  body.mc-home .mch .mc-mobile-nav-item.active .mc-slot-ico::after {
-    display: none;
-  }
-}
 
 /* =====================================================================
    JAVA HOME PASS (Oct 13)
@@ -5872,11 +5254,6 @@ body.mc-home .coc-content {
   }
 }
 
-/* From Mojang: the list loads five (data-count); the hero column shows three,
-   phones (moved under the page by mc-home.js) show all five. */
-.mch-hero-inner .mch-wire-list > :nth-child(n + 4) {
-  display: none;
-}
 
 /* Release readout: the update box is always there (a same-size, invisible
    stand-in when a version has none), so hovering never resizes the section. */
@@ -5912,14 +5289,11 @@ body.mc-home .coc-content {
   .mch-ch .as-band.mch-art {
     margin-top: 0;
   }
-  body.mc-home .mch .mch-ch--surface .mch-nav {
-    margin-bottom: 32px;
-  }
-  /* Title on its own line, "View all" under it (same as Popular articles). */
+  /* Title + "View all" share one row (same as Popular articles). */
   .mch-sec-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 18px;
   }
 
@@ -5930,38 +5304,11 @@ body.mc-home .coc-content {
     font-size: min(26px, 5.4vw);
     white-space: nowrap;
   }
-  /* ---- Popular articles: title on its own line, "View all" under it, and a
-     slimmer pager (arrows fixed in article-cards.js). */
-  .mch-art .lob-head--row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
+  /* ---- Popular articles: title + "All articles" share one line; cards,
+     progress line and arrows are the shared 11layout ARTICLE STRIP. */
   .mch-ch .mch-art .lob-head {
     margin-bottom: 18px;
   }
-  .mch-art .lob-go {
-    font-size: 12px;
-  }
-  .mch-art .art-slide .art-row-media {
-    margin-bottom: 12px;
-  }
-  .mch-art .art-slide-meta {
-    margin-bottom: 6px;
-  }
-  .mch-art .art-pager {
-    gap: 12px;
-    margin-top: 14px;
-  }
-  .mch-art .art-pager .art-nav button {
-    width: 36px;
-    height: 36px;
-  }
-  .mch-art .art-pager .art-nav svg {
-    width: 20px;
-    height: 20px;
-  }
-
   /* ---- From Mojang under the page: room before the footer. */
   .mct-news {
     padding-block: 40px 56px;
@@ -6048,59 +5395,13 @@ body.mc-home .coc-content {
   }
 }
 
-/* ---- Hotbar band on phones (Oct 13): the bar is its own section, equal
-   space above and below it, then a full-width hairline (hr.mch-nav-rule,
-   right after the nav in each page) and more room before the first title. */
-.mch-nav-rule {
-  display: none;
-}
 @media (max-width: 970px) {
-  body.mc-home .mch .mch-ch--surface .mch-nav {
-    margin-bottom: 0;
-  }
+  /* The first band under the banner (one per page). Mob Summon's .mt-wrap matches it. */
   .mch-ch--surface {
-    padding-top: 24px;
-  }
-  .mch-nav-rule {
-    display: block;
-    height: 1px;
-    margin: 24px calc(var(--coc-side) * -1) 40px;
-    border: 0;
-    background: rgba(255, 255, 255, 0.09);
-  }
-  .mct-hub .mch-nav-rule {
-    display: none;
+    padding-top: 48px;
   }
 }
 
-/* ---- Hotbar slot numbers (Oct 13): 1-9 in the top-left of each slot, like
-   the number keys that pick a hotbar slot. CSS counter, so the order in
-   mc-contents.json is the numbering. */
-body.mc-home .mch .mch-nav {
-  counter-reset: mc-slot;
-}
-body.mc-home .mch .mc-mobile-nav-item {
-  counter-increment: mc-slot;
-}
-body.mc-home .mch .mc-mobile-nav-item::before {
-  content: counter(mc-slot);
-  position: absolute;
-  top: 5px;
-  left: 6px;
-  font: 700 9px/1 var(--mch-mono, monospace);
-  color: rgba(255, 255, 255, 0.28);
-  pointer-events: none;
-}
-body.mc-home .mch .mc-mobile-nav-item.active::before {
-  color: rgba(255, 255, 255, 0.7);
-}
-@media (max-width: 970px) {
-  body.mc-home .mch .mc-mobile-nav-item::before {
-    top: 4px;
-    left: 5px;
-    font-size: 8px;
-  }
-}
 
 /* ---- Popular worlds, top 3 (Oct 13, v2) ----------------------------------
    Was: names and huge outlined 01/02/03 laid over the pictures, which already
@@ -6134,6 +5435,16 @@ body.mc-home .mch .mch-pod.is-first {
   background: none;
   box-shadow: none;
   transform: none;
+}
+.mch-pod {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.mch-pod {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
 }
 body.mc-home .mch .mch-pod:nth-child(2) {
   --medal: #c4c9d0;
@@ -6201,7 +5512,7 @@ body.mc-home .mch .mch-pod.is-first .mch-pod-name {
   transition: color 0.15s ease;
 }
 body.mc-home .mch .mch-pod:hover .mch-pod-name {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 body.mc-home .mch .mch-pod-desc,
 body.mc-home .mch .mch-pod.is-side .mch-pod-desc {
@@ -6299,10 +5610,40 @@ body.mc-home .mch .mch-pod.is-first {
   background: #16171b;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
+.mch-mods--row .mch-mod {
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.mch-mods--row .mch-mod {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+}
 body.mc-home .mch .mch-mods--row .mch-mod:hover,
 body.mc-home .mch .mch-pod:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: #1b1c21;
+  border-color: var(--lb-edge);
+  background: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+  transform: translateY(-3px);
+}
+.mch-mods--grid .mch-mod:hover {
+  background-color: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+  transform: translateY(-3px);
+}
+.mch-mods--grid .mch-mod > :not(.mch-mod-media) {
+  margin-left: 12px;
+  margin-right: 12px;
+}
+.mch-mods--grid .mch-mod {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+  padding-bottom: 12px;
+  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
 }
 body.mc-home .mch .mch-mods--row .mch-mod-media {
   margin: 0;
@@ -6419,6 +5760,10 @@ body.mc-home .mch .mch-src b {
 .skl-files .mch-more[hidden] {
   display: none;
 }
+.mch-more:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
 .skl-ctl .mct-label {
   margin-bottom: 10px;
   font-size: 11px;
@@ -6452,6 +5797,12 @@ body.mc-home .mch .mch-src b {
 .skl-box .mct-note code {
   font: 12px var(--mch-mono);
   color: #c9ccd2;
+}
+.skl-box {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .skl-uuids {
   display: grid;
@@ -6537,45 +5888,55 @@ body.mc-home .mch .mch-src b {
   display: none !important;
 }
 
-/* What to make: three big modes. */
+/* What to make: four big modes (the effect cloud joined Oct 19). */
 .pt-make {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   margin-bottom: 20px;
   padding: 4px;
   background: #0a0b0d;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .pt-mode {
   display: grid;
   gap: 4px;
   padding: 16px 18px;
-  border: 0;
-  background: #16171b;
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.55), inset -2px -2px 0 rgba(255, 255, 255, 0.045);
   font-family: 'Sora', sans-serif;
   text-align: left;
-  color: var(--mch-muted);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  /* The chip recipe (Oct 21 2026): well at rest, grey key when picked.
+     Was a grey key at rest and a white key with white text when picked. */
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 .pt-mode b {
   font: 700 16px/1.2 'Oxanium', sans-serif;
   letter-spacing: 0.02em;
-  color: #dfe2e6;
+  color: #c9ccd2;
 }
 .pt-mode span {
   font-size: 13px;
   line-height: 1.4;
 }
 .pt-mode:hover {
-  background: #1b1c21;
+  background: #17181d;
+  color: #c9ccd2;
 }
 .pt-mode[aria-pressed='true'] {
-  background: #26272d;
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.42), inset 4px 4px 0 rgba(255, 255, 255, 0.1), inset -4px -4px 0 rgba(0, 0, 0, 0.45);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #c9ccd2;
+}
+.pt-mode[aria-pressed='true']:hover {
+  background: var(--lb-raise-hover);
 }
 .pt-mode[aria-pressed='true'] b {
   color: #fff;
@@ -6641,7 +6002,10 @@ body.mc-home .mch .mch-src b {
   gap: 4px;
   padding: 4px;
   background: #0a0b0d;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .pt-slot {
   position: relative;
@@ -6763,6 +6127,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: var(--mch-muted);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
+  border-radius: var(--lb-r);
 }
 .pt-filter button:hover,
 .pt-seg button:hover,
@@ -6774,8 +6139,9 @@ button.pt-slot[aria-pressed='true'] canvas {
 .pt-seg button[aria-pressed='true'],
 .pt-ver button[aria-pressed='true'],
 .pt-quick button[aria-pressed='true'] {
-  background: #26272d;
-  box-shadow: inset 0 -2px 0 var(--mch-red);
+  /* Picked = the raised grey key in its sunken tray (was a white key). */
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
   color: #fff;
 }
 .pt-search {
@@ -6890,7 +6256,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: #8f9fff; /* the tooltip's blue, lifted for contrast on the panel */
 }
 .pt-mine-row.is-H .pt-mine-name em {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .pt-mine-name small,
 .pt-empty small {
@@ -6901,17 +6267,20 @@ button.pt-slot[aria-pressed='true'] canvas {
 .pt-input {
   height: 44px;
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0;
   background: #0d0e10;
   font: 500 15px 'Sora', sans-serif;
   color: #fff;
   caret-color: var(--mch-red);
   outline: none;
   transition: border-color 0.15s ease;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .pt-input:focus {
-  border-color: rgba(194, 59, 59, 0.85);
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
 }
 .pt-input::placeholder {
   color: #6c7077;
@@ -6922,6 +6291,12 @@ button.pt-slot[aria-pressed='true'] canvas {
 .mch .pt-build,
 .pt-panel {
   min-width: 0;
+}
+.pt-panel {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 /* Two lines per effect: icon, name, level and remove on top; the time
    field and its quick picks under the name. */
@@ -7025,7 +6400,7 @@ button.pt-slot[aria-pressed='true'] canvas {
 }
 .pt-remove:hover {
   background: rgba(194, 59, 59, 0.14);
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 
 /* Look: particles + colour side by side. */
@@ -7044,7 +6419,9 @@ button.pt-slot[aria-pressed='true'] canvas {
   gap: 2px;
   width: fit-content;
   padding: 3px;
-  background: #0a0b0d;
+  border-radius: 8px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
 }
 .pt-seg button {
   height: 40px;
@@ -7064,33 +6441,41 @@ button.pt-slot[aria-pressed='true'] canvas {
   opacity: 0;
   pointer-events: none;
 }
-.pt-toggle span {
+/* The switch is the span right after the input. Not every span in the label: a text
+   span (the mob page's enchantment label) got squeezed into the 38px switch and spilled. */
+.pt-toggle input + span {
   position: relative;
   flex: none;
   width: 38px;
   height: 22px;
-  background: #2a2c32;
   transition: background 0.15s ease;
+  border-radius: 4px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
 }
-.pt-toggle span::after {
+.pt-toggle input + span::after {
   content: '';
   position: absolute;
   top: 3px;
   left: 3px;
   width: 16px;
   height: 16px;
-  background: #9aa0a8;
   transition: transform 0.2s var(--mch-ease), background 0.15s ease;
+  border-radius: 3px;
+  background: #6b6f7a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .pt-toggle input:checked + span {
-  background: var(--mch-red);
+  background: var(--lb-red);
+  box-shadow: inset 0 0 0 2px var(--lb-red-edge), inset 0 3px 0 rgba(0, 0, 0, 0.25);
 }
 .pt-toggle input:checked + span::after {
-  background: #fff;
   transform: translateX(16px);
+  background: #fff;
+  box-shadow: inset 0 -2px 0 #c9ccd2, 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .pt-toggle input:focus-visible + span {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .pt-colour {
@@ -7149,8 +6534,10 @@ button.pt-slot[aria-pressed='true'] canvas {
   width: 30px;
   height: 30px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 .pt-sw--none {
   background: #0d0e10;
@@ -7202,6 +6589,12 @@ button.pt-slot[aria-pressed='true'] canvas {
   gap: 0;
   background: #141519;
 }
+.pt-cmd {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
 .pt-cmd-head {
   display: flex;
   align-items: center;
@@ -7250,6 +6643,11 @@ button.pt-slot[aria-pressed='true'] canvas {
   background: transparent;
   color: var(--mch-dim);
   cursor: default;
+}
+.pt-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
 }
 .pt-send {
   display: flex;
@@ -7306,7 +6704,15 @@ button.pt-slot[aria-pressed='true'] canvas {
 .pt-remove:focus-visible,
 .pt-sw:focus-visible,
 .pt-link:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.pt-mode:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.pt-mode:focus-visible {
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 
@@ -7323,6 +6729,7 @@ button.pt-slot[aria-pressed='true'] canvas {
     grid-template-columns: minmax(0, 1fr);
   }
   .pt-make {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-bottom: 12px;
   }
   .pt-mode {
@@ -7414,14 +6821,16 @@ button.pt-slot[aria-pressed='true'] canvas {
   gap: 8px;
   height: 44px;
   padding: 0 22px;
-  border: 0;
-  background: var(--mch-red);
   font: 700 12px/1 'Sora', sans-serif;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: #fff;
   cursor: pointer;
   transition: background 0.15s ease;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
 }
 .pt-btn svg {
   width: 15px;
@@ -7431,10 +6840,11 @@ button.pt-slot[aria-pressed='true'] canvas {
   stroke-width: 2;
 }
 .pt-btn:hover {
-  background: var(--mch-red-hover);
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red-hover);
 }
 .pt-btn:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .crd-hint {
@@ -7551,7 +6961,7 @@ button.pt-slot[aria-pressed='true'] canvas {
 }
 .bcn-res:focus-visible,
 .arm-recipe:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .bcn-res-n {
@@ -7663,7 +7073,7 @@ button.pt-slot[aria-pressed='true'] canvas {
 .cir-step button:focus-visible,
 .cir-zoom button:focus-visible,
 .cir-profile button:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 /* Side view: one bar per layer, top layer first. */
@@ -7702,6 +7112,12 @@ button.pt-slot[aria-pressed='true'] canvas {
 .cir-board {
   display: grid;
   background: #141519;
+}
+.cir-board {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .cir-tools {
   display: flex;
@@ -7750,6 +7166,10 @@ button.pt-slot[aria-pressed='true'] canvas {
   background: #0f1013;
   scrollbar-width: thin;
   scrollbar-color: #2a2c32 transparent;
+  border: 0;
+  border-radius: var(--lb-r);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: var(--lb-ring-well);
 }
 .cir-stage canvas {
   display: block;
@@ -7786,7 +7206,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: var(--mch-muted);
 }
 .crd-paste-msg.is-error {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .crd-worlds {
   display: grid;
@@ -7892,7 +7312,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: #fff;
 }
 .crd-swap:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .crd-facts {
@@ -8248,6 +7668,16 @@ button.pt-slot[aria-pressed='true'] canvas {
   right: 18px;
   bottom: auto;
 }
+#skinInput:focus {
+  border-color: #000;
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
+}
+#skinInput {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
 .arm-chip {
   position: absolute;
   top: 14px;
@@ -8326,7 +7756,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   stroke-width: 2.4;
 }
 .fwk-tabs button:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .fwk-shapes {
@@ -8387,7 +7817,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   cursor: pointer;
 }
 .fwk-plus:focus-within {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 4px;
 }
 .fwk-fx {
@@ -8512,7 +7942,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: #fff;
 }
 .fwk-replay:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .mct-tip.fwk-tip {
@@ -8692,7 +8122,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   stroke-width: 2.2;
 }
 .txe-x:hover:not(:disabled) {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .txe-x:disabled {
   opacity: 0.25;
@@ -8789,7 +8219,7 @@ button.pt-slot[aria-pressed='true'] canvas {
 .txe-x:focus-visible,
 .txe-st:focus-visible,
 .txe-hex:focus-within {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 
@@ -8806,11 +8236,13 @@ button.pt-slot[aria-pressed='true'] canvas {
   width: 30px;
   height: 30px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.16);
   background: var(--c, #1b1c21);
   font: 700 13px var(--mch-mono);
   color: #fff;
   cursor: pointer;
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
 }
 .cc-q--st,
 .cc-q--hex {
@@ -8822,12 +8254,9 @@ button.pt-slot[aria-pressed='true'] canvas {
   opacity: 0;
   cursor: pointer;
 }
-.cc-q:hover {
-  border-color: #fff;
-}
 .cc-q:focus-visible,
 .cc-q--hex:focus-within {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .cc-input {
@@ -8896,15 +8325,15 @@ button.pt-slot[aria-pressed='true'] canvas {
   padding: 0 12px;
 }
 .mch .cc-copy .mch-copy {
-  height: 30px;
-  padding: 0 9px;
   font-size: 11px;
-  letter-spacing: 0.2px;
-  text-transform: none;
 }
 .mch .cc-copy .mch-copy svg {
   width: 12px;
   height: 12px;
+}
+.mch-copy:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
 }
 .cc-use {
   position: absolute;
@@ -8927,6 +8356,12 @@ button.pt-slot[aria-pressed='true'] canvas {
   gap: 12px;
   padding: 16px;
   background: #141519;
+}
+.cc-stage {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .cc-canvas {
   overflow: hidden;
@@ -9020,7 +8455,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   cursor: pointer;
 }
 .motd-up:focus-within {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .motd-stage {
@@ -9100,7 +8535,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: #c9ccd2;
 }
 .sgn-line.is-over .sgn-w b {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .sgn-cmd {
   grid-column: 2 / -1;
@@ -9154,7 +8589,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   padding: 0 12px;
 }
 .bk-chars.is-over {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .bk-stage {
   display: grid;
@@ -9175,7 +8610,7 @@ button.pt-slot[aria-pressed='true'] canvas {
 }
 .bk-info .is-over {
   font-style: normal;
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 
 /* ---- ANVIL (/minecraft/tools/anvil, mc-anvil.js) ---------------------------
@@ -9261,17 +8696,24 @@ button.pt-slot[aria-pressed='true'] canvas {
   cursor: pointer;
 }
 .anv-lv button[aria-pressed='true'] {
-  background: #eceef1;
-  color: #111316;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
 }
 .anv-pick:focus-visible,
 .anv-lv button:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
 .anv-board {
   display: grid;
   background: #141519;
+}
+.anv-board {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
 }
 .anv-totals {
   padding: 18px 20px;
@@ -9359,7 +8801,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: #9be07a;
 }
 .anv-step.is-bad small {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .anv-empty {
   margin: 0;
@@ -9369,7 +8811,7 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: var(--mch-muted);
 }
 .anv-empty.is-bad {
-  color: var(--mch-red-text);
+  color: var(--lb-red-text);
 }
 .anv-steps {
   display: grid;
@@ -9614,6 +9056,14 @@ button.pt-slot[aria-pressed='true'] canvas {
   color: var(--mch-muted);
   cursor: pointer;
 }
+.cir-step-btn {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
 .ske-tools svg,
 .cir-step-btn svg {
   width: 18px;
@@ -9637,8 +9087,52 @@ button.pt-slot[aria-pressed='true'] canvas {
 }
 .ske-tools button:focus-visible,
 .cir-step-btn:focus-visible {
-  outline: 2px solid var(--mch-red-text);
+  outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
+}
+#cirZoomIn:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+#cirFit:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+#cirZoomOut:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+#cirZoomIn {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+#cirFit {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+#cirZoomOut {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+.cir-step-btn:hover {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise-hover);
+  color: #fff;
 }
 .ske-sheet {
   display: grid;
@@ -9821,7 +9315,12 @@ button.pt-slot[aria-pressed='true'] canvas {
 }
 .mob-eqopts {
   display: grid;
-  gap: 12px;
+  margin-top: 20px;
+}
+/* both set display, which would beat the hidden attribute */
+.mob-eqopts[hidden],
+.pt-toggle[hidden] {
+  display: none;
 }
 .mob-fxlist,
 .mob-riders {
@@ -9902,6 +9401,13 @@ button.pt-slot[aria-pressed='true'] canvas {
 .mob-stage.is-3d .mob-card {
   display: none;
 }
+/* mc-mob3d.js adds .no-3d when WebGL fails or a mob has no model: the spawn egg card instead */
+.mob-stage.no-3d canvas {
+  display: none;
+}
+.mob-stage.no-3d .mob-card {
+  display: grid;
+}
 .mob-egg {
   width: 160px;
   height: 160px;
@@ -9924,27 +9430,6 @@ button.pt-slot[aria-pressed='true'] canvas {
 .mob-name span {
   font-size: 12.5px;
   color: var(--mch-muted);
-}
-.mob-tower {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px;
-  background: rgba(10, 11, 13, 0.8);
-}
-.mob-tower img {
-  width: 26px;
-  height: 26px;
-  image-rendering: pixelated;
-}
-.mob-tower img.is-base {
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px solid var(--mch-line-2);
 }
 .mob-under {
   display: grid;
@@ -10037,5 +9522,98 @@ button.pt-slot[aria-pressed='true'] canvas {
   .anv-leaf {
     width: 70px;
     font-size: 10.5px;
+  }
+}
+
+/* ---- RAISED STONE CHAPTER (Oct 20 2026) ----------------------------------
+   Stone (Customize) sits IN FRONT of Play: a lit line on its top, and it
+   casts a shadow down onto Deepslate (z-index so Deepslate can't cover it). */
+.mch-ch--stone {
+  z-index: 1;
+  border-top: 2px solid var(--lb-edge, #060708);
+  border-bottom: 2px solid var(--lb-edge, #060708);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* mc-home.js adds the phone-only From Mojang slot on every page; on desktop
+   it stays empty and its padding showed as a stray strip. */
+.mct-news:empty {
+  display: none;
+}
+
+
+@keyframes mch-caret {
+  50% { opacity: 0; }
+}
+
+@media (max-width: 970px) {
+  .mch-art .lob-head--row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+/* ---- SECTION TITLES (Oct 21 2026) -----------------------------------------
+   Size = /coc/'s titles (the --fs-title scale in 11layout.css: 28-36px
+   desktop, 18px phones). Fill = the home page's .hm-head .hm-title gradient,
+   bright left to a little darker right. text-fill-color (not color) so the
+   <em> phrase, which sets its own color, still shows the gradient. */
+html body .lob-title,
+html body .mch-sec-title {
+  font-size: var(--fs-title);
+  background: linear-gradient(90deg, #ffffff, #c0c9d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@media (max-width: 970px) {
+  html body .lob-title,
+  html body .mch-sec-title {
+    letter-spacing: 0;
+  }
+}
+
+/* ---- R-Packs / shaders / modpacks arrows, desktop: the "View all" key
+   (11layout.css .art-all), 36px like it, to its right. Phones keep no
+   arrows (article-cards.css hides .art-nav there) -- they swipe. */
+@media (min-width: 971px) {
+  .mch-sec-act {
+    gap: 8px;
+  }
+  .mch-sec-act .art-all {
+    order: -1;
+  }
+  .mch-sec-act .mch-row-nav {
+    gap: 8px;
+    overflow: visible;
+    border: 0;
+    background: none;
+  }
+  .mch-sec-act .mch-row-nav button {
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-btn);
+    color: #e6e8ec;
+  }
+  .mch-sec-act .mch-row-nav svg {
+    width: 14px;
+    height: 14px;
+  }
+  .mch-sec-act .mch-row-nav button:hover:not(:disabled) {
+    background: var(--lb-raise-hover);
+    color: #fff;
+  }
+  .mch-sec-act .mch-row-nav button:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: var(--lb-btn-down);
+  }
+  .mch-sec-act .mch-row-nav button:disabled {
+    color: rgba(255, 255, 255, 0.25);
   }
 }
