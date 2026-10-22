@@ -149,6 +149,11 @@ def codes():
     return [{'code': c['code'], 'rewards': c.get('rewards', []), 'primos': primos(c.get('rewards', []))} for c in get(ENNEAD + 'codes').get('active', [])]
 
 
+def expired():
+    # The codes page's expired list: code + Primogems only (262 codes; the Lobby loads this file too).
+    return [{'code': c['code'], 'primos': primos(c.get('rewards', []))} for c in get(ENNEAD + 'codes').get('inactive', [])]
+
+
 def farm():
     """Talent books + weapon materials by weekday (Mon=Thu, Tue=Fri, Wed=Sat), with who uses each book."""
     schedule = yatta('dailyDungeon')
@@ -230,6 +235,7 @@ def main():
         'events': lambda: events(calendar),
         'challenges': lambda: challenges(calendar),
         'codes': codes,
+        'expired': expired,
         'farm': farm,
     }
     for key, job in jobs.items():

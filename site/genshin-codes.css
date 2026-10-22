@@ -1,0 +1,141 @@
+/* ============================================================
+   GENSHIN IMPACT REDEEM CODES (Oct 23 2026) -- /genshin-impact/codes only.
+   Linked after genshin.css (base, pieces, .gi-tb header, the .gi-code rows).
+   Data: /genshin-feed.json `codes` + `expired`. Behaviour: genshin-codes.js.
+
+   Order: active codes, How to redeem (the drawn Paimon Menu, moved here from
+   the Lobby), expired codes with a "check a code" box, questions.
+   ============================================================ */
+
+.cd-first { padding-top: 48px; }
+
+/* ---- HOW TO REDEEM: a drawn Paimon Menu, the cursor walks the steps ------- */
+.gr { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.gr-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  background: url('/images/genshin/art/fatui-harbingers.webp') center 30% / cover;
+  box-shadow: var(--lb-shadow);
+  font-family: 'Sora', sans-serif;
+  container-type: inline-size;
+  user-select: none;
+}
+/* The game world behind the menu: the namecard, dimmed. */
+/* The game behind the pause menu: the Harbingers art, dimmed so the menu reads. */
+.gr-stage::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 12, 20, 0.62), rgba(10, 12, 20, 0.42)); }
+.gr-scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0s 0.35s; }
+.gr-stage[data-scene='menu'] .gr-menu,
+.gr-stage[data-scene='set'] .gr-set,
+.gr-stage[data-scene='dlg'] .gr-set,
+.gr-stage[data-scene='dlg'] .gr-dlg,
+.gr-stage[data-scene='mail'] .gr-mail { opacity: 1; visibility: visible; transition: opacity 0.35s ease; }
+.gr-stage[data-scene='dlg'] .gr-set { filter: brightness(0.45); }
+/* Paimon Menu */
+.gr-menu { display: grid; grid-template-columns: 36% 1fr; }
+.gr-prof { display: flex; flex-direction: column; justify-content: center; gap: 1.2cqw; padding: 0 5cqw; background: linear-gradient(90deg, rgba(10, 13, 24, 0.85), rgba(10, 13, 24, 0.4)); }
+.gr-ava { width: 12cqw; height: 12cqw; border-radius: 50%; border: 0.5cqw solid #ece5d8; background: url('/icons/genshin.jpg') center / cover; }
+.gr-prof b { font-size: 2.6cqw; font-weight: 700; color: #ece5d8; }
+.gr-prof span { font-size: 1.5cqw; color: rgba(236, 229, 216, 0.7); }
+.gr-prof i { align-self: flex-start; font-style: normal; padding: 0.5cqw 1.2cqw; border-radius: 99px; background: rgba(236, 229, 216, 0.12); font-size: 1.4cqw; color: #ece5d8; }
+.gr-grid { display: grid; grid-template-columns: repeat(4, 1fr); align-content: center; gap: 3cqw 1cqw; padding: 0 4cqw; }
+.gr-app { display: flex; flex-direction: column; align-items: center; gap: 1cqw; font-size: 1.4cqw; color: #ece5d8; text-align: center; }
+.gr-app span { display: grid; place-items: center; width: 7.2cqw; height: 7.2cqw; border-radius: 50%; background: #ece5d8; box-shadow: 0 0.4cqw 1.2cqw rgba(0, 0, 0, 0.4); }
+.gr-app svg { width: 3.6cqw; height: 3.6cqw; fill: none; stroke: #3b4255; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Settings */
+.gr-set { display: grid; grid-template-columns: 26% 1fr; grid-template-rows: auto 1fr; background: rgba(10, 13, 24, 0.82); }
+.gr-set-top { grid-column: 1 / -1; display: flex; align-items: center; gap: 1.4cqw; padding: 2.6cqw 4cqw; border-bottom: 1px solid rgba(236, 229, 216, 0.12); font-size: 2.4cqw; font-weight: 700; color: #ece5d8; }
+.gr-set-top svg { width: 3cqw; height: 3cqw; fill: none; stroke: #ece5d8; stroke-width: 2; }
+.gr-tabs { display: flex; flex-direction: column; gap: 0.6cqw; padding: 2.4cqw 2cqw; }
+.gr-tabs span { padding: 1.4cqw 2cqw; border-radius: 99px; font-size: 1.6cqw; color: rgba(236, 229, 216, 0.6); }
+.gr-tabs span.is-on { background: #ece5d8; color: #3b4255; font-weight: 700; }
+.gr-rows { display: flex; flex-direction: column; gap: 1.2cqw; padding: 2.4cqw 4cqw 2.4cqw 1cqw; }
+.gr-row { display: flex; align-items: center; justify-content: space-between; padding: 1.6cqw 2.2cqw; border-radius: 1cqw; background: rgba(236, 229, 216, 0.06); font-size: 1.7cqw; color: #ece5d8; }
+.gr-pill { padding: 1cqw 2.4cqw; border-radius: 99px; background: #ece5d8; font-size: 1.5cqw; font-weight: 700; color: #3b4255; }
+.gr-row.is-target { box-shadow: inset 0 0 0 0.3cqw rgba(255, 255, 255, 0.7); }
+/* Redeem dialog */
+.gr-dlg { display: grid; place-items: center; }
+.gr-card { width: 58%; padding: 3.6cqw 4cqw 3cqw; border-radius: 1.6cqw; background: #ece5d8; box-shadow: 0 2cqw 5cqw rgba(0, 0, 0, 0.55); color: #3b4255; text-align: center; }
+.gr-card b { display: block; font-size: 2.6cqw; }
+.gr-card small { display: block; margin-top: 1cqw; font-size: 1.4cqw; color: #7d8494; }
+.gr-input { display: flex; align-items: center; height: 5.6cqw; margin-top: 2.6cqw; padding: 0 2cqw; border-radius: 0.8cqw; background: #fff; box-shadow: inset 0 0 0 0.25cqw #d7cfbf; font: 800 2.2cqw/1 'Sora', sans-serif; letter-spacing: 0.3cqw; color: #3b4255; }
+.gr-input i { width: 0.25cqw; height: 3cqw; margin-left: 0.3cqw; background: #3b4255; animation: gr-blink 1s steps(1) infinite; }
+@keyframes gr-blink { 50% { opacity: 0; } }
+.gr-btns { display: flex; gap: 1.6cqw; margin-top: 3cqw; }
+.gr-btns span { flex: 1; padding: 1.6cqw 0; border-radius: 99px; background: #fff; font-size: 1.7cqw; font-weight: 700; box-shadow: inset 0 0 0 0.25cqw #d7cfbf; }
+.gr-btns span.is-main { background: #3b4255; color: #ece5d8; box-shadow: none; }
+/* Mail */
+.gr-mail { display: grid; grid-template-columns: 38% 1fr; background: rgba(10, 13, 24, 0.84); }
+.gr-mail-list { padding: 4cqw 2cqw 4cqw 4cqw; border-right: 1px solid rgba(236, 229, 216, 0.12); }
+.gr-mail-list p { font-size: 1.6cqw; font-weight: 700; color: rgba(236, 229, 216, 0.6); margin-bottom: 2cqw; }
+.gr-letter { display: flex; gap: 1.4cqw; align-items: center; padding: 1.8cqw; border-radius: 1cqw; background: #ece5d8; color: #3b4255; font-size: 1.5cqw; font-weight: 700; }
+.gr-letter::before { content: ''; flex: none; width: 1.2cqw; height: 1.2cqw; border-radius: 50%; background: var(--gi-acc); }
+.gr-letter-body { padding: 4cqw; color: #ece5d8; }
+.gr-letter-body b { display: block; font-size: 2.4cqw; }
+.gr-letter-body p { margin-top: 1.4cqw; font-size: 1.5cqw; color: rgba(236, 229, 216, 0.7); }
+.gr-gifts { display: flex; flex-wrap: wrap; gap: 1.4cqw; margin-top: 3cqw; }
+.gr-gift { position: relative; display: grid; place-items: center; width: 9cqw; height: 10.4cqw; border-radius: 1cqw; background: linear-gradient(160deg, #c99648, #8d5d2a); overflow: hidden; }
+.gr-gift img { width: 6.4cqw; height: 6.4cqw; margin-top: -2cqw; }
+.gr-gift b { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.6cqw 0; background: #ece5d8; font-size: 1.3cqw; color: #3b4255; text-align: center; }
+.gr-claim { display: inline-block; margin-top: 3cqw; padding: 1.4cqw 4cqw; border-radius: 99px; background: #ece5d8; font-size: 1.6cqw; font-weight: 700; color: #3b4255; }
+/* The cursor and its click ring */
+.gr-cursor { position: absolute; z-index: 5; top: 0; left: 0; width: 2.6cqw; height: auto; transition: transform 0.8s var(--gi-ease); filter: drop-shadow(0 0.3cqw 0.6cqw rgba(0, 0, 0, 0.6)); pointer-events: none; }
+.gr-ring { position: absolute; z-index: 4; top: 0; left: 0; width: 5cqw; height: 5cqw; margin: -2.5cqw 0 0 -2.5cqw; border-radius: 50%; border: 0.3cqw solid #fff; opacity: 0; pointer-events: none; }
+.gr-ring.is-on { animation: gr-ring 0.5s ease-out; }
+@keyframes gr-ring { from { scale: 0.3; opacity: 1; } to { scale: 1.4; opacity: 0; } }
+/* Steps */
+.gr-steps { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.gr-step { border: 2px solid transparent; border-radius: var(--lb-r); transition: background-color 0.2s ease, border-color 0.2s ease; }
+.gr-step button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 14px; border: 0; background: none; text-align: left; cursor: pointer; color: #c9ccd2; }
+.gr-step button b { font: 800 14px/1.2 'Sora', sans-serif; letter-spacing: 0.3px; }
+.gr-num { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 800 13px/1 'Cinzel', serif; color: #8b9099; }
+.gr-step p { display: none; padding: 0 16px 14px 58px; font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+.gr-step.is-on { border-color: var(--lb-edge); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.gr-step.is-on button { color: #fff; }
+.gr-step.is-on .gr-num { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.gr-step.is-on p { display: block; }
+.gr-step button:hover .gr-num { color: #fff; }
+.gr-step button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.gr-note { margin-top: 14px; padding: 12px 14px; border-left: 2px solid #34363e; font-size: 12px; line-height: 1.6; color: var(--gi-muted); }
+.gr-cap { margin-top: 10px; font-size: 11px; color: var(--gi-dim); }
+@media (prefers-reduced-motion: reduce) {
+  .gr-cursor, .gr-ring { display: none; }
+}
+
+/* ---- EXPIRED CODES -------------------------------------------------------- */
+.cd-find { flex: none; width: 300px; padding-block: 4px; }
+.cd-find .lb-search-input { font-size: 14px; text-transform: uppercase; }
+.cd-find .lb-search-input::placeholder { text-transform: none; }
+.cd-find .lb-search-btn { width: 36px; height: 36px; }
+.cd-check { margin: -10px 0 14px; font-size: 13px; color: var(--gi-muted); }
+.cd-check:empty { display: none; }
+.cd-check b { color: #fff; letter-spacing: 0.5px; }
+.cd-old { display: flex; flex-wrap: wrap; gap: 6px; }
+.cd-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px 6px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-well); font: 700 12px/1 'Sora', sans-serif; letter-spacing: 0.8px; color: #8b9099; }
+.cd-chip .gi-primo { gap: 4px; font-size: 11px; color: var(--gi-dim); }
+.cd-chip .gi-primo img { width: 14px; height: 14px; opacity: 0.7; }
+.cd-chip.is-hit { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.cd-more { margin-top: 16px; }
+
+/* ---- QUESTIONS -------------------------------------------------------------- */
+.cd-faq { display: flex; flex-direction: column; gap: 8px; max-width: 860px; }
+.cd-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; list-style: none; cursor: pointer; font: 700 14px/1.3 'Sora', sans-serif; color: #fff; }
+.cd-faq summary::-webkit-details-marker { display: none; }
+.cd-faq summary::after { content: '+'; flex: none; font: 600 18px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.cd-faq details[open] summary::after { content: '3'; }
+.cd-faq summary:hover { background: var(--lb-box-hover); }
+.cd-faq summary:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.cd-faq p { padding: 0 18px 16px; font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+
+@media (max-width: 1280px) and (min-width: 971px) {
+  .gr { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 970px) {
+  .cd-first { padding-top: 32px; }
+  .gr { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .cd-old-head { flex-direction: column; align-items: stretch; gap: 14px; }
+  .cd-find { width: auto; }
+  .cd-check { margin-top: 0; }
+}

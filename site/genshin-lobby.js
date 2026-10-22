@@ -224,6 +224,8 @@
       .join('');
   }
 
+  // The Lobby shows the first 3 (the feed's order); the rest, the expired ones and
+  // How to redeem live on /genshin-impact/codes.
   function codes(list) {
     const box = $('giCodes');
     if (!list || !list.length) {
@@ -231,15 +233,9 @@
       return;
     }
     const sum = list.reduce((a, c) => a + (c.primos || 0), 0);
-    $('giCodesSub').textContent = `${list.length} active codes worth ${sum.toLocaleString()} Primogems. Redeem opens the official gift page with the code filled in.`;
-    box.innerHTML = list
-      .map(
-        (c) => `<div class="gi-box gi-code"><div class="gi-code-text"><p class="gi-code-name">${esc(c.code)}</p><p class="gi-code-rw">${esc((c.rewards || []).join(', '))}</p></div>
-      ${c.primos ? `<span class="gi-primo">${PRIMO}${c.primos}</span>` : ''}
-      <div class="gi-code-acts"><button type="button" class="gi-key" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
-      <a class="gi-key" href="https://genshin.hoyoverse.com/en/gift?code=${encodeURIComponent(c.code)}" target="_blank" rel="noopener" aria-label="Redeem ${esc(c.code)}">Redeem<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a></div></div>`
-      )
-      .join('');
+    $('giCodesSub').textContent = `${list.length} active codes worth ${sum.toLocaleString()} Primogems. Here are ${Math.min(3, list.length)}; Redeem opens the official gift page with the code filled in.`;
+    $('giCodesAll').textContent = `All ${list.length} codes`;
+    box.innerHTML = list.slice(0, 3).map(GI.codeRow).join('');
   }
 
   function farm(f, day, books) {
@@ -279,18 +275,6 @@
 
   // ---- interactions ----
   document.addEventListener('click', (e) => {
-    const copy = e.target.closest('[data-copy]');
-    if (copy) {
-      const done = () => {
-        copy.classList.add('is-done');
-        copy.querySelector('span').textContent = 'Copied';
-        setTimeout(() => {
-          copy.classList.remove('is-done');
-          copy.querySelector('span').textContent = 'Copy';
-        }, 1500);
-      };
-      if (navigator.clipboard) navigator.clipboard.writeText(copy.dataset.copy).then(done, () => {});
-    }
     const arrow = e.target.closest('.gi-arrow');
     if (arrow) {
       const row = $(arrow.dataset.row);
@@ -331,89 +315,6 @@
     st.textContent = `Player lookup is almost ready. Soon this shows ${uidServer() || 'that'} player ${uid.value}'s showcase right here.`;
   });
 
-  // ---- HOW TO REDEEM: the cursor walks the drawn Paimon Menu ----
-  // Reward icons the mail shows, by item name (yatta item ids).
-  const ITEM = { Primogem: '/images/genshin/primogem.webp', Mora: 202, "Hero's Wit": 104003, "Adventurer's Experience": 104002, 'Mystic Enhancement Ore': 104013, 'Fine Enhancement Ore': 104012 };
-  function redeemDemo(code) {
-    const stage = $('grStage');
-    if (!stage) return;
-    const cur = $('grCursor');
-    const ring = $('grRing');
-    const steps = [...document.querySelectorAll('#grSteps .gr-step')];
-    const text = (code && code.code) || 'GENSHINGIFT';
-    $('grGifts').innerHTML = ((code && code.rewards) || ['Primogem ×50'])
-      .map((r) => {
-        const m = r.match(/^(.*?)\s*[×x]\s*([\d,]+)$/);
-        if (!m || !ITEM[m[1]]) return '';
-        const src = typeof ITEM[m[1]] === 'string' ? ITEM[m[1]] : ASSET_ITEM(ITEM[m[1]]);
-        return `<span class="gr-gift"><img src="${esc(src)}" alt=""><b>${esc(m[2])}</b></span>`;
-      })
-      .join('');
-    $('grCap').textContent = 'Drawn for this guide, not a screenshot. Typing: ' + text + ', one of the live codes above.';
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let timers = [];
-    let step = 0;
-    let visible = false;
-    const later = (ms, fn) => timers.push(setTimeout(fn, ms));
-    const stop = () => {
-      timers.forEach(clearTimeout);
-      timers = [];
-    };
-    const move = (el) => {
-      const s = stage.getBoundingClientRect();
-      const r = el.getBoundingClientRect();
-      const x = r.left - s.left + r.width / 2;
-      const y = r.top - s.top + r.height / 2;
-      cur.style.transform = `translate(${x}px, ${y}px)`;
-      ring.style.left = x + 'px';
-      ring.style.top = y + 'px';
-    };
-    const click = () => {
-      ring.classList.remove('is-on');
-      void ring.offsetWidth;
-      ring.classList.add('is-on');
-    };
-    const SCENES = ['menu', 'set', 'dlg', 'mail'];
-    function play(i, auto) {
-      stop();
-      step = i;
-      steps.forEach((li, n) => {
-        li.classList.toggle('is-on', n === i);
-        li.querySelector('button').setAttribute('aria-current', n === i ? 'step' : 'false');
-      });
-      stage.dataset.scene = SCENES[i];
-      const typed = $('grTyped');
-      typed.textContent = i === 2 && !reduce ? '' : i >= 2 ? text : '';
-      if (reduce) return;
-      if (i === 0) {
-        later(300, () => move($('grGear')));
-        later(1200, click);
-      } else if (i === 1) {
-        later(300, () => move($('grAccount')));
-        later(1100, click);
-        later(1500, () => move($('grRedeemNow')));
-        later(2300, click);
-      } else if (i === 2) {
-        [...text].forEach((ch, n) => later(400 + n * 90, () => (typed.textContent += ch)));
-        const done = 400 + text.length * 90;
-        later(done + 200, () => move($('grExchange')));
-        later(done + 1000, click);
-      } else {
-        later(400, () => move($('grClaim')));
-        later(1200, click);
-      }
-      if (auto) later(i === 2 ? 600 + text.length * 90 + 2200 : 3400, () => visible && play((i + 1) % 4, true));
-    }
-    steps.forEach((li, n) => li.querySelector('button').addEventListener('click', () => play(n, true)));
-    // Only animate while it's on screen.
-    new IntersectionObserver((es) => {
-      visible = es[0].isIntersecting;
-      if (visible) play(step, true);
-      else stop();
-    }, { threshold: 0.35 }).observe(stage);
-    play(0, false);
-  }
-  const ASSET_ITEM = (id) => 'https://gi.yatta.moe/assets/UI/UI_ItemIcon_' + id + '.png';
 
   // ---- NATIONS ----
   const NATIONS = [
@@ -627,7 +528,6 @@
       events(feed.events);
       endgame(feed.challenges, feed.events);
       codes(feed.codes);
-      redeemDemo((feed.codes || []).find((c) => c.primos) || (feed.codes || [])[0]);
       nations(feed.characters || []);
       GI.serverTray($('giServer'), () => {
         today(feed);

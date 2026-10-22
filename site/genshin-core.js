@@ -176,6 +176,26 @@
   const tile = (icon, rarity, name) => `<span class="gi-tile r${rarity || 4}"><img src="${esc(icon)}" alt="${esc(name || '')}" title="${esc(name || '')}" loading="lazy" decoding="async"></span>`;
   const elIcon = (el) => `/images/genshin/element/${el}.webp`;
 
+  // One redeem code row (.gi-code, genshin.css): code, rewards, Primogems, Copy + Redeem.
+  // Redeem opens HoYoverse's gift page with the code filled in.
+  const codeRow = (c) => `<div class="gi-box gi-code"><div class="gi-code-text"><p class="gi-code-name">${esc(c.code)}</p><p class="gi-code-rw">${esc((c.rewards || []).join(', '))}</p></div>
+      ${c.primos ? `<span class="gi-primo">${PRIMO}${c.primos}</span>` : ''}
+      <div class="gi-code-acts"><button type="button" class="gi-key" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
+      <a class="gi-key" href="https://genshin.hoyoverse.com/en/gift?code=${encodeURIComponent(c.code)}" target="_blank" rel="noopener" aria-label="Redeem ${esc(c.code)}">Redeem<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a></div></div>`;
+  // Any [data-copy] button on any Genshin page: copies, then reads "Copied" for a moment.
+  document.addEventListener('click', (e) => {
+    const copy = e.target.closest('[data-copy]');
+    if (!copy || !navigator.clipboard) return;
+    navigator.clipboard.writeText(copy.dataset.copy).then(() => {
+      copy.classList.add('is-done');
+      copy.querySelector('span').textContent = 'Copied';
+      setTimeout(() => {
+        copy.classList.remove('is-done');
+        copy.querySelector('span').textContent = 'Copy';
+      }, 1500);
+    }, () => {});
+  });
+
   window.GI = {
     $,
     esc,
@@ -199,6 +219,7 @@
     fit,
     tile,
     elIcon,
+    codeRow,
     feed: fetch('/genshin-feed.json').then((r) => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();

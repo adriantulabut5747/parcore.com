@@ -252,6 +252,7 @@ banners[]     {name, version, start, end,
 events[]      {name, description, image, type, start, end}
 challenges[]  {name, type, start, end, primos}
 codes[]       {code, rewards[], primos}
+expired[]     {code, primos}            # ennead `inactive`, for the codes page (Oct 23 2026)
 farm          {monday|tuesday|wednesday: {books[{city, series, icon, users[{name, rarity, icon}]}],
                                           weapons[{city, name, icon}]}}
 ```
@@ -525,7 +526,13 @@ timeline (paimon.moe's Timeline is the reference): one bar per event across a da
 "now" line, bars coloured by kind (wish / event / endgame / double drops), event art on hover/tap,
 countdowns; list view on phones. Optional later: version day markers.
 
-**5. Redeem codes** · `/genshin-impact/codes` · planned · **high priority (biggest search term)**
+**5. Redeem codes** · `/genshin-impact/codes` · BUILT Oct 23 2026 (Adrian to QC). Files: `genshin-impact/codes.html`,
+`genshin-codes.css/.js`. Order: active codes (all), How to redeem (the drawn Paimon Menu, MOVED here from the
+Lobby with its CSS + `redeemDemo`), expired codes (feed `expired`, 24 shown + "Show all", a "Check a code" box
+that says active / expired / not on our list), 4 questions (Adrian to fact-check), link boxes. The title's
+month is set by JS. The code row (`GI.codeRow`) and the Copy button live in genshin-core.js; their CSS
+(`.gi-code*`) in genshin.css. The Lobby now shows the first 3 codes + an "All N codes" key in the head.
+Original plan:
 Data: feed `codes` (active) + ennead `inactive` (261) + planned `codesSeen` for "New" badges.
 Front end: active codes (copy + official Redeem link), total Primogems, the drawn How-to-redeem
 walkthrough moved here (Lobby keeps a short version or links), expired codes collapsed below,
