@@ -1,0 +1,98 @@
+/* ============================================================
+   GENSHIN IMPACT ENDGAME (Oct 23 2026) -- /genshin-impact/endgame only.
+   Linked after genshin.css (base, pieces, .gi-tb header, .gi-bar, .gi-more).
+   Data: /genshin-feed.json `challenges` + `events` (periods, rewards, Stygian)
+   and `endgame` (Abyss floors, Theater season, enemy pictures; from the
+   Fandom wiki). Behaviour: genshin-endgame.js.
+
+   Three sections, one per mode, each with its reset countdown in the head.
+   Abyss: a floor tray, then the floor's ley line disorders and its three
+   chambers (star targets, each half's waves as round enemy portraits).
+   Every floor sits in one grid cell, so switching floors never moves the page.
+   ============================================================ */
+
+.eg-icon { color: #e6e8ec; }
+.gi-bar a.gi-tab { text-decoration: none; }
+.eg-first { padding-top: 40px; }
+
+/* Reset countdown + reward, at the right of each section head. */
+.eg-reset { display: flex; gap: 28px; flex: none; }
+.eg-reset > div { display: flex; flex-direction: column; gap: 8px; }
+.eg-reset .gi-ends { font-size: 15px; }
+
+/* ---- SPIRAL ABYSS ---------------------------------------------------------- */
+.eg-floor-tabs { width: fit-content; margin-bottom: 16px; }
+.eg-floors { display: grid; }
+.eg-floor { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 12px; visibility: hidden; }
+.eg-floor.is-on { visibility: visible; }
+.eg-dis { display: flex; align-items: baseline; gap: 18px; padding: 16px 20px; }
+.eg-dis .gi-label { flex: none; }
+.eg-dis ul { display: flex; flex-direction: column; gap: 6px; list-style: none; }
+.eg-dis li { font-size: 14px; line-height: 1.45; color: #e6e8ec; }
+.eg-chambers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.eg-ch { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 18px; }
+.eg-ch header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.eg-ch header b { font: 800 15px/1 'Sora', sans-serif; color: #fff; }
+.eg-ch header span { font: 700 12px/1 'Sora', sans-serif; color: var(--gi-muted); }
+.eg-target { font-size: 12px; line-height: 1.5; color: var(--gi-muted); }
+.eg-target span { margin-right: 6px; color: #f2c45a; }
+.eg-half { padding-top: 12px; border-top: 1px solid var(--gi-line); }
+.eg-half > .gi-label { display: block; margin-bottom: 10px; }
+.eg-waves { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+.eg-wave { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Between waves: a small grey chevron at portrait height. */
+.eg-then { flex: none; width: 7px; height: 7px; margin: 22px 4px 0 0; border-top: 2px solid #5d616b; border-right: 2px solid #5d616b; transform: rotate(45deg); }
+.eg-foe { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 78px; }
+.eg-foe-pic { position: relative; width: 52px; height: 52px; border: 2px solid var(--lb-edge); border-radius: 50%; background: var(--lb-well); }
+.eg-foe-pic img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+.eg-foe-pic b { position: absolute; right: -6px; bottom: -4px; padding: 2px 5px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; background: #060708; font: 800 10px/1 'Sora', sans-serif; color: #fff; }
+.eg-foe figcaption { display: -webkit-box; width: 100%; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; font-size: 10px; line-height: 1.25; color: #c9ccd2; text-align: center; }
+.eg-none { font-size: 12px; color: var(--gi-dim); }
+
+/* ---- IMAGINARIUM THEATER ---------------------------------------------------- */
+/* The Theater's room (the Lobby's endgame art) faintly behind the right side. */
+.eg-theater { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); overflow: hidden; }
+.eg-theater::before { content: ''; position: absolute; z-index: -1; inset: 0; opacity: 0.22; background: url('/images/genshin/endgame/theater.webp') right center / cover; -webkit-mask-image: linear-gradient(90deg, transparent 30%, #000); mask-image: linear-gradient(90deg, transparent 30%, #000); }
+.eg-th-main { display: flex; flex-direction: column; gap: 22px; padding: 22px 24px; }
+.eg-th-main > div > .gi-label { display: block; margin-bottom: 10px; }
+.eg-els { display: flex; flex-wrap: wrap; gap: 8px; }
+.eg-el { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 13px/1 'Sora', sans-serif; color: #fff; }
+.eg-el img { width: 22px; height: 22px; }
+.eg-whos { display: flex; flex-wrap: wrap; gap: 12px; }
+.eg-who { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 64px; }
+.eg-who .gi-tile { width: 56px; height: 56px; }
+.eg-who figcaption { width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 600; color: #d7d9dd; text-align: center; }
+.eg-bless { margin-top: 12px; font-size: 13px; line-height: 1.5; color: var(--gi-muted); }
+.eg-th-foes { padding: 22px 24px; border-left: 1px solid var(--gi-line); background: rgba(10, 10, 12, 0.45); }
+.eg-th-foes ul { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; list-style: none; }
+.eg-th-foes li { display: flex; align-items: center; gap: 12px; }
+.eg-th-foes img,
+.eg-th-foes i { flex: none; width: 44px; height: 44px; border: 2px solid var(--lb-edge); border-radius: 50%; background: var(--lb-well); object-fit: contain; }
+.eg-th-foes b { flex: 1; min-width: 0; font: 700 13px/1.3 'Sora', sans-serif; color: #fff; }
+.eg-th-foes span { flex: none; font: 700 12px/1 'Sora', sans-serif; color: var(--gi-muted); }
+
+/* ---- STYGIAN ONSLAUGHT ------------------------------------------------------ */
+.eg-sty { display: grid; grid-template-columns: min(560px, 50%) minmax(0, 1fr); overflow: hidden; }
+.eg-sty-art img { width: 100%; height: 100%; aspect-ratio: 1080 / 390; object-fit: cover; }
+.eg-sty-body { align-self: center; padding: 22px 26px; }
+.eg-sty-body p { font-size: 14px; line-height: 1.6; color: #b9bdc4; }
+
+@media (min-width: 971px) and (max-width: 1280px) {
+  .eg-foe { width: 66px; }
+  .eg-foe-pic { width: 46px; height: 46px; }
+}
+
+@media (max-width: 970px) {
+  .eg-first { padding-top: 28px; }
+  #egFacts li:nth-child(3) { display: none; } /* two chips fit a phone's header */
+  .gi-sec-head:has(> .eg-reset) { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .eg-floor-tabs { width: auto; }
+  .eg-dis { flex-direction: column; gap: 10px; padding: 14px 16px; }
+  .eg-chambers,
+  .eg-theater,
+  .eg-sty { grid-template-columns: minmax(0, 1fr); }
+  .eg-th-main,
+  .eg-th-foes { padding: 18px 16px; }
+  .eg-th-foes { border-left: 0; border-top: 1px solid var(--gi-line); }
+  .eg-sty-body { padding: 16px; }
+}

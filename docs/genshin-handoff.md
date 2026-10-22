@@ -253,6 +253,9 @@ events[]      {name, description, image, type, start, end}
 challenges[]  {name, type, start, end, primos}
 codes[]       {code, rewards[], primos}
 expired[]     {code, primos}            # ennead `inactive`, for the codes page (Oct 23 2026)
+endgame       {abyss {start, end, version, floors[{floor, disorders[], chambers[{level, target, halves[waves[{name, n}]]}]}]},
+               theater {season, version, start, end, elements[], characters[], guests[], blessing, enemies[{name, level}]},
+               icons {enemy name: wiki thumb url}}   # Fandom wiki, for the endgame page (Oct 23 2026)
 farm          {monday|tuesday|wednesday: {books[{city, series, icon, users[{name, rarity, icon}]}],
                                           weapons[{city, name, icon}]}}
 ```
@@ -540,7 +543,18 @@ FAQ (AR 10, one use per account, region, livestream codes expire fast). SEO titl
 "Genshin Impact codes (<Month Year>) | Parchrome" — update the month from the page (JS) or via the
 feed script writing a small `codes-meta` value.
 
-**6. Endgame** · `/genshin-impact/endgame` · planned
+**6. Endgame** · `/genshin-impact/endgame` · BUILT Oct 23 2026 (Adrian to QC). Files: `genshin-impact/endgame.html`,
+`genshin-endgame.css/.js`. **yatta's `tower` is stale (its last schedule closed Mar 2025)**, so, Adrian's call, the
+feed's `endgame()` job reads the Genshin Fandom wiki (CC BY-SA, credited on the page): 'Spiral Abyss/Floors/Abyssal
+Moon Spire' says which period page holds each floor 9-12; each floor = ley line disorders (`** ` lines) + its
+{{Domain Enemies}} (levelN, targetN, enemiesN_1/N_2; '//' = next wave, ';' = next enemy, '*n' = count). Theater =
+the newest 'Imaginarium Theater/Seasons/YYYY-MM-DD' page that has started: its header template (elements,
+characters, guests, blessing, enemies with levels). Enemy pictures = the wiki's 'File:<Name> Icon.png' (96px thumbs,
+hotlinked). Periods, countdowns and Primogems still come from ennead `challenges`; Stygian = the feed event (no
+boss list: no reliable source). Page: one section per mode, reset countdown + reward in each head, server switch;
+Abyss floor tray (Floor 12 first), every floor in one grid cell so the height never changes. Not shown yet:
+the Abyss blessing (the wiki builds it with a DPL query, not plain wikitext) and next period previews.
+Original plan:
 Data: feed `challenges` (periods + Primogems) + yatta `tower` (2 schedules: floors, chambers,
 ley line disorders, blessing) into the feed. Front end: Spiral Abyss current floors 9-12 with ley
 line disorders and enemies (yatta monster icons), next rotation preview; Imaginarium Theater period

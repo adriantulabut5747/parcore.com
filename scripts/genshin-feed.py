@@ -18,6 +18,7 @@ import io
 import json
 import re
 import sys
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -185,6 +186,118 @@ def slug(name):
     return re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_')
 
 
+# ---- ENDGAME (Oct 23 2026): the Genshin Fandom wiki (CC BY-SA, credited on the page) --------
+# yatta's `tower` stopped at Mar 2025, so this period's Spiral Abyss floors and the current
+# Imaginarium Theater season come from the wiki's wikitext. Dates/countdowns still come from
+# the ennead `challenges`; this only adds what's inside each mode.
+WIKI = 'https://genshin-impact.fandom.com/api.php?'
+
+
+def wiki(**q):
+    return get(WIKI + urllib.parse.urlencode(dict(q, format='json')))
+
+
+def wikitext(page):
+    return wiki(action='parse', page=page, prop='wikitext')['parse']['wikitext']['*']
+
+
+def unwiki(s):
+    """Wiki markup -> plain text: {{Color|x|Text}} -> Text, [[a|b]] -> b, other templates dropped."""
+    s = re.sub(r'<!--.*?-->', '', s, flags=re.S)
+    s = re.sub(r'\{\{Color\|[^|{}]*\|([^{}]*)\}\}', r'\1', s)
+    s = re.sub(r'\{\{[^{}]*\}\}', '', s)
+    s = re.sub(r'\[\[(?:[^|\]]*\|)?([^\]]*)\]\]', r'\1', s)
+    s = re.sub(r"'{2,}", '', s)
+    s = re.sub(r'<br\s*/?>', ' ', s)
+    s = re.sub(r'<[^>]+>', '', s)
+    return ' '.join(s.split())
+
+
+def params(block):
+    """'|key = value' lines of one template call -> dict."""
+    return {m.group(1): m.group(2).strip() for m in re.finditer(r'^\|\s*(\w+)\s*=(.*)$', block, re.M)}
+
+
+def template(text, name):
+    i = text.index('{{' + name)
+    return text[i:text.index('\n}}', i)]
+
+
+def foes(s):
+    """'A*2; B*?// C' -> waves [[{name, n}]] (n 0 = count not known)."""
+    out = []
+    for wave in unwiki(s).split('//'):
+        group = []
+        for part in wave.split(';'):
+            name, _, n = part.strip().strip('/').partition('*')
+            if name.strip():
+                group.append({'name': name.strip(), 'n': int(n) if n.strip().isdigit() else 0})
+        if group:
+            out.append(group)
+    return out
+
+
+def abyss():
+    """The current Abyssal Moon Spire, floors 9-12. The wiki's 'Abyssal Moon Spire' page says
+    which period page each floor comes from (a floor that didn't change keeps an older page)."""
+    spire = wikitext('Spiral Abyss/Floors/Abyssal Moon Spire')
+    pages, floors, info = {}, [], {}
+    for page, n in re.findall(r'\{\{Transclude\|([^|}]+)\|Floor (\d+)\}\}', spire):
+        if page not in pages:
+            pages[page] = wikitext(page)
+        text = pages[page]
+        head = params(template(text, 'Abyssal Moon Spire'))
+        if head.get('start', '') > info.get('start', ''):
+            info = {'start': head.get('start', ''), 'end': head.get('end', ''), 'version': head.get('startVersion', '')}
+        sec = re.search(r'===\s*Floor %s\s*===(.*?)(?=\n===|\Z)' % n, text, re.S).group(1)
+        enemies = params(template(sec, 'Domain Enemies'))
+        floors.append({
+            'floor': int(n),
+            'disorders': [unwiki(d) for d in re.findall(r'^\*\*\s*(.+)$', sec, re.M)],
+            'chambers': [{'level': int(enemies.get('level%d' % c) or 0), 'target': unwiki(enemies.get('target%d' % c, '')),
+                          'halves': [foes(enemies.get('enemies%d_%d' % (c, h), '')) for h in (1, 2)]}
+                         for c in (1, 2, 3) if enemies.get('level%d' % c)],
+        })
+    if len(floors) != 4:
+        raise ValueError('expected floors 9-12, got %d' % len(floors))
+    return dict(info, floors=sorted(floors, key=lambda f: f['floor']))
+
+
+def theater():
+    """The Imaginarium Theater season running now (its page's header template)."""
+    today = datetime.datetime.now(UTC8).strftime('%Y-%m-%d')
+    q = wiki(action='query', list='categorymembers', cmtitle='Category:Imaginarium Theater Seasons', cmlimit=500)
+    titles = [m['title'] for m in q['query']['categorymembers'] if re.search(r'/Seasons/\d{4}-\d\d-\d\d$', m['title'])]
+    title = max((t for t in titles if t[-10:] <= today), key=lambda t: t[-10:])
+    p = params(template(wikitext(title), 'Imaginarium Theater Season'))
+
+    def split(k):
+        return [unwiki(x) for x in p.get(k, '').split(';') if unwiki(x)]
+
+    return {
+        'season': p.get('season', ''), 'version': p.get('startVersion', ''), 'start': p.get('start', ''), 'end': p.get('end', ''),
+        'elements': split('elements'), 'characters': split('characters'), 'guests': split('guests'), 'blessing': unwiki(p.get('blessing', '')),
+        'enemies': [{'name': n.strip(), 'level': int(re.sub(r'\D', '', lv) or 0)} for n, _, lv in (e.partition('*') for e in split('enemies'))],
+    }
+
+
+def endgame():
+    out = {'abyss': abyss(), 'theater': theater()}
+    # Enemy pictures: the wiki's "File:<Name> Icon.png" as 96px thumbs (hotlinked, like CODM's weapons).
+    names = sorted({e['name'] for f in out['abyss']['floors'] for c in f['chambers'] for h in c['halves'] for w in h for e in w} |
+                   {e['name'] for e in out['theater']['enemies']})
+    icons = {}
+    for i in range(0, len(names), 50):
+        q = wiki(action='query', titles='|'.join('File:%s Icon.png' % n for n in names[i:i + 50]), prop='imageinfo', iiprop='url', iiurlwidth=96)['query']
+        back = {x['to']: x['from'] for x in q.get('normalized', [])}
+        for pg in q['pages'].values():
+            url = (pg.get('imageinfo') or [{}])[0].get('thumburl')
+            if url:
+                icons[back.get(pg['title'], pg['title'])[len('File:'):-len(' Icon.png')]] = url
+    out['icons'] = icons
+    return out
+
+
 def history(roster, live):
     """Every character wish since 1.0, one entry per phase: start/end (unix, read as UTC+8),
     version, kind (event | chronicled), the featured 5-stars and 4-stars by name. Weapons
@@ -236,6 +349,7 @@ def main():
         'challenges': lambda: challenges(calendar),
         'codes': codes,
         'expired': expired,
+        'endgame': endgame,
         'farm': farm,
     }
     for key, job in jobs.items():
