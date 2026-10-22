@@ -1,0 +1,109 @@
+/* ============================================================
+   GENSHIN IMPACT RERUN TRACKER (Oct 22 2026) -- /genshin-impact/reruns only.
+   Linked after genshin.css (base, pieces, the .gi-tb header, .gi-bar, .gi-more).
+   Data: /genshin-history.json (every wish since 1.0) + /genshin-feed.json
+   (the roster: icons, elements). Behaviour: genshin-reruns.js.
+
+   Under the header: rarity tabs + sort (one row), element filter + search
+   (the next), then one row per character: who, a drawn timeline of every
+   banner they've been on since 1.0 (shared axis), their last banner and the
+   days since. A row opens (native <details>) to list every run.
+   ============================================================ */
+
+/* ---- FILTERS ------------------------------------------------------------ */
+.rt-filters { display: flex; align-items: center; gap: 12px; margin: -10px 0 24px; }
+.rt-filters .gi-tab { flex: 0 0 auto; }
+#rtEl .gi-tab { padding: 0 9px; }
+#rtEl .gi-tab img { width: 22px; height: 22px; border-radius: 0; object-fit: contain; }
+.rt-find { flex: 1; max-width: 360px; margin-left: auto; padding-block: 4px; }
+.rt-find .lb-search-input { font-size: 14px; }
+.rt-find .lb-search-btn { width: 36px; height: 36px; }
+
+/* ---- THE LIST ----------------------------------------------------------- */
+/* One grid for the head and every row, so the timelines line up on one axis. */
+.rt-head,
+.rt-row > summary {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 230px) minmax(0, 1fr) 118px 104px;
+  align-items: center;
+  gap: 18px;
+}
+.rt-head { padding: 0 18px 10px; }
+.rt-head .gi-label:last-child { text-align: right; }
+.rt-axis { position: relative; height: 14px; }
+.rt-axis span { position: absolute; top: 0; transform: translateX(-50%); font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1px; color: var(--gi-dim); }
+.rt-list { display: flex; flex-direction: column; gap: 8px; }
+.rt-row { overflow: hidden; }
+.rt-row > summary { padding: 12px 18px; list-style: none; cursor: pointer; }
+.rt-row > summary::-webkit-details-marker { display: none; }
+.rt-row > summary:hover { background: var(--lb-box-hover); }
+.rt-row > summary:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.rt-row .gi-tile { width: 52px; height: 52px; }
+.rt-who { min-width: 0; }
+.rt-who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
+.rt-who span { display: flex; align-items: center; gap: 6px; margin-top: 5px; overflow: hidden; white-space: nowrap; font-size: 11.5px; color: var(--gi-muted); }
+.rt-who img { flex: none; width: 15px; height: 15px; }
+.rt-who i, .rt-who em { overflow: hidden; text-overflow: ellipsis; font-style: normal; }
+.rt-who em { display: none; } /* phones: "4 runs · last Oct 2026" in place of weapon · nation */
+
+/* The drawn timeline: a hairline from 1.0 to today, one mark per banner.
+   Event wish = tall grey bar; Chronicled = short hollow mark (a 3-week run is
+   only a few px wide, so the height tells them apart); the latest = white; on
+   a banner right now = red (the one thing that needs the eye). */
+.rt-line { position: relative; height: 22px; }
+.rt-line::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(255, 255, 255, 0.1); }
+.rt-tick { position: absolute; top: 4px; bottom: 4px; min-width: 4px; border-radius: 2px; background: #6a6e77; }
+.rt-tick.is-chron { top: 7px; bottom: 7px; border: 2px solid #6a6e77; background: transparent; }
+.rt-tick.is-last { background: #fff; }
+.rt-tick.is-last.is-chron { border-color: #fff; background: transparent; }
+.rt-tick.is-now { background: var(--gi-acc); border-color: var(--gi-acc); }
+
+.rt-last { display: flex; flex-direction: column; gap: 4px; }
+.rt-last b { font: 700 13px/1.1 'Sora', sans-serif; color: #fff; white-space: nowrap; }
+.rt-last small { font-size: 11px; color: var(--gi-dim); white-space: nowrap; }
+.rt-wait { text-align: right; }
+.rt-wait b { display: block; font: 800 24px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.rt-wait small { display: block; margin-top: 4px; font-size: 11px; color: var(--gi-muted); }
+.rt-now { display: inline-block; padding: 5px 8px; border-radius: 4px; background: rgba(var(--gi-acc-rgb), 0.3); font: 700 11px/1 'Sora', sans-serif; color: #ffa395; white-space: nowrap; }
+
+/* Opened: every run, oldest first, and the real gaps. */
+.rt-runs { padding: 4px 18px 18px 88px; border-top: 1px solid var(--gi-line); }
+.rt-runs p { margin-top: 12px; font-size: 12.5px; color: var(--gi-muted); }
+.rt-runs p b { color: #fff; }
+.rt-runs ol { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; list-style: none; }
+.rt-runs li { padding: 6px 9px 5px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-well); font: 600 11px/1 'Sora', sans-serif; white-space: nowrap; color: var(--gi-muted); }
+.rt-runs li b { margin-right: 4px; color: #fff; }
+
+.rt-empty { padding: 28px 18px; }
+
+/* ---- DESKTOP NARROW ----------------------------------------------------- */
+@media (min-width: 971px) and (max-width: 1280px) {
+  .rt-head,
+  .rt-row > summary { grid-template-columns: 48px minmax(0, 180px) minmax(0, 1fr) 96px 92px; gap: 14px; }
+  .rt-row .gi-tile { width: 48px; height: 48px; }
+  .rt-filters { flex-wrap: wrap; }
+  .rt-find { max-width: none; flex-basis: 100%; }
+}
+
+/* ---- PHONES: who + days on one line, the timeline under them -------------- */
+@media (max-width: 970px) {
+  .gi-bar #rtSort { align-self: flex-start; }
+  .rt-filters { flex-direction: column; align-items: stretch; gap: 10px; margin: -6px 0 16px; }
+  .rt-find { max-width: none; margin-left: 0; }
+  #rtEl { justify-content: space-between; }
+  .rt-head { display: none; }
+  #rtFacts li:nth-child(3) { display: none; } /* two chips fit a phone's header */
+  .rt-list { gap: 6px; }
+  .rt-row > summary { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'pic who wait' 'line line line'; gap: 6px 12px; padding: 10px 12px 8px; }
+  .rt-row .gi-tile { grid-area: pic; width: 40px; height: 40px; }
+  .rt-who { grid-area: who; }
+  .rt-who em { display: inline; }
+  .rt-who i { display: none; }
+  .rt-line { grid-area: line; height: 12px; }
+  .rt-tick { top: 1px; bottom: 1px; }
+  .rt-tick.is-chron { top: 3px; bottom: 3px; }
+  .rt-last { display: none; }
+  .rt-wait { grid-area: wait; }
+  .rt-wait b { font-size: 20px; }
+  .rt-runs { padding: 2px 14px 14px; }
+}

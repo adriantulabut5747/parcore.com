@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Seed Map | Parchrome</title>
+<meta name="description" content="See any Minecraft Java seed before you load it: biomes, villages, strongholds, ancient cities, trial chambers and every other structure, in the Overworld, Nether and End.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/minecraft/tools/seed-map">
+<meta property="og:title" content="Minecraft Seed Map | Parchrome">
+<meta property="og:description" content="Biomes and structures for any Minecraft Java seed, in your browser.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Seed Map | Parchrome">
+<meta name="twitter:description" content="Biomes and structures for any Minecraft Java seed, in your browser.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261022sb">
+<link rel="stylesheet" href="/mc-java.css?v=20261020bn">
+<link rel="stylesheet" href="/coc-more.css?v=20261021hd">
+<link rel="stylesheet" href="/coc-cards.css?v=20261021tm">
+<link rel="stylesheet" href="/mc-home.css?v=20261022qref">
+<link rel="stylesheet" href="/mc-hero.css?v=20261022tb">
+<link rel="stylesheet" href="/mc-tool.css?v=20261021ph">
+<link rel="stylesheet" href="/leaflet/leaflet.css?v=1.9.4">
+<link rel="stylesheet" href="/mc-seedmap.css?v=1">
+
+
+</head>
+<body class="mc-home mt-page">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <button type="button" class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
+    Parchrome
+  </div>
+  <button type="button" id="search-btn" onclick="toggleSearch()" aria-label="Search" aria-expanded="false" aria-controls="search-overlay" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/minecraft.png" alt="TH10 Icon" class="th-icon" loading="lazy" decoding="async">
+    <div class="secondary-content">
+          <!-- Desktop shows just the section name; mobile adds the hardcoded
+               "you are here" crumb. Structure mirrors the HWR bar so the two
+               read identically, but the group is static here rather than
+               driven by a scroll-spy. -->
+          <span class="secondary-content-desktop">Minecraft</span>
+          <span class="secondary-content-mobile">
+            <span class="sc-mobile-text">Minecraft</span>
+            <span class="sc-mobile-group">Tools</span>
+          </span>
+        </div>
+  </div>
+    <div class="stb-divider" aria-hidden="true"></div>
+  <!-- hwr's own strip markup, ids and all: 11layout.js wires the arrows by
+       these ids, and the CSS deciding how the two strips share the bar is
+       keyed to these wrappers. Sections left, editions right, both filled
+       from mc-contents.json by the nav script below. -->
+  <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
+    <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
+  </nav>
+  <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+  <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
+       from hwr-categories.json on the hwr pages. This bar holds the Minecraft
+       editions instead, so it opts out of being rebuilt. -->
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" loading="lazy" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <div class="coc-content">
+      <div class="mch">
+      <!-- TOOL PAGE v4 (Oct 18 2026). Everything inside the page is mt-* (mc-tool.css), so none of
+           the shared pt-/mct- tool styles in mc-home.css reach it. Hooks the scripts need: every id,
+           every data-* attribute, .mch-tabs / .mch-tab (the tab engine in mc-home.js) and .mch-copy
+           (the copy engine). The banner + section tabs are the shared ones
+           (mc-hero.css), back since Oct 21.
+           Desktop: settings (left) | preview + command (right, sticky, sized to the window).
+           Phones: preview, settings, command; the preview has its own Copy. -->
+      <!-- Banner (Oct 12): the page header over the forest shot, with the live
+           Java versions (hvs-* ids, filled by mc-java.js). Parcorp Village,
+           the old featured banner, is #2 in Top 10 Worlds. -->
+      <header class="mch-hero mch-hero--page mch-hero--tool">
+        <!-- Background: still image (Creaking render, 1200x675 WebP), shared by every tool page. --><img class="mch-hero-bg" src="/minecrafticons/mc-tools-banner.webp" alt="" width="1200" height="675" fetchpriority="high">
+        <div class="mch-frame mch-hero-inner">
+          <div class="mch-hero-main">
+            <p class="mch-hero-eyebrow">Curated Minecraft resources</p>
+            <h1 class="mch-hero-title">Seed<span>Map.</span></h1>
+            <div class="mch-hero-foot">
+              <dl class="mch-hero-stats mch-hero-ver" id="hero-version-strip" aria-label="Current Java versions">
+                <div><dt>Release</dt><dd id="hvs-release-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-release-updated"></dd></div>
+                <div><dt>Snapshot</dt><dd id="hvs-snapshot-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-snapshot-updated"></dd></div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </header>
+      <!-- Section tabs (Oct 22 2026: under the banner card): filled by mc-java.js renderMobileNav, styled in mc-hero.css TABS + TOOL BANNER. -->
+      <div class="mch-frame mch-hero-tabs"><nav class="mch-nav" aria-label="Tools"></nav></div>
+
+      <div class="mch-frame mt-wrap">
+        <!-- SEED MAP (Oct 22 2026): mc-seedmap.js + mc-seedmap-worker.js (cubiomes compiled to
+             mc-seedmap.wasm by _tools/seedmap/build.py) + Leaflet (/leaflet/). Layout: mc-seedmap.css.
+             Seed, version, dimension, spot and zoom live in the address (#seed=..&x=..&z=..). -->
+        <section class="mt-app sm-app" id="mc-tool" aria-label="Seed map">
+          <div class="mt-box sm-ctl">
+            <div class="mt-f">
+              <label class="mt-l" for="smSeed">Seed</label>
+              <div class="sm-row">
+                <input class="mt-in" id="smSeed" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Number or text">
+                <button type="button" class="mt-btn" id="smRandom" title="Random seed" aria-label="Random seed"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg></button>
+              </div>
+            </div>
+            <div class="mt-f">
+              <label class="mt-l" for="smVer">Version</label>
+              <select class="mt-in" id="smVer"></select>
+            </div>
+            <div class="mt-seg" id="smDim" role="group" aria-label="Dimension">
+              <button type="button" data-dim="overworld" aria-pressed="true">Overworld</button><button type="button" data-dim="nether" aria-pressed="false">Nether</button><button type="button" data-dim="end" aria-pressed="false">End</button>
+            </div>
+            <form class="mt-f" id="smGo">
+              <span class="mt-l">Go to</span>
+              <div class="sm-row sm-xz">
+                <input class="mt-in" id="smX" type="text" inputmode="numeric" autocomplete="off" placeholder="X" aria-label="X">
+                <input class="mt-in" id="smZ" type="text" inputmode="numeric" autocomplete="off" placeholder="Z" aria-label="Z">
+                <button type="submit" class="mt-btn">Go</button>
+              </div>
+            </form>
+            <div class="sm-acts">
+              <button type="button" class="mt-btn" id="smShare"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Share</span></button>
+            </div>
+          </div>
+          <div class="mt-box sm-mapbox">
+            <div class="sm-map" id="smMap" aria-label="Seed map. Drag to move, scroll or pinch to zoom."></div>
+            <div class="sm-read" id="smRead"></div>
+          </div>
+          <div class="mt-box sm-show">
+            <fieldset class="mt-fs">
+              <legend class="mt-lg">Show</legend>
+              <div id="smShow"></div>
+            </fieldset>
+            <p class="sm-credit">Biomes are the surface ones. Generated in your browser by <a href="https://github.com/Cubitect/cubiomes" target="_blank" rel="noopener">cubiomes</a> (MIT); map by <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> (BSD-2).</p>
+          </div>
+        </section>
+      </div>
+      </div>
+
+      <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY LIGHTBOX (banners) -->
+<div id="gal-lightbox" onclick="closeLightbox()">
+  <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
+  <div id="gal-lb-inner" onclick="event.stopPropagation()">
+    <img id="gal-lb-img" alt="" loading="lazy" decoding="async">
+    <div id="gal-lb-copybox">
+      <div id="gal-lb-name"></div>
+      <div id="gal-lb-code"></div>
+      <button id="gal-lb-copy-btn" onclick="galCopyCmd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+        Copy Command
+      </button>
+      <div id="gal-lb-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PALETTE LIGHTBOX -->
+<div id="pal-lightbox" onclick="closePalette()">
+  <button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+  <!-- Prev/next were only ever built on the worlds and seeds pages. The grids
+       here are galleries too, so they get the same controls; palLightboxNav()
+       is shared and needs these ids to exist before it can be called. -->
+  <button id="pal-lb-prev" onclick="event.stopPropagation();palLightboxNav(-1)" aria-label="Previous image">&#8249;</button>
+  <button id="pal-lb-next" onclick="event.stopPropagation();palLightboxNav(1)" aria-label="Next image">&#8250;</button>
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" alt="" loading="lazy" decoding="async">
+  </div>
+  <div id="pal-lb-bar">
+    <div id="pal-lb-title"></div>
+    <div id="pal-lb-count"></div>
+  </div>
+</div>
+
+<!-- COMMAND MODAL -->
+<div class="cmd-modal-backdrop" id="cmdModal" onclick="closeCmdOutside(event)">
+  <div class="cmd-modal">
+    <button class="cmd-modal-close" onclick="closeCmd()">✕</button>
+    <div class="cmd-modal-title" id="cmdModalTitle"></div>
+    <div class="cmd-modal-sub" id="cmdModalSub">Command</div>
+    <div class="cmd-code-box" id="cmdModalCode"></div>
+    <button class="cmd-copy-btn" onclick="copyCmd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+      Copy Command
+    </button>
+    <div class="cmd-copy-feedback" id="cmdFeedback"></div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+        <span class="mx-hdr-ico"><img src="/minecrafticons/minecraft-block-logo.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Minecraft Pages</span><span class="mx-hdr-count" data-role="more-count"></span></span>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"><!-- rendered from mc-contents.json --></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+</div>
+
+<script src="/11layout.js?v=20261021tb1"></script>
+
+<script src="/mc-java.js?v=20261022tb"></script>
+<script src="/leaflet/leaflet.js?v=1.9.4" defer></script>
+<script src="/mc-seedmap.js?v=1" defer></script>
+<script src="/mc-home.js?v=20261018tr" defer></script>
+</body>
+</html>

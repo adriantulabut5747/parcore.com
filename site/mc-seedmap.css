@@ -1,0 +1,189 @@
+/* SEED MAP (Oct 22 2026) -- /minecraft/tools/seed-map, mc-seedmap.js. Linked after mc-tool.css;
+   the controls are mc-tool.css's mt-* pieces, this file only lays them out and dresses Leaflet.
+   Desktop: controls + layers (left column) | map (right, both rows). Phones: controls, map, layers. */
+body.mc-home.mt-page .sm-app {
+  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-areas: 'ctl map' 'show map';
+  grid-template-rows: auto 1fr;
+  align-items: stretch;
+}
+.sm-ctl {
+  grid-area: ctl;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+.sm-show {
+  grid-area: show;
+  padding: 16px;
+  min-height: 0;
+}
+.sm-show .mt-lg {
+  margin-bottom: 8px;
+}
+.sm-mapbox {
+  grid-area: map;
+  position: relative;
+  overflow: hidden;
+  min-height: 640px;
+  height: calc(100vh - 140px);
+}
+.sm-row {
+  display: flex;
+  gap: 6px;
+}
+.sm-row .mt-in {
+  flex: 1;
+  min-width: 0;
+}
+.sm-row .mt-btn {
+  height: 44px;
+  flex: none;
+}
+.sm-xz .mt-in {
+  font-variant-numeric: tabular-nums;
+}
+.sm-acts {
+  display: flex;
+  gap: 6px;
+}
+.sm-tg img {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+}
+.sm-credit {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--mt-muted);
+}
+.sm-credit a {
+  color: var(--mt-soft);
+}
+
+/* ---- the map ---- */
+.sm-map {
+  position: absolute;
+  inset: 4px;
+  border-radius: 4px;
+  background: var(--mt-well);
+  box-shadow: var(--mt-well-edge);
+  font-family: 'Sora', sans-serif;
+}
+.sm-map canvas.leaflet-tile {
+  image-rendering: pixelated;
+}
+.sm-pin {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -14px 0 0 -14px;
+  padding: 2px;
+  background: rgba(14, 13, 13, 0.82);
+  border: 1px solid #000;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.sm-pin:hover {
+  background: #2a2c35;
+  z-index: 1;
+}
+/* Cursor readout, bottom-left over the map. */
+.sm-read {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 1000;
+  display: flex;
+  gap: 12px;
+  padding: 6px 10px;
+  background: rgba(12, 13, 16, 0.86);
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: 6px;
+  font: 500 12.5px/1.3 'Sora', sans-serif;
+  color: var(--mt-muted);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.sm-read b,
+.sm-read .sm-biome {
+  color: #fff;
+  font-weight: 600;
+}
+.sm-read:empty {
+  display: none;
+}
+/* Leaflet's zoom buttons as raised keys. */
+.sm-map .leaflet-bar {
+  border: 0;
+  box-shadow: none;
+  display: grid;
+  gap: 4px;
+}
+.sm-map .leaflet-bar a,
+.sm-map .leaflet-bar a:first-child,
+.sm-map .leaflet-bar a:last-child {
+  width: 36px;
+  height: 36px;
+  line-height: 34px;
+  border: 0;
+  border-radius: var(--mt-r);
+  background: var(--mt-ctl);
+  box-shadow: var(--mt-bevel);
+  color: var(--mt-soft);
+  font: 600 18px/34px 'Sora', sans-serif;
+}
+.sm-map .leaflet-bar a:hover {
+  background: var(--mt-ctl-h);
+  color: #fff;
+}
+.sm-map .leaflet-bar a.leaflet-disabled {
+  background: var(--mt-box);
+  color: #555962;
+}
+/* Structure popup. */
+.sm-pop .leaflet-popup-content-wrapper {
+  background: var(--mt-box);
+  border: 2px solid var(--mt-edge-dark);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 10px 24px -12px rgba(0, 0, 0, 0.85);
+  color: var(--mt-text);
+}
+.sm-pop .leaflet-popup-tip {
+  background: var(--mt-box);
+}
+.sm-pop .leaflet-popup-content {
+  display: grid;
+  gap: 6px;
+  margin: 12px 14px;
+  font: 500 13px/1.35 'Sora', sans-serif;
+}
+.sm-pop .leaflet-popup-content b {
+  font-size: 14px;
+  color: #fff;
+}
+.sm-pop .leaflet-popup-content span {
+  color: var(--mt-muted);
+  font-variant-numeric: tabular-nums;
+}
+.sm-pop .sm-tp {
+  height: 34px;
+  justify-content: center;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  body.mc-home.mt-page .sm-app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'ctl' 'map' 'show';
+    grid-template-rows: none;
+  }
+  .sm-mapbox {
+    min-height: 0;
+    height: 68vh; /* leaves page above/below the map to scroll by */
+  }
+}

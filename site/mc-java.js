@@ -2511,11 +2511,11 @@ document.addEventListener('keydown', function(e){
     if (tabs && data.mobileNav) {
       const onTool = onToolsPage(data);
       const list = onTool ? data.tools : data.mobileNav;
-      // Tool pages: the lobby is their parent, not a tab -- a back button above
-      // the banner title leads there instead (mc-hero.css BACK TO ALL TOOLS).
+      // Tool pages: the lobby is their parent, not a tab -- a key in the banner's
+      // top-right corner leads there instead (mc-hero.css BACK TO ALL TOOLS).
       const title = onTool && document.querySelector('.mch-hero--page .mch-hero-title');
       if (title && !title.parentElement.querySelector('.mch-back')) {
-        (title.parentElement.querySelector('.mch-hero-eyebrow') || title).insertAdjacentHTML('beforebegin', '<a class="mch-back" href="/minecraft/tools/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>All tools</a>');
+        (title.parentElement.querySelector('.mch-hero-eyebrow') || title).insertAdjacentHTML('beforebegin', '<a class="mch-back" href="/minecraft/tools/"><span class="mch-back-text">All tools</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 16l4-4-4-4M19 12H9"/></svg></a>');
       }
       tabs.innerHTML = list.map(heroNavTabHtml).join('');
       const cur = tabs.querySelector('.active');

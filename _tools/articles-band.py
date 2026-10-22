@@ -1,5 +1,5 @@
 # Draws the /articles/ header band: brush streaks + a torn bottom edge (inline SVG).
-import random, math
+import random, math, sys
 random.seed(11)
 W, H, EDGE = 1600, 240, 180          # torn edge sits around y=EDGE (flat, like the reference)
 f = lambda v: f'{v:.0f}'
@@ -73,4 +73,10 @@ svg = f'''<svg class="ah-band-art" viewBox="0 0 {W} {H}" preserveAspectRatio="xM
         <path d="{' '.join(red)}" fill="#5c1c20" opacity=".75"/>
       </g>
     </svg>'''
-print(svg)
+# `python articles-band.py site/images/band-streaks.svg` writes the same art as a
+# standalone file for CSS backgrounds (/web-resources/ categories header).
+if len(sys.argv) > 1:
+    open(sys.argv[1], 'w', encoding='utf-8').write(
+        svg.replace('<svg class="ah-band-art"', '<svg xmlns="http://www.w3.org/2000/svg"'))
+else:
+    print(svg)

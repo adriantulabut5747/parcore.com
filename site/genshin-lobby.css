@@ -1,0 +1,638 @@
+/* ============================================================
+   GENSHIN IMPACT LOBBY (Oct 22 2026) -- /genshin-impact/ only.
+   Linked after genshin.css (the shared base, pieces and wish card).
+   Data: /genshin-feed.json. Behaviour: genshin-lobby.js.
+   ============================================================ */
+
+/* ---- HERO v5 (Oct 22 2026): Klee's campfire, one fixed picture -----------
+   images/genshin/art/klee-campfire.webp (1298x736 = 1.7636:1), drawn at the
+   hero's height (--hh; never zoomed past it), --iw wide. Desktop: anchored by
+   its right side (--ir) so Klee's back (88% across the picture) ends 64px left
+   of the Today panel. Its edges fade out with a CSS mask on the picture itself
+   (a gradient layer on top left a 1px seam: the "white line"). The copy is
+   centred top to bottom on the left over a soft dark halo. Embers are placed
+   in picture fractions (--x), so they follow the fire at every width. */
+.gi-hero {
+  --hh: clamp(600px, calc(100vh - 150px), 800px);
+  --iw: calc(var(--hh) * 1.7636);
+  --ir: calc(var(--coc-side) + 360px + 64px - var(--iw) * 0.12);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #0b0a0c;
+}
+.gi-hero-bg {
+  position: absolute;
+  top: 0;
+  right: var(--ir);
+  z-index: -3;
+  width: var(--iw);
+  height: var(--hh);
+  background: url('/images/genshin/art/klee-campfire.webp') 0 0 / 100% 100% no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 85%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 85%, transparent 100%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gi-hero-bg { animation: gi-settle 18s var(--gi-ease) both; }
+}
+@keyframes gi-settle { from { transform: scale(1.04); } to { transform: scale(1); } }
+/* The grade: a soft dark halo behind the copy, the right side shaded under the
+   Today panel, a fade into the page at the foot, a little shade under the bar. */
+.gi-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 46% at 16% 52%, rgba(9, 9, 11, 0.82) 0%, rgba(9, 9, 11, 0.55) 55%, rgba(9, 9, 11, 0) 100%),
+    linear-gradient(90deg, rgba(9, 9, 11, 0.6) 0%, rgba(9, 9, 11, 0) 22%),
+    linear-gradient(270deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 34%),
+    linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0.6) 12%, rgba(10, 10, 11, 0) 30%),
+    linear-gradient(180deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 14%);
+}
+.gi-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(120% 100% at 45% 45%, transparent 60%, rgba(0, 0, 0, 0.45) 100%);
+}
+/* Embers rising off the fire. */
+.gi-hero-fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.gi-hero-fx i {
+  position: absolute;
+  top: calc(var(--hh) * 0.56);
+  left: calc(100% - var(--ir) - var(--iw) * (1 - var(--x)));
+  width: var(--s, 3px);
+  height: var(--s, 3px);
+  border-radius: 50%;
+  background: #ffc27a;
+  opacity: 0;
+  animation: gi-ember var(--d, 10s) ease-out var(--t, 0s) infinite;
+}
+@keyframes gi-ember {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 0.9; }
+  70% { opacity: 0.35; }
+  100% { transform: translate(var(--dx, 20px), -380px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gi-hero-fx { display: none; }
+}
+
+.gi-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: center;
+  gap: 32px;
+  min-height: var(--hh);
+  padding-top: 96px;
+  padding-bottom: 120px;
+}
+.gi-hero-main { max-width: 560px; }
+.gi-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font: 600 12px/1 'Sora', sans-serif;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #b4b8bf;
+}
+.gi-kicker::before { content: ''; width: 7px; height: 7px; background: var(--gi-acc); transform: rotate(45deg); }
+.gi-hero-title {
+  font-family: 'Cinzel', serif !important;
+  font-size: clamp(48px, 4.2vw, 80px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+.gi-hero-title em {
+  display: block;
+  font-style: normal;
+  font-family: inherit !important;
+  color: inherit;
+}
+/* One live line (genshin.js lede()): who's on the wishes and for how long, what
+   the codes are worth, when the Abyss resets. Three lines tall from the start,
+   so filling it never moves anything. */
+.gi-lede { min-height: 4.8em; max-width: 25em; margin-top: 22px; font-size: 16px; line-height: 1.6; color: #c3c6cc; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8); }
+.gi-lede b { font-weight: 600; color: #fff; white-space: nowrap; }
+.gi-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.gi-hero-cta .gi-key { height: 48px; padding: 0 22px 2px; font-size: 14px; }
+
+/* Today in Teyvat (Oct 22 2026): a quiet glass panel on the hero's right. It
+   shouldn't pull the eye from the art: see-through, thin edge, no raised box. */
+.gi-today {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(10, 10, 12, 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+}
+.gi-today-cell { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 16px 18px; border-top: 1px solid rgba(255, 255, 255, 0.06); color: inherit; text-decoration: none; transition: background-color 0.2s ease; }
+.gi-today-cell:first-child { border-top: 0; }
+a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
+.gi-today-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 18px; }
+.gi-today-cell:first-child .gi-today-top { margin-bottom: 6px; }
+.gi-today-h { display: flex; align-items: center; gap: 9px; white-space: nowrap; font: 700 11px/1 'Sora', sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: #c9ccd2; }
+.gi-today-h::before { content: ''; width: 6px; height: 6px; background: var(--gi-acc); transform: rotate(45deg); }
+.gi-today-v { font: 600 14px/1.2 'Sora', sans-serif; color: #e6e8ec; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gi-today-big { font: 700 30px/1 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff; font-variant-numeric: tabular-nums; }
+.gi-today-day { font-size: 12px; color: var(--gi-muted); white-space: nowrap; }
+.gi-today-books { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 5px; }
+.gi-today-books .gi-tile { width: 100%; max-width: 44px; height: auto; aspect-ratio: 1; }
+.gi-today-bday { display: flex; align-items: center; gap: 12px; }
+.gi-today-bday .gi-tile { width: 40px; height: 40px; }
+.gi-today-bday p { font-size: 13px; line-height: 1.45; color: var(--gi-muted); }
+.gi-today-bday p b { color: #fff; font-weight: 600; }
+.gi-tray--xs { padding: 3px; }
+.gi-tray--xs .gi-tab { min-height: 24px; padding: 0 8px; font-size: 10px; letter-spacing: 0.08em; }
+
+/* Laptops (<=1440px: the panel would cover Klee): the art is a fixed-height
+   band (--hh) slid 6% left, the copy centred on it, and the Today panel a
+   three-cell strip over the art's faded foot. */
+@media (max-width: 1440px) {
+  .gi-hero { --hh: clamp(640px, calc(100vh - 100px), 820px); --ir: calc(100% - var(--iw) * 0.94); background: transparent; }
+  .gi-hero::before, .gi-hero::after { bottom: auto; height: var(--hh); }
+  .gi-hero-grid { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-top: 72px; padding-bottom: 120px; }
+  .gi-hero-main { display: flex; flex-direction: column; justify-content: center; min-height: calc(var(--hh) - 72px - 110px); }
+  .gi-today { flex-direction: row; }
+  .gi-today-cell { flex: 1; border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.06); }
+  .gi-today-cell:first-child { flex: 1.25; border-left: 0; }
+}
+/* Tablets and phones: Klee and the fire as a band on top (centred on them),
+   fading into the page at its foot; the copy and the Today panel under it. The
+   embers keep rising and a low warm glow sits where the band fades, so the
+   picture runs into the page instead of stopping. */
+@media (max-width: 970px) {
+  .gi-hero { --hh: min(92vw, 520px); --ir: calc(50% - var(--iw) * 0.43); }
+  .gi-hero-bg {
+    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 98%), linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, #000 50%, transparent 98%), linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-composite: intersect;
+  }
+  .gi-hero::before { background: linear-gradient(180deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 90px); }
+  .gi-hero::after { height: calc(var(--hh) + 120px); background: radial-gradient(60% 150px at 50% calc(var(--hh) - 30px), rgba(255, 138, 64, 0.13), transparent 70%); }
+  .gi-hero-grid { display: block; padding-top: calc(var(--hh) - 70px); padding-bottom: 48px; }
+  .gi-hero-main { display: block; min-height: 0; max-width: none; }
+  .gi-today { flex-direction: column; margin-top: 28px; background: rgba(14, 14, 17, 0.7); }
+  .gi-today-cell { border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+  .gi-today-cell:first-child { border-top: 0; }
+  .gi-kicker { font-size: 11px; margin-bottom: 14px; }
+  .gi-hero-title { font-size: clamp(42px, 12vw, 64px); }
+  .gi-lede { min-height: 0; margin-top: 16px; font-size: 15px; }
+  .gi-hero-cta { margin-top: 22px; }
+  .gi-hero-cta .gi-key { flex: 1; }
+  .gi-today-big { font-size: 28px; }
+}
+
+/* ---- PLAYER LOOKUP ------------------------------------------------------ */
+.gi-look {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  align-items: center;
+  gap: 32px 48px;
+  padding: 32px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.gi-look::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(14, 15, 19, 0.96) 22%, rgba(14, 15, 19, 0.55) 55%, rgba(14, 15, 19, 0.88) 100%), url('/images/genshin/art/moonlit-shore.webp') center 58% / cover;
+}
+/* First section under the hero (Oct 22 2026): it rides up over the hero's faded foot. */
+.gi-sec--first { position: relative; z-index: 2; margin-top: -64px; padding-top: 0; }
+.gi-look-feats { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 16px; }
+.gi-look-feats li { display: flex; align-items: center; gap: 8px; list-style: none; font-size: 12px; color: var(--gi-muted); }
+.gi-look-feats li::before { content: ''; width: 6px; height: 6px; background: #4a4d56; transform: rotate(45deg); }
+.gi-look-form { display: flex; gap: 8px; }
+.gi-uid {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 48px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.gi-uid:focus-within { border-color: #3a3d46; }
+.gi-uid input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 14px;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: 700 16px/1 'Sora', sans-serif;
+  letter-spacing: 1.5px;
+  color: #fff;
+}
+.gi-uid input::placeholder { color: #565a63; letter-spacing: 0.5px; font-weight: 600; }
+.gi-uid-server { flex: none; margin-right: 10px; padding: 5px 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.07); font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #c9ccd2; }
+.gi-uid-server:empty { display: none; }
+.gi-look-form .gi-key { height: 48px; padding: 0 22px 2px; font-size: 14px; }
+.gi-look-status { min-height: 18px; margin-top: 10px; font-size: 12px; color: var(--gi-muted); }
+.gi-look-status.is-warn { color: #e6b26a; }
+
+/* ---- EVENTS ROW --------------------------------------------------------- */
+.gi-row { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 4px 2px 12px; margin: -4px -2px 0; }
+.gi-row::-webkit-scrollbar { display: none; }
+.gi-ev { flex: 0 0 calc((100% - 32px) / 3); scroll-snap-align: start; display: flex; flex-direction: column; overflow: hidden; }
+/* Event banners are the game's 1080x390 art with the title baked in: show all of it. */
+.gi-ev-media { position: relative; aspect-ratio: 1080 / 390; background: #15161a; overflow: hidden; border-bottom: 2px solid rgba(var(--gi-acc-rgb), 0.5); }
+.gi-ev-media img { width: 100%; height: 100%; object-fit: cover; }
+.gi-ev-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; flex: 1; }
+.gi-ev-name { font: 800 15px/1.3 'Sora', sans-serif; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gi-ev-desc { font-size: 12px; line-height: 1.55; color: var(--gi-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gi-ev-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
+
+/* ---- ENDGAME ------------------------------------------------------------ */
+.gi-end-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.gi-end { display: flex; flex-direction: column; overflow: hidden; }
+.gi-end-media { position: relative; height: 150px; display: flex; align-items: center; justify-content: center; background: url('/images/genshin/namecard/endgame.webp') center / cover; }
+.gi-end-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, var(--lb-box) 0%, rgba(42, 20, 22, 0.55) 100%); }
+.gi-end-media > img { position: relative; z-index: 1; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6)); }
+.gi-end-media.has-photo > img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; filter: none; }
+/* Photos (Abyss portal, Theater room, the Stygian banner): only the foot fades into the card. */
+.gi-end-media.has-photo::after { background: linear-gradient(0deg, var(--lb-box) 0%, rgba(20, 21, 24, 0.35) 38%, rgba(20, 21, 24, 0) 70%); }
+.gi-end-media svg { position: relative; z-index: 1; width: 54px; height: 54px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6)); }
+.gi-end-body { display: flex; flex-direction: column; gap: 12px; padding: 4px 18px 18px; }
+.gi-end-name { font: 800 17px/1.2 'Sora', sans-serif; color: #fff; }
+.gi-end-stats { display: flex; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--gi-line); }
+.gi-end-stats div { display: flex; flex-direction: column; gap: 6px; }
+.gi-end-stats .gi-today-v { font-size: 14px; }
+
+/* ---- CODES -------------------------------------------------------------- */
+.gi-codes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.gi-code { display: flex; align-items: center; gap: 14px; padding: 12px 12px 12px 16px; }
+.gi-code-text { flex: 1; min-width: 0; }
+.gi-code-name { font: 800 15px/1 'Sora', sans-serif; letter-spacing: 1px; color: #fff; overflow-wrap: anywhere; }
+.gi-code-rw { margin-top: 6px; font-size: 11.5px; color: var(--gi-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gi-code .gi-primo { flex: none; }
+.gi-code-acts { display: flex; gap: 6px; flex: none; }
+
+/* ---- FARM TODAY (Oct 22 2026): its own band (.gi-city, the floating city) ----
+   One .gi-grp card per nation, its namecard on top: talent book(s) + who uses
+   them, then the weapon material. Scrolls sideways in a .gi-row (8 nations). */
+.gi-fc { flex: 0 0 calc((100% - 48px) / 4); scroll-snap-align: start; display: flex; flex-direction: column; }
+.gi-fc-body { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 6px 16px 16px; }
+.gi-fc-item { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.gi-fc-item .gi-tile { width: 44px; height: 44px; }
+.gi-fc-item > div { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.gi-fc-item .gi-label { color: var(--gi-acc-text); }
+.gi-fc-item b { overflow: hidden; font: 700 14px/1.25 'Sora', sans-serif; color: #fff; white-space: nowrap; text-overflow: ellipsis; }
+.gi-fc-item small { font-size: 11.5px; color: var(--gi-muted); }
+.gi-fc-users { display: flex; flex-wrap: wrap; gap: 5px; }
+.gi-fc-users .gi-tile { width: 34px; height: 34px; }
+.gi-book-more { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; background: var(--lb-well); font: 700 11px/1 'Sora', sans-serif; color: var(--gi-muted); }
+.gi-fc-weps { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--gi-line); }
+
+/* ---- WHAT'S NEXT (page groups) ----------------------------------------- */
+.gi-next { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.gi-grp { overflow: hidden; }
+.gi-grp-art { position: relative; aspect-ratio: 840 / 330; background: center / cover; }
+.gi-grp-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, var(--lb-box) 4%, rgba(20, 21, 24, 0.35) 70%, rgba(20, 21, 24, 0.2)); }
+.gi-grp-art h3 { position: absolute; z-index: 1; left: 16px; bottom: 10px; font: 900 18px/1 'Cinzel', serif; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6); }
+.gi-grp ul { list-style: none; padding: 6px 16px 14px; }
+.gi-grp li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--gi-line); font-size: 13px; color: #8f949c; }
+.gi-grp li:last-child { border-bottom: 0; }
+.gi-grp li a { color: #fff; text-decoration: none; font-weight: 600; }
+.gi-grp li a:hover { color: #c9ccd2; }
+
+/* ---- CURATED TOOLS ------------------------------------------------------ */
+.gi-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.gi-tool { display: flex; gap: 14px; padding: 16px; }
+.gi-tool-ico { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); }
+.gi-tool-ico img { width: 22px; height: 22px; }
+.gi-tool b { display: flex; align-items: center; gap: 8px; font: 800 14px/1.2 'Sora', sans-serif; color: #fff; }
+.gi-tool b span { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gi-dim); }
+.gi-tool p { margin-top: 6px; font-size: 12px; line-height: 1.55; color: var(--gi-muted); }
+
+/* ---- DESKTOP NARROW ----------------------------------------------------- */
+@media (max-width: 1280px) and (min-width: 971px) {
+  .gi-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gi-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gi-ev { flex-basis: calc((100% - 16px) / 2); }
+  .gi-fc { flex-basis: calc((100% - 32px) / 3); }
+}
+
+/* ---- PHONES ------------------------------------------------------------- */
+@media (max-width: 970px) {
+  .gi-sec--first { margin-top: 0; padding-top: 8px; }
+  .gi-look { grid-template-columns: minmax(0, 1fr); padding: 20px; gap: 20px; }
+  .gi-look::before { background: linear-gradient(180deg, rgba(14, 15, 19, 0.96) 0%, rgba(14, 15, 19, 0.82) 45%, rgba(14, 15, 19, 0.7) 70%, rgba(14, 15, 19, 0.92) 100%), url('/images/genshin/art/moonlit-shore.webp') 42% 60% / cover; }
+  /* Phones: the Search key shrinks to its icon so the UID field keeps the room. */
+  .gi-look-form .gi-key { width: 48px; padding: 0 0 2px; gap: 0; }
+  .gi-look-form .gi-key-t { display: none; }
+  .gi-look-form .gi-key svg { width: 18px; height: 18px; }
+  .gi-ev, .gi-fc { flex-basis: 84%; }
+  .gi-end-grid, .gi-codes, .gi-next, .gi-tools { grid-template-columns: minmax(0, 1fr); }
+  .gi-code { flex-wrap: wrap; row-gap: 10px; }
+  .gi-code-text { flex-basis: 100%; }
+  .gi-code-acts { flex: 1; justify-content: flex-end; }
+}
+
+/* ============================================================
+   DRAWN SECTIONS (Oct 22 2026): how to redeem, nations, reactions, pity.
+   Same idea as Minecraft's "Install a world": the picture is drawn in the
+   page (HTML/SVG, aria-hidden) and the real instructions sit beside it.
+   ============================================================ */
+
+/* ---- HOW TO REDEEM: a drawn Paimon Menu, the cursor walks the steps ------- */
+.gr { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 48px; }
+.gr-head { margin-bottom: 16px; }
+.gr-head h3 { font: 900 20px/1 'Cinzel', serif; text-transform: uppercase; color: #fff; }
+.gr-head h3 em { font-style: normal; color: inherit; font-family: inherit; }
+.gr-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  background: url('/images/genshin/art/fatui-harbingers.webp') center 30% / cover;
+  box-shadow: var(--lb-shadow);
+  font-family: 'Sora', sans-serif;
+  container-type: inline-size;
+  user-select: none;
+}
+/* The game world behind the menu: the namecard, dimmed. */
+/* The game behind the pause menu: the Harbingers art, dimmed so the menu reads. */
+.gr-stage::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 12, 20, 0.62), rgba(10, 12, 20, 0.42)); }
+.gr-scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0s 0.35s; }
+.gr-stage[data-scene='menu'] .gr-menu,
+.gr-stage[data-scene='set'] .gr-set,
+.gr-stage[data-scene='dlg'] .gr-set,
+.gr-stage[data-scene='dlg'] .gr-dlg,
+.gr-stage[data-scene='mail'] .gr-mail { opacity: 1; visibility: visible; transition: opacity 0.35s ease; }
+.gr-stage[data-scene='dlg'] .gr-set { filter: brightness(0.45); }
+/* Paimon Menu */
+.gr-menu { display: grid; grid-template-columns: 36% 1fr; }
+.gr-prof { display: flex; flex-direction: column; justify-content: center; gap: 1.2cqw; padding: 0 5cqw; background: linear-gradient(90deg, rgba(10, 13, 24, 0.85), rgba(10, 13, 24, 0.4)); }
+.gr-ava { width: 12cqw; height: 12cqw; border-radius: 50%; border: 0.5cqw solid #ece5d8; background: url('/icons/genshin.jpg') center / cover; }
+.gr-prof b { font-size: 2.6cqw; font-weight: 700; color: #ece5d8; }
+.gr-prof span { font-size: 1.5cqw; color: rgba(236, 229, 216, 0.7); }
+.gr-prof i { align-self: flex-start; font-style: normal; padding: 0.5cqw 1.2cqw; border-radius: 99px; background: rgba(236, 229, 216, 0.12); font-size: 1.4cqw; color: #ece5d8; }
+.gr-grid { display: grid; grid-template-columns: repeat(4, 1fr); align-content: center; gap: 3cqw 1cqw; padding: 0 4cqw; }
+.gr-app { display: flex; flex-direction: column; align-items: center; gap: 1cqw; font-size: 1.4cqw; color: #ece5d8; text-align: center; }
+.gr-app span { display: grid; place-items: center; width: 7.2cqw; height: 7.2cqw; border-radius: 50%; background: #ece5d8; box-shadow: 0 0.4cqw 1.2cqw rgba(0, 0, 0, 0.4); }
+.gr-app svg { width: 3.6cqw; height: 3.6cqw; fill: none; stroke: #3b4255; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Settings */
+.gr-set { display: grid; grid-template-columns: 26% 1fr; grid-template-rows: auto 1fr; background: rgba(10, 13, 24, 0.82); }
+.gr-set-top { grid-column: 1 / -1; display: flex; align-items: center; gap: 1.4cqw; padding: 2.6cqw 4cqw; border-bottom: 1px solid rgba(236, 229, 216, 0.12); font-size: 2.4cqw; font-weight: 700; color: #ece5d8; }
+.gr-set-top svg { width: 3cqw; height: 3cqw; fill: none; stroke: #ece5d8; stroke-width: 2; }
+.gr-tabs { display: flex; flex-direction: column; gap: 0.6cqw; padding: 2.4cqw 2cqw; }
+.gr-tabs span { padding: 1.4cqw 2cqw; border-radius: 99px; font-size: 1.6cqw; color: rgba(236, 229, 216, 0.6); }
+.gr-tabs span.is-on { background: #ece5d8; color: #3b4255; font-weight: 700; }
+.gr-rows { display: flex; flex-direction: column; gap: 1.2cqw; padding: 2.4cqw 4cqw 2.4cqw 1cqw; }
+.gr-row { display: flex; align-items: center; justify-content: space-between; padding: 1.6cqw 2.2cqw; border-radius: 1cqw; background: rgba(236, 229, 216, 0.06); font-size: 1.7cqw; color: #ece5d8; }
+.gr-pill { padding: 1cqw 2.4cqw; border-radius: 99px; background: #ece5d8; font-size: 1.5cqw; font-weight: 700; color: #3b4255; }
+.gr-row.is-target { box-shadow: inset 0 0 0 0.3cqw rgba(255, 255, 255, 0.7); }
+/* Redeem dialog */
+.gr-dlg { display: grid; place-items: center; }
+.gr-card { width: 58%; padding: 3.6cqw 4cqw 3cqw; border-radius: 1.6cqw; background: #ece5d8; box-shadow: 0 2cqw 5cqw rgba(0, 0, 0, 0.55); color: #3b4255; text-align: center; }
+.gr-card b { display: block; font-size: 2.6cqw; }
+.gr-card small { display: block; margin-top: 1cqw; font-size: 1.4cqw; color: #7d8494; }
+.gr-input { display: flex; align-items: center; height: 5.6cqw; margin-top: 2.6cqw; padding: 0 2cqw; border-radius: 0.8cqw; background: #fff; box-shadow: inset 0 0 0 0.25cqw #d7cfbf; font: 800 2.2cqw/1 'Sora', sans-serif; letter-spacing: 0.3cqw; color: #3b4255; }
+.gr-input i { width: 0.25cqw; height: 3cqw; margin-left: 0.3cqw; background: #3b4255; animation: gr-blink 1s steps(1) infinite; }
+@keyframes gr-blink { 50% { opacity: 0; } }
+.gr-btns { display: flex; gap: 1.6cqw; margin-top: 3cqw; }
+.gr-btns span { flex: 1; padding: 1.6cqw 0; border-radius: 99px; background: #fff; font-size: 1.7cqw; font-weight: 700; box-shadow: inset 0 0 0 0.25cqw #d7cfbf; }
+.gr-btns span.is-main { background: #3b4255; color: #ece5d8; box-shadow: none; }
+/* Mail */
+.gr-mail { display: grid; grid-template-columns: 38% 1fr; background: rgba(10, 13, 24, 0.84); }
+.gr-mail-list { padding: 4cqw 2cqw 4cqw 4cqw; border-right: 1px solid rgba(236, 229, 216, 0.12); }
+.gr-mail-list p { font-size: 1.6cqw; font-weight: 700; color: rgba(236, 229, 216, 0.6); margin-bottom: 2cqw; }
+.gr-letter { display: flex; gap: 1.4cqw; align-items: center; padding: 1.8cqw; border-radius: 1cqw; background: #ece5d8; color: #3b4255; font-size: 1.5cqw; font-weight: 700; }
+.gr-letter::before { content: ''; flex: none; width: 1.2cqw; height: 1.2cqw; border-radius: 50%; background: var(--gi-acc); }
+.gr-letter-body { padding: 4cqw; color: #ece5d8; }
+.gr-letter-body b { display: block; font-size: 2.4cqw; }
+.gr-letter-body p { margin-top: 1.4cqw; font-size: 1.5cqw; color: rgba(236, 229, 216, 0.7); }
+.gr-gifts { display: flex; flex-wrap: wrap; gap: 1.4cqw; margin-top: 3cqw; }
+.gr-gift { position: relative; display: grid; place-items: center; width: 9cqw; height: 10.4cqw; border-radius: 1cqw; background: linear-gradient(160deg, #c99648, #8d5d2a); overflow: hidden; }
+.gr-gift img { width: 6.4cqw; height: 6.4cqw; margin-top: -2cqw; }
+.gr-gift b { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.6cqw 0; background: #ece5d8; font-size: 1.3cqw; color: #3b4255; text-align: center; }
+.gr-claim { display: inline-block; margin-top: 3cqw; padding: 1.4cqw 4cqw; border-radius: 99px; background: #ece5d8; font-size: 1.6cqw; font-weight: 700; color: #3b4255; }
+/* The cursor and its click ring */
+.gr-cursor { position: absolute; z-index: 5; top: 0; left: 0; width: 2.6cqw; height: auto; transition: transform 0.8s var(--gi-ease); filter: drop-shadow(0 0.3cqw 0.6cqw rgba(0, 0, 0, 0.6)); pointer-events: none; }
+.gr-ring { position: absolute; z-index: 4; top: 0; left: 0; width: 5cqw; height: 5cqw; margin: -2.5cqw 0 0 -2.5cqw; border-radius: 50%; border: 0.3cqw solid #fff; opacity: 0; pointer-events: none; }
+.gr-ring.is-on { animation: gr-ring 0.5s ease-out; }
+@keyframes gr-ring { from { scale: 0.3; opacity: 1; } to { scale: 1.4; opacity: 0; } }
+/* Steps */
+.gr-steps { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.gr-step { border: 2px solid transparent; border-radius: var(--lb-r); transition: background-color 0.2s ease, border-color 0.2s ease; }
+.gr-step button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 14px; border: 0; background: none; text-align: left; cursor: pointer; color: #c9ccd2; }
+.gr-step button b { font: 800 14px/1.2 'Sora', sans-serif; letter-spacing: 0.3px; }
+.gr-num { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 800 13px/1 'Cinzel', serif; color: #8b9099; }
+.gr-step p { display: none; padding: 0 16px 14px 58px; font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+.gr-step.is-on { border-color: var(--lb-edge); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.gr-step.is-on button { color: #fff; }
+.gr-step.is-on .gr-num { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.gr-step.is-on p { display: block; }
+.gr-step button:hover .gr-num { color: #fff; }
+.gr-step button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.gr-note { margin-top: 14px; padding: 12px 14px; border-left: 2px solid #34363e; font-size: 12px; line-height: 1.6; color: var(--gi-muted); }
+.gr-cap { margin-top: 10px; font-size: 11px; color: var(--gi-dim); }
+@media (prefers-reduced-motion: reduce) {
+  .gr-cursor, .gr-ring { display: none; }
+}
+
+/* ---- NATIONS: full-bleed band on the nation's namecard -------------------- */
+.gi-nat { position: relative; isolation: isolate; margin-top: 96px; padding: 72px 0 80px; overflow: hidden; border-block: 1px solid rgba(255, 255, 255, 0.07); }
+.gi-nat-bg { position: absolute; inset: 0; z-index: -2; background: var(--nat-img, none) center 40% / cover; transform: scale(1.04); }
+.gi-nat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 70% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), transparent 70%),
+    linear-gradient(90deg, rgba(10, 10, 11, 0.97) 0%, rgba(10, 10, 11, 0.86) 38%, rgba(10, 10, 11, 0.45) 75%, rgba(10, 10, 11, 0.3) 100%),
+    linear-gradient(180deg, #0a0a0b 0%, rgba(10, 10, 11, 0) 22%, rgba(10, 10, 11, 0) 78%, #0a0a0b 100%);
+}
+.gi-nat .gi-tray { margin-bottom: 36px; }
+.gi-nat .gi-tab img { width: 18px; height: 18px; border-radius: 0; object-fit: contain; }
+.gi-nat-body { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr); gap: 48px; align-items: start; }
+.gi-nat-body > div:first-child { min-width: 0; }
+.gi-nat-name { white-space: nowrap; font: 900 clamp(34px, 3.8vw, 64px)/1 'Cinzel', serif; text-transform: uppercase; color: #fff; text-shadow: 0 6px 30px rgba(0, 0, 0, 0.6); }
+.gi-nat-ideal { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; font-size: 15px; color: #c9ccd2; }
+.gi-nat-ideal span { display: flex; align-items: center; gap: 10px; }
+.gi-nat-ideal img { width: 26px; height: 26px; }
+.gi-nat-ideal b { color: #fff; }
+.gi-nat-count { display: flex; align-items: baseline; gap: 10px; margin-top: 28px; }
+.gi-nat-count b { font: 900 46px/1 'Cinzel', serif; color: #fff; }
+.gi-nat-count span { font-size: 13px; color: var(--gi-muted); }
+.gi-nat-chars { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 14px 10px; }
+.gi-nat-chars figure { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.gi-nat-chars .gi-tile { width: 100%; height: auto; aspect-ratio: 1; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45); }
+.gi-nat-chars figcaption { width: 100%; font-size: 11px; font-weight: 600; color: #d7d9dd; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- REACTIONS: pick two elements on the wheel --------------------------- */
+.gi-rx { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); gap: 48px; align-items: center; }
+.gi-wheel { width: 100%; height: auto; overflow: visible; }
+.gi-wheel .rx-ring { fill: none; stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
+.gi-wheel .rx-poly { fill: rgba(255, 255, 255, 0.015); stroke: rgba(255, 255, 255, 0.09); stroke-width: 1; stroke-dasharray: 3 6; }
+.gi-wheel .rx-link { stroke: var(--gi-acc); stroke-width: 3; stroke-linecap: round; }
+.gi-wheel .rx-node { cursor: pointer; outline: none; }
+.gi-wheel .rx-node circle { fill: #141518; stroke: #060708; stroke-width: 3; transition: stroke 0.15s ease, fill 0.15s ease; }
+.gi-wheel .rx-node:hover circle, .gi-wheel .rx-node:focus-visible circle { fill: #1f2027; stroke: #3a3d46; }
+.gi-wheel .rx-node.is-on circle { fill: #241619; stroke: var(--gi-acc); }
+.gi-wheel .rx-node text { font: 700 10px 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; fill: #8b9099; text-anchor: middle; }
+.gi-wheel .rx-node.is-on text { fill: #fff; }
+.gi-wheel .rx-mid { font: 900 15px 'Cinzel', serif; text-transform: uppercase; fill: #fff; text-anchor: middle; }
+.gi-wheel .rx-mid-k { font: 700 9px 'Sora', sans-serif; letter-spacing: 1.6px; text-transform: uppercase; fill: #8b9099; text-anchor: middle; }
+.rx-card { padding: 26px; }
+.rx-kind { font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: #8b9099; }
+.rx-name { margin-top: 10px; font: 900 clamp(28px, 3vw, 44px)/1 'Cinzel', serif; text-transform: uppercase; color: #fff; }
+.rx-eq { display: flex; align-items: center; gap: 10px; margin-top: 14px; font: 700 13px 'Sora', sans-serif; color: #c9ccd2; }
+.rx-eq img { width: 26px; height: 26px; }
+.rx-desc { margin-top: 14px; font-size: 14px; line-height: 1.65; color: #c9ccd2; }
+.rx-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--gi-line); }
+.rx-list button { padding: 7px 11px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 11px/1 'Sora', sans-serif; letter-spacing: 0.5px; color: #8b9099; cursor: pointer; }
+.rx-list button:hover { color: #fff; }
+.rx-list button.is-on { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.rx-foot { margin-top: 14px; font-size: 11px; color: var(--gi-dim); }
+
+/* ---- PITY: the 90 pulls, drawn ------------------------------------------ */
+.gi-pity { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
+.gi-pity-chart { display: flex; align-items: center; padding: 24px 24px 16px; }
+.gi-pity-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.gi-pity-svg .pb { fill: #2a2c35; }
+.gi-pity-svg .pb.is-soft { fill: #4a4d58; }
+.gi-pity-svg .pb.is-spent { fill: rgba(var(--gi-acc-rgb), 0.4); }
+.gi-pity-svg .pb.is-next { fill: var(--gi-acc); }
+.gi-pity-svg .pz { fill: rgba(var(--gi-acc-rgb), 0.08); }
+.gi-pity-svg .pl { stroke: rgba(255, 255, 255, 0.16); stroke-dasharray: 3 4; }
+.gi-pity-svg text { font: 700 9px 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; fill: #6f737b; }
+.gi-pity-svg text.is-red { fill: var(--gi-acc-text); }
+.gi-pity-ctl { display: flex; flex-direction: column; gap: 18px; padding: 24px; }
+.gi-pity-ctl label { display: flex; justify-content: space-between; align-items: baseline; }
+.gi-pity-ctl output { font: 800 32px/1 'Sora', sans-serif; color: #fff; }
+.gi-range { -webkit-appearance: none; appearance: none; width: 100%; height: 12px; margin: 4px 0; border: 2px solid var(--lb-edge); border-radius: 99px; background: linear-gradient(90deg, var(--gi-acc) var(--p, 0%), var(--lb-well) var(--p, 0%)); cursor: pointer; }
+.gi-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-raise); box-shadow: var(--lb-btn); }
+.gi-range::-moz-range-thumb { width: 22px; height: 22px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-raise); box-shadow: var(--lb-btn); }
+.gi-range:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.gi-pity-stats { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; border-top: 1px solid var(--gi-line); }
+.gi-stat { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-bottom: 1px solid var(--gi-line); }
+.gi-stat b { font: 800 24px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gi-stat b.is-red { color: var(--gi-acc-text); }
+.gi-stat small { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 5px; font-size: 11px; color: var(--gi-muted); }
+.gi-stat small .gi-primo { flex-basis: 100%; font-size: 11px; }
+.gi-stat small img { width: 14px; height: 14px; }
+.gi-pity-note { font-size: 11px; line-height: 1.6; color: var(--gi-dim); }
+
+@media (max-width: 1280px) and (min-width: 971px) {
+  .gr { grid-template-columns: minmax(0, 1fr); }
+  .gi-rx { grid-template-columns: minmax(260px, 360px) minmax(0, 1fr); gap: 32px; }
+}
+@media (max-width: 970px) {
+  .gr, .gi-nat-body, .gi-rx, .gi-pity { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .gr { margin-top: 36px; }
+  .gi-nat { margin-top: 64px; padding: 48px 0 56px; }
+  .gi-nat .gi-tray { margin-bottom: 24px; }
+  .gi-nat::before { background: radial-gradient(80% 50% at 0% 100%, rgba(var(--gi-acc-rgb), 0.14), transparent 70%), linear-gradient(180deg, #0a0a0b 0%, rgba(10, 10, 11, 0.7) 25%, rgba(10, 10, 11, 0.88) 60%, #0a0a0b 100%); }
+  .gi-nat-chars { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
+  .gi-wheel { max-width: 360px; margin: 0 auto; }
+  .rx-card, .gi-pity-chart, .gi-pity-ctl { padding: 18px; }
+}
+
+/* ---- COMING TO PARCHROME: full-bleed band on the floating city ------------
+   The city sits in the top half of the picture; the band shows it above the
+   page groups, which fade in from the dark below. */
+.gi-city { position: relative; isolation: isolate; margin-top: 96px; padding: 220px 0 80px; overflow: hidden; border-block: 1px solid rgba(255, 255, 255, 0.07); }
+.gi-city-bg { position: absolute; inset: 0; z-index: -2; background: url('/images/genshin/art/floating-city.webp') center 30% / cover no-repeat; }
+.gi-city::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, #0a0a0b 0%, rgba(10, 10, 11, 0.25) 16%, rgba(10, 10, 11, 0.1) 32%, rgba(10, 10, 11, 0.82) 58%, #0a0a0b 86%),
+    radial-gradient(60% 40% at 100% 100%, rgba(var(--gi-acc-rgb), 0.12), transparent 70%);
+}
+.gi-city .gi-title { filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.7)); }
+.gi-city .gi-grp { background: rgba(20, 21, 24, 0.9); backdrop-filter: blur(8px); }
+@media (max-width: 970px) {
+  .gi-city { margin-top: 64px; padding: 150px 0 56px; }
+}
+
+/* ============================================================
+   SPACING + PHONES, COMPACT (Oct 22 2026, Adrian: "i dont want scrolling that
+   much"). Desktop: the gap under the lookup card matches the one above it.
+   Phones: every section trimmed to what it needs -- the banner card compressed,
+   the reactions card tighter with its chips in one swipe row, the nation's
+   characters a two-row swipe carousel, the endgame cards a swipe row sized like
+   the event cards, and less of the city above Farm today.
+   ============================================================ */
+#wishes { padding-top: 120px; }
+.gi-farm-band { padding-top: 150px; }
+
+@media (max-width: 970px) {
+  #wishes { padding-top: 56px; }
+  .gi-farm-band { padding-top: 64px; padding-bottom: 44px; }
+
+
+  /* Reactions: a smaller wheel and card, the reaction chips in one swipe row. */
+  .gi-rx { gap: 14px; }
+  .gi-wheel { max-width: 280px; }
+  .rx-card { padding: 16px; }
+  .rx-name { margin-top: 6px; font-size: 24px; }
+  .rx-eq { margin-top: 8px; gap: 8px; font-size: 12px; }
+  .rx-eq img { width: 20px; height: 20px; }
+  .rx-desc { margin-top: 8px; font-size: 12.5px; line-height: 1.55; }
+  .rx-list { flex-wrap: nowrap; overflow-x: auto; gap: 5px; margin-top: 12px; padding-top: 12px; scrollbar-width: none; }
+  .rx-list::-webkit-scrollbar { display: none; }
+  .rx-list button { flex: none; padding: 6px 9px; font-size: 10px; }
+  .rx-foot { margin-top: 10px; font-size: 10px; }
+
+  /* Nations: a smaller name, the facts on one line, the characters a three-row
+     carousel you swipe (the band no longer grows with the roster). */
+  .gi-nat { padding: 36px 0 40px; }
+  .gi-nat .gi-tray { margin-bottom: 18px; }
+  .gi-nat-body { gap: 16px; }
+  .gi-nat-name { font-size: 30px; }
+  .gi-nat-ideal { flex-direction: row; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 13px; }
+  .gi-nat-ideal img { width: 20px; height: 20px; }
+  .gi-nat-count { margin-top: 10px; }
+  .gi-nat-count b { font-size: 28px; }
+  .gi-nat-chars {
+    grid-template-columns: none;
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    grid-auto-columns: 60px;
+    gap: 10px 8px;
+    margin-right: calc(-1 * var(--coc-side));
+    padding-right: var(--coc-side);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .gi-nat-chars::-webkit-scrollbar { display: none; }
+  .gi-nat-chars figure { scroll-snap-align: start; }
+
+  /* Endgame: a swipe row, cards and art sized like the event cards. */
+  .gi-end-grid { display: flex; gap: 16px; margin: -4px -2px 0; padding: 4px 2px 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .gi-end-grid::-webkit-scrollbar { display: none; }
+  .gi-end { flex: 0 0 84%; scroll-snap-align: start; }
+  .gi-end-media { height: auto; aspect-ratio: 1080 / 390; }
+}

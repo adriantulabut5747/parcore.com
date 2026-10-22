@@ -1,0 +1,501 @@
+/* ============================================================
+   GENSHIN IMPACT -- SHARED (Oct 22 2026). Every /genshin-impact/ page links
+   this first, then its own file (genshin-lobby.css, genshin-banners.css...).
+   Here: base reset, tokens, the night-sky ground, the shared pieces (keys,
+   trays, titles, boxes, tiles) and the wish banner card (.gi-wish), which the
+   Lobby and the Banners page both draw. Behaviour: genshin-core.js.
+
+   Look: the site's raised UI (--lb-* box / key / well from 11layout.css)
+   on /coc/'s near-black ground. Buttons copy Minecraft's grey key
+   (.mch-more / .mch-copy) and tab tray (mc-hero.css TABS). Colour:
+   the wish card takes the featured character's element (--gi-el, set in JS);
+   everything else is grey, with a low-saturation red (--gi-acc,
+   Oct 22 2026, Adrian: "our color is red and not cream") only where something
+   needs the eye: the main key, picked chart/wheel marks, "soon" countdowns.
+   Type: Cinzel for titles, Sora for everything else.
+   ============================================================ */
+
+/* ---- BASE: reset + scroll layout (every game page carries its own) ---- */
+body { visibility: hidden; }
+html.loaded body { visibility: visible; }
+html { visibility: hidden; }
+html.loaded { visibility: visible; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Oxanium', sans-serif; }
+body { height: 100vh; background: #0a0a0b; color: #eff2f5; display: flex; flex-direction: column; overflow: hidden; }
+* { scrollbar-width: thin; scrollbar-color: #2f3136 #121318; -webkit-tap-highlight-color: transparent; }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #121318; }
+::-webkit-scrollbar-thumb { background: #2f3136; border: 2px solid #121318; }
+::-webkit-scrollbar-thumb:hover { background: #3a3d43; }
+html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
+.coc-main { display: flex; flex-direction: column; flex: 1 1 auto; overflow-y: auto; }
+.coc-content { flex: 1 0 auto; }
+/* The scroller starts at the top of the viewport and gives the bar's height
+   back as padding, so nothing but the page shows behind the bars. */
+.main { margin-top: 0; }
+.coc-main { padding-top: var(--topbar-height, 52px); }
+@media (min-width: 971px) {
+  .sidebar { margin-top: var(--topbar-height, 40px); }
+}
+@media (max-width: 970px) {
+  body { overflow: auto; height: auto; }
+}
+
+/* ---- TOKENS + GROUND ---------------------------------------------------- */
+.gi-page {
+  --gi-text: #eceef1;
+  --gi-muted: #9aa0a8;
+  --gi-dim: #6f737b;
+  --gi-line: rgba(255, 255, 255, 0.08);
+  --gi-el: #98d8f0;
+  --gi-r4: #9d7fd6;
+  --gi-r5: #d6a04e;
+  --gi-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Accent = a low-saturation red (Oct 22 2026; gold/cream before that). Use it
+     sparingly: most things are white or grey. */
+  --gi-acc: #a3464b;
+  --gi-acc-hover: #b05257;
+  --gi-acc-text: #d68a8d;
+  --gi-acc-ink: #fff;
+  --gi-acc-rgb: 163, 70, 75;
+  --gi-btn-acc: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -3px 0 rgba(0, 0, 0, 0.3), 0 2px 8px -2px rgba(0, 0, 0, 0.6);
+}
+@media (max-width: 970px) {
+  .gi-page { --coc-side: 5%; }
+}
+/* GROUND (Oct 22 2026): genshintools.com's night sky, in our red. Three soft
+   glows on a near-black gradient (body), a faint layer of big diagonal tiles and
+   two dot grids over it (body::before), and drifting, twinkling stars on a canvas
+   (genshin.js "STARS"). All fixed to the screen, so the page scrolls over them.
+   The scroller and content are see-through so the sky shows; the hero and the
+   nation / city bands keep their own pictures on top. */
+body.gi-page {
+  background:
+    radial-gradient(1100px 620px at 16% -8%, rgba(var(--gi-acc-rgb), 0.1), transparent 60%),
+    radial-gradient(950px 560px at 88% 2%, rgba(160, 170, 190, 0.045), transparent 58%),
+    radial-gradient(1200px 820px at 50% 118%, rgba(var(--gi-acc-rgb), 0.06), transparent 60%),
+    linear-gradient(#0e0d0f 0%, #0b0b0c 42%, #09090a 100%) #09090a;
+  background-attachment: fixed;
+}
+/* The #09090a above is the canvas colour (body's background spreads to the
+   whole window). Without it the canvas is the browser's white, which flashes
+   on phones while the address bar / bottom nav slide and the fixed gradient
+   catches up. */
+
+/* Bar labels = Minecraft's (mc-java.css "BOTTOM NAV = CLASH'S"): sentence case,
+   Oxanium 10.5px / 500, no tracking. Bar title = Sora, white, like Minecraft's
+   crumb (desktop is already Sora via 11layout's ONE DESKTOP BAR). */
+.gi-page .bn-bar .bn-item,
+.gi-page .bn-bar .bn-more-label {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.gi-page .secondary-top-bar .secondary-content { font-family: 'Sora', sans-serif; color: #eff2f5; }
+body.gi-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(circle, rgba(var(--gi-acc-rgb), 0.12) 1px, transparent 1px),
+    radial-gradient(circle, rgba(226, 232, 240, 0.05) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(var(--gi-acc-rgb), 0.06) 0 28%, transparent 29% 100%);
+  background-size: 190px 190px, 96px 96px, 760px 760px;
+}
+.gi-stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.gi-page .main,
+.gi-page .coc-main,
+.gi-page .coc-content { background: transparent; }
+.gi { font-family: 'Sora', sans-serif; color: var(--gi-text); padding-bottom: 72px; }
+.gi * { font-family: inherit; }
+.gi-frame { padding-inline: var(--coc-side); }
+.gi img { display: block; }
+.gi [hidden] { display: none !important; }
+.gi-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---- SHARED PIECES ------------------------------------------------------ */
+/* Grey key = Minecraft's .mch-more / .mch-copy. */
+.gi-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 600 13px/1 'Sora', sans-serif;
+  color: #e6e8ec;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+.gi-key:hover { background: var(--lb-raise-hover); color: #fff; }
+.gi-key:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
+.gi-key svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.gi-key.is-done { background: var(--lb-well); box-shadow: var(--card-well); color: #fff; } /* Copied: pressed in */
+.gi-key--red { background: var(--gi-acc); box-shadow: var(--gi-btn-acc); color: var(--gi-acc-ink); }
+.gi-key--red:hover { background: var(--gi-acc-hover); color: var(--gi-acc-ink); }
+.gi-key:focus-visible,
+.gi-tab:focus-visible,
+.gi-card:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Tab tray = Minecraft's banner tabs: one sunken well, the picked one raised. */
+.gi-tray {
+  display: flex;
+  gap: 2px;
+  padding: 5px;
+  border: 2px solid var(--lb-edge);
+  border-radius: calc(var(--lb-r) + 3px);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gi-tray::-webkit-scrollbar { display: none; }
+.gi-tab {
+  display: flex;
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: none;
+  font: 800 11px/1 'Sora', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #8b9099;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.gi-tab:not(.active):hover { background: #1a1b21; color: #c9ccd2; }
+.gi-tab.active { border-color: var(--lb-edge); background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.gi-tab img { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; }
+.gi-tray--sm .gi-tab { min-height: 28px; padding: 0 9px; font-size: 10px; letter-spacing: 1px; }
+
+/* Section head: Cinzel caps, plain white (the <em> doesn't change colour). */
+.gi-sec { padding-top: 72px; }
+.gi-sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.gi-title {
+  font-family: 'Cinzel', serif !important;
+  font-size: var(--fs-title);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  /* Minecraft's section-title fill (mc-home.css SECTION TITLES), Oct 22 2026:
+     size from the site's --fs-title (28-36px desktop, 18px phones), white to
+     steel left to right. text-fill-color, so the <em> shares the gradient. */
+  background: linear-gradient(90deg, #ffffff, #c0c9d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gi-title em { font-style: normal; font-family: inherit !important; }
+.gi-sec-head .mch-sec-sub { margin-top: 8px; }
+.gi-acts { display: flex; align-items: center; gap: 8px; flex: none; }
+.gi-arrow { width: 36px; padding: 0 0 2px; }
+.gi-arrow:disabled { color: rgba(255, 255, 255, 0.25); cursor: default; }
+.gi-arrow:disabled:hover { background: var(--lb-raise); }
+
+/* Box = the raised UI box. */
+.gi-box {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.gi-card { transition: transform 0.25s var(--gi-ease), box-shadow 0.25s ease, background-color 0.25s ease; text-decoration: none; color: inherit; }
+a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color: var(--lb-box-hover); box-shadow: var(--lb-shadow-hover); }
+@media (prefers-reduced-motion: no-preference) {
+  a.gi-card:hover { transform: translateY(-3px); }
+}
+.gi-label { font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: #8e939b; }
+/* Small spaced caps line over a section title, red diamond first. */
+.gi-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font: 600 11px/1 'Sora', sans-serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #9aa0a8;
+}
+.gi-eyebrow::before { content: ''; width: 6px; height: 6px; background: var(--gi-acc); transform: rotate(45deg); }
+.gi-primo { display: inline-flex; align-items: center; gap: 5px; font: 700 12px/1 'Sora', sans-serif; color: #fff; white-space: nowrap; }
+.gi-primo img { width: 18px; height: 18px; }
+.gi-empty { padding: 18px; font-size: 13px; color: var(--gi-muted); }
+.gi-empty a { color: #fff; }
+
+/* Character / item tile: the in-game rarity backing. */
+.gi-tile { position: relative; flex: none; width: 48px; height: 48px; border-radius: 6px; overflow: hidden; background: linear-gradient(160deg, #3d3f4a, #2a2b33); }
+.gi-tile img { width: 100%; height: 100%; object-fit: cover; }
+.gi-tile.r4 { background: linear-gradient(160deg, #8a6cc2, #5b4785); }
+.gi-tile.r5 { background: linear-gradient(160deg, #c99648, #8d5d2a); }
+
+
+/* ---- EVENT WISHES v2 (Oct 22 2026) ----------------------------------------
+   One wide banner in the spirit of the in-game wish screen. The feed only has
+   the featured 5-star's official cut-out (transparent), so the backdrop is drawn
+   in the character's element colour (--gi-el, genshin.js): a diagonal wash, a
+   glow and lit floor under them, light shafts, and the banner's thin frame line.
+   Info left, the wishes as round portraits down the right. Fixed height. */
+.gi-wish {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr) 150px;
+  height: 500px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.9);
+  background:
+    radial-gradient(48% 70% at 62% 58%, color-mix(in srgb, var(--gi-el) 26%, transparent), transparent 72%),
+    linear-gradient(105deg, #0e0f13 0%, #0e0f13 32%, color-mix(in srgb, var(--gi-el) 9%, #101117) 62%, color-mix(in srgb, var(--gi-el) 18%, #12131a) 100%);
+}
+.gi-wish-art {
+  position: absolute;
+  inset: 0 150px 0 28%;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 92%, transparent 100%);
+}
+.gi-wish-art::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: -60px; height: 160px; background: radial-gradient(closest-side, color-mix(in srgb, var(--gi-el) 38%, transparent), transparent); }
+.gi-wish-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; transition: opacity 0.35s ease; }
+.gi-wish-img.is-out { opacity: 0; }
+.gi-hero-weps { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6%; }
+.gi-hero-weps img { height: 72%; width: auto; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.6)); }
+.gi-wish-info { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 40px 0 40px 48px; }
+.gi-wish-tag {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+  background: rgba(10, 10, 11, 0.6);
+  font: 600 10.5px/1 'Sora', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e6e8ec;
+}
+.gi-wish-tag::before { content: ''; width: 6px; height: 6px; background: var(--gi-el); transform: rotate(45deg); }
+/* One line, always: genshin.js shrinks a long name to fit (keeping the line
+   box), so switching wishes never changes the card's height. */
+.gi-name {
+  min-width: 0;
+  margin-top: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  font-family: 'Cinzel', serif !important;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+}
+.gi-wish-title { display: flex; align-items: center; gap: 12px; height: 22px; margin-top: 6px; overflow: hidden; white-space: nowrap; font: 600 15px/1 'Sora', sans-serif; color: #d7d9dd; }
+.gi-rarity { font-size: 13px; letter-spacing: 2px; color: #f2c45a; }
+.gi-meta { display: flex; flex-wrap: nowrap; overflow: hidden; white-space: nowrap; align-items: center; gap: 8px 12px; height: 20px; margin-top: 14px; font-size: 13px; color: rgba(236, 238, 241, 0.74); }
+.gi-meta b { font-weight: 600; color: #fff; }
+.gi-meta .gi-el { display: inline-flex; align-items: center; gap: 6px; color: var(--gi-el); font-weight: 600; }
+.gi-meta .gi-el img { width: 18px; height: 18px; }
+.gi-four { margin-top: 26px; }
+.gi-four-row { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 16px; margin-top: 10px; height: 44px; }
+.gi-four-row figure { flex: none; display: flex; align-items: center; gap: 9px; }
+.gi-four-row .gi-tile { width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(157, 127, 214, 0.45); }
+.gi-four-row figcaption { font-size: 12px; font-weight: 600; color: #e6e8ec; }
+.gi-four-row figcaption small { display: block; margin-top: 2px; font-size: 10.5px; font-weight: 500; color: var(--gi-muted); }
+.gi-wish-ends { display: flex; align-items: center; gap: 12px; margin-top: 26px; }
+.gi-clock-units { display: flex; gap: 4px; }
+.gi-clock-units span { display: flex; align-items: baseline; gap: 2px; padding: 6px 7px 5px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-well); }
+.gi-clock-units b { font: 700 15px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gi-clock-units small { font: 600 9px/1 'Sora', sans-serif; text-transform: uppercase; color: var(--gi-dim); }
+/* The wishes: round portraits down the right edge (the official preview's circles). */
+.gi-wish-switch { grid-column: 3; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding-right: 48px; }
+.gi-wish-switch[hidden] { display: none !important; }
+.gi-ws { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 0; border: 0; background: none; cursor: pointer; }
+.gi-ws-pic { display: block; width: 60px; height: 60px; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.16); border-radius: 50%; background: rgba(10, 10, 12, 0.7); transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.gi-ws-pic img { width: 100%; height: 100%; object-fit: cover; }
+.gi-ws-name { max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #8b9099; transition: color 0.15s ease; }
+.gi-ws:hover .gi-ws-pic { border-color: rgba(255, 255, 255, 0.4); }
+.gi-ws:hover .gi-ws-name { color: #c9ccd2; }
+.gi-ws.active .gi-ws-pic { border-color: #fff; box-shadow: 0 0 0 3px rgba(var(--gi-acc-rgb), 0.6); }
+.gi-ws.active .gi-ws-name { color: #fff; }
+.gi-ws:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 8px; }
+@media (max-width: 1280px) and (min-width: 971px) {
+  .gi-wish { grid-template-columns: minmax(0, 360px) minmax(0, 1fr) 120px; height: 470px; }
+  .gi-wish-switch { padding-right: 28px; }
+  .gi-wish-art { right: 100px; }
+  .gi-wish-info { padding-left: 36px; }
+  .gi-name { font-size: 44px; }
+}
+@media (max-width: 970px) {
+  /* Phones: the art on top (2:1, the switch over its top-right), the info under it. */
+  .gi-wish { display: flex; flex-direction: column; height: auto; }
+  .gi-wish-art { position: relative; inset: auto; aspect-ratio: 2 / 1; -webkit-mask-image: linear-gradient(180deg, #000 75%, transparent); mask-image: linear-gradient(180deg, #000 75%, transparent); }
+  .gi-wish-info { padding: 4px 22px 24px; }
+  .gi-name { margin-top: 14px; font-size: 32px; }
+  .gi-four { margin-top: 18px; }
+  .gi-wish-ends { margin-top: 18px; }
+  .gi-wish-switch { position: absolute; top: 18px; right: 18px; flex-direction: row; gap: 10px; padding-right: 0; }
+  .gi-ws-pic { width: 42px; height: 42px; }
+  .gi-ws-name { display: none; }
+}
+
+/* ---- SMALL SHARED BITS ------------------------------------------------- */
+.gi-ends { font: 700 12px/1 'Sora', sans-serif; color: #fff; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gi-ends.is-ending, .gi-today-v.is-ending { color: #ffa395; } /* ends within a day */
+.gi-ends.is-ending { margin: -4px 0; padding: 4px 7px; border-radius: 4px; background: rgba(var(--gi-acc-rgb), 0.3); }
+.gi-soon { flex: none; font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #5d616b; }
+.gi-here { flex: none; font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #c9ccd2; }
+.gi-credit { margin-top: 56px; font-size: 11px; line-height: 1.6; color: #565a63; }
+
+/* ---- PHONES ------------------------------------------------------------- */
+@media (max-width: 970px) {
+  .gi-sec { padding-top: 48px; }
+  .gi-sec-head { margin-bottom: 18px; }
+  .gi-arrow { display: none; }
+
+  /* Current banners: a shorter art strip, no tag, the 4-stars as faces only and
+     sharing a line with the countdown. Still one fixed height for every wish. */
+  .gi-wish-art { aspect-ratio: 16 / 7; }
+  .gi-wish-tag, .gi-four .gi-label, .gi-wish-ends .gi-label, .gi-four-row figcaption { display: none; }
+  .gi-wish-info { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 0 18px 18px; }
+  .gi-name, .gi-wish-title, .gi-meta { flex: 0 0 100%; }
+  .gi-name { margin-top: 2px; font-size: 24px; }
+  .gi-wish-title { height: 18px; margin-top: 4px; gap: 8px; font-size: 13px; }
+  .gi-rarity { font-size: 11px; }
+  .gi-meta { height: 18px; margin-top: 6px; font-size: 12px; }
+  .gi-meta .gi-el img { width: 16px; height: 16px; }
+  .gi-four { margin-top: 14px; }
+  .gi-four-row { gap: 6px; height: 32px; margin-top: 0; }
+  .gi-four-row .gi-tile { width: 32px; height: 32px; }
+  .gi-wish-ends { margin: 14px 0 0 auto; }
+  .gi-clock-units span { padding: 5px 6px 4px; }
+  .gi-clock-units b { font-size: 13px; }
+  .gi-wish-switch { top: 12px; right: 12px; gap: 8px; }
+  .gi-ws-pic { width: 36px; height: 36px; }
+}
+
+/* ---- PAGE HEADER (.gi-tb) -- every page but the Lobby (Banners, Reruns...) -----
+   /coc/'s .tb banner (th-layouts.css) in Genshin type: a raised box, one fixed
+   picture on the right fading into it, an icon, title, one sentence, fact chips.
+   Then .gi-bar (tabs/filters row) and .gi-more (link boxes) under the content. */
+.gi-tb {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 196px;
+  /* 48px = 11layout's gap under the bars (every page but the Lobby, whose hero
+     runs under them), + the .tb's own 20px. */
+  margin-top: 68px;
+  padding: 28px 32px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+/* The picture fills the right two-thirds and fades out to the left, so the
+   words always sit on the plain box colour. Faces sit ~30% down the art. */
+.gi-tb-art {
+  position: absolute;
+  z-index: -2;
+  top: 0;
+  right: 0;
+  width: 64%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 34%, #000 78%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 34%, #000 78%);
+  animation: gi-tb-settle 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes gi-tb-settle {
+  from { transform: scale(1.06); }
+  to { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gi-tb-art { animation: none; }
+}
+/* Our red from the bottom-left, and a soft floor under the chips. */
+.gi-tb::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 120% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), rgba(var(--gi-acc-rgb), 0) 70%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.55) 0%, rgba(10, 10, 12, 0) 45%);
+}
+.gi-tb-body { display: flex; align-items: center; gap: 22px; min-width: 0; max-width: min(640px, 58%); }
+.gi-tb-icon { flex: none; width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)); }
+.gi-tb-copy { min-width: 0; }
+.gi-tb .gi-title { font-size: clamp(26px, 2.5vw, 38px); line-height: 1.04; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55)); }
+.gi-tb-desc { margin-top: 10px; max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #b9bdc4; text-wrap: pretty; }
+/* One row, never wraps: small chips so they fit a 360px phone. */
+.gi-tb-facts { display: flex; flex-wrap: nowrap; gap: 6px; margin-top: 14px; list-style: none; }
+.gi-tb-facts li {
+  padding: 5px 9px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(18, 19, 22, 0.72);
+  font: 600 11px/1 'Sora', sans-serif;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  color: var(--gi-muted);
+}
+.gi-tb-facts b { margin-right: 2px; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; }
+/* Tabs / filters row under the header: left group, right group. */
+.gi-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px 0 24px; }
+/* Link boxes under the content (e.g. "Your pity", "Rerun tracker -- Soon"). */
+.gi-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 48px; }
+.gi-more > * { display: flex; align-items: center; gap: 16px; padding: 18px 20px; }
+.gi-more b { display: flex; align-items: center; gap: 10px; font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
+.gi-more p { margin-top: 5px; font-size: 12.5px; line-height: 1.5; color: var(--gi-muted); }
+.gi-more > div { flex: 1; min-width: 0; }
+.gi-more svg { flex: none; width: 18px; height: 18px; fill: none; stroke: #c9ccd2; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.gi-note { margin-top: 18px; font-size: 11.5px; line-height: 1.6; color: var(--gi-dim); }
+@media (min-width: 971px) and (max-width: 1350px) {
+  .gi-tb-body { gap: 18px; max-width: 74%; }
+  .gi-tb-icon { width: 60px; height: 60px; }
+  .gi-tb-art { width: 50%; }
+}
+@media (max-width: 970px) {
+  .gi-tb { min-height: 0; margin-top: 64px; padding: 18px 16px 16px; }
+  .gi-tb-art {
+    width: 100%;
+    -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
+  }
+  .gi-tb::before {
+    background:
+      radial-gradient(70% 120% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), rgba(var(--gi-acc-rgb), 0) 70%),
+      linear-gradient(90deg, rgba(18, 19, 22, 0.9) 0%, rgba(18, 19, 22, 0.65) 70%, rgba(18, 19, 22, 0.45) 100%);
+  }
+  .gi-tb-body { align-items: flex-start; gap: 12px; max-width: none; }
+  .gi-tb-icon { width: 46px; height: 46px; }
+  .gi-tb-desc { margin-top: 6px; font-size: 13px; }
+  .gi-tb-facts { margin-top: 10px; }
+  .gi-bar { flex-direction: column; align-items: stretch; gap: 10px; margin: 20px 0 16px; }
+  .gi-more { grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 28px; }
+}

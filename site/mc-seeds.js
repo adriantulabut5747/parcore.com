@@ -22,10 +22,10 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
   }
-  // Chunkbase at this seed, on the Java version the old page's links used.
+  // Our Seed Map (/minecraft/tools/seed-map, Oct 22 2026) at this seed, centred on the spot the shots show.
   function mapUrl(s) {
-    var u = 'https://www.chunkbase.com/apps/seed-map#seed=' + encodeURIComponent(s.seed) + '&platform=java_26_2&dimension=overworld';
-    if (s.coords) u += '&x=' + s.coords.x + '&z=' + s.coords.z + '&zoom=0.5';
+    var u = '/minecraft/tools/seed-map#seed=' + encodeURIComponent(s.seed);
+    if (s.coords) u += '&x=' + s.coords.x + '&z=' + s.coords.z + '&zoom=0';
     return u;
   }
   function where(s) {
@@ -48,37 +48,70 @@
   function seedRow(s) {
     return '<div class="mch-seedrow"><code class="mch-seedval">' + esc(s.seed) + '</code>' +
       '<div class="mch-seedacts"><button type="button" class="mch-copy" data-copy="' + esc(s.seed) + '" aria-label="Copy seed ' + esc(s.seed) + '">' + COPY + '<span>Copy</span></button>' +
-      '<a class="mch-copy mch-maplink" href="' + mapUrl(s) + '" target="_blank" rel="noopener" aria-label="Open ' + esc(s.name) + ' on Chunkbase">' + MAP + 'Map</a></div></div>';
+      '<a class="mch-copy mch-maplink" href="' + mapUrl(s) + '" aria-label="Open ' + esc(s.name) + ' on the seed map">' + MAP + 'Map</a></div></div>';
   }
 
+  // Tag -> 16px item icon (mc-seeds.json tagIcons); set once the JSON is in.
+  var icons = {};
+  function ico(t) {
+    return icons[t] ? '<img src="' + esc(icons[t]) + '" alt="" width="16" height="16">' : '';
+  }
+  var ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+
+  // Featured seed: the picture with a counter and prev/next keys, thumbs under
+  // it; right: name, text, what it has, two facts, then the seed number as the
+  // biggest thing in the box with a red Copy (the page's main action).
   function renderFeature(s, tags) {
+    var n = s.shots.length;
     var thumbs = s.shots.map(function (src, i) {
-      return '<button type="button" class="pal-card mch-sfeat-thumb' + (i === 0 ? ' is-on' : '') + '" data-full="' + esc(src) + '" aria-label="Shot ' + (i + 1) + ' of ' + s.shots.length + '">' +
+      return '<button type="button" class="pal-card mch-sfeat-thumb' + (i === 0 ? ' is-on' : '') + '" data-full="' + esc(src) + '" aria-label="Shot ' + (i + 1) + ' of ' + n + '">' +
         '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async"><span class="pal-card-label" hidden>' + esc(s.name) + '</span></button>';
     }).join('');
+    var fact = function (icon, label, value) {
+      return '<div><img src="/minecrafticons/items/' + icon + '.png" alt="" width="16" height="16"><span><small>' + label + '</small><b>' + value + '</b></span></div>';
+    };
     feature.innerHTML =
       '<div class="mch-sfeat-media">' +
-        '<button type="button" class="mch-sfeat-stage" id="sfeatStage" aria-label="Open ' + esc(s.name) + ' full size"><img id="sfeatImg" src="' + esc(s.shots[0]) + '" alt="' + esc(s.name) + '" decoding="async"><span class="mch-sfeat-zoom">' + ZOOM + 'Full size</span></button>' +
+        '<div class="mch-sfeat-view">' +
+          '<button type="button" class="mch-sfeat-stage" id="sfeatStage" aria-label="Open ' + esc(s.name) + ' full size"><img id="sfeatImg" src="' + esc(s.shots[0]) + '" alt="' + esc(s.name) + '" decoding="async"><span class="mch-sfeat-zoom">' + ZOOM + 'Full size</span></button>' +
+          (n > 1 ? '<span class="mch-sfeat-n" id="sfeatN" aria-live="polite">1 / ' + n + '</span>' +
+            '<button type="button" class="mch-sfeat-arrow is-prev" data-step="-1" aria-label="Previous shot">' + ARROW + '</button>' +
+            '<button type="button" class="mch-sfeat-arrow" data-step="1" aria-label="Next shot">' + ARROW + '</button>' : '') +
+        '</div>' +
         '<div class="mch-sfeat-thumbs mch-shots" aria-label="Screenshots">' + thumbs + '</div>' +
       '</div>' +
       '<div class="mch-sfeat-info">' +
         '<h3 class="mch-sfeat-name">' + esc(s.name) + '</h3>' +
         '<p class="mch-sfeat-desc">' + esc(s.desc) + '</p>' +
-        '<dl class="mch-sfeat-meta"><div><dt>Where</dt><dd>' + where(s) + '</dd></div><div><dt>Shots</dt><dd>' + s.shots.length + '</dd></div>' +
-        (s.tags.length ? '<div><dt>Has</dt><dd>' + s.tags.map(function (t) { return esc(tags[t]); }).join(', ') + '</dd></div>' : '') + '</dl>' +
-        seedRow(s) +
+        (s.tags.length ? '<ul class="mch-sfeat-tags" aria-label="Has">' + s.tags.map(function (t) { return '<li>' + ico(t) + esc(tags[t]) + '</li>'; }).join('') + '</ul>' : '') +
+        '<div class="mch-sfeat-facts">' + fact('compass', 'Where', where(s)) + fact('spyglass', 'Shots', n) + '</div>' +
+        '<div class="mch-sfeat-seed">' +
+          '<span class="mch-sfeat-label">Seed</span>' +
+          '<code class="mch-sfeat-num">' + esc(s.seed) + '</code>' +
+          '<div class="mch-seedacts"><button type="button" class="mch-copy" data-copy="' + esc(s.seed) + '" aria-label="Copy seed ' + esc(s.seed) + '">' + COPY + '<span>Copy</span></button>' +
+          '<a class="mch-copy mch-maplink" href="' + mapUrl(s) + '" aria-label="Open ' + esc(s.name) + ' on the seed map">' + MAP + 'Map</a></div>' +
+        '</div>' +
       '</div>';
     feature.removeAttribute('aria-busy');
     var stage = document.getElementById('sfeatStage');
     var img = document.getElementById('sfeatImg');
-    var on = feature.querySelector('.mch-sfeat-thumb');
-    // Thumbs pick the big picture; the big picture opens the lightbox on it.
-    feature.querySelectorAll('.mch-sfeat-thumb').forEach(function (t) {
-      t.addEventListener('click', function () {
-        on.classList.remove('is-on');
-        on = t;
-        t.classList.add('is-on');
-        img.src = t.getAttribute('data-full');
+    var count = document.getElementById('sfeatN');
+    var all = Array.prototype.slice.call(feature.querySelectorAll('.mch-sfeat-thumb'));
+    var on = all[0];
+    // Thumbs and arrows pick the big picture; the big picture opens the lightbox on it.
+    function show(t) {
+      on.classList.remove('is-on');
+      on = t;
+      t.classList.add('is-on');
+      img.src = t.getAttribute('data-full');
+      if (count) count.textContent = all.indexOf(t) + 1 + ' / ' + n;
+    }
+    all.forEach(function (t) {
+      t.addEventListener('click', function () { show(t); });
+    });
+    feature.querySelectorAll('.mch-sfeat-arrow').forEach(function (b) {
+      b.addEventListener('click', function () {
+        show(all[(all.indexOf(on) + Number(b.getAttribute('data-step')) + n) % n]);
       });
     });
     stage.addEventListener('click', function () {
@@ -109,22 +142,32 @@
       var heroCount = document.getElementById('seedHeroCount');
       if (heroCount) heroCount.textContent = seeds.length;
 
-      renderFeature(seeds[0], tags);
+      icons = data.tagIcons || {};
+      renderFeature(seeds.filter(function (s) { return s.id === data.featured; })[0] || seeds[0], tags);
       grid.innerHTML = seeds.map(function (s) { return card(s, tags); }).join('');
       grid.addEventListener('click', function (e) {
         var shot = e.target.closest('.mch-scard-shot');
         if (shot && typeof window.openPalette === 'function') window.openPalette(shot);
       });
 
-      // Chips: All + every tag, with how many seeds carry it.
+      // Chips: All + every tag, with its item icon (tagIcons) and how many seeds carry it.
       var active = 'all';
-      chipsBox.innerHTML = '<button type="button" class="mch-chip" data-tag="all" aria-pressed="true">All<span>' + seeds.length + '</span></button>' +
+      chipsBox.innerHTML = '<button type="button" class="mch-chip" data-tag="all" aria-pressed="true">' + ico('all') + 'All<span>' + seeds.length + '</span></button>' +
         Object.keys(tags).map(function (t) {
           var n = seeds.filter(function (s) { return s.tags.indexOf(t) > -1; }).length;
-          return '<button type="button" class="mch-chip" data-tag="' + t + '" aria-pressed="false">' + esc(tags[t]) + '<span>' + n + '</span></button>';
+          return '<button type="button" class="mch-chip" data-tag="' + t + '" aria-pressed="false">' + ico(t) + esc(tags[t]) + '<span>' + n + '</span></button>';
         }).join('');
 
       var cards = Array.prototype.slice.call(grid.children);
+      var rand = document.getElementById('seedRandom');
+      var marked = null;
+      // Ring a card and bring it to the middle of the screen (shared links, Random).
+      function mark(el, smooth) {
+        if (marked) marked.classList.remove('is-target');
+        marked = el;
+        el.classList.add('is-target');
+        el.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
+      }
       function apply() {
         var q = find.value.trim().toLowerCase();
         var shown = 0;
@@ -134,8 +177,9 @@
           cards[i].hidden = !ok;
           if (ok) shown++;
         });
-        count.textContent = shown === seeds.length ? seeds.length + ' seeds' : shown + ' of ' + seeds.length + ' seeds';
+        count.innerHTML = shown === seeds.length ? '<b>' + shown + '</b> seeds' : '<b>' + shown + '</b> of ' + seeds.length;
         empty.hidden = shown > 0;
+        rand.disabled = shown === 0;
         document.getElementById('seedEmptyQ').textContent = q ? '“' + find.value.trim() + '”' : 'this filter';
       }
       chipsBox.addEventListener('click', function (e) {
@@ -154,12 +198,36 @@
       });
       apply();
 
+      // Random: any card the current filters show, never the same one twice in a
+      // row; the address becomes its share link (#seed-12).
+      rand.addEventListener('click', function () {
+        var pool = cards.filter(function (c) { return !c.hidden && c !== marked; });
+        if (!pool.length) pool = cards.filter(function (c) { return !c.hidden; });
+        if (!pool.length) return;
+        var pick = pool[Math.floor(Math.random() * pool.length)];
+        mark(pick, true);
+        history.replaceState(null, '', '#' + pick.id);
+      });
+
+      // Cards / List. The choice is remembered on this device only.
+      var views = document.getElementById('seedView');
+      function setView(v) {
+        grid.classList.toggle('is-list', v === 'list');
+        views.querySelectorAll('button').forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false');
+        });
+      }
+      views.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b) return;
+        setView(b.getAttribute('data-view'));
+        try { localStorage.setItem('seedView', b.getAttribute('data-view')); } catch (err) {}
+      });
+      try { if (localStorage.getItem('seedView') === 'list') setView('list'); } catch (err) {}
+
       // Shared links (#seed-12) land on the card and mark it.
       var hit = location.hash && document.getElementById(location.hash.slice(1));
-      if (hit && hit.classList.contains('mch-scard')) {
-        hit.classList.add('is-target');
-        hit.scrollIntoView({ block: 'center' });
-      }
+      if (hit && hit.classList.contains('mch-scard')) mark(hit);
     })
     .catch(function () {
       feature.removeAttribute('aria-busy');

@@ -767,58 +767,77 @@ body.mc-home .mch-hero--page:not(:has(.mch-hero-tabs)) {
   }
 }
 
-/* ---- BACK TO ALL TOOLS (Oct 21 2026) ----------------------------------------
-   Above the title on every tool page (added by mc-java.js renderMobileNav): the
-   lobby is the tools' parent, so it's a way back, not one of the tabs. Same
-   sunken well + Oxanium caps as the tabs, small, with a back arrow. */
+/* ---- BACK TO ALL TOOLS (Oct 21 2026; corner key Oct 22 2026) ----------------
+   Added by mc-java.js renderMobileNav on every tool page: the lobby is the tools'
+   parent, so it's a way back, not one of the tabs. /coc/'s tool-page key (.tb-back
+   in th-layouts.css): the banner card's top-right corner, raised grey key, words +
+   exit icon. Phones: the icon alone (the words stay for screen readers). */
 .mch-back {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  right: 14px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  margin-bottom: 20px;
-  padding: 0 12px 0 9px;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px 0 14px;
   border: 2px solid var(--lb-edge, #060708);
   border-radius: var(--lb-r, 6px);
-  background: var(--lb-well, #121317);
-  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: var(--lb-raise, #2a2c35);
+  box-shadow: var(--lb-btn);
   font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.3px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
   line-height: 1;
   text-transform: uppercase;
   text-decoration: none;
-  color: #8b9099;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+  color: #e6e8ec;
+  transition: background-color 0.15s ease;
 }
 .mch-back svg {
-  width: 15px;
-  height: 15px;
+  flex: none;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.4;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: transform 0.15s ease;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .mch-back:hover {
-  background: #1a1b21;
+  background: var(--lb-raise-hover, #32343e);
   color: #fff;
 }
 .mch-back:hover svg {
-  color: var(--mch-red);
-  transform: translateX(-2px);
+  transform: translateX(2px);
 }
 .mch-back:focus-visible {
   outline: 2px solid #fff;
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 @media (max-width: 970px) {
   .mch-back {
-    margin-bottom: 14px;
+    top: 10px;
+    right: 10px;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+  }
+  .mch-back svg {
+    width: 15px;
+    height: 15px;
+  }
+  .mch-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 body.mc-home:not(.mt-page) .mch-hero--page::before {
@@ -868,5 +887,163 @@ body.mc-home:not(.mt-page) .mch-hero--page::before {
   .mch-hero--page .mch-hero-eyebrow::before {
     width: 7px;
     height: 7px;
+  }
+}
+
+/* ---- TOOL BANNER (Oct 22 2026) ----------------------------------------------
+   Tool pages only (.mch-hero--tool; not the tools lobby, not the Java pages): the
+   banner is /coc/'s compressed .tb card (th-layouts.css "Banner (.tb)") instead of
+   the full-bleed photo. A box in the page column, 196px tall, 20px under the bar
+   like the TH pages: the Creaking art on the right two-thirds fading into the card,
+   the red wash bottom-left, eyebrow + one-line title + versions on the left, the
+   "All tools" key top-right. No From Mojang (gone from the markup with its modal).
+   The tabs tray sits under the card instead of straddling it; on desktop it wraps
+   into as many rows as the tools need (no sideways scroll, the tabs stretch to fill
+   each row); phones keep one slim scrolling strip, text only. Everything above is
+   outranked here (body.mc-home prefix), so restyle the tool banner in this block. */
+body.mc-home .mch-hero--page.mch-hero--tool {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 196px;
+  margin: 68px var(--coc-side) 0; /* .coc-content starts 48px under the 64px bar: 20px gap, = .tb */
+  padding: 28px 32px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  overflow: hidden;
+  isolation: isolate;
+}
+body.mc-home .mch-hero--page.mch-hero--tool::before {
+  display: none; /* the ground glow under the old full-width banner */
+}
+body.mc-home .mch-hero--tool .mch-hero-bg {
+  z-index: -2;
+  left: auto;
+  width: 64%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 34%, #000 78%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 34%, #000 78%);
+}
+body.mc-home .mch-hero--page.mch-hero--tool::after {
+  z-index: -1;
+  background:
+    radial-gradient(60% 120% at 0% 100%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 70%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.55) 0%, rgba(10, 10, 12, 0) 45%);
+}
+/* Static, so the back key positions against the card's corner. */
+body.mc-home .mch-hero--tool .mch-hero-inner {
+  position: static;
+  display: block;
+  flex: 1;
+  min-width: 0;
+  max-width: min(640px, 58%);
+  min-height: 0;
+  padding: 0;
+}
+body.mc-home .mch-hero--tool .mch-hero-eyebrow {
+  margin-bottom: 10px;
+}
+body.mc-home .mch-hero--tool .mch-hero-title {
+  margin: 0;
+  font-size: clamp(26px, 2.5vw, 38px); /* = .tb-title */
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+body.mc-home .mch-hero--tool .mch-hero-title span {
+  display: inline;
+  margin-left: 0.28em;
+}
+body.mc-home .mch-hero--tool .mch-hero-foot {
+  margin-top: 14px;
+}
+body.mc-home .mch-hero--tool .mch-hero-ver dd:not(.mch-hero-age) {
+  font-size: 16px;
+}
+/* Tabs under the card: 32px below it (= the TH pages' tabs under .tb). The bottom
+   margin keeps "SPACE UNDER THE TABS": 64px to the first content (the old banner's
+   margin, moved here). */
+body.mc-home .mch-hero--tool + .mch-hero-tabs {
+  margin: 32px 0 -21px;
+}
+body.mc-home.mt-page .mch-hero--tool + .mch-hero-tabs {
+  margin-bottom: 12px;
+}
+@media (min-width: 971px) {
+  .mch-hero--tool + .mch-hero-tabs .mch-nav {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+  /* Last row: tabs keep their own width, left-aligned. A zero-width filler after
+     the last tab always lands on the last row and its huge grow takes that row's
+     spare width; the full rows above still share theirs out. */
+  .mch-hero--tool + .mch-hero-tabs .mch-nav::after {
+    content: '';
+    flex: 999 0 0;
+  }
+}
+@media (min-width: 971px) and (max-width: 1350px) {
+  body.mc-home .mch-hero--tool .mch-hero-inner {
+    max-width: 74%;
+  }
+  body.mc-home .mch-hero--tool .mch-hero-bg {
+    width: 50%;
+  }
+}
+@media (max-width: 970px) {
+  body.mc-home .mch-hero--page.mch-hero--tool {
+    min-height: 0;
+    margin-top: 52px; /* lands where .tb does on phones */
+    padding: 18px 16px 16px;
+  }
+  /* Art across the whole card, dimmed on the left where the words are. */
+  body.mc-home .mch-hero--tool .mch-hero-bg {
+    width: 100%;
+    -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
+  }
+  body.mc-home .mch-hero--page.mch-hero--tool::after {
+    background:
+      radial-gradient(70% 120% at 0% 100%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 70%),
+      linear-gradient(90deg, rgba(18, 19, 22, 0.9) 0%, rgba(18, 19, 22, 0.65) 70%, rgba(18, 19, 22, 0.45) 100%);
+  }
+  body.mc-home .mch-hero--tool .mch-hero-inner {
+    max-width: none;
+    padding-right: 30px; /* clear of the corner key */
+  }
+  body.mc-home .mch-hero--tool .mch-hero-title {
+    font-size: 21px;
+    letter-spacing: -0.01em;
+  }
+  body.mc-home .mch-hero--tool .mch-hero-foot {
+    margin-top: 12px;
+  }
+  /* Slim strip in the page column (lined up with the card): no pictures, 34px
+     tabs, still one row that scrolls. */
+  body.mc-home .mch-hero--tool + .mch-hero-tabs,
+  body.mc-home.mt-page .mch-hero--tool + .mch-hero-tabs {
+    margin: 14px 0 -7px;
+    padding-inline: var(--coc-side);
+  }
+  .mch-hero--tool + .mch-hero-tabs .mch-nav {
+    padding: 4px;
+    border-inline: 2px solid var(--lb-edge, #060708);
+    border-radius: calc(var(--lb-r, 6px) + 3px);
+  }
+  .mch-hero--tool + .mch-hero-tabs .mch-nav-tab {
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+  .mch-hero--tool + .mch-hero-tabs .mch-nav-tab img {
+    display: none;
+  }
+  .mch-hero--tool + .mch-hero-tabs .mch-nav-arrow--l {
+    left: calc(var(--coc-side) + 2px);
+    border-radius: var(--lb-r, 6px) 0 0 var(--lb-r, 6px);
+  }
+  .mch-hero--tool + .mch-hero-tabs .mch-nav-arrow--r {
+    right: calc(var(--coc-side) + 2px);
+    border-radius: 0 var(--lb-r, 6px) var(--lb-r, 6px) 0;
   }
 }

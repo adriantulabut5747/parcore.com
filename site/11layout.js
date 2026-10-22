@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clans" stays lit while reading /articles/coc/<slug>). noActive: never
     // lit (Articles' "Search" points at the feed, like "All").
     const prefix = item.activePrefix && normalizePage(item.activePrefix);
-    const isActive = !item.noActive && (normalizePage(item.link) === currentPage ||
+    const isActive = !item.noActive && ((item.link.charAt(0) !== '#' && normalizePage(item.link) === currentPage) ||
       (item.activeOn || []).some(l => normalizePage(l) === currentPage) ||
       !!(prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/'))));
     return `<a href="${item.link}" class="${className}${isActive ? ' active' : ''}">${iconSvg(item, isActive)}<span>${item.name}</span></a>`;
@@ -477,12 +477,67 @@ document.addEventListener('DOMContentLoaded', () => {
     left.classList.add('has-crumbs');
   }
 
+  // "groups" (Genshin, Oct 22 2026): a section with many pages shows its
+  // groups instead (Live / Database / Tools / Guides). Each group is one
+  // top-bar link with a hover menu of its pages, one phone-bar item that
+  // opens the More sheet at that group, and one labelled section of the
+  // sheet (coc-more.css's .mx tiles, like Minecraft and CoC). A group link
+  // isn't a page itself (href "#gn-<i>"); it's lit when you're on one of
+  // its built pages.
+  function buildGroups(game) {
+    const groups = game.groups;
+    buildHubNav({ hubNav: groups.map((g, i) => ({
+      name: g.name, link: '#gn-' + i, icon: g.icon,
+      activeOn: g.pages.filter(p => !p.soon).map(p => p.link)
+    })) });
+    if (buildHubStrip) {
+      window.stbHubMenus(stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav, {
+        keyOf: link => ((link.getAttribute('href') || '').match(/^#(gn-\d+)$/) || [])[1] || '',
+        labels: Object.fromEntries(groups.map((g, i) => ['gn-' + i, g.name])),
+        lists: Object.fromEntries(groups.map((g, i) => ['gn-' + i, g.pages.map(p => ({ href: p.soon ? '' : p.link, name: p.name, soon: p.soon }))]))
+      });
+    }
+
+    const list = document.querySelector('#moreOverlay .more-list');
+    if (list) {
+      const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const tile = p => p.soon
+        ? `<a class="mx-tool is-soon" aria-disabled="true"><span class="mx-tool-name">${esc(p.name)}</span></a>`
+        : `<a class="mx-tool${normalizePage(p.link) === currentPage ? ' active' : ''}" href="${p.link}"><span class="mx-tool-name">${esc(p.name)}</span></a>`;
+      list.classList.add('mx');
+      list.innerHTML = groups.map((g, i) =>
+        `<section class="mx-sec" id="gn-sec-${i}"><div class="mx-head"><h3 class="mx-label mx-label--ico"><svg viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>${esc(g.name)}</h3></div>` +
+        `<div class="mx-tools">${g.pages.map(tile).join('')}</div></section>`).join('');
+      const count = document.querySelector('#moreOverlay .mx-hdr-count');
+      const all = [].concat(...groups.map(g => g.pages));
+      if (count) count.textContent = all.filter(p => !p.soon).length + ' live · ' + all.length + ' pages';
+    }
+
+    // Group links: on phones open the sheet at that group; on desktop a click
+    // opens the hover menu (for touch laptops and anyone who clicks).
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href^="#gn-"]');
+      if (!a) return;
+      e.preventDefault();
+      if (a.classList.contains('stb-hub-link')) return a.dispatchEvent(new Event('mouseenter'));
+      const overlay = document.getElementById('moreOverlay');
+      const sec = document.getElementById('gn-sec-' + a.getAttribute('href').slice(4));
+      if (!overlay) return;
+      if (!overlay.classList.contains('open')) window.toggleMoreMenu();
+      const sc = sec && sec.closest('.more-sheet-scroll');
+      const top = sc && sc.querySelector('.more-sheet-top'); // sticky: it covers the list's top
+      if (sc) sc.scrollTop += sec.getBoundingClientRect().top - sc.getBoundingClientRect().top - (top ? top.offsetHeight : 0) - 12;
+    });
+    buildCrumbs(game.home, game.name, [].concat(...groups.map(g => g.pages)));
+  }
+
   if (gameKey) {
     fetch('/game-nav.json')
       .then(res => res.json())
       .then(all => {
         const game = all[gameKey];
         if (!game) return console.error('game-nav.json has no "' + gameKey + '" entry');
+        if (game.groups) return buildGroups(game);
         buildHubNav({ hubNav: game.pages, bottomNav: game.pages.filter(p => p.bottomNav) });
         // "more": a section can give the sheet its own list (Articles lists
         // the featured games) instead of repeating its pages.

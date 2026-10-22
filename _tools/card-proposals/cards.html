@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Card proposals</title>
+<!-- Private preview (not published). Run python _tools/serve.py first: images load from the local site. -->
+<base href="http://localhost:8765/">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Oxanium:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --box: #141518; --box-hover: #202128; --well: #121317; --edge: #060708;
+  --red: #c23b3b; --red-text: #e86a6a; --dim: #8d9199; --text: #eff1f4;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.09), 0 10px 24px -12px rgba(0,0,0,.85);
+  --shadow-hover: inset 0 0 0 1px rgba(255,255,255,.11), inset 0 1px 0 rgba(255,255,255,.14), 0 16px 30px -14px rgba(0,0,0,.9);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { padding: 64px 6% 120px; background: #0a0a0b; color: var(--text); font-family: 'Sora', sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+.prop { margin-bottom: 96px; }
+.prop-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+.prop-letter { font: 900 15px 'Orbitron'; color: var(--red-text); }
+.prop h2 { font: 900 30px/1.1 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: -.3px; }
+.prop p.note { max-width: 760px; margin: 0 0 28px 31px; font-size: 13px; line-height: 1.6; color: var(--dim); }
+.grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 970px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } body { padding: 40px 16px; } }
+.clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.by { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: #b4b8be; white-space: nowrap; overflow: hidden; }
+.by img { width: 16px; height: 16px; flex: none; object-fit: cover; border-radius: 3px; }
+.cap { font: 700 10px 'Oxanium'; letter-spacing: 1.4px; text-transform: uppercase; }
+
+/* ---------- A. BADGES ON THE ART ---------- */
+.va { display: flex; flex-direction: column; border-radius: 6px; background: var(--box); box-shadow: 0 0 0 2px var(--edge), var(--shadow); overflow: hidden; transition: transform .35s var(--ease), box-shadow .35s, background-color .35s; }
+.va-media { position: relative; aspect-ratio: 1; overflow: hidden; }
+.va-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+.va-media::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
+.va-chip { position: absolute; top: 10px; display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 4px; background: rgba(10,10,11,.62); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); backdrop-filter: blur(8px); color: #fff; }
+.va-chip img { width: 13px; height: 13px; }
+.va-src { left: 10px; }
+.va-tag { right: 10px; color: #d6d8dc; }
+.va-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 14px 16px; }
+.va h3 { font-size: 15px; font-weight: 700; line-height: 1.3; transition: color .2s; }
+.va p { font-size: 13px; line-height: 1.5; color: var(--dim); }
+.va:hover { transform: translateY(-4px); background: var(--box-hover); box-shadow: 0 0 0 2px var(--edge), var(--shadow-hover); }
+.va:hover .va-media img { transform: scale(1.06); }
+.va:hover .va-media::after { transform: scaleX(1); }
+.va:hover h3 { color: var(--red-text); }
+
+/* ---------- B. POSTER ---------- */
+.vb { position: relative; display: block; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden; background: var(--box); box-shadow: 0 0 0 2px var(--edge), var(--shadow); transition: transform .35s var(--ease), box-shadow .35s; isolation: isolate; }
+.vb > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform .9s var(--ease), filter .5s; }
+.vb::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10,10,11,0) 30%, rgba(10,10,11,.75) 62%, #0a0a0b 100%); transition: opacity .4s; }
+.vb-src { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 5px; background: rgba(10,10,11,.6); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); backdrop-filter: blur(8px); }
+.vb-src img { width: 15px; height: 15px; }
+.vb-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 14px 15px; }
+.vb-tag { color: var(--red-text); }
+.vb h3 { margin: 6px 0 8px; font-size: 17px; font-weight: 700; line-height: 1.2; }
+.vb-more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease); }
+.vb-more > div { overflow: hidden; }
+.vb-more p { padding-top: 10px; font-size: 12.5px; line-height: 1.5; color: #c4c7cd; opacity: 0; transition: opacity .3s .05s; }
+.vb:hover { transform: translateY(-4px); box-shadow: 0 0 0 2px var(--edge), var(--shadow-hover); }
+.vb:hover > img { transform: scale(1.08); filter: saturate(1.15); }
+.vb:hover .vb-more { grid-template-rows: 1fr; }
+.vb:hover .vb-more p { opacity: 1; }
+
+/* ---------- C. FRAMED WELL ---------- */
+.vc { display: flex; flex-direction: column; padding: 8px; border-radius: 6px; background: var(--box); box-shadow: 0 0 0 2px var(--edge), var(--shadow); transition: transform .35s var(--ease), box-shadow .35s, background-color .35s; }
+.vc-media { position: relative; aspect-ratio: 4 / 3; }
+.vc-frame { position: absolute; inset: 0; border-radius: 4px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--edge); }
+.vc-frame img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.88); transition: filter .4s, transform .7s var(--ease); }
+.vc-frame::after { content: ''; position: absolute; inset: 0; border-radius: 4px; box-shadow: inset 0 0 0 2px var(--edge), inset 0 4px 0 rgba(0,0,0,.35); pointer-events: none; }
+.vc-src { position: absolute; top: 0; right: 0; z-index: 1; display: flex; align-items: center; gap: 5px; padding: 6px 8px 5px 9px; border-radius: 0 4px 0 6px; background: #0a0b0c; color: #e6e8ec; }
+.vc-src img { width: 12px; height: 12px; }
+.vc-icon { position: absolute; left: 10px; bottom: -20px; z-index: 1; width: 44px; height: 44px; padding: 3px; border-radius: 7px; background: #2a2c35; box-shadow: inset 0 0 0 2px var(--edge), inset 0 3px 0 rgba(255,255,255,.1), inset 0 -5px 0 rgba(0,0,0,.3), 0 6px 14px -6px #000; transition: transform .45s var(--ease); }
+.vc-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+.vc-body { display: flex; flex-direction: column; gap: 6px; padding: 28px 6px 6px; }
+.vc h3 { font-size: 15px; font-weight: 700; line-height: 1.3; transition: color .2s; }
+.vc-author { margin-top: -3px; font-size: 12px; color: #9ca0a8; }
+.vc p { font-size: 13px; line-height: 1.5; color: var(--dim); }
+.vc-tags { display: flex; gap: 6px; margin-top: 6px; }
+.vc-tags span { padding: 5px 8px 4px; border-radius: 4px; background: var(--well); box-shadow: inset 0 0 0 2px var(--edge), inset 0 3px 0 rgba(0,0,0,.35); color: #a9adb5; }
+.vc:hover { transform: translateY(-4px); background: var(--box-hover); box-shadow: 0 0 0 2px var(--edge), var(--shadow-hover); }
+.vc:hover .vc-frame img { filter: brightness(1.04); transform: scale(1.04); }
+.vc:hover .vc-icon { transform: translateY(-6px) rotate(-6deg); }
+.vc:hover h3 { color: var(--red-text); }
+
+/* ---------- D. TILT + GLARE ---------- */
+.vd-wrap { perspective: 900px; }
+.vd { position: relative; display: flex; flex-direction: column; border-radius: 6px; overflow: hidden; background: var(--box); box-shadow: 0 0 0 2px var(--edge), var(--shadow); transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; transition: transform .5s var(--ease), box-shadow .35s; will-change: transform; }
+.vd.is-live { transition: transform .08s linear, box-shadow .35s; }
+.vd::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,.16), rgba(255,255,255,0) 45%); opacity: 0; transition: opacity .3s; }
+.vd:hover::after { opacity: 1; }
+.vd:hover { box-shadow: 0 0 0 2px var(--edge), var(--shadow-hover), 0 30px 40px -24px rgba(0,0,0,.95); }
+.vd-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+.vd-media img { width: 112%; height: 112%; margin: -6% 0 0 -6%; object-fit: cover; transform: translate(var(--px, 0), var(--py, 0)); transition: transform .5s var(--ease); }
+.vd.is-live .vd-media img { transition: transform .08s linear; }
+.vd-src { position: absolute; left: 12px; bottom: -11px; z-index: 1; display: flex; align-items: center; gap: 6px; padding: 5px 9px 4px; border-radius: 4px; background: #2a2c35; box-shadow: inset 0 0 0 2px var(--edge), inset 0 2px 0 rgba(255,255,255,.1), inset 0 -3px 0 rgba(0,0,0,.3); color: #e6e8ec; }
+.vd-src img { width: 12px; height: 12px; }
+.vd-body { display: flex; flex-direction: column; gap: 8px; padding: 22px 14px 16px; }
+.vd h3 { font-size: 15px; font-weight: 700; line-height: 1.3; }
+.vd p { font-size: 13px; line-height: 1.5; color: var(--dim); }
+.vd-tag { color: var(--red-text); }
+
+/* ---------- E. PIXEL CORNERS + XP BAR ---------- */
+.ve { --c: polygon(0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px, 100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%, 6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 6px), 0 calc(100% - 6px));
+  display: block; padding: 2px; background: var(--edge); clip-path: var(--c); filter: drop-shadow(0 10px 14px rgba(0,0,0,.6)); transition: transform .35s var(--ease); }
+.ve-in { position: relative; display: flex; flex-direction: column; height: 100%; background: var(--box); clip-path: var(--c); box-shadow: inset 0 1px 0 rgba(255,255,255,.09); transition: background-color .3s; }
+.ve-media { position: relative; aspect-ratio: 1; overflow: hidden; }
+.ve-media img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; transition: transform .7s var(--ease), filter .4s; filter: saturate(.92); }
+.ve-bar { position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; align-items: center; gap: 9px; padding: 7px 9px; background: rgba(10,10,11,.66); backdrop-filter: blur(8px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px)); }
+.ve-bar > img { width: 30px; height: 30px; flex: none; object-fit: cover; }
+.ve-bar h3 { font-size: 14px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ve-bar small { display: block; font-size: 11px; color: #b4b8be; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ve-bar > div { min-width: 0; }
+.ve-body { display: flex; flex-direction: column; gap: 10px; flex: 1; padding: 12px 12px 18px; }
+.ve p { font-size: 13px; line-height: 1.5; color: var(--dim); }
+.ve-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; color: #9ca0a8; }
+.ve-foot img { width: 14px; height: 14px; opacity: .8; }
+.ve-xp { position: absolute; left: 10px; right: 10px; bottom: 7px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; height: 4px; }
+.ve-xp i { background: #23252b; transition: background-color .2s; }
+.ve:hover { transform: translateY(-4px); }
+.ve:hover .ve-in { background: var(--box-hover); }
+.ve:hover .ve-media img { transform: scale(1.06); filter: saturate(1.12); }
+.ve:hover .ve-xp i { background: var(--red); }
+.ve-xp i:nth-child(1) { transition-delay: 0s } .ve-xp i:nth-child(2) { transition-delay: .03s } .ve-xp i:nth-child(3) { transition-delay: .06s } .ve-xp i:nth-child(4) { transition-delay: .09s } .ve-xp i:nth-child(5) { transition-delay: .12s }
+.ve-xp i:nth-child(6) { transition-delay: .15s } .ve-xp i:nth-child(7) { transition-delay: .18s } .ve-xp i:nth-child(8) { transition-delay: .21s } .ve-xp i:nth-child(9) { transition-delay: .24s } .ve-xp i:nth-child(10) { transition-delay: .27s }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; }
+  .va:hover, .vb:hover, .vc:hover, .ve:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<section class="prop"><div class="prop-head"><span class="prop-letter">A</span><h2>Badges on the art</h2></div>
+<p class="note">Closest to today, but cleaner: source and tag move onto the picture as frosted chips, so the footer row disappears. Hover: card lifts, picture zooms, a red line wipes across its bottom edge, title turns red.</p>
+<div class="grid" id="A"></div></section>
+
+<section class="prop"><div class="prop-head"><span class="prop-letter">B</span><h2>Poster</h2></div>
+<p class="note">The picture is the whole card, text sits on a dark fade at the bottom. Source is an icon-only key in the corner. Hover: the description rises out from under the title and the picture zooms and warms up. Strongest "wow", least text visible at rest.</p>
+<div class="grid" id="B"></div></section>
+
+<section class="prop"><div class="prop-head"><span class="prop-letter">C</span><h2>Framed well</h2></div>
+<p class="note">Our raised-UI recipe all the way through: the picture sits sunken in the box, the pack's icon is a raised key overlapping its edge, the source is a black corner tab (like the old rank badge), tags are little wells. Hover: the icon hops up and tilts, the picture brightens.</p>
+<div class="grid" id="C"></div></section>
+
+<section class="prop"><div class="prop-head"><span class="prop-letter">D</span><h2>Tilt and glare</h2></div>
+<p class="note">The card leans toward your cursor in 3D with a soft light following it, and the picture drifts the other way (parallax). The source is a grey key hanging off the picture. Needs a few lines of JS; touch screens and reduced-motion get a flat card.</p>
+<div class="grid" id="D"></div></section>
+
+<section class="prop"><div class="prop-head"><span class="prop-letter">E</span><h2>Pixel corners</h2></div>
+<p class="note">The Minecraft one: stepped pixel corners, the name and author on a frosted bar over the picture, and an XP bar along the bottom whose ten segments fill red, one after another, on hover. Would only suit the Minecraft pages; CoC would get its own flavour.</p>
+<div class="grid" id="E"></div></section>
+
+<script>
+var FAV = function (d) { return 'https://www.google.com/s2/favicons?domain=' + d + '&sz=64'; };
+var PACKS = [
+  { name: 'Terralith', by: 'Stardust Labs', tag: 'Terrain', desc: 'Almost 100 new biomes, from realistic to light fantasy, built from vanilla blocks only', img: '/minecrafticons/datapacks/terralith.webp', icon: 'https://cdn.modrinth.com/data/8oi3bsk5/1959d924a1088944bbf07a06ba523726112d7e7a_96.webp' },
+  { name: 'VeinMiner', by: 'Miraculixx', tag: 'Quality of life', desc: 'Break one ore and the whole vein comes with it. Saves hours of strip mining', img: '/minecrafticons/datapacks/veinminer.webp', icon: 'https://cdn.modrinth.com/data/OhduvhIc/5ea1f538e66ee4d4e5e571ad952cba0e06e0bd5c.png' },
+  { name: 'Dungeons and Taverns', by: 'NovaWostra', tag: 'Structures', desc: 'Taverns to rest in and dungeons to raid, scattered across the whole world', img: '/minecrafticons/datapacks/dungeons-and-taverns.webp', icon: 'https://cdn.modrinth.com/data/tpehi7ww/429ba22d212868940cdd82465df949ac51c9791e_96.webp' },
+  { name: 'Towns and Towers', by: 'Biban_Auriu', tag: 'Structures', desc: 'A village and pillager outpost for every biome, plus ships out at sea', img: '/minecrafticons/datapacks/towns-and-towers.webp', icon: 'https://cdn.modrinth.com/data/DjLobEOy/f7f552ec019c9ad8b777c9ab5eecbb95da8707a0_96.webp' },
+  { name: 'Tectonic', by: 'Apollo', tag: 'Terrain', desc: 'Taller mountains, deeper valleys and wilder coasts. Terrain worth climbing', img: '/minecrafticons/datapacks/tectonic.webp', icon: 'https://cdn.modrinth.com/data/lWDHr9jE/d8b3413f797479dcc0d8764756613e449a358a2e_96.webp' }
+];
+var M = FAV('modrinth.com');
+var by = function (p) { return '<span class="by"><img src="' + p.icon + '" alt="">' + p.by + '</span>'; };
+var T = {
+  A: function (p) { return '<a class="va" href="#"><div class="va-media"><img src="' + p.img + '" alt=""><span class="va-chip va-src cap"><img src="' + M + '" alt="">Modrinth</span><span class="va-chip va-tag cap">' + p.tag + '</span></div>' +
+    '<div class="va-body"><h3 class="clamp2">' + p.name + '</h3>' + by(p) + '<p class="clamp2">' + p.desc + '</p></div></a>'; },
+  B: function (p) { return '<a class="vb" href="#"><img src="' + p.img + '" alt=""><span class="vb-src" title="Modrinth"><img src="' + M + '" alt="Modrinth"></span>' +
+    '<div class="vb-body"><span class="vb-tag cap">' + p.tag + '</span><h3>' + p.name + '</h3>' + by(p) + '<div class="vb-more"><div><p>' + p.desc + '</p></div></div></div></a>'; },
+  C: function (p) { return '<a class="vc" href="#"><div class="vc-media"><div class="vc-frame"><img src="' + p.img + '" alt=""></div><span class="vc-src cap"><img src="' + M + '" alt="">Modrinth</span><span class="vc-icon"><img src="' + p.icon + '" alt=""></span></div>' +
+    '<div class="vc-body"><h3 class="clamp2">' + p.name + '</h3><span class="vc-author">by ' + p.by + '</span><p class="clamp2">' + p.desc + '</p><div class="vc-tags"><span class="cap">' + p.tag + '</span></div></div></a>'; },
+  D: function (p) { return '<div class="vd-wrap"><a class="vd" href="#"><div class="vd-media"><img src="' + p.img + '" alt=""></div><span class="vd-src cap" style="position:relative;margin:-11px 0 0 12px;align-self:flex-start;left:auto;bottom:auto"><img src="' + M + '" alt="">Modrinth</span>' +
+    '<div class="vd-body" style="padding-top:12px"><span class="vd-tag cap">' + p.tag + '</span><h3 class="clamp2">' + p.name + '</h3>' + by(p) + '<p class="clamp2">' + p.desc + '</p></div></a></div>'; },
+  E: function (p) { return '<a class="ve" href="#"><div class="ve-in"><div class="ve-media"><img src="' + p.img + '" alt=""><div class="ve-bar"><img src="' + p.icon + '" alt=""><div><h3>' + p.name + '</h3><small>' + p.by + '</small></div></div></div>' +
+    '<div class="ve-body"><p class="clamp2">' + p.desc + '</p><div class="ve-foot"><span class="cap">' + p.tag + '</span><img src="' + M + '" alt="Modrinth" title="Modrinth"></div></div>' +
+    '<div class="ve-xp" aria-hidden="true">' + '<i></i>'.repeat(10) + '</div></div></a>'; }
+};
+Object.keys(T).forEach(function (k) { document.getElementById(k).innerHTML = PACKS.map(T[k]).join(''); });
+
+// D: tilt toward the pointer (mouse only, not under reduced motion).
+if (matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches) {
+  document.querySelectorAll('.vd').forEach(function (c) {
+    c.addEventListener('pointermove', function (e) {
+      var r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      c.classList.add('is-live');
+      c.style.setProperty('--ry', ((x - 0.5) * 12).toFixed(2) + 'deg');
+      c.style.setProperty('--rx', ((0.5 - y) * 10).toFixed(2) + 'deg');
+      c.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+      c.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+      c.style.setProperty('--px', ((0.5 - x) * 10).toFixed(1) + 'px');
+      c.style.setProperty('--py', ((0.5 - y) * 10).toFixed(1) + 'px');
+    });
+    c.addEventListener('pointerleave', function () {
+      c.classList.remove('is-live');
+      ['--rx', '--ry', '--px', '--py'].forEach(function (v) { c.style.removeProperty(v); });
+    });
+  });
+}
+</script>
+</body>
+</html>

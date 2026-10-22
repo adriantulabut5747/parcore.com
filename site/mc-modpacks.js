@@ -2,6 +2,10 @@
    the single mods, launchers, essential mods and links from /mc-modpacks.json,
    and the live Modrinth leaderboard with Modpacks / Mods tabs (api.modrinth.com,
    CORS open, no key; rows reuse the home's .mch-st-* standings).
+   /minecraft/java/data-packs (Oct 22 2026) runs on the same engine: #mpGrid's
+   data-src picks the JSON (/mc-datapacks.json), which carries its own noun,
+   link label and "picks" (Vanilla Tweaks); a Modrinth tab's data-index sorts
+   by downloads or follows. Sections a page leaves out are skipped.
    Styles: MODPACKS PAGE (+ PACKS PAGE, SEEDS PAGE) in mc-home.css. */
 (function () {
   var grid = document.getElementById('mpGrid');
@@ -15,6 +19,18 @@
   function favicon(site, size) {
     return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(site) + '&sz=' + (size || 64);
   }
+  // Internal links (/minecraft/tools/...) stay in the tab; the rest open a new one.
+  function target(href) {
+    return /^https?:/.test(href) ? ' target="_blank" rel="noopener"' : '';
+  }
+  function essItem(m) {
+    return '<a class="mch-ess-item" href="' + esc(m.href) + '"' + target(m.href) + '><img src="' + esc(m.icon) + '" alt="" loading="lazy">' +
+      '<span><b>' + esc(m.name) + '</b><small>' + esc(m.desc) + '</small></span></a>';
+  }
+  function fill(id, html) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
   function card(p, tags) {
     var site = /modrinth\.com/.test(p.href) ? 'modrinth.com' : 'curseforge.com';
     return '<a class="mch-mod" href="' + esc(p.href) + '" target="_blank" rel="noopener">' +
@@ -26,19 +42,21 @@
       (tags ? '<span class="mch-mod-tags">' + p.tags.map(function (t) { return esc(tags[t] || t); }).join(' · ') + '</span>' : '') + '</span></a>';
   }
 
-  fetch('/mc-modpacks.json')
+  fetch(grid.getAttribute('data-src') || '/mc-modpacks.json')
     .then(function (r) {
       if (!r.ok) throw new Error(r.status);
       return r.json();
     })
     .then(function (data) {
-      var packs = data.modpacks;
+      var packs = data.modpacks || data.datapacks;
       var tags = data.tags;
+      var noun = data.noun || 'modpacks';
       var hero = document.getElementById('mpHeroCount');
       if (hero) hero.textContent = packs.length;
 
       grid.innerHTML = packs.map(function (p) { return card(p, tags); }).join('');
-      document.getElementById('singleGrid').innerHTML = data.mods.map(function (p) { return card(p, tags); }).join('');
+      if (data.mods) fill('singleGrid', data.mods.map(function (p) { return card(p, tags); }).join(''));
+      if (data.picks) fill('pickGrid', data.picks.map(essItem).join(''));
 
       // Chips: All + every tag. A pack with two tags shows under both.
       var chips = document.getElementById('mpChips');
@@ -66,7 +84,7 @@
           c.querySelector('[data-n]').textContent = n;
           c.disabled = !n && t !== active;
         });
-        document.getElementById('mpCount').textContent = shown === packs.length ? packs.length + ' modpacks' : shown + ' of ' + packs.length + ' modpacks';
+        document.getElementById('mpCount').textContent = shown === packs.length ? packs.length + ' ' + noun : shown + ' of ' + packs.length + ' ' + noun;
         document.getElementById('mpEmpty').hidden = shown > 0;
         document.getElementById('mpEmptyQ').textContent = q ? '“' + find.value.trim() + '”' : 'this filter';
       }
@@ -86,32 +104,32 @@
       });
       apply();
 
-      document.getElementById('launcherGrid').innerHTML = data.launchers.map(function (l, i) {
+      fill('launcherGrid', data.launchers.map(function (l, i) {
         return '<a class="mch-launcher' + (i === 0 ? ' is-top' : '') + '" href="' + esc(l.href) + '" target="_blank" rel="noopener">' +
           '<img src="' + favicon(l.site, 128) + '" alt="" loading="lazy">' +
           '<span class="mch-launcher-tag">' + esc(l.tag) + '</span>' +
           '<h3>' + esc(l.name) + '</h3><p>' + esc(l.desc) + '</p>' +
-          '<span class="mch-launcher-go">Download<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a>';
-      }).join('');
-      document.getElementById('essGrid').innerHTML = data.essentials.map(function (m) {
-        return '<a class="mch-ess-item" href="' + esc(m.href) + '" target="_blank" rel="noopener"><img src="' + esc(m.icon) + '" alt="" loading="lazy">' +
-          '<span><b>' + esc(m.name) + '</b><small>' + esc(m.desc) + '</small></span></a>';
-      }).join('');
-      document.getElementById('linkRow').innerHTML = '<span class="mch-linkrow-label">More mods at</span>' + data.links.map(function (l) {
+          '<span class="mch-launcher-go">' + esc(l.go || 'Download') + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></span></a>';
+      }).join(''));
+      fill('essGrid', data.essentials.map(essItem).join(''));
+      fill('linkRow', '<span class="mch-linkrow-label">' + esc(data.linkLabel || 'More mods at') + '</span>' + data.links.map(function (l) {
         return '<a class="mch-src mch-linkpill" href="' + esc(l.href) + '" target="_blank" rel="noopener"><img src="' + favicon(l.site) + '" alt="" loading="lazy">' + esc(l.name) + '</a>';
-      }).join('');
+      }).join(''));
     })
     .catch(function () {
-      grid.innerHTML = '<p class="mch-sfail">The modpack list did not load. Refresh the page to try again.</p>';
+      grid.innerHTML = '<p class="mch-sfail">The list did not load. Refresh the page to try again.</p>';
     });
 
-  // ---- Live: Modrinth top 10, Modpacks or Mods ----
+  // ---- Live: Modrinth top 10 (Modpacks / Mods, or data packs by downloads / follows) ----
   var board = document.getElementById('mrBoard');
   if (!board) return;
   var all = document.getElementById('mrAll');
   var tabs = Array.prototype.slice.call(document.querySelectorAll('#mc-modrinth .mch-tab'));
   var compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
   var LOADERS = { fabric: 'Fabric', forge: 'Forge', neoforge: 'NeoForge', quilt: 'Quilt' };
+  // Data packs all run on vanilla, so their middle column shows what they change instead.
+  var CATS = { worldgen: 'Worldgen', adventure: 'Adventure', mobs: 'Mobs', equipment: 'Equipment', 'game-mechanics': 'Mechanics', utility: 'Utility', decoration: 'Decoration', magic: 'Magic', technology: 'Tech' };
+  var PLURAL = { mod: 'mods', modpack: 'modpacks', datapack: 'data packs' };
   var cache = {};
   function ago(iso) {
     var d = Math.max(0, Math.round((Date.now() - new Date(iso)) / 864e5));
@@ -122,40 +140,49 @@
     var y = Math.round(d / 365);
     return y + (y === 1 ? ' year ago' : ' years ago');
   }
-  function draw(type, hits) {
-    var max = hits.length ? hits[0].downloads : 1;
+  function draw(type, index, hits) {
+    var metric = index === 'follows' ? 'follows' : 'downloads';
+    var labels = type === 'datapack' ? CATS : LOADERS;
+    var max = Math.max.apply(null, hits.map(function (h) { return h[metric]; }).concat(1));
     board.innerHTML = hits.map(function (h, i) {
-      var loaders = (h.categories || []).filter(function (c) { return LOADERS[c]; }).map(function (c) { return LOADERS[c]; }).join(' · ');
+      var loaders = (h.categories || []).filter(function (c) { return labels[c]; }).slice(0, 2).map(function (c) { return labels[c]; }).join(' · ');
       return '<a class="mch-st-row" role="row" href="https://modrinth.com/' + type + '/' + esc(h.slug) + '" target="_blank" rel="noopener">' +
         '<span class="mch-st-rank" role="cell">' + String(i + 1).padStart(2, '0') + '</span>' +
         '<span class="mch-st-server" role="cell"><img src="' + esc(h.icon_url || '') + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
           '<span><b>' + esc(h.title) + '</b><small>' + esc(h.description) + '</small></span></span>' +
         '<span class="mch-st-mode" role="cell">' + (loaders || '&mdash;') + '</span>' +
-        '<span class="mch-st-players" role="cell"><span class="mch-st-count"><b>' + compact.format(h.downloads) + '</b> downloads</span>' +
-          '<span class="mch-st-bar"><i style="width:' + Math.max(2, Math.round(h.downloads / max * 100)) + '%"></i></span></span>' +
+        '<span class="mch-st-players" role="cell"><span class="mch-st-count"><b>' + compact.format(h[metric]) + '</b> ' + metric + '</span>' +
+          '<span class="mch-st-bar"><i style="width:' + Math.max(2, Math.round(h[metric] / max * 100)) + '%"></i></span></span>' +
         '<span class="mch-st-when" role="cell">' + ago(h.date_modified) + '</span></a>';
     }).join('');
     board.removeAttribute('aria-busy');
   }
-  function load(type) {
-    all.href = 'https://modrinth.com/' + type + 's?s=downloads';
-    all.firstChild.textContent = type === 'mod' ? 'All mods on Modrinth' : 'All modpacks on Modrinth';
-    if (cache[type]) return draw(type, cache[type]);
+  function load(type, index) {
+    var key = type + '/' + index;
+    all.href = 'https://modrinth.com/' + type + 's?s=' + index;
+    all.firstChild.textContent = 'All ' + PLURAL[type] + ' on Modrinth';
+    if (cache[key]) return draw(type, index, cache[key]);
     board.setAttribute('aria-busy', 'true');
     board.innerHTML = '<div class="mch-st-loading">Loading the Modrinth top 10&hellip;</div>';
-    fetch('https://api.modrinth.com/v2/search?limit=10&index=downloads&facets=' + encodeURIComponent('[["project_type:' + type + '"]]'))
+    fetch('https://api.modrinth.com/v2/search?limit=10&index=' + index + '&facets=' + encodeURIComponent('[["project_type:' + type + '"]]'))
       .then(function (r) {
         if (!r.ok) throw new Error(r.status);
         return r.json();
       })
       .then(function (res) {
-        cache[type] = res.hits;
-        if (tabs.some(function (t) { return t.classList.contains('is-on') && t.getAttribute('data-type') === type; })) draw(type, res.hits);
+        cache[key] = res.hits;
+        if (tabs.some(function (t) { return t.classList.contains('is-on') && tabKey(t) === key; })) draw(type, index, res.hits);
       })
       .catch(function () {
         board.removeAttribute('aria-busy');
         board.innerHTML = '<div class="mch-st-loading">Modrinth did not answer. The list will be back when it does.</div>';
       });
+  }
+  function tabKey(t) {
+    return t.getAttribute('data-type') + '/' + (t.getAttribute('data-index') || 'downloads');
+  }
+  function loadTab(t) {
+    load(t.getAttribute('data-type'), t.getAttribute('data-index') || 'downloads');
   }
   tabs.forEach(function (t, i) {
     function pick() {
@@ -166,7 +193,7 @@
         o.tabIndex = on ? 0 : -1;
       });
       board.setAttribute('aria-labelledby', t.id);
-      load(t.getAttribute('data-type'));
+      loadTab(t);
     }
     t.addEventListener('click', pick);
     t.addEventListener('keydown', function (e) {
@@ -177,5 +204,5 @@
       next.focus();
     });
   });
-  load('modpack');
+  loadTab(tabs[0]);
 })();

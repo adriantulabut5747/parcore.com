@@ -2972,7 +2972,11 @@ a.mch-feat:hover {
   background: #0d0e10;
   cursor: zoom-in;
 }
+/* Pinned to the frame (absolute), so a taller or wider shot never changes the
+   box's size when you switch pictures: the frame alone sets the height. */
 .mch-sfeat-stage img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -3006,12 +3010,12 @@ a.mch-feat:hover {
 }
 .mch-sfeat-thumb {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   padding: 0;
   overflow: hidden;
-  border: 0;
-  background: #0d0e10;
-  opacity: 0.5;
+  border: 2px solid var(--lb-edge);
+  background: var(--lb-well);
+  opacity: 0.45;
   cursor: pointer;
   transition: opacity 0.15s ease;
   border-radius: 4px;
@@ -3057,27 +3061,202 @@ a.mch-feat:hover {
   line-height: 1.65;
   color: var(--mch-muted);
 }
-.mch-sfeat-meta {
+/* Oct 22 2026 pass: the picture gets a counter + prev/next keys; the facts
+   are two wells with item icons; the seed number is the biggest thing on
+   the right, in a well, with a red Copy (main action, Raised UI rule). */
+.mch-sfeat-view {
+  position: relative;
+}
+.mch-sfeat-stage {
+  width: 100%;
+  border-radius: var(--lb-r);
+}
+/* Desktop: the picture grows to the info column's height, no dead space under the thumbs. */
+@media (min-width: 971px) {
+  .mch-sfeat-view {
+    flex: 1;
+    min-height: 0;
+  }
+  .mch-sfeat-stage {
+    height: 100%;
+    min-height: 300px;
+    aspect-ratio: auto;
+  }
+}
+.mch-sfeat-n {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgba(13, 14, 16, 0.82);
+  font: 700 12px/1 'Sora', sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  pointer-events: none;
+}
+.mch-sfeat-arrow {
+  position: absolute;
+  top: 50%;
+  left: 12px;
   display: grid;
-  margin: 0;
-  border-top: 1px solid var(--mch-line);
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0 0 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 0.2s ease, background-color 0.15s ease;
 }
-.mch-sfeat-meta div {
+.mch-sfeat-arrow:not(.is-prev) {
+  left: auto;
+  right: 12px;
+}
+.mch-sfeat-arrow.is-prev svg {
+  transform: scaleX(-1);
+}
+.mch-sfeat-arrow svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+}
+.mch-sfeat-view:hover .mch-sfeat-arrow,
+.mch-sfeat-arrow:focus-visible {
+  opacity: 1;
+}
+.mch-sfeat-arrow:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.mch-sfeat-arrow:active {
+  transform: translateY(calc(-50% + 1px));
+  box-shadow: var(--lb-btn-down);
+}
+@media (hover: none) {
+  .mch-sfeat-arrow {
+    opacity: 1;
+  }
+}
+.mch-sfeat-tags {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--mch-line);
-  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.mch-sfeat-meta dt {
+.mch-sfeat-tags li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 11px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #c9ccd2;
+}
+.mch-sfeat-tags img,
+.mch-sfeat-facts img {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+.mch-sfeat-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.mch-sfeat-facts > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.mch-sfeat-facts img {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+.mch-sfeat-facts span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.mch-sfeat-facts small,
+.mch-sfeat-label {
+  font: 800 10.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
   color: var(--mch-dim);
 }
-.mch-sfeat-meta dd {
-  margin: 0;
-  font-weight: 600;
-  text-align: right;
+.mch-sfeat-facts b {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+/* The seed itself: label, the number big in a well, then Copy (red) + Map. */
+.mch-sfeat-seed {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--mch-line);
+}
+.mch-sfeat-num {
+  display: block;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  font: 700 clamp(17px, 1.5vw, 21px) / 1.2 var(--mch-mono) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  scrollbar-width: none;
+  color: #fff;
+  user-select: all;
+}
+.mch-sfeat .mch-seedacts .mch-copy {
+  height: 44px;
+}
+.mch-sfeat .mch-copy[data-copy] {
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+}
+.mch-sfeat .mch-copy[data-copy]:hover {
+  background: var(--lb-red-hover);
+}
+/* Copied: the off-white key, so the change reads on a button that was red. */
+.mch-sfeat .mch-copy[data-copy].is-done {
+  border-color: var(--lb-pick-edge);
+  background: var(--lb-pick);
+  box-shadow: var(--lb-pick-shadow);
+  color: var(--lb-pick-ink);
 }
 
 /* Search + count, then the chips. */
@@ -3088,46 +3267,10 @@ a.mch-feat:hover {
   gap: 16px;
   margin-bottom: 16px;
 }
+/* The look is .lb-search in 11layout.css (the home hero's bar); width only here. */
 .mch-sfind {
-  position: relative;
   flex: 0 1 420px;
   min-width: 0;
-  border: 0;
-  border-radius: var(--lb-r);
-  background: var(--lb-well);
-  box-shadow: var(--lb-ring-well);
-}
-.mch-sfind svg {
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  width: 17px;
-  height: 17px;
-  color: var(--mch-dim);
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-.mch-sfind input {
-  width: 100%;
-  height: 48px;
-  padding: 0 16px 0 46px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0;
-  background: #0d0e10;
-  font: 500 15px 'Sora', sans-serif;
-  color: #fff;
-  caret-color: var(--mch-red);
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-.mch-sfind input::placeholder {
-  color: #7a7e85;
-}
-.mch-sfind input:focus {
-  border-color: rgba(194, 59, 59, 0.85);
-}
-.mch-sfind:focus-within {
-  box-shadow: var(--lb-ring-well), 0 0 0 2px var(--lb-red-text);
 }
 .mch-scount {
   margin: 0;
@@ -3201,6 +3344,235 @@ a.mch-feat:hover {
 }
 .mch-chip[aria-pressed='true'] span {
   color: #a7abb3;
+}
+
+/* ---- SEEDS DECK (Oct 22 2026) ----------------------------------------------
+   /minecraft/java/seeds only: every library control in one box. Top: the
+   search well (the count sits inside it, before the red key), the Cards/List
+   tray (MC tabs recipe: sunken tray, picked = grey key) and the Random key.
+   Under a hairline: the tag chips with their 16px item icons (mc-seeds.json
+   tagIcons, drawn pixel-sharp). Scoped to .mch-sdeck: the other pages'
+   .mch-sbar / chips stay as is. */
+.mch-sdeck {
+  margin-bottom: 24px;
+  border: 2px solid var(--lb-edge);
+  border-radius: calc(var(--lb-r) + 4px);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.mch-sdeck-top {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+}
+.mch-sdeck .mch-sfind {
+  flex: 1 1 auto;
+}
+.mch-seg {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  padding: 4px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.mch-seg button,
+.mch-srand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--lb-r);
+  font: 600 13px/1 'Sora', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+.mch-seg button {
+  height: 44px;
+  padding: 0 14px;
+  border: 2px solid transparent;
+  background: transparent;
+  color: #8b9099;
+}
+.mch-seg button:hover {
+  color: #c9ccd2;
+}
+.mch-seg button[aria-pressed='true'] {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.mch-seg svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+.mch-srand {
+  flex: none;
+  height: 56px;
+  padding: 0 18px 2px;
+  border: 2px solid var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+}
+.mch-srand:hover:not(:disabled) {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.mch-srand:active:not(:disabled),
+.mch-seg button:active {
+  transform: translateY(1px);
+}
+.mch-srand:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.mch-srand img,
+.mch-sdeck .mch-chip img {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+.mch-sdeck .mch-chip img {
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+.mch-sdeck .mch-chip:hover img,
+.mch-sdeck .mch-chip[aria-pressed='true'] img {
+  opacity: 1;
+}
+/* Spacing is tuned so every chip fits on one row from 1366px wide up;
+   narrower screens scroll the row (the chips' Oct 21 rule: never wrap). */
+.mch-sdeck-foot {
+  padding: 10px 10px 8px;
+  border-top: 2px solid var(--lb-edge);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.mch-sdeck .mch-chips {
+  gap: 4px;
+  margin: 0;
+}
+.mch-sdeck .mch-chip {
+  gap: 6px;
+  padding: 0 9px;
+}
+.mch-sdeck .mch-scount {
+  flex: none;
+  padding-right: 4px;
+  font-size: 12.5px;
+}
+.mch-sdeck .mch-scount b {
+  font-weight: 700;
+  color: #fff;
+}
+.mch-seg button:focus-visible,
+.mch-srand:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+/* Random and shared links (#seed-12) ring the card they land on. */
+.mch-scard.is-target {
+  border-color: var(--lb-red-edge);
+  box-shadow: var(--lb-shadow), 0 0 0 2px var(--lb-red-text);
+}
+
+/* List view: one row per seed -- shot, name + one line of text + tags, then
+   the seed number and its actions on the right. Same card, laid out flat. */
+.mch-seeds.is-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.is-list .mch-scard {
+  flex-direction: row;
+}
+.is-list .mch-scard-media {
+  flex: none;
+  width: 168px;
+}
+.is-list .mch-scard-shot {
+  height: 100%;
+  min-height: 100px;
+  aspect-ratio: auto;
+}
+.is-list .mch-shots-n {
+  right: 6px;
+  bottom: 6px;
+  padding: 3px 6px;
+  font-size: 10px;
+}
+.is-list .mch-scard-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+  align-content: center;
+  gap: 4px 24px;
+  min-width: 0;
+  padding: 12px 16px;
+}
+.is-list .mch-scard-name {
+  font-size: 15px;
+}
+.is-list .mch-scard-desc {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  font-size: 13px;
+}
+.is-list .mch-scard-tags {
+  margin: 2px 0 0;
+}
+.is-list .mch-seedrow {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  align-self: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: 0;
+}
+@media (max-width: 970px) {
+  .mch-sdeck-top {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+  .mch-sdeck .mch-sfind {
+    flex-basis: 100%;
+  }
+  .mch-seg {
+    flex: 1 1 auto;
+  }
+  .mch-seg button {
+    flex: 1;
+    height: 38px;
+  }
+  .mch-srand {
+    height: 50px;
+  }
+  .mch-sdeck-foot {
+    padding: 10px 10px 6px;
+  }
+  .is-list .mch-scard-media {
+    width: 112px;
+  }
+  .is-list .mch-scard-body {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
+  }
+  .is-list .mch-scard-desc {
+    display: none;
+  }
+  .is-list .mch-seedrow {
+    display: flex;
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 6px;
+  }
 }
 
 /* Seed cards. */
@@ -3821,7 +4193,7 @@ a.mch-chip {
   text-decoration: none;
   transition: background 0.15s ease;
 }
-.mch-ess-item:hover {
+a.mch-ess-item:hover {
   background: #1c1e23;
 }
 .mch-ess-item img {
@@ -3841,7 +4213,7 @@ a.mch-chip {
   font-size: 15px;
   color: #fff;
 }
-.mch-ess-item:hover b {
+a.mch-ess-item:hover b {
   color: var(--lb-red-text);
 }
 .mch-ess-item small {
@@ -9615,5 +9987,125 @@ html body .mch-sec-title {
   }
   .mch-sec-act .mch-row-nav button:disabled {
     color: rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* ---- DATA PACKS PAGE (Oct 22 2026) ------------------------------------
+   /minecraft/java/data-packs. Pack commands: the terminal list two rows
+   across from 1200px (.mch-term-list--2col), one below (narrower columns
+   would cut off the "last" / "first" ending of the enable commands). Before you play:
+   a quick-reference card, four labelled columns of term + answer (.mch-qref). */
+.mch-term-list--2col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.mch-term-list--2col .mch-term-row + .mch-term-row {
+  border-top: 0;
+}
+.mch-term-list--2col .mch-term-row:nth-child(n + 3) {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.mch-term-list--2col .mch-term-row:nth-child(even) {
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+/* Icon-only Copy so the whole command fits beside it (last / first matter). */
+.mch-term-list--2col .mch-copy {
+  width: 40px;
+  padding: 0;
+}
+.mch-term-list--2col .mch-copy span {
+  display: none;
+}
+.mch-term-list--2col .mch-term-name {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.mch-qref {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow), 0 34px 60px -30px rgba(0, 0, 0, 0.95);
+}
+.mch-qref-col {
+  min-width: 0;
+  padding: 22px 22px 26px;
+}
+.mch-qref-col + .mch-qref-col {
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+.mch-qref-h {
+  display: inline-block;
+  margin: 0 0 20px;
+  padding: 7px 10px 6px;
+  border-radius: 4px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-ring-btn);
+  font: 800 10px/1 'Oxanium', sans-serif !important;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #d6d8dc;
+}
+.mch-qref dl {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+}
+.mch-qref dt {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.mch-qref dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--mch-dim);
+}
+.mch-qref code {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--lb-well);
+  font-family: var(--mch-mono) !important;
+  font-size: 12px;
+  color: #c9ccd2;
+}
+@media (max-width: 1199px) {
+  .mch-qref {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mch-qref-col:nth-child(3) {
+    border-left: 0;
+  }
+  .mch-qref-col:nth-child(n + 3) {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+}
+@media (max-width: 1199px) {
+  .mch-term-list--2col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mch-term-list--2col .mch-term-row:nth-child(even) {
+    border-left: 0;
+  }
+  .mch-term-list--2col .mch-term-row:nth-child(2) {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+}
+@media (max-width: 640px) {
+  .mch-qref {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mch-qref-col + .mch-qref-col {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-left: 0;
+  }
+  .mch-qref-col {
+    padding: 18px 16px 20px;
   }
 }

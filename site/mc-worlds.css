@@ -1,0 +1,576 @@
+/* /minecraft/java/worlds (Oct 22 2026): the library cards' extras and the
+   "Install a world" walkthrough. The deck, chips, search and FAQ wear the
+   seeds page's classes (mc-home.css); only what's new lives here.
+   Behaviour: mc-worlds.js. */
+
+/* ---- LIBRARY CARDS --------------------------------------------------------
+   .mch-mod cards (mc-home.css) + a version badge on the picture (the old rank
+   badge's recipe) and the seeds tag line under the text. */
+.mwl-card[hidden] {
+  display: none;
+}
+.mwl-ver {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 6px 9px 5px;
+  background: #0a0b0c;
+  font: 800 13px/1 'Orbitron', sans-serif;
+  color: #fff;
+}
+.mwl-ver small {
+  font: 600 9px/1 'Sora', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b9099;
+}
+.mwl-card .mch-scard-tags {
+  margin: 0;
+}
+.mwl-card.is-target .mch-mod-media {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 3px;
+}
+
+/* ---- INSTALL WALKTHROUGH --------------------------------------------------
+   Stage (illustration) left, steps (the real instructions) right; stacked on
+   phones. The stage is 16:10, 4:3 under 600px -- mc-worlds.js sizes the game
+   canvas with the same query. Its text scales with the stage (cqw). */
+.mwi-os {
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+.mwi-os button {
+  height: 38px;
+}
+.mwi-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.mwi-fig {
+  margin: 0;
+  min-width: 0;
+}
+.mwi-cap {
+  margin-top: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--mch-dim);
+}
+.mwi-cap a {
+  font-weight: 600;
+  color: var(--lb-red-text);
+  text-decoration: none;
+}
+.mwi-cap a:hover {
+  text-decoration: underline;
+}
+.mwi-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: #0c0e13;
+  box-shadow: var(--lb-shadow);
+  container-type: inline-size;
+  user-select: none;
+}
+.mwi-desk,
+.mwi-mc {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.35s ease;
+}
+.mwi-desk {
+  font: 500 clamp(8px, 2.05cqw, 14px) / 1.3 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #e4e4e6;
+}
+.mwi-mc {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.mwi-stage[data-mode='mc'] .mwi-mc {
+  opacity: 1;
+}
+.mwi-stage[data-mode='mc'] .mwi-desk {
+  opacity: 0;
+}
+/* Desktop wallpaper (Adrian's photo, pre-blurred): the same on every system. */
+.mwi-desk {
+  background: #15171a url('/minecrafticons/gui/menu/desktop.webp') center / cover;
+}
+
+/* File windows */
+.mwi-win,
+.mwi-mini {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1e1e21;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.09), 0 18px 44px rgba(0, 0, 0, 0.6);
+}
+.mwi-win {
+  z-index: 2;
+  left: 6%;
+  top: 7%;
+  width: 88%;
+  height: 86%;
+  transition: left 0.6s var(--lb-ease), top 0.6s var(--lb-ease), width 0.6s var(--lb-ease), height 0.6s var(--lb-ease);
+}
+.mwi-win.is-split {
+  left: 31%;
+  top: 13%;
+  width: 65%;
+  height: 80%;
+}
+.mwi-mini {
+  z-index: 1;
+  left: 3%;
+  top: 22%;
+  width: 36%;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.5s var(--lb-ease);
+}
+.mwi-win.is-split ~ .mwi-mini {
+  opacity: 1;
+  transform: none;
+}
+.mwi-mini .mwi-rows {
+  padding: 0.4em 0.3em 0.8em;
+}
+.mwi-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.7em;
+  height: 2.4em;
+  padding: 0 0.9em;
+  background: #2a2a2e;
+}
+.mwi-lights {
+  display: none;
+  gap: 0.45em;
+}
+.mwi-lights i {
+  width: 0.85em;
+  height: 0.85em;
+  border-radius: 50%;
+  background: #ff5f57;
+}
+.mwi-lights i:nth-child(2) {
+  background: #febc2e;
+}
+.mwi-lights i:nth-child(3) {
+  background: #28c840;
+}
+.mwi-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mwi-ctl {
+  display: flex;
+  gap: 1.2em;
+  color: #b9b9be;
+}
+.mwi-ctl i {
+  font-style: normal;
+}
+.mwi-ctl i:nth-child(1)::before {
+  content: '\2500';
+}
+.mwi-ctl i:nth-child(2)::before {
+  content: '\2610';
+}
+.mwi-ctl i:nth-child(3)::before {
+  content: '\2715';
+}
+.mwi[data-os='mac'] .mwi-lights {
+  display: flex;
+}
+.mwi[data-os='mac'] .mwi-ctl {
+  display: none;
+}
+.mwi[data-os='mac'] .mwi-title,
+.mwi[data-os='linux'] .mwi-title {
+  text-align: center;
+}
+.mwi[data-os='linux'] .mwi-ctl i:not(:last-child) {
+  display: none;
+}
+.mwi[data-os='linux'] .mwi-ctl i:last-child {
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  background: #3b3b40;
+  font-size: 0.8em;
+}
+.mwi-addr {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.7em;
+  padding: 0.45em 0.9em;
+  border-bottom: 1px solid #2f2f33;
+}
+.mwi-arrows {
+  color: #77777d;
+  letter-spacing: 0.3em;
+}
+.mwi-path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.3em 0.65em;
+  border-radius: 4px;
+  background: #141416;
+  white-space: nowrap;
+}
+.mwi-path i {
+  margin: 0 0.45em;
+  font-style: normal;
+  color: #77777d;
+}
+.mwi-path.is-typing {
+  box-shadow: 0 0 0 1px #4c8dff;
+}
+.mwi-path.is-typing::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: #fff;
+  animation: mwi-blink 1s steps(1) infinite;
+}
+.mwi-head,
+.mwi-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.3fr) minmax(0, 1.6fr) minmax(0, 0.7fr);
+  gap: 0.8em;
+  padding: 0.34em 0.75em;
+}
+.mwi-head {
+  flex: none;
+  margin: 0 0.3em;
+  border-bottom: 1px solid #2f2f33;
+  font-size: 0.86em;
+  color: #8e8e94;
+}
+.mwi-mini .mwi-row {
+  grid-template-columns: 1fr;
+}
+.mwi-rows {
+  flex: 1;
+  overflow: hidden;
+  padding: 0.25em 0.3em;
+}
+.mwi-row {
+  border-radius: 4px;
+  white-space: nowrap;
+  color: #8e8e94;
+}
+.mwi-row > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mwi-n {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  color: #e4e4e6;
+}
+.mwi-n svg,
+.mwi-ghost svg {
+  flex: none;
+  width: 1.35em;
+  height: 1.35em;
+}
+.mwi-n b {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+.mwi-row.is-sel {
+  background: rgba(76, 141, 255, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(76, 141, 255, 0.55);
+}
+.mwi-row.is-new {
+  animation: mwi-pop 0.55s var(--lb-ease);
+}
+.mwi-row.is-key {
+  background: rgba(255, 215, 64, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 215, 64, 0.55);
+}
+.mwi-row.is-key b {
+  color: #ffe27a;
+}
+
+/* Context menu, drag ghost, callout, pointer */
+.mwi-menu {
+  position: absolute;
+  z-index: 5;
+  min-width: 11em;
+  padding: 0.35em;
+  border: 1px solid #45454b;
+  border-radius: 8px;
+  background: #2b2b2f;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: scale(0.96);
+  transform-origin: top left;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.mwi-menu.is-on {
+  opacity: 1;
+  transform: none;
+}
+.mwi-menu span {
+  display: block;
+  padding: 0.38em 0.8em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.mwi-menu .is-hot {
+  background: #3d6fd9;
+  color: #fff;
+}
+.mwi-ghost {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.3em 0.65em;
+  border: 1px solid rgba(130, 175, 255, 0.85);
+  border-radius: 4px;
+  background: rgba(76, 141, 255, 0.4);
+  white-space: nowrap;
+  color: #fff;
+  opacity: 0;
+  transform: translate(-12%, -50%);
+  transition: left 1s var(--lb-ease), top 1s var(--lb-ease), opacity 0.2s ease;
+}
+.mwi-ghost.is-on {
+  opacity: 0.92;
+}
+.mwi-tip {
+  position: absolute;
+  z-index: 6;
+  max-width: 44%;
+  padding: 0.5em 0.75em;
+  border-radius: 6px;
+  background: #ffd740;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+  color: #1c1600;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.35s var(--lb-ease);
+}
+.mwi-tip.is-on {
+  opacity: 1;
+  transform: none;
+}
+.mwi-tip::before {
+  content: '';
+  position: absolute;
+  left: 1.2em;
+  top: -0.4em;
+  width: 0.8em;
+  height: 0.8em;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.mwi-cursor {
+  position: absolute;
+  z-index: 9;
+  left: 80%;
+  top: 85%;
+  width: clamp(11px, 2.3cqw, 19px);
+  height: auto;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+  transform-origin: 0 0;
+  transition: left 0.7s var(--lb-ease), top 0.7s var(--lb-ease);
+  pointer-events: none;
+}
+.mwi-cursor.is-click {
+  animation: mwi-click 0.22s ease;
+}
+
+/* Steps */
+.mwi-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mwi-step {
+  position: relative;
+  overflow: hidden;
+  padding: 14px 16px 15px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.mwi-step > button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  color: #fff;
+  cursor: pointer;
+}
+.mwi-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font: 700 13px/1 'Orbitron', sans-serif;
+  color: var(--mch-muted);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.mwi-step.is-on .mwi-num {
+  background: var(--lb-red);
+  box-shadow: var(--lb-ring-red);
+  color: #fff;
+}
+.mwi-step > button:hover .mwi-num {
+  color: #fff;
+}
+.mwi-step > button:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+.mwi-step p {
+  margin: 8px 0 0 42px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--mch-dim);
+  transition: color 0.2s ease;
+}
+.mwi-step.is-on p {
+  color: var(--mch-muted);
+}
+.mwi-step::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: var(--lb-red-text);
+}
+.mwi-step.is-run::after {
+  animation: mwi-prog var(--mwi-dur, 7s) linear forwards;
+}
+.mwi [data-for] {
+  display: none;
+}
+.mwi[data-os='win'] [data-for='win'],
+.mwi[data-os='mac'] [data-for='mac'],
+.mwi[data-os='linux'] [data-for='linux'] {
+  display: inline;
+}
+.mwi-pathrow {
+  flex-flow: row wrap;
+  margin: 10px 0 0 42px;
+}
+.mwi-pathrow .mch-seedval {
+  flex: 1 1 220px;
+  min-width: 0;
+  height: auto;
+  padding-block: 9px;
+  line-height: 1.45 !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.mwi-pathrow .mch-seedacts {
+  display: flex;
+}
+
+@keyframes mwi-blink {
+  50% { opacity: 0; }
+}
+@keyframes mwi-pop {
+  from { opacity: 0; transform: translateY(-4px); background: rgba(76, 141, 255, 0.5); }
+}
+@keyframes mwi-click {
+  50% { transform: scale(0.8); }
+}
+@keyframes mwi-prog {
+  to { width: 100%; }
+}
+
+@media (max-width: 970px) {
+  .mwi-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .mwi-stage {
+    aspect-ratio: 4 / 3;
+  }
+  .mwi-win {
+    left: 4%;
+    width: 92%;
+  }
+  .mwi-win.is-split {
+    left: 24%;
+    width: 73%;
+  }
+  .mwi-mini {
+    width: 40%;
+  }
+  .mwi-step p,
+  .mwi-pathrow {
+    margin-left: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mwi-win,
+  .mwi-mini,
+  .mwi-ghost,
+  .mwi-cursor,
+  .mwi-desk,
+  .mwi-mc {
+    transition: none;
+  }
+  .mwi-row.is-new,
+  .mwi-path.is-typing::after {
+    animation: none;
+  }
+}

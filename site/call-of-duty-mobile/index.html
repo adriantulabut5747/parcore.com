@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261021qs">
+<link rel="stylesheet" href="/11layout.css?v=20261022sb">
 
 
 <style>
@@ -525,16 +525,20 @@ background-color: #181A1C;
 
   <div class="li-side">
     <!-- BATTLE PASS CARD. Filled by the script below from ggseason.com; stays hidden if that fails. -->
+    <!-- Match-HUD look (Oct 22 2026): the clock is a scoreboard, one sunken well per unit;
+         the ring (season gone by) sits in a round well with the season number in it. -->
     <div class="li-bp" id="bp-widget" hidden>
       <div class="li-bp-ring" aria-hidden="true">
-        <svg viewBox="0 0 64 64"><circle class="li-bp-track" cx="32" cy="32" r="28"/><circle class="li-bp-fill" id="bpRing" cx="32" cy="32" r="28" pathLength="100"/></svg>
-        <span class="li-bp-days"><b id="bp-days">--</b>days</span>
+        <svg viewBox="0 0 64 64"><circle class="li-bp-track" cx="32" cy="32" r="27"/><circle class="li-bp-fill" id="bpRing" cx="32" cy="32" r="27" pathLength="100"/></svg>
+        <b id="bp-num"></b>
       </div>
       <div class="li-bp-text">
         <p class="li-bp-k">Battle pass ends in</p>
         <p class="li-bp-name" id="bp-season-name"></p>
-        <p class="li-bp-clock"><b id="bp-hours">--</b>h <b id="bp-mins">--</b>m <b id="bp-secs">--</b>s</p>
       </div>
+      <p class="li-bp-clock">
+        <span><b id="bp-days">--</b>Days</span><span><b id="bp-hours">--</b>Hrs</span><span><b id="bp-mins">--</b>Min</span><span class="li-bp-sec"><b id="bp-secs">--</b>Sec</span>
+      </p>
       <p class="li-bp-sub" id="bp-sub"></p>
     </div>
 
@@ -570,24 +574,29 @@ background-color: #181A1C;
   </div>
   <nav class="li-doors" aria-labelledby="liRowTitle">
     <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=KRM-262">
-      <img src="/images/codm/guns/krm262.webp" alt="" decoding="async">
-      <span class="li-door-k">Shotgun</span><span class="li-door-n">KRM-262</span>
+      <span class="li-door-top"><span class="li-door-slot" aria-hidden="true">01</span><span class="li-door-k">Shotgun</span></span>
+      <span class="li-door-well"><img src="/images/codm/guns/krm262.webp" alt="" decoding="async"></span>
+      <span class="li-door-n">KRM-262</span>
     </a>
     <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=USS-9">
-      <img src="/images/codm/guns/uss9.webp" alt="" decoding="async">
-      <span class="li-door-k">SMG</span><span class="li-door-n">USS-9</span>
+      <span class="li-door-top"><span class="li-door-slot" aria-hidden="true">02</span><span class="li-door-k">SMG</span></span>
+      <span class="li-door-well"><img src="/images/codm/guns/uss9.webp" alt="" decoding="async"></span>
+      <span class="li-door-n">USS-9</span>
     </a>
     <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=Tundra">
-      <img src="/images/codm/guns/tundra.webp" alt="" decoding="async">
-      <span class="li-door-k">Sniper</span><span class="li-door-n">Tundra</span>
+      <span class="li-door-top"><span class="li-door-slot" aria-hidden="true">03</span><span class="li-door-k">Sniper</span></span>
+      <span class="li-door-well"><img src="/images/codm/guns/tundra.webp" alt="" decoding="async"></span>
+      <span class="li-door-n">Tundra</span>
     </a>
     <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=AK117">
-      <img src="/images/codm/guns/ak117.webp" alt="" decoding="async">
-      <span class="li-door-k">Assault rifle</span><span class="li-door-n">AK117</span>
+      <span class="li-door-top"><span class="li-door-slot" aria-hidden="true">04</span><span class="li-door-k">Assault rifle</span></span>
+      <span class="li-door-well"><img src="/images/codm/guns/ak117.webp" alt="" decoding="async"></span>
+      <span class="li-door-n">AK117</span>
     </a>
     <a class="li-door li-door--gun" href="/call-of-duty-mobile/attachments?q=USS-9">
-      <img src="/images/codm/guns/uss9.webp" alt="" decoding="async">
-      <span class="li-door-k">SMG</span><span class="li-door-n">USS-9</span>
+      <span class="li-door-top"><span class="li-door-slot" aria-hidden="true">05</span><span class="li-door-k">SMG</span></span>
+      <span class="li-door-well"><img src="/images/codm/guns/uss9.webp" alt="" decoding="async"></span>
+      <span class="li-door-n">USS-9</span>
     </a>
   </nav>
   </div>
@@ -615,7 +624,7 @@ background-color: #181A1C;
 .li::before{
   content:""; position:absolute; inset:0; z-index:-2; pointer-events:none;
   background:
-    linear-gradient(to top, #121213 0, rgba(12,12,13,.92) 120px, rgba(12,12,13,.55) 230px, rgba(12,12,13,0) 340px),
+    linear-gradient(to top, #181a1c 0, rgba(12,12,13,.92) 120px, rgba(12,12,13,.55) 230px, rgba(12,12,13,0) 340px),
     /* push Makarov (left) and Price (right) back so Ghost and the skull soldier lead */
     radial-gradient(ellipse 40% 75% at 0% 30%, rgba(8,8,9,.97) 0%, rgba(8,8,9,.8) 45%, rgba(8,8,9,0) 85%),
     radial-gradient(ellipse 34% 70% at 100% 25%, rgba(8,8,9,.9) 0%, rgba(8,8,9,.6) 45%, rgba(8,8,9,0) 80%),
@@ -663,56 +672,73 @@ background-color: #181A1C;
   .li-bg{ animation:none; }
   .li-fx i{ display:none; }
   .li-fx::before, .li-fx::after{ animation:none; }
-  .li-door, .li-door img, .li-bp-fill{ transition:none; }
+  .li-door, .li-door-well img, .li-bp-fill, .li-links a::after{ transition:none; }
 }
 
 /* ---- battle pass card (top-left) ---- */
 .li-side{ grid-area:side; align-self:start; margin-top:clamp(24px,8vh,96px); } /* room above the battle pass card */
 .li-bp[hidden]{ display:none; }
+/* Box with a match-HUD inside: round ring well + title, then the scoreboard (four wells). */
 .li-bp{
-  display:grid; grid-template-columns:76px 1fr; gap:6px 14px; align-items:center;
-  padding:16px;background:rgba(16,16,18,.88);
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background-color: var(--lb-box);
-  box-shadow: var(--lb-shadow);
+  display:grid; grid-template-columns:56px 1fr; gap:12px 14px; align-items:center; padding:16px;
+  border:2px solid var(--lb-edge); border-radius:var(--lb-r); background:var(--lb-box); box-shadow:var(--lb-shadow);
 }
 .li-bp p{ margin:0; }
-.li-bp-ring{ position:relative; width:76px; height:76px; }
-.li-bp-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
-.li-bp-ring circle{ fill:none; stroke-width:5; }
-.li-bp-track{ stroke:#2a2a2f; }
-.li-bp-fill{ stroke:#be1b1b; stroke-linecap:round; stroke-dasharray:0 100; transition:stroke-dasharray .8s cubic-bezier(.2,.7,.2,1); }
-.li-bp-days{
-  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#8d8f95;
+.li-bp-ring{
+  position:relative; width:56px; height:56px; border-radius:50%;
+  background:var(--lb-well); box-shadow:var(--lb-ring-well);
 }
-.li-bp-days b{ font-family:'Orbitron', sans-serif; font-size:22px; font-weight:900; line-height:1; color:#fff; letter-spacing:0; }
+.li-bp-ring svg{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
+.li-bp-ring circle{ fill:none; stroke-width:4; }
+.li-bp-track{ stroke:#24252b; }
+.li-bp-fill{ stroke:var(--lb-red); stroke-linecap:round; stroke-dasharray:0 100; transition:stroke-dasharray .8s var(--lb-ease); }
+.li-bp-ring b{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:'Orbitron', sans-serif; font-size:14px; font-weight:900; color:#fff;
+}
 .li-bp .li-bp-k{ font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#8d8f95; }
 .li-bp .li-bp-name{ margin-top:3px; font-family:'Orbitron', sans-serif; font-size:15px; font-weight:800; line-height:1.25; text-wrap:balance; }
-.li-bp .li-bp-clock{ margin-top:6px; font-size:12px; color:#8d8f95; font-variant-numeric:tabular-nums; }
-.li-bp-clock b{ font-family:'Orbitron', sans-serif; font-size:13px; color:#e03a3a; }
-.li-bp .li-bp-sub{ grid-column:1 / -1; margin-top:8px; padding-top:10px; border-top:1px solid #222226; font-size:12px; line-height:1.5; color:#8a8a8f; }
+/* scoreboard: one sunken well per unit; the live seconds are the red one */
+.li-bp .li-bp-clock{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.li-bp-clock span{
+  display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 4px 8px;
+  border-radius:var(--lb-r); background:var(--lb-well); box-shadow:var(--lb-ring-well);
+  font-size:9px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:#7d7f86;
+}
+.li-bp-clock b{ font-family:'Orbitron', sans-serif; font-size:20px; font-weight:900; line-height:1; color:#f2f3f5; font-variant-numeric:tabular-nums; }
+.li-bp-clock .li-bp-sec b{ color:var(--lb-red-text); }
+.li-bp .li-bp-sub{ grid-column:1 / -1; padding-top:12px; border-top:1px solid #222226; font-size:12px; line-height:1.5; color:#8a8a8f; }
 .li-bp-sub a{ color:#b9bbc0; text-decoration:underline; text-underline-offset:2px; }
 .li-bp-sub a:hover{ color:#fff; }
 
-/* ---- guide links (left, under the battle pass card) ---- */
-.li-links{ margin-top:26px; display:grid; gap:4px; }
+/* ---- guide links: one menu box (like CODM's lobby side menu); icons in wells, the
+   hovered row rises as a grey key. Rows keep a transparent 2px edge so hover doesn't shift. ---- */
+.li-links{
+  margin-top:16px; display:grid; gap:2px; padding:6px;
+  border:2px solid var(--lb-edge); border-radius:var(--lb-r); background:transparent; box-shadow:var(--lb-shadow);
+}
 .li-links a{
-  display:flex; align-items:center; gap:14px; padding:6px 4px; border-radius:0;
-  font-size:14px; font-weight:600; color:#c4c6cb; text-decoration:none; text-shadow:0 1px 8px rgba(0,0,0,.8);
-  transition:color .15s ease;
+  display:flex; align-items:center; gap:12px; padding:5px 10px 5px 5px;
+  border:2px solid transparent; border-radius:var(--lb-r);
+  font-size:14px; font-weight:600; color:#c4c6cb; text-decoration:none;
+  transition:color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+/* chevron on the right, slides in on hover */
+.li-links a::after{
+  content:""; margin-left:auto; width:6px; height:6px; flex:none;
+  border:solid #5d5f66; border-width:2px 2px 0 0; transform:translateX(-4px) rotate(45deg);
+  transition:transform .2s var(--lb-ease), border-color .15s ease;
 }
 .li-links i{
-  flex:none; width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-  border-radius:0; border:1px solid rgba(255,255,255,.22); background:rgba(12,12,13,.35);
-  transition:border-color .15s ease, background-color .15s ease;
+  flex:none; width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+  border-radius:calc(var(--lb-r) - 1px); background:var(--lb-well); box-shadow:var(--lb-ring-well);
 }
-.li-links svg{ width:17px; height:17px; fill:none; stroke:#d5d7dc; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:stroke .15s ease; }
-.li-links a:hover{ color:#fff; }
-.li-links a:hover i{ border-color:#be1b1b; background:rgba(190,27,27,.18); }
-.li-links a:hover svg{ stroke:#ff5555; }
-.li-links a:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
+.li-links svg{ width:16px; height:16px; fill:none; stroke:#b9bbc1; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:stroke .15s ease; }
+.li-links a:hover{ color:#fff; border-color:var(--lb-edge); background:var(--lb-raise); box-shadow:var(--lb-btn); }
+.li-links a:hover::after{ border-color:#fff; transform:translateX(0) rotate(45deg); }
+.li-links a:hover svg{ stroke:var(--lb-red-text); }
+.li-links a:active{ transform:translateY(1px); box-shadow:var(--lb-btn-down); }
+.li-links a:focus-visible{ outline:2px solid var(--lb-red-text); outline-offset:2px; }
 
 /* ---- title panel (right) ---- */
 .li-copy{ grid-area:copy; align-self:center; }
@@ -723,15 +749,17 @@ background-color: #181A1C;
 
 /* ---- store buttons (title panel) ---- */
 .li-store[hidden]{ display:none; }
-.li-store{ margin-top:20px; display:flex; flex-wrap:wrap; gap:10px; }
-.li-store a{
-  display:flex; align-items:center; gap:10px; padding:9px 16px 9px 12px; border-radius:0;
-  background:rgba(16,16,18,.88); border:1px solid #2a2a2f; color:#fff; text-decoration:none;
-  transition:border-color .15s ease, background-color .15s ease;
+.li-store{ margin-top:20px; display:flex; flex-wrap:wrap; gap:8px; }
+/* store buttons = grey keys, same recipe as .li-pc below */
+.li-store a{ display:flex; align-items:center; gap:8px; padding:8px 12px 8px 9px; color:#fff; text-decoration:none; }
+.li-store a, .li-pc{
+  border:2px solid var(--lb-edge); border-radius:var(--lb-r); background:var(--lb-raise); box-shadow:var(--lb-btn);
+  transition:background-color .15s ease, transform .1s ease, box-shadow .1s ease;
 }
-.li-store a:hover{ border-color:#be1b1b; background:rgba(190,27,27,.14); }
-.li-store a:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
-.li-store svg{ width:20px; height:20px; flex:none; fill:none; stroke:#e03a3a; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.li-store a:hover{ background:var(--lb-raise-hover); }
+.li-store a:active, .li-pc:active{ transform:translateY(1px); box-shadow:var(--lb-btn-down); }
+.li-store a:focus-visible{ outline:2px solid var(--lb-red-text); outline-offset:2px; }
+.li-store svg{ width:20px; height:20px; flex:none; fill:none; stroke:var(--lb-red-text); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .li-store b{ display:block; font-family:'Orbitron', sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
 .li-store small{ display:block; margin-top:2px; font-size:11px; color:#9a9ca1; font-variant-numeric:tabular-nums; }
 .li-store svg.li-brand{ width:24px; height:24px; stroke:none; }
@@ -739,16 +767,10 @@ background-color: #181A1C;
 .li-store a:hover svg.li-brand--ios{ stroke:#fff; }
 .li-pc{
   margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:8px 16px 8px 12px;
-text-decoration:none;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: var(--lb-raise);
-  box-shadow: var(--lb-btn);
-  color: #e6e8ec;
-  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  text-decoration:none; color:#e6e8ec;
 }
-.li-pc:hover{ border-color: var(--lb-edge); background: var(--lb-raise-hover); color: #fff; }
-.li-pc:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
+.li-pc:hover{ background:var(--lb-raise-hover); color:#fff; }
+.li-pc:focus-visible{ outline:2px solid var(--lb-red-text); outline-offset:2px; }
 .li-pc svg{ width:22px; height:22px; flex:none; fill:none; stroke:#d5d7dc; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .li-pc b{ display:block; font-family:'Orbitron', sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
 .li-pc small{ display:block; margin-top:2px; font-size:11px; color:#9a9ca1; }
@@ -764,45 +786,57 @@ text-decoration:none;
 .li-row-head a:hover{ color:#fff; }
 .li-row-head a svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
 .li-doors{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
+/* Loadout slots (Oct 22 2026): box = the slot, slot number + class chip on top, the gun in a
+   sunken well (Gunsmith preview), name under it. Hover lifts the slot and racks the gun forward. */
 .li-door{
-  position:relative; aspect-ratio:16 / 9; scroll-snap-align:start;
-  display:flex; flex-direction:column; justify-content:flex-end;
-  padding:16px;text-decoration:none; color:#fff;
-  background:#141416;transition:transform .18s cubic-bezier(.2,.7,.2,1), border-color .18s ease;
-  overflow: hidden;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background-color: var(--lb-box);
-  box-shadow: var(--lb-shadow);
+  position:relative; scroll-snap-align:start; display:flex; flex-direction:column; gap:8px;
+  padding:10px 10px 12px; text-decoration:none; color:#fff;
+  border:2px solid var(--lb-edge); border-radius:var(--lb-r); background:var(--lb-box); box-shadow:var(--lb-shadow);
+  transition:transform .25s var(--lb-ease), box-shadow .25s ease, background-color .25s ease;
 }
-a.li-door:hover{ transform:translateY(-3px); border-color: var(--lb-edge); background-color: var(--lb-box-hover); box-shadow: var(--lb-shadow-hover); }
-a.li-door:focus-visible{ outline:2px solid #e03a3a; outline-offset:2px; }
-.li-door img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.55; transition:opacity .18s ease; }
-a.li-door:hover img{ opacity:.8; }
-a.li-door {
-  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
+a.li-door:hover{ transform:translateY(-3px); background:var(--lb-box-hover); box-shadow:var(--lb-shadow-hover); }
+a.li-door:active{ transform:translateY(-1px); }
+a.li-door:focus-visible{ outline:2px solid var(--lb-red-text); outline-offset:2px; }
+.li-door-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.li-door-slot{ font-family:'Orbitron', sans-serif; font-size:11px; font-weight:900; color:#5d5f66; transition:color .2s ease; }
+a.li-door:hover .li-door-slot{ color:var(--lb-red-text); }
+.li-door-k{
+  padding:3px 7px; border-radius:calc(var(--lb-r) - 2px); background:var(--lb-well); box-shadow:inset 0 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  font-family:'Orbitron', sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lb-red-text); white-space:nowrap;
 }
-.li-door::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,11,.95) 15%, rgba(10,10,11,0) 75%); }
-.li-door--gun img{
-  inset:8% 6% auto; width:88%; height:58%; object-fit:contain; opacity:.9;
-  /* soften the grey Gunsmith backdrop of the crops into the card */
+.li-door-well{
+  position:relative; display:block; aspect-ratio:3 / 1; overflow:hidden;
+  border-radius:var(--lb-r); background:var(--lb-well); box-shadow:var(--lb-ring-well);
+}
+.li-door-well img{
+  position:absolute; inset:6% 6% 2%; width:88%; height:92%; object-fit:contain; opacity:.88;
+  /* soften the grey Gunsmith backdrop of the crops into the well */
   -webkit-mask-image:radial-gradient(ellipse 58% 62% at 50% 50%, #000 55%, transparent 100%);
           mask-image:radial-gradient(ellipse 58% 62% at 50% 50%, #000 55%, transparent 100%);
+  transition:transform .35s var(--lb-ease), opacity .2s ease;
 }
-a.li-door--gun:hover img{ opacity:1; }
-.li-door-k, .li-door-n{ position:relative; z-index:1; }
-.li-door-k{ font-family:'Orbitron', sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#ff5555; }
-.li-door-n{ margin-top:5px; font-family:'Orbitron', sans-serif; font-size:clamp(14px,1.1vw,18px); font-weight:800; text-transform:uppercase; }
+a.li-door:hover .li-door-well img{ opacity:1; transform:translateX(4%) scale(1.06); }
+.li-door-n{ padding:0 2px; font-family:'Orbitron', sans-serif; font-size:clamp(14px,1.1vw,17px); font-weight:800; text-transform:uppercase; }
 
 /* laptops: narrower panels and less zoom, or the title lands on Ghost's face */
 @media (max-width:1500px) and (min-width:971px){
   .li{ grid-template-columns:minmax(280px,320px) 1fr minmax(320px,380px); padding-left:clamp(24px,6.5vw,96px); padding-right:clamp(24px,6.5vw,96px); }
   .li-bg{ background-position:90% 8%; background-size:115% auto; }
   /* tighter guide list so the gun row stays on a 768px-tall laptop screen */
-  .li-links{ margin-top:16px; gap:0; }
-  .li-links a{ padding:3px 4px; font-size:13px; }
-  .li-links i{ width:30px; height:30px; }
+  .li-links{ margin-top:12px; gap:0; padding:4px; }
+  .li-links a{ padding:3px 10px 3px 3px; font-size:13px; }
+  .li-links i{ width:28px; height:28px; }
   .li-links svg{ width:15px; height:15px; }
+}
+/* short desktop screens (768px laptops): the taller HUD card + slots must still leave the
+   whole gun row above the fold */
+@media (min-width:971px) and (max-height:860px){
+  .li-side{ margin-top:8px; }
+  .li-bp{ gap:10px 14px; padding:14px; }
+  .li-bp-clock span{ padding:7px 4px 6px; gap:3px; }
+  .li-bp-clock b{ font-size:17px; }
+  .li-door{ gap:6px; padding:8px 8px 10px; }
+  .li-door-well{ aspect-ratio:7 / 2; }
 }
 @media (max-width:970px){
   /* phones: stacked -- battle pass card, title, then the cards as one swipeable row.
@@ -815,7 +849,7 @@ a.li-door--gun:hover img{ opacity:1; }
   .li-bg{ background-size:cover; background-position:51% top; } /* Ghost + the skull soldier */
   .li::before{
     background:
-      linear-gradient(to bottom, rgba(18,18,19,0) 70%, #121213 100%),
+      linear-gradient(to bottom, rgba(24,26,28,0) 70%, #181a1c 100%),
       linear-gradient(to bottom, rgba(12,12,13,.35), rgba(12,12,13,.9) 50%),
       repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 48px),
       repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 48px);
@@ -825,17 +859,18 @@ a.li-door--gun:hover img{ opacity:1; }
   .li-side, .li-copy{ align-self:stretch; min-width:0; }
   .li-side{ margin-top:0; }
   .li-row-title span{ display:none; }
-  .li-bp{ background:rgba(16,16,18,.9); }
-  .li-links{ margin-top:14px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+  /* the menu box becomes one swipeable strip */
+  .li-links{ margin-top:12px; display:flex; gap:4px; padding:4px; overflow-x:auto; scrollbar-width:none; }
   .li-links::-webkit-scrollbar{ display:none; }
-  .li-links a{ flex:none; gap:8px; padding:4px 12px 4px 4px; border:1px solid rgba(255,255,255,.14); border-radius:0; font-size:13px; white-space:nowrap; }
+  .li-links a{ flex:none; gap:8px; padding:3px 12px 3px 3px; font-size:13px; white-space:nowrap; }
+  .li-links a::after{ display:none; }
   .li-links i{ width:28px; height:28px; }
   .li-links svg{ width:14px; height:14px; }
   .li-doors{
     display:flex; overflow-x:auto; gap:10px; padding:4px 2px 6px; margin:-4px -2px -6px;
     scroll-snap-type:x proximity; scrollbar-width:thin; scrollbar-color:#2f3136 transparent;
   }
-  .li-door{ flex:0 0 240px; }
+  .li-door{ flex:0 0 220px; }
   .li-door-n{ font-size:13px; }
 }
 </style>
@@ -867,6 +902,7 @@ a.li-door--gun:hover img{ opacity:1; }
   const summary = (ev.description || '').replace(/^.*?Ends (Est\. )?[^.]*\.\s*/, '');
   const notes = ev.location && ev.location.url;
   document.getElementById('bp-season-name').textContent = name;
+  document.getElementById('bp-num').textContent = num ? 'S' + num : '';
   document.getElementById('bp-sub').innerHTML =
     (summary ? summary.replace(/[<>&]/g, '') + ' ' : '') +
     (notes && /^https:\/\/www\.callofduty\.com\//.test(notes) ? `<a href="${notes.replace(/["<>]/g, encodeURIComponent)}" target="_blank" rel="noopener">Patch notes</a> · ` : '') +
@@ -891,12 +927,440 @@ a.li-door--gun:hover img{ opacity:1; }
 })();
 </script>
 
-<!-- ESPORTS CHAMPIONSHIP HUB — vred.jpg is a fixed-height section BACKGROUND behind just the
-     widget card, fading down to coc-main's own colour. The search/filter/grid content lives
-     OUTSIDE this wrapper (further below) so it always sits on the flat page background,
-     no matter how tall the grid gets — that decoupling is what was causing the visible
-     line/pattern before (the fade was being stretched to fit the grid's variable height,
-     so on a short grid it never finished fading before the image peeked through). -->
+<!-- POPULAR GUIDES (Oct 22 2026): CODM articles, one lead + three on the right (a swipeable row
+     on phones). No CODM article exists yet, so the four cards are placeholders, not links: skeleton
+     title bars and a "Coming soon" line. When one goes live, turn its card into
+     <a class="pg-card" href="/articles/codm/<id>"> with an <img> in .pg-screen and the real title
+     in place of the .pg-line bars. Idle: each screen has a slow scan sweep. Hover (scroll-in on
+     touch): red corner brackets close in on the card and the reticle locks, like aiming down sights. -->
+<section class="pg pg--bg" id="guides" aria-labelledby="pgTitle">
+  <div class="pg-box">
+    <div class="pg-head">
+      <div>
+        <h2 class="pg-title" id="pgTitle">Popular Guides</h2>
+        <p class="pg-sub">CODM guides written by Parchrome. The first ones are on the way.</p>
+      </div>
+      <span class="pg-status"><i aria-hidden="true"></i>Briefings incoming</span>
+    </div>
+
+    <div class="pg-grid">
+      <div class="pg-card pg-card--lead">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Guide 01</span>
+          <span class="pg-line" aria-hidden="true"></span>
+          <span class="pg-line pg-line--short" aria-hidden="true"></span>
+          <span class="pg-line pg-line--dek" aria-hidden="true"></span>
+          <span class="pg-meta">Coming soon</span>
+        </span>
+      </div>
+      <div class="pg-card">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Guide 02</span>
+          <span class="pg-line" aria-hidden="true"></span>
+          <span class="pg-line pg-line--short" aria-hidden="true"></span>
+          <span class="pg-meta">Coming soon</span>
+        </span>
+      </div>
+      <div class="pg-card">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Guide 03</span>
+          <span class="pg-line" aria-hidden="true"></span>
+          <span class="pg-line pg-line--short" aria-hidden="true"></span>
+          <span class="pg-meta">Coming soon</span>
+        </span>
+      </div>
+      <div class="pg-card">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Guide 04</span>
+          <span class="pg-line" aria-hidden="true"></span>
+          <span class="pg-line pg-line--short" aria-hidden="true"></span>
+          <span class="pg-meta">Coming soon</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Shared by Popular Guides and The Armory (its own <style> adds .pg-name/.pg-text/.pg-grid--two/--row).
+   .pg = a full-width band, the box inside capped at 1280px. */
+.pg{ flex:0 0 auto; position:relative; isolation:isolate; padding:64px 12% 0; }
+/* the red V (moved here from the World Championship box, Oct 22 2026): stretched across the
+   band like it was there, darkened, and masked out at the top and bottom so it melts into the
+   hero above and the Armory below -- no edge anywhere. */
+.pg--bg{ padding-top:130px; padding-bottom:96px; }
+.pg--bg::before{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:url('/minecrafticons/vred.jpg') center / 100% 100% no-repeat;
+  filter:brightness(.45) saturate(1.05);
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 28%, #000 66%, transparent 100%);
+          mask-image:linear-gradient(to bottom, transparent 0%, #000 28%, #000 66%, transparent 100%);
+}
+/* box = the briefing board: raised box over a faint tactical grid, a red tab on its top edge */
+.pg-box{
+  position:relative; max-width:1280px; margin:0 auto; padding:22px 22px 24px;
+  border:2px solid var(--lb-edge); border-radius:var(--lb-r); box-shadow:var(--lb-shadow);
+  background:
+    radial-gradient(ellipse 60% 80% at 0% 0%, rgba(194,59,59,.07), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 32px),
+    var(--lb-box);
+}
+.pg-box::before{ content:""; position:absolute; top:-2px; left:22px; width:72px; height:3px; border-radius:0 0 2px 2px; background:var(--lb-red); }
+.pg-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; margin-bottom:18px; }
+/* same stencil as The Armory's titles */
+.pg-title{
+  margin:0; font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800;
+  font-size:clamp(36px,3.6vw,52px); line-height:.9; letter-spacing:.01em; text-transform:uppercase; color:#f2f3f5;
+}
+.pg-sub{ margin:8px 0 0; max-width:46ch; font-size:14px; line-height:1.55; color:#9b9a96; }
+.pg-status{
+  display:inline-flex; align-items:center; gap:8px; padding:7px 11px;
+  border-radius:var(--lb-r); background:var(--lb-well); box-shadow:var(--lb-ring-well);
+  font-family:'Orbitron', sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#8d8f95;
+}
+.pg-status[hidden]{ display:none; }
+.pg-status i{ width:7px; height:7px; border-radius:50%; background:var(--lb-red-text); animation:pgBlink 1.6s steps(2, jump-none) infinite; }
+
+/* one lead card on the left, three stacked on the right */
+.pg-grid{ display:grid; grid-template-columns:1.55fr 1fr; grid-template-rows:repeat(3, minmax(124px, auto)); gap:12px; }
+.pg-card--lead{ grid-row:1 / -1; }
+.pg-card{
+  position:relative; display:flex; gap:12px; padding:9px; color:#fff; text-decoration:none;
+  border:2px solid var(--lb-edge); border-radius:var(--lb-r); background:#1a1b20; box-shadow:var(--lb-shadow);
+  transition:transform .25s var(--lb-ease), box-shadow .25s ease, background-color .25s ease;
+}
+.pg-card--lead{ flex-direction:column; }
+
+/* the picture slot: a sunken screen with scanlines and a slow sweep (idle) */
+.pg-screen{
+  position:relative; flex:0 0 42%; display:flex; align-items:center; justify-content:center; overflow:hidden;
+  border-radius:var(--lb-r); box-shadow:var(--lb-ring-well);
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 60%, rgba(194,59,59,.12), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+    var(--lb-well);
+}
+.pg-card--lead .pg-screen{ flex:1 1 auto; min-height:250px; }
+.pg-screen::after{
+  content:""; position:absolute; left:0; right:0; top:0; height:35%;
+  background:linear-gradient(to bottom, transparent, rgba(255,255,255,.045) 70%, rgba(232,106,106,.08) 100%, transparent);
+  transform:translateY(-100%); animation:pgSweep 6s linear infinite;
+}
+.pg-card:nth-child(2) .pg-screen::after{ animation-delay:-1.5s; }
+.pg-card:nth-child(3) .pg-screen::after{ animation-delay:-3s; }
+.pg-card:nth-child(4) .pg-screen::after{ animation-delay:-4.5s; }
+.pg-reticle{
+  width:40px; height:40px; fill:none; stroke:rgba(255,255,255,.2); stroke-width:1.6; stroke-linecap:round;
+  transition:transform .5s var(--lb-ease), stroke .25s ease;
+}
+.pg-card--lead .pg-reticle{ width:76px; height:76px; stroke-width:1.2; }
+
+/* text side: a class-style chip, skeleton bars where the title goes, the status line */
+.pg-body{ flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:8px; padding:2px 4px; }
+.pg-card--lead .pg-body{ flex:none; gap:10px; padding:4px 6px 6px; }
+.pg-tag{
+  align-self:flex-start; padding:3px 7px; border-radius:calc(var(--lb-r) - 2px);
+  background:var(--lb-well); box-shadow:inset 0 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  font-family:'Orbitron', sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lb-red-text);
+}
+.pg-line{
+  display:block; height:11px; width:92%; border-radius:3px;
+  background:linear-gradient(90deg, #202128 0%, #2b2c34 50%, #202128 100%) 0 0 / 200% 100%;
+  box-shadow:inset 0 2px 0 rgba(0,0,0,.3); animation:pgShimmer 2.6s linear infinite;
+}
+.pg-line--short{ width:58%; }
+.pg-card--lead .pg-line{ height:18px; }
+.pg-card--lead .pg-line--short{ width:52%; }
+.pg-card--lead .pg-line.pg-line--dek{ height:10px; width:76%; margin-top:4px; }
+.pg-meta{ font-family:'Orbitron', sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#5d5f66; }
+
+/* target lock: four red corner brackets close in from a little outside the card */
+.pg-lock{
+  position:absolute; inset:4px; z-index:2; pointer-events:none; --c:var(--lb-red-text); --l:16px;
+  background:
+    linear-gradient(var(--c),var(--c)) left top / var(--l) 2px, linear-gradient(var(--c),var(--c)) left top / 2px var(--l),
+    linear-gradient(var(--c),var(--c)) right top / var(--l) 2px, linear-gradient(var(--c),var(--c)) right top / 2px var(--l),
+    linear-gradient(var(--c),var(--c)) left bottom / var(--l) 2px, linear-gradient(var(--c),var(--c)) left bottom / 2px var(--l),
+    linear-gradient(var(--c),var(--c)) right bottom / var(--l) 2px, linear-gradient(var(--c),var(--c)) right bottom / 2px var(--l);
+  background-repeat:no-repeat; opacity:0; transform:scale(1.06);
+  transition:opacity .2s ease, transform .35s var(--lb-ease);
+}
+.pg-card--lead .pg-lock{ --l:26px; }
+@media (hover:hover){
+  .pg-card:hover{ transform:translateY(-3px); background:var(--lb-box-hover); box-shadow:var(--lb-shadow-hover); }
+  .pg-card:hover .pg-lock{ opacity:1; transform:scale(1); }
+  .pg-card:hover .pg-reticle{ transform:rotate(90deg) scale(.8); stroke:var(--lb-red-text); }
+}
+.pg-card.is-lock .pg-lock{ opacity:1; transform:scale(1); }
+.pg-card.is-lock .pg-reticle{ transform:rotate(90deg) scale(.8); stroke:var(--lb-red-text); }
+.pg-card:focus-visible{ outline:2px solid var(--lb-red-text); outline-offset:2px; }
+
+@keyframes pgSweep{ to{ transform:translateY(300%); } }
+@keyframes pgShimmer{ from{ background-position:100% 0; } to{ background-position:-100% 0; } }
+@keyframes pgBlink{ 50%{ opacity:.25; } }
+
+/* phones: the four cards become one swipeable row, all the lead's shape */
+@media (max-width:970px){
+  .pg{ padding:48px 5% 0; }
+  .pg--bg{ padding-top:90px; padding-bottom:110px; }
+  .pg-box{ padding:18px 16px 18px; }
+  .pg-box::before{ left:16px; }
+  .pg-grid{
+    display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding:0 16px;
+    margin:0 -16px; padding:2px 16px 4px; scrollbar-width:none;
+  }
+  .pg-grid::-webkit-scrollbar{ display:none; }
+  .pg-card{ flex:0 0 78%; flex-direction:column; scroll-snap-align:start; }
+  .pg-screen, .pg-card--lead .pg-screen{ flex:none; min-height:0; aspect-ratio:16 / 9; }
+  .pg-body, .pg-card--lead .pg-body{ flex:none; padding:2px 4px 4px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .pg-screen::after, .pg-line, .pg-status i{ animation:none; }
+  .pg-card, .pg-lock, .pg-reticle{ transition:none; }
+}
+</style>
+<script>
+// touch screens have no hover: lock onto each card (guides + Armory) once it's mostly on screen
+(function(){
+  if (!window.matchMedia('(hover: none)').matches || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('is-lock'); io.unobserve(e.target); }
+  }), { threshold: 0.7 });
+  document.querySelectorAll('.pg-card').forEach(c => io.observe(c));
+})();
+</script>
+
+<!-- SECTION TITLES shared by every middle section (.layouts-title-box). The old
+     "Featured CODM Contents" cards are gone: the intro's four doors replaced them. -->
+<style>
+.layouts-title-box {
+  margin: 0px 12% 15px 12%;
+  border-radius: 0;
+  padding: 12px 20px 12px 0;
+  text-align: center;
+  background: transparent;
+  border-bottom: 1px solid #2a2a2a;
+  position: relative;
+}
+.layouts-title-box::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 2px;
+  background: linear-gradient(90deg, #d40000, #7b1515);
+}
+.layouts-title {
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #c0c9d4, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.layouts-subtitle{ margin-top:6px; font-size:13px; color:var(--text-muted); }
+@media (max-width: 900px){
+.layouts-title-box {
+  margin: 0px 5% 15px 5%;
+}}
+</style>
+<!-- THE ARMORY (Oct 22 2026): the guide doors, built from Popular Guides' cards (.pg-*: box, sunken
+     screens, target-lock hover). Two boxes: The Armory (lead + two stacked) and Field Kit (three
+     across). Field Kit cards point at their planned pages (/sensitivity, /color-codes, /tools);
+     those pages are still to be built. Counts come from /codm-guns.json. Pictures are gun
+     cut-outs and drawn icons. Phones: a grid (lead full width, two below), not a swipe row,
+     because these are the page's main doors. -->
+<section class="pg ar" id="armory" aria-labelledby="arTitle">
+  <div class="pg-box">
+    <div class="pg-head">
+      <div>
+        <h2 class="pg-title" id="arTitle">The Armory</h2>
+        <p class="pg-sub">Gun builds for every mode, plus full classes.</p>
+      </div>
+      <span class="pg-status" id="arCount" hidden><i aria-hidden="true"></i><span></span></span>
+    </div>
+    <div class="pg-grid pg-grid--two">
+      <a class="pg-card pg-card--lead" href="/call-of-duty-mobile/attachments?mode=multiplayer">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><img src="/images/codm/guns/ak117.webp" alt="" loading="lazy" decoding="async"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Multiplayer</span>
+          <span class="pg-name">MP Attachments</span>
+          <span class="pg-text">Attachment builds for Multiplayer. Verified builds include a code you can paste into the game.</span>
+          <span class="pg-meta pg-meta--go"><span data-manifest="multiplayer">Gun builds</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="pg-card" href="/call-of-duty-mobile/attachments?mode=battleroyale">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><img src="/images/codm/guns/tundra.webp" alt="" loading="lazy" decoding="async"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Battle Royale</span>
+          <span class="pg-name">BR Attachments</span>
+          <span class="pg-text">Longer-range builds for Battle Royale fights.</span>
+          <span class="pg-meta pg-meta--go"><span data-manifest="battleroyale">Gun builds</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="pg-card" href="/call-of-duty-mobile/loadouts">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><img src="/images/codm/guns/uss9.webp" alt="" loading="lazy" decoding="async"><svg class="pg-reticle" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg></span>
+        <span class="pg-body">
+          <span class="pg-tag">Every mode</span>
+          <span class="pg-name">Loadouts</span>
+          <span class="pg-text">Primary, secondary, perks, lethal and tactical for each mode.</span>
+          <span class="pg-meta pg-meta--go"><span>Full classes</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <div class="pg-box pg-box--kit">
+    <div class="pg-head">
+      <div>
+        <h2 class="pg-title pg-title--sm">Field Kit</h2>
+        <p class="pg-sub">Set up your controls, colour your name and use our CODM tools.</p>
+      </div>
+    </div>
+    <div class="pg-grid pg-grid--row">
+      <a class="pg-card" href="/call-of-duty-mobile/sensitivity">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><span class="pg-art"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="2.5"/><path d="M24 3v10M24 35v10M3 24h10M35 24h10"/></svg></span></span>
+        <span class="pg-body">
+          <span class="pg-tag">Controls</span>
+          <span class="pg-name">Sensitivity Codes</span>
+          <span class="pg-text">Sensitivity settings for each device and playstyle.</span>
+          <span class="pg-meta pg-meta--go"><span>Sensitivity</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="pg-card" href="/call-of-duty-mobile/color-codes">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><span class="pg-art pg-art--swatch"><i></i><i></i><i></i><i></i></span></span>
+        <span class="pg-body">
+          <span class="pg-tag">Profile</span>
+          <span class="pg-name">Color Codes</span>
+          <span class="pg-text">Codes that change the colour of your in-game name.</span>
+          <span class="pg-meta pg-meta--go"><span>Name colours</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="pg-card" href="/call-of-duty-mobile/tools">
+        <span class="pg-lock" aria-hidden="true"></span>
+        <span class="pg-screen" aria-hidden="true"><span class="pg-art"><svg viewBox="0 0 48 48"><path d="M30 8a9 9 0 0 0-8.4 12.3L8 33.9a3.5 3.5 0 0 0 5 5l13.7-13.6A9 9 0 0 0 39 17.3l-5.6 5.6-6-1.4-1.4-6 5.6-5.6A9 9 0 0 0 30 8z"/></svg></span></span>
+        <span class="pg-body">
+          <span class="pg-tag">Utilities</span>
+          <span class="pg-name">Tools</span>
+          <span class="pg-text">Calculators and checkers for CODM players.</span>
+          <span class="pg-meta pg-meta--go"><span>CODM tools</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Armory-only bits on top of the shared .pg-* cards (Popular Guides' <style> above) */
+.ar{ display:flex; flex-direction:column; gap:14px; }
+/* the red V's fade-out above already gives the gap */
+.pg--bg ~ .ar{ padding-top:16px; }
+.pg-box--kit{ width:100%; }
+.pg-title--sm{ font-size:clamp(28px,2.6vw,38px); }
+/* lead + two stacked on the right */
+.pg-grid--two{ grid-template-rows:repeat(2, minmax(168px, auto)); }
+/* the two on the right: picture on top too -- a gun is wide, a side screen made it tiny */
+.pg-grid--two .pg-card:not(.pg-card--lead){ flex-direction:column; gap:10px; }
+.pg-grid--two .pg-card:not(.pg-card--lead) .pg-screen{ flex:none; aspect-ratio:3 / 1; }
+/* three across, picture on top */
+.pg-grid--row{ grid-template-columns:repeat(3, minmax(0,1fr)); grid-template-rows:none; }
+.pg-grid--row .pg-card{ flex-direction:column; }
+.pg-grid--row .pg-screen{ flex:none; aspect-ratio:2 / 1; }
+
+/* real titles + teasers (the guides' placeholders have skeleton bars instead) */
+.pg-name{ font-family:'Orbitron', sans-serif; font-size:16px; font-weight:800; line-height:1.2; text-transform:uppercase; }
+.pg-card--lead .pg-name{ font-size:clamp(20px,1.8vw,26px); }
+.pg-text{ font-size:13px; line-height:1.5; color:#a3a5ab; max-width:52ch; }
+.pg-meta--go{ margin-top:auto; padding-top:4px; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--lb-red-text); font-variant-numeric:tabular-nums; }
+.pg-meta--go svg{ width:16px; height:16px; flex:none; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; transition:transform .35s var(--lb-ease); }
+
+/* pictures in the screens: a gun cut-out (softened into the well) or a drawn icon */
+.pg-screen img{
+  position:absolute; inset:8% 6%; width:88%; height:84%; object-fit:contain; filter:brightness(.78) saturate(.9);
+  -webkit-mask-image:radial-gradient(ellipse 58% 62% at 50% 50%, #000 55%, transparent 100%);
+          mask-image:radial-gradient(ellipse 58% 62% at 50% 50%, #000 55%, transparent 100%);
+  transition:transform .45s var(--lb-ease), filter .3s ease;
+}
+.pg-card--lead .pg-screen img{ /* bigger picture, so a softer, earlier fade hides the Gunsmith backdrop */
+  -webkit-mask-image:radial-gradient(ellipse 52% 58% at 50% 50%, #000 35%, transparent 100%);
+          mask-image:radial-gradient(ellipse 52% 58% at 50% 50%, #000 35%, transparent 100%);
+}
+.pg-screen img + .pg-reticle{ position:absolute; z-index:1; opacity:0; transition:opacity .25s ease, transform .5s var(--lb-ease), stroke .25s ease; }
+.pg-art{ width:min(30%, 76px); aspect-ratio:1; color:#7d7f86; transition:color .25s ease, transform .45s var(--lb-ease); }
+.pg-art svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.pg-art--swatch{ display:grid; grid-template-columns:1fr 1fr; gap:10%; padding:6%; opacity:.75; transition:opacity .25s ease, transform .45s var(--lb-ease); }
+.pg-art--swatch i{ border-radius:3px; box-shadow:inset 0 1px 0 rgba(255,255,255,.25), inset 0 -2px 0 rgba(0,0,0,.25); }
+.pg-art--swatch i:nth-child(1){ background:#c23b3b; } .pg-art--swatch i:nth-child(2){ background:#d9a52c; }
+.pg-art--swatch i:nth-child(3){ background:#2f86c9; } .pg-art--swatch i:nth-child(4){ background:#43a463; }
+
+/* hover / touch lock: the gun racks forward under the reticle, icons light up */
+@media (hover:hover){
+  a.pg-card:hover .pg-screen img{ transform:translateX(3%) scale(1.06); filter:none; }
+  a.pg-card:hover .pg-screen img + .pg-reticle{ opacity:.9; }
+  a.pg-card:hover .pg-art{ color:#f2f3f5; transform:scale(1.08); }
+  a.pg-card:hover .pg-art--swatch{ opacity:1; }
+  a.pg-card:hover .pg-meta--go svg{ transform:translateX(4px); }
+}
+a.pg-card.is-lock .pg-screen img{ filter:none; }
+a.pg-card.is-lock .pg-screen img + .pg-reticle{ opacity:.9; }
+a.pg-card.is-lock .pg-art{ color:#f2f3f5; }
+
+@media (max-width:1150px) and (min-width:971px){
+  .pg-grid--two .pg-card:not(.pg-card--lead) .pg-text{ display:none; }
+}
+/* phones: a grid, not a swipe row -- lead (or the first tool) full width, two below */
+@media (max-width:970px){
+  .pg-grid.pg-grid--two, .pg-grid.pg-grid--row{
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:none; gap:10px; margin:0; padding:0; overflow:visible;
+  }
+  .pg-grid--two .pg-card--lead, .pg-grid--row .pg-card:first-child{ grid-column:1 / -1; }
+  .pg-grid--two .pg-card, .pg-grid--row .pg-card{ flex:none; }
+  .pg-grid--two .pg-screen, .pg-grid--row .pg-screen{ aspect-ratio:16 / 9; }
+  .pg-grid--two .pg-card--lead .pg-screen, .pg-grid--row .pg-card:first-child .pg-screen{ aspect-ratio:2 / 1; }
+  .pg-name{ font-size:14px; }
+}
+@media (max-width:520px){
+  .pg-grid--two .pg-card:not(.pg-card--lead) .pg-text, .pg-grid--row .pg-card:not(:first-child) .pg-text{ display:none; }
+}
+@media (prefers-reduced-motion: reduce){
+  .pg-screen img, .pg-art, .pg-meta--go svg, .pg-screen img + .pg-reticle{ transition:none; }
+}
+</style>
+
+<script>
+// manifests: real counts from the shared gun file. "verified" = a build read off a real
+// Gunsmith screenshot (it has an attachments block). The header pill shows the totals.
+fetch('/codm-guns.json').then(r => r.json()).then(guns => {
+  document.querySelectorAll('[data-manifest]').forEach(el => {
+    const list = guns.filter(g => (g.modes || []).includes(el.dataset.manifest));
+    const verified = list.filter(g => g.attachments).length;
+    el.textContent = `${list.length} guns` + (verified ? ` · ${verified} verified` : '');
+  });
+  const pill = document.getElementById('arCount');
+  const verified = guns.filter(g => g.attachments).length;
+  pill.lastElementChild.textContent = `${guns.length} guns` + (verified ? ` · ${verified} verified` : '');
+  pill.hidden = false;
+}).catch(() => {});
+</script>
+
+<!-- ESPORTS CHAMPIONSHIP HUB (below the Armory since Oct 22 2026). Its red V background (vred.jpg)
+     moved to Popular Guides (.pg--bg); the box now sits on the plain page ground. -->
 <div class="champ-section-bg">
 <div class="champ-widget">
   <div class="champ-header">
@@ -927,35 +1391,7 @@ a.li-door--gun:hover img{ opacity:1; }
 .champ-section-bg{
   position:relative;
   width:100%;
-  min-height:450px;
-  padding:50px 0 0px 0;
-  background-color:#181A1C;
-  overflow:hidden;
-}
-.champ-section-bg::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  background-image:url('/minecrafticons/vred.jpg');
-  background-repeat:no-repeat;
-  background-size:100% 600px;
-  background-position:top center;
-  filter:brightness(0.45) saturate(1.05);
-}
-.champ-section-bg::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none; 
-  background:linear-gradient(to bottom,
-    #121213 0px,
-    transparent 100px,
-    transparent 300px,
-    #181A1C 460px,
-    #181A1C 100%);
+  padding:56px 0 0 0;
 }
 .champ-section-bg .champ-widget{ position:relative; z-index:1; }
 .champ-widget{
@@ -1133,292 +1569,6 @@ a.li-door--gun:hover img{ opacity:1; }
   }).catch(() => {});
 })();
 </script>
-
-<!-- SECTION TITLES shared by every middle section (.layouts-title-box). The old
-     "Featured CODM Contents" cards are gone: the intro's four doors replaced them. -->
-<style>
-.layouts-title-box {
-  margin: 0px 12% 15px 12%;
-  border-radius: 0;
-  padding: 12px 20px 12px 0;
-  text-align: center;
-  background: transparent;
-  border-bottom: 1px solid #2a2a2a;
-  position: relative;
-}
-.layouts-title-box::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 50%;
-  transform: translateX(-50%);
-  width: 100px; height: 2px;
-  background: linear-gradient(90deg, #d40000, #7b1515);
-}
-.layouts-title {
-  font-size: clamp(16px, 2vw, 22px);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(90deg, #c0c9d4, #ffffff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.layouts-subtitle{ margin-top:6px; font-size:13px; color:var(--text-muted); }
-@media (max-width: 900px){
-.layouts-title-box {
-  margin: 0px 5% 15px 5%;
-}}
-</style>
-<!-- THE ARMORY (Oct 2026): the guide doors as sealed supply crates in the Shipment yard.
-     A crate's lid hides most of its gun and its teaser is blacked out; hover or focus
-     (or scrolling it into view on touch screens) lifts the lid and wipes the redaction.
-     Field Kit crates point at their planned pages (/sensitivity, /color-codes, /tools);
-     those pages are still to be built. Manifest counts come from /codm-guns.json.
-     Pictures are placeholders (gun cut-outs, and drawn icons for the Field Kit). -->
-<section class="ar" id="armory" aria-labelledby="arTitle">
-  <div class="ar-inner">
-    <div class="ar-head">
-      <h2 class="ar-title" id="arTitle">The Armory</h2>
-      <p class="ar-sub">Each crate opens onto a guide. Hover or tap one to look inside.</p>
-    </div>
-
-    <div class="ar-grid">
-      <a class="cr cr--lead" href="/call-of-duty-mobile/attachments?mode=multiplayer">
-        <span class="cr-hold"><img src="/images/codm/guns/ak117.webp" alt="" loading="lazy" decoding="async"></span>
-        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">MP</span><span class="cr-rivets"></span></span>
-        <span class="cr-body">
-          <span class="cr-name">MP Attachments</span>
-          <span class="cr-tease">Attachment builds for Multiplayer. Verified builds include a code you can paste into the game.</span>
-          <span class="cr-manifest"><span data-manifest="multiplayer">Gun builds</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
-        </span>
-      </a>
-
-      <a class="cr" href="/call-of-duty-mobile/attachments?mode=battleroyale">
-        <span class="cr-hold"><img src="/images/codm/guns/tundra.webp" alt="" loading="lazy" decoding="async"></span>
-        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">BR</span><span class="cr-rivets"></span></span>
-        <span class="cr-body">
-          <span class="cr-name">BR Attachments</span>
-          <span class="cr-tease">Longer-range builds for Battle Royale fights.</span>
-          <span class="cr-manifest"><span data-manifest="battleroyale">Gun builds</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
-        </span>
-      </a>
-
-      <a class="cr" href="/call-of-duty-mobile/loadouts">
-        <span class="cr-hold"><img src="/images/codm/guns/uss9.webp" alt="" loading="lazy" decoding="async"></span>
-        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">LO</span><span class="cr-rivets"></span></span>
-        <span class="cr-body">
-          <span class="cr-name">Loadouts</span>
-          <span class="cr-tease">Primary, secondary, perks, lethal and tactical for each mode.</span>
-          <span class="cr-manifest"><span>Full classes</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
-        </span>
-      </a>
-    </div>
-
-    <div class="ar-head ar-head--kit">
-      <h2 class="ar-title ar-title--kit">Field Kit</h2>
-      <p class="ar-sub">Set up your controls, colour your name and use our CODM tools.</p>
-    </div>
-
-    <div class="kit-grid">
-      <a class="cr" href="/call-of-duty-mobile/sensitivity">
-        <span class="cr-hold"><span class="cr-art" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="2.5"/><path d="M24 3v10M24 35v10M3 24h10M35 24h10"/></svg></span></span>
-        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">SN</span><span class="cr-rivets"></span></span>
-        <span class="cr-body">
-          <span class="cr-name">Sensitivity Codes</span>
-          <span class="cr-tease">Sensitivity settings for each device and playstyle.</span>
-          <span class="cr-manifest"><span>Sensitivity</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
-        </span>
-      </a>
-      <a class="cr" href="/call-of-duty-mobile/color-codes">
-        <span class="cr-hold"><span class="cr-art cr-art--swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span>
-        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">CC</span><span class="cr-rivets"></span></span>
-        <span class="cr-body">
-          <span class="cr-name">Color Codes</span>
-          <span class="cr-tease">Codes that change the colour of your in-game name.</span>
-          <span class="cr-manifest"><span>Name colours</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
-        </span>
-      </a>
-      <a class="cr" href="/call-of-duty-mobile/tools">
-        <span class="cr-hold"><span class="cr-art" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M30 8a9 9 0 0 0-8.4 12.3L8 33.9a3.5 3.5 0 0 0 5 5l13.7-13.6A9 9 0 0 0 39 17.3l-5.6 5.6-6-1.4-1.4-6 5.6-5.6A9 9 0 0 0 30 8z"/></svg></span></span>
-        <span class="cr-lid" aria-hidden="true"><span class="cr-mark">TL</span><span class="cr-rivets"></span></span>
-        <span class="cr-body">
-          <span class="cr-name">Tools</span>
-          <span class="cr-tease">Calculators and checkers for CODM players.</span>
-          <span class="cr-manifest"><span>CODM tools</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<style>
-.ar{
-  --ar-edge:#16161a; --ar-steel:#1a1c1f; --ar-lid:#26292d; --ar-ink:#e8e6e1; --ar-dim:#9b9a96; --ar-red:#d42a2a;
-  position:relative; isolation:isolate; flex:0 0 auto; min-height:780px; margin-top:40px;
-  padding:56px 12% 64px; color:var(--ar-ink);
-  /* the Shipment yard, pushed almost to black so the crates read on top of it */
-  background:
-    linear-gradient(to bottom, var(--ar-edge) 0%, rgba(10,10,11,.86) 16%, rgba(10,10,11,.9) 84%, var(--ar-edge) 100%),
-    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(10,10,11,.55), rgba(10,10,11,.85)),
-    url('/callofdutymobile-icons/shipment.jpg') center 40% / cover no-repeat,
-    #0b0b0c;
-}
-.ar-inner{ max-width:1280px; margin:0 auto; }
-.ar-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px 32px; flex-wrap:wrap; margin-bottom:22px; }
-.ar-head--kit{ margin:30px 0 12px; }
-.ar-title{
-  margin:0; font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800;
-  font-size:clamp(44px,5vw,68px); line-height:.9; letter-spacing:.01em; text-transform:uppercase;
-}
-.ar-title--kit{ font-size:clamp(32px,3.4vw,44px); }
-.ar-sub{ margin:0; max-width:46ch; font-size:14px; line-height:1.55; color:var(--ar-dim); }
-
-/* ---- crates ---- */
-.ar-grid{ display:grid; grid-template-columns:1.35fr 1fr; grid-template-rows:repeat(2, 220px); gap:14px; }
-.cr--lead{ grid-row:1 / span 2; }
-.cr{
-  position:relative; display:flex; flex-direction:column; overflow:hidden; border-radius:0;
-  text-decoration:none; color:var(--ar-ink);
-  background:linear-gradient(180deg, #202225, var(--ar-steel) 60%, #141517);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 22px 44px -22px rgba(0,0,0,.95);
-  -webkit-tap-highlight-color:transparent;
-}
-.cr-hold{ position:relative; flex:1; min-height:0; overflow:hidden;
-  background:radial-gradient(ellipse 70% 80% at 50% 70%, rgba(212,42,42,.16), transparent 70%), #0e0f10; }
-/* The picture (a gun cut-out, or a drawn icon on Field Kit crates) is fitted whole
-   inside the hold. Shut, it sits zoomed in and low, so only its top shows in the
-   peek; open, it zooms out to the full picture at full brightness. */
-.cr-hold img, .cr-art{
-  position:absolute; left:50%; top:50%; width:auto; height:auto; max-width:94%; max-height:88%;
-  transform:translate(-50%, -50%) translateY(26%) scale(1.45); filter:brightness(.62) saturate(.85);
-  transition:transform .7s cubic-bezier(.16,1,.3,1), filter .5s ease;
-}
-.cr-hold img{
-  -webkit-mask-image:linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
-  -webkit-mask-composite:source-in;
-          mask-image:linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 7%, #000 93%, transparent);
-          mask-composite:intersect;
-}
-.cr-art{ width:min(34%, 120px); aspect-ratio:1; color:rgba(232,230,225,.85); }
-.cr-art svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
-.cr-art--swatch{ display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:8%; padding:8%; }
-.cr-art--swatch i{ border-radius:0; }
-.cr-art--swatch i:nth-child(1){ background:#d42a2a; } .cr-art--swatch i:nth-child(2){ background:#e0b030; }
-.cr-art--swatch i:nth-child(3){ background:#2f8fd6; } .cr-art--swatch i:nth-child(4){ background:#47b36a; }
-/* the lid: covers all but the bottom sliver of the hold */
-.cr-lid{
-  position:absolute; left:0; right:0; top:0; height:calc(100% - var(--body-h, 118px) - var(--peek, 46px));
-  display:flex; align-items:center; justify-content:center;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.05), transparent 30%),
-    linear-gradient(180deg, var(--ar-lid), #1f2225);
-  box-shadow:0 10px 18px -6px rgba(0,0,0,.85);
-  transition:transform .7s cubic-bezier(.16,1,.3,1);
-}
-.cr-lid::after{ /* lip */
-  content:""; position:absolute; left:0; right:0; bottom:0; height:6px;
-  background:linear-gradient(180deg, #33373c, #1b1d20);
-}
-.cr-mark{
-  font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800; line-height:1;
-  font-size:clamp(40px,4.4vw,64px); letter-spacing:.06em; color:rgba(232,230,225,.1);
-}
-.cr--lead .cr-mark{ font-size:clamp(88px,10vw,160px); }
-.cr-rivets, .cr-lid::before{ /* two rivets on the lid's top corners */
-  position:absolute; top:12px; width:7px; height:7px; border-radius:0;
-  background:radial-gradient(circle at 35% 35%, #4a4e54, #17191b 70%);
-}
-.cr-rivets{ left:12px; }
-.cr-lid::before{ content:""; right:12px; }
-
-.cr-body{ position:relative; display:flex; flex-direction:column; gap:6px; padding:12px 18px 14px; height:var(--body-h, 118px); flex:0 0 auto;
-  background:linear-gradient(180deg, #17181b, #121315); }
-.cr--lead{ --body-h:140px; --peek:64px; }
-.cr-name{
-  font-family:'Big Shoulders Stencil Display', 'Oxanium', sans-serif; font-weight:800; text-transform:uppercase;
-  font-size:26px; line-height:1; letter-spacing:.02em;
-}
-.cr--lead .cr-name{ font-size:clamp(30px,2.8vw,38px); }
-/* the teaser is blacked out line by line, like a redacted file, until the crate opens */
-.cr-tease{ position:relative; font-size:13px; line-height:1.6; color:#c8c6c0; max-width:52ch; }
-.cr-tease::after{
-  content:""; position:absolute; inset:0;
-  background:repeating-linear-gradient(to bottom, transparent 0 .22em, #050505 .22em 1.38em, transparent 1.38em 1.6em);
-  transform-origin:right center; transition:transform .5s cubic-bezier(.16,1,.3,1) .1s;
-}
-.cr-manifest{
-  margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:12px;
-  font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ar-red);
-  font-variant-numeric:tabular-nums;
-}
-.cr-manifest svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;
-  transition:transform .4s cubic-bezier(.16,1,.3,1); }
-
-/* opened: hover / keyboard focus, or scrolled into view on touch screens (.is-open) */
-@media (hover:hover){
-  a.cr:hover .cr-lid{ transform:translateY(-100%); }
-  a.cr:hover .cr-hold img, a.cr:hover .cr-art{ transform:translate(-50%, -50%) scale(1); filter:none; }
-  a.cr:hover .cr-tease::after{ transform:scaleX(0); }
-  a.cr:hover .cr-manifest svg{ transform:translateX(4px); }
-}
-a.cr:focus-visible .cr-lid, a.cr.is-open .cr-lid{ transform:translateY(-100%); }
-a.cr:focus-visible .cr-hold img, a.cr.is-open .cr-hold img, a.cr:focus-visible .cr-art, a.cr.is-open .cr-art{ transform:translate(-50%, -50%) scale(1); filter:none; }
-a.cr:focus-visible .cr-tease::after, a.cr.is-open .cr-tease::after{ transform:scaleX(0); }
-a.cr:focus-visible{ outline:2px solid var(--ar-red); outline-offset:3px; }
-
-/* ---- field kit: the same crates, three across ---- */
-.kit-grid{ display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:210px; gap:14px; }
-
-@media (max-width:1150px){
-  .ar-grid{ grid-template-rows:repeat(2, 205px); }
-  .kit-grid{ grid-auto-rows:200px; }
-  .cr-name{ font-size:22px; }
-}
-@media (max-width:970px){
-  .ar{ min-height:0; margin-top:32px; padding:44px 5% 52px; }
-  .ar-title{ font-size:44px; }
-  .ar-grid{ grid-template-columns:1fr 1fr; grid-template-rows:260px 230px; gap:10px; }
-  .cr--lead{ grid-row:auto; grid-column:1 / -1; }
-  .cr{ --body-h:118px; }
-  .cr--lead{ --body-h:128px; }
-  .cr-body{ padding:12px 14px 14px; }
-  .cr-name{ font-size:20px; }
-  .cr--lead .cr-name{ font-size:28px; }
-  .cr-tease{ font-size:12px; }
-  /* phones: same pattern as the Armory, first crate full width, two below */
-  .kit-grid{ grid-template-columns:1fr 1fr; grid-auto-rows:230px; gap:10px; }
-  .kit-grid > .cr:first-child{ grid-column:1 / -1; }
-}
-@media (max-width:520px){
-  .ar-grid{ grid-template-rows:250px 250px; }
-  .ar-grid .cr:not(.cr--lead) .cr-tease, .kit-grid .cr:not(:first-child) .cr-tease{ display:none; }
-}
-@media (prefers-reduced-motion: reduce){
-  .cr-lid, .cr-hold img, .cr-art, .cr-tease::after, .cr-manifest svg{ transition:none; }
-}
-</style>
-
-<script>
-(function(){
-  // manifests: real counts from the shared gun file
-  fetch('/codm-guns.json').then(r => r.json()).then(guns => {
-    document.querySelectorAll('[data-manifest]').forEach(el => {
-      const list = guns.filter(g => (g.modes || []).includes(el.dataset.manifest));
-      // "verified" = a build read off a real Gunsmith screenshot (it has an attachments block)
-      const verified = list.filter(g => g.attachments).length;
-      el.textContent = `${list.length} guns` + (verified ? ` · ${verified} verified` : '');
-    });
-  }).catch(() => {});
-  // touch screens have no hover: open each crate once it's mostly on screen
-  if (!window.matchMedia('(hover: none)').matches || !('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('is-open'); io.unobserve(e.target); }
-  }), { threshold: 0.7 });
-  document.querySelectorAll('#armory a.cr').forEach(c => io.observe(c));
-})();
-</script>
-
 
 <!-- OFFICIAL VIDEOS: newest uploads from the official CODM YouTube channel.
      /codm-feed.json is refreshed daily by .github/workflows/codm-feed.yml. -->

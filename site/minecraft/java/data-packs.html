@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Java Data Packs | Parchrome</title>
+<meta name="description" content="The most downloaded Java Edition data packs for new terrain, structures, bosses and quality of life, how to install them in any world or server, and the live Modrinth top 10.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/minecraft/java/data-packs">
+<meta property="og:title" content="Minecraft Java Data Packs — Parchrome">
+<meta property="og:description" content="New biomes, structures, bosses and tweaks for vanilla Minecraft. No mod loader needed.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/home/mc-data-packs.webp">
+<meta property="og:image:width" content="720">
+<meta property="og:image:height" content="405">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Java Data Packs — Parchrome">
+<meta name="twitter:description" content="New biomes, structures, bosses and tweaks for vanilla Minecraft. No mod loader needed.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/home/mc-data-packs.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261022sb">
+<link rel="stylesheet" href="/mc-java.css?v=20261020bn">
+<link rel="stylesheet" href="/coc-more.css?v=20261021hd">
+<link rel="stylesheet" href="/mc-home.css?v=20261022qref">
+<link rel="stylesheet" href="/mc-hero.css?v=20261022tb">
+
+
+</head>
+<body class="mc-home">  
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/minecraft.png" alt="TH10 Icon" class="th-icon" loading="lazy" decoding="async">
+    <div class="secondary-content">
+          <!-- Desktop shows just the section name; mobile adds the hardcoded
+               "you are here" crumb. Structure mirrors the HWR bar so the two
+               read identically, but the group is static here rather than
+               driven by a scroll-spy. -->
+          <span class="secondary-content-desktop">Minecraft Java</span>
+          <span class="secondary-content-mobile">
+            <span class="sc-mobile-text">Minecraft Java</span>
+            <span class="sc-mobile-group">Data Packs</span>
+          </span>
+        </div>
+  </div>
+    <div class="stb-divider" aria-hidden="true"></div>
+  <!-- hwr's own strip markup, ids and all: 11layout.js wires the arrows by
+       these ids, and the CSS deciding how the two strips share the bar is
+       keyed to these wrappers. Sections left, editions right, both filled
+       from mc-contents.json by the nav script below. -->
+  <nav class="stb-dsn-wrap" id="stbDsnWrap" aria-label="Sections">
+    <div class="dsn-categories-scroll" id="dsnCategoriesScroll"></div>
+  </nav>
+  <div class="stb-divider stb-divider-end" aria-hidden="true"></div>
+  <!-- data-hub-nav="off": initHubNav() in 11layout.js fills #stbHubNavScroll
+       from hwr-categories.json on the hwr pages. This bar holds the Minecraft
+       editions instead, so it opts out of being rebuilt. -->
+  <nav class="stb-hub-nav" id="stbHubNav" data-hub-nav="off" aria-label="Editions">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" loading="lazy" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <!-- HERO v2 — see the "HERO v2" block in mc-java.css. The edition wordmark
+         swaps per edition (Bedrock / Story / Dungeons logos are already in
+         minecrafticons/); the live version pills keep the original hvs-* ids so
+         the Mojang piston-meta fetch in mc-java.js drives them unchanged. -->
+    <div class="coc-content">
+      <!-- MINECRAFT JAVA HOME v2 (Oct 12 2026): centered frame, bone bands,
+           podium, command terminal, server standings. Styles: mc-home.css,
+           behaviour (copy, tabs, block reveals): mc-home.js. mc-java.js still
+           fills the nav strip (.mc-mobile-nav), the hvs-* versions,
+           #vt-sb-latest and #server-row: keep those ids. -->
+      <div class="mch">
+      <!-- Banner (Oct 12): the page header over the forest shot, with the live
+           Java versions (hvs-* ids, filled by mc-java.js). Parcorp Village,
+           the old featured banner, is #2 in Top 10 Worlds. -->
+      <header class="mch-hero mch-hero--page">
+        <!-- Background clip: Pinterest pin 605452743702191634 (736x414, its largest size). Muted, looped; the JPG is its first frame and the reduced-motion fallback. --><video class="mch-hero-bg" src="/minecrafticons/mc-java-banner.mp4" poster="/minecrafticons/mc-java-banner.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+        <div class="mch-frame mch-hero-inner">
+          <div class="mch-hero-main">
+            <p class="mch-hero-eyebrow">Curated Minecraft resources</p>
+            <h1 class="mch-hero-title">Minecraft<span>Data Packs.</span></h1>
+            <div class="mch-hero-foot">
+              <dl class="mch-hero-stats mch-hero-ver" id="hero-version-strip" aria-label="Current Java versions">
+                <div><dt>Release</dt><dd id="hvs-release-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-release-updated"></dd></div>
+                <div><dt>Snapshot</dt><dd id="hvs-snapshot-version">&mdash;</dd><dd class="mch-hero-age" id="hvs-snapshot-updated"></dd></div>
+              </dl>
+            </div>
+          </div>
+          <!-- From Mojang: the three newest Java posts (data-count) (#vt-sb-latest, filled by
+               mc-java.js); "All updates" opens the full feed (#vtModal). -->
+          <aside class="mch-hero-news" aria-labelledby="mc-wire-t">
+            <div class="mch-hero-news-head"><h2 id="mc-wire-t"><i class="mch-live" aria-hidden="true"></i>From Mojang</h2><button type="button" class="mch-more" onclick="openVtFeed()">All updates<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+            <div class="vt-sb-latest mch-wire-list" id="vt-sb-latest" data-count="5"><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div></div>
+          </aside>
+        </div>
+        <!-- Section tabs (Oct 21 2026): filled by mc-java.js renderMobileNav, styled in mc-hero.css TABS. -->
+        <div class="mch-frame mch-hero-tabs"><nav class="mch-nav" aria-label="Java sections"></nav></div>
+      </header>
+
+
+      <!-- DATA PACKS (Oct 22 2026): a copy of /minecraft/java/mods on the same engine.
+           mc-modpacks.js reads /mc-datapacks.json (#mpGrid data-src) and builds the
+           filter chips, search, pack grid, Vanilla Tweaks picks (#pickGrid), sources
+           (#launcherGrid), make-your-own tools (#essGrid) and links, plus the live
+           Modrinth board (tabs: data-index downloads / follows). The install tabs are
+           mc-home.js's tab engine (aria-controls panels). Styles: MODPACKS PAGE in mc-home.css. -->
+      <div class="mch-ch mch-ch--surface" id="ch-datapacks" role="region" aria-label="Data packs">
+        <div class="mch-frame">
+
+        <section class="mch-sec" id="mc-datapacks" aria-labelledby="mc-datapacks-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-datapacks-t">Curated <em>data packs.</em></h3><p class="mch-sec-sub">A data pack is a zip that adds biomes, structures, bosses or new rules to vanilla. No mod loader needed. These are the most downloaded on Modrinth.</p></div></header>
+          <div class="mch-sbar">
+            <label class="mch-sfind lb-search" for="mpFind">
+              <span class="mch-visually-hidden">Search data packs</span>
+              <input id="mpFind" class="lb-search-input" type="search" placeholder="Biomes, villages, dragon" autocomplete="off" spellcheck="false">
+              <span class="lb-search-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+            </label>
+            <p class="mch-scount" id="mpCount" role="status" aria-live="polite"></p>
+          </div>
+          <div class="mch-chips" id="mpChips" role="group" aria-label="Filter data packs"></div>
+          <div class="mch-mods mch-mods--grid" id="mpGrid" data-src="/mc-datapacks.json" style="--cols:5"></div>
+          <div class="mch-sempty" id="mpEmpty" hidden><p>No data packs match <b id="mpEmptyQ"></b>.</p><button type="button" class="mch-copy" id="mpReset">Clear filters</button></div>
+        </section>
+
+        <section class="mch-sec" id="mc-vtpicks" aria-labelledby="mc-vtpicks-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-vtpicks-t">Vanilla Tweaks <em>favourites.</em></h3><p class="mch-sec-sub">Small fixes that keep vanilla feeling like vanilla. Tick the ones you want and download one zip.</p></div></header>
+          <div class="mch-ess" id="pickGrid"></div>
+          <div class="mch-panel-foot"><a class="art-all" href="https://vanillatweaks.net/picker/datapacks/" target="_blank" rel="noopener">Open the Vanilla Tweaks picker<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a></div>
+        </section>
+        </div>
+      </div>
+
+      <!-- Where to get them: the one deepslate band on this page. -->
+      <div class="mch-ch mch-ch--play" id="ch-dpsetup" role="region" aria-label="Where to get data packs">
+        <div class="mch-frame">
+        <section class="mch-sec" id="mc-dpsources" aria-labelledby="mc-dpsources-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-dpsources-t">Where to <em>get them.</em></h3><p class="mch-sec-sub">Four sites cover almost every data pack worth playing.</p></div></header>
+          <div class="mch-launchers" id="launcherGrid"></div>
+        </section>
+        </div>
+      </div>
+
+      <!-- Everything after the sources sits back on the solid ground (Adrian, Oct 22):
+           only "Where to get them" wears the deepslate. -->
+      <div class="mch-ch mch-ch--surface" id="ch-dpguide" role="region" aria-label="Using data packs">
+        <div class="mch-frame">
+
+        <section class="mch-sec" id="mc-modrinth" aria-labelledby="mc-modrinth-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-modrinth-t">Top 10 on <em>Modrinth.</em></h3><p class="mch-sec-sub">Pulled live from Modrinth when you open the page. A few are add-ons for mods, so check the pack page first.</p></div><span class="mch-sec-meta"><i class="mch-live" aria-hidden="true"></i>Live</span></header>
+          <div class="mch-tabs" role="tablist" aria-label="Modrinth top 10">
+            <button type="button" class="mch-tab is-on" role="tab" id="tab-mr-dl" aria-selected="true" data-type="datapack" data-index="downloads">Most downloaded</button>
+            <button type="button" class="mch-tab" role="tab" id="tab-mr-fol" aria-selected="false" data-type="datapack" data-index="follows" tabindex="-1">Most followed</button>
+          </div>
+          <div class="mch-standings mch-standings--mr" role="table" aria-label="Top data packs on Modrinth">
+            <div class="mch-st-head" role="row"><span role="columnheader">#</span><span role="columnheader">Pack</span><span role="columnheader" class="mch-st-mode">Type</span><span role="columnheader">Count</span><span role="columnheader" class="mch-st-when">Updated</span></div>
+            <div class="mch-st-body" id="mrBoard" role="tabpanel" aria-labelledby="tab-mr-dl" aria-busy="true"><div class="mch-st-loading">Loading the Modrinth top 10&hellip;</div></div>
+          </div>
+          <div class="mch-panel-foot mch-mr-foot"><a class="art-all" id="mrAll" href="https://modrinth.com/datapacks?s=downloads" target="_blank" rel="noopener">All data packs on Modrinth<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a></div>
+        </section>
+
+        <section class="mch-sec" id="mc-install" aria-labelledby="mc-install-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-install-t">Add a <em>data pack.</em></h3><p class="mch-sec-sub">Keep the download zipped. Minecraft reads the .zip as it is.</p></div></header>
+          <div class="mch-tabs" role="tablist" aria-label="Where you are adding it">
+            <button type="button" class="mch-tab is-on" role="tab" id="tab-in-new" aria-selected="true" aria-controls="in-new">New world</button>
+            <button type="button" class="mch-tab" role="tab" id="tab-in-old" aria-selected="false" aria-controls="in-old" tabindex="-1">Existing world</button>
+            <button type="button" class="mch-tab" role="tab" id="tab-in-srv" aria-selected="false" aria-controls="in-srv" tabindex="-1">Server</button>
+          </div>
+          <div id="in-new" role="tabpanel" aria-labelledby="tab-in-new">
+            <ol class="mch-steps">
+              <li><b>Open the pack list</b><p>Create New World, go to the More tab and press Data Packs.</p></li>
+              <li><b>Drop the zip in</b><p>Drag the .zip onto the window, then click it to move it from Available to Selected.</p></li>
+              <li><b>Create the world</b><p>Press Done, then Create. Terrain packs like Terralith shape the world from the first chunk.</p></li>
+            </ol>
+          </div>
+          <div id="in-old" role="tabpanel" aria-labelledby="tab-in-old" hidden>
+            <ol class="mch-steps">
+              <li><b>Open the world folder</b><p>Singleplayer, select the world, Edit, then Open World Folder.</p></li>
+              <li><b>Drop the zip in</b><p>Put the .zip in the datapacks folder inside it.</p></li>
+              <li><b>Load it</b><p>Join the world and type <code>/reload</code>. Terrain packs only change land you haven't explored yet.</p></li>
+            </ol>
+          </div>
+          <div id="in-srv" role="tabpanel" aria-labelledby="tab-in-srv" hidden>
+            <ol class="mch-steps">
+              <li><b>Find the world folder</b><p>It's named after level-name in server.properties, usually world.</p></li>
+              <li><b>Upload the zip</b><p>Put the .zip in world/datapacks with your host's file manager or FTP.</p></li>
+              <li><b>Reload</b><p>Run <code>/reload</code> from the console or as an op. Players don't install anything.</p></li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="mch-sec" id="mc-dpcmds" aria-labelledby="mc-dpcmds-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-dpcmds-t">Pack <em>commands.</em></h3><p class="mch-sec-sub">Run and control packs without leaving the game. Swap in your own file name.</p></div></header>
+          <div class="mch-term"><div class="mch-term-bar"><span class="mch-term-hint">Tap Copy, paste into chat. Only /trigger works with cheats off</span></div><ul class="mch-term-list mch-term-list--2col">
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/knowledge_book.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="List packs" data-sub="Every pack, on or off" data-cmd="/datapack list">List packs<span>Every pack, on or off</span></button><code class="mch-term-code">/datapack list</code></div><button type="button" class="mch-copy" data-copy="/datapack list" aria-label="Copy the List packs command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/book.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Only running packs" data-sub="What&#x27;s loaded right now" data-cmd="/datapack list enabled">Only running packs<span>What&#x27;s loaded right now</span></button><code class="mch-term-code">/datapack list enabled</code></div><button type="button" class="mch-copy" data-copy="/datapack list enabled" aria-label="Copy the Only running packs command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/repeating_command_block.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Reload" data-sub="Loads new packs and file edits" data-cmd="/reload">Reload<span>Loads new packs and file edits</span></button><code class="mch-term-code">/reload</code></div><button type="button" class="mch-copy" data-copy="/reload" aria-label="Copy the Reload command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/barrier.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Turn a pack off" data-sub="Keeps the file in the folder" data-cmd="/datapack disable &quot;file/Terralith.zip&quot;">Turn a pack off<span>Keeps the file in the folder</span></button><code class="mch-term-code">/datapack disable "file/Terralith.zip"</code></div><button type="button" class="mch-copy" data-copy="/datapack disable &quot;file/Terralith.zip&quot;" aria-label="Copy the Turn a pack off command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/command_block.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Turn on, top priority" data-sub="Wins every clash" data-cmd="/datapack enable &quot;file/Terralith.zip&quot; last">Turn on, top priority<span>Wins every clash</span></button><code class="mch-term-code">/datapack enable "file/Terralith.zip" last</code></div><button type="button" class="mch-copy" data-copy="/datapack enable &quot;file/Terralith.zip&quot; last" aria-label="Copy the Turn on, top priority command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/chain_command_block.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Turn on, lowest priority" data-sub="Loses every clash" data-cmd="/datapack enable &quot;file/Terralith.zip&quot; first">Turn on, lowest priority<span>Loses every clash</span></button><code class="mch-term-code">/datapack enable "file/Terralith.zip" first</code></div><button type="button" class="mch-copy" data-copy="/datapack enable &quot;file/Terralith.zip&quot; first" aria-label="Copy the Turn on, lowest priority command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/comparator.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Open pack settings" data-sub="/function + Tab lists them" data-cmd="/function custom_nether_portals:config">Open pack settings<span>/function + Tab lists them</span></button><code class="mch-term-code">/function custom_nether_portals:config</code></div><button type="button" class="mch-copy" data-copy="/function custom_nether_portals:config" aria-label="Copy the Open pack settings command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+            <li class="mch-term-row"><img class="mch-term-ico" src="/minecrafticons/items/name_tag.png" alt="" loading="lazy"><div class="mch-term-main"><button type="button" class="mch-term-name" onclick="openCmd(this)" data-name="Player switches" data-sub="No cheats needed" data-cmd="/trigger TimberToggle">Player switches<span>No cheats needed</span></button><code class="mch-term-code">/trigger TimberToggle</code></div><button type="button" class="mch-copy" data-copy="/trigger TimberToggle" aria-label="Copy the Player switches command"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button></li>
+          </ul></div>
+        </section>
+
+        <!-- Know-how: one reference card, four columns (mc-home.css "DATA PACKS PAGE", .mch-qref). -->
+        <section class="mch-sec" id="mc-dpknow" aria-labelledby="mc-dpknow-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-dpknow-t">Before you <em>play.</em></h3><p class="mch-sec-sub">The rules every pack follows, in one screen.</p></div></header>
+          <div class="mch-qref">
+            <div class="mch-qref-col"><h4 class="mch-qref-h">Running packs</h4><dl><div><dt>Cheats or op</dt><dd>Every <code>/datapack</code> command needs them. Singleplayer: Open to LAN, Allow Commands.</dd></div><div><dt>Load order</dt><dd>Lower in <code>/datapack list</code> wins when two packs change the same thing.</dd></div><div><dt>What /reload misses</dt><dd>New biomes, dimensions and terrain only apply after you leave and rejoin.</dd></div></dl></div>
+            <div class="mch-qref-col"><h4 class="mch-qref-h">Your world</h4><dl><div><dt>One world at a time</dt><dd>Each world has its own datapacks folder. New worlds start without them.</dd></div><div><dt>Back up first</dt><dd>Copy the world before adding terrain or structure packs. Generated chunks can't be undone.</dd></div><div><dt>Removing a pack</dt><dd>Structures it built and items it gave out stay. Only new behaviour stops.</dd></div></dl></div>
+            <div class="mch-qref-col"><h4 class="mch-qref-h">Versions</h4><dl><div><dt>Version warnings</dt><dd>"Made for an older version" warns you, it doesn't block the pack.</dd></div><div><dt>Big updates</dt><dd>Terrain packs usually break across them. Wait for the pack's own update.</dd></div><div><dt>Experiments</dt><dd>Mojang's experimental packs can only be switched on when creating a world.</dd></div></dl></div>
+            <div class="mch-qref-col"><h4 class="mch-qref-h">Servers &amp; fixes</h4><dl><div><dt>Players install nothing</dt><dd>The pack runs on the server. Joining players need no files.</dd></div><div><dt>Two-zip packs</dt><dd>Packs with new models also ship a resource pack. Push it with <code>resource-pack</code> in server.properties.</dd></div><div><dt>Nothing happens?</dt><dd>Turn on the output log in the launcher settings. Broken files are named there on load.</dd></div></dl></div>
+          </div>
+        </section>
+
+        <section class="mch-sec" id="mc-essentials" aria-labelledby="mc-essentials-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-essentials-t">Make <em>your own.</em></h3><p class="mch-sec-sub">A data pack is folders of JSON and command files. These do the hard part.</p></div></header>
+          <div class="mch-ess" id="essGrid"></div>
+        </section>
+
+        <section class="mch-sec" id="mc-dpfaq" aria-labelledby="mc-dpfaq-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-dpfaq-t">Good to <em>know.</em></h3></div></header>
+          <div class="mch-faq">
+            <details><summary>Data pack or mod: what's the difference?</summary><p>Data packs run on plain vanilla. No Fabric, no Forge, no launcher, and players joining a server install nothing. Mods can add whole new code and blocks; data packs reshape what the game already has: terrain, structures, loot, recipes and mob behaviour.</p></details>
+            <details><summary>Do they work on Bedrock?</summary><p>No. Data packs are Java Edition only. Bedrock has its own add-ons (behaviour packs), and they aren't interchangeable.</p></details>
+            <details><summary>Can I add a terrain pack to an old world?</summary><p>Yes, but it only changes chunks you haven't loaded yet, so there will be a hard edge where old land meets new. For packs like Terralith or Tectonic, a fresh world looks far better.</p></details>
+            <details><summary>My pack doesn't show up. Why?</summary><p>Open the zip: <code>pack.mcmeta</code> must sit at the top, not inside another folder. A zip downloaded from GitHub's green button is often nested one level too deep. Also check the pack supports your Minecraft version.</p></details>
+            <details><summary>Do data packs work on Realms?</summary><p>Yes. Add them to a singleplayer world, then upload that world to your Realm.</p></details>
+          </div>
+          <nav class="mch-linkrow" id="linkRow" aria-label="Where to find more data packs"></nav>
+        </section>
+        </div>
+      </div>
+
+
+
+
+      </div>
+
+      <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY LIGHTBOX (banners) -->
+<div id="gal-lightbox" onclick="closeLightbox()">
+  <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
+  <div id="gal-lb-inner" onclick="event.stopPropagation()">
+    <img id="gal-lb-img" alt="" loading="lazy" decoding="async">
+    <div id="gal-lb-copybox">
+      <div id="gal-lb-name"></div>
+      <div id="gal-lb-code"></div>
+      <button id="gal-lb-copy-btn" onclick="galCopyCmd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+        Copy Command
+      </button>
+      <div id="gal-lb-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PALETTE LIGHTBOX -->
+<div id="pal-lightbox" onclick="closePalette()">
+  <button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+  <!-- Prev/next were only ever built on the worlds and seeds pages. The grids
+       here are galleries too, so they get the same controls; palLightboxNav()
+       is shared and needs these ids to exist before it can be called. -->
+  <button id="pal-lb-prev" onclick="event.stopPropagation();palLightboxNav(-1)" aria-label="Previous image">&#8249;</button>
+  <button id="pal-lb-next" onclick="event.stopPropagation();palLightboxNav(1)" aria-label="Next image">&#8250;</button>
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" alt="" loading="lazy" decoding="async">
+  </div>
+  <div id="pal-lb-bar">
+    <div id="pal-lb-title"></div>
+    <div id="pal-lb-count"></div>
+  </div>
+</div>
+
+<!-- COMMAND MODAL -->
+<div class="cmd-modal-backdrop" id="cmdModal" onclick="closeCmdOutside(event)">
+  <div class="cmd-modal">
+    <button class="cmd-modal-close" onclick="closeCmd()">✕</button>
+    <div class="cmd-modal-title" id="cmdModalTitle"></div>
+    <div class="cmd-modal-sub" id="cmdModalSub">Command</div>
+    <div class="cmd-code-box" id="cmdModalCode"></div>
+    <button class="cmd-copy-btn" onclick="copyCmd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+      Copy Command
+    </button>
+    <div class="cmd-copy-feedback" id="cmdFeedback"></div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+        <span class="mx-hdr-ico"><img src="/minecrafticons/minecraft-block-logo.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Minecraft Pages</span><span class="mx-hdr-count" data-role="more-count"></span></span>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"><!-- rendered from mc-contents.json --></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+</div>
+
+<script src="/11layout.js?v=20261021tb1"></script>
+
+<script src="/mc-java.js?v=20261022tb"></script>
+<script src="/mc-modpacks.js?v=20261022dp" defer></script>
+<script src="/mc-home.js?v=20261014nd" defer></script>
+<!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
+<div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
+  <div class="vt-modal-panel" onclick="event.stopPropagation()">
+    <div class="vt-modal-head">
+      <div>
+        <div class="vt-modal-title">Recent Updates</div>
+        <div class="vt-modal-sub">Official Java patch notes from Mojang</div>
+      </div>
+      <button type="button" class="vt-modal-close" onclick="closeVtFeed()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="vt-modal-body">
+      <div class="vt-feed-list" id="vt-modal-list">
+        <div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

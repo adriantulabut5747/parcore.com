@@ -1,0 +1,134 @@
+/* ============================================================
+   GENSHIN IMPACT BANNERS (Oct 22 2026) -- /genshin-impact/banners only.
+   Linked after genshin.css (base, pieces, the .gi-wish card it reuses).
+   Data: /genshin-feed.json "banners". Behaviour: genshin-banners.js.
+
+   Header = the shared .gi-tb (genshin.css): the Fatui Harbingers art, the
+   Intertwined Fate icon, title, sentence, fact chips. Under it: the wish tabs + server
+   switch, then every live wish as a .gi-wish card. Desktop: all stacked
+   (the tabs jump to each). Phones: tabs, one card at a time, fixed height.
+   ============================================================ */
+
+
+/* ---- TABS + SERVER ------------------------------------------------------ */
+.gi-bar #gbTabs { flex: 0 1 auto; min-width: 0; }
+.gi-bar #gbTabs .gi-tab { flex: 0 0 auto; padding: 0 16px 0 10px; }
+.gi-bar #gbTabs .gi-tab img { border-radius: 50%; background: rgba(255, 255, 255, 0.06); }
+.gi-bar #gbServer { flex: none; }
+.gb-server-note { margin-top: -14px; margin-bottom: 20px; font-size: 11.5px; color: var(--gi-dim); }
+
+/* ---- THE WISH CARDS (.gi-wish from genshin.css, no switch column) ---------
+   Info left, art right; every second card flips (art left). The weapon card
+   adds a third column: the Epitomized Path, drawn. */
+.gb-list { display: flex; flex-direction: column; gap: 28px; }
+.gb-wish { grid-template-columns: minmax(0, 460px) minmax(0, 1fr); scroll-margin-top: 90px; }
+.gb-wish .gi-wish-art { inset: 0 0 0 420px; } /* the info column, less the mask's faded edge */
+.gb-wish .gi-wish-info { padding-right: 24px; }
+.gb-wish--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 460px); }
+.gb-wish--flip .gi-wish-art {
+  inset: 0 460px 0 0; /* stops at the 460px info column, so the art never runs under the words */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 82%, transparent 100%);
+}
+.gb-wish--flip .gi-wish-info { grid-column: 2; padding: 40px 48px 40px 0; }
+.gb-wish--flip { background:
+    radial-gradient(48% 70% at 38% 58%, color-mix(in srgb, var(--gi-el) 26%, transparent), transparent 72%),
+    linear-gradient(255deg, #0e0f13 0%, #0e0f13 32%, color-mix(in srgb, var(--gi-el) 9%, #101117) 62%, color-mix(in srgb, var(--gi-el) 18%, #12131a) 100%); }
+
+/* The real rates, as chips (official wish details; no soft pity). */
+.gb-rates { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; list-style: none; }
+.gb-rates li {
+  padding: 6px 9px 5px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 5px;
+  background: var(--lb-well);
+  font: 600 11px/1 'Sora', sans-serif;
+  white-space: nowrap;
+  color: var(--gi-muted);
+}
+.gb-rates b { margin-right: 3px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+.gb-ends { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-top: 22px; }
+.gb-ends .gi-ends { font-size: 22px; font-weight: 800; }
+.gb-ends .gi-ends.is-ending { margin: 0; font-size: 18px; }
+.gb-ends small { font-size: 12px; color: var(--gi-dim); }
+.gb-fourw { margin-top: 8px; font-size: 11.5px; line-height: 1.5; color: var(--gi-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Weapon card: the two 5-star weapons' official wish art side by side,
+   named at their feet, on a plain light glow. */
+.gb-wep { grid-template-columns: minmax(0, 420px) minmax(0, 1fr) 300px; }
+.gb-wep .gi-wish-art { inset: 0 300px 0 420px; -webkit-mask-image: none; mask-image: none; } /* between the info and the path */
+.gb-weps { position: absolute; inset: 24px 0 56px; display: flex; align-items: stretch; justify-content: center; gap: 4%; }
+.gb-weps figure { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 0; }
+.gb-weps img { flex: 1; min-height: 0; width: auto; max-width: 100%; object-fit: contain; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.6)); }
+.gb-weps figcaption { text-align: center; font: 800 13px/1.2 'Sora', sans-serif; color: #fff; white-space: nowrap; }
+.gb-weps figcaption small { display: block; margin-top: 3px; font-size: 10.5px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--gi-muted); }
+
+/* Epitomized Path, drawn: three diamonds on a line -- the course (outline),
+   the Fate Point a miss fills (red), the weapon you picked (white). */
+.gb-path { position: relative; z-index: 2; grid-column: 3; display: flex; flex-direction: column; justify-content: center; padding: 40px 40px 40px 0; }
+.gb-path ol { position: relative; display: flex; flex-direction: column; gap: 22px; margin-top: 16px; list-style: none; }
+.gb-path ol::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 2px; background: rgba(255, 255, 255, 0.1); }
+.gb-path li { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 14px; }
+.gb-path li b { font: 700 13.5px/1.3 'Sora', sans-serif; color: #fff; }
+.gb-path li small { grid-column: 2; margin-top: 3px; font-size: 11.5px; line-height: 1.5; color: var(--gi-muted); }
+.gb-pip { grid-row: 1 / span 2; width: 12px; height: 12px; margin: 3px 0 0 3px; border: 2px solid #8b9099; background: #101117; transform: rotate(45deg); }
+.gb-pip.is-point { border-color: var(--gi-acc); background: var(--gi-acc); }
+.gb-pip.is-yours { border-color: #fff; background: #fff; }
+.gb-path-line { display: none; }
+
+
+/* ---- DESKTOP NARROW ----------------------------------------------------- */
+/* Laptops: three columns leave the two weapons ~330px, so the path becomes a
+   strip across the card's foot (three steps in a row) and the card grows. */
+@media (min-width: 971px) and (max-width: 1440px) {
+  .gb-wep { grid-template-columns: minmax(0, 420px) minmax(0, 1fr); grid-template-rows: 500px auto; height: auto; }
+  .gb-wep .gi-wish-art { inset: 0 0 auto 420px; height: 500px; }
+  .gb-path { grid-column: 1 / -1; padding: 22px 48px 30px; border-top: 1px solid var(--gi-line); }
+  .gb-path ol { flex-direction: row; gap: 24px; margin-top: 14px; }
+  .gb-path ol::before { top: 9px; bottom: auto; left: 8px; right: 8px; width: auto; height: 2px; }
+  .gb-path li { flex: 1; }
+}
+@media (min-width: 971px) and (max-width: 1280px) {
+  .gb-wish { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); }
+  .gb-wish--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); }
+  .gb-wish--flip .gi-wish-info { padding-right: 36px; }
+  .gb-wish .gi-wish-art { left: 360px; }
+  .gb-wish--flip .gi-wish-art { left: 0; right: 400px; }
+  .gb-wep { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); grid-template-rows: 470px auto; }
+  .gb-wep .gi-wish-art { left: 400px; height: 470px; }
+  .gb-path { padding-inline: 36px; }
+}
+
+/* ---- PHONES: one wish at a time, the tabs switch it ------------------------
+   Every card sits in the same grid cell, so the list is always as tall as
+   the tallest card and switching never moves the page. */
+@media (max-width: 970px) {
+
+  .gi-bar #gbTabs .gi-tab { flex: 1 0 auto; }
+  .gi-bar #gbServer { align-self: flex-end; }
+  .gb-server-note { margin-top: -6px; margin-bottom: 14px; }
+
+  .gb-list { display: grid; }
+  .gb-wish { grid-area: 1 / 1; }
+  .gb-wish:not(.is-on) { visibility: hidden; }
+  .gb-wish--flip .gi-wish-info { padding: 0 18px 18px; }
+  .gb-wish--flip .gi-wish-art { -webkit-mask-image: linear-gradient(180deg, #000 75%, transparent); mask-image: linear-gradient(180deg, #000 75%, transparent); }
+  .gb-wish .gi-wish-art, .gb-wish--flip .gi-wish-art, .gb-wep .gi-wish-art { inset: auto; height: auto; }
+  .gb-wep .gi-wish-art { -webkit-mask-image: none; mask-image: none; }
+  .gb-weps { inset: 12px 0 10px; }
+  .gb-weps figcaption { font-size: 11px; }
+  .gb-weps figcaption small { display: none; }
+  .gb-rates { flex-wrap: nowrap; overflow-x: auto; margin-top: 12px; scrollbar-width: none; flex: 0 0 100%; }
+  .gb-rates::-webkit-scrollbar { display: none; }
+  .gb-rates li { flex: none; }
+  .gb-rates { order: 1; } /* phones: 4-stars + countdown on one line, the rates under them */
+  .gb-ends { margin: 14px 0 0 auto; }
+  .gb-ends .gi-ends { font-size: 15px; }
+  .gb-ends small, .gb-fourw { display: none; }
+  .gb-path { padding: 0 18px 18px; }
+  .gb-path .gi-label, .gb-path ol { display: none; }
+  .gb-path-line { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1.45; color: var(--gi-muted); }
+  .gb-path-line b { color: #fff; }
+  .gb-path-line .gb-pip { flex: none; margin: 0 2px; }
+
+}
