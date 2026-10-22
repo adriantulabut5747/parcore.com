@@ -509,7 +509,17 @@ since, number of runs, list of past runs; sort by "longest wait"; filters elemen
 Drawn idea: a horizontal timeline per character (one tick per run since 1.0).
 Open: licence of the seed data; whether to include weapons.
 
-**4. Events timeline** · `/genshin-impact/events` · planned
+**4. Events timeline** · `/genshin-impact/events` · BUILT Oct 23 2026 (Adrian to QC). Adrian's calls:
+lanes + art (not a colour per kind), list on phones, current version only. Files: `genshin-impact/events.html`,
+`genshin-events.css/.js`. Desktop: one box, lanes Wishes / Events / Endgame (seelie icons tracker / planner /
+weapons), bars = grey keys with their own art dimmed, elapsed part shaded, packed into rows; axis = a tick per
+server day, date on Mondays, version / "Phase 2" tags from genshin-history.json; red Today line. Hover / tap a
+bar = the fixed-height details panel (art at 1080:390, dates in server time, description, countdown, Primogems).
+Wishes = this version's phases from genshin-history.json + the live weapon wish (history has no weapon wishes).
+Stygian Onslaught sits in Endgame. Undated events (Overflowing Favor) are named above the chart, not drawn.
+Server switch: feed times are Asia's; everything moves with the server except version-update moments, spotted
+as 06:00/07:00 Asia time (`isUpdate`, a heuristic). Phones: list, ending soonest, progress line per row.
+Original plan:
 Data: feed `events` + `banners` + `challenges` (all have start/end). Front end: a Gantt-style
 timeline (paimon.moe's Timeline is the reference): one bar per event across a date axis, a red
 "now" line, bars coloured by kind (wish / event / endgame / double drops), event art on hover/tap,

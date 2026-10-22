@@ -1,0 +1,130 @@
+/* ============================================================
+   GENSHIN IMPACT EVENTS TIMELINE (Oct 23 2026) -- /genshin-impact/events only.
+   Linked after genshin.css (base, pieces, the .gi-tb header, .gi-bar, .gi-more).
+   Data: /genshin-feed.json (events, endgame, the live weapon wish) +
+   /genshin-history.json (this version's wish phases). Behaviour: genshin-events.js.
+
+   Desktop: one box with three lanes (Wishes / Events / Endgame) on a shared
+   date axis. Bars are grey keys with their own art dimmed inside; the part
+   already over is shaded. Red = the today line only (and the shared <24 h
+   countdown pill). Under it, a fixed-height panel for the hovered / tapped bar.
+   Phones: the chart is too wide, so a list, ending soonest first.
+   ============================================================ */
+
+/* ---- ABOVE THE CHART ---------------------------------------------------- */
+.gi-bar #evServer { margin-left: auto; }
+.ev-extra { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: 12.5px; color: var(--gi-muted); }
+.ev-extra b { font-weight: 700; color: #fff; }
+.ev-extra small { font-size: 11.5px; color: var(--gi-dim); }
+
+/* ---- THE CHART ---------------------------------------------------------- */
+.ev-chart { padding: 14px 20px 6px; overflow: hidden; }
+.ev-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); }
+.ev-lane { border-top: 1px solid var(--gi-line); }
+.ev-lane-h { display: flex; align-items: center; gap: 8px; height: 52px; font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: #8e939b; }
+.ev-lane-h svg { flex: none; width: 22px; height: 22px; color: #c9ccd2; }
+.ev-track { position: relative; }
+/* Today: one red line down every row (each track draws its piece; no gaps between rows). */
+.ev-track::after { content: ''; position: absolute; z-index: 3; top: 0; bottom: 0; left: var(--now, -10%); width: 2px; margin-left: -1px; background: var(--gi-acc); pointer-events: none; }
+
+/* Axis: a tick per server day, the date on Mondays, version / phase starts. */
+.ev-axis .ev-track { height: 50px; }
+.ev-day { position: absolute; bottom: 0; width: 1px; height: 5px; background: rgba(255, 255, 255, 0.14); }
+.ev-day.is-mon { height: 10px; background: rgba(255, 255, 255, 0.32); }
+.ev-date { position: absolute; bottom: 15px; padding-left: 4px; font: 600 10.5px/1 'Sora', sans-serif; white-space: nowrap; color: var(--gi-dim); }
+.ev-ver { position: absolute; top: 2px; padding: 3px 6px 2px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 3px; background: #15161a; font: 800 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; color: #c9ccd2; }
+.ev-today { position: absolute; z-index: 4; top: 2px; padding: 3px 6px 2px; border-radius: 3px; background: var(--gi-acc); transform: translateX(-50%); font: 800 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; color: #fff; }
+.ev-mark { position: absolute; top: 0; bottom: 0; border-left: 1px dashed rgba(255, 255, 255, 0.12); }
+
+/* Bars: the grey key, art dimmed inside, the elapsed part shaded. 40px + 8px gap = ROW in the JS. */
+.ev-bar {
+  position: absolute;
+  isolation: isolate;
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  min-width: 6px;
+  margin-top: 6px;
+  padding: 0 10px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 700 12px/1 'Sora', sans-serif;
+  color: #e6e8ec;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.ev-bar-art { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; opacity: 0.24; transition: opacity 0.15s ease; }
+.ev-bar-done { position: absolute; z-index: -1; top: 0; bottom: 0; left: 0; background: rgba(6, 7, 8, 0.5); }
+.ev-bar-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+.ev-bar-left { flex: none; display: flex; align-items: center; gap: 6px; }
+.ev-bar:hover,
+.ev-bar.is-picked { border-color: #c9ccd2; background-color: var(--lb-raise-hover); color: #fff; }
+.ev-bar:hover .ev-bar-art,
+.ev-bar.is-picked .ev-bar-art { opacity: 0.4; }
+.ev-bar:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ev-bar.is-ended { opacity: 0.45; }
+.ev-bar.is-next { border-style: dashed; background: transparent; box-shadow: none; }
+@container (max-width: 190px) {
+  .ev-bar-left { display: none; }
+}
+@container (max-width: 90px) {
+  .ev-faces { display: none; }
+}
+.ev-in { font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--gi-dim); }
+
+/* Round portraits: 5-star characters / weapons on a wish. */
+.ev-faces { flex: none; display: flex; }
+.ev-faces img { width: 26px; height: 26px; border: 1px solid rgba(214, 160, 78, 0.6); border-radius: 50%; background: linear-gradient(160deg, #c99648, #8d5d2a); object-fit: cover; }
+.ev-faces img + img { margin-left: -6px; }
+
+/* ---- DETAILS (fixed height, so picking a bar never moves the page) ------- */
+/* Art column = the event banners' own 1080:390 shape at the panel's height (capped), so they aren't cropped. */
+.ev-detail { --h: 210px; display: grid; grid-template-columns: min(calc(var(--h) * 2.77), 46%) minmax(0, 1fr); height: var(--h); margin-top: 16px; overflow: hidden; }
+.ev-d-art { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0e0f13; }
+.ev-d-img { width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent); mask-image: linear-gradient(90deg, #000 70%, transparent); }
+/* Wishes: the official cut-out on a soft floor. */
+.ev-d-art.is-wish { background: radial-gradient(60% 80% at 50% 70%, rgba(214, 160, 78, 0.14), transparent 70%), #0e0f13; }
+.ev-d-art.is-wish .ev-d-img { object-position: 50% 22%; }
+.ev-d-art.is-weapon .ev-d-img { padding: 12px 0; object-fit: contain; }
+.ev-d-art .ev-faces img { width: 72px; height: 72px; border-width: 2px; }
+.ev-d-art .ev-faces img + img { margin-left: 12px; }
+.ev-d-body { display: flex; flex-direction: column; min-width: 0; padding: 22px 26px 20px; }
+.ev-d-name { margin-top: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 21px/1.2 'Sora', sans-serif; color: #fff; }
+.ev-d-when { margin-top: 6px; font-size: 12.5px; color: var(--gi-muted); }
+.ev-d-when small { margin-left: 4px; font-size: 11px; color: var(--gi-dim); }
+.ev-d-desc { display: -webkit-box; max-width: 80ch; margin: 10px 0 14px; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 13px; line-height: 1.5; color: #b9bdc4; }
+.ev-d-foot { display: flex; gap: 32px; margin-top: auto; }
+.ev-d-foot > div { display: flex; flex-direction: column; gap: 8px; }
+.ev-d-foot .gi-ends { font-size: 15px; }
+
+/* ---- PHONES' LIST ------------------------------------------------------- */
+.ev-list { display: none; }
+
+@media (min-width: 971px) and (max-width: 1280px) {
+  .ev-row { grid-template-columns: 92px minmax(0, 1fr); }
+  .ev-lane-h svg { width: 18px; height: 18px; }
+  .ev-detail { --h: 180px; }
+}
+
+@media (max-width: 970px) {
+  .ev-chart,
+  .ev-detail { display: none; }
+  .gi-bar #evServer { margin-left: 0; align-self: flex-start; }
+  .ev-list { display: flex; flex-direction: column; gap: 6px; }
+  .ev-item { position: relative; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 12px 10px 8px; overflow: hidden; }
+  .ev-item-art { display: flex; align-items: center; justify-content: center; width: 72px; height: 42px; overflow: hidden; border-radius: 4px; background: var(--lb-well); }
+  .ev-item-art img { width: 100%; height: 100%; object-fit: cover; }
+  .ev-item-art > svg { width: 22px; height: 22px; color: #5d616b; }
+  .ev-item-art .ev-faces img { width: 30px; height: 30px; }
+  .ev-item-body { min-width: 0; }
+  .ev-item-body b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 13px/1.25 'Sora', sans-serif; color: #fff; }
+  .ev-item-body small { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--gi-muted); }
+  .ev-item-left { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .ev-item-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: #6a6e77; }
+}
