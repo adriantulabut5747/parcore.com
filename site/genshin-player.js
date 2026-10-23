@@ -9,7 +9,7 @@
   const { $, esc, EL, NEUTRAL, elIcon, uidServer, lookup, ON_PAGES, playerHref } = window.GI;
   const UI = 'https://enka.network/ui/';
   // GitHub Pages can't run the function, so it calls the Netlify site's (CORS allows it).
-  const API = ON_PAGES ? 'https://extraordinary-donut-f21bde.netlify.app/api/genshin' : '/api/genshin';
+  const API = ON_PAGES ? 'https://parchrome.netlify.app/api/genshin' : '/api/genshin';
   // The UID: /genshin-impact/player/<UID> on Netlify, ?uid=<UID> on GitHub Pages.
   const seg = location.pathname.split('/genshin-impact/player/')[1] || '';
   const raw = decodeURIComponent(new URLSearchParams(location.search).get('uid') || seg.replace(/\/$/, ''));

@@ -746,10 +746,12 @@ Uses the shared article system (`docs/articles-guide.md`, `site/articles.json`, 
 - **GitHub Pages** (adriantulabut5747.github.io/parcore.com) has no rewrites and no functions: there
   a player is `/genshin-impact/player/?uid=<UID>` (`GI.playerHref`, `GI.ON_PAGES` in genshin-core.js,
   the CoC tracker's `?tag=` pattern) and the page calls the Netlify test site's
-  `https://extraordinary-donut-f21bde.netlify.app/api/genshin` (the function's ORIGINS allows Pages).
-  That only works once genshin-api.mjs is deployed to that Netlify site: as of Oct 23 2026 pushes
-  reach GitHub Pages only (no Netlify deploy on any recent commit; neither Netlify site had Events /
-  Endgame either), so Netlify needs a deploy from Adrian's account.
+  `https://parchrome.netlify.app/api/genshin` (the function's ORIGINS allows Pages).
+  **Netlify (Oct 23 2026):** the parchrome site (team wildparcore) was Netlify Drop only until Oct 23;
+  it is now linked to this repo (main, publish `site`, functions `netlify/functions`), so every push
+  to main deploys it -- the feed workflows' commits too (credits). It has no `COC_API_KEY` yet (the
+  CoC tracker on it says noKey); the CoC pages on Pages still use extraordinary-donut-f21bde (another
+  Netlify account, which has the key).
 - **Known gap**: on `/genshin-impact/player/<UID>` the nav doesn't light "Player lookup" (full-path
   matching in 11layout.js); `/genshin-impact/player/` does.
 - Headless screenshots: the build's wish art sometimes isn't painted in the capture until something
