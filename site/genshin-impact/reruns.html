@@ -16,10 +16,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261022sb">
+<link rel="stylesheet" href="/11layout.css?v=20261023bc">
 <link rel="stylesheet" href="/coc-more.css?v=20261022gn">
-<link rel="stylesheet" href="/genshin.css?v=20261023p">
-<link rel="stylesheet" href="/genshin-reruns.css?v=20261022c">
+<link rel="stylesheet" href="/genshin.css?v=20261023ud">
+<link rel="stylesheet" href="/genshin-reruns.css?v=20261023v2">
 </head>
 <body class="gi-page" data-game-nav="genshin-impact">
 
@@ -90,6 +90,7 @@
 
   <div class="coc-main">
     <div class="coc-content">
+      <main class="gi">
       <div class="gi-frame">
 
         <!-- HEADER: the shared .gi-tb (genshin.css), same as Banners. Facts filled from the data. -->
@@ -99,48 +100,120 @@
             <img class="gi-tb-icon" src="/images/genshin/fate.webp" alt="" width="76" height="76">
             <div class="gi-tb-copy">
               <h1 class="gi-title"><span class="gi-vh">Genshin Impact </span>Rerun <em>tracker</em></h1>
-              <p class="gi-tb-desc">Every banner each character has been on since 1.0, and how long since their last one.</p>
+              <p class="gi-tb-desc">Every banner each character has been on since 1.0, how long since their last one, and who's overdue.</p>
               <ul class="gi-tb-facts" id="rtFacts"></ul>
             </div>
           </div>
         </header>
 
-        <!-- Rarity + sort, then element + search. Built and wired by genshin-reruns.js. -->
-        <div class="gi-bar">
-          <div class="gi-tray" id="rtRarity" role="tablist" aria-label="Rarity">
-            <button type="button" class="gi-tab" role="tab" data-v="5">5&#9733; characters</button>
-            <button type="button" class="gi-tab" role="tab" data-v="4">4&#9733; characters</button>
+        <!-- ON THE WISHES NOW: each live phase, which run this is and how long everyone waited for it.
+             Hidden until genshin-reruns.js finds a live phase. -->
+        <section class="gi-sec rt-sec--first" id="rtNowSec" hidden>
+          <div class="gi-sec-head">
+            <div>
+              <h2 class="gi-title">On the wishes <em>now.</em></h2>
+              <p class="mch-sec-sub">Who's back, which run this is, and how long they were gone.</p>
+            </div>
+            <div class="gi-tray gi-tray--sm" id="rtSrv" role="group" aria-label="Server">
+              <button type="button" class="gi-tab" data-server="asia">Asia</button>
+              <button type="button" class="gi-tab" data-server="america">NA</button>
+              <button type="button" class="gi-tab" data-server="europe">EU</button>
+            </div>
           </div>
-          <div class="gi-tray gi-tray--sm" id="rtSort" role="tablist" aria-label="Sort by">
-            <button type="button" class="gi-tab" role="tab" data-v="wait">Longest wait</button>
-            <button type="button" class="gi-tab" role="tab" data-v="runs">Most runs</button>
-            <button type="button" class="gi-tab" role="tab" data-v="new">Newest</button>
-          </div>
-        </div>
-        <div class="rt-filters">
-          <div class="gi-tray gi-tray--sm" id="rtEl" role="tablist" aria-label="Element"></div>
-          <label class="lb-search rt-find" for="rtQ">
-            <span class="gi-vh">Find a character</span>
-            <input id="rtQ" class="lb-search-input" type="search" placeholder="Find a character" autocomplete="off" spellcheck="false">
-            <span class="lb-search-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
-          </label>
-        </div>
+          <div class="rt-now-list" id="rtNow"></div>
+        </section>
 
-        <!-- One row per character (open it for every run). Timelines share one axis (#rtAxis). -->
-        <div class="rt-head" aria-hidden="true"><span></span><span class="gi-label" id="rtCount"></span><div class="rt-axis" id="rtAxis"></div><span class="gi-label">Last banner</span><span class="gi-label">Waiting</span></div>
-        <div class="rt-list" id="rtList"><p class="gi-empty">Loading the banner history&hellip;</p></div>
+        <!-- LONGEST WAITS: the top five as wish cards. Its own rarity tray. -->
+        <section class="gi-sec">
+          <div class="gi-sec-head">
+            <div>
+              <h2 class="gi-title">Longest <em>waits.</em></h2>
+              <p class="mch-sec-sub" id="rtTopSub">The characters with the longest time since their last banner.</p>
+            </div>
+            <div class="gi-tray gi-tray--sm" id="rtTopR" role="group" aria-label="Rarity">
+              <button type="button" class="gi-tab" data-v="5">5&#9733;</button>
+              <button type="button" class="gi-tab" data-v="4">4&#9733;</button>
+            </div>
+          </div>
+          <div class="rt-top" id="rtTop"></div>
+        </section>
+
+        <!-- EVERY CHARACTER: rarity + sort, then element + weapon + search (kept in the address).
+             One row per character (open it for every run). Timelines share one axis (#rtAxis). -->
+        <section class="gi-sec" id="all">
+          <div class="gi-sec-head">
+            <div>
+              <h2 class="gi-title">Every <em>character.</em></h2>
+              <p class="mch-sec-sub">A mark for every banner since 1.0. Open a row for each run and the gaps between them.</p>
+            </div>
+          </div>
+          <div class="gi-bar rt-bar">
+            <div class="gi-tray" id="rtRarity" role="group" aria-label="Rarity">
+              <button type="button" class="gi-tab" data-v="5">5&#9733; characters</button>
+              <button type="button" class="gi-tab" data-v="4">4&#9733; characters</button>
+            </div>
+            <div class="gi-tray gi-tray--sm" id="rtSort" role="group" aria-label="Sort by">
+              <button type="button" class="gi-tab" data-v="wait">Longest wait</button>
+              <button type="button" class="gi-tab" data-v="runs">Most banners</button>
+              <button type="button" class="gi-tab" data-v="new">Newest</button>
+              <button type="button" class="gi-tab" data-v="az">A&ndash;Z</button>
+            </div>
+          </div>
+          <div class="rt-filters">
+            <div class="gi-tray gi-tray--sm" id="rtEl" role="group" aria-label="Element"></div>
+            <div class="gi-tray gi-tray--sm" id="rtW" role="group" aria-label="Weapon"></div>
+            <label class="lb-search rt-find" for="rtQ">
+              <span class="gi-vh">Find a character</span>
+              <input id="rtQ" class="lb-search-input" type="search" placeholder="Find a character" autocomplete="off" spellcheck="false">
+              <span class="lb-search-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+            </label>
+          </div>
+          <div class="rt-head"><span class="rt-count"><span id="rtCount"></span><button type="button" class="rt-clear" id="rtClear" hidden>Clear filters</button></span><div class="rt-axis" id="rtAxis" aria-hidden="true"></div><span class="gi-label">Last banner</span><span class="gi-label">Waiting</span></div>
+          <div class="rt-list" id="rtList"><p class="gi-empty">Loading the banner history&hellip;</p></div>
+        </section>
+
+        <!-- EVERY WISH SINCE 1.0: one column per phase, grouped by version, newest in view. -->
+        <section class="gi-sec">
+          <div class="gi-sec-head">
+            <div>
+              <h2 class="gi-title">Every wish since <em>1.0.</em></h2>
+              <p class="mch-sec-sub">Each phase's featured 5&#9733; and 4&#9733; characters, newest on the right. Tap a face for their history.</p>
+            </div>
+            <div class="gi-acts">
+              <button type="button" class="gi-key gi-arrow" id="rtRibPrev" aria-label="Older wishes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <button type="button" class="gi-key gi-arrow" id="rtRibNext" aria-label="Newer wishes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="gi-box rt-ribbon" id="rtRibbon"></div>
+        </section>
+
+        <!-- RERUN RECORDS: tiles, then every 5-star comeback by how long it took. -->
+        <section class="gi-sec">
+          <div class="gi-sec-head">
+            <div>
+              <h2 class="gi-title">Rerun <em>records.</em></h2>
+              <p class="mch-sec-sub">The extremes since 1.0, worked out from every banner above.</p>
+            </div>
+          </div>
+          <div class="rt-recs" id="rtRecs"></div>
+          <div class="gi-box rt-hist-box">
+            <h3 class="rt-hist-t">How long a 5&#9733; rerun takes</h3>
+            <p class="rt-hist-sub" id="rtHistSub"></p>
+            <div class="rt-hist" id="rtHist"></div>
+          </div>
+        </section>
 
         <div class="gi-more">
           <a class="gi-box gi-card" href="/genshin-impact/banners">
             <div><b>Current banners</b><p>Who's on the wishes right now, the real rates, and when they end.</p></div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
-          <a class="gi-box gi-card" href="/genshin-impact/#pity">
-            <div><b>Your pity</b><p>Drag to your pull count and see your odds of a 5&#9733; from there.</p></div>
+          <a class="gi-box gi-card" href="/genshin-impact/characters">
+            <div><b>All characters</b><p>Every playable character by nation or newest, with their element, weapon and rarity.</p></div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
         </div>
-        <p class="gi-note">Waiting = days since the character's last banner ended. Tall marks are Event Wishes, short hollow ones Chronicled Wishes, white is the latest and red is live now; standard-banner 5&#9733;s (only ever in Chronicled Wishes) aren't listed. 4&#9733; runs are the times they were one of a wish's featured 4&#9733;s.</p>
+        <p class="gi-note">Waiting = days since the character's last banner ended; "&times; usual" compares it with their average gap between banners (the bar's middle mark is 1&times;). Tall marks are Event Wishes, short hollow ones Chronicled Wishes, white is the latest and red is live now; the bands behind the marks are major versions. A 5&#9733;'s banners include Chronicled Wishes, since you can aim for them there; standard-banner 5&#9733;s (only ever in Chronicled Wishes) aren't listed. A 4&#9733;'s runs are the Event Wishes where they were one of the three featured 4&#9733;s (a Chronicled Wish's 4&#9733;s are its pool, not a rate-up). Weapon banners aren't tracked yet.</p>
         <p class="gi-credit">Game assets &copy; HoYoverse. Parchrome is a fan site and isn't affiliated with HoYoverse. Banner history: paimon.moe (MIT License, &copy; 2021 Made Baruna) plus our live feed, refreshed every three hours.</p>
 
       </div>
@@ -203,8 +276,8 @@
   </div>
 </div>
 
-<script src="/11layout.js?v=20261022gn"></script>
-<script src="/genshin-core.js?v=20261023s"></script>
-<script src="/genshin-reruns.js?v=20261022c"></script>
+<script src="/11layout.js?v=20261023gp"></script>
+<script src="/genshin-core.js?v=20261023ci"></script>
+<script src="/genshin-reruns.js?v=20261023v2"></script>
 </body>
 </html>

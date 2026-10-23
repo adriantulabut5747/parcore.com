@@ -1,109 +1,389 @@
 /* ============================================================
-   GENSHIN IMPACT RERUN TRACKER (Oct 22 2026) -- /genshin-impact/reruns only.
+   GENSHIN IMPACT RERUN TRACKER (v2 Oct 23 2026) -- /genshin-impact/reruns only.
    Linked after genshin.css (base, pieces, the .gi-tb header, .gi-bar, .gi-more).
    Data: /genshin-history.json (every wish since 1.0) + /genshin-feed.json
-   (the roster: icons, elements). Behaviour: genshin-reruns.js.
+   (the roster: icons, wish-card art, elements). Behaviour: genshin-reruns.js.
 
-   Under the header: rarity tabs + sort (one row), element filter + search
-   (the next), then one row per character: who, a drawn timeline of every
-   banner they've been on since 1.0 (shared axis), their last banner and the
-   days since. A row opens (native <details>) to list every run.
+   Under the header, five sections:
+   1. On the wishes now (.rt-lv): the live phase's 5-star wish cards on their
+      element's light, which run this is and how long everyone was gone.
+   2. Longest waits (.rt-tc): the top five as wish cards, a "x usual" meter.
+   3. Every character: filters, then one row per character with a drawn
+      timeline (version bands behind it) that opens to a run log (.rt-run).
+   4. Every wish since 1.0 (.rt-ribbon): one column per phase, by version.
+   5. Rerun records (.rt-rec) + a chart of how long comebacks take (.rt-hist).
+   Red only where the eye should go: live marks, overdue meters, the median bar.
    ============================================================ */
 
-/* ---- FILTERS ------------------------------------------------------------ */
-.rt-filters { display: flex; align-items: center; gap: 12px; margin: -10px 0 24px; }
+.rt-sec--first { padding-top: 56px; }
+
+/* Faces anywhere on the page open that character's row (data-go). */
+.rt-face { flex: none; padding: 0; border: 0; border-radius: 6px; background: none; cursor: pointer; transition: transform 0.15s var(--gi-ease); }
+span.rt-face { cursor: default; }
+button.rt-face:hover { transform: translateY(-2px); }
+button.rt-face:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.rt-face .gi-tile { display: block; width: 44px; height: 44px; } /* a span in a button stays inline (width ignored) without this */
+.rt-face.is-sm .gi-tile { width: 26px; height: 26px; border-radius: 4px; }
+
+/* The "x usual" meter: 0..2x their average gap, the white notch = 1x. Grey under it,
+   red past it (overdue). */
+.rt-meter { position: relative; display: block; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.1); }
+.rt-meter i { position: absolute; inset: 0 auto 0 0; width: var(--p); border-radius: 2px; background: #8b9099; }
+.rt-meter.is-over i { background: var(--gi-acc); }
+.rt-meter::after { content: ''; position: absolute; left: 50%; top: -3px; width: 2px; height: 10px; border-radius: 1px; background: rgba(255, 255, 255, 0.55); }
+
+/* ---- 1. ON THE WISHES NOW --------------------------------------------------- */
+.rt-now-list { display: flex; flex-direction: column; gap: 16px; }
+/* The art side wears the first 5-star's element light (--gi-el, set inline), like the
+   wish cards on the Lobby and Banners pages. */
+.rt-lv {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
+  min-height: 380px;
+  overflow: hidden;
+  background:
+    radial-gradient(42% 80% at 22% 70%, color-mix(in srgb, var(--gi-el) 22%, transparent), transparent 72%),
+    linear-gradient(105deg, color-mix(in srgb, var(--gi-el) 12%, #121318) 0%, var(--lb-box) 52%);
+}
+.rt-lv-art {
+  position: relative;
+  display: flex;
+  justify-content: flex-end; /* the cards lean on the info column */
+  align-items: stretch;
+  padding: 0 4%;
+  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent), linear-gradient(0deg, transparent, #000 22%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, #000 70%, transparent), linear-gradient(0deg, transparent, #000 22%);
+  mask-composite: intersect;
+}
+/* The cards slanted like the 10-pull result screen (the Characters header's fan). */
+.rt-lv-art img {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 0;
+  height: 100%;
+  margin-left: -18px;
+  object-fit: cover;
+  clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%);
+}
+.rt-lv-art img:first-child { margin-left: 0; }
+.rt-lv-art.is-many img { flex: 1 1 0; }
+.rt-lv-info { display: flex; flex-direction: column; justify-content: center; gap: 22px; min-width: 0; padding: 32px 40px 32px 8px; }
+.rt-lv-info .gi-eyebrow { margin: 0; }
+.rt-lv-info .gi-eyebrow::before { background: var(--gi-el); }
+.rt-lv-fives { display: flex; flex-wrap: wrap; gap: 14px 40px; }
+.rt-lv-name { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+.rt-lv-name img { width: 24px; height: 24px; }
+.rt-lv-name span { font-family: 'Cinzel', serif !important; font-size: 30px; font-weight: 800; line-height: 1.05; text-transform: uppercase; color: #fff; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); }
+.rt-lv-name:hover span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.rt-lv-name:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.rt-lv-five p { margin-top: 6px; font-size: 13px; color: var(--gi-muted); }
+.rt-lv-five b, .rt-lv-four small b { font-weight: 700; color: #fff; }
+.rt-lv-four ul { display: flex; flex-wrap: wrap; gap: 12px 26px; margin-top: 10px; list-style: none; }
+.rt-lv-four li { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.rt-lv-four .gi-tile { width: 40px; height: 40px; }
+.rt-lv-four li > span { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rt-lv-four li > span > b { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; }
+.rt-lv-four small { font-size: 11px; color: var(--gi-muted); white-space: nowrap; }
+.rt-lv-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding-top: 18px; border-top: 1px solid var(--gi-line); }
+.rt-lv-foot > div { display: flex; flex-direction: column; gap: 6px; }
+.rt-lv-clock { font: 800 26px/1 'Sora', sans-serif; }
+.rt-lv-clock.is-ending { margin: 0; padding: 4px 8px; align-self: flex-start; }
+.rt-lv-foot small { font-size: 11px; color: var(--gi-dim); }
+
+/* ---- 2. LONGEST WAITS -------------------------------------------------------- */
+.rt-top { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+/* Subtle at rest (art dimmed), special on hover: full colour, the art leans in. */
+.rt-tc {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  aspect-ratio: 5 / 8;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: linear-gradient(160deg, #4a3c6a, #1d1a28);
+  box-shadow: var(--lb-shadow);
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.25s var(--gi-ease), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.rt-tc.r5 { background: linear-gradient(160deg, #6a4c2a, #2b2014); }
+.rt-tc-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; filter: brightness(0.7) saturate(0.85); transition: filter 0.35s ease, transform 0.6s var(--gi-ease); }
+.rt-tc::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10, 10, 12, 0) 34%, rgba(10, 10, 12, 0.82) 64%, rgba(10, 10, 12, 0.96)); }
+.rt-tc-rank { position: absolute; top: 8px; left: 12px; font-family: 'Cinzel', serif !important; font-size: 44px; font-weight: 800; line-height: 1; color: rgba(255, 255, 255, 0.9); text-shadow: 0 3px 14px rgba(0, 0, 0, 0.7); }
+.rt-tc:first-child .rt-tc-rank { color: var(--gi-acc-text); }
+.rt-tc-body { position: absolute; inset: auto 0 0; display: flex; flex-direction: column; gap: 6px; padding: 14px 14px 16px; }
+.rt-tc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
+.rt-tc-days { display: flex; align-items: baseline; gap: 6px; font-size: 12px; color: var(--gi-muted); }
+.rt-tc-days strong { font-family: 'Cinzel', serif !important; font-size: 36px; font-weight: 800; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+.rt-tc-meta { font-size: 11px; line-height: 1.35; color: var(--gi-muted); }
+.rt-tc .rt-meter { margin: 4px 0 1px; }
+.rt-tc:hover,
+.rt-tc:focus-visible { border-color: rgba(var(--gi-acc-rgb), 0.6); box-shadow: var(--lb-shadow-hover); }
+.rt-tc:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.rt-tc:hover .rt-tc-art,
+.rt-tc:focus-visible .rt-tc-art { filter: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .rt-tc:hover,
+  .rt-tc:focus-visible { transform: translateY(-3px); }
+  .rt-tc:hover .rt-tc-art,
+  .rt-tc:focus-visible .rt-tc-art { transform: scale(1.05); }
+  .rt-tc { animation: rt-rise 0.6s var(--gi-ease) both; animation-delay: calc(var(--i) * 0.06s); }
+}
+@keyframes rt-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- 3. EVERY CHARACTER: filters ----------------------------------------------- */
+.rt-bar { margin-top: 0; }
+.rt-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: -10px 0 24px; }
 .rt-filters .gi-tab { flex: 0 0 auto; }
 #rtEl .gi-tab { padding: 0 9px; }
 #rtEl .gi-tab img { width: 22px; height: 22px; border-radius: 0; object-fit: contain; }
-.rt-find { flex: 1; max-width: 360px; margin-left: auto; padding-block: 4px; }
+.rt-find { flex: 1; min-width: 220px; max-width: 360px; margin-left: auto; padding-block: 4px; }
 .rt-find .lb-search-input { font-size: 14px; }
 .rt-find .lb-search-btn { width: 36px; height: 36px; }
+.rt-count { grid-column: 1 / 3; display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--gi-muted); white-space: nowrap; }
+.rt-count b { font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+.rt-clear { padding: 4px 0; border: 0; background: none; font: 500 12px/1 'Sora', sans-serif; color: #c9ccd2; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.rt-clear:hover { color: #fff; }
+.rt-clear:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ---- THE LIST ----------------------------------------------------------- */
 /* One grid for the head and every row, so the timelines line up on one axis. */
 .rt-head,
 .rt-row > summary {
   display: grid;
-  grid-template-columns: 52px minmax(0, 230px) minmax(0, 1fr) 118px 104px;
+  grid-template-columns: 52px minmax(0, 230px) minmax(0, 1fr) 118px 112px;
   align-items: center;
   gap: 18px;
 }
-.rt-head { padding: 0 18px 10px; }
+.rt-head { align-items: end; padding: 0 18px 10px; }
 .rt-head .gi-label:last-child { text-align: right; }
-.rt-axis { position: relative; height: 14px; }
-.rt-axis span { position: absolute; top: 0; transform: translateX(-50%); font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1px; color: var(--gi-dim); }
+/* Axis: a band per major version (labelled), the years under it, "Today" at the end. */
+.rt-axis { position: relative; height: 34px; border-radius: 3px 3px 0 0; background: var(--bands); }
+.rt-ax-v { position: absolute; top: 4px; overflow: hidden; text-align: center; white-space: nowrap; font-family: 'Cinzel', serif !important; font-size: 11px; font-weight: 800; line-height: 1; color: #9aa0a8; }
+.rt-ax-y { position: absolute; bottom: 2px; transform: translateX(-50%); font: 600 9.5px/1 'Sora', sans-serif; letter-spacing: 0.6px; color: var(--gi-dim); }
+.rt-ax-y::before { content: ''; position: absolute; left: 50%; bottom: 12px; width: 1px; height: 6px; background: rgba(255, 255, 255, 0.18); }
+.rt-ax-now { position: absolute; right: 0; bottom: 2px; font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 0.6px; text-transform: uppercase; color: var(--gi-acc-text); }
 .rt-list { display: flex; flex-direction: column; gap: 8px; }
-.rt-row { overflow: hidden; }
+.rt-row { overflow: hidden; scroll-margin: 120px; }
 .rt-row > summary { padding: 12px 18px; list-style: none; cursor: pointer; }
 .rt-row > summary::-webkit-details-marker { display: none; }
 .rt-row > summary:hover { background: var(--lb-box-hover); }
 .rt-row > summary:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.rt-row[open] > summary { background: var(--lb-box-hover); }
+.rt-row.is-flash { animation: rt-flash 1.6s ease; }
+@keyframes rt-flash {
+  0%, 30% { border-color: rgba(var(--gi-acc-rgb), 0.9); }
+  100% { border-color: var(--lb-edge); }
+}
 .rt-row .gi-tile { width: 52px; height: 52px; }
 .rt-who { min-width: 0; }
 .rt-who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
 .rt-who span { display: flex; align-items: center; gap: 6px; margin-top: 5px; overflow: hidden; white-space: nowrap; font-size: 11.5px; color: var(--gi-muted); }
 .rt-who img { flex: none; width: 15px; height: 15px; }
 .rt-who i, .rt-who em { overflow: hidden; text-overflow: ellipsis; font-style: normal; }
-.rt-who em { display: none; } /* phones: "4 runs · last Oct 2026" in place of weapon · nation */
+.rt-who em { display: none; } /* phones: "4 runs + 1 Chronicled" in place of weapon · nation */
 
-/* The drawn timeline: a hairline from 1.0 to today, one mark per banner.
-   Event wish = tall grey bar; Chronicled = short hollow mark (a 3-week run is
-   only a few px wide, so the height tells them apart); the latest = white; on
-   a banner right now = red (the one thing that needs the eye). */
-.rt-line { position: relative; height: 22px; }
+/* The drawn timeline: one mark per banner on the version bands (--bands, set by the
+   script on the section). Event wish = tall grey bar; Chronicled = short hollow mark
+   (a 3-week run is only a few px wide, so the height tells them apart); the latest =
+   white; on a banner right now = red (the one thing that needs the eye). */
+.rt-line { position: relative; height: 26px; border-radius: 3px; background: var(--bands); }
 .rt-line::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(255, 255, 255, 0.1); }
-.rt-tick { position: absolute; top: 4px; bottom: 4px; min-width: 4px; border-radius: 2px; background: #6a6e77; }
-.rt-tick.is-chron { top: 7px; bottom: 7px; border: 2px solid #6a6e77; background: transparent; }
+.rt-tick { position: absolute; top: 5px; bottom: 5px; min-width: 4px; border-radius: 2px; background: #6a6e77; }
+.rt-tick.is-chron { top: 8px; bottom: 8px; border: 2px solid #6a6e77; background: transparent; }
 .rt-tick.is-last { background: #fff; }
 .rt-tick.is-last.is-chron { border-color: #fff; background: transparent; }
 .rt-tick.is-now { background: var(--gi-acc); border-color: var(--gi-acc); }
 
-.rt-last { display: flex; flex-direction: column; gap: 4px; }
+.rt-last { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .rt-last b { font: 700 13px/1.1 'Sora', sans-serif; color: #fff; white-space: nowrap; }
-.rt-last small { font-size: 11px; color: var(--gi-dim); white-space: nowrap; }
-.rt-wait { text-align: right; }
-.rt-wait b { display: block; font: 800 24px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
-.rt-wait small { display: block; margin-top: 4px; font-size: 11px; color: var(--gi-muted); }
+.rt-last small { overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: var(--gi-dim); white-space: nowrap; }
+.rt-wait { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.rt-wait b { display: block; font-family: 'Cinzel', serif !important; font-size: 26px; font-weight: 800; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+.rt-wait small { display: block; margin-top: 4px; font-size: 11px; color: var(--gi-muted); white-space: nowrap; }
+.rt-wait .rt-meter { width: 84px; margin-top: 8px; }
 .rt-now { display: inline-block; padding: 5px 8px; border-radius: 4px; background: rgba(var(--gi-acc-rgb), 0.3); font: 700 11px/1 'Sora', sans-serif; color: #ffa395; white-space: nowrap; }
 
-/* Opened: every run, oldest first, and the real gaps. */
-.rt-runs { padding: 4px 18px 18px 88px; border-top: 1px solid var(--gi-line); }
-.rt-runs p { margin-top: 12px; font-size: 12.5px; color: var(--gi-muted); }
-.rt-runs p b { color: #fff; }
-.rt-runs ol { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; list-style: none; }
-.rt-runs li { padding: 6px 9px 5px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-well); font: 600 11px/1 'Sora', sans-serif; white-space: nowrap; color: var(--gi-muted); }
-.rt-runs li b { margin-right: 4px; color: #fff; }
-
+/* Opened: every run as a card, oldest first, the days between them, then the sums. */
+.rt-runs { padding: 16px 18px 18px 88px; border-top: 1px solid var(--gi-line); }
+.rt-log { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.rt-run { display: flex; flex-direction: column; gap: 5px; min-width: 150px; padding: 10px 12px 11px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--card-well); }
+.rt-run.is-chron { border-style: dashed; border-color: #2b2d34; }
+.rt-run.is-now { border-color: rgba(var(--gi-acc-rgb), 0.75); }
+.rt-run-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.rt-run-top b { font-family: 'Cinzel', serif !important; font-size: 16px; font-weight: 800; color: #fff; }
+.rt-run-top span { font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 1.1px; text-transform: uppercase; color: var(--gi-muted); }
+.rt-run.is-now .rt-run-top span { color: #ffa395; }
+.rt-run p { font-size: 11.5px; color: var(--gi-muted); white-space: nowrap; }
+.rt-run-co { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+.rt-more { font: 700 10.5px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.rt-gap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0 4px; font: 600 9.5px/1 'Sora', sans-serif; letter-spacing: 0.6px; text-transform: uppercase; color: var(--gi-dim); }
+.rt-gap b { font: 800 13px/1 'Sora', sans-serif; letter-spacing: 0; color: #c9ccd2; font-variant-numeric: tabular-nums; }
+.rt-gap::before { content: ''; width: 28px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); }
+.rt-sum { margin-top: 14px; font-size: 12.5px; line-height: 1.6; color: var(--gi-muted); }
+.rt-sum b { color: #fff; }
 .rt-empty { padding: 28px 18px; }
+
+/* ---- 4. EVERY WISH SINCE 1.0 ---------------------------------------------------- */
+.rt-ribbon { display: flex; padding: 18px 8px 20px; overflow-x: auto; scrollbar-width: thin; }
+.rt-ver { flex: none; padding: 0 12px; }
+.rt-ver + .rt-ver { border-left: 1px solid var(--gi-line); }
+.rt-ver-n { display: block; margin: 0 0 12px 2px; font-family: 'Cinzel', serif !important; font-size: 15px; font-weight: 800; color: #fff; }
+.rt-ver-ph { display: flex; gap: 6px; }
+.rt-ph { flex: none; display: flex; flex-direction: column; align-items: center; gap: 7px; width: 82px; height: 176px; padding: 9px 6px 10px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--card-well); }
+.rt-ph-d { font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; color: var(--gi-dim); }
+.rt-ph-5 { display: flex; flex-direction: column; gap: 5px; }
+.rt-ph-5 .gi-tile { width: 48px; height: 48px; }
+.rt-ph-4 { display: flex; gap: 3px; margin-top: auto; }
+.rt-ph-4 .gi-tile { width: 22px; height: 22px; }
+.rt-ph.is-chron { width: 108px; border-style: dashed; border-color: #2b2d34; }
+.rt-ph.is-chron .rt-ph-5 { display: grid; grid-template-columns: repeat(3, 28px); gap: 4px; }
+.rt-ph.is-chron .rt-ph-5 .gi-tile { width: 28px; height: 28px; border-radius: 4px; }
+.rt-ph.is-now { border-color: rgba(var(--gi-acc-rgb), 0.75); }
+.rt-ph.is-now .rt-ph-d { color: #ffa395; }
+
+/* ---- 5. RERUN RECORDS ------------------------------------------------------------ */
+.rt-recs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rt-rec { display: flex; flex-direction: column; padding: 18px 20px 20px; }
+.rt-rec-v { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; font-size: 12.5px; color: var(--gi-muted); }
+.rt-rec-v b { font-family: 'Cinzel', serif !important; font-size: 38px; font-weight: 800; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+.rt-rec-faces { display: flex; gap: 5px; margin-top: 14px; }
+.rt-rec-faces .gi-tile { width: 34px; height: 34px; }
+.rt-rec-d { margin-top: auto; padding-top: 12px; font-size: 12px; line-height: 1.5; color: var(--gi-muted); }
+
+/* The chart: one bar per version-long bin (2px gaps, rounded tops on the baseline),
+   grey; the median's bin in our red. Hover / focus a bar for its count and who. */
+.rt-hist-box { margin-top: 12px; padding: 24px 28px 22px; }
+.rt-hist-t { font: 800 16px/1.2 'Sora', sans-serif; color: #fff; }
+.rt-hist-sub { margin-top: 6px; max-width: 80ch; font-size: 12.5px; line-height: 1.55; color: var(--gi-muted); }
+.rt-hist-sub b { color: #fff; }
+.rt-hist-bars { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); align-items: end; gap: 2px; height: 180px; margin-top: 26px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+.rt-bin { position: relative; display: flex; align-items: flex-end; height: 100%; outline: 0; }
+.rt-bin i { width: 100%; height: var(--h); border-radius: 4px 4px 0 0; background: #4d5059; transition: background-color 0.15s ease; }
+.rt-bin.is-mid i { background: var(--gi-acc); }
+.rt-bin:not(.is-zero):hover i,
+.rt-bin:focus-visible i { background: #9aa0a8; }
+.rt-bin.is-mid:hover i,
+.rt-bin.is-mid:focus-visible i { background: var(--gi-acc-hover); }
+.rt-tip {
+  position: absolute;
+  z-index: 3;
+  bottom: calc(var(--h) + 8px);
+  left: 50%;
+  display: none;
+  width: max-content;
+  max-width: 240px;
+  padding: 9px 11px;
+  border: 1px solid #2b2d34;
+  border-radius: 6px;
+  background: #0d0e11;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.8);
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--gi-muted);
+  pointer-events: none;
+}
+.rt-tip b { display: block; font-size: 12.5px; color: #fff; }
+.rt-tip small { display: block; margin-top: 4px; font-size: 11px; color: #c9ccd2; }
+.rt-bin:hover .rt-tip,
+.rt-bin:focus-visible .rt-tip { display: block; }
+.rt-bin:nth-child(-n + 3) .rt-tip { left: 0; transform: none; }
+.rt-bin:nth-last-child(-n + 3) .rt-tip { left: auto; right: 0; transform: none; }
+.rt-hist-x { display: grid; grid-template-columns: repeat(var(--n, 30), minmax(0, 1fr)); gap: 2px; margin-top: 6px; font: 600 10px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.rt-hist-x span { overflow: visible; white-space: nowrap; }
+.rt-hist-cap { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 12px; }
+.rt-hist-key { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gi-muted); }
+.rt-hist-key i { width: 10px; height: 10px; border-radius: 2px; background: var(--gi-acc); }
 
 /* ---- DESKTOP NARROW ----------------------------------------------------- */
 @media (min-width: 971px) and (max-width: 1280px) {
   .rt-head,
-  .rt-row > summary { grid-template-columns: 48px minmax(0, 180px) minmax(0, 1fr) 96px 92px; gap: 14px; }
+  .rt-row > summary { grid-template-columns: 48px minmax(0, 170px) minmax(0, 1fr) 96px 100px; gap: 14px; }
   .rt-row .gi-tile { width: 48px; height: 48px; }
-  .rt-filters { flex-wrap: wrap; }
-  .rt-find { max-width: none; flex-basis: 100%; }
+  .rt-find { max-width: none; flex-basis: 100%; margin-left: 0; }
+  .rt-runs { padding-left: 80px; }
+  .rt-lv-name span { font-size: 24px; }
+  .rt-lv-info { padding-right: 28px; }
+  .rt-tc-days strong { font-size: 30px; }
+  .rt-tc-rank { font-size: 36px; }
 }
 
-/* ---- PHONES: who + days on one line, the timeline under them -------------- */
+/* ---- PHONES ------------------------------------------------------------- */
 @media (max-width: 970px) {
-  .gi-bar #rtSort { align-self: flex-start; }
-  .rt-filters { flex-direction: column; align-items: stretch; gap: 10px; margin: -6px 0 16px; }
-  .rt-find { max-width: none; margin-left: 0; }
+  .rt-sec--first { padding-top: 40px; }
+  .gi-sec-head:has(#rtSrv), .gi-sec-head:has(#rtTopR) { flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+
+  /* Live: the cards as a band on top, the info under them. */
+  .rt-lv { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .rt-lv-art { height: 230px; padding: 0 8%; -webkit-mask-image: linear-gradient(0deg, transparent, #000 30%); mask-image: linear-gradient(0deg, transparent, #000 30%); }
+  .rt-lv-info { gap: 16px; padding: 4px 18px 18px; }
+  .rt-lv-fives { gap: 10px 24px; }
+  .rt-lv-name span { font-size: 22px; }
+  .rt-lv-name img { width: 20px; height: 20px; }
+  .rt-lv-five p { font-size: 12px; }
+  .rt-lv-four ul { gap: 10px 16px; }
+  .rt-lv-four .gi-tile { width: 34px; height: 34px; }
+  .rt-lv-clock { font-size: 22px; }
+  .rt-lv-foot .gi-key { padding: 0 12px 2px; font-size: 12px; }
+
+  /* Longest waits: one swipe row. */
+  .rt-top { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 44%; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
+  .rt-top::-webkit-scrollbar { display: none; }
+  .rt-tc { scroll-snap-align: start; }
+  .rt-tc-body { gap: 5px; padding: 10px 10px 12px; }
+  .rt-tc-name { font-size: 13px; }
+  .rt-tc-days strong { font-size: 28px; }
+  .rt-tc-rank { top: 6px; left: 10px; font-size: 32px; }
+  .rt-tc-meta { font-size: 10.5px; }
+
+  .gi-bar.rt-bar #rtSort { align-self: flex-start; max-width: 100%; }
+  .rt-filters { flex-direction: column; align-items: stretch; gap: 10px; margin: -6px 0 14px; }
+  .rt-find { min-width: 0; max-width: none; margin-left: 0; }
   #rtEl { justify-content: space-between; }
-  .rt-head { display: none; }
-  #rtFacts li:nth-child(3) { display: none; } /* two chips fit a phone's header */
+  .rt-head { display: flex; padding: 0 2px 8px; }
+  .rt-head > :not(.rt-count) { display: none; }
   .rt-list { gap: 6px; }
-  .rt-row > summary { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'pic who wait' 'line line line'; gap: 6px 12px; padding: 10px 12px 8px; }
+  .rt-row > summary { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: 'pic who wait' 'line line line'; gap: 8px 12px; padding: 10px 12px; }
   .rt-row .gi-tile { grid-area: pic; width: 40px; height: 40px; }
   .rt-who { grid-area: who; }
   .rt-who em { display: inline; }
   .rt-who i { display: none; }
-  .rt-line { grid-area: line; height: 12px; }
-  .rt-tick { top: 1px; bottom: 1px; }
+  .rt-line { grid-area: line; height: 14px; }
+  .rt-tick { top: 2px; bottom: 2px; }
   .rt-tick.is-chron { top: 3px; bottom: 3px; }
   .rt-last { display: none; }
   .rt-wait { grid-area: wait; }
-  .rt-wait b { font-size: 20px; }
-  .rt-runs { padding: 2px 14px 14px; }
+  .rt-wait b { font-size: 22px; }
+  .rt-wait small { margin-top: 3px; font-size: 10.5px; }
+  .rt-wait .rt-meter { width: 64px; margin-top: 6px; }
+  .rt-runs { padding: 12px 12px 14px; }
+  .rt-log { gap: 6px; }
+  .rt-run { flex: 1 1 130px; min-width: 0; }
+  .rt-run p { white-space: normal; }
+  .rt-gap { flex-direction: row; gap: 4px; flex-basis: 100%; padding: 0; }
+  .rt-gap::before { display: none; }
+
+  .rt-ribbon { padding: 14px 4px 16px; }
+  .rt-ver { padding: 0 8px; }
+
+  .rt-recs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .rt-rec { padding: 14px 14px 16px; }
+  .rt-rec-v { flex-wrap: wrap; gap: 2px 6px; margin-top: 10px; font-size: 11px; }
+  .rt-rec-v b { font-size: 28px; }
+  .rt-rec-faces { margin-top: 10px; }
+  .rt-rec-faces .gi-tile { width: 28px; height: 28px; }
+  .rt-rec-d { font-size: 11px; }
+  .rt-hist-box { padding: 18px 14px 16px; }
+  .rt-hist-bars { height: 140px; gap: 1px; }
+  .rt-hist-x { gap: 1px; }
 }

@@ -4,6 +4,42 @@
    Data: /genshin-feed.json. Behaviour: genshin-lobby.js.
    ============================================================ */
 
+/* TITLE GEM (Oct 23 2026, Adrian): every section title on the lobby leads with the gem
+   (--gi-gem, genshin.css) like a bullet. em-sized, so it follows --fs-title on phones.
+   Section heads only: Endgame resets' title sits inside its box and has none (Adrian). */
+.gi-sec-head .gi-title::before {
+  content: '';
+  display: inline-block;
+  width: 0.62em;
+  height: 0.78em;
+  margin-right: 0.4em;
+  vertical-align: -0.06em;
+  background: var(--gi-gem) center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(var(--gi-acc-rgb), 0.45));
+}
+
+/* Elemental reactions sits under the tall wish card: more room above it (Adrian). */
+#reactions { padding-top: 112px; }
+@media (max-width: 970px) {
+  #reactions { padding-top: 80px; }
+}
+
+/* Phones (Adrian): Current banners first, then the Endgame box, then reactions. The three
+   share one .gi-frame, so it becomes a flex column and `order` swaps them; markup stays
+   desktop order. The Endgame box takes a normal section gap once it's under the card. */
+@media (max-width: 970px) {
+  .gi-frame:has(> #endgame) { display: flex; flex-direction: column; }
+  #endgame { order: 1; padding-top: 48px; }
+  #reactions { order: 2; }
+}
+
+/* PHONE SIDES (Oct 23 2026, Adrian): the lobby uses /coc/'s phone inset (5% of the
+   screen), not the 10px genshin.css gives the other Genshin pages. vw, not %: the
+   hero's --ir calc and nested paddings would read a % against other boxes. */
+@media (max-width: 970px) {
+  .gi-page { --coc-side: 5vw; }
+}
+
 /* ---- HERO v5 (Oct 22 2026): Klee's campfire, one fixed picture -----------
    images/genshin/art/klee-campfire.webp (1298x736 = 1.7636:1), drawn at the
    hero's height (--hh; never zoomed past it), --iw wide. Desktop: anchored by
@@ -126,6 +162,37 @@
 .gi-lede b { font-weight: 600; color: #fff; white-space: nowrap; }
 .gi-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
 .gi-hero-cta .gi-key { height: 48px; padding: 0 22px 2px; font-size: 14px; }
+/* Player search (Oct 23 2026): the shared UID field (genshin.css "PLAYER LOOKUP BOX") as the
+   hero's first key. The warning line and the player card float under it, so the hero never
+   changes height (genshin-lobby.js "PLAYER SEARCH"). */
+.gi-find { position: relative; z-index: 3; flex: 1 1 0; min-width: 0; max-width: 380px; }
+.gi-find .gi-look-status { position: absolute; top: 100%; left: 2px; margin-top: 8px; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }
+.gi-find .gi-look-status:empty, .gi-find .gi-look-status:has(~ .gi-hit:not([hidden])) { display: none; }
+.gi-hit {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  animation: gi-hit-in 0.25s var(--gi-ease);
+}
+@keyframes gi-hit-in { from { opacity: 0; transform: translateY(-6px); } }
+.gi-hit-msg { padding: 14px 16px; font-size: 13px; color: var(--gi-muted); }
+.gi-hit-msg.is-warn { color: #e6b26a; }
+.gi-hit-card { display: flex; align-items: center; gap: 14px; padding: 12px 14px; color: inherit; text-decoration: none; transition: background-color 0.2s ease; }
+.gi-hit-card:hover, .gi-hit-card:focus-visible { background: var(--lb-raise); }
+.gi-hit-card .gi-tile { flex: none; width: 52px; height: 52px; border-radius: 50%; }
+.gi-hit-q { display: grid; place-items: center; width: 100%; height: 100%; font: 800 20px/1 'Cinzel', serif; font-style: normal; color: #fff; }
+.gi-hit-who { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.gi-hit-who b { font: 700 15px/1.2 'Sora', sans-serif; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gi-hit-who small { font-size: 12px; color: var(--gi-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gi-hit-sig { font-style: italic; color: var(--gi-dim) !important; }
+.gi-hit-go { display: flex; align-items: center; gap: 6px; flex: none; font: 700 12px/1 'Sora', sans-serif; color: #c9ccd2; }
+.gi-hit-go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Today in Teyvat (Oct 22 2026): a quiet glass panel on the hero's right. It
    shouldn't pull the eye from the art: see-through, thin edge, no raised box. */
@@ -147,7 +214,8 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 .gi-today-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 18px; }
 .gi-today-cell:first-child .gi-today-top { margin-bottom: 6px; }
 .gi-today-h { display: flex; align-items: center; gap: 9px; white-space: nowrap; font: 700 11px/1 'Sora', sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: #c9ccd2; }
-.gi-today-h::before { content: ''; width: 6px; height: 6px; background: var(--gi-acc); transform: rotate(45deg); }
+/* The in-game Daily Commission marker (Fandom wiki's vector trace, File:Icon_Commission.svg). */
+.gi-today-h::before { content: ''; flex: none; width: 18px; height: 18px; background: url('/images/genshin/commission.svg') center / contain no-repeat; }
 .gi-today-v { font: 600 14px/1.2 'Sora', sans-serif; color: #e6e8ec; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .gi-today-big { font: 700 30px/1 'Sora', sans-serif; letter-spacing: -0.01em; color: #fff; font-variant-numeric: tabular-nums; }
 .gi-today-day { font-size: 12px; color: var(--gi-muted); white-space: nowrap; }
@@ -177,25 +245,35 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
    embers keep rising and a low warm glow sits where the band fades, so the
    picture runs into the page instead of stopping. */
 @media (max-width: 970px) {
-  .gi-hero { --hh: min(92vw, 520px); --ir: calc(50% - var(--iw) * 0.43); }
+  /* Phones (Oct 23 2026, Adrian): the copy centred on the picture instead of under it.
+     Klee (~68% across the art) sits at 78% of the screen, so she peeks out on the right
+     past the copy; the fire is behind the text, dimmed by the left shade. 82px = the bars. */
+  .gi-hero { --hh: 560px; --ir: calc(22% - var(--iw) * 0.32); }
   .gi-hero-bg {
-    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 98%), linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(180deg, #000 50%, transparent 98%), linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-    mask-composite: intersect;
+    -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
   }
-  .gi-hero::before { background: linear-gradient(180deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 90px); }
-  .gi-hero::after { height: calc(var(--hh) + 120px); background: radial-gradient(60% 150px at 50% calc(var(--hh) - 30px), rgba(255, 138, 64, 0.13), transparent 70%); }
-  .gi-hero-grid { display: block; padding-top: calc(var(--hh) - 70px); padding-bottom: 48px; }
-  .gi-hero-main { display: block; min-height: 0; max-width: none; }
-  .gi-today { flex-direction: column; margin-top: 28px; background: rgba(14, 14, 17, 0.7); }
+  .gi-hero::before {
+    background:
+      linear-gradient(90deg, rgba(9, 9, 11, 0.84) 0%, rgba(9, 9, 11, 0.6) 48%, rgba(9, 9, 11, 0.06) 88%),
+      linear-gradient(180deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 100px),
+      linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0) 24%);
+  }
+  .gi-hero::after { display: none; }
+  .gi-hero-grid { display: block; padding-top: 82px; padding-bottom: 40px; }
+  .gi-hero-main { display: flex; flex-direction: column; justify-content: center; min-height: calc(var(--hh) - 82px); max-width: none; padding-bottom: 12px; }
+  .gi-today { flex-direction: column; margin-top: 0; background: rgba(14, 14, 17, 0.7); }
   .gi-today-cell { border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
   .gi-today-cell:first-child { border-top: 0; }
-  .gi-kicker { font-size: 11px; margin-bottom: 14px; }
-  .gi-hero-title { font-size: clamp(42px, 12vw, 64px); }
-  .gi-lede { min-height: 0; margin-top: 16px; font-size: 15px; }
-  .gi-hero-cta { margin-top: 22px; }
-  .gi-hero-cta .gi-key { flex: 1; }
+  .gi-kicker { gap: 9px; margin-bottom: 12px; font-size: 10px; letter-spacing: 0.22em; }
+  .gi-hero-title { font-size: clamp(36px, 10.5vw, 50px); }
+  .gi-lede { min-height: 0; max-width: 72%; margin-top: 14px; font-size: 13.5px; line-height: 1.55; }
+  .gi-hero-cta { margin-top: 20px; }
+  .gi-find { flex-basis: 100%; max-width: none; }
+  /* genshin.css shrinks the lookup key to its icon on phones; the hero keeps "Search". */
+  .gi-find .gi-look-form .gi-key { width: auto; padding: 0 18px 2px; gap: 8px; }
+  .gi-find .gi-key-t { display: inline; }
+  .gi-hit-go { font-size: 0; gap: 0; } /* arrow only */
   .gi-today-big { font-size: 28px; }
 }
 
@@ -215,21 +293,45 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 .gi-ev-desc { font-size: 12px; line-height: 1.55; color: var(--gi-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .gi-ev-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
 
-/* ---- ENDGAME ------------------------------------------------------------ */
-.gi-end-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.gi-end { display: flex; flex-direction: column; overflow: hidden; }
-.gi-end-media { position: relative; height: 150px; display: flex; align-items: center; justify-content: center; background: url('/images/genshin/namecard/endgame.webp') center / cover; }
-.gi-end-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, var(--lb-box) 0%, rgba(42, 20, 22, 0.55) 100%); }
-.gi-end-media > img { position: relative; z-index: 1; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6)); }
-.gi-end-media.has-photo > img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; filter: none; }
-/* Photos (Abyss portal, Theater room, the Stygian banner): only the foot fades into the card. */
-.gi-end-media.has-photo::after { background: linear-gradient(0deg, var(--lb-box) 0%, rgba(20, 21, 24, 0.35) 38%, rgba(20, 21, 24, 0) 70%); }
-.gi-end-media svg { position: relative; z-index: 1; width: 54px; height: 54px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6)); }
-.gi-end-body { display: flex; flex-direction: column; gap: 12px; padding: 4px 18px 18px; }
-.gi-end-name { font: 800 17px/1.2 'Sora', sans-serif; color: #fff; }
-.gi-end-stats { display: flex; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--gi-line); }
-.gi-end-stats div { display: flex; flex-direction: column; gap: 6px; }
-.gi-end-stats .gi-today-v { font-size: 14px; }
+/* ---- ENDGAME (Oct 23 2026): the box under the hero = the old Player lookup box (.gi-look,
+   genshin.css: moonlit shore), its right column one sunken row per mode. */
+/* The moon and the figure on the shore (~59% / ~55% across the picture) sit under Klee:
+   the picture is drawn 130% wide so it can slide, which puts the figure at ~45% of the box
+   and the moon at ~50% at any width. */
+.gi-eg::before { background-size: auto, 130% auto; background-position: 0 0, 88% 61%; }
+.gi-eg .mch-sec-sub { margin-top: 6px; }
+.gi-eg-more { margin-top: 20px; }
+.gi-eg-list { display: flex; flex-direction: column; gap: 8px; }
+.gi-eg-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px 80px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(10, 11, 14, 0.72);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+.gi-eg-name { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gi-eg-name h3 { font: 800 15px/1.2 'Sora', sans-serif; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gi-eg-stat { display: flex; flex-direction: column; gap: 6px; }
+
+/* Redeem codes on phones (Adrian: "really really more compact"): one slim row per code --
+   code, Primogems, then Copy / Redeem as icon keys. No rewards line. /genshin-impact/codes
+   keeps the full rows. */
+@media (max-width: 970px) {
+  #giCodes { gap: 6px; }
+  #giCodes .gi-code { flex-wrap: nowrap; gap: 10px; padding: 7px 7px 7px 12px; }
+  #giCodes .gi-code-text { flex: 1 1 auto; }
+  #giCodes .gi-code-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+  #giCodes .gi-code-rw { display: none; }
+  #giCodes .gi-code .gi-primo { font-size: 12px; }
+  #giCodes .gi-code-acts { flex: none; gap: 4px; }
+  #giCodes .gi-code-acts .gi-key { width: 34px; height: 34px; padding: 0; gap: 0; font-size: 0; }
+  #giCodes .gi-code-acts .gi-key span { display: none; }
+  #giCodes .gi-code-acts .gi-key svg { width: 15px; height: 15px; }
+}
 
 /* ---- FARM TODAY (Oct 22 2026): its own band (.gi-city, the floating city) ----
    One .gi-grp card per nation, its namecard on top: talent book(s) + who uses
@@ -280,7 +382,7 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 @media (max-width: 970px) {
   .gi-sec--first { margin-top: 0; padding-top: 8px; }
   .gi-ev, .gi-fc { flex-basis: 84%; }
-  .gi-end-grid, .gi-next, .gi-tools { grid-template-columns: minmax(0, 1fr); }
+  .gi-next, .gi-tools { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ============================================================
@@ -315,6 +417,8 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 .gi-nat-count { display: flex; align-items: baseline; gap: 10px; margin-top: 28px; }
 .gi-nat-count b { font: 900 46px/1 'Cinzel', serif; color: #fff; }
 .gi-nat-count span { font-size: 13px; color: var(--gi-muted); }
+.gi-nat-all { height: 52px; margin-top: 32px; padding: 0 26px 2px; font-size: 15px; }
+.gi-nat-all svg { width: 16px; height: 16px; }
 .gi-nat-chars { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 14px 10px; }
 .gi-nat-chars figure { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
 .gi-nat-chars .gi-tile { width: 100%; height: auto; aspect-ratio: 1; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45); }
@@ -460,10 +564,32 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
   }
   .gi-nat-chars::-webkit-scrollbar { display: none; }
   .gi-nat-chars figure { scroll-snap-align: start; }
+  /* The count sits beside the name, small, so the name stays the loud part; the
+     "View all characters" link (.gi-all, quiet on phones) goes under the faces. */
+  .gi-nat-body { grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: 0 12px; }
+  .gi-nat-info { display: contents; }
+  .gi-nat-name { grid-area: 1 / 1; font-size: 28px; }
+  .gi-nat-count { grid-area: 1 / 2; gap: 5px; margin: 0; }
+  .gi-nat-count b { font: 700 13px/1 'Sora', sans-serif; }
+  .gi-nat-count span { font-size: 12px; }
+  .gi-nat-ideal { grid-area: 2 / 1 / 3 / -1; margin: 10px 0 16px; }
+  .gi-nat-chars { grid-area: 3 / 1 / 4 / -1; }
+  .gi-nat-all { grid-area: 4 / 1 / 5 / -1; justify-self: start; margin-top: 12px; }
 
-  /* Endgame: a swipe row, cards and art sized like the event cards. */
-  .gi-end-grid { display: flex; gap: 16px; margin: -4px -2px 0; padding: 4px 2px 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-  .gi-end-grid::-webkit-scrollbar { display: none; }
-  .gi-end { flex: 0 0 84%; scroll-snap-align: start; }
-  .gi-end-media { height: auto; aspect-ratio: 1080 / 390; }
+  /* Endgame (Adrian: "drop the background image... compress"): no picture, title + link on
+     one line, one tight row per mode (name + dates | countdown | Primogems, no labels). */
+  .gi-eg { gap: 12px; padding: 14px; }
+  .gi-eg::before { display: none; }
+  .gi-eg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .gi-eg-head .gi-eyebrow, .gi-eg-head .mch-sec-sub { display: none; }
+  .gi-eg-more { margin: 0; }
+  .gi-eg-list { gap: 6px; }
+  .gi-eg-row { grid-template-columns: minmax(0, 1fr) 66px 58px; gap: 10px; padding: 9px 12px; }
+  .gi-eg-name { gap: 4px; }
+  .gi-eg-name h3 { font-size: 13px; }
+  .gi-eg-name .gi-label { font-size: 9px; }
+  .gi-eg-stat .gi-label { display: none; }
+  .gi-eg-stat .gi-today-v, .gi-eg-stat .gi-primo { font-size: 12.5px; }
 }
+
+

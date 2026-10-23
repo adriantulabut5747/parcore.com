@@ -3,308 +3,881 @@
    Linked after genshin.css (base, pieces, .gi-tb header, .gi-bar, the
    shared PLAYER LOOKUP BOX). Behaviour: genshin-player.js.
 
-   The profile card (.gp-card) is the player's own namecard, drawn like the
-   in-game friend card: picture fading in from the right, round profile
-   picture, nickname, UID, signature, then the numbers in sunken wells.
-   The build (.gp-build) is one fixed-height box on desktop (picking another
-   character never moves the page): wish art in the character's element
-   (--gi-el) on the left, weapon + final stats, then the five artifacts.
+   Profile card (.gp-card, simplified Oct 23 2026): ONE banner = the painted
+   Mondstadt map as its ground, inside a gold trim (drawn corners + crest, the
+   in-game UI's gold on purpose, like the drawn Paimon Menu): profile picture,
+   name / UID / signature, the milestone medals on the right, then the numbers
+   in one sunken tray. The player's namecard is no longer on it (it leads the
+   Namecard collection below).
+   Build (.gp-build): sized by its OWN width (container queries on
+   .gp-show), not the screen's, because the sidebar changes how much room
+   it gets. Wide = art | weapon + stats | artifacts at a fixed height
+   (picking another character never moves the page); medium = art + stats
+   side by side, artifacts in two columns under them; narrow = stacked.
+   The art always fills its own column, centred -- never a share of the box.
    ============================================================ */
 
 .gp-icon { color: #d9dce1; }
 .gp-first { padding-top: 40px; }
 
-/* ---- SEARCH (no UID) ---- */
-.gp-recent { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 14px; }
-.gp-recent > div { display: flex; flex-wrap: wrap; gap: 6px; }
-.gp-recent .gi-key { height: 30px; padding: 0 10px 2px; font-size: 12px; letter-spacing: 0.5px; }
-.gp-recent .gi-key small { font: 600 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--gi-muted); }
-.gp-how { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.gp-how > div { padding: 20px 22px; }
-.gp-how b { font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
-.gp-how p { margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+/* ---- SEARCH (no UID): the profile card with nobody in it yet ----
+   Same .gp-card / .gp-badges / .gp-stats as a loaded player (below), so the search and the
+   result are one card before and after. Only what differs is here. */
+.gp-card.gp-blank { margin-top: 0; padding-top: 40px; } /* the .gi-tb banner sits above it, not the bars; no crest to clear */
+/* Its starfield namecard is sky blue, which fought the red / gold / dark (Adrian): drained and
+   re-lit as the Genshin ground's red night sky. The art's own stars keep their sparkle. */
+.gp-tb .gi-tb-art { filter: grayscale(1) sepia(1) hue-rotate(-40deg) saturate(1.7) brightness(0.55) contrast(1.15); }
+/* "?" = nobody yet: the profile picture slot and a recent lookup without a picture. */
+.gp-q { display: grid; place-items: center; width: 100%; height: 100%; font: 800 56px/1 'Cinzel', serif; font-style: normal; color: rgba(211, 188, 142, 0.85); }
+.gi-tile .gp-q { font-size: 22px; }
+.gp-blank .gi-look-form { max-width: 560px; margin-top: 16px; }
+.gp-stats--blank b { color: #4f535c; }
+.gp-stats--blank svg { stroke: #5d616b; }
 
-/* ---- PROFILE CARD ---- */
-.gp-card {
+/* Recent lookups: the showcase tray's tabs (face, nickname, UID + server). */
+.gp-recent { margin-top: 18px; }
+.gp-recent-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.gp-recent .gp-ch { text-decoration: none; }
+
+/* Before you search: three drawn tips (.gp-rec-k = their label row). */
+.gp-tips-sec { padding-top: 56px; }
+.gp-tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+.gp-tip { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 22px; background: radial-gradient(70% 55% at 50% 0%, rgba(211, 188, 142, 0.08), rgba(211, 188, 142, 0) 70%), #0e0f12; }
+.gp-tip-art {
   position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 28px;
-  min-height: 300px;
-  margin-top: 68px; /* 11layout's 48px gap under the bars + 20, like .gi-tb */
-  padding: 32px;
+  height: 150px;
+  margin-bottom: 10px;
   overflow: hidden;
-}
-.gp-card-art { position: absolute; z-index: -2; top: 0; right: 0; width: 66%; height: 100%; }
-.gp-card-art img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.35) 30%, #000 72%);
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.35) 30%, #000 72%);
-}
-.gp-card::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 120% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), rgba(var(--gi-acc-rgb), 0) 70%),
-    linear-gradient(0deg, rgba(10, 10, 12, 0.7) 0%, rgba(10, 10, 12, 0) 55%);
-}
-.gp-card-main { display: flex; align-items: center; gap: 24px; min-width: 0; max-width: 62%; }
-.gp-face {
-  flex: none;
-  width: 112px;
-  height: 112px;
-  overflow: hidden;
-  border: 3px solid rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
-  background: linear-gradient(160deg, #3d3f4a, #24252c);
-  box-shadow: 0 0 0 4px rgba(var(--gi-acc-rgb), 0.45), 0 12px 30px -10px rgba(0, 0, 0, 0.8);
-}
-.gp-face img { width: 100%; height: 100%; object-fit: cover; }
-.gp-who { min-width: 0; }
-.gp-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: 'Cinzel', serif !important;
-  font-size: clamp(28px, 2.6vw, 42px);
-  font-weight: 800;
-  line-height: 1.1;
-  color: #fff;
-  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.6);
-}
-.gp-uid { display: flex; align-items: center; gap: 10px; margin-top: 8px; font: 700 13px/1 'Sora', sans-serif; letter-spacing: 1.2px; color: #c9ccd2; font-variant-numeric: tabular-nums; }
-.gp-uid .gi-uid-server { margin: 0; }
-.gp-sig { margin-top: 12px; max-width: 52ch; font-size: 13.5px; line-height: 1.5; color: #b9bdc4; overflow-wrap: anywhere; }
-.gp-stats { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; }
-.gp-stats li {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  min-width: 128px;
-  padding: 12px 16px 11px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: rgba(18, 19, 23, 0.82);
-  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-.gp-stats b { font: 800 20px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
-.gp-stats b small { font-size: 12px; font-weight: 700; color: #f2c45a; }
-.gp-stats span { font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #8e939b; }
-
-/* Loading: the card's shape, quietly pulsing. */
-.gp-skel { display: block; width: 240px; height: 30px; border-radius: 4px; background: rgba(255, 255, 255, 0.06); }
-.gp-skel--s { width: 140px; height: 14px; margin-top: 12px; }
-.gp-card.is-loading .gp-stats li { height: 62px; }
-@media (prefers-reduced-motion: no-preference) {
-  .gp-card.is-loading .gp-skel,
-  .gp-card.is-loading .gp-face,
-  .gp-card.is-loading .gp-stats li { animation: gp-pulse 1.4s ease-in-out infinite; }
-}
-@keyframes gp-pulse {
-  50% { opacity: 0.45; }
-}
-/* Errors: same box, a message and maybe a Try again key. */
-.gp-msg { flex-direction: row; align-items: center; min-height: 196px; }
-.gp-msg > div { flex: 1; min-width: 0; }
-.gp-msg-t { font: 800 24px/1.2 'Sora', sans-serif; color: #fff; }
-.gp-msg p:not(.gi-eyebrow) { margin-top: 8px; max-width: 60ch; font-size: 14px; line-height: 1.55; color: var(--gi-muted); }
-
-/* Look up another + Copy / Refresh. */
-.gp-bar { flex-wrap: wrap; }
-.gp-again { display: flex; gap: 6px; width: min(340px, 100%); }
-.gp-again .gi-uid { height: 40px; }
-.gp-again .gi-uid input { font-size: 14px; }
-.gp-again .gi-key { width: 40px; height: 40px; padding: 0 0 2px; }
-.gp-again-st { flex: 1; min-height: 0; margin-top: 0; }
-.gp-again-st:empty { display: none; }
-.gp-bar .gi-key:disabled { cursor: default; color: #8b9099; }
-.gp-bar .gi-key:disabled:hover { background: var(--lb-raise); }
-#gpRefreshT { font-variant-numeric: tabular-nums; }
-
-/* ---- SHOWCASE ---- */
-.gp-show { padding-top: 48px; }
-.gp-chars { margin-bottom: 16px; }
-.gp-ch { flex: 0 0 auto; gap: 10px; min-height: 52px; padding: 0 14px 0 6px; }
-.gp-ch .gi-tile { width: 36px; height: 36px; border-radius: 50%; }
-.gp-ch:not(.active) .gi-tile { opacity: 0.75; }
-
-.gp-build {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 340px) minmax(0, 470px);
-  height: 640px;
-  overflow: hidden;
-  background:
-    radial-gradient(50% 70% at 18% 60%, color-mix(in srgb, var(--gi-el) 22%, transparent), transparent 72%),
-    linear-gradient(105deg, color-mix(in srgb, var(--gi-el) 14%, #111217) 0%, #111217 42%, var(--lb-box) 60%);
-}
-/* The wish art sits behind the first column, fading out to the right. */
-.gp-art { position: absolute; z-index: -1; inset: 0 auto 0 0; width: 50%; -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent); mask-image: linear-gradient(90deg, #000 55%, transparent); }
-.gp-art img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 30%; }
-.gp-b-who {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-width: 0;
-  padding: 32px;
-  background: linear-gradient(0deg, rgba(10, 10, 12, 0.85) 0%, rgba(10, 10, 12, 0) 45%);
-}
-.gp-b-el { display: flex; align-items: center; gap: 8px; font: 700 12px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--gi-el); }
-.gp-b-el img { width: 20px; height: 20px; }
-.gp-b-el .gi-rarity { margin-left: 4px; }
-.gp-b-name {
-  margin-top: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: 'Cinzel', serif !important;
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.08;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
-}
-.gp-b-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 13px; color: rgba(236, 238, 241, 0.74); }
-.gp-b-meta b { font-weight: 700; color: #fff; }
-.gp-talents { display: flex; gap: 8px; margin-top: 18px; }
-.gp-talents span {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  width: 64px;
-  padding: 9px 0 8px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: rgba(18, 19, 23, 0.82);
-  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
-}
-.gp-talents b { font: 800 18px/1 'Sora', sans-serif; color: #fff; }
-.gp-talents small { font: 700 8.5px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #8e939b; }
-.gp-talents .is-up b { color: #7fd8f0; } /* boosted by a constellation, like the game's blue */
-
-.gp-b-mid,
-.gp-b-arts { min-width: 0; padding: 24px 22px; background: rgba(14, 15, 18, 0.72); border-left: 1px solid var(--gi-line); }
-.gp-weapon { display: flex; gap: 14px; padding: 12px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
-.gp-weapon .gi-tile { width: 64px; height: 64px; }
-.gp-weapon > div { min-width: 0; }
-.gp-weapon b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 14px/1.2 'Sora', sans-serif; color: #fff; }
-.gp-weapon p { margin-top: 5px; font-size: 12px; color: var(--gi-muted); }
-.gp-wep-stats { display: flex; flex-wrap: wrap; gap: 4px 12px; }
-.gp-wep-stats b { display: inline; font-size: 12px; }
-.gp-weapon.gp-empty { font-size: 12px; color: var(--gi-dim); }
-.gp-final { margin-top: 18px; list-style: none; }
-.gp-final li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--gi-line); font-size: 13px; color: #c9ccd2; }
-.gp-final li:last-child { border-bottom: 0; }
-.gp-final b { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font: 700 14px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
-.gp-final small { font-size: 10.5px; font-weight: 600; color: var(--gi-dim); }
-
-.gp-arts-head { display: flex; align-items: center; justify-content: space-between; }
-.gp-cv { font: 700 11px/1 'Sora', sans-serif; letter-spacing: 1px; color: var(--gi-muted); }
-.gp-cv b { margin-left: 4px; font-size: 16px; color: #fff; }
-.gp-sets { display: flex; flex-wrap: wrap; gap: 4px 14px; min-height: 18px; margin: 10px 0 12px; font-size: 12px; color: #c9ccd2; }
-.gp-sets span { display: inline-flex; align-items: center; gap: 6px; }
-.gp-sets b { padding: 3px 5px 2px; border-radius: 3px; background: rgba(var(--gi-acc-rgb), 0.35); font: 800 10px/1 'Sora', sans-serif; color: #fff; }
-.gp-sets b::after { content: 'pc'; font-weight: 600; }
-.gp-pieces { display: flex; flex-direction: column; gap: 6px; }
-.gp-piece {
-  position: relative;
-  display: grid;
-  grid-template-columns: 52px 92px minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-  height: 92px;
-  padding: 0 10px;
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
   background: var(--lb-well);
   box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
 }
-.gp-piece .gi-tile { width: 52px; height: 52px; overflow: visible; }
-.gp-piece .gi-tile img { border-radius: 6px; }
-.gp-piece .gi-tile i { position: absolute; right: -4px; bottom: -4px; padding: 2px 4px; border-radius: 3px; background: #0b0b0d; font: 700 9.5px/1 'Sora', sans-serif; font-style: normal; color: #fff; }
-.gp-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.gp-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 10.5px/1 'Sora', sans-serif; color: var(--gi-muted); }
-.gp-main b { font: 800 17px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
-.gp-piece ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 12px; list-style: none; }
-.gp-piece li { display: flex; justify-content: space-between; gap: 6px; min-width: 0; font-size: 11px; color: #9aa0a8; }
-.gp-piece li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gp-piece li b { font-weight: 700; color: #e6e8ec; font-variant-numeric: tabular-nums; }
-.gp-piece-cv { position: absolute; top: 6px; right: 8px; font: 700 9px/1 'Sora', sans-serif; letter-spacing: 0.6px; color: #5d616b; }
-.gp-piece.gp-empty { grid-template-columns: 52px 1fr; }
-.gp-piece.gp-empty small { font-size: 12px; color: var(--gi-dim); }
+.gp-tip h3 { font: 800 16px/1.3 'Sora', sans-serif; color: #fff; }
+.gp-tip > p:last-child { font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+.gp-n { display: grid; flex: none; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--gi-acc); font: 800 10px/1 'Sora', sans-serif; font-style: normal; letter-spacing: 0; color: #fff; }
+/* 1: the Paimon Menu's corner, drawn: menu icons, and the UID plate lit in the bottom right. */
+.gp-pm { background: radial-gradient(60% 80% at 100% 100%, rgba(211, 188, 142, 0.14), rgba(211, 188, 142, 0) 70%), linear-gradient(160deg, #1b1d24, #111216); }
+.gp-pm-grid { position: absolute; top: 18px; left: 18px; display: grid; grid-template-columns: repeat(4, 30px); gap: 12px 14px; }
+.gp-pm-grid i { width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, 0.06); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.gp-pm-uid {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: rgba(10, 10, 13, 0.75);
+  box-shadow: 0 0 0 1px rgba(211, 188, 142, 0.7), 0 0 20px -2px rgba(211, 188, 142, 0.45);
+  font: 700 11px/1 'Sora', sans-serif;
+  letter-spacing: 1px;
+  color: #c9ccd2;
+  font-variant-numeric: tabular-nums;
+}
+.gp-pm-uid b { color: #fff; }
+.gp-pm-uid::after { content: ''; position: absolute; inset: -6px; border: 1px solid rgba(211, 188, 142, 0.6); border-radius: 10px; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .gp-pm-uid::after { animation: gp-ping 2.4s ease-out infinite; }
+}
+@keyframes gp-ping {
+  0% { opacity: 0.9; transform: scale(0.94); }
+  70%,
+  100% { opacity: 0; transform: scale(1.12); }
+}
+/* 2: first digit -> server; the typed UID's row lights in the red accent. */
+.gp-srv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: center; gap: 6px; padding: 8px; list-style: none; }
+.gp-srv li { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 6px; border-radius: 6px; font: 600 11.5px/1.15 'Sora', sans-serif; color: #9aa0a8; transition: background-color 0.2s, color 0.2s, box-shadow 0.2s; }
+.gp-srv b { display: grid; flex: none; place-items: center; min-width: 32px; height: 24px; padding: 0 5px; border-radius: 5px; background: rgba(255, 255, 255, 0.07); font: 800 12px/1 'Sora', sans-serif; color: #e6e8ec; transition: background-color 0.2s; }
+.gp-srv li.is-on { background: rgba(var(--gi-acc-rgb), 0.16); box-shadow: inset 0 0 0 1px rgba(var(--gi-acc-rgb), 0.7); color: #fff; }
+.gp-srv li.is-on b { background: var(--gi-acc); color: #fff; }
+/* 3: the empty-showcase drawing (EMPTY SHOWCASE below), sized down to the tile. */
+.gp-tip .gp-noshow-art { justify-content: center; gap: 12px; padding: 14px 16px; }
+.gp-tip .gp-ghosts { grid-template-columns: repeat(4, 44px); justify-content: center; }
+
+/* ---- PROFILE CARD ---- */
+.gp-card {
+  --gp-gold: 211, 188, 142;
+  position: relative;
+  isolation: isolate;
+  margin-top: 92px; /* 11layout's 48px gap under the bars + 44, like .gi-tb */
+  padding: 54px 0 40px;
+  overflow: hidden;
+  container: gp-card / inline-size;
+}
+
+/* The ground: the painted Mondstadt map from HoYoLAB's Traveler's Diary (its desktop background,
+   corner cards cropped off), the city on the right; faded toward the name on the left. */
+.gp-card-art { position: absolute; z-index: -1; inset: 0; pointer-events: none; }
+.gp-card-art img { width: 100%; height: 100%; object-fit: cover; object-position: 100% 30%; filter: brightness(1.05) saturate(1.05); }
+.gp-card-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(20, 21, 25, 0.88) 0%, rgba(20, 21, 25, 0.55) 35%, rgba(20, 21, 25, 0) 65%),
+    linear-gradient(180deg, rgba(20, 21, 25, 0.55) 0%, rgba(20, 21, 25, 0) 30%, rgba(20, 21, 25, 0) 75%, rgba(20, 21, 25, 0.5) 100%);
+}
+
+/* The gold trim round the whole card: a hairline frame, a flourish in each corner, a crest at the top. */
+.gp-frame { position: absolute; z-index: 2; inset: 14px; border: 1px solid rgba(var(--gp-gold), 0.38); border-radius: 15px; pointer-events: none; }
+.gp-orn { position: absolute; width: 64px; height: 64px; }
+.gp-orn--tl { top: -1px; left: -1px; }
+.gp-orn--tr { top: -1px; right: -1px; transform: scaleX(-1); }
+.gp-orn--bl { bottom: -1px; left: -1px; transform: scaleY(-1); }
+.gp-orn--br { right: -1px; bottom: -1px; transform: scale(-1); }
+.gp-frame svg { display: block; width: 100%; height: 100%; fill: rgba(14, 14, 17, 0.55); stroke: rgba(var(--gp-gold), 0.8); stroke-width: 1.3; stroke-linecap: round; }
+.gp-frame .gp-orn svg { fill: none; }
+.gp-frame svg .f { fill: rgba(var(--gp-gold), 0.9); stroke: none; }
+.gp-crest { position: absolute; top: -10px; left: 50%; width: 160px !important; height: 20px !important; transform: translateX(-50%); }
+
+.gp-card-main { position: relative; z-index: 3; display: flex; align-items: flex-start; gap: 26px; min-width: 0; padding: 0 36px; }
+.gp-face {
+  position: relative;
+  flex: none;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #3d3f4a, #24252c);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 0 7px #121317, 0 0 0 8px rgba(var(--gp-gold), 0.7), 0 16px 34px -10px rgba(0, 0, 0, 0.9);
+}
+.gp-face img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.gp-who { flex: 1; min-width: 0; padding-top: 20px; }
+.gp-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Cinzel', serif !important;
+  font-size: clamp(30px, 2.8vw, 46px);
+  font-weight: 800;
+  line-height: 1.08;
+  color: #fff;
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.6);
+}
+.gp-uid { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 10px; font: 600 13px/1 'Sora', sans-serif; letter-spacing: 1px; color: #9aa0a8; font-variant-numeric: tabular-nums; }
+.gp-uid b { font-weight: 800; color: #e6e8ec; }
+.gp-uid .gi-uid-server { margin: 0; }
+/* Copy UID: a small grey key, so it reads as a button next to the chip. */
+.gp-uid-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px 1px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 700 10px/1 'Sora', sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #c9ccd2;
+  cursor: pointer;
+}
+.gp-uid-copy:hover { background: var(--lb-raise-hover); color: #fff; }
+.gp-uid-copy svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.gp-uid-copy.is-done { background: var(--lb-well); box-shadow: var(--card-well); color: #fff; }
+.gp-sig { position: relative; margin-top: 14px; max-width: 52ch; padding-left: 14px; font-size: 13.5px; font-style: italic; line-height: 1.55; color: #c3c7cd; overflow-wrap: anywhere; }
+.gp-sig::before { content: ''; position: absolute; top: 2px; bottom: 2px; left: 0; width: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.18); }
+
+/* Milestones: the card's right column, two medals a row (the fifth spans both); the game's
+   achievement category medals, gold + glowing when reached, grey when not. Glassy wells, so
+   the map's city shows through. Under 800px card width they drop under the name. */
+.gp-badges { flex: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: min(440px, 42%); padding-top: 6px; list-style: none; }
+.gp-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(12, 13, 16, 0.8);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.gp-badge:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.gp-badge > span:last-child { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.gp-badge b { font: 700 12px/1.25 'Sora', sans-serif; color: #9aa0a8; }
+.gp-badge small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; color: var(--gi-dim); font-variant-numeric: tabular-nums; }
+.gp-medal { flex: none; width: 38px; height: 38px; }
+.gp-medal img { width: 100%; height: 100%; filter: grayscale(1) brightness(0.55); opacity: 0.45; }
+.gp-badge.is-on { background: linear-gradient(90deg, rgba(211, 188, 142, 0.14), rgba(211, 188, 142, 0) 70%), rgba(12, 13, 16, 0.8); }
+.gp-badge.is-on .gp-medal img { filter: drop-shadow(0 0 8px rgba(211, 188, 142, 0.45)); opacity: 1; }
+.gp-badge.is-on b { color: #fff; }
+.gp-badge.is-on small { color: #d3bc8e; }
+@container gp-card (max-width: 799px) {
+  .gp-card-main { flex-wrap: wrap; }
+  .gp-badges { width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gp-badge:last-child:nth-child(odd) { grid-column: auto; }
+}
+/* The search card's UID field needs the room: its medals drop under it sooner (desktop; phones below). */
+@media (min-width: 971px) {
+  @container gp-card (max-width: 1099px) {
+    .gp-blank .gp-card-main { flex-wrap: wrap; }
+    .gp-blank .gp-badges { width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gp-blank .gp-badge:last-child:nth-child(odd) { grid-column: auto; }
+  }
+}
+
+/* The numbers: one sunken tray, a cell each (over the trim's corner flourishes). */
+.gp-stats {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  margin: 26px 36px 0;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  list-style: none;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(12, 13, 16, 0.86);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.gp-stats li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 14px 18px;
+  border-left: 1px solid var(--gi-line);
+}
+.gp-stats li:first-child { border-left: 0; }
+/* Six numbers on a mid-width card (sidebar open): two rows of three, not five + a lone one. */
+@container gp-card (max-width: 999px) {
+  .gp-stats:has(> li:nth-child(6)) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gp-stats:has(> li:nth-child(6)) li:nth-child(3n + 1) { border-left: 0; }
+  .gp-stats:has(> li:nth-child(6)) li:nth-child(n + 4) { border-top: 1px solid var(--gi-line); }
+}
+.gp-stats svg { grid-row: span 2; width: 22px; height: 22px; fill: none; stroke: #7d828b; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.gp-stats b { font: 800 20px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gp-stats b small { font-size: 12px; font-weight: 700; color: #f2c45a; }
+.gp-stats span { font: 700 9.5px/1.2 'Sora', sans-serif; letter-spacing: 1.1px; text-transform: uppercase; color: #8e939b; }
+
+/* Loading: the card's shape, quietly pulsing. */
+.gp-skel { display: block; width: 240px; height: 32px; border-radius: 4px; background: rgba(255, 255, 255, 0.06); }
+.gp-skel--s { width: 140px; height: 14px; margin-top: 14px; }
+.gp-card.is-loading .gp-face { box-shadow: none; }
+.gp-card.is-loading .gp-stats li { height: 66px; }
+@media (prefers-reduced-motion: no-preference) {
+  .gp-card.is-loading .gp-skel,
+  .gp-card.is-loading .gp-face,
+  .gp-card.is-loading .gp-stats { animation: gp-pulse 1.4s ease-in-out infinite; }
+}
+@keyframes gp-pulse {
+  50% { opacity: 0.45; }
+}
+/* Errors: same box, a message and maybe a Try again key. */
+.gp-msg { display: flex; flex-direction: row; align-items: center; min-height: 196px; padding: 32px; }
+.gp-msg > div { flex: 1; min-width: 0; }
+.gp-msg-t { font: 800 24px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-msg p:not(.gi-eyebrow) { margin-top: 8px; max-width: 60ch; font-size: 14px; line-height: 1.55; color: var(--gi-muted); }
+
+/* The card's UID line = the search (Oct 23 2026): at rest it reads like the UID (the UID is the
+   placeholder, bright); hover shows a faint edge, focus sinks it into a well. Copy / Link / Refresh
+   are the small grey keys beside it. Replaced the bar under the card. */
+.gp-find { display: flex; }
+.gp-find-box { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 3px 0 10px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 7px; background: rgba(6, 7, 10, 0.35); cursor: text; transition: border-color 0.15s ease, background-color 0.15s ease; }
+.gp-find-box:hover { border-color: rgba(255, 255, 255, 0.22); }
+.gp-find-box:focus-within { border-color: #3a3d46; background: var(--lb-well); box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.35); }
+.gp-find-k { color: #9aa0a8; }
+.gp-find-box input { width: 94px; min-width: 0; padding: 0; border: 0; outline: 0; background: none; font: 800 13px/1 'Sora', sans-serif; letter-spacing: 1px; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-find-box input::placeholder { color: #e6e8ec; opacity: 1; }
+.gp-find-box input:focus::placeholder { color: #565a63; }
+.gp-msg .gp-find-box input::placeholder { color: #8b9099; font-weight: 600; letter-spacing: 0.5px; }
+.gp-find-go { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 5px; background: none; color: #8b9099; cursor: pointer; }
+.gp-find-go:hover,
+.gp-find-box:focus-within .gp-find-go { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.gp-find-go svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.gp-find-go:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.gp-find-st { flex-basis: 100%; min-height: 0; margin: 0; letter-spacing: 0; }
+.gp-find-st:empty { display: none; }
+.gp-msg .gp-uid { margin-top: 16px; }
+.gp-uid-copy:disabled { cursor: default; color: #8b9099; }
+.gp-uid-copy:disabled:hover { background: var(--lb-raise); }
+#gpRefreshT { font-variant-numeric: tabular-nums; }
+
+/* ---- SHOWCASE TRAY ---- */
+.gp-show { padding-top: 48px; container: gp-show / inline-size; }
+.gp-chars { position: relative; margin-bottom: 16px; } /* offsetLeft of a tab is measured from the tray */
+.gp-ch { flex: 0 0 auto; gap: 12px; min-height: 62px; padding: 0 16px 0 7px; text-transform: none; letter-spacing: 0; }
+.gp-ch .gi-tile { width: 46px; height: 46px; overflow: visible; border-radius: 8px; }
+.gp-ch .gi-tile > img:first-child { border-radius: 8px; }
+.gp-ch-el { position: absolute; right: -5px; bottom: -5px; width: 20px !important; height: 20px !important; padding: 2px; border-radius: 50%; background: #0c0c0f; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.gp-ch-t { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
+.gp-ch-t b { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 13px/1.1 'Sora', sans-serif; }
+.gp-ch-t small { font: 600 10.5px/1 'Sora', sans-serif; letter-spacing: 0.4px; color: var(--gi-muted); }
+.gp-ch:not(.active) .gi-tile { opacity: 0.7; }
+.gp-ch.active .gp-ch-t small { color: #c9ccd2; }
+
+/* ---- CARD STUDIO: under the card (it used to be a bar of buttons above it) ----
+   Three labelled groups, one job each: Picture (own art, Move + zoom, artist credit), Text (caption,
+   what the card shows), Style (shape, colour); the save keys along the foot. Enka.Network has the
+   same tools in one unlabelled strip, which is why it's confusing: keep the labels. */
+.gp-studio { margin-top: 14px; padding: 20px 22px 18px; }
+.gp-st-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.8fr); }
+.gp-st-grp { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-width: 0; padding: 0 24px; }
+.gp-st-grp:first-child { padding-left: 0; }
+.gp-st-grp:last-child { padding-right: 0; }
+.gp-st-grp + .gp-st-grp { border-left: 1px solid var(--gi-line); }
+.gp-st-grp h3 { margin: 0; }
+.gp-st-grp .gi-tray { max-width: 100%; }
+.gp-st-art { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.gp-st-thumb { flex: none; width: 40px; height: 52px; border: 2px solid var(--lb-edge); border-radius: 6px; background: var(--lb-well) 50% 18% / cover no-repeat; }
+.gp-st-art > span:last-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gp-st-art b { font: 700 13px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-st-art small { font-size: 11.5px; line-height: 1.35; color: var(--gi-muted); }
+.gp-st-art small.is-warn { color: #e6b26a; }
+.gp-st-keys { display: flex; flex-wrap: wrap; gap: 8px; }
+.gp-st-keys .gi-key { height: 34px; padding: 0 12px 2px; font-size: 12.5px; }
+#gpArtReset { width: 34px; padding: 0 0 2px; }
+.gp-st-keys .gi-key:disabled { opacity: 0.4; cursor: default; }
+.gp-st-keys .gi-key:disabled:hover { background: var(--lb-raise); }
+.gp-st-zoom { display: flex; align-items: center; gap: 12px; width: 100%; }
+.gp-st-zoom input { flex: 1; min-width: 0; accent-color: #c9ccd2; }
+.gp-st-zoom output { min-width: 38px; font: 700 12px/1 'Sora', sans-serif; text-align: right; color: #c9ccd2; font-variant-numeric: tabular-nums; }
+.gp-st-field { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.gi-uid.gp-st-in { flex: none; width: 100%; height: 40px; }
+.gp-st-in input { padding: 0 12px; font: 600 13.5px/1 'Sora', sans-serif; letter-spacing: 0; }
+.gp-shape .gi-tab { gap: 6px; }
+.gp-shape svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+/* The colour switch's dots: the element's colour, and a spectrum for "from the art". */
+.gp-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gp-el-dot, #8b9099); }
+.gp-dot--art { background: conic-gradient(#e36c6c, #e3c76c, #7fd38a, #6cb6e3, #a98ae3, #e36c6c); }
+.gp-st-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--gi-line); }
+.gp-st-foot .gi-acts { flex-wrap: wrap; margin-left: auto; }
+.gp-st-foot .gi-key:disabled { cursor: progress; }
+.gp-card-st { margin: 0; }
+.gp-card-st:empty { display: none; }
+#gpBuild.is-drop .gp-build { box-shadow: 0 0 0 2px var(--lb-edge), 0 0 0 5px rgba(255, 255, 255, 0.45); }
+@container gp-show (max-width: 979px) {
+  .gp-st-grid { grid-template-columns: minmax(0, 1fr); }
+  .gp-st-grp { padding: 18px 0 0; }
+  .gp-st-grp:first-child { padding-top: 0; }
+  .gp-st-grp + .gp-st-grp { margin-top: 18px; border-top: 1px solid var(--gi-line); border-left: 0; }
+  .gp-st-foot .gi-acts { margin-left: 0; }
+}
+
+/* ---- THE BUILD CARD (the picture people download) ----
+   Wide (box >= 1100px, and always in the download stage): art | weapon + stats | artifacts,
+   breakdown strip under them. The art bleeds into the middle column like Enka's; the frame,
+   crest and brand pill are Parchrome's. Options = classes: .no-uid .no-name .no-rolls .no-brk. */
+.gp-build {
+  --gp-gold: 211, 188, 142;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 36fr) minmax(0, 27fr) minmax(0, 37fr);
+  grid-template-areas: 'hero mid arts' 'brk brk brk';
+  border-radius: 14px;
+  overflow: hidden;
+  color: #eef0f3;
+  font-family: 'Sora', sans-serif;
+  background:
+    radial-gradient(52% 80% at 18% 46%, color-mix(in srgb, var(--gi-el) 45%, transparent), transparent 70%),
+    radial-gradient(45% 70% at 100% 0%, color-mix(in srgb, var(--gi-el) 20%, transparent), transparent 70%),
+    linear-gradient(115deg, color-mix(in srgb, var(--gi-el) 34%, #0a0c11) 0%, color-mix(in srgb, var(--gi-el) 15%, #0c0e13) 48%, #0d0f14 100%);
+  box-shadow: 0 0 0 2px var(--lb-edge), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+}
+/* Star dust, thicker behind the art. */
+.gp-build::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.7) 0.7px, transparent 1.3px), radial-gradient(rgba(255, 255, 255, 0.45) 0.6px, transparent 1.1px);
+  background-size: 97px 89px, 53px 61px;
+  background-position: 0 0, 27px 19px;
+  opacity: 0.35;
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 75%);
+  mask-image: linear-gradient(90deg, #000, transparent 75%);
+}
+.gp-build .gp-frame { inset: 12px; }
+.gp-brand {
+  position: absolute;
+  z-index: 3;
+  bottom: 4px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px 2px 3px;
+  border: 1px solid rgba(var(--gp-gold), 0.45);
+  border-radius: 999px;
+  background: #0e0f13;
+  transform: translateX(-50%);
+  font: 700 10px/1 'Sora', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #e8d6ae;
+}
+.gp-brand img { width: 16px; height: 16px; border-radius: 50%; }
+
+/* Stat icons. */
+.gp-si { position: relative; display: inline-grid; flex: none; place-items: center; width: 16px; height: 16px; color: currentColor; }
+.gp-si svg,
+.gp-si img { width: 100%; height: 100%; fill: currentColor; }
+.gp-si.is-pct::after { content: '%'; position: absolute; right: -5px; bottom: -4px; font: 800 8px/1 'Sora', sans-serif; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .gp-build,
+  .gp-hidden { animation: gp-in 0.4s var(--gi-ease) both; }
+  .gp-art img { animation: gp-float 8s ease-in-out infinite; }
+}
+@keyframes gp-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+@keyframes gp-float {
+  50% { transform: translateY(-7px); }
+}
+
+/* Column 1: the art, the name, constellations (left), talents (right), UID (foot). */
+.gp-hero { grid-area: hero; position: relative; min-width: 0; min-height: 600px; }
+/* A soft dark wash behind the name (top left) and the UID (foot), for light art like Hu Tao's ghost.
+   It lives INSIDE .gp-art so the art's mask fades it out too: as .gp-hero::after it stopped dead at
+   the column edge while the art ran on, which drew a vertical seam. */
+.gp-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(58% 34% at 0% 0%, rgba(6, 7, 10, 0.6), rgba(6, 7, 10, 0) 100%), linear-gradient(0deg, rgba(6, 7, 10, 0.45), rgba(6, 7, 10, 0) 22%); }
+.gp-art { position: absolute; z-index: -1; inset: 0 -22% 0 0; -webkit-mask-image: linear-gradient(90deg, #000 62%, transparent 96%); mask-image: linear-gradient(90deg, #000 62%, transparent 96%); }
+.gp-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+/* Your own picture: its right edge fades out (the bottom in portrait / stacked), the other edges softly, wherever Move puts it (the mask rides on the
+   picture, so a zoomed-out or moved picture never shows a hard edge). Official art is a cut-out. */
+.gp-art img.is-own {
+  --own-x: linear-gradient(90deg, transparent, #000 7%, #000 55%, transparent 98%);
+  --own-y: linear-gradient(180deg, transparent, #000 7%, #000 93%, transparent);
+  -webkit-mask-image: var(--own-x), var(--own-y);
+  mask-image: var(--own-x), var(--own-y);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.is-portrait .gp-art img.is-own { --own-x: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); --own-y: linear-gradient(180deg, transparent, #000 7%, #000 60%, transparent 98%); }
+.gp-b-head { position: relative; padding: 36px 24px 0 40px; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.75); }
+.gp-b-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font: 800 30px/1.08 'Cinzel', serif !important; color: #fff; }
+.gp-owner { display: inline-flex; align-items: center; gap: 5px; font: 700 11px/1 'Sora', sans-serif; letter-spacing: 0.6px; color: rgba(255, 255, 255, 0.72); }
+.gp-owner::before { content: ''; width: 0; height: 0; border: 4px solid transparent; border-bottom: 6px solid currentColor; transform: translateY(-2px); }
+.gp-b-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin-top: 10px; font-size: 15px; color: rgba(255, 255, 255, 0.78); }
+.gp-b-meta b { font-weight: 800; color: #fff; }
+.gp-b-meta small { font-size: inherit; color: rgba(255, 255, 255, 0.55); }
+.gp-fr { display: inline-flex; align-items: center; gap: 5px; }
+.gp-fr svg { width: 16px; height: 16px; fill: #ff9fb6; }
+.gp-b-el { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; padding: 5px 10px 5px 6px; border-radius: 999px; background: rgba(6, 7, 10, 0.55); font: 700 11px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: color-mix(in srgb, var(--gi-el) 55%, #fff); text-shadow: none; }
+.gp-b-el img { width: 18px; height: 18px; }
+.gp-b-el > span:not(.gi-rarity) { color: rgba(255, 255, 255, 0.75); }
+.gp-b-el .gi-rarity { font-size: 12px; }
+
+/* Constellations: nodes on a glowing line, like a star chart. */
+.gp-cons { position: absolute; top: 178px; left: 36px; display: flex; flex-direction: column; gap: 12px; list-style: none; }
+.gp-cons::before { content: ''; position: absolute; z-index: -1; top: 16px; bottom: 16px; left: 50%; width: 2px; transform: translateX(-50%); background: linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 70%, transparent), rgba(255, 255, 255, 0.08)); }
+.gp-cons li {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(8, 9, 12, 0.72);
+}
+.gp-cons img { width: 74%; height: 74%; opacity: 0.25; filter: grayscale(1); }
+.gp-cons svg { position: absolute; width: 16px; height: 16px; fill: rgba(255, 255, 255, 0.75); }
+.gp-cons li.is-on { border-color: var(--gi-el); background: color-mix(in srgb, var(--gi-el) 26%, rgba(8, 9, 12, 0.8)); box-shadow: 0 0 16px -2px color-mix(in srgb, var(--gi-el) 75%, transparent); }
+.gp-cons li.is-on img { opacity: 1; filter: none; }
+
+/* Talents: down the art's right side, the level under each. */
+.gp-talents { position: absolute; right: 8px; bottom: 74px; display: flex; flex-direction: column; gap: 10px; }
+.gp-tal { display: flex; flex-direction: column; align-items: center; }
+.gp-tal i { display: grid; place-items: center; width: 50px; height: 50px; border: 1.5px solid rgba(255, 255, 255, 0.22); border-radius: 50%; background: rgba(8, 9, 12, 0.75); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.8); }
+.gp-tal i img { width: 34px; height: 34px; }
+.gp-tal b { min-width: 28px; margin-top: -10px; padding: 3px 6px 2px; border-radius: 9px; background: #0b0b0d; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); font: 800 12px/1 'Sora', sans-serif; text-align: center; color: #fff; }
+.gp-tal.is-up b { color: #7fd8f0; box-shadow: inset 0 0 0 1px rgba(127, 216, 240, 0.5); } /* boosted by a constellation, the game's blue */
+/* The art's foot: caption, UID, artist credit (the studio's, all optional). */
+.gp-tags { position: absolute; bottom: 28px; left: 34px; right: 78px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.gp-cap { max-width: 100%; overflow: hidden; padding: 6px 12px 6px 10px; border-radius: 999px; background: rgba(6, 7, 10, 0.66); box-shadow: inset 0 0 0 1px rgba(var(--gp-gold), 0.4); font: 700 13px/1 'Sora', sans-serif; text-overflow: ellipsis; white-space: nowrap; color: #fff; }
+.gp-cap::before { content: ''; display: inline-block; width: 6px; height: 6px; margin: 0 8px 1px 0; background: rgba(var(--gp-gold), 0.9); transform: rotate(45deg); }
+.gp-credit { max-width: 100%; overflow: hidden; font: 600 10px/1.2 'Sora', sans-serif; letter-spacing: 0.4px; text-overflow: ellipsis; white-space: nowrap; color: rgba(255, 255, 255, 0.62); text-shadow: 0 1px 6px #000; }
+.gp-cap:empty,
+.gp-credit:empty { display: none; }
+.gp-uidtag { padding: 5px 10px; border-radius: 999px; background: rgba(6, 7, 10, 0.6); font: 700 11.5px/1 'Sora', sans-serif; letter-spacing: 1.6px; color: rgba(255, 255, 255, 0.82); font-variant-numeric: tabular-nums; }
+
+/* Column 2: weapon, final stats, set bonuses. */
+.gp-b-mid { grid-area: mid; display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 36px 18px 34px 12px; }
+.gp-wep { display: grid; grid-template-columns: 92px minmax(0, 1fr); align-items: center; gap: 16px; }
+.gp-wep-ico { position: relative; width: 92px; height: 92px; border-radius: 12px; background: linear-gradient(160deg, #3d3f4a, #2a2b33); box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.8); }
+.gp-wep-ico.r4 { background: linear-gradient(160deg, #8a6cc2, #5b4785); }
+.gp-wep-ico.r5 { background: linear-gradient(160deg, #c99648, #8d5d2a); }
+.gp-wep-ico img { width: 100%; height: 100%; }
+.gp-wep-ico .gi-rarity { position: absolute; bottom: -8px; left: 50%; padding: 1px 5px; border-radius: 6px; background: rgba(8, 9, 12, 0.85); transform: translateX(-50%); font-size: 10px; letter-spacing: 1px; white-space: nowrap; }
+.gp-wep-who { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.gp-wep-who > b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 17px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.gp-chips > span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 6px; background: rgba(0, 0, 0, 0.38); font: 700 13px/1.2 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-chips small { font-size: inherit; font-weight: 600; color: rgba(255, 255, 255, 0.5); }
+.gp-chips .gp-r { background: rgba(var(--gp-gold), 0.24); color: #f3e2b8; }
+.gp-wep.gp-empty { display: block; font-size: 12px; color: var(--gi-dim); }
+.gp-final { list-style: none; }
+.gp-final li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 7px 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-size: 13.5px; font-weight: 600; color: #dfe2e6; }
+.gp-final li:last-child { border-bottom: 0; }
+.gp-final .gp-si { color: rgba(255, 255, 255, 0.85); }
+.gp-final b { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font: 800 14.5px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-final small { font-size: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.45); }
+.gp-final em { font-style: normal; color: #8fd6a2; } /* the bonus on top of base, the game's green */
+.gp-sets { display: flex; flex-direction: column; gap: 6px; margin-top: auto; list-style: none; }
+.gp-sets li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; background: rgba(0, 0, 0, 0.32); font-size: 13px; font-weight: 700; color: #a6dc8e; }
+.gp-set-ico { display: grid; flex: none; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: rgba(166, 220, 142, 0.14); }
+.gp-set-ico svg { width: 15px; height: 15px; fill: #a6dc8e; }
+.gp-sets li > span:nth-child(2) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gp-sets li b { padding: 3px 8px; border-radius: 5px; background: rgba(0, 0, 0, 0.45); color: #fff; }
+.gp-sets .gp-noset { color: var(--gi-dim); }
+.gp-r-sets b { padding: 3px 5px 2px; border-radius: 3px; background: rgba(var(--gi-acc-rgb), 0.35); font: 800 10px/1 'Sora', sans-serif; color: #fff; }
+.gp-noset { color: var(--gi-dim); }
+
+/* Column 3: the five artifacts, main stat over the piece, substats 2 x 2. */
+.gp-b-arts { grid-area: arts; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 30px 36px 34px 6px; }
+.gp-arts-head { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 16px; }
+.gp-cv { font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); }
+.gp-cv b { margin-left: 4px; font-size: 15px; letter-spacing: 0; text-transform: none; color: #fff; }
+.gp-cv small { font-size: 11px; color: rgba(255, 255, 255, 0.5); }
+.gp-pieces { display: flex; flex-direction: column; gap: 8px; }
+.gp-pc {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  height: 92px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+.gp-pc-art { position: absolute; z-index: -1; top: -10px; left: -8px; width: 112px; height: 112px; -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 95%); mask-image: linear-gradient(90deg, #000 45%, transparent 95%); }
+.gp-pc-art img { width: 100%; height: 100%; }
+.gp-pc-main { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; padding-right: 14px; border-right: 1px solid rgba(255, 255, 255, 0.1); text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); }
+.gp-pc-main .gp-si { width: 16px; height: 16px; }
+.gp-pc-main > b { font: 800 22px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-pc-foot { display: flex; align-items: center; gap: 6px; }
+.gp-pc-foot .gi-rarity { font-size: 9px; letter-spacing: 0.5px; }
+.gp-pc-foot i { padding: 2px 5px; border-radius: 4px; background: rgba(0, 0, 0, 0.55); font: 700 10px/1 'Sora', sans-serif; font-style: normal; color: #fff; text-shadow: none; }
+.gp-pc-subs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: center; gap: 10px 14px; padding: 0 16px; list-style: none; }
+.gp-pc-subs li { display: flex; align-items: center; gap: 7px; min-width: 0; font: 700 14px/1 'Sora', sans-serif; color: #b9bec6; font-variant-numeric: tabular-nums; }
+.gp-pc-subs .gp-si { width: 15px; height: 15px; }
+.gp-pc-subs li.is-crit { color: #fff; }
+/* Roll pips: one dot per roll (1 = never upgraded). */
+.gp-rolls { display: flex; gap: 2px; margin-left: 1px; }
+.gp-rolls i { width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); }
+.is-crit .gp-rolls i { background: rgba(255, 255, 255, 0.8); }
+.gp-pc-cv { position: absolute; top: 5px; right: 9px; font: 700 9px/1 'Sora', sans-serif; letter-spacing: 0.6px; color: rgba(255, 255, 255, 0.35); }
+.gp-pc.gp-empty { display: flex; align-items: center; padding: 0 18px; font-size: 12px; color: var(--gi-dim); }
+
+/* Substat breakdown: totals across the five pieces, under the card. */
+.gp-brk { grid-area: brk; display: flex; flex-wrap: wrap; gap: 8px; padding: 0 36px 34px 40px; list-style: none; }
+.gp-brk li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: rgba(0, 0, 0, 0.34); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.gp-brk b { font: 800 13.5px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-brk small { font-size: 11px; color: rgba(255, 255, 255, 0.58); }
+
+/* Options off. */
+.gp-build.no-uid .gp-uidtag,
+.gp-build.no-name .gp-owner,
+.gp-build.no-rolls .gp-rolls,
+.gp-build.no-brk .gp-brk { display: none; }
+
+/* Move: a layer over the art takes the drag; the picture holds still while it's on. */
+.gp-mover {
+  position: absolute;
+  z-index: 6;
+  inset: 10px;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 76px;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  background: rgba(6, 7, 10, 0.12);
+  cursor: grab;
+  touch-action: none;
+  outline: 0;
+}
+.gp-mover:active { cursor: grabbing; }
+.gp-mover:focus-visible { border-color: #fff; }
+.gp-mover span { padding: 8px 14px; border-radius: 999px; background: rgba(6, 7, 10, 0.85); font: 700 12px/1 'Sora', sans-serif; color: #fff; pointer-events: none; }
+.gp-build.is-moving .gp-art img { animation: none; }
+
+/* The download stage: a fixed 1280px copy off screen, still and fully drawn. */
+.gp-stage { position: fixed; top: 0; left: -20000px; width: 1280px; container: gp-show / inline-size; pointer-events: none; }
+.gp-stage--port { width: 720px; }
+.gp-stage *,
+.gp-stage *::before { animation: none !important; transition: none !important; }
 
 .gp-hidden { display: flex; align-items: center; gap: 16px; padding: 22px; }
 .gp-hidden .gi-tile { width: 64px; height: 64px; border-radius: 50%; }
 .gp-hidden b { font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
 .gp-hidden p { margin-top: 6px; font-size: 13px; line-height: 1.55; color: var(--gi-muted); }
 
-/* ---- NARROW DESKTOP (the sidebar takes ~300px, so up to 1700px): art + who on top,
-   the two lists side by side under it. ---- */
-@media (min-width: 971px) and (max-width: 1700px) {
-  .gp-build { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); grid-template-rows: 300px auto; height: auto; }
-  .gp-b-who { grid-column: 1 / -1; }
-  /* No mask here: the art is a transparent cut-out drawn whole (contain), so it has no edge to fade. */
-  .gp-art { width: 100%; height: 300px; -webkit-mask-image: none; mask-image: none; }
-  .gp-art img { object-fit: contain; object-position: 30% 30%; }
-  .gp-b-mid { border-left: 0; }
+/* ---- THE CARD, MEDIUM (box under 1100px): art + stats side by side, artifacts under in two columns ---- */
+@container gp-show (max-width: 1099px) {
+  .gp-build { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: 'hero mid' 'arts arts' 'brk brk'; }
+  .gp-hero { min-height: 560px; }
+  .gp-b-mid { padding-right: 36px; }
+  /* Two columns of pieces; the CV / ratio / crit rolls box fills the sixth cell. */
+  .gp-b-arts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 36px 24px 40px; }
+  .gp-pieces { display: contents; }
+  .gp-arts-head { order: 9; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 0 18px; border-radius: 10px; background: rgba(0, 0, 0, 0.22); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
 }
+
+/* ---- THE CARD, NARROW (phones): stacked ---- */
+@container gp-show (max-width: 679px) {
+  .gp-build { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'hero' 'mid' 'arts' 'brk'; }
+  .gp-hero { min-height: 480px; }
+  .gp-art { inset: 0; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }
+  .gp-art img.is-own { --own-x: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); --own-y: linear-gradient(180deg, transparent, #000 7%, #000 60%, transparent 98%); }
+  .gp-b-head { padding: 28px 20px 0 26px; }
+  .gp-b-name { font-size: 25px; }
+  .gp-cons { top: 150px; left: 22px; gap: 8px; }
+  .gp-cons li { width: 34px; height: 34px; }
+  .gp-talents { right: 18px; bottom: 30px; }
+  .gp-tal i { width: 44px; height: 44px; }
+  .gp-tags { left: 26px; bottom: 26px; }
+  .gp-b-mid { padding: 6px 22px 18px; }
+  .gp-b-arts { padding: 0 22px 26px; }
+  .gp-b-arts { display: flex; }
+  .gp-pieces { display: flex; }
+  .gp-arts-head { order: 0; flex-direction: row; justify-content: flex-start; padding: 0; background: none; box-shadow: none; }
+  .gp-pc { grid-template-columns: 120px minmax(0, 1fr); }
+  .gp-pc-art { width: 96px; height: 96px; top: -4px; }
+  .gp-pc-main > b { font-size: 19px; }
+  .gp-pc-subs { gap: 9px 10px; padding: 0 12px; }
+  .gp-pc-subs li { font-size: 12.5px; gap: 5px; }
+  .gp-brk { padding: 0 22px 30px; }
+}
+
+/* ---- THE CARD, PORTRAIT (option): a tall card for phones and stories ----
+   720px wide (1080 in the picture, about 9:16): the art on top, then weapon + stats in two columns,
+   then the artifacts 2 x 3 with the CV box as the sixth tile. Selectors carry .is-portrait so they
+   beat the medium / narrow rules above whatever the box's width. */
+.gp-build.is-portrait {
+  max-width: 720px;
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'hero' 'mid' 'arts' 'brk';
+  background:
+    radial-gradient(85% 42% at 50% 20%, color-mix(in srgb, var(--gi-el) 48%, transparent), transparent 72%),
+    radial-gradient(70% 30% at 100% 62%, color-mix(in srgb, var(--gi-el) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 34%, #0a0c11) 0%, color-mix(in srgb, var(--gi-el) 14%, #0c0e13) 46%, #0d0f14 100%);
+}
+.gp-build.is-portrait::before { -webkit-mask-image: linear-gradient(180deg, #000, transparent 55%); mask-image: linear-gradient(180deg, #000, transparent 55%); }
+.is-portrait .gp-hero { min-height: 580px; }
+.is-portrait .gp-art { inset: 0 0 -70px; -webkit-mask-image: linear-gradient(180deg, #000 68%, transparent 98%); mask-image: linear-gradient(180deg, #000 68%, transparent 98%); }
+.is-portrait .gp-art img { object-position: 50% 22%; }
+.is-portrait .gp-art::after { background: radial-gradient(80% 30% at 0% 0%, rgba(6, 7, 10, 0.6), rgba(6, 7, 10, 0) 100%); }
+.is-portrait .gp-b-head { padding: 38px 40px 0; }
+.is-portrait .gp-b-name { font-size: 34px; }
+.is-portrait .gp-cons { top: 196px; left: 38px; }
+.is-portrait .gp-talents { right: 34px; bottom: 34px; }
+.is-portrait .gp-tags { left: 34px; bottom: 30px; right: 110px; }
+.is-portrait .gp-b-mid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; padding: 10px 36px 0; }
+.is-portrait .gp-wep { grid-column: 1 / -1; }
+.is-portrait .gp-final { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 26px; }
+.is-portrait .gp-final li:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.is-portrait .gp-sets { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; margin-top: 0; }
+.is-portrait .gp-sets li { flex: 1 1 40%; }
+.is-portrait .gp-b-arts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 18px 36px 44px; }
+.is-portrait .gp-pieces { display: contents; }
+.is-portrait .gp-arts-head { order: 9; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 0 18px; border-radius: 10px; background: rgba(0, 0, 0, 0.22); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.is-portrait .gp-pc { grid-template-columns: 116px minmax(0, 1fr); height: 96px; }
+.is-portrait .gp-pc-art { top: -4px; width: 100px; height: 100px; }
+.is-portrait .gp-pc-main { padding-right: 10px; }
+.is-portrait .gp-pc-main > b { font-size: 19px; }
+.is-portrait .gp-pc-subs { gap: 11px 8px; padding: 0 10px; }
+.is-portrait .gp-pc-subs li { gap: 5px; font-size: 12.5px; }
+.is-portrait .gp-pc-subs .gp-si { width: 13px; height: 13px; }
+.is-portrait .gp-brk { padding: 0 36px 44px; }
+/* A portrait card on a phone-width page: one artifact per row (the picture keeps 2 x 3). */
+@container gp-show (max-width: 679px) {
+  .gp-build.is-portrait .gp-hero { min-height: 500px; }
+  .gp-build.is-portrait .gp-b-head { padding: 28px 22px 0 26px; }
+  .gp-build.is-portrait .gp-b-name { font-size: 25px; }
+  .gp-build.is-portrait .gp-cons { top: 150px; left: 22px; }
+  .gp-build.is-portrait .gp-b-mid { padding: 6px 22px 0; }
+  .gp-build.is-portrait .gp-final { grid-template-columns: minmax(0, 1fr); }
+  .gp-build.is-portrait .gp-b-arts { display: flex; flex-direction: column; padding: 16px 22px 30px; }
+  .gp-build.is-portrait .gp-arts-head { order: 0; flex-direction: row; flex-wrap: wrap; padding: 0; background: none; box-shadow: none; }
+  .gp-build.is-portrait .gp-brk { padding: 0 22px 30px; }
+}
+
+/* ---- EVERY BUILD AT A GLANCE ---- */
+.gp-roster { padding-top: 56px; }
+.gp-table-wrap { padding: 0; overflow-x: auto; }
+.gp-table { width: 100%; min-width: 880px; border-collapse: collapse; font-size: 13px; }
+.gp-table thead th { padding: 14px 14px 12px; border-bottom: 1px solid var(--gi-line); font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-align: left; text-transform: uppercase; color: #8e939b; white-space: nowrap; }
+.gp-table td,
+.gp-table tbody th { padding: 12px 14px; border-top: 1px solid var(--gi-line); text-align: left; vertical-align: middle; color: #c9ccd2; }
+.gp-table tbody tr:first-child > * { border-top: 0; }
+.gp-table tbody tr { cursor: pointer; transition: background 0.15s; }
+.gp-table tbody tr:hover,
+.gp-table tbody tr:focus-visible { background: rgba(255, 255, 255, 0.035); outline: 0; }
+.gp-table tbody tr:hover th,
+.gp-table tbody tr:focus-visible th { background: var(--lb-box-hover, #18191e); }
+.gp-table tbody tr:hover th,
+.gp-table tbody tr:focus-visible th { box-shadow: inset 3px 0 0 var(--gi-el); }
+.gp-table tbody th { min-width: 200px; font-weight: 400; }
+/* The name column stays put while the table scrolls sideways on narrow screens. */
+.gp-table thead th:first-child,
+.gp-table tbody th { position: sticky; z-index: 1; left: 0; background: var(--lb-box); }
+.gp-r-who { display: flex; align-items: center; gap: 12px; }
+.gp-table tbody th .gi-tile { width: 42px; height: 42px; border-radius: 50%; }
+.gp-r-name { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.gp-r-name b { font: 700 13.5px/1.1 'Sora', sans-serif; color: #fff; }
+.gp-r-name small { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gi-el); }
+.gp-r-name img { width: 14px; height: 14px; }
+.gp-r-num { font: 700 13px/1.2 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gp-r-num small { display: block; margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--gi-muted); }
+.gp-r-cv { font-size: 15px; font-weight: 800; }
+.gp-r-tal { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gp-r-tal b { font-weight: 700; color: #fff; }
+.gp-r-tal b.is-up { color: #7fd8f0; }
+.gp-r-tal i { margin: 0 4px; font-style: normal; color: var(--gi-dim); }
+.gp-r-wep { display: flex; align-items: center; gap: 10px; min-width: 180px; }
+.gp-r-wep .gi-tile { width: 36px; height: 36px; }
+.gp-r-wep > span:last-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gp-r-wep b { max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; color: #e6e8ec; }
+.gp-r-wep small { font-size: 11px; color: var(--gi-muted); }
+.gp-r-sets { min-width: 170px; }
+.gp-r-sets span { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.gp-r-sets span + span { margin-top: 5px; }
+.gp-r-sets b::after { content: 'pc'; font-weight: 600; }
+
+/* ---- NAMECARD COLLECTION ---- */
+.gp-ncs { padding-top: 56px; }
+.gp-nc-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px 14px; list-style: none; }
+.gp-nc-list button { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.gp-nc-art {
+  position: relative;
+  display: block;
+  aspect-ratio: 420 / 200;
+  border: 2px solid var(--lb-edge);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #16171c;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 22px -14px rgba(0, 0, 0, 0.9);
+  transition: transform 0.25s var(--gi-ease), box-shadow 0.25s var(--gi-ease);
+}
+.gp-nc-art img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.72) saturate(0.85); transition: filter 0.25s; }
+.gp-nc-list button:hover .gp-nc-art,
+.gp-nc-list button:focus-visible .gp-nc-art { transform: translateY(-3px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 16px 28px -14px rgba(0, 0, 0, 0.95); }
+.gp-nc-list button:hover img,
+.gp-nc-list button:focus-visible img { filter: none; }
+.gp-nc-list button:focus-visible { outline: 0; }
+.gp-nc-art em {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 7px 3px;
+  border: 1px solid rgba(211, 188, 142, 0.55);
+  border-radius: 4px;
+  background: rgba(10, 10, 12, 0.78);
+  font: 700 9px/1 'Sora', sans-serif;
+  font-style: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #e8d6ae;
+}
+.gp-nc-cap { display: flex; flex-direction: column; gap: 5px; padding: 10px 2px 0; }
+.gp-nc-cap b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 12.5px/1.2 'Sora', sans-serif; color: #e6e8ec; }
+.gp-nc-cap small { font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #8e939b; }
+
+/* The viewer: a native <dialog>, the namecard at full size with its in-game text. */
+.gp-dlg {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 2px solid var(--lb-edge);
+  border-radius: 12px;
+  background: var(--lb-box);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 30px 80px -20px rgba(0, 0, 0, 0.95);
+  color: var(--gi-text);
+  font-family: 'Sora', sans-serif;
+}
+.gp-dlg::backdrop { background: rgba(5, 5, 7, 0.78); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.gp-dlg-x { position: absolute; z-index: 1; top: 12px; right: 12px; width: 38px; height: 38px; padding: 0 0 2px; }
+.gp-dlg-art { aspect-ratio: 840 / 400; background: #16171c; }
+.gp-dlg-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.gp-dlg-body { padding: 20px 24px 26px; }
+.gp-dlg-body h3 { margin-top: 8px; font: 800 24px/1.2 'Cinzel', serif; color: #fff; }
+.gp-dlg-src { margin-top: 8px; font-size: 13px; line-height: 1.5; color: #c9ccd2; }
+.gp-dlg-src:empty,
+.gp-dlg-desc:empty { display: none; }
+.gp-dlg-desc { margin-top: 14px; padding-left: 14px; border-left: 2px solid rgba(255, 255, 255, 0.14); font-size: 13px; font-style: italic; line-height: 1.65; color: var(--gi-muted); white-space: pre-line; }
+
+/* Tip labels on the search page: icon / number + caps. */
+.gp-rec-k { display: flex; align-items: center; gap: 8px; font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.3px; text-transform: uppercase; color: #e6e8ec; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
+.gp-rec-k svg { flex: none; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- EMPTY SHOWCASE: a drawn profile panel (empty slots + the switch) and the steps ---- */
+.gp-noshow { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); align-items: center; gap: 36px; padding: 28px; }
+.gp-noshow-paimon { position: absolute; top: -42px; right: -26px; width: 104px; height: 104px; transform: rotate(8deg); filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.7)); }
+.gp-noshow-art { position: relative; display: flex; flex-direction: column; gap: 16px; padding: 22px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
+.gp-ghosts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.gp-ghosts span { display: grid; place-items: center; aspect-ratio: 1; border: 2px dashed rgba(255, 255, 255, 0.14); border-radius: 50%; }
+.gp-ghosts span::before { content: '+'; font: 600 20px/1 'Sora', sans-serif; color: #5d616b; }
+.gp-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); font-size: 12px; font-weight: 600; color: #c9ccd2; }
+.gp-switch i { position: relative; flex: none; width: 36px; height: 20px; border-radius: 10px; background: var(--gi-acc); }
+.gp-switch i::after { content: ''; position: absolute; top: 3px; right: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+.gp-noshow-copy h3 { margin-top: 10px; font: 800 22px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-noshow-copy > p:not(.gi-eyebrow) { margin-top: 8px; max-width: 60ch; font-size: 13.5px; line-height: 1.6; color: var(--gi-muted); }
+.gp-noshow-copy ol { display: grid; gap: 9px; margin-top: 16px; list-style: none; counter-reset: gp-step; }
+.gp-noshow-copy li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #c9ccd2; counter-increment: gp-step; }
+.gp-noshow-copy li::before { content: counter(gp-step); display: grid; flex: none; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); font: 700 11px/1 'Sora', sans-serif; color: #fff; }
+.gp-noshow-copy li b { color: #fff; }
 
 /* ---- PHONES ---- */
 @media (max-width: 970px) {
   .gp-first { padding-top: 28px; }
-  .gp-how { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .gp-card { gap: 18px; min-height: 0; margin-top: 64px; padding: 0 16px 16px; }
-  /* The namecard on top at its own shape, the picture overlapping its foot. */
-  .gp-card-art { position: relative; z-index: 0; width: auto; height: auto; aspect-ratio: 840 / 400; margin: 0 -16px; }
-  .gp-card-art img { -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent); mask-image: linear-gradient(180deg, #000 55%, transparent); }
-  .gp-card::before { background: radial-gradient(70% 60% at 0% 100%, rgba(var(--gi-acc-rgb), 0.14), rgba(var(--gi-acc-rgb), 0) 70%); }
-  .gp-card-main { position: relative; align-items: flex-end; gap: 14px; max-width: none; margin-top: -58px; }
-  .gp-face { width: 84px; height: 84px; }
+  .gp-card.gp-blank { margin-top: 0; }
+  .gp-blank .gp-q { font-size: 38px; }
+  /* Phones: the name beside the face, the UID field full width under both (it was cut off beside the face). */
+  .gp-blank .gp-card-main { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 0 14px; }
+  .gp-blank .gp-who { display: contents; }
+  .gp-blank .gp-name { grid-column: 2; grid-row: 1; padding-bottom: 6px; }
+  .gp-blank .gi-look-form,
+  .gp-blank .gi-look-status,
+  .gp-blank .gp-badges { grid-column: 1 / -1; }
+  .gp-blank .gi-look-form { max-width: none; margin-top: 14px; }
+  .gp-tips-sec { padding-top: 40px; }
+  .gp-tips { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  /* A lighter trim; the medals wrap under the name, two a row. */
+  .gp-card { margin-top: 64px; padding: 34px 0 22px; }
+  .gp-card-art img { object-position: 92% 30%; }
+  .gp-card-art::after { background: linear-gradient(90deg, rgba(20, 21, 25, 0.9) 0%, rgba(20, 21, 25, 0.45) 100%), linear-gradient(180deg, rgba(20, 21, 25, 0.75) 0%, rgba(20, 21, 25, 0) 50%); }
+  .gp-frame { inset: 8px; border-radius: 10px; }
+  .gp-orn { width: 40px; height: 40px; }
+  .gp-crest { top: -7px; width: 110px !important; height: 14px !important; }
+  .gp-card-main { flex-wrap: wrap; gap: 14px; padding: 0 22px; }
+  .gp-face { width: 88px; height: 88px; }
+  .gp-who { padding-top: 10px; }
   .gp-name { font-size: 26px; }
   .gp-uid { font-size: 12px; }
   .gp-sig { margin-top: 10px; font-size: 12.5px; }
-  .gp-card-main + .gp-stats { margin-top: 2px; }
-  .gp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-  .gp-stats li { min-width: 0; padding: 10px 10px 9px; }
+  .gp-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 18px 22px 0; }
+  .gp-stats li { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 11px 10px; border-top: 1px solid var(--gi-line); }
+  .gp-stats li:nth-child(3n + 1) { border-left: 0; }
+  .gp-stats li:nth-child(-n + 3) { border-top: 0; }
+  .gp-stats svg { display: none; }
   .gp-stats b { font-size: 16px; }
   .gp-stats span { font-size: 8.5px; letter-spacing: 0.8px; }
   .gp-msg { flex-direction: column; align-items: flex-start; min-height: 0; padding: 20px; }
   .gp-msg-t { font-size: 20px; }
-  .gp-bar { flex-direction: row; align-items: center; gap: 8px; }
-  .gp-again { flex: 1; width: auto; min-width: 0; }
-  .gp-again-st { flex-basis: 100%; order: 3; }
-  .gp-bar .gi-acts .gi-key { width: 40px; height: 40px; padding: 0 0 2px; }
-  .gp-bar .gi-acts .gi-key span { display: none; }
 
   .gp-show { padding-top: 36px; }
-  .gp-ch { min-height: 46px; padding: 0 10px 0 5px; gap: 8px; font-size: 10px; }
-  .gp-ch .gi-tile { width: 32px; height: 32px; }
-  .gp-build { display: flex; flex-direction: column; height: auto; }
-  .gp-art { position: relative; z-index: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 60%, transparent); }
-  .gp-art img { object-position: 50% 25%; }
-  .gp-b-who { position: relative; margin-top: -92px; padding: 0 16px 18px; background: none; }
-  .gp-b-name { font-size: 28px; }
-  .gp-talents span { width: auto; flex: 1; }
-  .gp-b-mid, .gp-b-arts { padding: 16px; border-left: 0; border-top: 1px solid var(--gi-line); }
-  .gp-final { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; margin-top: 12px; }
-  .gp-final li { padding: 9px 0; font-size: 12px; }
-  .gp-final li:last-child { border-bottom: 1px solid var(--gi-line); }
-  .gp-final b { font-size: 13px; }
-  .gp-final small { display: none; }
-  .gp-piece { grid-template-columns: 44px 76px minmax(0, 1fr); gap: 10px; height: auto; min-height: 80px; padding: 10px 8px; }
-  .gp-piece .gi-tile { width: 44px; height: 44px; }
-  .gp-main b { font-size: 15px; }
-  .gp-piece ul { gap: 6px 8px; }
-  .gp-piece li { font-size: 10.5px; }
-  .gp-piece-cv { display: none; }
+  .gp-studio { padding: 16px; }
+  .gp-ch { min-height: 54px; gap: 10px; padding: 0 12px 0 6px; }
+  .gp-ch .gi-tile { width: 38px; height: 38px; }
+  .gp-ch-t b { max-width: 110px; font-size: 12px; }
+  .gp-roster,
+  .gp-ncs { padding-top: 40px; }
+  .gp-nc-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 8px; }
+  .gp-badge:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .gp-noshow-paimon { top: -30px; right: -8px; width: 80px; height: 80px; }
+  .gp-badges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gp-badge { padding: 10px; gap: 10px; }
+  .gp-noshow { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 18px; }
 }

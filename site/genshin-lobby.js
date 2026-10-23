@@ -4,110 +4,24 @@
 // genshin-lobby.css. Everything from the feed is third-party text, so it goes through
 // esc() before it reaches markup.
 (function () {
-  const { $, esc, now, EL, NEUTRAL, MONTHS, PRIMO, parts, pad, nextReset, gameDay, srvEnd, countdowns, fit, tile, elIcon } = window.GI;
+  const { $, esc, now, MONTHS, PRIMO, parts, pad, nextReset, gameDay, srvEnd, countdowns, fit, tile, elIcon, NATIONS } = window.GI;
   const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const FARM_DAY = { monday: 'monday', thursday: 'monday', tuesday: 'tuesday', friday: 'tuesday', wednesday: 'wednesday', saturday: 'wednesday' };
 
-  // Countdowns once a second: the shared [data-end] ones, the wish clock (its end moved
-  // to the picked server) and the daily reset.
+  // Countdowns once a second: the shared [data-end] ones and the daily reset (the wish
+  // card ticks its own clock).
   function tick() {
     const t = now();
     countdowns();
-    const clock = $('giClock');
-    if (clock && clock.dataset.srv) {
-      const p = parts(srvEnd(clock.dataset.srv) - t);
-      clock.querySelectorAll('[data-u]').forEach((b) => (b.textContent = pad(p[b.dataset.u])));
-    }
     const left = nextReset() - t;
     const p = parts(left);
     $('giReset').textContent = pad(p.h) + ':' + pad(p.m) + ':' + pad(p.s);
   }
-  window.addEventListener('resize', () => fit($('giName')));
 
 
-  // ---- hero ----
-  function hero(banners) {
-    const views = banners.filter((b) => (b.characters && b.characters.length) || (b.weapons && b.weapons.length));
-    if (!views.length) {
-      $('giMeta').textContent = 'No wish is running right now.';
-      return;
-    }
-    const sw = $('giSwitch');
-    sw.innerHTML = views
-      .map((b, i) => {
-        const five = (b.characters || []).find((c) => c.rarity === 5);
-        const label = five ? five.name : 'Weapons';
-        const pic = five ? five.icon : (b.weapons[0] || {}).icon;
-        return `<button type="button" class="gi-ws" role="tab" data-i="${i}" aria-label="${esc(label)}"><span class="gi-ws-pic">${pic ? `<img src="${esc(pic)}" alt="">` : ''}</span><span class="gi-ws-name">${esc(label)}</span></button>`;
-      })
-      .join('');
-    sw.hidden = views.length < 2;
-    sw.addEventListener('click', (e) => {
-      const b = e.target.closest('.gi-ws');
-      if (b) show(views, +b.dataset.i);
-    });
-    show(views, 0);
-  }
-
-  function show(views, i) {
-    const b = views[i];
-    const five = (b.characters || []).find((c) => c.rarity === 5);
-    const sec = $('giWish');
-    let art = $('giArt');
-    if (!art) {
-      art = document.createElement('img');
-      art.className = 'gi-wish-img';
-      art.id = 'giArt';
-      art.alt = '';
-      art.decoding = 'async';
-      art.hidden = true;
-      $('giWeps').before(art);
-    }
-    const weps = $('giWeps');
-    $('giSwitch').querySelectorAll('.gi-ws').forEach((t) => {
-      const on = +t.dataset.i === i;
-      t.classList.toggle('active', on);
-      t.setAttribute('aria-selected', on);
-    });
-    sec.style.setProperty('--gi-el', five ? EL[five.element] || NEUTRAL : NEUTRAL);
-    $('giEyebrow').textContent = b.name + (b.version ? ' · v' + b.version : '');
-    let four;
-    if (five) {
-      $('giName').textContent = five.name;
-      $('giTitle').textContent = five.title || '';
-      $('giMeta').innerHTML = [`<span class="gi-el">${EL[five.element] ? `<img src="/images/genshin/element/${five.element.toLowerCase()}.webp" alt="">` : ''}${esc(five.element)}</span>`, esc(five.weapon), esc(five.affiliation)].filter(Boolean).join('<span aria-hidden="true">·</span>');
-      weps.hidden = true;
-      if (five.splash && art.getAttribute('src') !== five.splash) {
-        if (art.getAttribute('src')) art.classList.add('is-out'); // fade only when swapping wishes
-        art.onload = () => art.classList.remove('is-out');
-        art.src = five.splash;
-        art.hidden = false;
-      }
-      four = b.characters.filter((c) => c.rarity === 4);
-      $('giFourLabel').innerHTML = 'Featured 4&#9733;';
-      $('giFourRow').innerHTML = four.map((c) => `<figure>${tile(c.icon, 4, c.name)}<figcaption>${esc(c.name)}${c.element ? `<small>${esc(c.element)}</small>` : ''}</figcaption></figure>`).join('');
-    } else {
-      // Same lines and heights as a character wish, so switching never moves the hero:
-      // one-line title (the weapon wish's in-game name), one meta line, one row of tiles.
-      const top = b.weapons.filter((w) => w.rarity === 5);
-      $('giName').textContent = 'Epitome Invocation';
-      $('giTitle').textContent = 'Weapon Event Wish';
-      $('giMeta').innerHTML = top.map((w) => `<b>${esc(w.name)}</b>`).join('<span aria-hidden="true">·</span>');
-      art.hidden = true;
-      art.removeAttribute('src');
-      weps.innerHTML = top.map((w) => `<img src="${esc(w.icon)}" alt="">`).join('');
-      weps.hidden = false;
-      four = b.weapons.filter((w) => w.rarity === 4);
-      $('giFourLabel').innerHTML = 'Featured 4&#9733; weapons';
-      $('giFourRow').innerHTML = four.map((w) => `<figure>${tile(w.icon, w.rarity, w.name)}</figure>`).join('');
-    }
-    $('giFour').hidden = !four.length;
-    fit($('giName'));
-    const clock = $('giClock');
-    clock.dataset.srv = b.end;
-    clock.hidden = false;
-    tick();
-  }
+  // ---- CURRENT BANNERS v3: the wish card is shared with the Banners page (genshin-wish.js,
+  // GI.wishCard), so it's drawn there. ----
+  let wish = { tick() {} };
 
   // ---- hero lede (Oct 22 2026): one live sentence under the title -- who's on the
   // wishes and for how long, what the codes are worth, when the Abyss resets.
@@ -197,45 +111,41 @@
       .join('');
   }
 
-  // In-game shots from the Genshin wiki (Oct 22 2026), cropped to the card's shape:
-  // the Spiral Abyss portal, the Imaginarium Theater's room (images/genshin/endgame/).
-  const ENDGAME_ART = { ActTypeTower: '/images/genshin/endgame/abyss.webp', ActTypeRoleCombat: '/images/genshin/endgame/theater.webp' };
   function endgame(ch, evs) {
     const t = now();
-    const list = (ch || []).filter((c) => c.end > t);
     const stygian = (evs || []).find((e) => e.type === 'ActTypeHardChallenge' && (!e.end || e.end > t));
-    const cards = list.map((c) => ({ name: c.name, end: c.end, start: c.start, primos: c.primos, media: ENDGAME_ART[c.type] ? `<img src="${ENDGAME_ART[c.type]}" alt="" loading="lazy">` : '', photo: !!ENDGAME_ART[c.type] }));
-    if (stygian) cards.push({ name: stygian.name, end: stygian.end, start: stygian.start, primos: 0, media: stygian.image ? `<img src="${esc(stygian.image)}" alt="">` : '', photo: !!stygian.image });
-    if (!cards.length) {
-      $('giEnd').innerHTML = '<p class="gi-empty">No endgame data right now.</p>';
+    const rows = (ch || []).filter((c) => c.end > t).concat(stygian ? [stygian] : []);
+    const list = $('giEnd');
+    if (!rows.length) {
+      list.innerHTML = '<p class="gi-empty">No endgame data right now.</p>';
       return;
     }
     const day = (s) => {
       const d = new Date(s * 1000);
       return MONTHS[d.getUTCMonth()] + ' ' + d.getUTCDate();
     };
-    $('giEnd').innerHTML = cards
+    list.innerHTML = rows
       .map(
-        (c) => `<article class="gi-box gi-end"><div class="gi-end-media${c.photo ? ' has-photo' : ''}">${c.media}</div>
-      <div class="gi-end-body"><h3 class="gi-end-name">${esc(c.name)}</h3>${c.start ? `<span class="gi-label">${day(c.start)} – ${day(c.end)}</span>` : ''}
-      <div class="gi-end-stats"><div><span class="gi-label">Resets in</span><span class="gi-today-v" data-end="${+c.end}"></span></div>
-      ${c.primos ? `<div><span class="gi-label">Reward</span><span class="gi-primo">${PRIMO}${c.primos.toLocaleString()}</span></div>` : ''}</div></div></article>`
+        (c) => `<div class="gi-eg-row"><div class="gi-eg-name"><h3>${esc(c.name)}</h3>${c.start ? `<span class="gi-label">${day(c.start)} – ${day(c.end)}</span>` : ''}</div>
+      <div class="gi-eg-stat"><span class="gi-label">Resets in</span>${c.end ? `<span class="gi-today-v" data-end="${+c.end}"></span>` : '<span class="gi-today-v">Ongoing</span>'}</div>
+      ${c.primos ? `<div class="gi-eg-stat"><span class="gi-label">Reward</span><span class="gi-primo">${PRIMO}${c.primos.toLocaleString()}</span></div>` : ''}</div>`
       )
       .join('');
   }
 
-  // The Lobby shows the first 3 (the feed's order); the rest, the expired ones and
-  // How to redeem live on /genshin-impact/codes.
+  // The Lobby shows every code with Primogems (Adrian, Oct 23 2026; the first 3 if none have
+  // any); the rest, the expired ones and How to redeem live on /genshin-impact/codes.
   function codes(list) {
     const box = $('giCodes');
     if (!list || !list.length) {
       box.innerHTML = '<p class="gi-empty">No active codes right now.</p>';
       return;
     }
-    const sum = list.reduce((a, c) => a + (c.primos || 0), 0);
-    $('giCodesSub').textContent = `${list.length} active codes worth ${sum.toLocaleString()} Primogems. Here are ${Math.min(3, list.length)}; Redeem opens the official gift page with the code filled in.`;
-    $('giCodesAll').textContent = `All ${list.length} codes`;
-    box.innerHTML = list.slice(0, 3).map(GI.codeRow).join('');
+    const primo = list.filter((c) => c.primos);
+    const sum = primo.reduce((a, c) => a + c.primos, 0);
+    if (primo.length) $('giCodesSub').textContent = `${primo.length} codes worth ${sum.toLocaleString()} Primogems.`;
+    $('giCodesAll').firstChild.textContent = `All ${list.length} codes`;
+    box.innerHTML = (primo.length ? primo : list.slice(0, 3)).map(GI.codeRow).join('');
   }
 
   function farm(f, day, books) {
@@ -291,25 +201,70 @@
   }
   document.querySelectorAll('.gi-row').forEach((r) => r.addEventListener('scroll', syncArrows, { passive: true }));
 
-  // Player lookup: opens /genshin-impact/player/<UID> (GI.lookup, genshin-core.js).
-  GI.lookup($('giLook'));
+  // ---- PLAYER SEARCH (hero, Oct 23 2026): Search asks /api/genshin who the UID is and shows
+  // them as a card; the card opens their page. This is the landing page, so nothing (not even
+  // the 66 KB id map) is fetched before the first Search. It's the same request the player page
+  // makes, so opening the card is a browser-cache hit (the API sends max-age=60).
+  const UI = 'https://enka.network/ui/';
+  const LOOK_ERR = {
+    notFound: 'No player has this UID. Check the number and try again.',
+    maintenance: 'Genshin is under maintenance. Try again once it’s over.',
+    busy: 'Too many lookups right now. Try again in a minute.',
+    enka5xx: 'Enka.Network isn’t answering. Try again in a few minutes.',
+  };
+  const hit = $('giHit');
+  let enkaMap = null;
+  let asked = '';
+  const closeHit = () => {
+    asked = '';
+    hit.hidden = true;
+  };
+  // Newer profiles send a picture id, older ones a character (+ costume): genshin-player.js pfp().
+  function pfp(map, pp) {
+    if (!pp) return '';
+    if (pp.id && map.pf[pp.id]) return UI + map.pf[pp.id] + '.png';
+    const c = map.c[pp.avatarId];
+    return map.cos[pp.costumeId] ? UI + 'UI_AvatarIcon_' + map.cos[pp.costumeId] + '.png' : c && c.i ? UI + 'UI_AvatarIcon_' + c.i + '.png' : '';
+  }
+  function findPlayer(uid) {
+    if (uid === asked) return;
+    asked = uid;
+    hit.hidden = false;
+    hit.innerHTML = `<p class="gi-hit-msg">Looking up UID ${uid}&hellip;</p>`;
+    enkaMap = enkaMap || fetch('/genshin-enka-map.json').then((r) => (r.ok ? r.json() : Promise.reject('unreachable')));
+    const player = fetch(GI.API + '?uid=' + uid).then(async (r) => {
+      const d = await r.json().catch(() => ({ error: r.ok ? 'enka5xx' : 'unreachable' }));
+      if (!r.ok || d.error) throw d.error || 'unreachable';
+      return d;
+    });
+    Promise.all([player, enkaMap])
+      .then(([d, map]) => {
+        if (uid !== asked) return;
+        const p = d.playerInfo || {};
+        const pic = pfp(map, p.profilePicture);
+        const facts = [p.level != null && 'AR ' + p.level, p.worldLevel != null && 'WL ' + p.worldLevel, 'UID ' + uid, GI.uidServer(uid)].filter(Boolean).map(esc).join(' &middot; ');
+        hit.innerHTML = `<a class="gi-hit-card" href="${GI.playerHref(uid)}"><span class="gi-tile r5">${pic ? `<img src="${esc(pic)}" alt="" decoding="async">` : '<i class="gi-hit-q">?</i>'}</span>
+          <span class="gi-hit-who"><b>${esc(p.nickname || 'Traveler')}</b><small>${facts}</small>${p.signature ? `<small class="gi-hit-sig">${esc(p.signature)}</small>` : ''}</span>
+          <span class="gi-hit-go">View profile<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>`;
+      })
+      .catch((e) => {
+        if (e === 'unreachable') enkaMap = null; // let the next Search try the map again
+        if (uid !== asked) return;
+        hit.innerHTML = `<p class="gi-hit-msg is-warn">${esc(LOOK_ERR[e] || 'Couldn’t reach the lookup. Check your connection and try again.')}</p>`;
+        asked = ''; // Search again retries
+      });
+  }
+  GI.lookup($('giLook'), findPlayer);
+  $('giUid').addEventListener('input', closeHit);
+  $('giFind').addEventListener('keydown', (e) => e.key === 'Escape' && closeHit());
+  document.addEventListener('click', (e) => !hit.hidden && !e.target.closest('#giFind') && closeHit());
 
 
-  // ---- NATIONS ----
-  const NATIONS = [
-    { name: 'Mondstadt', key: 'mondstadt', el: 'anemo', ideal: 'Freedom' },
-    { name: 'Liyue', key: 'liyue', el: 'geo', ideal: 'Contracts' },
-    { name: 'Inazuma', key: 'inazuma', el: 'electro', ideal: 'Eternity' },
-    { name: 'Sumeru', key: 'sumeru', el: 'dendro', ideal: 'Wisdom' },
-    { name: 'Fontaine', key: 'fontaine', el: 'hydro', ideal: 'Justice' },
-    { name: 'Natlan', key: 'natlan', el: 'pyro', ideal: 'War' },
-    { name: 'Nod-Krai', key: 'nodkrai', el: '', ideal: '' },
-    { name: 'Snezhnaya', key: 'snezhnaya', el: 'cryo', ideal: 'Love' },
-  ];
+  // ---- NATIONS ---- (the list itself: GI.NATIONS in genshin-core.js, shared with the Characters page)
   const cap = (s) => s[0].toUpperCase() + s.slice(1);
   function nations(chars) {
     const tabs = $('giNatTabs');
-    tabs.innerHTML = NATIONS.map((n, i) => `<button type="button" class="gi-tab" role="tab" data-i="${i}">${n.el ? `<img src="${elIcon(n.el)}" alt="">` : ''}${esc(n.name)}</button>`).join('');
+    tabs.innerHTML = NATIONS.map((n, i) => `<button type="button" class="gi-tab" role="tab" data-i="${i}">${n.el || n.icon ? `<img src="${n.icon || elIcon(n.el)}" alt="">` : ''}${esc(n.name)}</button>`).join('');
     const pick = (i) => {
       const n = NATIONS[i];
       tabs.querySelectorAll('.gi-tab').forEach((t) => {
@@ -321,9 +276,10 @@
       $('giNatName').textContent = n.name;
       $('giNatIdeal').innerHTML = n.el
         ? `<span><img src="${elIcon(n.el)}" alt="">Home of the <b>${cap(n.el)} Archon</b></span><span>Ideal: <b>${n.ideal}</b></span>`
-        : '<span>An autonomous region of Snezhnaya</span>';
+        : `<span>${n.icon ? `<img src="${n.icon}" alt="">` : ''}An autonomous region of Snezhnaya</span>`;
       const list = chars.filter((c) => c.region === n.name).sort((a, b) => b.rarity - a.rarity || a.name.localeCompare(b.name));
       $('giNatCount').textContent = list.length;
+      $('giNatAll').href = '/genshin-impact/characters?nation=' + n.key;
       fit($('giNatName'));
       $('giNatChars').innerHTML = list.map((c) => `<figure>${tile(c.icon, c.rarity, c.name)}<figcaption>${esc(c.name)}</figcaption></figure>`).join('');
     };
@@ -406,9 +362,9 @@
       svg.querySelectorAll('.rx-node').forEach((g) => g.classList.toggle('is-on', els.includes(g.dataset.el)));
       const pts = els.map((el) => pos[ELS.indexOf(el)]);
       $('rxLinks').innerHTML = pts.length > 1 ? pts.map((p, i) => (i < pts.length - 1 || pts.length > 2 ? `<line class="rx-link" x1="${p[0]}" y1="${p[1]}" x2="${pts[(i + 1) % pts.length][0]}" y2="${pts[(i + 1) % pts.length][1]}"/>` : '')).join('') : '';
-      $('rxMidK').textContent = r ? r.k : els.length > 1 ? 'No reaction' : 'Pick one more';
+      $('rxMidK').textContent = r ? r.k : els.length > 1 ? 'No reaction' : 'Tap one more';
       $('rxMid').textContent = r ? r.n : '';
-      $('rxKind').textContent = r ? r.k : els.length > 1 ? 'No reaction' : 'Pick a second element';
+      $('rxKind').textContent = r ? r.k : els.length > 1 ? 'No reaction' : 'Tap a second element';
       $('rxName').textContent = r ? r.n : els.length > 1 ? 'Nothing happens' : cap(els[0]);
       $('rxEq').innerHTML = els.map((el) => `<img src="${elIcon(el)}" alt="">${cap(el)}`).join('<span aria-hidden="true">+</span>');
       $('rxDesc').textContent = r ? r.d : els.length > 1 ? "Anemo, Geo and Dendro don't react with each other, and no element reacts with itself." : 'Choose another element on the wheel.';
@@ -499,7 +455,7 @@
   // ---- go ----
   GI.feed
     .then((feed) => {
-      hero(feed.banners || []);
+      wish = GI.wishCard(feed.banners || []);
       lede(feed);
       const v = (feed.banners || []).find((b) => b.version);
       if (v) $('giVer').textContent = v.version;
@@ -512,6 +468,7 @@
         today(feed);
         lede(feed);
         tick();
+        wish.tick();
       });
       tick();
       syncArrows();

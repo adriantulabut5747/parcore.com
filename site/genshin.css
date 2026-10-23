@@ -2,8 +2,8 @@
    GENSHIN IMPACT -- SHARED (Oct 22 2026). Every /genshin-impact/ page links
    this first, then its own file (genshin-lobby.css, genshin-banners.css...).
    Here: base reset, tokens, the night-sky ground, the shared pieces (keys,
-   trays, titles, boxes, tiles) and the wish banner card (.gi-wish), which the
-   Lobby and the Banners page both draw. Behaviour: genshin-core.js.
+   trays, titles, boxes, tiles). The wish card the Lobby and the Banners page
+   both draw is in genshin-wish.css. Behaviour: genshin-core.js.
 
    Look: the site's raised UI (--lb-* box / key / well from 11layout.css)
    on /coc/'s near-black ground. Buttons copy Minecraft's grey key
@@ -59,14 +59,19 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
   --gi-acc-ink: #fff;
   --gi-acc-rgb: 163, 70, 75;
   --gi-btn-acc: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -3px 0 rgba(0, 0, 0, 0.3), 0 2px 8px -2px rgba(0, 0, 0, 0.6);
+  /* The gem (Oct 23 2026): a four-point Primogem-style star in the accent red, eight facets lit
+     from the top left. 16x20, so draw it at a 4:5 box. Section-title bullet on the lobby
+     (genshin-lobby.css "TITLE GEM"); reuse it anywhere as a background or mask. */
+  --gi-gem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath fill='%23f2c4c6' d='M8 10 5.2 7 8 0zM8 10 0 10 5.2 7z'/%3E%3Cpath fill='%23c96a70' d='M8 10 8 0 10.8 7zM8 10 5.2 13 0 10z'/%3E%3Cpath fill='%239a3f45' d='M8 10 10.8 7 16 10zM8 10 8 20 5.2 13z'/%3E%3Cpath fill='%235e2327' d='M8 10 16 10 10.8 13zM8 10 10.8 13 8 20z'/%3E%3C/svg%3E");
 }
 @media (max-width: 970px) {
-  .gi-page { --coc-side: 5%; }
+  /* 10px = the CoC layouts / army pages' phone sides (1coclayouts.css .coc-content) */
+  .gi-page { --coc-side: 10px; }
 }
 /* GROUND (Oct 22 2026): genshintools.com's night sky, in our red. Three soft
-   glows on a near-black gradient (body), a faint layer of big diagonal tiles and
-   two dot grids over it (body::before), and drifting, twinkling stars on a canvas
-   (genshin.js "STARS"). All fixed to the screen, so the page scrolls over them.
+   glows on a near-black gradient (body) and two faint dot grids over it
+   (body::before). Still on purpose (Adrian, Oct 23 2026): no moving stars and no
+   diagonal tiles (their hard edges read as lines). All fixed to the screen.
    The scroller and content are see-through so the sky shows; the hero and the
    nation / city bands keep their own pictures on top. */
 body.gi-page {
@@ -104,11 +109,11 @@ body.gi-page::before {
   mix-blend-mode: screen;
   background-image:
     radial-gradient(circle, rgba(var(--gi-acc-rgb), 0.12) 1px, transparent 1px),
-    radial-gradient(circle, rgba(226, 232, 240, 0.05) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(var(--gi-acc-rgb), 0.06) 0 28%, transparent 29% 100%);
-  background-size: 190px 190px, 96px 96px, 760px 760px;
+    radial-gradient(circle, rgba(226, 232, 240, 0.05) 1px, transparent 1px);
+  background-size: 190px 190px, 96px 96px;
 }
-.gi-stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+/* Rising stars (GI.stars): a canvas filling its host box, e.g. the Lobby's wish card. */
+.gi-stars { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
 .gi-page .main,
 .gi-page .coc-main,
 .gi-page .coc-content { background: transparent; }
@@ -143,6 +148,26 @@ body.gi-page::before {
 .gi-key:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
 .gi-key svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .gi-key.is-done { background: var(--lb-well); box-shadow: var(--card-well); color: #fff; } /* Copied: pressed in */
+/* "View all" links (.gi-all: All banners, All codes, View all characters...). Desktop = their key;
+   phones = the site's quiet "All articles" link (11layout.css .art-all): grey text + arrow, underlined. */
+@media (max-width: 970px) {
+  .gi-page .gi-key.gi-all {
+    height: auto;
+    gap: 6px;
+    padding: 6px 2px;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    font: 500 12px/1 'Sora', sans-serif;
+    color: #8a8c93;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  .gi-page .gi-key.gi-all:hover { color: #fff; }
+  .gi-page .gi-key.gi-all svg { width: 14px; height: 14px; transition: transform 0.2s var(--gi-ease); }
+  .gi-page .gi-key.gi-all:hover svg { color: #e86a6a; transform: translateX(3px); }
+}
 .gi-key--red { background: var(--gi-acc); box-shadow: var(--gi-btn-acc); color: var(--gi-acc-ink); }
 .gi-key--red:hover { background: var(--gi-acc-hover); color: var(--gi-acc-ink); }
 .gi-key:focus-visible,
@@ -248,117 +273,12 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 .gi-tile.r5 { background: linear-gradient(160deg, #c99648, #8d5d2a); }
 
 
-/* ---- EVENT WISHES v2 (Oct 22 2026) ----------------------------------------
-   One wide banner in the spirit of the in-game wish screen. The feed only has
-   the featured 5-star's official cut-out (transparent), so the backdrop is drawn
-   in the character's element colour (--gi-el, genshin.js): a diagonal wash, a
-   glow and lit floor under them, light shafts, and the banner's thin frame line.
-   Info left, the wishes as round portraits down the right. Fixed height. */
-.gi-wish {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: minmax(0, 420px) minmax(0, 1fr) 150px;
-  height: 500px;
-  overflow: hidden;
-  border: 0;
-  border-radius: 12px;
-  box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.9);
-  background:
-    radial-gradient(48% 70% at 62% 58%, color-mix(in srgb, var(--gi-el) 26%, transparent), transparent 72%),
-    linear-gradient(105deg, #0e0f13 0%, #0e0f13 32%, color-mix(in srgb, var(--gi-el) 9%, #101117) 62%, color-mix(in srgb, var(--gi-el) 18%, #12131a) 100%);
-}
-.gi-wish-art {
-  position: absolute;
-  inset: 0 150px 0 28%;
-  z-index: 0;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 92%, transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 92%, transparent 100%);
-}
-.gi-wish-art::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: -60px; height: 160px; background: radial-gradient(closest-side, color-mix(in srgb, var(--gi-el) 38%, transparent), transparent); }
-.gi-wish-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; transition: opacity 0.35s ease; }
-.gi-wish-img.is-out { opacity: 0; }
-.gi-hero-weps { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6%; }
-.gi-hero-weps img { height: 72%; width: auto; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.6)); }
-.gi-wish-info { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 40px 0 40px 48px; }
-.gi-wish-tag {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 99px;
-  background: rgba(10, 10, 11, 0.6);
-  font: 600 10.5px/1 'Sora', sans-serif;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #e6e8ec;
-}
-.gi-wish-tag::before { content: ''; width: 6px; height: 6px; background: var(--gi-el); transform: rotate(45deg); }
-/* One line, always: genshin.js shrinks a long name to fit (keeping the line
-   box), so switching wishes never changes the card's height. */
-.gi-name {
-  min-width: 0;
-  margin-top: 18px;
-  white-space: nowrap;
-  overflow: hidden;
-  font-family: 'Cinzel', serif !important;
-  font-size: 52px;
-  font-weight: 800;
-  line-height: 1.05;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
-}
-.gi-wish-title { display: flex; align-items: center; gap: 12px; height: 22px; margin-top: 6px; overflow: hidden; white-space: nowrap; font: 600 15px/1 'Sora', sans-serif; color: #d7d9dd; }
+/* Pieces the wish card (.gw, genshin-wish.css) uses: the 5 stars and the countdown boxes. */
 .gi-rarity { font-size: 13px; letter-spacing: 2px; color: #f2c45a; }
-.gi-meta { display: flex; flex-wrap: nowrap; overflow: hidden; white-space: nowrap; align-items: center; gap: 8px 12px; height: 20px; margin-top: 14px; font-size: 13px; color: rgba(236, 238, 241, 0.74); }
-.gi-meta b { font-weight: 600; color: #fff; }
-.gi-meta .gi-el { display: inline-flex; align-items: center; gap: 6px; color: var(--gi-el); font-weight: 600; }
-.gi-meta .gi-el img { width: 18px; height: 18px; }
-.gi-four { margin-top: 26px; }
-.gi-four-row { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 16px; margin-top: 10px; height: 44px; }
-.gi-four-row figure { flex: none; display: flex; align-items: center; gap: 9px; }
-.gi-four-row .gi-tile { width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(157, 127, 214, 0.45); }
-.gi-four-row figcaption { font-size: 12px; font-weight: 600; color: #e6e8ec; }
-.gi-four-row figcaption small { display: block; margin-top: 2px; font-size: 10.5px; font-weight: 500; color: var(--gi-muted); }
-.gi-wish-ends { display: flex; align-items: center; gap: 12px; margin-top: 26px; }
 .gi-clock-units { display: flex; gap: 4px; }
 .gi-clock-units span { display: flex; align-items: baseline; gap: 2px; padding: 6px 7px 5px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-well); }
 .gi-clock-units b { font: 700 15px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
 .gi-clock-units small { font: 600 9px/1 'Sora', sans-serif; text-transform: uppercase; color: var(--gi-dim); }
-/* The wishes: round portraits down the right edge (the official preview's circles). */
-.gi-wish-switch { grid-column: 3; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding-right: 48px; }
-.gi-wish-switch[hidden] { display: none !important; }
-.gi-ws { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 0; border: 0; background: none; cursor: pointer; }
-.gi-ws-pic { display: block; width: 60px; height: 60px; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.16); border-radius: 50%; background: rgba(10, 10, 12, 0.7); transition: border-color 0.15s ease, box-shadow 0.15s ease; }
-.gi-ws-pic img { width: 100%; height: 100%; object-fit: cover; }
-.gi-ws-name { max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #8b9099; transition: color 0.15s ease; }
-.gi-ws:hover .gi-ws-pic { border-color: rgba(255, 255, 255, 0.4); }
-.gi-ws:hover .gi-ws-name { color: #c9ccd2; }
-.gi-ws.active .gi-ws-pic { border-color: #fff; box-shadow: 0 0 0 3px rgba(var(--gi-acc-rgb), 0.6); }
-.gi-ws.active .gi-ws-name { color: #fff; }
-.gi-ws:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 8px; }
-@media (max-width: 1280px) and (min-width: 971px) {
-  .gi-wish { grid-template-columns: minmax(0, 360px) minmax(0, 1fr) 120px; height: 470px; }
-  .gi-wish-switch { padding-right: 28px; }
-  .gi-wish-art { right: 100px; }
-  .gi-wish-info { padding-left: 36px; }
-  .gi-name { font-size: 44px; }
-}
-@media (max-width: 970px) {
-  /* Phones: the art on top (2:1, the switch over its top-right), the info under it. */
-  .gi-wish { display: flex; flex-direction: column; height: auto; }
-  .gi-wish-art { position: relative; inset: auto; aspect-ratio: 2 / 1; -webkit-mask-image: linear-gradient(180deg, #000 75%, transparent); mask-image: linear-gradient(180deg, #000 75%, transparent); }
-  .gi-wish-info { padding: 4px 22px 24px; }
-  .gi-name { margin-top: 14px; font-size: 32px; }
-  .gi-four { margin-top: 18px; }
-  .gi-wish-ends { margin-top: 18px; }
-  .gi-wish-switch { position: absolute; top: 18px; right: 18px; flex-direction: row; gap: 10px; padding-right: 0; }
-  .gi-ws-pic { width: 42px; height: 42px; }
-  .gi-ws-name { display: none; }
-}
 
 /* ---- PLAYER LOOKUP BOX (Lobby + /genshin-impact/player; moved here Oct 23 2026) ----
    UID field + red Search key on the moonlit shore. Behaviour: GI.lookup (genshin-core.js). */
@@ -453,25 +373,9 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
   .gi-sec-head { margin-bottom: 18px; }
   .gi-arrow { display: none; }
 
-  /* Current banners: a shorter art strip, no tag, the 4-stars as faces only and
-     sharing a line with the countdown. Still one fixed height for every wish. */
-  .gi-wish-art { aspect-ratio: 16 / 7; }
-  .gi-wish-tag, .gi-four .gi-label, .gi-wish-ends .gi-label, .gi-four-row figcaption { display: none; }
-  .gi-wish-info { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 0 18px 18px; }
-  .gi-name, .gi-wish-title, .gi-meta { flex: 0 0 100%; }
-  .gi-name { margin-top: 2px; font-size: 24px; }
-  .gi-wish-title { height: 18px; margin-top: 4px; gap: 8px; font-size: 13px; }
   .gi-rarity { font-size: 11px; }
-  .gi-meta { height: 18px; margin-top: 6px; font-size: 12px; }
-  .gi-meta .gi-el img { width: 16px; height: 16px; }
-  .gi-four { margin-top: 14px; }
-  .gi-four-row { gap: 6px; height: 32px; margin-top: 0; }
-  .gi-four-row .gi-tile { width: 32px; height: 32px; }
-  .gi-wish-ends { margin: 14px 0 0 auto; }
   .gi-clock-units span { padding: 5px 6px 4px; }
   .gi-clock-units b { font-size: 13px; }
-  .gi-wish-switch { top: 12px; right: 12px; gap: 8px; }
-  .gi-ws-pic { width: 36px; height: 36px; }
 }
 
 /* ---- PAGE HEADER (.gi-tb) -- every page but the Lobby (Banners, Reruns...) -----
@@ -485,9 +389,9 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
   align-items: center;
   min-height: 196px;
   /* 48px = 11layout's gap under the bars (every page but the Lobby, whose hero
-     runs under them), + the .tb's own 20px. */
-  margin-top: 68px;
-  padding: 28px 32px;
+     runs under them), + 44px of air (Adrian, Oct 23 2026: was 20; phones keep theirs). */
+  margin-top: 92px;
+  padding: 34px 44px; /* clear of the frame's corners (HEADER FRAME) */
   overflow: hidden;
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
@@ -527,23 +431,71 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
     radial-gradient(60% 120% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), rgba(var(--gi-acc-rgb), 0) 70%),
     linear-gradient(0deg, rgba(10, 10, 12, 0.55) 0%, rgba(10, 10, 12, 0) 45%);
 }
-.gi-tb-body { display: flex; align-items: center; gap: 22px; min-width: 0; max-width: min(640px, 58%); }
-.gi-tb-icon { flex: none; width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)); }
-.gi-tb-copy { min-width: 0; }
-.gi-tb .gi-title { font-size: clamp(26px, 2.5vw, 38px); line-height: 1.04; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55)); }
-.gi-tb-desc { margin-top: 10px; max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #b9bdc4; text-wrap: pretty; }
-/* One row, never wraps: small chips so they fit a 360px phone. */
-.gi-tb-facts { display: flex; flex-wrap: nowrap; gap: 6px; margin-top: 14px; list-style: none; }
-.gi-tb-facts li {
-  padding: 5px 9px 4px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(18, 19, 22, 0.72);
-  font: 600 11px/1 'Sora', sans-serif;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  color: var(--gi-muted);
+/* One grid for desktop and phones (.gi-tb-copy is display:contents, so its
+   children join it): the icon beside the title + sentence, the facts line under
+   both, so it gets the icon's width too. Phones move the icon to the title's row. */
+.gi-tb-body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0 22px; min-width: 0; max-width: min(640px, 58%); }
+.gi-tb-copy { display: contents; }
+/* HEADER FRAME (Oct 23 2026, Adrian: "less contrast"): every .gi-tb wears a quiet gold frame.
+   Cut corners like the game's panels with a fainter echo line inside, hairline edges that fade
+   toward the middle (the gradients below), a four-point star on the top edge (the night sky's
+   sparkle). Markup added to each .gi-tb by genshin-core.js (TBF), so no page carries a copy. */
+.gi-tbf {
+  --c: 12px; /* the corner cut: the edges start this far in, the corner SVG draws the diagonal */
+  --e: rgba(211, 188, 142, 0.3);
+  --m: rgba(211, 188, 142, 0.06);
+  position: absolute;
+  z-index: 2;
+  inset: 10px;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--e), var(--m) 28%, var(--m) 72%, var(--e)) 50% 0 / calc(100% - 2 * var(--c)) 1px no-repeat,
+    linear-gradient(90deg, var(--e), var(--m) 28%, var(--m) 72%, var(--e)) 50% 100% / calc(100% - 2 * var(--c)) 1px no-repeat,
+    linear-gradient(180deg, var(--e), var(--m) 50%, var(--e)) 0 50% / 1px calc(100% - 2 * var(--c)) no-repeat,
+    linear-gradient(180deg, var(--e), var(--m) 50%, var(--e)) 100% 50% / 1px calc(100% - 2 * var(--c)) no-repeat;
 }
-.gi-tb-facts b { margin-right: 2px; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; }
+.gi-tbf-c { position: absolute; width: 32px; height: 32px; }
+.gi-tbf-c--tl { top: 0; left: 0; }
+.gi-tbf-c--tr { top: 0; right: 0; transform: scaleX(-1); }
+.gi-tbf-c--bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.gi-tbf-c--br { right: 0; bottom: 0; transform: scale(-1); }
+.gi-tbf-c svg { display: block; width: 100%; height: 100%; fill: none; stroke: rgba(211, 188, 142, 0.38); stroke-width: 1; }
+.gi-tbf-c svg .i { stroke: rgba(211, 188, 142, 0.16); }
+/* The star sits on the top edge; short lines taper out of it both ways. */
+.gi-tbf-star { position: absolute; top: -5px; left: 50%; width: 11px; height: 11px; transform: translateX(-50%); }
+.gi-tbf-star svg { display: block; width: 100%; height: 100%; fill: rgba(211, 188, 142, 0.55); }
+.gi-tbf-star::before,
+.gi-tbf-star::after { content: ''; position: absolute; top: 5px; width: 72px; height: 1px; }
+.gi-tbf-star::before { right: calc(100% + 5px); background: linear-gradient(270deg, rgba(211, 188, 142, 0.4), rgba(211, 188, 142, 0)); }
+.gi-tbf-star::after { left: calc(100% + 5px); background: linear-gradient(90deg, rgba(211, 188, 142, 0.4), rgba(211, 188, 142, 0)); }
+.gi-tb-icon { grid-row: 1 / 3; width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)); }
+.gi-tb .gi-title { grid-column: 2; font-size: clamp(26px, 2.5vw, 38px); line-height: 1.04; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55)); }
+.gi-tb-desc { grid-column: 2; margin-top: 10px; max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #b9bdc4; text-wrap: pretty; }
+/* Facts (Oct 23 2026): no chip boxes -- one flat line of numbers under a gold
+   hairline (the frame's colour), gold diamonds between, wrapping instead of
+   running off the edge. Same look on phones; only the spacing shrinks there. */
+.gi-tb-facts {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 0;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(211, 188, 142, 0.14);
+  list-style: none;
+}
+.gi-tb-facts:empty { display: none; }
+.gi-tb-facts li { font: 600 12.5px/1 'Sora', sans-serif; letter-spacing: 0.2px; white-space: nowrap; color: var(--gi-muted); }
+.gi-tb-facts b { margin-right: 3px; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; }
+.gi-tb-facts li:not(:last-child)::after {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 14px 2px;
+  transform: rotate(45deg);
+  background: rgba(211, 188, 142, 0.45);
+}
 /* Tabs / filters row under the header: left group, right group. */
 .gi-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px 0 24px; }
 /* Link boxes under the content (e.g. "Your pity", "Rerun tracker -- Soon"). */
@@ -555,12 +507,17 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 .gi-more svg { flex: none; width: 18px; height: 18px; fill: none; stroke: #c9ccd2; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .gi-note { margin-top: 18px; font-size: 11.5px; line-height: 1.6; color: var(--gi-dim); }
 @media (min-width: 971px) and (max-width: 1350px) {
-  .gi-tb-body { gap: 18px; max-width: 74%; }
+  .gi-tb-body { gap: 0 18px; max-width: 74%; }
   .gi-tb-icon { width: 60px; height: 60px; }
   .gi-tb-art { width: 50%; }
 }
 @media (max-width: 970px) {
-  .gi-tb { min-height: 0; margin-top: 64px; padding: 18px 16px 16px; }
+  /* 52px = 20px under the secondary bar, the CoC layouts / army .tb gap */
+  .gi-tb { min-height: 0; margin-top: 52px; padding: 22px 20px 18px; }
+  .gi-tbf { inset: 6px; }
+  .gi-tbf-c { width: 24px; height: 24px; }
+  .gi-tbf-star::before,
+  .gi-tbf-star::after { width: 44px; }
   .gi-tb-art {
     width: 100%;
     -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
@@ -571,10 +528,17 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
       radial-gradient(70% 120% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), rgba(var(--gi-acc-rgb), 0) 70%),
       linear-gradient(90deg, rgba(18, 19, 22, 0.9) 0%, rgba(18, 19, 22, 0.65) 70%, rgba(18, 19, 22, 0.45) 100%);
   }
-  .gi-tb-body { align-items: flex-start; gap: 12px; max-width: none; }
-  .gi-tb-icon { width: 46px; height: 46px; }
-  .gi-tb-desc { margin-top: 6px; font-size: 13px; }
-  .gi-tb-facts { margin-top: 10px; }
+  /* PHONE LAYOUT (Oct 23 2026, Adrian: "messy and cramped"): a side icon column
+     squeezed the title onto two lines and the sentence onto four. Now a small icon
+     shares the title's row and everything below runs the banner's full width. */
+  .gi-tb-body { gap: 0 10px; max-width: none; }
+  .gi-tb-icon { grid-row: auto; width: 30px; height: 30px; }
+  .gi-tb .gi-title { font-size: 21px; line-height: 1.15; white-space: nowrap; }
+  .gi-tb-desc { grid-column: 1 / -1; margin-top: 10px; font-size: 12.5px; line-height: 1.55; color: #c4c7cd; }
+  .gi-tb-facts { gap: 6px 0; margin-top: 14px; padding-top: 12px; }
+  .gi-tb-facts li { font-size: 11px; }
+  .gi-tb-facts b { margin-right: 2px; }
+  .gi-tb-facts li:not(:last-child)::after { width: 3px; height: 3px; margin: 0 10px 2px; }
   .gi-bar { flex-direction: column; align-items: stretch; gap: 10px; margin: 20px 0 16px; }
   .gi-more { grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 28px; }
 }

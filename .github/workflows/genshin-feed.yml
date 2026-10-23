@@ -1,7 +1,7 @@
 # Refreshes site/genshin-feed.json (wishes, events, endgame, codes, farm schedule,
 # birthdays), site/genshin-history.json (every past wish, for the rerun tracker;
 # from paimon.moe's MIT-licensed banner list) and the featured 5-stars' wish art in site/images/genshin/splash/ for
-# the Genshin Impact lobby, every 3 hours (codes come and go fast).
+# the Genshin Impact lobby, plus site/genshin-weapons.json + weapon art (/genshin-impact/weapons), every 3 hours (codes come and go fast).
 # No secrets needed: every source is public. See scripts/genshin-feed.py.
 #
 # Run it by hand any time from the Actions tab ("Run workflow").
@@ -30,6 +30,7 @@ jobs:
             site/genshin-feed.json
             site/genshin-history.json
             site/genshin-enka-map.json
+            site/genshin-weapons.json
             site/images/genshin
           sparse-checkout-cone-mode: false
 
@@ -44,13 +45,13 @@ jobs:
 
       - name: Commit if changed
         run: |
-          if [ -z "$(git status --porcelain -- site/genshin-feed.json site/genshin-history.json site/genshin-enka-map.json site/images/genshin)" ]; then
+          if [ -z "$(git status --porcelain -- site/genshin-feed.json site/genshin-history.json site/genshin-enka-map.json site/genshin-weapons.json site/images/genshin)" ]; then
             echo "No change."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/genshin-feed.json site/genshin-history.json site/genshin-enka-map.json site/images/genshin
+          git add site/genshin-feed.json site/genshin-history.json site/genshin-enka-map.json site/genshin-weapons.json site/images/genshin
           git commit -m "Update Genshin feed"
           git pull --rebase
           git push

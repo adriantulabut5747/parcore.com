@@ -15,38 +15,54 @@
   const SERVERS = { asia: 8, america: -5, europe: 1 };
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const PRIMO = '<img src="/images/genshin/primogem.webp" alt="" width="18" height="18">';
+  // Nations in release order: feed `region` name, art key (images/genshin/nation/<key>.webp),
+  // archon element + ideal. Lobby Nations band + Farm cards, Characters page bands.
+  const NATIONS = [
+    { name: 'Mondstadt', key: 'mondstadt', el: 'anemo', ideal: 'Freedom' },
+    { name: 'Liyue', key: 'liyue', el: 'geo', ideal: 'Contracts' },
+    { name: 'Inazuma', key: 'inazuma', el: 'electro', ideal: 'Eternity' },
+    { name: 'Sumeru', key: 'sumeru', el: 'dendro', ideal: 'Wisdom' },
+    { name: 'Fontaine', key: 'fontaine', el: 'hydro', ideal: 'Justice' },
+    { name: 'Natlan', key: 'natlan', el: 'pyro', ideal: 'War' },
+    { name: 'Nod-Krai', key: 'nodkrai', el: '', ideal: '', icon: '/images/genshin/element/moonsign.webp' }, // Moonsign: not an element, Nod-Krai's lunar mark (wiki Icon_Moonsign)
+    { name: 'Snezhnaya', key: 'snezhnaya', el: 'cryo', ideal: 'Love' },
+  ];
 
-  // ---- STARS (Oct 22 2026): the ground's slow, twinkling stars, after
-  // genshintools.com's sky (genshin.css GROUND). Mostly pale grey, one in five
-  // in the accent red. One still frame under reduced motion; requestAnimationFrame
-  // stops by itself in a hidden tab.
-  (function stars() {
+  // ---- STARS: dots drifting up and twinkling, mostly pale grey, one in five in the accent
+  // red, on a canvas filling `host` (.gi-stars, genshin.css). Was the whole page's ground; since
+  // Oct 23 2026 (Adrian) the ground is still and the stars live in the Lobby's wish card.
+  // Runs only while the host is on screen; one still frame under reduced motion.
+  function stars(host) {
     const c = document.createElement('canvas');
     const ctx = c.getContext('2d');
-    if (!ctx) return;
+    if (!ctx || !host) return;
     c.className = 'gi-stars';
     c.setAttribute('aria-hidden', 'true');
-    document.body.prepend(c);
+    host.prepend(c);
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const TINT = ['226,228,232', '226,228,232', '226,228,232', '190,196,206', '196,108,112'];
     let w = 0;
     let h = 0;
     let list = [];
+    let on = false;
     function setup() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = c.width = Math.floor(innerWidth * dpr);
-      h = c.height = Math.floor(innerHeight * dpr);
-      list = Array.from({ length: Math.min(90, Math.floor((innerWidth * innerHeight) / 18000)) }, () => ({
+      const cw = host.clientWidth;
+      const ch = host.clientHeight;
+      w = c.width = Math.floor(cw * dpr);
+      h = c.height = Math.floor(ch * dpr);
+      list = Array.from({ length: Math.min(70, Math.floor((cw * ch) / 9000)) }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
         r: (Math.random() * 1.2 + 0.4) * dpr,
-        a: Math.random() * 0.45 + 0.1,
+        a: Math.random() * 0.5 + 0.15,
         tw: Math.random() * 0.016 + 0.003,
         ph: Math.random() * 6.28,
-        vy: -(Math.random() * 0.14 + 0.03) * dpr,
+        vy: -(Math.random() * 0.22 + 0.06) * dpr,
         vx: (Math.random() - 0.5) * 0.05 * dpr,
         rgb: TINT[(Math.random() * TINT.length) | 0],
       }));
+      draw(false);
     }
     function draw(move) {
       ctx.clearRect(0, 0, w, h);
@@ -68,18 +84,19 @@
         ctx.fill();
       }
     }
-    setup();
-    window.addEventListener('resize', () => {
-      setup();
-      if (still) draw(false);
-    });
-    if (still) return draw(false);
     const loop = () => {
+      if (!on) return;
       draw(true);
       requestAnimationFrame(loop);
     };
-    requestAnimationFrame(loop);
-  })();
+    new ResizeObserver(setup).observe(host);
+    if (still) return;
+    new IntersectionObserver(([e]) => {
+      const was = on;
+      on = e.isIntersecting;
+      if (on && !was) requestAnimationFrame(loop);
+    }).observe(host);
+  }
 
   // ---- server (saved per viewer; first visit guesses from the time zone) ----
   let server = 'asia';
@@ -204,7 +221,9 @@
   // player is /genshin-impact/player/?uid=<UID> and the API is the Netlify site's.
   const ON_PAGES = location.hostname.endsWith('github.io');
   const playerHref = (u) => (ON_PAGES ? '/genshin-impact/player/?uid=' + u : '/genshin-impact/player/' + u);
-  function lookup(form) {
+  const API = ON_PAGES ? 'https://parchrome.netlify.app/api/genshin' : '/api/genshin';
+  // go(uid) replaces opening the player's page (the Lobby's hero search shows who it is first).
+  function lookup(form, go) {
     if (!form) return;
     const uid = form.querySelector('input');
     const chip = form.querySelector('.gi-uid-server');
@@ -227,20 +246,45 @@
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!/^\d{9,10}$/.test(uid.value)) return say('A UID is 9 or 10 digits.', true);
-      location.href = playerHref(uid.value);
+      if (go) go(uid.value);
+      else location.href = playerHref(uid.value);
     });
   }
 
+  // ---- HEADER FRAME (Oct 23 2026): every page header (.gi-tb) gets the same quiet gold frame
+  // (genshin.css "HEADER FRAME"): four cut corners, each with a fainter echo line (one drawing,
+  // mirrored by CSS), and the star on the top edge. The edges themselves are CSS gradients.
+  const TBF =
+    ['tl', 'tr', 'bl', 'br'].map((k) => `<i class="gi-tbf-c gi-tbf-c--${k}"><svg viewBox="0 0 32 32"><path d="M.5 12 12 .5"/><path class="i" d="M5 24v-9.5L14.5 5H24"/></svg></i>`).join('') +
+    '<i class="gi-tbf-star"><svg viewBox="0 0 12 12"><path d="M6 0c.6 4.2 1.8 5.4 6 6-4.2.6-5.4 1.8-6 6-.6-4.2-1.8-5.4-6-6 4.2-.6 5.4-1.8 6-6z"/></svg></i>';
+  document.querySelectorAll('.gi-tb').forEach((tb) => tb.insertAdjacentHTML('beforeend', `<span class="gi-tbf" aria-hidden="true">${TBF}</span>`));
+
+  // Stat icons (moved here from genshin-weapons.js, Oct 23 2026; the weapons page and the wish card use them): the player page's drawn set (genshin-player.js SI), the ones a weapon can show.
+  const SI = {
+    atk: '<path d="M20.8 2.2l1 1-1 4.4-8.7 8.7-3.4-3.4 8.7-8.7zM7.6 13.8l3 3-1.5 1.5 1.1 1.1-1.4 1.4-1.6-1.6-2.7 2.7-1.4-1.4 2.7-2.7-1.6-1.6 1.4-1.4 1.1 1.1z"/>',
+    hp: '<path d="M12 2.6c3.7 4.7 6.6 8.3 6.6 11.8a6.6 6.6 0 0 1-13.2 0c0-3.5 2.9-7.1 6.6-11.8z"/>',
+    def: '<path d="M12 2.4l8 2.9v6.1c0 5-3.4 8.7-8 10.2-4.6-1.5-8-5.2-8-10.2V5.3z"/>',
+    em: '<path d="M12 3.2a3.3 3.3 0 1 1 0 6.6 3.3 3.3 0 0 1 0-6.6zM6.4 12.6a3.3 3.3 0 1 1 0 6.6 3.3 3.3 0 0 1 0-6.6zM17.6 12.6a3.3 3.3 0 1 1 0 6.6 3.3 3.3 0 0 1 0-6.6z"/>',
+    cr: '<path d="M12 3.5l1.9 6.6 6.6 1.9-6.6 1.9-1.9 6.6-1.9-6.6L3.5 12l6.6-1.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+    cd: '<path d="M12 2.5l2.2 7.3 7.3 2.2-7.3 2.2-2.2 7.3-2.2-7.3L2.5 12l7.3-2.2z"/>',
+    er: '<path d="M12 3.8a8.2 8.2 0 0 1 7.6 5.1h-2.4A6.2 6.2 0 0 0 6.9 9.6L9.2 12H3V5.8l2.3 2.3A8.2 8.2 0 0 1 12 3.8zM4.4 15.1h2.4a6.2 6.2 0 0 0 10.3.7L14.8 13.4H21v6.2l-2.3-2.3A8.2 8.2 0 0 1 4.4 15.1z"/>',
+    phys: '<path d="M12 2.5l2.6 6.9 6.9 2.6-6.9 2.6-2.6 6.9-2.6-6.9L2.5 12l6.9-2.6z"/>',
+  };
+  const SUB_ICON = { ATK: 'atk', HP: 'hp', DEF: 'def', 'Elemental Mastery': 'em', 'CRIT Rate': 'cr', 'CRIT DMG': 'cd', 'Energy Recharge': 'er', 'Physical DMG Bonus': 'phys' };
+
   window.GI = {
     ON_PAGES,
+    API,
     playerHref,
     uidServer,
     lookup,
+    stars,
     $,
     esc,
     now,
     EL,
     NEUTRAL,
+    NATIONS,
     SERVERS,
     MONTHS,
     PRIMO,
@@ -259,6 +303,9 @@
     tile,
     elIcon,
     codeRow,
+    TBF,
+    SI,
+    SUB_ICON,
     feed: fetch('/genshin-feed.json').then((r) => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();

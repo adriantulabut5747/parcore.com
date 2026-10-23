@@ -7,7 +7,7 @@ comes from, and a full spec for each of the 28 planned pages. This file is priva
 
 **Status in one line:** the whole Live group is built locally (Oct 23 2026): Lobby, Banners, Rerun
 tracker, Events timeline, Redeem codes, Endgame and Player lookup (`/genshin-impact/player/<UID>`, section 9).
-The Database / Tools / Guides pages are planned and listed on the Lobby, in the nav menus and in the More
+Database: **Characters** and **Weapons** built (Oct 23 2026, Adrian to QC). The rest of Database / Tools / Guides is planned and listed on the Lobby, in the nav menus and in the More
 sheet as "Soon".
 Nothing of this session is committed yet (see section 13).
 
@@ -41,6 +41,10 @@ Nothing of this session is committed yet (see section 13).
 | Group icons (seelie.me's traces of the in-game menu icons, all 11) | `_tools/genshin/seelie-icons.json` (unpublished) |
 | Backup of the old (pre-redesign) page | `Downloads/parcore.com/_backup/genshin/index.html` (outside the repo) |
 | Player lookup page + its CSS / JS | `site/genshin-impact/player/index.html` (every `/genshin-impact/player/<UID>`, `_redirects` 200 rule), `site/genshin-player.css` / `.js` |
+| Characters page + its CSS / JS | `site/genshin-impact/characters.html`, `site/genshin-characters.css` / `.js` (7.8 as built) |
+| Character cards (generated) | `site/images/genshin/strip/<icon key>.webp`: each character's wish-result card (Enka `UI_Gacha_AvatarIcon_*`, 320x1024), a 320x512 cut starting `STRIP_TOP` (0.12) down, WebP q80, ~40 KB; `Traveler.webp` drawn once by `_tools/genshin/traveler-strip.py` |
+| Weapons page + its CSS / JS + data | `site/genshin-impact/weapons.html`, `site/genshin-weapons.css` / `.js` (+ `genshin-characters.css`), `site/genshin-weapons.json` (feed script `weapons()`), art `site/images/genshin/weapon/` (7.10 as built) |
+| Nation list (shared) | `GI.NATIONS` in genshin-core.js (moved from genshin-lobby.js Oct 23 2026): Lobby Nations + Farm, Characters bands |
 | Player lookup backend | `netlify/functions/genshin-api.mjs` (`/api/genshin?uid=`); locally `_tools/serve.py` calls Enka itself |
 | Enka id maps (generated) | `site/genshin-enka-map.json` (`enka_map()` in the feed script, from EnkaNetwork/API-docs `store/gi`) |
 
@@ -248,10 +252,16 @@ Domain `city` numbers: 1 Mondstadt, 2 Liyue, 3 Inazuma, 4 Sumeru, 5 Fontaine, 6 
 ## 4. The feed today (`site/genshin-feed.json`)
 
 ```
-characters[]  {id, name, rarity, icon, element, weapon, birthday [m,d] | null, release, region}
+characters[]  {id, name, rarity, icon, element, weapon, birthday [m,d] | null, release, region, strip}
+              # strip = /images/genshin/strip/<key>.webp ('' if Enka has no card yet: the page shows the face).
+              # One Traveler entry (Oct 23 2026): element '', elements [unlock order], region '', birthday null.
+              # Characters with no element (Manekin / Manekina) are left out (Adrian).
 banners[]     {name, version, start, end,
-               characters[{id, name, rarity, element, icon, (5★ only:) title, affiliation, weapon, splash}],
-               weapons[{name, rarity, icon, type, (5★ only:) splash}]}   # type + splash via yatta `weapon`, matched by name
+               characters[{id, name, rarity, element, icon, (5★ only:) title, affiliation, weapon, splash,
+                           kit {constellation, talents[3 {name, icon, text}], cons[6 {name, icon, text}]}}],
+               weapons[{name, rarity, icon, type, (5★ only:) splash, sub, passive {name, text (R1)}}]}
+               # type + splash via yatta `weapon`, matched by name. kit / passive = yatta avatar/{id} and
+               # weapon/{id} (Oct 23 2026, kit_text(): [[word]] = the game's highlighted words, cut near 420 chars)
 events[]      {name, description, image, type, start, end}
 challenges[]  {name, type, start, end, primos}
 codes[]       {code, rewards[], primos}
@@ -344,23 +354,56 @@ dark gradient over it (see `.gi-nat::before`, `.gi-look::before`, `.gi-grp-art::
   keep rising and a low warm glow (`.gi-hero::after`) sits where it fades. Copy then the panel below.
   `klee-campfire-tall.webp` is no longer used.
 - Embers: `left: calc(100% − var(--ir) − var(--iw) × (1 − --x))`, `--x` = fraction across the picture.
-- **Under the hero:** the Player lookup card first, 120px above the next title on desktop (`.gi-sec--first`, rides 64px up over the faded
+- **Hero search (Oct 23 2026, Adrian):** the CTA row is only a UID search bar (shared `.gi-look-form`, red "Search"
+  key; the Redeem codes key was removed, Adrian). Search = `GI.lookup(form, findPlayer)`: fetches `GI.API?uid=` (same URL as the player page, so
+  opening it is a cache hit) + the enka map, ONLY on Search (landing page: no API on load), and shows the player in
+  `#giHit` (face, nickname, AR/WL/UID/server, signature); the card links to the player page. Warning + card float
+  under the bar (absolute), so the hero never changes height.
+- **Under the hero:** Endgame resets (Oct 23 2026) in the old Player lookup box (`.gi-look.gi-eg`): rows per mode on
+  the box's own moonlit shore (Adrian rejected the three endgame pictures cross-wiping as a slideshow), first, 120px above the next title on desktop (`.gi-sec--first`, rides 64px up over the faded
   foot), then **Event wishes**.
-- **Current banners** (renamed from "Event wishes", Oct 22 2026; `#wishes`, Adrian: the old wish card + resets column "looks so ai generated"):
-  one wide banner in the spirit of the in-game wish screen. The feed only has the 5★'s official
-  cut-out (`UI_Gacha_AvatarImg`, transparent; the full in-game banner art has the game's text baked
-  in), so the backdrop is drawn in the element colour (`--gi-el`): diagonal wash, glow + lit floor.
-  No outline, no inner frame line, no light shafts (Adrian removed them: "clean this area even more",
-  "not a fan of the outline"); a soft drop shadow only. Left: tag, name (one line, `fit()`), title +
-  ★★★★★ (`.gi-rarity`; NOT `.gi-stars`, that's the star canvas), element/weapon/affiliation, round
-  featured 4★ (the weapon wish lists only its 4★ weapons: the two 5★ are drawn big and named, and
-  all seven got cut off), countdown. Right: the wishes as round portraits (`.gi-ws`, picked = white
-  ring + red halo), 48px in from the edge; the art stops before that column. Fixed height 500px (470 at 971–1280); phones = art on top, info below, switch over the
-  art's top-right. The resets column is gone: Abyss/Theater/codes live in the subtitle, the Endgame
-  and Codes sections.
-- **Fixed geometry**: measured Oct 22 2026 (v5): wish banner 500px desktop, 517px phone 500, identical
+- **Current banners v3** (Oct 23 2026, Adrian: "this card area should be the most best front end... FULL
+  REDESIGN"; he picked the star-chart layout). Lobby only: `.gw-*` in genshin-lobby.css "CURRENT BANNERS v3",
+  genshin-lobby.js "CURRENT BANNERS v3". The Banners page still uses the old `.gi-wish` (genshin.css) -- move it
+  over only once Adrian has QC'd the lobby card. Pieces: the wishes as a `.gi-tray` top left (round portrait +
+  name; the old round-portrait column on the right is gone, he didn't like it); info column (tag, name `fit()`,
+  title + ★, element/weapon/affiliation, **Talents** = 3 round keys Normal/Skill/Burst, featured 4★, countdown);
+  the 5★ cut-out in the middle; its **constellation as a star chart on the art** (6 nodes C1→C6 + lines, shape =
+  one of 3 decorative presets picked by character id -- NOT the in-game shape); one **Inspect** glass panel
+  (bottom right) showing what the hovered/focused talent or constellation does, clicking/tapping pins it,
+  default = the Burst. Hovering Cn lights C1..Cn and the lines between ("the path to Cn"). Weapon wish: no
+  chart; the two 5★ weapons tilted on the art, their passives (R1 + substat) are the keys.
+  Motion: `--gi-el` is a registered `@property <color>`, so the whole backdrop cross-fades between wishes; art
+  slides in/out; info rises in line by line; chart draws itself when the card first scrolls into view
+  (IntersectionObserver `.is-in`) and on each switch; idle = art float, floor breathe, rising motes, twinkle,
+  ring on the pinned node. All off under reduced motion.
+  Layout switches on the **card's** width (`#wishes` is container `gw`), not the screen: ≥1061px 560px tall;
+  761–1060 520px tall; ≤760 stacked (tray, 16:9 art band, info, talents, constellations as a row, 4★, Inspect,
+  countdown), min-height = the tallest wish (`measure()`, re-run on width change only -- phone URL bars fire
+  resize on scroll), Inspect absorbs the slack.
+- **Fixed geometry**: measured Oct 23 2026 (v3 card): wish banner 560px (card ≥1061 wide), 520 (761–1060), 988px phone 500 (min-height), identical
   for every wish; hero 674 (1920×919), 816 (1366×768), 1097 (phone). Re-measure after any change
   (click each `.gi-ws`, compare `offsetHeight`).
+
+### 5.4a Lobby pass, Oct 23 2026 (Adrian)
+- **Ground is still**: no page stars, no 135deg tiles (their hard edges read as lines). `GI.stars(host)` (genshin-core.js)
+  now draws the rising stars into a box instead: only the wish card `.gw` (z-index 0, behind the art), running only
+  while it's on screen. `.gw` wears the player build card's ground (`.gp-build` gradients + star dust in `.gw::before`).
+- **Hero search** 380px max, red "Search" key, no Redeem codes key. Phones: copy centred ON the picture (`--hh` 560px,
+  Klee at ~78% of the screen, left shade), Today panel under it.
+- **Endgame box** desktop: the moonlit shore is drawn 130% wide at 88% 61% so the moon + figure sit under Klee
+  (Adrian). Phones: no picture, title + "Floors and seasons" on one line (`.gi-eg-head`), rows without labels.
+- **Current banners** phones = a grid: tray, 240px art with name/title/meta over its foot, talents | 4★, then the
+  countdown full width in big sunken boxes. No constellation row and no Inspect panel on phones (Adrian: the row got
+  cut). ~490px tall (was 988). `measure()` runs when `.gw` isn't `display: block`.
+- **Nations**: "View all characters" (`.gi-nat-all`, red, no href until the Characters page exists); phones: count beside
+  the name (small), the link under the faces. Nod-Krai's tab + line use `element/moonsign.webp` (the wiki's
+  `Icon_Moonsign.png`, 64px; Moonsign is Nod-Krai's lunar mark, not an element).
+- **Codes**: the Lobby lists every live code with Primogems (first 3 if none have any); subtitle "N codes worth X Primogems."
+  Phones: one slim row each (code, Primogems, icon-only Copy / Redeem; no rewards line), `#giCodes` only.
+- Reactions copy says "Tap", not "Pick" (desktop too).
+- **`.gi-all`** (genshin.css): add it to any "view all" key; phones show it as 11layout's quiet `.art-all` link.
+- **Sub-page headers** `.gi-tb` (and the player `.gp-card`): 92px margin-top on desktop (was 68); phones unchanged.
 
 ### 5.4b Event banners and Farm today (Oct 22 2026)
 - **Event cards** show the whole banner: the feed's event images are the game's 1080×390 art with the
@@ -479,8 +522,8 @@ Build order is in section 12.
 **1. Lobby** · `/genshin-impact/` · BUILT
 Sections in order: Klee hero (live subtitle + Today in Teyvat panel: server switch Asia/NA/EU saved
 in localStorage `gi-server`, daily reset 04:00 server time, today's 8 talent books, today's/next
-birthday) → Player lookup → Event wishes banner → Reactions wheel → Nations band → Live events row →
-Endgame resets (Abyss, Theater, Stygian) → Redeem codes (+ How to redeem drawn walkthrough) → Farm
+birthday; the CTA row is the UID search) → Endgame resets box → Event wishes banner → Reactions wheel → Nations band → Live events row →
+Redeem codes (+ How to redeem drawn walkthrough) → Farm
 today band → Pity chart →
 Coming to Parchrome (28 pages in 4 groups) → Community tools (11 curated sites) → credit.
 Server offsets: Asia +8, America −5, Europe +1; the game day flips at 04:00 server time.
@@ -501,7 +544,21 @@ both 5★ weapons + 4★s, Epitomized Path explained); countdowns; featured 4★
 to their character pages. "Next up" only when officially announced (ennead has no upcoming
 field — use news posts or leave it out). Link to the Rerun tracker.
 
-**3. Rerun tracker** · `/genshin-impact/reruns` · BUILT Oct 22 2026 (Adrian to QC). Data: the feed
+**3. Rerun tracker** · `/genshin-impact/reruns` · BUILT Oct 22 2026 (Adrian to QC). **v2 Oct 23 2026** (Adrian: "go crazy", Adrian to QC). Order: `.gi-tb` header →
+**On the wishes now** (each live phase: the 5★s' wish cards slanted on the first one's element light, "3rd run · back after
+189 days" per 5★ and featured 4★, countdown + server tray, link to Banners) → **Longest waits** (top 5 as wish cards,
+own 5★/4★ tray, a "×usual" meter: wait ÷ their average gap, notch = 1×, red past it) → **Every character** (rarity + sort
+Longest wait / Most banners / Newest / A–Z, element + weapon trays, search, all kept in the address `?r=4&sort=&el=&w=&q=`;
+the axis has major-version bands (also behind every row's line, `--bands` on `#all`) + years + Today; a row opens to a run
+log built on first open: one card per run with its co-stars, the days between runs, first/average/longest gap) →
+**Every wish since 1.0** (sideways ribbon, one column per phase grouped by version, newest in view) → **Rerun records**
+(6 tiles + a chart of every 5★ comeback binned by 42 days = one version, median bar red, hover/focus tooltips). Any face
+with `data-go` opens that character's row; `#c-<slug>` in a link opens it on load.
+Counting rules (in the page's note): a 5★'s banners include Chronicled Wishes; **a 4★'s runs are Event Wishes only**
+(paimon lists a Chronicled Wish's whole 4★ pool as featured -- 50 names in 6.7 -- which made every 4★'s "last banner" read
+Jul 2026 before v2). Chronicled Wishes take the version of the Event Wish running when they start (paimon labels the
+Feb 2026 Mondstadt Chronicled "6.0"). **Open:** the Characters page's last-banner line still counts Chronicled 4★s
+(`lastRun` in genshin-characters.js); banners.html is missing `<main class="gi">` (reruns had the same bug, fixed). Data: the feed
 script's `history()` job parses paimon.moe's `src/data/banners.js` (MIT, (c) 2021 Made Baruna; credit is
 on the page and in the JSON) every run, maps its ids to our roster by slugged name, and appends live
 phases paimon hasn't added yet (deduped by kind + start). Weapons left out (open question). Page: same
@@ -557,7 +614,7 @@ the newest 'Imaginarium Theater/Seasons/YYYY-MM-DD' page that has started: its h
 characters, guests, blessing, enemies with levels). Enemy pictures = the wiki's 'File:<Name> Icon.png' (96px thumbs,
 hotlinked). Periods, countdowns and Primogems still come from ennead `challenges`; Stygian = the feed event (no
 boss list: no reliable source). Page: one section per mode, reset countdown + reward in each head, server switch;
-Abyss floor tray (Floor 12 first), every floor in one grid cell so the height never changes. Not shown yet:
+Abyss floor tray (Floor 9 first, Adrian's call), every floor in one grid cell so the height never changes. Chambers wear a heat ramp (steel / amber / red: soft top wash, Cinzel numeral in the corner, level chip; no top glow line, Adrian removed it). The mode jump links are raised keys with a down arrow, not a tray (a tray reads as a filter) and gold star chips parsed from the target text. Under the Abyss and the Theater: a static "Did you know" box of six tips each, from the wiki's rules pages (hand-written in endgame.html; recheck when a mode's rules change). Not shown yet:
 the Abyss blessing (the wiki builds it with a DPL query, not plain wikitext) and next period previews.
 Original plan:
 Data: feed `challenges` (periods + Primogems) + yatta `tower` (2 schedules: floors, chambers,
@@ -571,7 +628,22 @@ in section 9.
 
 ### DATABASE
 
-**8. Characters** · `/genshin-impact/characters` · planned
+**8. Characters** · `/genshin-impact/characters` · BUILT Oct 23 2026 (Adrian to QC). As built, Adrian's calls:
+card art = the **wish-result cards** (he picked them over square portraits after first choosing squares), a 320x512 cut
+starting 12% down (`STRIP_TOP` in the feed script; at 0 the faces sat behind the names, Adrian); views **By nation | Newest | A-Z** (nation bands by default, the other two flatten
+it); cards are **not links** until page 9 exists; **one Traveler card** (both twins, listed under every element they've
+unlocked; yatta also lists a Cryo Traveler -- Adrian to confirm it's released); Manekin / Manekina left out; Aloy, Skirk,
+Nicole + Traveler in an **"Other"** band; hover / tap info = **element, weapon, nation** only (no ascension stat, so no
+stat filter either). Page: `.gi-tb` header whose art is drawn in the markup (the six archons' cards slanted like the
+10-pull screen, `.ch-fan`; static on purpose) -> view tray + search -> filters (element, rarity, weapon, nation; laptops
+fit them on two rows, phones fold rarity/weapon/nation behind a "Filters" key with a count badge) -> nation bands
+(namecard head fading in from the right, "N of M characters", 5-stars first then A-Z) -> `.gi-more` links. Cards: deep
+rarity backing (most wish cards are partly transparent), art dimmed at rest (4-star cards have their purple painted in),
+full colour + the wish reveal's light sweep + the info line on hover / focus (cards are `tabindex=0`, so a tap shows it),
+rarity line on the foot, "New" (red) = released in the last 42 days. Every choice is in the address
+(`?view=new&el=hydro&weapon=bow&rarity=5&nation=other&q=`; unknown values fall back to all); the Lobby's "View all
+characters" key opens `?nation=<picked tab>`. 9 across at 1920, 6-7 at 1366, 4 across on phones (5:7 cards there).
+Original plan:
 Data: `genshin-db/characters.json` (weekly; roster + element, weapon, rarity, region, release,
 splash path) — the Lobby feed's `characters` is the lite version. Front end: grid grouped by nation
 (like the official site) with filters (element, weapon, rarity, nation) and search; each card =
@@ -588,7 +660,40 @@ materials per level (talent.promote), talent book days (from dailyDungeon), cons
 added (could be a workflow step when the roster grows). Open: slugs (use yatta `route`
 lowercased-hyphenated), how much talent text to show.
 
-**10. Weapons** · `/genshin-impact/weapons` · planned
+**10. Weapons** · `/genshin-impact/weapons` · BUILT Oct 23 2026 (Adrian to QC). Adrian's calls: mirror the Characters
+page; include 1-2★; show whatever yatta has (no hand check for unreleased weapons); stats as rows per ascension step
+(no level slider); a details drawer with everything. Files: `genshin-impact/weapons.html` (shell copied from
+characters.html), `genshin-weapons.css/.js`; the page ALSO links `genshin-characters.css` and reuses its `.ch-card` /
+`.ch-nat` / `.ch-filters` classes, so a card fix there reaches both pages. Data: `site/genshin-weapons.json` (own file,
+not the feed) from the feed script's `weapons()` job: yatta `weapon` minus the 26 `isWeaponSkin` entries (Sublimation
+skins, event costumes) = 252; detail (`weapon/{id}`) fetched ONCE per new id (`--weapons-full` refetches all);
+stats computed from `/api/v2/static/weaponCurve` (no `/en/`) + promote `addProps`, one row per step (1, 20, 20+, 40 ...);
+passive stored as a template (`t`, `{n}` = numbers that change, `v` their R1-R5 values) or five whole texts (`r`) when
+the wording differs; `forge` = [day group 0-2 (Mon/Thu, Tue/Fri, Wed/Sat), city, domain] rechecked every run.
+Art = `UI_Gacha_EquipIcon_*` -> `images/genshin/weapon/<key>.webp` 256x512 (~10 KB); no art yet = '' (card shows
+the icon; only the picture is retried). Page: views By type (bands with the type's 5★ lying across the head) | By
+rarity | A-Z; filters type, rarity, domain days (today's marked red, server = `gi-server`), substat; search; all in the
+address, the open drawer as `?w=<slug>`. Drawer (`<dialog>`, right side / bottom sheet on phones): art + base ATK /
+substat / max level, passive with an R1-R5 tray (changing numbers in red), stats table, ascension totals + domain
+(+ "Open today") + each phase, refinement Mora, in-game description, Copy link. No "best characters" (no source).
+**Drawer v2 (Oct 23 2026, Adrian: the top "looks so plain... doesn't feel like a drawer, unlike the More sheet")**: the
+`<dialog>` is a bare stage; `.wp-sheet` is the box (the More sheet's raised recipe), floating 12px in from the right on
+desktop, a bottom sheet (20px corners, grab handle, drag the handle / header down to close) on phones; slide-out on
+close (`.is-closing`). Header = `.mx-hdr` recipe: the weapon's icon in a sunken well, "Weapon details" + "Sword · ★★★★★ ·
+12 of 59" (position in the list as shown now), prev / next keys (and arrow keys) that walk the visible cards, Copy link,
+Close. Initial focus = the scroller (no focus ring on open). Hero (`#wpHero`, kept for the drawer's life so `GI.stars`
+runs once; only `#wpHeroIn` / `#wpDMain` are swapped): the build card's ground in the rarity colour `--wr`, star dust,
+rising stars, the gold header frame (`.gi-tbf` markup copied in the HTML), the weapon floating on a light pillar + floor
+ring, stat plates with the player page's drawn stat icons (`SI`, copied), and "On the weapon wish now" + countdown when the
+feed's Weapon Event Wish has it. Sticky jump tray (scroll-spy by IntersectionObserver: not checkable headless). Sections:
+passive (R1-R5 tray + diamond pips, text in a well), stats (drawn SVG growth chart: real steps as dots, ascension = the
+jump, ATK filled white, substat dashed red, each on its own scale; then the table), ascension (domain card on the
+nation's namecard with Mon-Sun pips: open days lit, today ringed, "Open today" / "Opens <day>"; materials as the game's
+series, weapon material first, cream count strips; Mora; each phase), refinement ladder, who can equip it (feed
+characters of that weapon type, 12 faces + "+N", link to Characters `?weapon=`), lore as a quote. The list also gained
+an **"On the weapon wish now"** strip (`#wpLive`, feed banner whose name has "weapon") and an "On wish" tag on those cards.
+Gotcha: `.gi-tile` is a `<span>` sized only as a flex/grid child, so the drawer sets `.wp-d-main .gi-tile { display: block }`.
+Original plan:
 Data: `genshin-db/weapons.json` from yatta `weapon` + `weapon/{id}` (278; passive per refinement,
 base ATK/substat curves, ascension mats). Front end: filterable grid (type, rarity, substat), detail
 drawer with passive R1-R5 switch, materials and which domain/day. Optional static pages later.
@@ -738,8 +843,8 @@ Uses the shared article system (`docs/articles-guide.md`, `site/articles.json`, 
   971-1700px (sidebar eats ~300px): art band on top, two columns under. Errors and "builds hidden"
   have their own boxes.
 - **Shared now**: the lookup box CSS moved from genshin-lobby.css to genshin.css ("PLAYER LOOKUP
-  BOX"), its JS to `GI.lookup(form)` / `GI.uidServer(uid)` in genshin-core.js; the Lobby's Search
-  opens the player page.
+  BOX"), its JS to `GI.lookup(form)` / `GI.uidServer(uid)` in genshin-core.js; the Lobby's hero
+  search shows the player first (`lookup(form, go)`), then their card opens the page. `GI.API` = the API URL.
 - **Not verified on a live profile**: `towerStarIndex`, `theaterActIndex`, `theaterStarIndex` (not in
   Enka's docs; the test profiles were old). The card shows each only when it's present. Check
   with an active account (Adrian's UID) and fix the names if they differ.
@@ -753,8 +858,138 @@ Uses the shared article system (`docs/articles-guide.md`, `site/articles.json`, 
   coc-api.mjs forwards each (already checked) query to extraordinary-donut-f21bde (another Netlify
   account, which has the key), server to server -- Adrian's call. Adding the key to parchrome makes
   the forwarding switch itself off. The CoC pages on Pages call extraordinary-donut directly.
-- **Known gap**: on `/genshin-impact/player/<UID>` the nav doesn't light "Player lookup" (full-path
-  matching in 11layout.js); `/genshin-impact/player/` does.
+- **Redesign (Oct 23 2026, second pass)**: profile card = the in-game friend card (Adrian picked it over
+  wish-result strips and a main-character splash): namecard as a full-width banner in a drawn gold trim
+  (corners + crest, the game UI's gold like the Paimon Menu drawing), profile picture over its foot, name /
+  UID / Copy UID / signature, "On show" faces on the right (a face opens its build), numbers in one sunken
+  tray with line icons. Character namecards are 840x400; battle-pass ones 420x200 get `.is-soft` (grain).
+  `towerStarIndex` is confirmed on a live profile (700378769). Tray cards show name + Lv + C + element badge. Build box layout is picked by the
+  box's OWN width (`container: gp-show`), not media queries: >=1100px art | weapon+stats | artifacts at 650px
+  fixed; 680-1099 art + stats, artifacts in 2 columns (6th cell = crit rolls of all rolls); narrower stacked.
+  The art fills its own column centred (the old 50%-of-the-box art was the "not centred" bug). New: constellation
+  icons down the art (lit = unlocked), talent icons, awakened weapon icon at ascension 2+, weapon type, base +
+  green bonus stats, CRIT ratio, roll pips per substat (each id in `appendPropIdList` is one roll, stat =
+  (id % 1000) / 10 -- checked on real pieces), "Every build at a glance" table (rows pick a build), "Namecard
+  collection" (`showNameCardIdList`, toned down). The picked character is in the address (`#xingqiu`), so Copy
+  and reloads keep it; arrow keys move the tray. Map gained `si` (talent icons), `k` (constellation icons),
+  `wt` (weapon type): 44 -> 66 KB. Old files: `Downloads/parcore.com/_backup/genshin-player/`.
+- **Third pass (Oct 23 2026)**: "Challenge record" section under the bar: Spiral Abyss (drawn 12-floor spire,
+  reached floor in the red accent, chamber dots, stars / 36 meter), Imaginarium Theater (act + stars), Stygian
+  Onslaught (difficulty + best clear m:ss), Achievements (count + Enka's `UI_AchievementIcon_O001`); a box says
+  "no record" when its field is missing. Newer field names (`theaterActIndex`, `theaterStarIndex`,
+  `theaterModeIndex`, `stygianIndex`, `stygianSeconds`, `stygianId`) come from the enka-network-api library;
+  Enka's own docs are stale. Theater difficulty (`theaterModeIndex`) is NOT shown: its id -> name map isn't
+  verified. Milestones (gold hex medals when reached): AR 60, Abyss Floor 12, 36 stars, 1,000 achievements,
+  10 max-friendship characters (thresholds are Claude's picks: Adrian to confirm). Enka sends only the
+  achievement COUNT (no list), and yatta's achievement list already holds unreleased 7.x ones, so there's no
+  "x / total" anywhere. Header: element + 5-star mix under the faces. Empty showcase = drawn profile panel
+  (empty slots + the Show Character Details switch) + 4 steps (menu wording: confirm). Namecards: map `ncn`
+  = [name, type] from yatta `namecard`; the one in use first with an "In use" tag, caption + type, a click
+  opens a `<dialog>` with the art and yatta's in-game text + source, fetched live on open (CORS *, quiet on
+  failure). "Enka.Network" key in the bar opens enka.network/u/<UID>/.
+- **Fourth pass (Oct 23 2026, "lacks colors or images")**: record boxes sit on art: Abyss portal + Theater room
+  (the Lobby's `images/genshin/endgame/`), Stygian = the left (orb) half of the wiki's event banner
+  (`endgame/stygian.webp`; its right half has baked-in text). Achievements box = the game's gold trophy
+  (`images/genshin/achievement/O001.webp`) on a 7%-opacity wall of the nation category medals (texture, NOT
+  a claim). Milestones use the matching category medals (A002 Art of Adventure, B005 Domains and Spiral
+  Abyss, B004 Challenger, O001 Wonders of the World, E001 Memories of the Heart), from yatta
+  `assets/UI/achievement/` (Enka's copies are 48px or missing). Empty states use Paimon's Candy Jar emoji
+  (`images/genshin/sticker/paimon-sleep|sad.webp`). Profile: faces + element mix moved INTO the banner foot;
+  the lower half (`.gp-low`) carries the painted Mondstadt map (`art/teyvat-map.webp`, Adrian's pick, Oct 23):
+  HoYoLAB's own Traveler's Diary desktop background (`act.hoyolab.com/ys/event/e20210923journal/images/
+  pc_bg.*.jpg`, 1920x1080), cropped to y 350-870 / x 0-1700 so the corner cards drop off and the city sits on
+  the right; on cards >= 1200px wide the numbers stop 400px short so the city shows. (Replaced the Paimon
+  map-desk wallpaper.)
+  Source for the stickers: HoYoLAB creator Lynnsa (uid 17138284), who reposts HoYoverse's
+  official art; the public API `bbs-api-os.hoyolab.com/community/post/wapi/getPostFull?post_id=` /
+  `userPost?uid=` lists a post's image URLs. **Abyss all-time best: not possible** (Adrian asked). Enka's
+  floor is this period's: a player with Stygian Difficulty 3 showed 8-3 (floors 1-8 never reset). HoYoLAB's
+  Battle Chronicle has history but needs the player's own login. 8-3 now reads "Floors 1-8 cleared; floors
+  9-12 not started this period". Fixed: on load the tray's `scrollIntoView` scrolled the PAGE past the
+  profile on short screens; the tray now scrolls itself (`.gp-chars` is positioned for offsetLeft).
+- **Build card + picture (Oct 23 2026, fifth pass; Adrian: "similar to Enka, but unique")**: `.gp-build` is
+  now an Enka-style share card: art | weapon + final stats + set bonuses | five artifacts (main stat over the
+  piece, substats 2x2 with drawn stat icons `SI` in genshin-player.js), plus Parchrome's touches: the profile
+  banner's gold trim + crest, constellations as nodes on a glowing line (padlocks when locked), element-tinted
+  ground with star dust, a "Parchrome" pill at the foot. Options above it (`#gpCardBar`): UID, Username, Roll
+  counts, Substat breakdown (totals per substat kind, rolls, "avg %" = total / (5-star max roll x rolls),
+  using section 10's max-roll table: confirm). Options are classes on the card (`.no-uid` ...) and remembered
+  in localStorage `gi-card-opts`. **Picture**: html-to-image 1.11.11 (MIT) self-hosted in `site/html-to-image/`,
+  loaded on the first click; the card is cloned into `.gp-stage` (fixed 1280px, off screen, animations off) so
+  every device gets the wide layout. Download = 1.5x (1920 wide), 2x button = 3x (3840), Copy image (Clipboard
+  API), Share (Web Share with a file; phones). File name `<nick>-<character>-parchrome.png`. **Fonts trap**:
+  html-to-image can't read Google Fonts' cross-origin stylesheets (its own fallback returned nothing), so
+  `loadFonts()` fetches Cinzel 800 + Sora (Latin blocks only) and passes them as `fontEmbedCSS`; without it the
+  picture falls back to Times/Arial. Enka's pictures have CORS *, so they embed. Medium boxes: the CV / ratio /
+  crit-rolls head fills the 6th cell of the 2-column artifact grid (`.gp-pieces { display: contents }`).
+- **Portrait card + seam fix (Oct 23 2026)**: a Landscape | Portrait switch (`[data-shape]`, `opts.port` in
+  `gi-card-opts`, class `.is-portrait`). Portrait = 720px card (1080 in the picture, ~1080x1900): art on top,
+  weapon + final stats in two columns, set bonuses, artifacts 2 x 3 with the CV box as the sixth tile; the
+  stage is `.gp-stage--port` (720px); file name gets `-portrait`. Its selectors carry `.is-portrait` so they
+  beat the medium/narrow container rules; on a phone-width page it shows one artifact per row (the picture
+  keeps 2 x 3). Seam: the dark wash behind the name/UID was `.gp-hero::after`, which ended at the art
+  column's edge while the art bled on into the stats column = a vertical line; it's now `.gp-art::after`,
+  inside the art's mask. (Headless note: `.gi-tab` colours transition, so a click under
+  `--virtual-time-budget` leaves them mid-swap -- not a bug.)
+- **Search page redesign (Oct 23 2026)**: no UID = the profile card with nobody in it (`.gp-card.gp-blank`, same
+  classes as a loaded player): moonlit-shore banner in the gold trim, dashed "On show" slots, a "?" profile picture,
+  "Any Traveler" + the UID field where the name/UID go, the number tray with dashes (`STATS` in genshin-player.js
+  draws both trays; `FRAME` both trims). Recent lookups = the showcase tray's tabs (face, nickname, UID + server):
+  `gi-uids` entries are now `{u, n, p}` (old bare UIDs still read; `p` must start with enka.network/ui/), with a
+  Clear key. "Before you search" = three drawn tips boxed like the Challenge record: Paimon Menu corner with the
+  UID plate, server list that lights the typed UID's row (`data-s` = `GI.uidServer` names), and the empty-showcase
+  drawing. Six numbers on a card under 1000px wide = two rows of three (both pages). The `.gi-tb` banner is unchanged.
+  Old files: `Downloads/parcore.com/_backup/genshin-player-search/`.
+- **Simpler profile card (Oct 23 2026, Adrian)**: the namecard banner (`.gp-banner`, `.is-soft`), the "On show"
+  faces + element mix (`.gp-team`, `teamMix`) and the whole **Challenge record** section (Abyss spire, Theater,
+  Stygian, Achievements boxes) are GONE. The card is now ONE banner: the Mondstadt map (`.gp-card-art`) as its
+  ground, the gold trim (`.gp-frame`) round the whole card, face / name / UID / signature left, the milestone
+  medals (`.gp-badges`, `medals(p, blank)` near the top of genshin-player.js) in a right column, the number tray
+  under both. Order after the card: bar -> Character showcase. Medals drop under the name below 800px card
+  width (1100px on the search card, so its UID field keeps its room). Adrian also considered 5★ / 4★ counts and
+  dropped them: Enka only sends the showcase, not the full roster. Old files:
+  `Downloads/parcore.com/_backup/genshin-player-card/`. Unused now: `images/genshin/sticker/paimon-sleep.webp`,
+  the nation medals A004…A026 in `images/genshin/achievement/` (were the Achievements box's wall).
+- **Search page trim (Oct 23 2026, Adrian)**: on the no-UID page the gold frame is on the `.gi-tb` "Player lookup"
+  banner, NOT on the blank card below it. It's its own quieter design (Adrian: "less contrast"), not the card's trim:
+  cut panel corners with a faint echo line, hairline edges fading toward the middle (CSS gradients), a small
+  four-point star on the top edge. Adrian then put it on EVERY page header: genshin.css "HEADER FRAME" (`.gi-tbf`)
+  + genshin-core.js `TBF`, which adds it to each `.gi-tb` (no page carries markup). `.gi-tb` padding grew to
+  34px 44px (phones 24px 22px 22px) so content clears the corners. The blank card has no
+  frame (40px top padding, since there's no crest to clear). A loaded player's card keeps its trim.
+  The banner's sky-blue starfield (`namecard/lookup.webp`) fought the red / gold / dark, so `.gp-tb .gi-tb-art`
+  re-tints it with a CSS filter into a dark crimson night sky (Endgame / Events already use the red and gold namecards).
+- **Phone header + sides (Oct 23 2026, Adrian: "messy and cramped")**: phones use CoC's layouts/army insets: `--coc-side`
+  10px (was 5%) and the `.gi-tb` 20px under the secondary bar (margin-top 52px). `.gi-tb-body` is ONE grid on both
+  (`.gi-tb-copy` = display:contents). Desktop: icon beside title + sentence, facts under both (so they get the icon's
+  width). Phones: 30px icon + 21px one-line title on row 1, sentence and facts full width below.
+  Facts have no chip boxes anywhere: one flat wrapping line under a gold hairline, gold diamonds between, one shared
+  rule; phones only shrink the spacing. They wrap, so no page hides a fact (endgame's + reruns' `nth-child(3)` hides gone).
+  Breadcrumbs (11layout.css, site-wide): desktop trail = Sora 14px/600 like CoC; the current page is the same flat grey.
+- **Card studio (Oct 23 2026, Adrian: Enka's custom-art tools, "but it shouldn't be confusing")**: the options
+  bar moved from above the build card to UNDER it (`#gpCardBar`, now `.gi-box.gp-studio`), as three labelled
+  groups + a save row: **Picture** (Upload / drop on the card / paste with Ctrl+V; Move = a dashed layer over the
+  art: drag, wheel or slider to zoom, arrow keys; Reset; Remove; Artist credit, only for your own picture),
+  **Text** (caption pill on the art, the UID / Username / Roll counts / Breakdown toggles), **Style** (Landscape |
+  Portrait, Element colour | From the art). Card side: `.gp-tags` at the art's foot = caption, UID, "Art: credit".
+  Storage: `gi-card-opts` gained `text`, `ada`; `gi-card-art` = `{avatarId: {l, p, cr}}` (l / p = landscape /
+  portrait position `{x, y, z}`: CSS `translate` % of the picture's box + `scale`); each upload is its own key
+  `gi-card-img:<avatarId>` (data URL, 1600px WebP; JPEG on Safari, which can't write WebP, so a transparent
+  cut-out gets a black ground there). "From the art" = the most common vivid hue (`tint()`, 24 hue bins on a
+  48px copy) clamped to s 35-75% / l 48-62%; a grey picture keeps the element colour. Export checked: the
+  picture keeps position, zoom, caption and colour. Uploads never leave the browser.
+- **UID line = the search (Oct 23 2026, Adrian: "those nav bars are useless")**: the bar under the profile card
+  (Another UID form, Copy, Refresh, Enka.Network) is GONE. The card's UID line is now a form (`finder()` /
+  `wireFind()` in genshin-player.js, `.gp-find*` CSS): the player's UID is the field's bright placeholder, so at
+  rest it reads "UID 800123456 · EUROPE"; type another + Enter (or the magnifier) looks it up; the server chip
+  shows the typed UID's server, the player's own when empty. Beside it: Copy (UID), Link (profile link + the
+  picked character's #hash, `#gpShare`), Refresh (`#gpRefresh`, counts down Enka's ttl as "52s"). All three are
+  redrawn with the card, so their handlers are set in `render()`. Error cards carry the same search. The
+  Enka.Network link was dropped. Also: Roll counts + Substat breakdown now start OFF on every visit (not restored
+  from `gi-card-opts`), and an uploaded picture's own edges fade (`img.is-own` mask: right strong, others soft;
+  bottom strong in portrait / stacked) so Move/zoom never shows a hard edge.
+- Nav: game-nav.json pages can carry `activePrefix` (Player lookup has it), so `/genshin-impact/player/<UID>`
+  lights Live + Player lookup (`buildGroups` in 11layout.js).
 - Headless screenshots: the build's wish art sometimes isn't painted in the capture until something
   forces a repaint. Not a page bug (hit-test + a forced repaint show it).
 

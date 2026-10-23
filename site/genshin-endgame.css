@@ -12,7 +12,10 @@
    ============================================================ */
 
 .eg-icon { color: #e6e8ec; }
-.gi-bar a.gi-tab { text-decoration: none; }
+/* Jump links: raised keys with a down arrow (a sunken tray would read as a filter). */
+.eg-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.eg-jump .gi-key svg { width: 14px; height: 14px; color: var(--gi-muted); }
+.eg-jump .gi-key:hover svg { color: #fff; }
 .eg-first { padding-top: 40px; }
 
 /* Reset countdown + reward, at the right of each section head. */
@@ -30,10 +33,25 @@
 .eg-dis ul { display: flex; flex-direction: column; gap: 6px; list-style: none; }
 .eg-dis li { font-size: 14px; line-height: 1.45; color: #e6e8ec; }
 .eg-chambers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.eg-ch { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 18px; }
-.eg-ch header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+/* Heat ramp (Oct 23 2026, Adrian's pick): each chamber runs hotter, steel -> amber -> our red,
+   because the enemies' level climbs. The colour shows on a soft wash from the top, a Cinzel
+   numeral (data-n) in the top-right corner, the level chip and a thin ring on the enemy
+   portraits. No top-edge glow line (Adrian removed it). The level chip sits next to the
+   title so the numeral has the corner to itself. */
+.eg-ch { --eg-heat: 125, 160, 196; --eg-heat-text: #a9c4de; position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 12px; padding: 18px 16px 18px; background: radial-gradient(110% 60% at 50% -8%, rgba(var(--eg-heat), 0.14), transparent 62%), var(--lb-box); }
+.eg-ch:nth-child(2) { --eg-heat: 201, 154, 78; --eg-heat-text: #e2bd7e; }
+.eg-ch:nth-child(3) { --eg-heat: var(--gi-acc-rgb); --eg-heat-text: var(--gi-acc-text); }
+.eg-ch::after { content: attr(data-n); position: absolute; z-index: -1; top: 8px; right: 16px; font: 900 56px/1 'Cinzel', serif; color: rgba(var(--eg-heat), 0.32); pointer-events: none; }
+.eg-ch header { display: flex; align-items: center; gap: 10px; }
 .eg-ch header b { font: 800 15px/1 'Sora', sans-serif; color: #fff; }
-.eg-ch header span { font: 700 12px/1 'Sora', sans-serif; color: var(--gi-muted); }
+.eg-ch header span { padding: 5px 9px; border: 1px solid rgba(var(--eg-heat), 0.45); border-radius: 999px; background: rgba(var(--eg-heat), 0.12); font: 700 12px/1 'Sora', sans-serif; color: var(--eg-heat-text); }
+.eg-ch .eg-foe-pic { box-shadow: 0 0 0 1px rgba(var(--eg-heat), 0.35); }
+/* Star targets: one gold chip per star count (the 3-star one edged gold). */
+.eg-stars { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.eg-stars ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+.eg-stars li { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 11.5px/1 'Sora', sans-serif; color: #e6e8ec; white-space: nowrap; }
+.eg-stars li:last-child { border-color: rgba(242, 196, 90, 0.35); }
+.eg-stars li span { font-size: 9px; letter-spacing: -1px; color: #f2c45a; }
 .eg-target { font-size: 12px; line-height: 1.5; color: var(--gi-muted); }
 .eg-target span { margin-right: 6px; color: #f2c45a; }
 .eg-half { padding-top: 12px; border-top: 1px solid var(--gi-line); }
@@ -72,6 +90,16 @@
 .eg-th-foes b { flex: 1; min-width: 0; font: 700 13px/1.3 'Sora', sans-serif; color: #fff; }
 .eg-th-foes span { flex: none; font: 700 12px/1 'Sora', sans-serif; color: var(--gi-muted); }
 
+/* ---- DID YOU KNOW (under the Abyss and the Theater) ------------------------- */
+/* Static, hand-written in the HTML from the wiki's rules pages. One box, six cells split by
+   hairlines (the ul's background shows through the 1px gaps). The title IS the takeaway, so
+   it's the loud part; the line under it is the quiet why. */
+.eg-tips { margin-top: 28px; }
+.eg-tips ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; background: var(--gi-line); list-style: none; }
+.eg-tips li { padding: 20px 22px; background: var(--lb-box); }
+.eg-tips b { display: block; margin-bottom: 6px; font: 800 16px/1.3 'Sora', sans-serif; color: #fff; text-wrap: balance; }
+.eg-tips p { font-size: 13px; line-height: 1.5; color: var(--gi-muted); }
+
 /* ---- STYGIAN ONSLAUGHT ------------------------------------------------------ */
 .eg-sty { display: grid; grid-template-columns: min(560px, 50%) minmax(0, 1fr); overflow: hidden; }
 .eg-sty-art img { width: 100%; height: 100%; aspect-ratio: 1080 / 390; object-fit: cover; }
@@ -85,15 +113,25 @@
 
 @media (max-width: 970px) {
   .eg-first { padding-top: 28px; }
-  #egFacts li:nth-child(3) { display: none; } /* two chips fit a phone's header */
   .gi-sec-head:has(> .eg-reset) { flex-direction: column; align-items: flex-start; gap: 12px; }
   .eg-floor-tabs { width: auto; }
+  /* The three jump keys always share one row (Adrian's call): equal widths, never wrap. */
+  .eg-jump { flex-wrap: nowrap; gap: 6px; }
+  .eg-jump .gi-key { flex: 1 1 0; min-width: 0; gap: 6px; padding: 0 8px 2px; }
+  .eg-jump .gi-key > span { overflow: hidden; text-overflow: ellipsis; }
+  .eg-tips li { padding: 16px 18px; }
+  .eg-tips b { font-size: 15px; }
   .eg-dis { flex-direction: column; gap: 10px; padding: 14px 16px; }
   .eg-chambers,
+  .eg-tips ul,
   .eg-theater,
   .eg-sty { grid-template-columns: minmax(0, 1fr); }
   .eg-th-main,
   .eg-th-foes { padding: 18px 16px; }
   .eg-th-foes { border-left: 0; border-top: 1px solid var(--gi-line); }
   .eg-sty-body { padding: 16px; }
+}
+/* Small phones: the long words drop (Abyss / Theater / Stygian) so the one row still fits. */
+@media (max-width: 600px) {
+  .eg-jump-x { display: none; }
 }

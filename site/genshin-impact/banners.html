@@ -16,10 +16,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261022sb">
+<link rel="stylesheet" href="/11layout.css?v=20261023bc">
 <link rel="stylesheet" href="/coc-more.css?v=20261022gn">
-<link rel="stylesheet" href="/genshin.css?v=20261023p">
-<link rel="stylesheet" href="/genshin-banners.css?v=20261022c">
+<link rel="stylesheet" href="/genshin.css?v=20261023ud">
+<link rel="stylesheet" href="/genshin-wish.css?v=20261023a">
+<link rel="stylesheet" href="/genshin-banners.css?v=20261023a">
 </head>
 <body class="gi-page" data-game-nav="genshin-impact">
 
@@ -92,10 +93,10 @@
     <div class="coc-content">
       <div class="gi-frame">
 
-        <!-- HEADER (Oct 22 2026): /coc/'s .tb banner in Genshin type (genshin-banners.css).
+        <!-- HEADER (Oct 22 2026): /coc/'s .tb banner in Genshin type (genshin.css .gi-tb).
              One fixed picture (the Fatui Harbingers, same art as the Lobby's How to redeem),
              the Intertwined Fate icon, title, one sentence, fact chips (#gbFacts, filled from
-             the feed). The wish tabs live under it, never in it. -->
+             the feed). The wishes' tabs are in the card, never in the header. -->
         <header class="gi-tb">
           <img class="gi-tb-art" src="/images/genshin/art/fatui-harbingers.webp" alt="" fetchpriority="high">
           <div class="gi-tb-body">
@@ -108,20 +109,53 @@
           </div>
         </header>
 
-        <!-- One tab per live wish (built by genshin-banners.js) + the server switch. Desktop:
-             the tabs jump to each card. Phones: they switch the one card shown. -->
+        <!-- The server switch: the card's countdown follows it. -->
         <div class="gi-bar">
-          <div class="gi-tray" id="gbTabs" role="tablist" aria-label="Current wishes"></div>
           <div class="gi-tray gi-tray--sm" id="gbServer" role="tablist" aria-label="Server">
             <button type="button" class="gi-tab" data-server="asia" role="tab">Asia</button>
             <button type="button" class="gi-tab" data-server="america" role="tab">NA</button>
             <button type="button" class="gi-tab" data-server="europe" role="tab">EU</button>
           </div>
+          <p class="gb-server-note">Wishes end at the same server time everywhere, so America's end 13 hours after Asia's and Europe's 7.</p>
         </div>
-        <p class="gb-server-note">Wishes end at the same server time everywhere, so America's end 13 hours after Asia's and Europe's 7.</p>
 
-        <!-- THE WISHES: one .gi-wish card each (the Lobby's card, genshin.css), from the feed. -->
-        <div class="gb-list" id="gbList"><p class="gi-empty">Loading the current wishes&hellip;</p></div>
+        <!-- THE WISH CARD (v2, Oct 23 2026): the Lobby's card, same markup + genshin-wish.css/.js
+             (shared, GI.wishCard), so a change there shows on both pages. Under it: how the picked
+             wish works (rates + its path, drawn; genshin-banners.js rules()). -->
+        <section class="gw-host gb-stage" aria-label="Current wishes">
+          <article class="gw" id="giWish" aria-labelledby="giName">
+            <div class="gw-art" id="gwArt" aria-hidden="true"></div>
+            <div class="gw-chart" id="gwChart" hidden></div>
+            <div class="gw-info">
+              <div class="gi-tray gw-tray" id="giSwitch" role="tablist" aria-label="Current wishes"></div>
+              <div class="gw-body">
+                <p class="gw-tag" id="giEyebrow">Event Wish</p>
+                <h3 class="gw-name" id="giName">Current wish</h3>
+                <p class="gw-title"><span id="giTitle"></span><span class="gi-rarity" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></p>
+                <p class="gw-meta" id="giMeta">Loading the current wishes&hellip;</p>
+                <dl class="gw-plates" id="gwPlates" hidden></dl>
+                <div class="gw-kit" id="gwKitBox" hidden>
+                  <p class="gi-label" id="gwKitLabel">Talents</p>
+                  <div class="gw-kit-row" id="gwKit"></div>
+                </div>
+                <div class="gw-four" id="giFour" hidden>
+                  <p class="gi-label" id="giFourLabel">Featured 4&#9733;</p>
+                  <div class="gw-four-row" id="giFourRow"></div>
+                </div>
+              </div>
+              <div class="gw-ends" id="giClock" hidden>
+                <span class="gi-label">Ends in</span>
+                <div class="gi-clock-units" role="timer" aria-live="off"><span><b data-u="d">--</b><small>d</small></span><span><b data-u="h">--</b><small>h</small></span><span><b data-u="m">--</b><small>m</small></span><span><b data-u="s">--</b><small>s</small></span></div>
+              </div>
+            </div>
+            <aside class="gw-insp" id="gwInsp" aria-live="polite" hidden>
+              <div class="gw-insp-head"><span class="gw-insp-ic" id="gwInspIc"></span><div><p class="gw-insp-k" id="gwInspK"></p><p class="gw-insp-n" id="gwInspN"></p></div></div>
+              <p class="gw-insp-t" id="gwInspT"></p>
+            </aside>
+          </article>
+          <div class="gi-box gb-rules" id="gbRules"></div>
+          <p class="gi-empty" id="gbEmpty" hidden>No wish is live right now. New ones show up here within three hours of going live.</p>
+        </section>
 
         <div class="gi-more">
           <a class="gi-box gi-card" href="/genshin-impact/reruns">
@@ -197,8 +231,9 @@
   </div>
 </div>
 
-<script src="/11layout.js?v=20261022gn"></script>
-<script src="/genshin-core.js?v=20261023s"></script>
-<script src="/genshin-banners.js?v=20261022c"></script>
+<script src="/11layout.js?v=20261023gp"></script>
+<script src="/genshin-core.js?v=20261023ci"></script>
+<script src="/genshin-wish.js?v=20261023a"></script>
+<script src="/genshin-banners.js?v=20261023a"></script>
 </body>
 </html>

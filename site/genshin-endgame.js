@@ -20,8 +20,18 @@
     }`);
 
   // ---- SPIRAL ABYSS ----
-  // "Remaining challenge time longer than (60/180/300) sec." -> the three star thresholds spaced out.
-  const stars = (t) => t.replace(/\((\d+)\/(\d+)\/(\d+)\)/, '$1 / $2 / $3');
+  // "Remaining challenge time longer than (60/180/300) sec." / "Target defense progress greater
+  // than (20/40/60)%." -> one gold chip per star count, each with its own threshold. Any other
+  // wording falls back to the wiki's sentence.
+  function stars(t) {
+    const m = t.match(/\((\d+)\/(\d+)\/(\d+)\)\s*(sec|%)/);
+    if (!m) return `<p class="eg-target"><span aria-hidden="true">&#9733;</span>${esc(t)}</p>`;
+    const unit = m[4] === '%' ? '%' : 's';
+    const chip = (n, i) => `<li><span aria-hidden="true">${'&#9733;'.repeat(i + 1)}</span>${n}${unit}</li>`;
+    return `<div class="eg-stars"><span class="gi-label">${unit === '%' ? 'Monolith HP left' : 'Time left'}</span><ul aria-label="${esc(t)}">${[m[1], m[2], m[3]]
+      .map(chip)
+      .join('')}</ul></div>`;
+  }
   function foe(e, icons) {
     const pic = icons[e.name] ? `<img src="${esc(icons[e.name])}" alt="" loading="lazy" decoding="async">` : '';
     return `<figure class="eg-foe" title="${esc(e.name)}"><span class="eg-foe-pic">${pic}${e.n > 1 ? `<b>&times;${e.n}</b>` : ''}</span><figcaption>${esc(e.name)}</figcaption></figure>`;
@@ -37,8 +47,9 @@
       <div class="gi-box eg-dis"><span class="gi-label">Ley line disorder</span><ul>${f.disorders.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></div>
       <div class="eg-chambers">${f.chambers
         .map(
-          (c, i) => `<article class="gi-box eg-ch"><header><b>Chamber ${i + 1}</b><span>Lv. ${c.level}</span></header>
-        <p class="eg-target"><span aria-hidden="true">&#9733;</span>${esc(stars(c.target))}</p>
+          // data-n = the faded numeral; the heat colour per chamber is in genshin-endgame.css.
+          (c, i) => `<article class="gi-box eg-ch" data-n="${['I', 'II', 'III'][i] || ''}"><header><b>Chamber ${i + 1}</b><span>Lv. ${c.level}</span></header>
+        ${stars(c.target)}
         ${half('First half', c.halves[0], icons, (c.spawns || [])[0])}${half('Second half', c.halves[1], icons, (c.spawns || [])[1])}</article>`
         )
         .join('')}</div></div>`;
@@ -65,7 +76,7 @@
       const b = e.target.closest('[data-floor]');
       if (b) pick(+b.dataset.floor);
     });
-    pick(a.floors[a.floors.length - 1].floor); // Floor 12 first: it's the one people look up
+    pick((a.floors.find((f) => f.floor === 9) || a.floors[0]).floor); // Floor 9 first (Adrian's call)
   }
 
   // ---- IMAGINARIUM THEATER ----
@@ -105,6 +116,34 @@
     $('egSty').innerHTML = `<article class="gi-box eg-sty">${e.image ? `<div class="eg-sty-art"><img src="${esc(e.image)}" alt="" loading="lazy"></div>` : ''}
       <div class="eg-sty-body">${e.description ? `<p>${esc(e.description)}</p>` : ''}</div></article>`;
   }
+
+  // ---- JUMP LINKS ----
+  // A quick eased scroll (~350 ms) instead of the browser's instant jump; the browser's own
+  // smooth scroll can't be sped up. The page scrolls inside .coc-main, not the window, and the
+  // fixed top bars cover its top, so the target lands just under them.
+  document.querySelector('.eg-jump').addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    const to = a && document.querySelector(a.getAttribute('href'));
+    if (!to) return;
+    e.preventDefault();
+    history.replaceState(null, '', a.getAttribute('href'));
+    let sc = to.parentElement;
+    while (sc && !(sc.scrollHeight > sc.clientHeight && /auto|scroll/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+    sc = sc || document.scrollingElement;
+    const scTop = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
+    const bars = Math.max(0, ...[...document.querySelectorAll('.top-bar, .secondary-top-bar')].map((b) => b.getBoundingClientRect().bottom));
+    const from = sc.scrollTop;
+    const dist = to.getBoundingClientRect().top - Math.max(scTop, bars) - 16;
+    sc.style.scrollBehavior = 'auto'; // a smooth scroll-behavior would lag behind every step
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return (sc.scrollTop = from + dist);
+    const t0 = performance.now();
+    const step = (t) => {
+      const p = Math.min(1, (t - t0) / 350);
+      sc.scrollTop = from + dist * (1 - Math.pow(1 - p, 3)); // ease-out cubic
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
 
   GI.serverTray($('egServer'));
   GI.feed

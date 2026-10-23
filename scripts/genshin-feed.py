@@ -1,6 +1,7 @@
 # Builds the Genshin Impact lobby's live data (/genshin-impact/):
 #   site/genshin-feed.json              -- wishes, events, endgame, codes, farm schedule, birthdays
 #   site/images/genshin/splash/*.webp   -- the official wish art of each featured 5-star
+#   site/images/genshin/strip/*.webp    -- every character's wish-result card, for /genshin-impact/characters
 #   site/genshin-enka-map.json          -- Enka ids -> names/icons for the player lookup
 #
 # Run every 3 hours by .github/workflows/genshin-feed.yml. No keys: both sources are public.
@@ -30,6 +31,12 @@ OUT = ROOT / 'genshin-feed.json'
 HISTORY = ROOT / 'genshin-history.json'  # every past wish, for /genshin-impact/reruns
 ENKA_MAP = ROOT / 'genshin-enka-map.json'  # Enka ids -> names/icons, for /genshin-impact/player
 SPLASH = ROOT / 'images' / 'genshin' / 'splash'
+STRIP = ROOT / 'images' / 'genshin' / 'strip'
+WEAPONS_OUT = ROOT / 'genshin-weapons.json'  # every weapon, for /genshin-impact/weapons
+WEAPON_ART = ROOT / 'images' / 'genshin' / 'weapon'
+# Where the card starts, as a share of the wish card's height: 0 = its top edge. Faces sit ~30% down, so
+# 0.12 skips the empty sky over the heads (Adrian). Change it -> delete strip/*.webp (not Traveler) and rerun.
+STRIP_TOP = 0.12
 UA = 'ParchromeBot/1.0 (https://parchrome.netlify.app; wildparchrome@gmail.com)'
 ENNEAD = 'https://api.ennead.cc/mihoyo/genshin/'
 YATTA = 'https://gi.yatta.moe/api/v2/en/'
@@ -83,17 +90,51 @@ def splash(icon_name):
     return '/images/genshin/splash/' + out.name
 
 
+def strip(icon_name):
+    """The wish-result card (UI_Gacha_AvatarIcon_*, 320x1024, painted) -> a 320x512 WebP cut from
+    STRIP_TOP down: face + upper body. Only Enka has these.
+    A character Enka doesn't have yet gets '' (the page shows the face icon) and is retried next run.
+    The Traveler has no wish card: images/genshin/strip/Traveler.webp is drawn once by
+    _tools/genshin/traveler-strip.py from the twins' wish art."""
+    key = icon_name.replace('UI_AvatarIcon_', '')
+    out = STRIP / (key + '.webp')
+    if not out.exists():
+        try:
+            im = Image.open(io.BytesIO(get('https://enka.network/ui/UI_Gacha_AvatarIcon_%s.png' % key, raw=True)))
+        except Exception as e:
+            print('strip', key, 'failed:', e, file=sys.stderr)
+            return ''
+        STRIP.mkdir(parents=True, exist_ok=True)
+        top = round(im.height * STRIP_TOP)
+        im.crop((0, top, im.width, top + im.height // 2)).save(out, 'WEBP', quality=80, method=6)
+    return '/images/genshin/strip/' + out.name
+
+
+TRAVELER_ORDER = ['Anemo', 'Geo', 'Electro', 'Dendro', 'Hydro', 'Pyro', 'Cryo']  # the order the story unlocks them (= the nations')
+
+
 def characters():
     items = yatta('avatar')['items'].values()
-    out = []
+    out, traveler = [], []
     for c in items:
-        if str(c['id']).startswith(('10000005', '10000007')):  # Traveler: no birthday, two entries
+        if str(c['id']).startswith(('10000005', '10000007')):  # Traveler: one entry per twin x element
+            traveler.append(c)
+            continue
+        if not c.get('element'):  # Manekin / Manekina: no element, not combat characters (Adrian)
             continue
         out.append({
             'id': c['id'], 'name': c['name'], 'rarity': c['rank'], 'icon': icon(c['icon']),
             'element': ELEMENTS.get(c['element'], c['element']), 'weapon': WEAPONS.get(c['weaponType'], ''),
             'birthday': c.get('birthday') or None, 'release': c.get('release'),
-            'region': REGIONS.get(c.get('region'), ''),
+            'region': REGIONS.get(c.get('region'), ''), 'strip': strip(c['icon']),
+        })
+    if traveler:  # one card for both twins; `elements` = every element they've unlocked so far
+        els = {ELEMENTS.get(c['element'], c['element']) for c in traveler}
+        out.append({
+            'id': 10000007, 'name': 'Traveler', 'rarity': 5, 'icon': icon('UI_AvatarIcon_PlayerGirl'),
+            'element': '', 'elements': [e for e in TRAVELER_ORDER if e in els], 'weapon': 'Sword',
+            'birthday': None, 'release': min(c.get('release') or 0 for c in traveler), 'region': '',
+            'strip': '/images/genshin/strip/Traveler.webp',
         })
     return sorted(out, key=lambda c: c['name'])
 
@@ -113,6 +154,7 @@ def banners(calendar):
                 entry.update({
                     'title': d['fetter'].get('title', ''), 'affiliation': d['fetter'].get('native', ''),
                     'weapon': WEAPONS.get(d['weaponType'], ''), 'splash': splash(d['icon']),
+                    'kit': kit(d),
                 })
             chars.append(entry)
         out.append({
@@ -129,7 +171,46 @@ def weapon(w, y):
         entry['type'] = WEAPONS.get(y['type'], '')
         if w['rarity'] == 5:
             entry['splash'] = splash(y['icon'])
+            d = yatta('weapon/%s' % y['id'])
+            affix = next(iter(d.get('affix', {}).values()), None)
+            entry['sub'] = SUBSTATS.get(d.get('specialProp'), '')
+            if affix:
+                entry['passive'] = {'name': affix['name'], 'text': kit_text(affix['upgrade'].get('0', ''))}
     return entry
+
+
+# Wish card "inspect" panel (Oct 23 2026): each featured 5-star's three combat talents and
+# six constellations, from yatta's avatar detail. Icons are yatta's small PNGs (hotlinked).
+SUBSTATS = {
+    'FIGHT_PROP_CRITICAL': 'CRIT Rate', 'FIGHT_PROP_CRITICAL_HURT': 'CRIT DMG', 'FIGHT_PROP_ATTACK_PERCENT': 'ATK',
+    'FIGHT_PROP_HP_PERCENT': 'HP', 'FIGHT_PROP_DEFENSE_PERCENT': 'DEF', 'FIGHT_PROP_CHARGE_EFFICIENCY': 'Energy Recharge',
+    'FIGHT_PROP_ELEMENT_MASTERY': 'Elemental Mastery', 'FIGHT_PROP_PHYSICAL_ADD_HURT': 'Physical DMG Bonus',
+}
+
+
+def kit_text(s, cap=420):
+    """yatta's rich text -> plain text; highlighted words become [[word]] (the page bolds them).
+    Cut at a sentence end near `cap` so the feed stays small."""
+    s = s.replace('\\n', '\n').lstrip('#')
+    s = re.sub(r'\{LAYOUT_PC#([^}]*)\}', r'\1', s)
+    s = re.sub(r'\{[^}]*\}', '', s)  # links, other layouts, sprites
+    s = re.sub(r'<color=[^>]*>(.*?)</color>', r'[[\1]]', s, flags=re.S)
+    s = re.sub(r'<[^>]+>', '', s)
+    s = re.sub(r'\n{2,}', '\n', s).strip()
+    if len(s) > cap:
+        cut = max(s.rfind('. ', 0, cap), s.rfind('.\n', 0, cap))
+        s = (s[:cut + 1] if cut > cap // 3 else s[:cap].rsplit(' ', 1)[0] + '…')
+        if s.count('[[') > s.count(']]'):
+            s += ']]'
+    return s
+
+
+def kit(d):
+    tal = [t for _, t in sorted(d.get('talent', {}).items(), key=lambda kv: int(kv[0]))]
+    combat = [t for t in tal if t.get('type') == 0][:2] + [t for t in tal if t.get('type') == 1][:1]
+    cons = [c for _, c in sorted(d.get('constellation', {}).items(), key=lambda kv: int(kv[0]))][:6]
+    item = lambda t: {'name': t['name'], 'icon': ASSET + t['icon'] + '.png', 'text': kit_text(t['description'])}
+    return {'constellation': d['fetter'].get('constellation', ''), 'talents': [item(t) for t in combat], 'cons': [item(c) for c in cons]}
 
 
 def events(calendar):
@@ -182,6 +263,123 @@ def farm():
                 weapons.append({'city': city, 'name': low['name'], 'icon': icon(top['icon'])})
         out[day] = {'books': books, 'weapons': weapons}
     return out
+
+
+# ---- WEAPONS (Oct 23 2026): /genshin-impact/weapons, its own file -------------------------------
+# Every weapon from yatta (skins dropped). Weapons only change with a patch, so a weapon's detail
+# (passive, stats, ascension costs) is fetched once, when its id first appears; the list itself
+# (one request) and the forgery days are checked every run. `python scripts/genshin-feed.py --weapons-full`
+# refetches every detail (e.g. after yatta fixes a passive's text).
+def passive(affix):
+    """R1-R5 passive texts -> one template + the numbers that change. The five texts differ only in
+    their highlighted numbers, so `t` keeps [[word]] for highlights that never change and {0}, {1}..
+    for the ones that do (`v` = their five values). If the wording itself differs between
+    refinements (it happens: "of the" in one), the five texts are kept whole in `r`."""
+    texts = [affix['upgrade'][k] for k in sorted(affix['upgrade'], key=int)]
+    col = r'<color=[^>]*>(.*?)</color>'
+    skel = [re.sub(col, '\x00', s, flags=re.S) for s in texts]
+    if len(set(skel)) != 1:
+        return {'name': affix['name'], 'r': [kit_text(s, cap=10**6) for s in texts]}
+    slots = list(zip(*[re.findall(col, s, flags=re.S) for s in texts]))
+    t, v = kit_text(skel[0], cap=10**6), []
+    for vals in slots:
+        if len(set(vals)) == 1:
+            t = t.replace('\x00', '[[%s]]' % vals[0], 1)
+        else:
+            t = t.replace('\x00', '{%d}' % len(v), 1)
+            v.append(list(vals))
+    return {'name': affix['name'], 't': t, 'v': v}
+
+
+def weapon_art(icon_name):
+    """The weapon's wish-result art (UI_Gacha_EquipIcon_*, 512x1024, transparent) -> 256x512 WebP."""
+    key = icon_name.replace('UI_EquipIcon_', '')
+    out = WEAPON_ART / (key + '.webp')
+    if not out.exists():
+        try:
+            im = Image.open(io.BytesIO(get(ASSET + 'UI_Gacha_EquipIcon_' + key + '.png', raw=True)))
+        except Exception as e:
+            print('weapon art', key, 'failed:', e, file=sys.stderr)
+            return ''
+        WEAPON_ART.mkdir(parents=True, exist_ok=True)
+        im.thumbnail((256, 512))
+        im.save(out, 'WEBP', quality=80, method=6)
+    return '/images/genshin/weapon/' + out.name
+
+
+def weapon_detail(w, curve, items):
+    d = yatta('weapon/%s' % w['id'])
+    for k, it in (d.get('items') or {}).items():
+        items[k] = [it['name'], it.get('rank', 1), icon(it['icon'])]
+    up = d.get('upgrade') or {}
+    props = {p['propType']: p for p in up.get('prop', [])}
+    base = props.get('FIGHT_PROP_BASE_ATTACK')
+    sub = next((p for k, p in props.items() if k != 'FIGHT_PROP_BASE_ATTACK'), None)
+    pct = sub is not None and sub['propType'] != 'FIGHT_PROP_ELEMENT_MASTERY'
+    promote = sorted(up.get('promote', []), key=lambda p: p['promoteLevel'])
+
+    def at(level, p):
+        c = curve[str(level)]['curveInfos']
+        atk = base['initValue'] * c[base['type']] + (p.get('addProps') or {}).get('FIGHT_PROP_BASE_ATTACK', 0) if base else 0
+        s = sub['initValue'] * c[sub['type']] * (100 if pct else 1) if sub else 0
+        return round(atk), (round(s, 1) if pct else round(s))
+
+    # One row per step the game shows: Lv 1, 20, 20+ (ascended), 40, 40+ ... max.
+    stats, lo = [], 1
+    for p in promote:
+        hi = p['unlockMaxLevel']
+        stats.append([lo, 1 if p['promoteLevel'] else 0, *at(lo, p)])
+        stats.append([hi, 0, *at(hi, p)])
+        lo = hi
+    affix = next(iter((d.get('affix') or {}).values()), None)
+    return {
+        'desc': kit_text(d.get('description') or '', cap=10**6),
+        'passive': passive(affix) if affix else None,
+        'stats': stats,
+        'asc': [[p.get('coinCost', 0), {k: n for k, n in (p.get('costItems') or {}).items()}] for p in promote if p['promoteLevel']],
+        'refine': up.get('awakenCost') or [],
+    }
+
+
+def weapons(full=False):
+    old = json.loads(WEAPONS_OUT.read_text(encoding='utf-8')) if WEAPONS_OUT.exists() else {}
+    known = {w['id']: w for w in old.get('weapons', [])} if not full else {}
+    items = dict(old.get('items', {})) if not full else {}
+    data = yatta('weapon')
+    names = data.get('props', {})
+    curve = None
+    out = []
+    for w in data['items'].values():
+        if w.get('isWeaponSkin'):  # Sublimation skins, event costumes: not weapons you own
+            continue
+        e = known.get(w['id'])
+        if e and not e['art']:  # no wish art yet (the page shows the small icon): retry just the picture
+            e['art'] = weapon_art(w['icon'])
+        if not e:
+            if curve is None:
+                curve = get(YATTA.replace('/en/', '/') + 'static/weaponCurve')['data']
+            e = {
+                'id': w['id'], 'name': w['name'], 'rarity': w['rank'], 'type': WEAPONS.get(w['type'], ''),
+                'sub': names.get(w.get('specialProp'), '') if w.get('specialProp') != 'NONE' else '',
+                'icon': icon(w['icon']), 'art': weapon_art(w['icon']),
+                **weapon_detail(w, curve, items),
+            }
+        out.append(e)
+    # Forgery days: which weekday's domain drops this weapon's ascension material (Mon/Thu = 0,
+    # Tue/Fri = 1, Wed/Sat = 2; Sunday has them all). Rechecked every run (one request).
+    sched = yatta('dailyDungeon')
+    forge = {}
+    for i, day in enumerate(DAYS):
+        for dn in sched[day].values():
+            if 'Mastery' not in dn['name']:
+                for r in dn['reward']:
+                    forge[str(r)] = [i, CITIES.get(dn['city'], ''), dn['name']]
+    for e in out:
+        ids = {k for _, cost in e['asc'] for k in cost}
+        e['forge'] = next((forge[k] for k in sorted(ids) if k in forge), None)
+    out.sort(key=lambda e: (list(WEAPONS.values()).index(e['type']) if e['type'] in WEAPONS.values() else 9, -e['rarity'], e['name']))
+    used = {k for e in out for _, cost in e['asc'] for k in cost}
+    return {'source': 'Project Amber (gi.yatta.moe)', 'items': {k: v for k, v in sorted(items.items()) if k in used}, 'weapons': out}
 
 
 def slug(name):
@@ -356,7 +554,8 @@ def enka_map():
     enka.network/ui/: a character's `i` makes UI_AvatarIcon_<i>.png (face) and
     UI_Gacha_AvatarImg_<i>.png (wish art). Characters are keyed by avatarId, the Traveler
     by avatarId-skillDepotId (one entry per element). `s` = the three talents in game
-    order as [skill id, the id its constellation boost is keyed by]."""
+    order as [skill id, the id its constellation boost is keyed by]; `si` = their icons
+    (Skill_<si>.png); `k` = the six constellation icons (UI_Talent_<k>.png); `wt` = weapon type."""
     store = 'https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/gi/'
     loc = get(store + 'locs.json')['en']
     name = lambda h: loc.get(str(h), '')
@@ -371,6 +570,9 @@ def enka_map():
             'r': 4 if c.get('QualityType') == 'QUALITY_PURPLE' else 5,
             'i': base(c['SideIconName']).replace('UI_AvatarIcon_Side_', ''),
             's': [[int(k), c.get('ProudMap', {}).get(str(k), 0)] for k in c.get('SkillOrder', [])],
+            'si': [base(c.get('Skills', {}).get(str(k), '')).replace('Skill_', '', 1) for k in c.get('SkillOrder', [])],
+            'k': [base(p).replace('UI_Talent_', '', 1) for p in c.get('Consts') or []],
+            'wt': WEAPONS.get(c.get('WeaponType'), ''),
         }
         for kid, k in (c.get('Costumes') or {}).items():
             costumes[kid] = base(k['Icon']).replace('UI_AvatarIcon_', '')
@@ -380,10 +582,28 @@ def enka_map():
         'c': chars,
         'cos': costumes,
         'nc': {k: base(v['Icon']) for k, v in get(store + 'namecards.json').items()},
+        # Namecard [name, type] (bond / achievement / battlePass / event / reputation / other), from yatta.
+        'ncn': {str(v['id']): [v['name'], v['type']] for v in yatta('namecard')['items'].values()},
         'pf': {k: base(v['IconPath']) for k, v in get(store + 'pfps.json').items() if v.get('IconPath')},
         'w': {k: name(v['NameTextMapHash']) for k, v in get(store + 'weapons.json').items()},
         'set': {k: name(v['Name']) for k, v in relics['Sets'].items()},
     }
+
+
+# Weapon wish card (Oct 23 2026): each featured 5-star gets its upright art and its max-level
+# [level, Base ATK, substat] from the weapons file (the weapons page's overview plates).
+def wish_weapons(banners):
+    if not WEAPONS_OUT.exists():
+        return
+    db = {w['name']: w for w in json.loads(WEAPONS_OUT.read_text(encoding='utf-8'))['weapons']}
+    for b in banners:
+        for w in b.get('weapons', []):
+            x = db.get(w['name'])
+            if w['rarity'] == 5 and x and x.get('stats'):
+                lv, _, atk, sub = x['stats'][-1]
+                w['max'] = [lv, atk, sub]
+                if x.get('art'):
+                    w['art'] = x['art']
 
 
 def main():
@@ -432,6 +652,16 @@ def main():
             print('Wrote', ENKA_MAP)
     except Exception as e:
         print('enka map failed, keeping the old file:', e, file=sys.stderr)
+
+    # The weapons database: its own file too; kept if it fails.
+    try:
+        wdb = weapons(full='--weapons-full' in sys.argv)
+        if not WEAPONS_OUT.exists() or json.loads(WEAPONS_OUT.read_text(encoding='utf-8')) != wdb:
+            WEAPONS_OUT.write_text(json.dumps(wdb, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+            print('Wrote', WEAPONS_OUT)
+    except Exception as e:
+        print('weapons failed, keeping the old file:', e, file=sys.stderr)
+    wish_weapons(data.get('banners', []))
 
     if data == old:
         print('No change.')
