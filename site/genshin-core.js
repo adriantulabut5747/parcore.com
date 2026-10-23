@@ -210,18 +210,23 @@
     const chip = form.querySelector('.gi-uid-server');
     const st = form.parentElement.querySelector('.gi-look-status');
     const paint = () => (chip.textContent = uid.value ? uidServer(uid.value) : '');
+    const hint = st.textContent;
+    const say = (text, warn) => {
+      st.textContent = text;
+      st.classList.toggle('is-warn', warn);
+    };
+    // Letters are dropped as they're typed: say why, or it looks like the box is broken.
     uid.addEventListener('input', () => {
-      uid.value = uid.value.replace(/\D/g, '').slice(0, 10);
+      const typed = uid.value;
+      uid.value = typed.replace(/\D/g, '').slice(0, 10);
+      if (/\D/.test(typed)) say('UIDs are numbers only, like 800123456. Player names can’t be searched.', true);
+      else if (st.classList.contains('is-warn')) say(hint, false);
       paint();
     });
     paint();
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!/^\d{9,10}$/.test(uid.value)) {
-        st.textContent = 'A UID is 9 or 10 digits.';
-        st.classList.add('is-warn');
-        return;
-      }
+      if (!/^\d{9,10}$/.test(uid.value)) return say('A UID is 9 or 10 digits.', true);
       location.href = playerHref(uid.value);
     });
   }
