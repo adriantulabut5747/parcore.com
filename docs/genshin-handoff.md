@@ -253,7 +253,7 @@ events[]      {name, description, image, type, start, end}
 challenges[]  {name, type, start, end, primos}
 codes[]       {code, rewards[], primos}
 expired[]     {code, primos}            # ennead `inactive`, for the codes page (Oct 23 2026)
-endgame       {abyss {start, end, version, floors[{floor, disorders[], chambers[{level, target, halves[waves[{name, n}]]}]}]},
+endgame       {abyss {start, end, version, floors[{floor, disorders[], chambers[{level, target, halves[waves[{name, n}]], spawns[first, second]}]}]},
                theater {season, version, start, end, elements[], characters[], guests[], blessing, enemies[{name, level}]},
                icons {enemy name: wiki thumb url}}   # Fandom wiki, for the endgame page (Oct 23 2026)
 farm          {monday|tuesday|wednesday: {books[{city, series, icon, users[{name, rarity, icon}]}],
@@ -547,7 +547,9 @@ feed script writing a small `codes-meta` value.
 `genshin-endgame.css/.js`. **yatta's `tower` is stale (its last schedule closed Mar 2025)**, so, Adrian's call, the
 feed's `endgame()` job reads the Genshin Fandom wiki (CC BY-SA, credited on the page): 'Spiral Abyss/Floors/Abyssal
 Moon Spire' says which period page holds each floor 9-12; each floor = ley line disorders (`** ` lines) + its
-{{Domain Enemies}} (levelN, targetN, enemiesN_1/N_2; '//' = next wave, ';' = next enemy, '*n' = count). Theater =
+{{Domain Enemies}} (levelN, targetN, enemiesN_1/N_2; '//' = next wave, ';' = next enemy, '*n' = count). noteN = how
+they spawn ('First Half: Initially spawns A x1...; more spawn as the previous are defeated'), split per half by
+`spawns()` and shown under that half's enemies. Theater =
 the newest 'Imaginarium Theater/Seasons/YYYY-MM-DD' page that has started: its header template (elements,
 characters, guests, blessing, enemies with levels). Enemy pictures = the wiki's 'File:<Name> Icon.png' (96px thumbs,
 hotlinked). Periods, countdowns and Primogems still come from ennead `challenges`; Stygian = the feed event (no

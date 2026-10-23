@@ -237,6 +237,20 @@ def foes(s):
     return out
 
 
+def spawns(note):
+    """A chamber's note -> [first half, second half]: 'First Half: Initially spawns A x1 and B x2;
+    more spawn as the previous are defeated.' (the wiki sometimes types 'Fist Half'). A note
+    without a half label goes on the first half."""
+    out = ['', '']
+    text = unwiki(note)
+    parts = re.split(r'\b(F\w*st|Second) Half:\s*', text)
+    if parts[0].strip():
+        out[0] = parts[0].strip()
+    for label, body in zip(parts[1::2], parts[2::2]):
+        out[1 if label == 'Second' else 0] = body.strip()
+    return out
+
+
 def abyss():
     """The current Abyssal Moon Spire, floors 9-12. The wiki's 'Abyssal Moon Spire' page says
     which period page each floor comes from (a floor that didn't change keeps an older page)."""
@@ -255,7 +269,8 @@ def abyss():
             'floor': int(n),
             'disorders': [unwiki(d) for d in re.findall(r'^\*\*\s*(.+)$', sec, re.M)],
             'chambers': [{'level': int(enemies.get('level%d' % c) or 0), 'target': unwiki(enemies.get('target%d' % c, '')),
-                          'halves': [foes(enemies.get('enemies%d_%d' % (c, h), '')) for h in (1, 2)]}
+                          'halves': [foes(enemies.get('enemies%d_%d' % (c, h), '')) for h in (1, 2)],
+                          'spawns': spawns(enemies.get('note%d' % c, ''))}
                          for c in (1, 2, 3) if enemies.get('level%d' % c)],
         })
     if len(floors) != 4:

@@ -26,20 +26,20 @@
     const pic = icons[e.name] ? `<img src="${esc(icons[e.name])}" alt="" loading="lazy" decoding="async">` : '';
     return `<figure class="eg-foe" title="${esc(e.name)}"><span class="eg-foe-pic">${pic}${e.n > 1 ? `<b>&times;${e.n}</b>` : ''}</span><figcaption>${esc(e.name)}</figcaption></figure>`;
   }
-  // A half: its waves left to right, a small arrow between them.
-  const half = (label, waves, icons) =>
+  // A half: its waves left to right, a small arrow between them, then how they spawn (the wiki's note).
+  const half = (label, waves, icons, spawn) =>
     `<div class="eg-half"><span class="gi-label">${label}</span><div class="eg-waves">${
       waves.length
         ? waves.map((w) => `<div class="eg-wave">${w.map((e) => foe(e, icons)).join('')}</div>`).join('<i class="eg-then" aria-hidden="true"></i>')
         : '<p class="eg-none">Not listed yet.</p>'
-    }</div></div>`;
+    }</div>${spawn ? `<p class="eg-spawn">${esc(spawn)}</p>` : ''}</div>`;
   const floor = (f, icons) => `<div class="eg-floor" data-floor="${f.floor}" role="tabpanel" aria-label="Floor ${f.floor}">
       <div class="gi-box eg-dis"><span class="gi-label">Ley line disorder</span><ul>${f.disorders.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></div>
       <div class="eg-chambers">${f.chambers
         .map(
           (c, i) => `<article class="gi-box eg-ch"><header><b>Chamber ${i + 1}</b><span>Lv. ${c.level}</span></header>
         <p class="eg-target"><span aria-hidden="true">&#9733;</span>${esc(stars(c.target))}</p>
-        ${half('First half', c.halves[0], icons)}${half('Second half', c.halves[1], icons)}</article>`
+        ${half('First half', c.halves[0], icons, (c.spawns || [])[0])}${half('Second half', c.halves[1], icons, (c.spawns || [])[1])}</article>`
         )
         .join('')}</div></div>`;
 
