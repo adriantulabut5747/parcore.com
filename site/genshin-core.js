@@ -200,6 +200,10 @@
   // server; 10-digit UIDs carry it in the second digit. Submit opens the player's page.
   const UID_SERVER = { 1: 'China', 2: 'China', 3: 'China', 5: 'China (B)', 6: 'America', 7: 'Europe', 8: 'Asia', 9: 'TW · HK · MO' };
   const uidServer = (v) => UID_SERVER[v.length === 10 && v[0] === '1' ? v[1] : v[0]] || '';
+  // GitHub Pages has no rewrite rules or functions (same as the CoC tracker): there a
+  // player is /genshin-impact/player/?uid=<UID> and the API is the Netlify site's.
+  const ON_PAGES = location.hostname.endsWith('github.io');
+  const playerHref = (u) => (ON_PAGES ? '/genshin-impact/player/?uid=' + u : '/genshin-impact/player/' + u);
   function lookup(form) {
     if (!form) return;
     const uid = form.querySelector('input');
@@ -218,11 +222,13 @@
         st.classList.add('is-warn');
         return;
       }
-      location.href = '/genshin-impact/player/' + uid.value;
+      location.href = playerHref(uid.value);
     });
   }
 
   window.GI = {
+    ON_PAGES,
+    playerHref,
     uidServer,
     lookup,
     $,

@@ -743,6 +743,13 @@ Uses the shared article system (`docs/articles-guide.md`, `site/articles.json`, 
 - **Not verified on a live profile**: `towerStarIndex`, `theaterActIndex`, `theaterStarIndex` (not in
   Enka's docs; the test profiles were old). The card shows each only when it's present. Check
   with an active account (Adrian's UID) and fix the names if they differ.
+- **GitHub Pages** (adriantulabut5747.github.io/parcore.com) has no rewrites and no functions: there
+  a player is `/genshin-impact/player/?uid=<UID>` (`GI.playerHref`, `GI.ON_PAGES` in genshin-core.js,
+  the CoC tracker's `?tag=` pattern) and the page calls the Netlify test site's
+  `https://extraordinary-donut-f21bde.netlify.app/api/genshin` (the function's ORIGINS allows Pages).
+  That only works once genshin-api.mjs is deployed to that Netlify site: as of Oct 23 2026 pushes
+  reach GitHub Pages only (no Netlify deploy on any recent commit; neither Netlify site had Events /
+  Endgame either), so Netlify needs a deploy from Adrian's account.
 - **Known gap**: on `/genshin-impact/player/<UID>` the nav doesn't light "Player lookup" (full-path
   matching in 11layout.js); `/genshin-impact/player/` does.
 - Headless screenshots: the build's wish art sometimes isn't painted in the capture until something

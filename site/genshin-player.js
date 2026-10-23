@@ -6,9 +6,13 @@
 // Styles: genshin.css + genshin-player.css. Player text (nickname, signature) is
 // third-party, so it goes through esc() like everything else.
 (function () {
-  const { $, esc, EL, NEUTRAL, elIcon, uidServer, lookup } = window.GI;
+  const { $, esc, EL, NEUTRAL, elIcon, uidServer, lookup, ON_PAGES, playerHref } = window.GI;
   const UI = 'https://enka.network/ui/';
-  const raw = decodeURIComponent(location.pathname.replace(/^\/genshin-impact\/player\/?/, '').replace(/\/$/, ''));
+  // GitHub Pages can't run the function, so it calls the Netlify site's (CORS allows it).
+  const API = ON_PAGES ? 'https://extraordinary-donut-f21bde.netlify.app/api/genshin' : '/api/genshin';
+  // The UID: /genshin-impact/player/<UID> on Netlify, ?uid=<UID> on GitHub Pages.
+  const seg = location.pathname.split('/genshin-impact/player/')[1] || '';
+  const raw = decodeURIComponent(new URLSearchParams(location.search).get('uid') || seg.replace(/\/$/, ''));
   const uid = /^\d{9,10}$/.test(raw) ? raw : '';
 
   // ---- recent searches: UIDs only, this browser only ----
@@ -34,7 +38,7 @@
     const r = recent();
     if (r.length) {
       $('gpRecent').hidden = false;
-      $('gpRecentList').innerHTML = r.map((u) => `<a class="gi-key" href="/genshin-impact/player/${u}">${u}<small>${esc(uidServer(u))}</small></a>`).join('');
+      $('gpRecentList').innerHTML = r.map((u) => `<a class="gi-key" href="${playerHref(u)}">${u}<small>${esc(uidServer(u))}</small></a>`).join('');
     }
     return;
   }
@@ -43,8 +47,7 @@
   $('gpPlayer').hidden = false;
   lookup($('gpAgain'));
   const card = $('gpCard');
-  const link = location.origin + '/genshin-impact/player/' + uid;
-  $('gpShare').dataset.copy = link;
+  $('gpShare').dataset.copy = location.origin + playerHref(uid);
 
   const ERR = {
     badUid: ["That isn't a UID", 'A UID is 9 or 10 digits, like 800123456. It sits in the bottom right of the Paimon Menu.'],
@@ -94,7 +97,7 @@
   function load() {
     card.className = 'gi-box gp-card is-loading';
     card.innerHTML = '<div class="gp-card-art"></div><div class="gp-card-main"><span class="gp-face"></span><div class="gp-who"><span class="gp-skel"></span><span class="gp-skel gp-skel--s"></span></div></div><ul class="gp-stats"><li></li><li></li><li></li><li></li></ul>';
-    const player = fetch('/api/genshin?uid=' + uid).then(async (r) => {
+    const player = fetch(API + '?uid=' + uid).then(async (r) => {
       const d = await r.json().catch(() => ({ error: r.ok ? 'enka5xx' : 'unreachable' }));
       if (!r.ok || d.error) throw d.error || 'unreachable';
       return d;
