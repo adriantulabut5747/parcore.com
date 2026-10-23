@@ -486,9 +486,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // its built pages.
   function buildGroups(game) {
     const groups = game.groups;
+    // A page with "activePrefix" is also "here" on every address under it
+    // (Player lookup: /genshin-impact/player/<UID>).
+    const here = p => !p.soon && (normalizePage(p.link) === currentPage ||
+      !!(p.activePrefix && currentPage.startsWith(normalizePage(p.activePrefix) + '/')));
     buildHubNav({ hubNav: groups.map((g, i) => ({
       name: g.name, link: '#gn-' + i, icon: g.icon,
-      activeOn: g.pages.filter(p => !p.soon).map(p => p.link)
+      activeOn: g.pages.some(here) ? [currentPage] : []
     })) });
     if (buildHubStrip) {
       window.stbHubMenus(stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav, {
@@ -503,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
       const tile = p => p.soon
         ? `<a class="mx-tool is-soon" aria-disabled="true"><span class="mx-tool-name">${esc(p.name)}</span></a>`
-        : `<a class="mx-tool${normalizePage(p.link) === currentPage ? ' active' : ''}" href="${p.link}"><span class="mx-tool-name">${esc(p.name)}</span></a>`;
+        : `<a class="mx-tool${here(p) ? ' active' : ''}" href="${p.link}"><span class="mx-tool-name">${esc(p.name)}</span></a>`;
       list.classList.add('mx');
       list.innerHTML = groups.map((g, i) =>
         `<section class="mx-sec" id="gn-sec-${i}"><div class="mx-head"><h3 class="mx-label mx-label--ico"><svg viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>${esc(g.name)}</h3></div>` +
