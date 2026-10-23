@@ -27,6 +27,10 @@ const ROUTES = {
   cwlwar: [(tag) => 'clanwarleagues/wars/' + tag, 60],
 };
 
+// The Netlify site (another account) that has COC_API_KEY; a site without the key
+// borrows its answers. Drop this once every site has the key.
+const KEYED_SITE = 'https://extraordinary-donut-f21bde.netlify.app';
+
 // Pages on another domain that may call this (GitHub Pages copy).
 const ORIGINS = ['https://adriantulabut5747.github.io'];
 
@@ -75,7 +79,18 @@ export default async (req) => {
   }
 
   const key = process.env.COC_API_KEY;
-  if (!key) return reply(500, { error: 'noKey' });
+  // No key on this site (parchrome.netlify.app has none, Oct 23 2026): ask the Netlify
+  // site that holds it, server to server (so no CORS), like _tools/serve.py does
+  // locally. The query was already checked above. Never forwards to itself.
+  if (!key) {
+    if (url.hostname === new URL(KEYED_SITE).hostname) return reply(500, { error: 'noKey' });
+    try {
+      const res = await fetch(KEYED_SITE + '/api/coc' + url.search, { headers: { Accept: 'application/json' } });
+      return reply(res.status, await res.text(), res.ok ? cacheSeconds : res.status === 404 ? 60 : 0);
+    } catch {
+      return reply(502, { error: 'unreachable' });
+    }
+  }
 
   try {
     const res = await fetch(API + path, {

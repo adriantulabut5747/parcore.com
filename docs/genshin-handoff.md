@@ -749,9 +749,10 @@ Uses the shared article system (`docs/articles-guide.md`, `site/articles.json`, 
   `https://parchrome.netlify.app/api/genshin` (the function's ORIGINS allows Pages).
   **Netlify (Oct 23 2026):** the parchrome site (team wildparcore) was Netlify Drop only until Oct 23;
   it is now linked to this repo (main, publish `site`, functions `netlify/functions`), so every push
-  to main deploys it -- the feed workflows' commits too (credits). It has no `COC_API_KEY` yet (the
-  CoC tracker on it says noKey); the CoC pages on Pages still use extraordinary-donut-f21bde (another
-  Netlify account, which has the key).
+  to main deploys it -- the feed workflows' commits too (credits). It has no `COC_API_KEY`, so its
+  coc-api.mjs forwards each (already checked) query to extraordinary-donut-f21bde (another Netlify
+  account, which has the key), server to server -- Adrian's call. Adding the key to parchrome makes
+  the forwarding switch itself off. The CoC pages on Pages call extraordinary-donut directly.
 - **Known gap**: on `/genshin-impact/player/<UID>` the nav doesn't light "Player lookup" (full-path
   matching in 11layout.js); `/genshin-impact/player/` does.
 - Headless screenshots: the build's wish art sometimes isn't painted in the capture until something
