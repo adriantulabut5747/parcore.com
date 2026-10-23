@@ -291,29 +291,8 @@
   }
   document.querySelectorAll('.gi-row').forEach((r) => r.addEventListener('scroll', syncArrows, { passive: true }));
 
-  // Player lookup (front end only). The UID's first digit is its server; 10-digit
-  // UIDs carry it in the second digit.
-  const UID_SERVER = { 1: 'China', 2: 'China', 3: 'China', 5: 'China (B)', 6: 'America', 7: 'Europe', 8: 'Asia', 9: 'TW · HK · MO' };
-  const uid = $('giUid');
-  const uidServer = () => {
-    const v = uid.value;
-    return UID_SERVER[v.length === 10 && v[0] === '1' ? v[1] : v[0]] || '';
-  };
-  uid.addEventListener('input', () => {
-    uid.value = uid.value.replace(/\D/g, '').slice(0, 10);
-    $('giUidServer').textContent = uid.value ? uidServer() : '';
-  });
-  $('giLook').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const st = $('giLookStatus');
-    if (!/^\d{9,10}$/.test(uid.value)) {
-      st.textContent = 'A UID is 9 or 10 digits.';
-      st.classList.add('is-warn');
-      return;
-    }
-    st.classList.remove('is-warn');
-    st.textContent = `Player lookup is almost ready. Soon this shows ${uidServer() || 'that'} player ${uid.value}'s showcase right here.`;
-  });
+  // Player lookup: opens /genshin-impact/player/<UID> (GI.lookup, genshin-core.js).
+  GI.lookup($('giLook'));
 
 
   // ---- NATIONS ----

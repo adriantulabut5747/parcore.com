@@ -1,0 +1,310 @@
+/* ============================================================
+   GENSHIN PLAYER LOOKUP (/genshin-impact/player/<UID>, Oct 23 2026)
+   Linked after genshin.css (base, pieces, .gi-tb header, .gi-bar, the
+   shared PLAYER LOOKUP BOX). Behaviour: genshin-player.js.
+
+   The profile card (.gp-card) is the player's own namecard, drawn like the
+   in-game friend card: picture fading in from the right, round profile
+   picture, nickname, UID, signature, then the numbers in sunken wells.
+   The build (.gp-build) is one fixed-height box on desktop (picking another
+   character never moves the page): wish art in the character's element
+   (--gi-el) on the left, weapon + final stats, then the five artifacts.
+   ============================================================ */
+
+.gp-icon { color: #d9dce1; }
+.gp-first { padding-top: 40px; }
+
+/* ---- SEARCH (no UID) ---- */
+.gp-recent { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 14px; }
+.gp-recent > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.gp-recent .gi-key { height: 30px; padding: 0 10px 2px; font-size: 12px; letter-spacing: 0.5px; }
+.gp-recent .gi-key small { font: 600 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--gi-muted); }
+.gp-how { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.gp-how > div { padding: 20px 22px; }
+.gp-how b { font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-how p { margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+
+/* ---- PROFILE CARD ---- */
+.gp-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 300px;
+  margin-top: 68px; /* 11layout's 48px gap under the bars + 20, like .gi-tb */
+  padding: 32px;
+  overflow: hidden;
+}
+.gp-card-art { position: absolute; z-index: -2; top: 0; right: 0; width: 66%; height: 100%; }
+.gp-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.35) 30%, #000 72%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.35) 30%, #000 72%);
+}
+.gp-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 120% at 0% 100%, rgba(var(--gi-acc-rgb), 0.16), rgba(var(--gi-acc-rgb), 0) 70%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.7) 0%, rgba(10, 10, 12, 0) 55%);
+}
+.gp-card-main { display: flex; align-items: center; gap: 24px; min-width: 0; max-width: 62%; }
+.gp-face {
+  flex: none;
+  width: 112px;
+  height: 112px;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  background: linear-gradient(160deg, #3d3f4a, #24252c);
+  box-shadow: 0 0 0 4px rgba(var(--gi-acc-rgb), 0.45), 0 12px 30px -10px rgba(0, 0, 0, 0.8);
+}
+.gp-face img { width: 100%; height: 100%; object-fit: cover; }
+.gp-who { min-width: 0; }
+.gp-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Cinzel', serif !important;
+  font-size: clamp(28px, 2.6vw, 42px);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.6);
+}
+.gp-uid { display: flex; align-items: center; gap: 10px; margin-top: 8px; font: 700 13px/1 'Sora', sans-serif; letter-spacing: 1.2px; color: #c9ccd2; font-variant-numeric: tabular-nums; }
+.gp-uid .gi-uid-server { margin: 0; }
+.gp-sig { margin-top: 12px; max-width: 52ch; font-size: 13.5px; line-height: 1.5; color: #b9bdc4; overflow-wrap: anywhere; }
+.gp-stats { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; }
+.gp-stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 128px;
+  padding: 12px 16px 11px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(18, 19, 23, 0.82);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.gp-stats b { font: 800 20px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-stats b small { font-size: 12px; font-weight: 700; color: #f2c45a; }
+.gp-stats span { font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #8e939b; }
+
+/* Loading: the card's shape, quietly pulsing. */
+.gp-skel { display: block; width: 240px; height: 30px; border-radius: 4px; background: rgba(255, 255, 255, 0.06); }
+.gp-skel--s { width: 140px; height: 14px; margin-top: 12px; }
+.gp-card.is-loading .gp-stats li { height: 62px; }
+@media (prefers-reduced-motion: no-preference) {
+  .gp-card.is-loading .gp-skel,
+  .gp-card.is-loading .gp-face,
+  .gp-card.is-loading .gp-stats li { animation: gp-pulse 1.4s ease-in-out infinite; }
+}
+@keyframes gp-pulse {
+  50% { opacity: 0.45; }
+}
+/* Errors: same box, a message and maybe a Try again key. */
+.gp-msg { flex-direction: row; align-items: center; min-height: 196px; }
+.gp-msg > div { flex: 1; min-width: 0; }
+.gp-msg-t { font: 800 24px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-msg p:not(.gi-eyebrow) { margin-top: 8px; max-width: 60ch; font-size: 14px; line-height: 1.55; color: var(--gi-muted); }
+
+/* Look up another + Copy / Refresh. */
+.gp-bar { flex-wrap: wrap; }
+.gp-again { display: flex; gap: 6px; width: min(340px, 100%); }
+.gp-again .gi-uid { height: 40px; }
+.gp-again .gi-uid input { font-size: 14px; }
+.gp-again .gi-key { width: 40px; height: 40px; padding: 0 0 2px; }
+.gp-again-st { flex: 1; min-height: 0; margin-top: 0; }
+.gp-again-st:empty { display: none; }
+.gp-bar .gi-key:disabled { cursor: default; color: #8b9099; }
+.gp-bar .gi-key:disabled:hover { background: var(--lb-raise); }
+#gpRefreshT { font-variant-numeric: tabular-nums; }
+
+/* ---- SHOWCASE ---- */
+.gp-show { padding-top: 48px; }
+.gp-chars { margin-bottom: 16px; }
+.gp-ch { flex: 0 0 auto; gap: 10px; min-height: 52px; padding: 0 14px 0 6px; }
+.gp-ch .gi-tile { width: 36px; height: 36px; border-radius: 50%; }
+.gp-ch:not(.active) .gi-tile { opacity: 0.75; }
+
+.gp-build {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 340px) minmax(0, 470px);
+  height: 640px;
+  overflow: hidden;
+  background:
+    radial-gradient(50% 70% at 18% 60%, color-mix(in srgb, var(--gi-el) 22%, transparent), transparent 72%),
+    linear-gradient(105deg, color-mix(in srgb, var(--gi-el) 14%, #111217) 0%, #111217 42%, var(--lb-box) 60%);
+}
+/* The wish art sits behind the first column, fading out to the right. */
+.gp-art { position: absolute; z-index: -1; inset: 0 auto 0 0; width: 50%; -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent); mask-image: linear-gradient(90deg, #000 55%, transparent); }
+.gp-art img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 30%; }
+.gp-b-who {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  padding: 32px;
+  background: linear-gradient(0deg, rgba(10, 10, 12, 0.85) 0%, rgba(10, 10, 12, 0) 45%);
+}
+.gp-b-el { display: flex; align-items: center; gap: 8px; font: 700 12px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--gi-el); }
+.gp-b-el img { width: 20px; height: 20px; }
+.gp-b-el .gi-rarity { margin-left: 4px; }
+.gp-b-name {
+  margin-top: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Cinzel', serif !important;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.08;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+}
+.gp-b-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 13px; color: rgba(236, 238, 241, 0.74); }
+.gp-b-meta b { font-weight: 700; color: #fff; }
+.gp-talents { display: flex; gap: 8px; margin-top: 18px; }
+.gp-talents span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 64px;
+  padding: 9px 0 8px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(18, 19, 23, 0.82);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+.gp-talents b { font: 800 18px/1 'Sora', sans-serif; color: #fff; }
+.gp-talents small { font: 700 8.5px/1 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #8e939b; }
+.gp-talents .is-up b { color: #7fd8f0; } /* boosted by a constellation, like the game's blue */
+
+.gp-b-mid,
+.gp-b-arts { min-width: 0; padding: 24px 22px; background: rgba(14, 15, 18, 0.72); border-left: 1px solid var(--gi-line); }
+.gp-weapon { display: flex; gap: 14px; padding: 12px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
+.gp-weapon .gi-tile { width: 64px; height: 64px; }
+.gp-weapon > div { min-width: 0; }
+.gp-weapon b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 14px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-weapon p { margin-top: 5px; font-size: 12px; color: var(--gi-muted); }
+.gp-wep-stats { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.gp-wep-stats b { display: inline; font-size: 12px; }
+.gp-weapon.gp-empty { font-size: 12px; color: var(--gi-dim); }
+.gp-final { margin-top: 18px; list-style: none; }
+.gp-final li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--gi-line); font-size: 13px; color: #c9ccd2; }
+.gp-final li:last-child { border-bottom: 0; }
+.gp-final b { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font: 700 14px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-final small { font-size: 10.5px; font-weight: 600; color: var(--gi-dim); }
+
+.gp-arts-head { display: flex; align-items: center; justify-content: space-between; }
+.gp-cv { font: 700 11px/1 'Sora', sans-serif; letter-spacing: 1px; color: var(--gi-muted); }
+.gp-cv b { margin-left: 4px; font-size: 16px; color: #fff; }
+.gp-sets { display: flex; flex-wrap: wrap; gap: 4px 14px; min-height: 18px; margin: 10px 0 12px; font-size: 12px; color: #c9ccd2; }
+.gp-sets span { display: inline-flex; align-items: center; gap: 6px; }
+.gp-sets b { padding: 3px 5px 2px; border-radius: 3px; background: rgba(var(--gi-acc-rgb), 0.35); font: 800 10px/1 'Sora', sans-serif; color: #fff; }
+.gp-sets b::after { content: 'pc'; font-weight: 600; }
+.gp-pieces { display: flex; flex-direction: column; gap: 6px; }
+.gp-piece {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  height: 92px;
+  padding: 0 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+.gp-piece .gi-tile { width: 52px; height: 52px; overflow: visible; }
+.gp-piece .gi-tile img { border-radius: 6px; }
+.gp-piece .gi-tile i { position: absolute; right: -4px; bottom: -4px; padding: 2px 4px; border-radius: 3px; background: #0b0b0d; font: 700 9.5px/1 'Sora', sans-serif; font-style: normal; color: #fff; }
+.gp-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.gp-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 10.5px/1 'Sora', sans-serif; color: var(--gi-muted); }
+.gp-main b { font: 800 17px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.gp-piece ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 12px; list-style: none; }
+.gp-piece li { display: flex; justify-content: space-between; gap: 6px; min-width: 0; font-size: 11px; color: #9aa0a8; }
+.gp-piece li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gp-piece li b { font-weight: 700; color: #e6e8ec; font-variant-numeric: tabular-nums; }
+.gp-piece-cv { position: absolute; top: 6px; right: 8px; font: 700 9px/1 'Sora', sans-serif; letter-spacing: 0.6px; color: #5d616b; }
+.gp-piece.gp-empty { grid-template-columns: 52px 1fr; }
+.gp-piece.gp-empty small { font-size: 12px; color: var(--gi-dim); }
+
+.gp-hidden { display: flex; align-items: center; gap: 16px; padding: 22px; }
+.gp-hidden .gi-tile { width: 64px; height: 64px; border-radius: 50%; }
+.gp-hidden b { font: 800 15px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-hidden p { margin-top: 6px; font-size: 13px; line-height: 1.55; color: var(--gi-muted); }
+
+/* ---- NARROW DESKTOP (the sidebar takes ~300px, so up to 1700px): art + who on top,
+   the two lists side by side under it. ---- */
+@media (min-width: 971px) and (max-width: 1700px) {
+  .gp-build { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); grid-template-rows: 300px auto; height: auto; }
+  .gp-b-who { grid-column: 1 / -1; }
+  /* No mask here: the art is a transparent cut-out drawn whole (contain), so it has no edge to fade. */
+  .gp-art { width: 100%; height: 300px; -webkit-mask-image: none; mask-image: none; }
+  .gp-art img { object-fit: contain; object-position: 30% 30%; }
+  .gp-b-mid { border-left: 0; }
+}
+
+/* ---- PHONES ---- */
+@media (max-width: 970px) {
+  .gp-first { padding-top: 28px; }
+  .gp-how { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .gp-card { gap: 18px; min-height: 0; margin-top: 64px; padding: 0 16px 16px; }
+  /* The namecard on top at its own shape, the picture overlapping its foot. */
+  .gp-card-art { position: relative; z-index: 0; width: auto; height: auto; aspect-ratio: 840 / 400; margin: 0 -16px; }
+  .gp-card-art img { -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent); mask-image: linear-gradient(180deg, #000 55%, transparent); }
+  .gp-card::before { background: radial-gradient(70% 60% at 0% 100%, rgba(var(--gi-acc-rgb), 0.14), rgba(var(--gi-acc-rgb), 0) 70%); }
+  .gp-card-main { position: relative; align-items: flex-end; gap: 14px; max-width: none; margin-top: -58px; }
+  .gp-face { width: 84px; height: 84px; }
+  .gp-name { font-size: 26px; }
+  .gp-uid { font-size: 12px; }
+  .gp-sig { margin-top: 10px; font-size: 12.5px; }
+  .gp-card-main + .gp-stats { margin-top: 2px; }
+  .gp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .gp-stats li { min-width: 0; padding: 10px 10px 9px; }
+  .gp-stats b { font-size: 16px; }
+  .gp-stats span { font-size: 8.5px; letter-spacing: 0.8px; }
+  .gp-msg { flex-direction: column; align-items: flex-start; min-height: 0; padding: 20px; }
+  .gp-msg-t { font-size: 20px; }
+  .gp-bar { flex-direction: row; align-items: center; gap: 8px; }
+  .gp-again { flex: 1; width: auto; min-width: 0; }
+  .gp-again-st { flex-basis: 100%; order: 3; }
+  .gp-bar .gi-acts .gi-key { width: 40px; height: 40px; padding: 0 0 2px; }
+  .gp-bar .gi-acts .gi-key span { display: none; }
+
+  .gp-show { padding-top: 36px; }
+  .gp-ch { min-height: 46px; padding: 0 10px 0 5px; gap: 8px; font-size: 10px; }
+  .gp-ch .gi-tile { width: 32px; height: 32px; }
+  .gp-build { display: flex; flex-direction: column; height: auto; }
+  .gp-art { position: relative; z-index: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 60%, transparent); }
+  .gp-art img { object-position: 50% 25%; }
+  .gp-b-who { position: relative; margin-top: -92px; padding: 0 16px 18px; background: none; }
+  .gp-b-name { font-size: 28px; }
+  .gp-talents span { width: auto; flex: 1; }
+  .gp-b-mid, .gp-b-arts { padding: 16px; border-left: 0; border-top: 1px solid var(--gi-line); }
+  .gp-final { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; margin-top: 12px; }
+  .gp-final li { padding: 9px 0; font-size: 12px; }
+  .gp-final li:last-child { border-bottom: 1px solid var(--gi-line); }
+  .gp-final b { font-size: 13px; }
+  .gp-final small { display: none; }
+  .gp-piece { grid-template-columns: 44px 76px minmax(0, 1fr); gap: 10px; height: auto; min-height: 80px; padding: 10px 8px; }
+  .gp-piece .gi-tile { width: 44px; height: 44px; }
+  .gp-main b { font-size: 15px; }
+  .gp-piece ul { gap: 6px 8px; }
+  .gp-piece li { font-size: 10.5px; }
+  .gp-piece-cv { display: none; }
+}

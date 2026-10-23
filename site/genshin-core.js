@@ -196,7 +196,35 @@
     }, () => {});
   });
 
+  // ---- PLAYER LOOKUP BOX (Lobby + /genshin-impact/player). A UID's first digit is its
+  // server; 10-digit UIDs carry it in the second digit. Submit opens the player's page.
+  const UID_SERVER = { 1: 'China', 2: 'China', 3: 'China', 5: 'China (B)', 6: 'America', 7: 'Europe', 8: 'Asia', 9: 'TW · HK · MO' };
+  const uidServer = (v) => UID_SERVER[v.length === 10 && v[0] === '1' ? v[1] : v[0]] || '';
+  function lookup(form) {
+    if (!form) return;
+    const uid = form.querySelector('input');
+    const chip = form.querySelector('.gi-uid-server');
+    const st = form.parentElement.querySelector('.gi-look-status');
+    const paint = () => (chip.textContent = uid.value ? uidServer(uid.value) : '');
+    uid.addEventListener('input', () => {
+      uid.value = uid.value.replace(/\D/g, '').slice(0, 10);
+      paint();
+    });
+    paint();
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!/^\d{9,10}$/.test(uid.value)) {
+        st.textContent = 'A UID is 9 or 10 digits.';
+        st.classList.add('is-warn');
+        return;
+      }
+      location.href = '/genshin-impact/player/' + uid.value;
+    });
+  }
+
   window.GI = {
+    uidServer,
+    lookup,
     $,
     esc,
     now,

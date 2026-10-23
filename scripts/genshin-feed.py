@@ -1,6 +1,7 @@
 # Builds the Genshin Impact lobby's live data (/genshin-impact/):
 #   site/genshin-feed.json              -- wishes, events, endgame, codes, farm schedule, birthdays
 #   site/images/genshin/splash/*.webp   -- the official wish art of each featured 5-star
+#   site/genshin-enka-map.json          -- Enka ids -> names/icons for the player lookup
 #
 # Run every 3 hours by .github/workflows/genshin-feed.yml. No keys: both sources are public.
 #   ennead  -- api.ennead.cc/mihoyo/genshin: calendar (banners, events, challenges) + codes
@@ -27,6 +28,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent / 'site'
 OUT = ROOT / 'genshin-feed.json'
 HISTORY = ROOT / 'genshin-history.json'  # every past wish, for /genshin-impact/reruns
+ENKA_MAP = ROOT / 'genshin-enka-map.json'  # Enka ids -> names/icons, for /genshin-impact/player
 SPLASH = ROOT / 'images' / 'genshin' / 'splash'
 UA = 'ParchromeBot/1.0 (https://parchrome.netlify.app; wildparchrome@gmail.com)'
 ENNEAD = 'https://api.ennead.cc/mihoyo/genshin/'
@@ -348,6 +350,42 @@ def history(roster, live):
     return {'source': "Banner history: paimon.moe (MIT License, Copyright (c) 2021 Made Baruna) + Parchrome's live feed.", 'banners': out}
 
 
+def enka_map():
+    """Id -> name/icon maps for the player lookup (/genshin-impact/player/<UID>), from
+    EnkaNetwork/API-docs store/gi (the ids Enka's API answers with). Icons are names on
+    enka.network/ui/: a character's `i` makes UI_AvatarIcon_<i>.png (face) and
+    UI_Gacha_AvatarImg_<i>.png (wish art). Characters are keyed by avatarId, the Traveler
+    by avatarId-skillDepotId (one entry per element). `s` = the three talents in game
+    order as [skill id, the id its constellation boost is keyed by]."""
+    store = 'https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/gi/'
+    loc = get(store + 'locs.json')['en']
+    name = lambda h: loc.get(str(h), '')
+    base = lambda p: p.rsplit('/', 1)[-1].rsplit('.', 1)[0]  # "/ui/UI_X.png" -> "UI_X"
+    chars, costumes = {}, {}
+    for cid, c in get(store + 'avatars.json').items():
+        if not c.get('SideIconName'):
+            continue
+        chars[cid] = {
+            'n': name(c['NameTextMapHash']),
+            'e': ELEMENTS.get(c.get('Element'), ''),
+            'r': 4 if c.get('QualityType') == 'QUALITY_PURPLE' else 5,
+            'i': base(c['SideIconName']).replace('UI_AvatarIcon_Side_', ''),
+            's': [[int(k), c.get('ProudMap', {}).get(str(k), 0)] for k in c.get('SkillOrder', [])],
+        }
+        for kid, k in (c.get('Costumes') or {}).items():
+            costumes[kid] = base(k['Icon']).replace('UI_AvatarIcon_', '')
+    relics = get(store + 'relics.json')
+    return {
+        'source': 'EnkaNetwork/API-docs store/gi',
+        'c': chars,
+        'cos': costumes,
+        'nc': {k: base(v['Icon']) for k, v in get(store + 'namecards.json').items()},
+        'pf': {k: base(v['IconPath']) for k, v in get(store + 'pfps.json').items() if v.get('IconPath')},
+        'w': {k: name(v['NameTextMapHash']) for k, v in get(store + 'weapons.json').items()},
+        'set': {k: name(v['Name']) for k, v in relics['Sets'].items()},
+    }
+
+
 def main():
     old = json.loads(OUT.read_text(encoding='utf-8')) if OUT.exists() else {}
     data = dict(old)
@@ -385,6 +423,15 @@ def main():
             print('Wrote', HISTORY)
     except Exception as e:
         print('history failed, keeping the old file:', e, file=sys.stderr)
+
+    # The player lookup's id maps: their own file too; kept if it fails.
+    try:
+        emap = enka_map()
+        if not ENKA_MAP.exists() or json.loads(ENKA_MAP.read_text(encoding='utf-8')) != emap:
+            ENKA_MAP.write_text(json.dumps(emap, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+            print('Wrote', ENKA_MAP)
+    except Exception as e:
+        print('enka map failed, keeping the old file:', e, file=sys.stderr)
 
     if data == old:
         print('No change.')

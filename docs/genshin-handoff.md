@@ -5,9 +5,10 @@ It records what Adrian decided, how the section is built, where every piece of d
 comes from, and a full spec for each of the 28 planned pages. This file is private
 (`docs/` is not published).
 
-**Status in one line:** the Lobby (`/genshin-impact/`), Banners (`/genshin-impact/banners`) and the
-Rerun tracker (`/genshin-impact/reruns`) are built and live locally (Oct 22 2026); the other 25 pages are planned and listed on the Lobby, in the nav
-menus and in the More sheet as "Soon".
+**Status in one line:** the whole Live group is built locally (Oct 23 2026): Lobby, Banners, Rerun
+tracker, Events timeline, Redeem codes, Endgame and Player lookup (`/genshin-impact/player/<UID>`, section 9).
+The Database / Tools / Guides pages are planned and listed on the Lobby, in the nav menus and in the More
+sheet as "Soon".
 Nothing of this session is committed yet (see section 13).
 
 ---
@@ -39,7 +40,9 @@ Nothing of this session is committed yet (see section 13).
 | Section nav (top bar menus, phone bottom nav, More sheet) | `site/game-nav.json` key `"genshin-impact"` → `groups` (see 5.7) |
 | Group icons (seelie.me's traces of the in-game menu icons, all 11) | `_tools/genshin/seelie-icons.json` (unpublished) |
 | Backup of the old (pre-redesign) page | `Downloads/parcore.com/_backup/genshin/index.html` (outside the repo) |
-| Player lookup backend (planned) | `netlify/functions/genshin-api.mjs` (does not exist yet) |
+| Player lookup page + its CSS / JS | `site/genshin-impact/player/index.html` (every `/genshin-impact/player/<UID>`, `_redirects` 200 rule), `site/genshin-player.css` / `.js` |
+| Player lookup backend | `netlify/functions/genshin-api.mjs` (`/api/genshin?uid=`); locally `_tools/serve.py` calls Enka itself |
+| Enka id maps (generated) | `site/genshin-enka-map.json` (`enka_map()` in the feed script, from EnkaNetwork/API-docs `store/gi`) |
 
 Preview: `python _tools/serve.py` → http://localhost:8765/genshin-impact/ (see CLAUDE.md for
 the headless-screenshot rules; transitions freeze in headless, which matters for the redeem
@@ -113,7 +116,7 @@ ennead.cc  ─┐
 yatta.moe  ─┘            │                                            ├─> genshin.js (browser)
                          └──> site/images/genshin/splash/*.webp ──────┘     renders the page
                                                                   
-enka.network <── netlify/functions/genshin-api.mjs <── browser (player lookup, PLANNED)
+enka.network <── netlify/functions/genshin-api.mjs <── browser (player lookup, BUILT Oct 23 2026)
 ```
 
 Three tiers. Pick the right one for each new page:
@@ -563,8 +566,8 @@ line disorders and enemies (yatta monster icons), next rotation preview; Imagina
 (element/cast info has no verified source yet — leave out or ask Adrian); Stygian Onslaught
 period/art. Resets per server. Open: source for Theater elements and Stygian bosses.
 
-**7. Player lookup** · `/genshin-impact/player/<UID>` · front end on the Lobby only; page +
-backend planned · full spec in section 9.
+**7. Player lookup** · `/genshin-impact/player/<UID>` · BUILT Oct 23 2026 (Adrian to QC) · as built
+in section 9.
 
 ### DATABASE
 
@@ -711,7 +714,41 @@ Uses the shared article system (`docs/articles-guide.md`, `site/articles.json`, 
 
 ---
 
-## 9. Player lookup — full spec (front end exists on the Lobby; the rest is planned)
+## 9. Player lookup (BUILT Oct 23 2026; the original spec follows the "as built" notes)
+
+### As built
+- **Function** `netlify/functions/genshin-api.mjs`: as specced below, plus `Netlify-Vary: query=uid|info`
+  (junk params can't skip the CDN cache), CDN cache = Enka's `ttl` clamped to 60-600 s, 424 → 503
+  `maintenance`, 429 → 503 `busy`. Not deployed until the repo goes through the Git-connected Netlify
+  deploy. Locally `_tools/serve.py` answers `/api/genshin` by calling Enka itself (same rules).
+- **Id maps** `site/genshin-enka-map.json` (~44 KB) from EnkaNetwork/API-docs **`store/gi/`** (the
+  newer store; the root `store/*.json` stopped at Dec 2025). Written by `enka_map()` in
+  `scripts/genshin-feed.py` (every 3 h, only when it changes; added to the workflow). Keys: `c`
+  characters (`n` name, `e` element, `r` rarity, `i` icon key, `s` talents as [skill id, proud id]),
+  the Traveler as `avatarId-skillDepotId`; `cos` costumes; `nc` namecards; `pf` profile pictures;
+  `w` weapon names by item id; `set` artifact set names. Pictures are hotlinked from
+  `enka.network/ui/` (CORS *, 6-month cache): `UI_AvatarIcon_<i>`, `UI_Gacha_AvatarImg_<i>` (~670 KB,
+  only the picked character's), `UI_Costume_<cos>`, namecards `.png` (the `.jpg` is 8 KB and soft).
+- **Page**: no UID = search (`.gi-tb`, the shared lookup box, recent UIDs, two "Before you search"
+  tips). A UID = profile card (namecard art fading in from the right, profile picture, name, UID +
+  server, signature, number wells) → "Another UID" + Copy link + Refresh (waits out the ttl) →
+  showcase tray of faces → one build box: wish art in the element colour + talents (constellation
+  boosts in blue), weapon + final stats (biggest DMG bonus, Healing if any), five artifacts with
+  sets and crit value (2×CR + CD from substats). Desktop ≥1701px: one 640px box, three columns;
+  971-1700px (sidebar eats ~300px): art band on top, two columns under. Errors and "builds hidden"
+  have their own boxes.
+- **Shared now**: the lookup box CSS moved from genshin-lobby.css to genshin.css ("PLAYER LOOKUP
+  BOX"), its JS to `GI.lookup(form)` / `GI.uidServer(uid)` in genshin-core.js; the Lobby's Search
+  opens the player page.
+- **Not verified on a live profile**: `towerStarIndex`, `theaterActIndex`, `theaterStarIndex` (not in
+  Enka's docs; the test profiles were old). The card shows each only when it's present. Check
+  with an active account (Adrian's UID) and fix the names if they differ.
+- **Known gap**: on `/genshin-impact/player/<UID>` the nav doesn't light "Player lookup" (full-path
+  matching in 11layout.js); `/genshin-impact/player/` does.
+- Headless screenshots: the build's wish art sometimes isn't painted in the capture until something
+  forces a repaint. Not a page bug (hit-test + a forced repaint show it).
+
+### Original spec
 
 ### Now (built)
 Lobby `#lookup` form: UID input (digits only, max 10) with a live server chip from the UID's
