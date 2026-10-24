@@ -7,7 +7,7 @@ comes from, and a full spec for each of the 28 planned pages. This file is priva
 
 **Status in one line:** the whole Live group is built locally (Oct 23 2026): Lobby, Banners, Rerun
 tracker, Events timeline, Redeem codes, Endgame and Player lookup (`/genshin-impact/player/<UID>`, section 9).
-Database: **Characters** and **Weapons** built (Oct 23 2026, Adrian to QC). The rest of Database / Tools / Guides is planned and listed on the Lobby, in the nav menus and in the More
+Database: **Characters** and **Weapons** built (Oct 23 2026, Adrian to QC); **Farm today** built Oct 24 2026 (Adrian to QC, 7.12). The rest of Database / Tools / Guides is planned and listed on the Lobby, in the nav menus and in the More
 sheet as "Soon".
 Nothing of this session is committed yet (see section 13).
 
@@ -269,8 +269,9 @@ expired[]     {code, primos}            # ennead `inactive`, for the codes page 
 endgame       {abyss {start, end, version, floors[{floor, disorders[], chambers[{level, target, halves[waves[{name, n}]], spawns[first, second]}]}]},
                theater {season, version, start, end, elements[], characters[], guests[], blessing, enemies[{name, level}]},
                icons {enemy name: wiki thumb url}}   # Fandom wiki, for the endgame page (Oct 23 2026)
-farm          {monday|tuesday|wednesday: {books[{city, series, icon, users[{name, rarity, icon}]}],
-                                          weapons[{city, name, icon}]}}
+farm          {monday|tuesday|wednesday: {books[{city, series, icon, domain, tiers[[name, icon] x3], users[{name, rarity, icon}]}],
+                                          weapons[{city, name, icon, domain, tiers[[name, icon] x4]}]}}
+              # icon = top tier (the Lobby uses it); domain = name without "Domain of ...: "; tiers lowest first (Oct 24 2026)
 ```
 Times are unix seconds. Thursday/Friday/Saturday reuse Monday/Tuesday/Wednesday; Sunday = all.
 `characters` excludes Travelers (122 entries now). `icon` URLs point at yatta / HoYo's CDN.
@@ -703,7 +704,26 @@ Data: yatta `reliquary` + `reliquary/{id}` (63 sets, 2/4-pc text, pieces, `sourc
 Front end: set grid with piece icons, 2/4-pc bonuses, where it drops (domain + days), "best for"
 only if Adrian writes it (no invented recommendations).
 
-**12. Farm today** · `/genshin-impact/farm` · planned (Lobby has the preview)
+**12. Farm today** · `/genshin-impact/farm` · BUILT Oct 24 2026 (Adrian to QC). Adrian's calls: Today first then the
+week; picker + UID import; 4★/5★ weapons with the rest on tap; all four extras (dial, tiers + domain names, tomorrow line,
+How domains work). Files: `genshin-impact/farm.html` (shell spliced from weapons.html), `genshin-farm.css/.js`. Data: feed
+`farm` (the job gained `domain` + `tiers`, section 4) + `/genshin-weapons.json` (each weapon's `forge` [group, city] = its
+material; no `requiredBy` needed), loaded after the feed. Page: `.gi-tb` on the floating city + a drawn **week dial** (SVG in
+JS "DIAL": 7 segments from Monday at the top, twin days share a grey, Sunday gold, today red + its twin outlined, links between
+twins, a hand at the week's progress; hover = name, click = that tab; hidden on phones) -> day tray (Mon·Thu / Tue·Fri / Wed·Sat /
+Sunday, red dot = today on the picked server, `?day=` in the address when not today) + My characters key + server tray ->
+**Tomorrow** line (a button: tomorrow's 8 books, "N of yours", rotate countdown; opens that tab) -> invitation box (no picks) ->
+**panels**: all four in one grid cell (`visibility`, not `hidden`), so tabs never change the height; each = "Your farm" box
+(your characters per open book + "On other days" by group) + a card per nation (namecard head, "N of yours" tag; book tiers
+2-4★ with chevrons, domain, faces; weapon material tiers 2-5★, domain, weapon tiles linking to Weapons `?w=`, max 11 (9 on
+phones) 4-5★ then "+N" for the rest incl. 1-3★). Sunday cards list all three books/materials per nation, no faces unless
+yours. **The week** board: nations x day groups, today's column red-tinted, "N of yours" per column, cells without your
+characters dimmed; a cell opens its tab. **How domains work** = `.gi-tips` (moved from Endgame to genshin.css), 6 tips:
+**Adrian to fact-check** (20 resin per run, Condensed = 2 runs at once, 3:1 crafting, Philosophies only from top domain
+levels, 04:00 rotation, Sunday all). **My characters**: tap any face (button, `aria-pressed`) or the picker `<dialog>`
+(search, element tray, A-Z grid); ids in localStorage `gi-farm-mine`. UID import = `GI.lookup` + `GI.API` (the showcase
+only, up to 12, said in the box). Lobby: Farm band got a "Full schedule" key; Coming to Parchrome links it.
+Original plan:
 Data: feed `farm` (all 3 day groups) + material `requiredBy.weapon` for weapon mats (add to the
 feed). Front end: weekday tabs (default = today by server), every book with its characters, every
 weapon material with its weapons; "My characters" picker saved in localStorage that highlights
@@ -1126,7 +1146,7 @@ Uncommitted, in the working tree:
 Open questions for Adrian:
 1. Domain cities 7/8 = Nod-Krai/Snezhnaya; Nod-Krai text "An autonomous region of Snezhnaya".
 2. 10-digit UID server rule.
-3. "Moonlight · 2 characters" looks low (yatta's requiredBy data) — check.
+3. ~~"Moonlight · 2 characters" looks low~~ checked Oct 24 2026: all 121 roster characters have exactly one book; Moonlight really has 2.
 4. Every number in section 10.
 5. Theater elements / Stygian boss source for the Endgame page.
 6. ~~Banner history seed source + licence~~ paimon.moe, MIT (Oct 22 2026). Weapons on the Rerun tracker?

@@ -239,18 +239,21 @@ def expired():
 
 
 def farm():
-    """Talent books + weapon materials by weekday (Mon=Thu, Tue=Fri, Wed=Sat), with who uses each book."""
+    """Talent books + weapon materials by weekday (Mon=Thu, Tue=Fri, Wed=Sat), with who uses each book.
+    `domain` = the domain's name without its "Domain of Mastery: " part; `tiers` = [name, icon] per
+    drop tier, lowest first (3 books, 4 weapon materials) -- the Farm today page shows them all."""
     schedule = yatta('dailyDungeon')
     mats = yatta('material')['items']
     out = {}
     for day in DAYS:
         books, weapons = [], []
         for d in schedule[day].values():
-            ids = [i for i in d['reward'] if i > 100000]
+            ids = sorted(i for i in d['reward'] if i > 100000)
             if not ids:
                 continue
             top, low = mats[str(max(ids))], mats[str(min(ids))]
             city = CITIES.get(d['city'], '')
+            more = {'domain': d['name'].split(': ', 1)[-1], 'tiers': [[mats[str(i)]['name'], icon(mats[str(i)]['icon'])] for i in ids]}
             if 'Mastery' in d['name']:
                 users = yatta('material/%s' % min(ids)).get('additions', {}).get('requiredBy', {}).get('avatar', [])
                 seen, who = set(), []
@@ -258,9 +261,9 @@ def farm():
                     if u['name'] != 'Traveler' and u['name'] not in seen:
                         seen.add(u['name'])
                         who.append({'name': u['name'], 'rarity': u['rank'], 'icon': icon(u['icon'])})
-                books.append({'city': city, 'series': low['name'].replace('Teachings of ', ''), 'icon': icon(top['icon']), 'users': who})
+                books.append({'city': city, 'series': low['name'].replace('Teachings of ', ''), 'icon': icon(top['icon']), 'users': who, **more})
             else:
-                weapons.append({'city': city, 'name': low['name'], 'icon': icon(top['icon'])})
+                weapons.append({'city': city, 'name': low['name'], 'icon': icon(top['icon']), **more})
         out[day] = {'books': books, 'weapons': weapons}
     return out
 
