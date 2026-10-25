@@ -5,11 +5,20 @@
 // reaches markup.
 (function () {
   const $ = (id) => document.getElementById(id);
-  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const esc = (s) =>
+    String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const now = () => Date.now() / 1000;
 
   // Element -> wish light. Genshin's own UI colours, a touch muted for the dark ground.
-  const EL = { Pyro: '#ef8a4c', Hydro: '#4cb8ef', Anemo: '#5fd3b4', Electro: '#b48ef0', Dendro: '#a5c83b', Cryo: '#98d8f0', Geo: '#efc35e' };
+  const EL = {
+    Pyro: '#ef8a4c',
+    Hydro: '#4cb8ef',
+    Anemo: '#5fd3b4',
+    Electro: '#b48ef0',
+    Dendro: '#a5c83b',
+    Cryo: '#98d8f0',
+    Geo: '#efc35e',
+  };
   const NEUTRAL = '#b9bec6'; // the weapon wish has no element: a plain light glow
   // Server clocks: daily reset is 04:00 server time.
   const SERVERS = { asia: 8, america: -5, europe: 1 };
@@ -120,7 +129,7 @@
           const on = b.dataset.server === server;
           b.classList.toggle('active', on);
           b.setAttribute('aria-selected', on);
-        })
+        }),
       );
     el.addEventListener('click', (e) => {
       const b = e.target.closest('[data-server]');
@@ -190,12 +199,15 @@
     el.style.height = el.style.lineHeight = h + 'px';
   }
 
-  const tile = (icon, rarity, name) => `<span class="gi-tile r${rarity || 4}"><img src="${esc(icon)}" alt="${esc(name || '')}" title="${esc(name || '')}" loading="lazy" decoding="async"></span>`;
+  const tile = (icon, rarity, name) =>
+    `<span class="gi-tile r${rarity || 4}"><img src="${esc(icon)}" alt="${esc(name || '')}" title="${esc(name || '')}" loading="lazy" decoding="async"></span>`;
   const elIcon = (el) => `/images/genshin/element/${el}.webp`;
 
   // One redeem code row (.gi-code, genshin.css): code, rewards, Primogems, Copy + Redeem.
   // Redeem opens HoYoverse's gift page with the code filled in.
-  const codeRow = (c) => `<div class="gi-box gi-code"><div class="gi-code-text"><p class="gi-code-name">${esc(c.code)}</p><p class="gi-code-rw">${esc((c.rewards || []).join(', '))}</p></div>
+  const codeRow = (
+    c,
+  ) => `<div class="gi-box gi-code"><div class="gi-code-text"><p class="gi-code-name">${esc(c.code)}</p><p class="gi-code-rw">${esc((c.rewards || []).join(', '))}</p></div>
       ${c.primos ? `<span class="gi-primo">${PRIMO}${c.primos}</span>` : ''}
       <div class="gi-code-acts"><button type="button" class="gi-key" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
       <a class="gi-key" href="https://genshin.hoyoverse.com/en/gift?code=${encodeURIComponent(c.code)}" target="_blank" rel="noopener" aria-label="Redeem ${esc(c.code)}">Redeem<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a></div></div>`;
@@ -203,14 +215,17 @@
   document.addEventListener('click', (e) => {
     const copy = e.target.closest('[data-copy]');
     if (!copy || !navigator.clipboard) return;
-    navigator.clipboard.writeText(copy.dataset.copy).then(() => {
-      copy.classList.add('is-done');
-      copy.querySelector('span').textContent = 'Copied';
-      setTimeout(() => {
-        copy.classList.remove('is-done');
-        copy.querySelector('span').textContent = 'Copy';
-      }, 1500);
-    }, () => {});
+    navigator.clipboard.writeText(copy.dataset.copy).then(
+      () => {
+        copy.classList.add('is-done');
+        copy.querySelector('span').textContent = 'Copied';
+        setTimeout(() => {
+          copy.classList.remove('is-done');
+          copy.querySelector('span').textContent = 'Copy';
+        }, 1500);
+      },
+      () => {},
+    );
   });
 
   // ---- PLAYER LOOKUP BOX (Lobby + /genshin-impact/player). A UID's first digit is its
@@ -255,9 +270,16 @@
   // (genshin.css "HEADER FRAME"): four cut corners, each with a fainter echo line (one drawing,
   // mirrored by CSS), and the star on the top edge. The edges themselves are CSS gradients.
   const TBF =
-    ['tl', 'tr', 'bl', 'br'].map((k) => `<i class="gi-tbf-c gi-tbf-c--${k}"><svg viewBox="0 0 32 32"><path d="M.5 12 12 .5"/><path class="i" d="M5 24v-9.5L14.5 5H24"/></svg></i>`).join('') +
+    ['tl', 'tr', 'bl', 'br']
+      .map(
+        (k) =>
+          `<i class="gi-tbf-c gi-tbf-c--${k}"><svg viewBox="0 0 32 32"><path d="M.5 12 12 .5"/><path class="i" d="M5 24v-9.5L14.5 5H24"/></svg></i>`,
+      )
+      .join('') +
     '<i class="gi-tbf-star"><svg viewBox="0 0 12 12"><path d="M6 0c.6 4.2 1.8 5.4 6 6-4.2.6-5.4 1.8-6 6-.6-4.2-1.8-5.4-6-6 4.2-.6 5.4-1.8 6-6z"/></svg></i>';
-  document.querySelectorAll('.gi-tb').forEach((tb) => tb.insertAdjacentHTML('beforeend', `<span class="gi-tbf" aria-hidden="true">${TBF}</span>`));
+  document
+    .querySelectorAll('.gi-tb')
+    .forEach((tb) => tb.insertAdjacentHTML('beforeend', `<span class="gi-tbf" aria-hidden="true">${TBF}</span>`));
 
   // Stat icons (moved here from genshin-weapons.js, Oct 23 2026; the weapons page and the wish card use them): the player page's drawn set (genshin-player.js SI), the ones a weapon can show.
   const SI = {
@@ -270,9 +292,185 @@
     er: '<path d="M12 3.8a8.2 8.2 0 0 1 7.6 5.1h-2.4A6.2 6.2 0 0 0 6.9 9.6L9.2 12H3V5.8l2.3 2.3A8.2 8.2 0 0 1 12 3.8zM4.4 15.1h2.4a6.2 6.2 0 0 0 10.3.7L14.8 13.4H21v6.2l-2.3-2.3A8.2 8.2 0 0 1 4.4 15.1z"/>',
     phys: '<path d="M12 2.5l2.6 6.9 6.9 2.6-6.9 2.6-2.6 6.9-2.6-6.9L2.5 12l6.9-2.6z"/>',
   };
-  const SUB_ICON = { ATK: 'atk', HP: 'hp', DEF: 'def', 'Elemental Mastery': 'em', 'CRIT Rate': 'cr', 'CRIT DMG': 'cd', 'Energy Recharge': 'er', 'Physical DMG Bonus': 'phys' };
+  const SUB_ICON = {
+    ATK: 'atk',
+    HP: 'hp',
+    DEF: 'def',
+    'Elemental Mastery': 'em',
+    'CRIT Rate': 'cr',
+    'CRIT DMG': 'cd',
+    'Energy Recharge': 'er',
+    'Physical DMG Bonus': 'phys',
+  };
+
+  // ---- GLIDE (moved here from genshin-birthdays.js, Oct 24 2026): an eased scroll to `target` instead
+  // of the browser's jump, on whichever element actually scrolls (.coc-main on desktop, the page on
+  // phones), clear of the fixed bars; then `.gi-arrive` on the target, so its title rises in and a red
+  // line sweeps under it (genshin.css "ARRIVAL"). Reduced motion = a plain jump. A newer glide cancels
+  // an older one. `done` runs when it lands.
+  const still = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scroller = (el) => {
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const o = getComputedStyle(p).overflowY;
+      if ((o === 'auto' || o === 'scroll') && p.scrollHeight > p.clientHeight) return p;
+    }
+    return document.scrollingElement;
+  };
+  let glideId = 0;
+  function glide(target, done) {
+    const box = scroller(target);
+    const page = box === document.scrollingElement;
+    const top0 = page ? 0 : box.getBoundingClientRect().top;
+    const gap = window.matchMedia('(max-width: 970px)').matches ? 64 : 84; // clear of the fixed bars
+    const from = box.scrollTop;
+    const to = Math.max(0, Math.min(box.scrollHeight - box.clientHeight, from + target.getBoundingClientRect().top - top0 - gap));
+    const id = ++glideId;
+    const arrive = () => {
+      target.classList.remove('gi-arrive');
+      void target.offsetWidth; // restart the animation if it's the same section again
+      target.classList.add('gi-arrive');
+      if (done) done();
+    };
+    if (still() || Math.abs(to - from) < 2) {
+      box.scrollTop = to;
+      return arrive();
+    }
+    const dur = Math.min(1100, 450 + Math.abs(to - from) * 0.25);
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2); // ease in-out cubic
+    box.style.scrollBehavior = 'auto'; // .coc-main is smooth, which would swallow each frame's step
+    const t0 = performance.now();
+    const step = (now) => {
+      if (id !== glideId) return; // a newer jump took over (it puts the smooth scrolling back when it lands)
+      const t = Math.min(1, (now - t0) / dur);
+      box.scrollTop = from + (to - from) * ease(t);
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        box.style.removeProperty('scroll-behavior');
+        arrive();
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---- JUMP NAV (Oct 24 2026, Achievements first): a .gi-tray of #section links. Clicking glides there;
+  // scrolling lights the section you're in. The picked key is ONE raised pill (.gi-pill) that slides and
+  // resizes from tab to tab instead of each tab lighting up on its own; during a glide it goes straight to
+  // the target (the sections passed on the way don't pull it back). On phones the tray scrolls itself so
+  // the picked tab stays in view. The first section's link leaves the address clean (no #hash).
+  function jumpNav(nav) {
+    if (!nav) return;
+    const links = [...nav.querySelectorAll('a[href^="#"]')];
+    const parts = links.map((a) => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+    const pill = document.createElement('i');
+    pill.className = 'gi-pill';
+    pill.setAttribute('aria-hidden', 'true');
+    nav.prepend(pill);
+    nav.classList.add('has-pill');
+    let lock = null; // the section a glide is heading to
+    function place() {
+      const a = links.find((x) => x.classList.contains('active'));
+      pill.classList.toggle('is-on', !!a);
+      if (!a) return;
+      pill.style.width = a.offsetWidth + 'px';
+      pill.style.transform = `translateX(${a.offsetLeft}px)`;
+      if (nav.scrollWidth > nav.clientWidth + 1)
+        nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: still() ? 'auto' : 'smooth' });
+    }
+    function pick(id) {
+      links.forEach((a) => {
+        const on = a.getAttribute('href') === '#' + id;
+        a.classList.toggle('active', on);
+        if (on) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+      place();
+    }
+    links.forEach((a) =>
+      a.addEventListener('click', (e) => {
+        const target = document.getElementById(a.getAttribute('href').slice(1));
+        if (!target) return;
+        e.preventDefault();
+        history.replaceState(null, '', location.pathname + location.search + (a === links[0] ? '' : a.getAttribute('href')));
+        lock = target.id;
+        pick(lock);
+        glide(target, () => (lock = null));
+      }),
+    );
+    const spy = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && !lock && pick(x.target.id)), {
+      rootMargin: '-40% 0px -55% 0px',
+    });
+    parts.forEach((p) => spy.observe(p));
+    pick(parts.length ? parts[0].id : ''); // at the top nothing crosses the spy's band yet: start on the first section
+    window.addEventListener('resize', place);
+    if (document.fonts) document.fonts.ready.then(place); // tab widths change once Sora loads
+    requestAnimationFrame(() => requestAnimationFrame(() => nav.classList.add('is-ready'))); // no slide-in from 0 on load
+  }
+
+  // ---- SHEET DRAG (phones; moved here from genshin-weapons.js Oct 24 2026 for Artifacts + Enemies too): drag
+  // the grip (.gi-grip) or the header down to close a bottom sheet, like the More sheet; pulling the content
+  // down once it's at the top drags it too (also mid-gesture: scroll up to the top and keep going). Touch
+  // events for the pull, not pointer: the browser cancels pointers on a scroller. `hide` = the page's
+  // animated close; the sheet's inline transform is cleared whenever its <dialog> closes.
+  function sheetDrag(sheet, handles, body, hide) {
+    const phone = () => matchMedia('(max-width: 970px)').matches;
+    let drag = null;
+    let last = null;
+    const start = (y) => {
+      drag = { y, dy: 0, t: performance.now() };
+      sheet.classList.add('is-dragging');
+    };
+    const move = (y) => {
+      drag.dy = Math.max(0, y - drag.y);
+      sheet.style.transform = `translateY(${drag.dy}px)`;
+    };
+    const end = () => {
+      last = null;
+      if (!drag) return;
+      const fast = drag.dy / (performance.now() - drag.t) > 0.6;
+      sheet.classList.remove('is-dragging');
+      if (drag.dy > 120 || (fast && drag.dy > 30)) hide();
+      else sheet.style.transform = '';
+      drag = null;
+    };
+    handles.forEach((el) => {
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button') || !phone()) return;
+        start(e.clientY);
+        el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener('pointermove', (e) => drag && move(e.clientY));
+      el.addEventListener('pointerup', end);
+      el.addEventListener('pointercancel', end);
+    });
+    body.addEventListener(
+      'touchstart',
+      (e) => {
+        last = e.touches.length === 1 && phone() ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+      },
+      { passive: true }
+    );
+    body.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!last) return;
+        const { clientX: x, clientY: y } = e.touches[0];
+        if (!drag && body.scrollTop <= 0 && y - last.y > Math.abs(x - last.x)) start(y);
+        last = { x, y };
+        if (!drag) return;
+        if (e.cancelable) e.preventDefault();
+        move(y);
+      },
+      { passive: false }
+    );
+    body.addEventListener('touchend', end);
+    body.addEventListener('touchcancel', end);
+    sheet.closest('dialog').addEventListener('close', () => (sheet.style.transform = ''));
+  }
 
   window.GI = {
+    sheetDrag,
+    glide,
+    jumpNav,
     ON_PAGES,
     API,
     playerHref,
@@ -311,4 +509,157 @@
       return r.json();
     }),
   };
+
+  // ---- HELP BUTTON "Traveler's notes" (Oct 24 2026, Adrian: CoC's "i" button, Genshin inside). The
+  // button, divider, backdrop and panel shell are CoC's (coc-help.css, linked on every Genshin page; same
+  // ids, never on the same page as coc-help.js). Open / close / scroll lock / "detach the panel to <body>"
+  // copy coc-help.js. The Genshin look is genshin.css "HELP PANEL". Live bits (reset clock, endgame resets,
+  // codes) come from the server clock and the feed; the rest is the game's fixed rules (handoff section 10).
+  (function help() {
+    const bar = document.querySelector('.secondary-top-bar');
+    if (!bar || $('stbInfoBtn')) return;
+    const N = (k) => `<img src="/images/genshin/nav/${k}.webp" alt="" width="28" height="28">`;
+    const row = (icon, title, body, live) =>
+      `<li class="gh-row"><span class="gh-ico" aria-hidden="true">${icon}</span><div><h4>${title}</h4><p>${body}</p>${live ? `<p class="gh-live" ${live}></p>` : ''}</div></li>`;
+    const actions = document.createElement('div');
+    actions.className = 'stb-mobile-actions';
+    actions.innerHTML =
+      '<div class="stb-help-divider" aria-hidden="true"></div><div class="stb-info-dropdown-wrap" id="stbInfoDropdownWrap">' +
+      '<button type="button" class="stb-icon-btn" id="stbInfoBtn" aria-label="Traveler’s notes: what to know about Genshin Impact" aria-haspopup="dialog" aria-expanded="false" aria-controls="stbInfoDropdown">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25" /><line x1="12" y1="11" x2="12" y2="16.5" stroke-width="2.4" /><circle cx="12" cy="7.6" r="1.3" fill="currentColor" stroke="none" /></svg></button>' +
+      '<div class="stb-info-dropdown gh" id="stbInfoDropdown" role="dialog" aria-labelledby="ghTitle" aria-hidden="true">' +
+      `<span class="gi-tbf" aria-hidden="true">${TBF}</span>` +
+      '<div class="gh-body"><div class="gh-head"><p class="gh-kick">Genshin Impact</p><h3 class="gh-title" id="ghTitle">Traveler’s notes</h3>' +
+      '<p class="gh-sub">The rules worth knowing, and the clocks that matter today.</p>' +
+      '<div class="gi-tray gi-tray--sm gh-srv" role="tablist" aria-label="Server"><button type="button" class="gi-tab" data-server="asia" role="tab">Asia</button><button type="button" class="gi-tab" data-server="america" role="tab">NA</button><button type="button" class="gi-tab" data-server="europe" role="tab">EU</button></div></div>' +
+      '<ul class="gh-list">' +
+      row('<img src="/images/genshin/commission.svg" alt="" width="28" height="28">', 'The day starts at 04:00', 'Daily Commissions and the farming domains roll over at 04:00 <b>server time</b>, not midnight. Weekly bosses and the shop reset Monday 04:00.', 'data-gh="reset"') +
+      row(N('banners'), 'Wishes and pity', '<b>160</b> Primogems a wish. A 5&#9733; is guaranteed by pull <b>90</b> on the character banner (odds climb from about 74), <b>80</b> on the weapon banner. Lose the 50/50 and your next 5&#9733; is the featured one.') +
+      row(N('endgame'), 'Endgame resets', 'Spiral Abyss and Imaginarium Theater pay Primogems every period. Clear them before they reset.', 'data-gh="end"') +
+      row(N('codes'), 'Redeem codes', 'You need <b>Adventure Rank 10</b>. Each code works once per account, and livestream codes expire fast.', 'data-gh="codes"') +
+      row(N('timers'), 'Original Resin', 'Refills <b>1 every 8 minutes</b>, up to <b>200</b>. Spend it on domains, bosses and ley lines before it caps.') +
+      '</ul><div class="gh-foot"><a class="gi-key gi-key--red" href="/genshin-impact/codes">' +
+      '<img src="/images/genshin/primogem.webp" alt="" width="18" height="18"><span>Today’s codes</span></a>' +
+      '<p class="gh-src">Live data from ennead.cc and Project Amber, refreshed every three hours.</p></div></div></div></div>';
+    bar.appendChild(actions);
+
+    let overlay = $('stbDdOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'stb-dd-overlay';
+      overlay.id = 'stbDdOverlay';
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(overlay);
+    }
+    const btn = $('stbInfoBtn');
+    const panel = $('stbInfoDropdown');
+    const wrap = $('stbInfoDropdownWrap');
+    const place = () => {
+      const r = wrap.getBoundingClientRect();
+      panel.style.top = r.bottom + 10 + 'px';
+      panel.style.right = window.innerWidth - r.right - 4 + 'px';
+      panel.style.maxHeight = window.innerHeight - r.bottom - 22 + 'px';
+    };
+    document.body.appendChild(panel);
+    window.addEventListener('resize', place);
+
+    // Live lines. The reset follows the server tray (shared with the page's trays via serverTray).
+    let feed = null;
+    const live = () => {
+      const t = now();
+      const set = (k, html) => {
+        const el = panel.querySelector(`[data-gh="${k}"]`);
+        if (el) el.innerHTML = html;
+      };
+      set('reset', `Next reset in <b>${short(nextReset() - t)}</b>`);
+      if (!feed) return;
+      const ch = (feed.challenges || []).filter((c) => c.end > t);
+      set('end', ch.map((c) => `${c.type === 'ActTypeTower' ? 'Abyss' : 'Theater'} in <b>${short(c.end - t)}</b>`).join(' &middot; '));
+      const codes = feed.codes || [];
+      const primos = codes.reduce((s, c) => s + (c.primos || 0), 0);
+      set('codes', codes.length ? `<b>${codes.length}</b> live now, worth <b>${primos}</b> Primogems` : '');
+    };
+    window.GI.feed.then((f) => (feed = f)).catch(() => {});
+    serverTray(panel.querySelector('.gh-srv'), live);
+
+    // Scroll lock (coc-help.js stbLockScroll, shortened): desktop scrolls .coc-main, phones the page.
+    let y = 0;
+    const block = (e) => e.preventDefault();
+    const lock = (on) => {
+      const main = document.querySelector('.coc-main');
+      const b = document.body.style;
+      if (on) {
+        y = window.pageYOffset || 0;
+        const sw = window.innerWidth - document.documentElement.clientWidth;
+        Object.assign(b, { position: 'fixed', top: -y + 'px', left: '0', right: '0', width: '100%', paddingRight: sw > 0 ? sw + 'px' : '' });
+      } else {
+        Object.assign(b, { position: '', top: '', left: '', right: '', width: '', paddingRight: '' });
+        window.scrollTo(0, y);
+      }
+      if (main) ['wheel', 'touchmove'].forEach((ev) => main[on ? 'addEventListener' : 'removeEventListener'](ev, block, { passive: false }));
+    };
+    let timer = 0;
+    const isOpen = () => panel.classList.contains('is-open');
+    const setOpen = (on) => {
+      if (on === isOpen()) return;
+      if (on) place();
+      panel.classList.toggle('is-open', on);
+      panel.setAttribute('aria-hidden', String(!on));
+      btn.setAttribute('aria-expanded', String(on));
+      overlay.classList.toggle('open', on);
+      lock(on);
+      clearInterval(timer);
+      if (on) {
+        live();
+        timer = setInterval(live, 1000);
+      }
+    };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(!isOpen());
+    });
+    document.addEventListener('click', (e) => {
+      if (isOpen() && !wrap.contains(e.target) && !panel.contains(e.target)) setOpen(false);
+    });
+    // Wheel inside the panel scrolls it (the page under it is locked).
+    panel.addEventListener('wheel', (e) => e.stopPropagation());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+  })();
+  // ---- MORE CARDS (Oct 24 2026, Adrian): every page's .gi-more = 2 random pages from the nav
+  // (game-nav.json, the More sheet's list), each with its nav icon and "desc". Never this page, a
+  // group page (All events / Full database / All tools) or a "soon" one. The page's own two cards
+  // stay in the markup as the fallback if the list doesn't load.
+  (function more() {
+    const box = document.querySelector('.gi-more');
+    if (!box) return;
+    const path = (link) => link.replace(/\.html$/, '').replace(/\/$/, '');
+    const here = path(location.pathname);
+    fetch('/game-nav.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      .then((all) => {
+        const groups = all['genshin-impact'].groups;
+        const hubs = groups.map((g) => path(g.link));
+        const pool = groups
+          .flatMap((g) => g.pages || [])
+          .filter((p) => !p.soon && !hubs.includes(path(p.link)) && path(p.link) !== here && !(p.activePrefix && here.startsWith(p.activePrefix)));
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        box.innerHTML = pool
+          .slice(0, 2)
+          .map(
+            (p) => `<a class="gi-box gi-card" href="${esc(p.link)}"><img class="gi-more-ico" src="${esc(p.icon)}" alt="" width="44" height="44" loading="lazy">
+            <div><b>${esc(p.name)}</b><p>${esc(p.desc || '')}</p></div>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>`
+          )
+          .join('');
+      })
+      .catch(() => {});
+  })();
 })();

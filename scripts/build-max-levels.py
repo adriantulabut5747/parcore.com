@@ -138,9 +138,9 @@ def level_table(text, req_words):
     return None, None
 
 
-def building_th(page):
-    """{building level: Town Hall level required}"""
-    t, _ = level_table(wikitext(page), ["Town Hall"])
+def building_th(page, hall="Town Hall"):
+    """{building level: Town Hall (or Builder Hall) level required}"""
+    t, _ = level_table(wikitext(page), [hall])
     return t or {}
 
 
@@ -158,6 +158,70 @@ def blacksmith_caps():
         if caps and all(th and c and e and th <= MAX_TH for th, c, e in caps):
             return caps
     raise SystemExit("Blacksmith table changed shape -- update blacksmith_caps()")
+
+
+# Builder Base (Oct 25 2026): troops level up in the Star Laboratory (each lab
+# level needs a Builder Hall), unlock in the Builder Barracks; the two heroes
+# list their Builder Hall directly. Same names as BB_UNITS in coc-tracker.js.
+MAX_BH = 10
+BB_HEROES = ["Battle Machine", "Battle Copter"]
+BB_TROOPS = ["Raged Barbarian", "Sneaky Archer", "Boxer Giant", "Beta Minion", "Bomber", "Baby Dragon",
+             "Cannon Cart", "Night Witch", "Drop Ship", "Power P.E.K.K.A", "Hog Glider", "Electrofire Wizard"]
+
+
+def bb_page(name):
+    """A unit's Builder Base text: the "/Builder Base" subpage when the unit
+    lives in both villages (Baby Dragon), else its own page."""
+    return wikitext(name + "/Builder Base") or wikitext(name)
+
+
+def barracks_level(text):
+    """The Builder Barracks level a troop unlocks at (its stats table)."""
+    for headers, rows in tables(text):
+        for i, h in enumerate(headers):
+            if "Builder Barracks" in h and rows and len(rows[0]) > i:
+                return num(rows[0][i])
+    return None
+
+
+def lab_table(text):
+    """{level: Star Laboratory level}. The requirement is each row's LAST
+    cell: some tables (Beta Minion, Bomber) have a two-row header whose
+    sub-columns shift the header positions."""
+    for headers, rows in tables(text):
+        if headers and re.match(r"Level\b", headers[0]) and any("Star Laboratory" in h and "Required" in h for h in headers):
+            return {num(r[0]): num(r[-1]) for r in rows if r and num(r[0])}
+    return None
+
+
+def builder_caps(problems):
+    lab = building_th("Star Laboratory", "Builder Hall")
+    barracks = building_th("Builder Barracks", "Builder Hall")
+    print(f"Star Laboratory: {len(lab)} levels; Builder Barracks: {len(barracks)} levels")
+    need = {}  # name -> {level: Builder Hall}
+    for name in BB_HEROES:
+        t, _ = level_table(bb_page(name), ["Builder Hall"])
+        if not t:
+            problems.append(f"{name}: no Builder Hall table")
+            continue
+        need[name] = t
+    for name in BB_TROOPS:
+        text = bb_page(name)
+        t = lab_table(text)
+        unlock = barracks.get(barracks_level(text))
+        if not t or not unlock:
+            problems.append(f"{name}: no Star Laboratory table or unlock level")
+            continue
+        need[name] = {lvl: (unlock if lvl == 1 or r is None else max(unlock, lab.get(r) or 99)) for lvl, r in t.items()}
+    bh_max = {str(bh): {} for bh in range(1, MAX_BH + 1)}
+    for name, levels in need.items():
+        for bh in range(1, MAX_BH + 1):
+            best = max([lvl for lvl, b in levels.items() if b and b <= bh] or [0])
+            if best:
+                bh_max[str(bh)][name] = best
+    for name in ["Battle Machine", "Raged Barbarian", "Night Witch", "Electrofire Wizard"]:
+        print(f"  {name}: " + ", ".join(f"BH{bh} {bh_max[str(bh)].get(name, '-')}" for bh in (3, 5, 7, 9, 10)))
+    return bh_max
 
 
 def main():
@@ -222,12 +286,16 @@ def main():
             if best:
                 th_max[str(th)][e["name"]] = best
 
+    bh_max = builder_caps(problems)
+
     doc = {
         "_readme": "Max level of every home troop, spell, siege, pet, hero and hero equipment at each Town Hall "
-        "(super troops left out). Built by scripts/build-max-levels.py from the Clash of Clans wiki -- "
+        "(super troops left out), and of every Builder Base troop and hero at each Builder Hall (bh). "
+        "Built by scripts/build-max-levels.py from the Clash of Clans wiki -- "
         "re-run it after every balance patch. Read by the Player Tracker's rushed / max check (coc-tracker.js).",
         "updated": time.strftime("%Y-%m-%d"),
         "th": th_max,
+        "bh": bh_max,
     }
     OUT.write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print(f"wrote {OUT.relative_to(REPO)}: TH18 has {len(th_max['18'])} units")

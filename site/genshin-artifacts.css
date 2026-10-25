@@ -1,0 +1,1056 @@
+/* ============================================================
+   GENSHIN IMPACT -- ARTIFACTS (/genshin-impact/artifacts, Oct 24 2026)
+   Own look (Adrian: "dont mirror it, build ur own"): square tiles like the
+   in-game inventory, and an Inspect panel centred on desktop (a bottom sheet
+   on phones). Shared pieces from genshin.css: .gi-tb header, .gi-tray / .gi-tab,
+   .gi-key, .gi-box, .gi-tile. --ar = the set's rarity colour (r g b);
+   --af-el = its element when the 2-piece is an element's DMG Bonus.
+   ============================================================ */
+.af-tile,
+.af-dlg,
+.af-mini {
+  --ar: 160, 128, 214;
+}
+.r5.af-tile,
+.af-dlg.r5,
+.af-mini.r5 {
+  --ar: 214, 170, 92;
+}
+.r3.af-tile,
+.af-dlg.r3,
+.af-mini.r3 {
+  --ar: 96, 146, 204;
+}
+
+/* ---- HEADER SLOTS: five gold squares in a shallow arc, the middle one raised ---- */
+.af-slots {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 44%;
+  padding-right: 52px;
+  object-fit: initial;
+  /* the shared .gi-tb-art fade would hide the outer squares: only soften the far left */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 22%);
+}
+.af-slots span {
+  flex: none;
+  width: 92px;
+  aspect-ratio: 1;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  background:
+    radial-gradient(90% 80% at 50% 18%, rgba(255, 226, 170, 0.28), rgba(255, 226, 170, 0) 70%), linear-gradient(160deg, #a77a3c, #5e3d1d);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 14px 28px -12px rgba(0, 0, 0, 0.9);
+}
+.af-slots span:nth-child(1),
+.af-slots span:nth-child(5) {
+  transform: translateY(22px) rotate(-4deg);
+}
+.af-slots span:nth-child(5) {
+  transform: translateY(22px) rotate(4deg);
+}
+.af-slots span:nth-child(2) {
+  transform: translateY(6px) rotate(-2deg);
+}
+.af-slots span:nth-child(4) {
+  transform: translateY(6px) rotate(2deg);
+}
+.af-slots span:nth-child(3) {
+  width: 116px;
+  transform: translateY(-8px);
+}
+.af-slots img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+
+/* ---- BAR + FILTERS ---- */
+.af-find-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+.af-find {
+  flex: 1;
+  max-width: 380px;
+  padding-block: 4px;
+}
+.af-find .lb-search-input {
+  font-size: 14px;
+}
+.af-find .lb-search-btn {
+  width: 36px;
+  height: 36px;
+}
+.af-more-key {
+  display: none;
+}
+.af-more-key b {
+  min-width: 18px;
+  padding: 3px 5px;
+  border-radius: 9px;
+  background: var(--gi-acc);
+  font:
+    700 10px/1 'Sora',
+    sans-serif;
+  color: #fff;
+}
+.af-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.af-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.af-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.af-row > .gi-label {
+  flex: none;
+  width: 64px;
+}
+.af-row .gi-tray {
+  min-width: 0;
+  flex-wrap: wrap;
+} /* desktop: every chip in view; phones scroll (PHONES) */
+.af-row .gi-tab {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+.af-row .gi-tab img,
+.af-row .gi-tab svg {
+  width: 15px;
+  height: 15px;
+  border-radius: 0;
+}
+.af-count {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--gi-muted);
+}
+.af-clear {
+  padding: 0;
+  border: 0;
+  background: none;
+  font:
+    600 12px/1 'Sora',
+    sans-serif;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ---- GRID OF SQUARES ---- */
+.af-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 14px;
+}
+.af-grid > .gi-empty {
+  grid-column: 1 / -1;
+}
+.af-tile {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  /* toned-down rarity backing on near-black (never a full-brightness box) */
+  background:
+    radial-gradient(85% 70% at 50% 22%, rgba(var(--ar), 0.34), rgba(var(--ar), 0) 72%),
+    linear-gradient(165deg, rgba(var(--ar), 0.3), rgba(var(--ar), 0.06) 62%), #121216;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 10px 22px -14px rgba(0, 0, 0, 0.9);
+  color: var(--gi-text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.3s var(--gi-ease),
+    box-shadow 0.3s ease;
+}
+/* the slow light ring behind the flower: only on hover / focus */
+.af-tile::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 40%;
+  width: 72%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--ar), 0),
+    rgba(var(--ar), 0.55),
+    rgba(var(--ar), 0) 40%,
+    rgba(var(--ar), 0.4) 70%,
+    rgba(var(--ar), 0)
+  );
+  -webkit-mask: radial-gradient(closest-side, transparent 78%, #000 80%, #000 96%, transparent 98%);
+  mask: radial-gradient(closest-side, transparent 78%, #000 80%, #000 96%, transparent 98%);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s var(--gi-ease);
+}
+.af-tile-art {
+  position: absolute;
+  inset: 8% 14% 26%;
+  display: grid;
+  place-items: center;
+}
+.af-tile-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55)) saturate(0.9);
+  transition:
+    transform 0.45s var(--gi-ease),
+    filter 0.3s ease;
+}
+.af-tile-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 60px);
+  padding: 4px 7px 4px 5px;
+  border-radius: 5px;
+  background: rgba(8, 8, 10, 0.62);
+  font:
+    700 9.5px/1 'Sora',
+    sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #c9ccd2;
+}
+.af-tile-tag img,
+.af-tile-tag svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+}
+.af-tile.has-el .af-tile-tag {
+  color: var(--af-el);
+}
+.af-new {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--gi-acc);
+  font:
+    800 9px/1 'Sora',
+    sans-serif;
+  font-style: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+/* foot band: name; on hover the other four pieces rise into it */
+.af-tile-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 27%;
+  padding: 10px 11px 10px;
+  background: linear-gradient(0deg, rgba(8, 8, 10, 0.92) 30%, rgba(8, 8, 10, 0.6) 75%, rgba(8, 8, 10, 0));
+}
+.af-tile-foot b {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font:
+    700 13px/1.25 'Sora',
+    sans-serif;
+  color: #f1f2f4;
+  text-wrap: balance;
+}
+.af-tile-pcs {
+  display: flex;
+  gap: 4px;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    height 0.3s var(--gi-ease),
+    opacity 0.25s ease,
+    margin 0.3s var(--gi-ease);
+}
+.af-tile-pcs img {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  background: rgba(var(--ar), 0.22);
+  object-fit: contain;
+}
+.af-tile:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .af-tile:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 0 0 1px rgba(var(--ar), 0.35),
+      0 18px 30px -16px rgba(0, 0, 0, 0.95);
+  }
+  .af-tile:hover::before {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    animation: af-spin 9s linear infinite;
+  }
+  .af-tile:hover .af-tile-art img {
+    transform: translateY(-8%) scale(1.04);
+    filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.6)) saturate(1.05);
+  }
+  .af-tile:hover .af-tile-pcs {
+    height: 26px;
+    margin-top: 7px;
+    opacity: 1;
+  }
+}
+.af-tile:focus-visible::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+@keyframes af-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .af-tile,
+  .af-tile-art img,
+  .af-tile::before {
+    transition: none;
+  }
+  .af-tile:hover::before {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   INSPECT: the <dialog> is the stage; .af-panel is the box (raised recipe),
+   centred, two columns: .af-stage (the piece) | .af-info. Phones: one column,
+   a sheet from the bottom.
+   ============================================================ */
+.af-dlg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--gi-text);
+}
+.af-dlg:not([open]) {
+  display: none;
+}
+.af-dlg::backdrop {
+  background: rgba(4, 4, 6, 0.72);
+}
+.af-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: min(1040px, calc(100vw - 48px));
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 14px;
+  background: var(--lb-box);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 30px 80px -20px rgba(0, 0, 0, 0.9);
+  transform: translate(-50%, -50%);
+  animation: af-in 0.28s var(--gi-ease) both;
+}
+.af-dlg.is-closing .af-panel {
+  animation: af-out 0.2s ease both;
+}
+@keyframes af-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -47%) scale(0.98);
+  }
+}
+@keyframes af-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.98);
+  }
+}
+.af-d-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 12px 20px;
+  border-bottom: 1px solid var(--gi-line);
+}
+.af-d-ttl {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+.af-d-ttl b {
+  font:
+    700 13px/1 'Sora',
+    sans-serif;
+  color: #fff;
+}
+.af-d-ttl span {
+  font:
+    600 11px/1 'Sora',
+    sans-serif;
+  color: var(--gi-muted);
+  letter-spacing: 0.3px;
+}
+.af-d-keys {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.af-sq {
+  width: 38px;
+  padding: 0;
+  justify-content: center;
+}
+.af-sq:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.af-d-sep {
+  width: 1px;
+  height: 22px;
+  margin: 0 4px;
+  background: var(--gi-line);
+}
+.af-d-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  outline: none;
+  overscroll-behavior: contain;
+}
+.af-in {
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr);
+  min-height: 100%;
+}
+
+/* the stage: the piece on a lit floor in the set's rarity colour */
+.af-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 26px 26px;
+  border-right: 1px solid var(--gi-line);
+  background:
+    radial-gradient(70% 46% at 50% 30%, rgba(var(--ar), 0.3), rgba(var(--ar), 0) 70%),
+    linear-gradient(180deg, rgba(var(--ar), 0.08), rgba(0, 0, 0, 0) 60%), #0f0f12;
+}
+.af-stage-art {
+  position: relative;
+  width: 236px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.af-stage-art::before {
+  content: '';
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--ar), 0.35);
+  box-shadow:
+    0 0 0 10px rgba(var(--ar), 0.05),
+    0 0 60px rgba(var(--ar), 0.18);
+}
+.af-stage-art::after {
+  content: '';
+  position: absolute;
+  bottom: -2%;
+  left: 22%;
+  right: 22%;
+  height: 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+}
+.af-stage-art img {
+  position: relative;
+  z-index: 1;
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.55));
+  animation: af-float 5s ease-in-out infinite;
+}
+@keyframes af-float {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.af-slots-row {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 12px;
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+.af-slot {
+  width: 54px;
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: rgba(var(--ar), 0.1);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.af-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+.af-slot:hover img {
+  opacity: 0.9;
+}
+.af-slot.is-on {
+  border-color: var(--lb-edge);
+  background: linear-gradient(160deg, rgba(var(--ar), 0.55), rgba(var(--ar), 0.2));
+  box-shadow: var(--lb-btn);
+}
+.af-slot.is-on img {
+  opacity: 1;
+}
+.af-slot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+.af-piece {
+  width: 100%;
+  text-align: center;
+}
+.af-piece .gi-label {
+  display: block;
+  margin-bottom: 8px;
+}
+.af-piece b {
+  display: block;
+  font:
+    700 15px/1.3 'Sora',
+    sans-serif;
+  color: #fff;
+}
+.af-piece p {
+  margin-top: 10px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--gi-muted);
+  text-wrap: pretty;
+}
+
+/* the info column */
+.af-info {
+  padding: 26px 30px 32px;
+  min-width: 0;
+}
+.af-name {
+  font:
+    700 clamp(22px, 2.2vw, 30px)/1.15 'Cinzel',
+    serif;
+  color: #fff;
+}
+.af-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--gi-muted);
+}
+.af-meta .gi-rarity {
+  letter-spacing: 1px;
+}
+.af-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  font:
+    700 10px/1 'Sora',
+    sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #c9ccd2;
+}
+.af-tag img,
+.af-tag svg {
+  width: 14px;
+  height: 14px;
+}
+.af-dlg[style*='--af-el:#'] .af-tag {
+  color: var(--af-el);
+}
+.af-sec {
+  margin-top: 26px;
+}
+.af-h {
+  margin-bottom: 12px;
+  font:
+    700 10.5px/1 'Sora',
+    sans-serif;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #8e939b;
+}
+.af-bonus {
+  display: flex;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.3);
+}
+.af-bonus + .af-bonus {
+  margin-top: 8px;
+}
+.af-bonus-n {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  width: 46px;
+  font:
+    800 22px/1 'Sora',
+    sans-serif;
+  color: #fff;
+}
+.af-bonus-n small {
+  margin-top: 5px;
+  font:
+    700 8.5px/1 'Sora',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gi-dim);
+}
+.af-bonus p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #c6c9cf;
+  text-wrap: pretty;
+}
+.af-bonus p b {
+  font-weight: 700;
+  color: #fff;
+}
+.af-best {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.af-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 72px;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  color: #c9ccd2;
+  text-decoration: none;
+}
+.af-face .gi-tile {
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  transition: transform 0.2s var(--gi-ease);
+}
+.af-face:hover {
+  color: #fff;
+}
+.af-face:hover .gi-tile {
+  transform: translateY(-2px);
+}
+.af-dom {
+  position: relative;
+  isolation: isolate;
+  padding: 18px 20px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: #101013;
+  box-shadow: var(--lb-shadow);
+}
+.af-dom::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 30%;
+  background: var(--af-dom, none) center / cover no-repeat;
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 70%);
+  mask-image: linear-gradient(90deg, transparent, #000 70%);
+}
+.af-dom-k {
+  display: block;
+  font:
+    700 9.5px/1 'Sora',
+    sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gi-dim);
+}
+.af-dom-n {
+  display: block;
+  margin-top: 8px;
+  font:
+    700 18px/1.2 'Cinzel',
+    serif;
+  color: #fff;
+}
+.af-dom-m {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #b9bdc4;
+}
+.af-dom-f {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  list-style: none;
+}
+.af-dom-f li {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(8, 8, 10, 0.6);
+  font:
+    700 10px/1 'Sora',
+    sans-serif;
+  letter-spacing: 0.6px;
+  color: #d9dbdf;
+}
+.af-pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.af-pair .gi-label {
+  flex: 0 0 100%;
+}
+.af-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font:
+    600 12.5px/1.2 'Sora',
+    sans-serif;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+.af-mini:hover {
+  background: var(--lb-raise-hover);
+}
+.af-mini img {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  background: linear-gradient(160deg, rgba(var(--ar), 0.5), rgba(var(--ar), 0.15));
+  object-fit: contain;
+}
+.af-from {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  list-style: none;
+}
+.af-from li {
+  padding: 7px 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  color: #c9ccd2;
+}
+.af-none {
+  font-size: 12.5px;
+  color: var(--gi-dim);
+}
+@media (prefers-reduced-motion: reduce) {
+  .af-panel,
+  .af-dlg.is-closing .af-panel,
+  .af-stage-art img {
+    animation: none;
+  }
+}
+
+/* ---- LAPTOPS ---- */
+@media (max-width: 1600px) {
+  .af-slots span {
+    width: 86px;
+  }
+  .af-slots span:nth-child(3) {
+    width: 104px;
+  }
+  .af-slots span:nth-child(1),
+  .af-slots span:nth-child(5) {
+    display: none;
+  }
+  .af-in {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+}
+
+/* ---- PHONES ---- */
+@media (max-width: 970px) {
+  .af-slots {
+    gap: 8px;
+    padding-right: 14px;
+    opacity: 0.55;
+  }
+  .af-slots span {
+    width: 64px;
+  }
+  .af-slots span:nth-child(3) {
+    width: 76px;
+  }
+  .af-bar {
+    flex-wrap: nowrap;
+  }
+  /* Filters (Adrian): a column must not wrap -- a wrapping column takes its widest row's full length as its
+     width and pushed the page sideways. Rows that don't fit scroll inside their own tray. Smaller keys. */
+  .af-bar .gi-tab,
+  .af-row .gi-tab {
+    min-height: 28px;
+    padding: 0 8px;
+    gap: 5px;
+    font-size: 9.5px;
+    letter-spacing: 0.6px;
+  }
+  .af-row .gi-tab img,
+  .af-row .gi-tab svg {
+    width: 13px;
+    height: 13px;
+  }
+  .af-bar > .gi-tray {
+    flex: none;
+  }
+  .af-find-row {
+    flex: 1 0 100%;
+  }
+  .af-find {
+    max-width: none;
+  }
+  .af-more-key {
+    display: inline-flex;
+    flex: none;
+    height: 44px;
+  }
+  .af-more {
+    display: none;
+  }
+  .af-more.is-open {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .af-row > .gi-label {
+    width: 54px;
+  }
+  .af-row .gi-tray {
+    flex-wrap: nowrap;
+  }
+  .af-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .af-tile {
+    border-radius: 8px;
+  }
+  .af-tile-foot {
+    padding: 8px;
+  }
+  .af-tile-foot b {
+    font-size: 11px;
+  }
+  .af-tile-tag {
+    top: 5px;
+    left: 5px;
+    padding: 3px 5px 3px 4px;
+    font-size: 8px;
+    max-width: calc(100% - 10px);
+  }
+  .af-tile-tag img,
+  .af-tile-tag svg {
+    width: 11px;
+    height: 11px;
+  }
+  .af-new {
+    top: auto;
+    bottom: calc(27% + 2px);
+    right: 5px;
+    padding: 3px 4px;
+    font-size: 7.5px;
+  }
+
+  .af-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: calc(100% - 40px);
+    border-radius: 18px 18px 0 0;
+    border-bottom: 0;
+    transform: none;
+    transition: transform 0.22s var(--lb-ease);
+    animation-name: af-up;
+  }
+  .af-panel.is-dragging {
+    transition: none;
+  }
+  .af-dlg.is-closing .af-panel {
+    animation-name: af-down;
+  }
+  /* grab handle on top (GI.sheetDrag): drag the grip / header down, or pull the content down at the top */
+  .af-d-bar {
+    padding: 10px 10px 10px 16px;
+    touch-action: none;
+  }
+  .af-d-copy span {
+    display: none;
+  }
+  .af-d-copy {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+  .af-in {
+    grid-template-columns: 1fr;
+  }
+  .af-stage {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding: 18px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--gi-line);
+  }
+  .af-stage-art {
+    width: 150px;
+  }
+  .af-slots-row {
+    order: 3;
+  }
+  .af-slot {
+    width: 46px;
+  }
+  .af-piece {
+    order: 2;
+    flex: 1;
+    min-width: 150px;
+    text-align: left;
+  }
+  .af-piece p {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .af-info {
+    padding: 20px 16px 28px;
+  }
+  .af-bonus {
+    padding: 12px;
+    gap: 10px;
+  }
+  .af-bonus p {
+    font-size: 13px;
+  }
+}
+@media (max-width: 560px) {
+  .af-slots {
+    display: none;
+  }
+}
+@keyframes af-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes af-down {
+  to {
+    transform: translateY(100%);
+  }
+}

@@ -2597,6 +2597,26 @@ controls there. */
   text-decoration: none;
   transition: color 0.15s ease;
 }
+/* BREADCRUMB FONT (Oct 24 2026, Adrian): every breadcrumb on every page is
+   Oxanium (was Sora) -- set HERE only, page stylesheets don't set a crumb font.
+   Covers the shared trail (.stb-crumbs: CoC, Minecraft, Genshin, game sections,
+   Web Resources + article desktops), the articles' phone trail (.secondary-content
+   with .sc-sep) and the Web Resources / Minecraft phone trail (.secondary-content-
+   mobile + TH pages' .stb-page). html body .secondary-top-bar outranks the
+   pages' own "* { font-family }" resets. A plain page title stays Sora. */
+html body .secondary-top-bar .stb-crumbs,
+html body .secondary-top-bar .stb-crumbs *,
+html body .secondary-top-bar .secondary-content:has(> .sc-sep),
+html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
+  font-family: 'Oxanium', sans-serif;
+}
+@media (max-width: 970px) {
+  html body .secondary-top-bar .secondary-content:has(.secondary-content-mobile),
+  html body .secondary-top-bar .secondary-content:has(.secondary-content-mobile) *,
+  html body .secondary-top-bar .stb-page {
+    font-family: 'Oxanium', sans-serif;
+  }
+}
 /* Every step keeps its width except a page's own name (a player or clan,
    set by window.setCrumbName in thz-script.js), which gives way first and
    ends in "..." -- long names never push the bar's info button off. */
@@ -2646,7 +2666,6 @@ controls there. */
    Desktop only -- phones keep "Web Resources / <section>" from the
    scroll-spy. */
 .secondary-left > .stb-crumbs {
-  font-family: 'Sora', sans-serif;
   font-size: 13px;
 }
 @media (min-width: 971px) {
@@ -2995,6 +3014,9 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   html body .secondary-top-bar .stb-crumbs * {
     font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #eef0f3;
   }
+  /* Breadcrumbs are Oxanium (BREADCRUMB FONT); no negative tracking on it. */
+  html body .secondary-top-bar .stb-crumbs,
+  html body .secondary-top-bar .stb-crumbs * { font-family: 'Oxanium', sans-serif; letter-spacing: 0; }
   /* ...but a breadcrumb stays flat grey, current page included
      (BREADCRUMB above); the white "*" above would otherwise win. */
   html body .secondary-top-bar .stb-crumbs * { color: var(--text-muted, #949ba4); }
@@ -3013,7 +3035,7 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
      (to the width that still shows "Search Parchrome") to fit its half --
      --act-w is the buttons beside it, set by fitBar -- then TIGHT below */
   html body .stb-search-wrap {
-    order: 2; display: flex; flex: 0 1 280px; min-width: 210px;
+    order: 2; display: flex; flex: 0 1 232px; min-width: 210px; /* was 280px (Adrian, Oct 24 2026: too wide) */
     max-width: calc((100% - var(--hub-w, 0px)) / 2 - 12px - var(--act-w, 0px));
   }
   html body .secondary-top-bar > .stb-mobile-actions,
@@ -3692,4 +3714,63 @@ html body.coc-home .lob-sub strong {
   .lb-search { padding: 5px 5px 5px 16px; }
   .lb-search-input { font-size: 14.5px; }
   .lb-search-btn { width: 36px; height: 36px; }
+}
+
+/* ============================================================
+   FEEDBACK BOX (Oct 24 2026; was the home page's own form)
+   Any page: put <div data-feedback></div> where it goes and 11layout.js
+   ("FEEDBACK BOX") builds the form inside it and sends it to Firestore
+   "feedback" (with the page's path). Firebase only loads once someone
+   touches the form. The page keeps its own title above it.
+   Box = raised box; type switch = a well with the picked type as the grey
+   key; stars red; fields = wells; Send = the red key.
+   ============================================================ */
+.fb .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.fb { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.fb-seg { display: flex; gap: 4px; margin: 0; padding: 4px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
+.fb-seg label { flex: 1; position: relative; }
+.fb-seg input, .fb-stars input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
+.fb-seg span { display: block; padding: 10px 6px; border: 2px solid transparent; border-radius: 5px; text-align: center; white-space: nowrap; font: 600 13px/1.2 'Sora', sans-serif; color: #8b9099; transition: background-color 0.2s ease, color 0.2s ease; }
+.fb-seg label:hover input:not(:checked) + span { color: #fff; }
+.fb-seg input:checked + span { border-color: var(--lb-edge); background: var(--lb-raise); color: #fff; box-shadow: var(--lb-btn); }
+.fb-seg input:focus-visible + span, .fb-stars input:focus-visible + svg { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
+.fb-stars { display: flex; gap: 4px; align-self: flex-start; margin: 0; padding: 6px 8px; border: 0; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.fb-stars[hidden] { display: none; }
+.fb-stars label { position: relative; width: 36px; height: 36px; display: grid; place-items: center; }
+.fb-stars svg { width: 28px; height: 28px; fill: #33343a; transition: fill 0.15s ease, transform 0.2s var(--lb-ease); }
+.fb-stars label.is-on svg { fill: var(--lb-red); }
+.fb-stars label:hover svg { transform: scale(1.1); }
+.fb-field {
+  width: 100%; box-sizing: border-box; padding: 12px 14px;
+  border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: #fff; caret-color: var(--lb-red); font: 400 14px/1.5 'Sora', sans-serif;
+}
+.fb-field::placeholder { color: #8a8c93; }
+.fb-field:focus { outline: none; border-color: #000; box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text); }
+textarea.fb-field { min-height: 116px; resize: vertical; }
+.fb-row { display: flex; gap: 10px; }
+.fb-row .fb-field { flex: 1; min-width: 0; }
+.fb-send, .fb-ok {
+  display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; cursor: pointer;
+  border: 2px solid var(--lb-red-edge); border-radius: var(--lb-r); background: var(--lb-red); box-shadow: var(--lb-btn-red);
+  font: 600 14px/1 'Sora', sans-serif; color: #fff; white-space: nowrap;
+}
+.fb-send:hover, .fb-ok:hover { background: var(--lb-red-hover); }
+.fb-send[disabled] { opacity: 0.6; cursor: progress; }
+/* The send result: a native <dialog>, built on first use. */
+.fb-modal { margin: auto; width: min(360px, 88vw); padding: 26px 22px 20px; text-align: center; color: #fff; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow), 0 30px 60px -20px rgba(0, 0, 0, 0.9); }
+.fb-modal::backdrop { background: rgba(0, 0, 0, 0.62); }
+.fb-modal-icon { width: 46px; height: 46px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center; background: rgba(224, 48, 47, 0.15); color: var(--lb-red-text); }
+.fb-modal-icon.is-success { background: rgba(52, 168, 96, 0.16); color: #57d68d; }
+.fb-modal-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.fb-modal p { margin: 0; font: 400 14.5px/1.55 'Sora', sans-serif; color: #d7d8db; }
+.fb-modal form { margin-top: 18px; }
+.fb-ok { width: 100%; }
+@media (max-width: 970px) {
+  .fb { padding: 14px; }
+  .fb-seg { gap: 2px; padding: 3px; }
+  .fb-seg span { padding: 9px 2px; font-size: clamp(11px, 3.2vw, 13px); }
+  .fb-row { flex-direction: column; }
+  .fb-send { width: 100%; }
 }

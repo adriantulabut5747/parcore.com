@@ -18,6 +18,7 @@
 //                       every width (the phone arrangement).
 //   wire(root)          names on hover / tap, empty places, edge fades.
 //                       Call again after redrawing; listeners attach once.
+//   parse(code)         the code as units (see parseArmy), after load().
 (function armySheet() {
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -89,7 +90,9 @@
       });
       return m;
     };
-    var troop = by((d.troops || []).concat(d.sieges || []));
+    // eventTroops: temporary troops (Lavaloon...), for drawing a link only;
+    // the maker never lists them (scripts/build-event-troops.py).
+    var troop = by((d.troops || []).concat(d.sieges || [], d.eventTroops || []));
     (d.sieges || []).forEach(function (u) {
       troop[u.id].siege = true;
     });
@@ -142,7 +145,11 @@
           var n = parseInt(nx[0], 10);
           var spell = key === 'd' || key === 's';
           var u = (spell ? units.spell : units.troop)[nx[1]];
-          if (!u || !(n > 0)) return;
+          if (!(n > 0) || !/^\d+$/.test(nx[1] || '')) return;
+          // An id we don't know yet (a brand-new event troop): a "?" tile
+          // with its count, so the army isn't silently missing a unit. Its
+          // housing isn't known, so used() counts it as 1 a unit.
+          if (!u) u = { id: nx[1], name: (spell ? 'Unknown spell' : 'Unknown troop') + ' (id ' + nx[1] + ')', space: 0, img: null };
           var cc = key === 'i' || key === 'd';
           var list = spell ? (cc ? 'ccSpells' : 'spells') : u.siege ? (cc ? 'ccSieges' : 'sieges') : cc ? 'ccTroops' : 'troops';
           out[list].push({ u: u, n: n });
@@ -164,7 +171,8 @@
     var label = x.n + ' ' + x.u.name;
     // Super troops get a red count chip (.is-super) so they stand out.
     var sup = x.u.super ? ' is-super' : '';
-    var inner = `<img src="${esc(units.dir + x.u.img)}" alt="" loading="lazy" decoding="async"><b class="as-n">×${x.n}</b>`;
+    var pic = x.u.img ? `<img src="${esc(units.dir + x.u.img)}" alt="" loading="lazy" decoding="async">` : '<span class="as-unknown" aria-hidden="true">?</span>';
+    var inner = `${pic}<b class="as-n">×${x.n}</b>`;
     if (edit)
       return `<button type="button" class="as-tile${sup}" data-sheet="remove" data-kind="${kind}" data-id="${x.u.id}" aria-label="Remove one ${esc(x.u.name)} (${x.n})" title="${esc(label)}" data-name="${esc(x.u.name)} ×${x.n}">${inner}</button>`;
     return `<span class="as-tile${sup}" role="img" aria-label="${esc(label)}" title="${esc(label)}" data-name="${esc(x.u.name)} ×${x.n}">${inner}</span>`;
@@ -363,33 +371,47 @@
   // data-slots, up to that many places) and never make a row scroll.
   // The row's width never depends on them, so refilling on resize can't
   // loop. OVERLAP matches the tiles' negative margin in th-layouts.css.
+  // Many rows at once (the Player Tracker draws 24 sheets = ~100 rows): all
+  // writes, then all reads, then all writes, so the page is laid out once.
+  // Measuring row by row between writes laid the whole page out ~200 times
+  // and froze it for seconds.
   var OVERLAP = 4;
-  function fillRow(row) {
-    [].slice.call(row.querySelectorAll('.as-ph')).forEach((p) => p.remove());
-    var items = row.children;
-    var slots = parseInt(row.dataset.slots, 10);
-    var n;
-    if (slots) n = slots - items.length;
-    else {
-      var probe = document.createElement('span');
-      probe.className = 'as-tile as-ph';
-      row.appendChild(probe);
-      var tile = probe.offsetWidth;
-      probe.remove();
+  function fillRows(rows) {
+    var jobs = rows.map(function (row) {
+      [].slice.call(row.querySelectorAll('.as-ph')).forEach((p) => p.remove());
+      var slots = parseInt(row.dataset.slots, 10);
+      var probe = null;
+      if (!slots) {
+        probe = document.createElement('span');
+        probe.className = 'as-tile as-ph';
+        row.appendChild(probe);
+      }
+      return { row: row, slots: slots, probe: probe, n: 0 };
+    });
+    jobs.forEach(function (j) {
+      var row = j.row;
+      if (j.slots) {
+        j.n = j.slots - row.children.length;
+        return;
+      }
+      var tile = j.probe.offsetWidth;
       if (!tile) return; // row not laid out (card on another page)
       var step = tile - OVERLAP;
-      var last = items[items.length - 1];
+      var last = j.probe.previousElementSibling;
       // place k's right edge: after units, lastRight + k*step; in an empty
       // row, k*step + OVERLAP (the first place has no overlap).
       var start = last ? last.getBoundingClientRect().right - row.getBoundingClientRect().left + row.scrollLeft : OVERLAP;
-      n = Math.floor((row.clientWidth - start) / step);
-    }
-    for (var i = 0; i < n; i++) {
-      var ph = document.createElement('span');
-      ph.className = 'as-tile as-ph';
-      ph.setAttribute('aria-hidden', 'true');
-      row.appendChild(ph);
-    }
+      j.n = Math.floor((row.clientWidth - start) / step);
+    });
+    jobs.forEach(function (j) {
+      if (j.probe) j.probe.remove();
+      for (var i = 0; i < j.n; i++) {
+        var ph = document.createElement('span');
+        ph.className = 'as-tile as-ph';
+        ph.setAttribute('aria-hidden', 'true');
+        j.row.appendChild(ph);
+      }
+    });
   }
   function edgeFade(row) {
     var max = row.scrollWidth - row.clientWidth;
@@ -399,24 +421,25 @@
   var ro =
     'ResizeObserver' in window
       ? new ResizeObserver(function (es) {
-          es.forEach(function (e) {
-            if (e.target.classList.contains('as-row')) fillRow(e.target);
-            edgeFade(e.target);
-          });
+          var rows = es.map((e) => e.target);
+          fillRows(rows.filter((r) => r.classList.contains('as-row')));
+          rows.forEach(edgeFade);
         })
       : null;
   var docWired = false;
   function wireSheets(root) {
+    var fresh = [];
     root.querySelectorAll('.as-row, .as-hero-row').forEach(function (row) {
       if (row.dataset.wired) return;
       row.dataset.wired = '1';
       row.addEventListener('scroll', () => edgeFade(row), { passive: true });
       if (ro) ro.observe(row);
-      else {
-        if (row.classList.contains('as-row')) fillRow(row);
-        edgeFade(row);
-      }
+      else fresh.push(row);
     });
+    if (fresh.length) {
+      fillRows(fresh.filter((r) => r.classList.contains('as-row')));
+      fresh.forEach(edgeFade);
+    }
     // A redrawn sheet takes the shown name away with its old nodes.
     if (namedLabel && !document.contains(namedLabel)) namedLabel = namedTile = null;
     if (root.dataset.sheetWired) return;
@@ -470,5 +493,6 @@
     },
     html: sheetHtml,
     wire: wireSheets,
+    parse: parseArmy, // after load(): the Player Tracker's battle log draws a slim army strip from it
   };
 })();

@@ -9,6 +9,69 @@ function cocPagePath(u) {
     .replace(/(.)\/$/, '$1');
 }
 
+// SHEET DRAG (phones; Oct 25 2026, copied from genshin-core.js GI.sheetDrag for the
+// Equipment panel and the Damage Calculator's attack sheet): drag the grip (.sheet-grip)
+// or the header down to close a bottom sheet; pulling the content down once it's at
+// the top drags it too. Touch events for the pull, not pointer: the browser cancels
+// pointers on a scroller. `hide` = the page's animated close; the inline transform
+// is cleared by the page when the sheet closes (or here, if it's a <dialog>).
+function cocSheetDrag(sheet, handles, body, hide) {
+  const phone = () => matchMedia('(max-width: 970px)').matches;
+  let drag = null;
+  let last = null;
+  const start = (y) => {
+    drag = { y, dy: 0, t: performance.now() };
+    sheet.classList.add('is-dragging');
+  };
+  const move = (y) => {
+    drag.dy = Math.max(0, y - drag.y);
+    sheet.style.transform = `translateY(${drag.dy}px)`;
+  };
+  const end = () => {
+    last = null;
+    if (!drag) return;
+    const fast = drag.dy / (performance.now() - drag.t) > 0.6;
+    sheet.classList.remove('is-dragging');
+    if (drag.dy > 120 || (fast && drag.dy > 30)) hide();
+    else sheet.style.transform = '';
+    drag = null;
+  };
+  handles.forEach((el) => {
+    el.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('button') || !phone()) return;
+      start(e.clientY);
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener('pointermove', (e) => drag && move(e.clientY));
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  });
+  body.addEventListener(
+    'touchstart',
+    (e) => {
+      last = e.touches.length === 1 && phone() ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    },
+    { passive: true },
+  );
+  body.addEventListener(
+    'touchmove',
+    (e) => {
+      if (!last) return;
+      const { clientX: x, clientY: y } = e.touches[0];
+      if (!drag && body.scrollTop <= 0 && y - last.y > Math.abs(x - last.x)) start(y);
+      last = { x, y };
+      if (!drag) return;
+      if (e.cancelable) e.preventDefault();
+      move(y);
+    },
+    { passive: false },
+  );
+  body.addEventListener('touchend', end);
+  body.addEventListener('touchcancel', end);
+  const dlg = sheet.closest('dialog');
+  if (dlg) dlg.addEventListener('close', () => (sheet.style.transform = ''));
+}
+
 /* =======================================================================
    TOWN HALL LAYOUTS PAGES (thNN-layouts.html) -- shared script.
    Every TH layouts page loads this (defer, at the end of <body>) with
@@ -522,7 +585,7 @@ function cocPagePath(u) {
     return tidy`
       <div class="discord-card" id="base-${id}">
         <div class="card-media sk">
-          <img src="${esc(page.imageDir + b.image)}" alt="TH${page.th} base layout ${b.id}" class="zoomable" loading="lazy" onclick="openPalette(this)" onload="this.parentNode.classList.remove('sk')" onerror="this.parentNode.classList.remove('sk')">${b.new ? '<span class="new-tag">New</span>' : ''}
+          <img src="${esc(page.imageDir + b.image)}" alt="TH${page.th} base layout ${b.id}" class="zoomable" loading="lazy" onclick="openPalette(this)" onload="this.parentNode.classList.remove('sk')" onerror="this.parentNode.classList.remove('sk')">${b.hot ? '<span class="base-tag base-tag--hot">Hot</span>' : b.new ? '<span class="base-tag base-tag--new">New</span>' : ''}
           <button type="button" class="th-cc" aria-expanded="false" aria-label="Show recommended clan castle troops" title="Recommended CC"><img src="${esc(page.icon)}" alt="" decoding="async"></button>
           <div class="cc-popup" role="dialog" aria-label="Recommended clan castle troops"><div class="ccp-head"><span class="ccp-title">Clan Castle</span><span class="ccp-note">Recommended</span></div><ul class="ccp-list">${cc}</ul></div>
         </div>

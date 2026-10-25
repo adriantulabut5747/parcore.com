@@ -1,7 +1,7 @@
-// Quick check of the tag cleaner in netlify/functions/coc-api.mjs.
+// Quick check of the tag cleaner in cloudflare/coc-api/worker.js.
 // Run: node scripts/test-coc-api.mjs   (prints "ok" or throws)
 import assert from 'node:assert';
-import { cleanTag } from '../netlify/functions/coc-api.mjs';
+import { cleanTag } from '../cloudflare/coc-api/worker.js';
 
 assert.equal(cleanTag('#2gypgpjp9'), '2GYPGPJP9');
 assert.equal(cleanTag(' #2GY PGP-JP9 '), '2GYPGPJP9');

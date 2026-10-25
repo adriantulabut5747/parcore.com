@@ -2,7 +2,7 @@
 // equipment counts of the world's top 200 for /coc/stats/ and the lobby teaser on /coc/.
 // Plan: docs/coc-lobby-plan.md.
 //
-// Run once a day by .github/workflows/lobby-stats.yml. Same setup as
+// Run once a week (Monday, before the league reset) by .github/workflows/lobby-stats.yml. Same setup as
 // clan-stats.mjs: the key is the COC_API_KEY secret, and calls go through
 // RoyaleAPI's proxy (45.79.218.79 is the IP registered on the key).
 //
@@ -70,7 +70,7 @@ const homeProfiles = await profilesOf(players.items);
 const builderProfiles = await profilesOf(builderPlayers.items);
 const globalProfiles = await profilesOf(globalPlayers.items);
 
-// Arrows on the page = change since the previous daily file. Supercell's own
+// Arrows on the page = change since the previous weekly file. Supercell's own
 // previousRank isn't "yesterday" (the #1 player showed +33, most rows +500),
 // so it isn't used. Same-day re-runs (Run workflow by hand) keep the
 // earlier baseline instead of resetting every arrow to "no change".

@@ -56,6 +56,7 @@ Two data paths:
 1. **Daily job → `site/coc-lobby-stats.json` (PH only).** It's a new
    `scripts/lobby-stats.mjs` plus `.github/workflows/lobby-stats.yml`, copied
    from the clan-stats pair.
+   (Oct 24 2026: now once a week, Monday 03:00 UTC, before the league reset.)
    It runs once a day, not every 15/30 min: rankings move slowly, and every
    commit triggers a Netlify deploy, which costs credits. It holds:
    - PH top players / clans / builder base / capital (trimmed to the fields shown)

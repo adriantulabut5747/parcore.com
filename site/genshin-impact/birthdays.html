@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genshin Impact character birthdays: calendar, next birthday and letters | Parchrome</title>
+<meta name="description" content="Every Genshin Impact character birthday on one calendar: whose birthday is today and next, the letter and gifts they send you, what they say on your birthday, and a calendar file with them all.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261024fb">
+<link rel="stylesheet" href="/coc-more.css?v=20261022gn">
+<link rel="stylesheet" href="/coc-help.css?v=20261024cc">
+<link rel="stylesheet" href="/genshin.css?v=20261025a">
+<link rel="stylesheet" href="/genshin-birthdays.css?v=20261025a">
+</head>
+<body class="gi-page" data-game-nav="genshin-impact">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/genshin.jpg" alt="" class="th-icon">
+    <div class="secondary-content">Genshin Impact</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Genshin Impact pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main">
+    <div class="coc-content">
+      <main class="gi bd">
+      <div class="gi-frame">
+
+        <!-- HEADER: the shared .gi-tb (genshin.css). Its art = the next five birthdays' wish cards, fanned like the
+             Characters header, each with its date (genshin-birthdays.js "HEADER"). Icon = a drawn cake. -->
+        <header class="gi-tb bd-tb">
+          <div class="gi-tb-art bd-fan" id="bdFan" aria-hidden="true"></div>
+          <div class="gi-tb-body">
+            <img class="gi-tb-icon" src="/images/genshin/nav/birthdays.webp" alt="" width="76" height="76">
+            <div class="gi-tb-copy">
+              <h1 class="gi-title"><span class="gi-vh">Genshin Impact </span>Character <em>birthdays</em></h1>
+              <p class="gi-tb-desc">Every character's birthday on one calendar, who's next, the letter they send you, and what they say on yours.</p>
+              <ul class="gi-tb-facts" id="bdFacts"></ul>
+            </div>
+          </div>
+        </header>
+
+        <!-- Jump tray (sections) + Add to calendar + server. "Today" follows the server's 04:00 reset (GI.gameDay). -->
+        <div class="gi-bar bd-bar">
+          <nav class="gi-tray bd-jump" aria-label="On this page">
+            <a class="gi-tab" href="#spotlight">Spotlight</a>
+            <a class="gi-tab" href="#year">Calendar</a>
+            <a class="gi-tab" href="#you">Your birthday</a>
+            <a class="gi-tab" href="#facts">Facts</a>
+          </nav>
+          <div class="bd-bar-r">
+            <a class="gi-key" href="#calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>Add to calendar</a>
+            <div class="gi-tray gi-tray--sm" id="bdServer" role="tablist" aria-label="Server">
+              <button type="button" class="gi-tab" data-server="asia" role="tab">Asia</button>
+              <button type="button" class="gi-tab" data-server="america" role="tab">NA</button>
+              <button type="button" class="gi-tab" data-server="europe" role="tab">EU</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPOTLIGHT: one character (today's birthday, else the next one; any face on the page swaps it, ?c=<slug>).
+             Left = their wish card on their namecard; middle = who they are + countdown; right = the drawn
+             letter (their newest birthday mail from the wiki: envelope, our red wax seal) and its gifts.
+             Fixed height: the letter scrolls inside, so switching never moves the page. -->
+        <section class="bd-spot-wrap" id="spotlight" aria-label="Birthday spotlight">
+          <div class="gi-box bd-spot" id="bdSpot"><p class="gi-empty">Loading the birthdays&hellip;</p></div>
+          <div class="gi-tray bd-next" id="bdNext" role="group" aria-label="Coming up"></div>
+        </section>
+
+        <!-- THE YEAR: the drawn ring (every birthday a dot in its element's colour, today's hand) + the 12
+             months as calendars (phones: one month at a time, picked in the tray). Filters dim faces instead
+             of removing them, so nothing changes height. -->
+        <section class="gi-sec" id="year" aria-labelledby="bdYearT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="bdYearT">The <em>year.</em></h2><p class="mch-sec-sub">Every birthday, month by month. Tap a face to put it in the spotlight.</p></div>
+          </header>
+          <!-- Filters: one labelled tray each. Phones fold them behind the Filters key (bdFKey). -->
+          <div class="bd-filters">
+            <button type="button" class="gi-key bd-fkey" id="bdFKey" aria-expanded="false" aria-controls="bdFRows"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Filters<b id="bdFN" hidden></b></button>
+            <div class="bd-frows" id="bdFRows">
+              <div class="bd-frow"><span class="gi-label">Element</span><div class="gi-tray gi-tray--sm" id="bdEl" role="group" aria-label="Element"></div></div>
+              <div class="bd-frow"><span class="gi-label">Nation</span><div class="gi-tray gi-tray--sm" id="bdNat" role="group" aria-label="Nation"></div></div>
+              <div class="bd-frow"><span class="gi-label">Rarity</span><div class="gi-tray gi-tray--sm" id="bdRar" role="group" aria-label="Rarity"></div></div>
+            </div>
+            <p class="bd-count"><span id="bdCount" aria-live="polite"></span><button type="button" class="bd-clear" id="bdClear" hidden>Clear filters</button></p>
+          </div>
+          <div class="bd-year">
+            <div class="gi-box bd-ring-box">
+              <div class="bd-ring" id="bdRing"></div>
+            </div>
+            <div class="bd-cal">
+              <div class="gi-tray gi-tray--sm bd-mtabs" id="bdMTabs" role="tablist" aria-label="Month"></div>
+              <div class="bd-months" id="bdMonths"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- YOUR BIRTHDAY: month + day (localStorage gi-bday, try/catch). Who shares it, who's closest, the
+             countdown, then every character's "Birthday" voice line (yatta avatarFetter) as a swipe row. -->
+        <section class="gi-sec" id="you" aria-labelledby="bdYouT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="bdYouT">Your <em>birthday.</em></h2><p class="mch-sec-sub">Tell us yours: who shares it, and what every character says to you on the day.</p></div>
+          </header>
+          <div class="gi-box bd-you">
+            <div class="bd-you-pick">
+              <span class="gi-label">Your birthday</span>
+              <div class="bd-you-row">
+                <label class="bd-sel"><span class="gi-vh">Month</span><select id="bdYouM"></select></label>
+                <label class="bd-sel bd-sel--d"><span class="gi-vh">Day</span><select id="bdYouD"></select></label>
+              </div>
+              <p class="bd-you-note">Saved on this device only.</p>
+            </div>
+            <div class="bd-you-out" id="bdYouOut"></div>
+          </div>
+          <div class="bd-lines-head">
+            <div><span class="gi-label">On your birthday</span><p class="bd-lines-sub">Their "Birthday" voice line, word for word.</p></div>
+            <div class="gi-acts">
+              <label class="lb-search bd-find" for="bdQ">
+                <span class="gi-vh">Find a character</span>
+                <input id="bdQ" class="lb-search-input" type="search" placeholder="Find a character" autocomplete="off" spellcheck="false">
+                <span class="lb-search-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+              </label>
+              <button type="button" class="gi-key gi-arrow" data-dir="-1" aria-label="Scroll left"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <button type="button" class="gi-key gi-arrow" data-dir="1" aria-label="Scroll right"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+          <div class="bd-lines" id="bdLines"></div>
+        </section>
+
+        <!-- FACTS: counted from the feed, nothing typed in. Months as bars, nations, shared days, the longest
+             wait, and your characters (Farm today's gi-farm-mine list). -->
+        <section class="gi-sec" id="facts" aria-labelledby="bdFactsT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="bdFactsT">By the <em>numbers.</em></h2><p class="mch-sec-sub">Counted from the current roster.</p></div>
+          </header>
+          <div class="bd-facts" id="bdFactGrid"></div>
+        </section>
+
+        <!-- ADD TO CALENDAR: a yearly-repeating .ics file, made in the browser (no server). -->
+        <section class="gi-sec" id="calendar" aria-labelledby="bdIcsT">
+          <div class="gi-box bd-ics">
+            <div class="bd-ics-art" id="bdIcsArt" aria-hidden="true"></div>
+            <div class="bd-ics-copy">
+              <h2 class="gi-title" id="bdIcsT">Never miss <em>one.</em></h2>
+              <p>A calendar file with every birthday, repeating each year. Open it with Apple Calendar or Outlook, or import it in Google Calendar (Settings, Import &amp; export).</p>
+              <div class="bd-ics-keys" id="bdIcsKeys">
+                <button type="button" class="gi-key gi-key--red" data-ics="all">All birthdays</button>
+                <button type="button" class="gi-key" data-ics="mine" hidden>Only my characters</button>
+                <button type="button" class="gi-key" data-ics="shown" hidden>Only the filtered ones</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- HOW BIRTHDAYS WORK: static, hand-written (Oct 24 2026). Adrian to fact-check every line. -->
+        <section class="gi-sec" id="how" aria-labelledby="bdHowT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="bdHowT">How birthdays <em>work.</em></h2><p class="mch-sec-sub">What happens in game on the day.</p></div>
+          </header>
+          <div class="gi-tips">
+            <ul class="gi-box">
+              <li><b>They write to you</b><p>On a character's birthday, a letter from them arrives in your in-game mail, with gifts attached.</p></li>
+              <li><b>Gifts come with the letter</b><p>Often their special dish or something they made, plus a few materials. The letter in the spotlight lists this year's real attachments.</p></li>
+              <li><b>The day starts at the daily reset</b><p>Birthdays follow the server's 04:00 reset, like commissions, so Asia, America and Europe flip at different hours.</p></li>
+              <li><b>Claim the gifts in time</b><p>Mail expires. Star a letter to keep it in your Collected Mail after the gifts are claimed.</p></li>
+              <li><b>Set your own in your profile</b><p>Pick your birthday in the Paimon Menu profile and you get a letter of your own on the day.</p></li>
+              <li><b>A new drawing every year</b><p>HoYoverse posts official birthday art for the character each year on HoYoLAB and the game's socials.</p></li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="gi-more">
+          <a class="gi-box gi-card" href="/genshin-impact/characters">
+            <div><b>All characters</b><p>Every playable character, by nation or newest first.</p></div>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="gi-box gi-card" href="/genshin-impact/farm">
+            <div><b>Farm today</b><p>Pick your characters there and this page marks their birthdays too.</p></div>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+        <p class="gi-note">"Today" follows the server you pick: the game day starts at 04:00 server time. The Traveler's birthday is the one you set, so they aren't on the calendar. Each letter is the character's newest birthday mail; older years are on the wiki.</p>
+        <p class="gi-credit">Game assets &copy; HoYoverse. Parchrome is a fan site and isn't affiliated with HoYoverse. Birthdays, profiles, namecards and voice lines: Project Amber (gi.yatta.moe). Birthday letters: the Genshin Impact Wiki (Fandom, CC BY-SA). Checked every three hours.</p>
+
+      </div>
+      </main>
+ <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/genshin.jpg" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Genshin Impact Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261024fb"></script>
+<script src="/genshin-core.js?v=20261025a"></script>
+<script src="/genshin-birthdays.js?v=20261024jn"></script>
+</body>
+</html>

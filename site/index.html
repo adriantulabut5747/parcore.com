@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/11layout.css?v=20261023bc">
+<link rel="stylesheet" href="/11layout.css?v=20261024fb">
 <link rel="stylesheet" href="/article-cards.css?v=20261021as">
 
 <!-- ============================================================
@@ -511,39 +511,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
    ============================================================ */
 .hm-help { background: var(--hm-grain), var(--hm-bg); padding: 72px var(--hm-gut) 80px; border-top: 2px solid var(--lb-edge); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
 .hm-help-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 4vw, 64px); align-items: start; }
-.hm-fb-box { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; padding: 18px;background: var(--hm-panel);}
-.hm-fb-box {
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background-color: var(--lb-box);
-  box-shadow: var(--lb-shadow);
-}
-.hm-seg { display: flex; gap: 4px; padding: 4px; border: 0; border-radius: var(--lb-r); background: #0c0c0d; }
-.hm-seg label { flex: 1; position: relative; }
-.hm-seg input, .hm-stars input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
-.hm-seg span { display: block; padding: 10px 6px; border-radius: var(--lb-r); text-align: center; font: 600 13px/1.2 'Sora', sans-serif; color: var(--hm-muted); transition: background 0.2s ease, color 0.2s ease; }
-.hm-seg input:checked + span { background: #26262a; color: #fff; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset; }
-.hm-seg input:focus-visible + span, .hm-stars input:focus-visible + svg { outline: 2px solid var(--hm-red); outline-offset: 2px; }
-.hm-stars { display: flex; gap: 4px; border: 0; }
-.hm-stars[hidden] { display: none; }
-.hm-stars label { position: relative; width: 36px; height: 36px; display: grid; place-items: center; }
-.hm-stars svg { width: 28px; height: 28px; fill: #33343a; transition: fill 0.15s ease, transform 0.2s var(--hm-ease); border-radius: var(--lb-r); }
-.hm-stars label.is-on svg { fill: #f2b01e; }
-.hm-stars label:hover svg { transform: scale(1.1); }
-.hm-field {
-  width: 100%; padding: 12px 14px;
-  background: #0c0c0d; color: #fff; caret-color: var(--hm-red);
-  font: 400 14px/1.5 'Sora', sans-serif; transition: border-color 0.2s ease;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background-color: var(--lb-well);
-  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-.hm-field::placeholder { color: #8a8c93; }
-.hm-field:focus { outline: none; border-color: #000; box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text); }
-textarea.hm-field { min-height: 116px; resize: vertical; }
-.hm-fb-row { display: flex; gap: 10px; }
-.hm-fb-row .hm-field { flex: 1; min-width: 0; }
+.hm-fb [data-feedback] { margin-top: 22px; }
 
 .hm-faq-list { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
 .hm-q {background: var(--hm-panel);transition: border-color 0.2s ease; }
@@ -567,25 +535,14 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 @media (max-width: 970px) {
   .hm-help { padding: 44px var(--hm-gut) 52px; }
   .hm-help-grid { grid-template-columns: 1fr; gap: 44px; }
-  .hm-fb-row { flex-direction: column; }
-  .hm-fb-row .hm-btn { width: 100%; }
   .hm-q summary { padding: 14px 16px; font-size: 14px; }
   .hm-a { padding: 0 16px 16px; font-size: 13.5px; }
+  /* Phones: open at once and fade in (a height animation re-lays out the page every frame and stutters). */
+  .hm-q::details-content { transition: none; }
+  .hm-q[open] .hm-a { animation: hm-a-in 0.2s var(--hm-ease); }
 }
+@keyframes hm-a-in { from { opacity: 0; transform: translateY(-6px); } }
 
-/* ---- Modal (native <dialog>) for the feedback form's messages ---- */
-.hm-modal {
-  margin: auto; width: min(360px, 88vw); padding: 26px 22px 20px; border-radius: var(--lb-r); text-align: center;
-  background: #151517; color: #fff; border: 1px solid var(--hm-line-2);
-  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9);
-}
-.hm-modal::backdrop { background: rgba(0, 0, 0, 0.62); }
-.hm-modal-icon { width: 46px; height: 46px; margin: 0 auto 14px; border-radius: var(--lb-r); display: grid; place-items: center; background: rgba(224, 48, 47, 0.15); color: var(--hm-red-soft); }
-.hm-modal-icon.is-success { background: rgba(52, 168, 96, 0.16); color: #57d68d; }
-.hm-modal-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.hm-modal p { font-size: 14.5px; line-height: 1.55; color: #d7d8db; }
-.hm-modal form { margin-top: 18px; }
-.hm-modal .hm-btn { width: 100%; }
 .hm-btn:not(.hm-btn-ghost):hover {
   border-color: var(--lb-red-edge);
   background: var(--lb-red-hover);
@@ -727,22 +684,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
   .hm-latest .art-track { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; }
 }
 
-/* Feedback: the type switch is a well, the picked type a light key */
-.hm-seg { padding: 4px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
-.hm-seg span { border: 2px solid transparent; border-radius: 5px; }
-.hm-seg label:hover input:not(:checked) + span { color: #fff; }
-/* picked = the dark grey key (Adrian: no white buttons here, Oct 21 2026) */
-.hm-seg input:checked + span { border-color: var(--lb-edge); background: var(--lb-raise); color: #fff; box-shadow: var(--lb-btn); }
-/* the three types always share one line ("Report a bug" used to wrap on phones) */
-.hm-seg span { white-space: nowrap; }
-@media (max-width: 970px) {
-  .hm-seg { gap: 2px; padding: 3px; }
-  .hm-seg span { padding: 9px 2px; font-size: clamp(11px, 3.2vw, 13px); }
-}
-.hm-stars { padding: 6px 8px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); align-self: flex-start; }
-.hm-stars svg { border-radius: 0; }
-.hm-fb-box { padding: 20px; }
-@media (max-width: 970px) { .hm-fb-box { padding: 14px; } }
 
 /* FAQ: lifts on hover, open one reads as pressed in */
 .hm-q { transition: background-color 0.2s ease, box-shadow 0.2s ease; }
@@ -750,9 +691,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 .hm-q[open] { background-color: var(--lb-box-hover); }
 .hm-q summary { border-radius: var(--lb-r); }
 
-/* Modal: a box */
-.hm-modal { border: 2px solid var(--lb-edge); background: var(--lb-box); box-shadow: var(--lb-shadow), 0 30px 60px -20px rgba(0, 0, 0, 0.9); }
-.hm-modal-icon { border-radius: 50%; }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-content > * { animation: none; }
@@ -1242,29 +1180,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
       <div class="hm-fb">
         <h2 class="hm-title">Send feedback</h2>
         <p class="hm-lede">Suggest a guide or a game, report a bug, or rate the site.</p>
-        <form class="hm-fb-box" id="fbForm" novalidate>
-          <fieldset class="hm-seg">
-            <legend class="sr-only">Feedback type</legend>
-            <label><input type="radio" name="fbType" value="rating" checked><span>Rate us</span></label>
-            <label><input type="radio" name="fbType" value="suggestion"><span>Suggestion</span></label>
-            <label><input type="radio" name="fbType" value="bug"><span>Report a bug</span></label>
-          </fieldset>
-          <fieldset class="hm-stars" id="fbStars">
-            <legend class="sr-only">Your rating</legend>
-            <label><input type="radio" name="fbRating" value="1" aria-label="1 star"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></label>
-            <label><input type="radio" name="fbRating" value="2" aria-label="2 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></label>
-            <label><input type="radio" name="fbRating" value="3" aria-label="3 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></label>
-            <label><input type="radio" name="fbRating" value="4" aria-label="4 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></label>
-            <label><input type="radio" name="fbRating" value="5" aria-label="5 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></label>
-          </fieldset>
-          <label class="sr-only" for="fbMessage">Message</label>
-          <textarea class="hm-field" id="fbMessage" placeholder="Tell us why you gave this rating (optional)"></textarea>
-          <div class="hm-fb-row">
-            <label class="sr-only" for="fbEmail">Email or in-game name</label>
-            <input class="hm-field" id="fbEmail" type="text" placeholder="Email or in-game name (required)" autocomplete="email">
-            <button class="hm-btn" id="fbSubmit" type="submit">Send</button>
-          </div>
-        </form>
+        <div data-feedback></div>
       </div>
 
       <div class="hm-faq">
@@ -1299,11 +1215,6 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
       </div>
     </div>
 
-    <dialog class="hm-modal" id="siteModal" aria-labelledby="siteModalMessage">
-      <div class="hm-modal-icon" id="siteModalIcon"></div>
-      <p id="siteModalMessage"></p>
-      <form method="dialog"><button class="hm-btn" type="submit">OK</button></form>
-    </dialog>
   </section>
 
   </div><!-- /#homeBelow -->
@@ -1334,7 +1245,7 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
 </div><!-- /.main -->
 
 <!-- Sidebar, top-bar search, scroll-to-top, pull-to-refresh: all shared, from 11layout.js. -->
-<script src="/11layout.js?v=20261023gp"></script>
+<script src="/11layout.js?v=20261024fb"></script>
 <script>
 /* ============================================================
    HOME PAGE SCRIPT (Oct 2026 rebuild). Needs 11layout.js first
@@ -1680,126 +1591,8 @@ textarea.hm-field { min-height: 116px; resize: vertical; }
     io.observe(about.querySelector('.hm-about-grid') || about);
   })();
 
-  // ---------- FEEDBACK FORM -> Firestore "feedback" collection.
-  // Firebase loads deferred at the end of the page; it is only touched on send.
-  (function () {
-    const form = document.getElementById('fbForm');
-    if (!form) return;
-    const stars = document.getElementById('fbStars');
-    const message = document.getElementById('fbMessage');
-    const email = document.getElementById('fbEmail');
-    const submit = document.getElementById('fbSubmit');
-    const modal = document.getElementById('siteModal');
-
-    const PLACEHOLDERS = {
-      rating: 'Tell us why you gave this rating (optional)',
-      suggestion: 'Which guide, game or tool would you like to see?',
-      bug: 'Describe the bug and the page you found it on'
-    };
-    const ICONS = {
-      error: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v6"/><path d="M12 17h.01"/></svg>',
-      success: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'
-    };
-
-    function showModal(text, type) {
-      const icon = document.getElementById('siteModalIcon');
-      icon.innerHTML = ICONS[type === 'success' ? 'success' : 'error'];
-      icon.classList.toggle('is-success', type === 'success');
-      document.getElementById('siteModalMessage').textContent = text;
-      if (modal.showModal) modal.showModal(); else alert(text);
-    }
-    // Clicking the dimmed backdrop closes the dialog too.
-    modal.addEventListener('click', e => { if (e.target === modal) modal.close(); });
-
-    let type = 'rating';
-    let rating = 0;
-    form.addEventListener('change', e => {
-      if (e.target.name === 'fbType') {
-        type = e.target.value;
-        stars.hidden = type !== 'rating';
-        message.placeholder = PLACEHOLDERS[type];
-      }
-      if (e.target.name === 'fbRating') {
-        rating = Number(e.target.value);
-        stars.querySelectorAll('label').forEach((l, i) => l.classList.toggle('is-on', i < rating));
-      }
-    });
-
-    // Spam guard: at most 5 messages per 10 minutes, tracked in localStorage.
-    const LIMIT = 5;
-    const WINDOW_MS = 10 * 60 * 1000;
-    const LOG_KEY = 'parchrome_feedback_log';
-    function sentLog() {
-      try {
-        const cutoff = Date.now() - WINDOW_MS;
-        return (JSON.parse(localStorage.getItem(LOG_KEY)) || []).filter(t => t > cutoff);
-      } catch (e) { return []; }
-    }
-    function recordSend() {
-      try { localStorage.setItem(LOG_KEY, JSON.stringify(sentLog().concat(Date.now()))); } catch (e) {}
-    }
-    function wait(ms) {
-      const s = Math.ceil(ms / 1000);
-      return s >= 60 ? Math.floor(s / 60) + 'm ' + (s % 60) + 's' : s + 's';
-    }
-
-    const FIREBASE_CONFIG = {
-      apiKey: 'AIzaSyAa8B5rIP0Y9w9jBN_mzKzkFW3xMdI9wgo',
-      authDomain: 'parchrome-feedback.firebaseapp.com',
-      projectId: 'parchrome-feedback',
-      storageBucket: 'parchrome-feedback.firebasestorage.app',
-      messagingSenderId: '546895020356',
-      appId: '1:546895020356:web:f145067c0b71dde2341711'
-    };
-    function db() {
-      if (!window.firebase || !firebase.firestore) throw new Error('Firebase not loaded');
-      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-      return firebase.firestore();
-    }
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const text = message.value.trim();
-      const who = email.value.trim();
-      if (type === 'rating' && !rating) return showModal('Pick a star rating before sending.');
-      if (type !== 'rating' && !text) return showModal('Write a message before sending.');
-      if (!who) { showModal('Add your email or in-game name before sending.'); email.focus(); return; }
-      const log = sentLog();
-      if (log.length >= LIMIT) {
-        return showModal('You have sent ' + LIMIT + ' messages in the last 10 minutes. Wait ' + wait(Math.min(...log) + WINDOW_MS - Date.now()) + ' before sending another.');
-      }
-      submit.disabled = true;
-      submit.textContent = 'Sending...';
-      Promise.resolve().then(() => db().collection('feedback').add({
-        type: type,
-        message: text,
-        email: who,
-        rating: type === 'rating' ? rating : null,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        page: location.pathname
-      })).then(() => {
-        recordSend();
-        showModal('Thanks. Your feedback was sent.', 'success');
-        form.reset();
-        type = 'rating';
-        rating = 0;
-        stars.hidden = false;
-        message.placeholder = PLACEHOLDERS.rating;
-        stars.querySelectorAll('label').forEach(l => l.classList.remove('is-on'));
-      }).catch(err => {
-        console.error('Feedback submit error:', err);
-        showModal('Your feedback could not be sent. Check your connection and try again.');
-      }).finally(() => {
-        submit.disabled = false;
-        submit.textContent = 'Send';
-      });
-    });
-  })();
 })();
 </script>
 <script src="/article-cards.js?v=20261021as" defer></script>
-<!-- Firebase (feedback form only): deferred, so it never blocks the page. -->
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js" defer></script>
 </body>
 </html>

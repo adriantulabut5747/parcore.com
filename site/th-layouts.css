@@ -898,11 +898,6 @@
 .clan-card {
   margin: 142px 0 0;
 }
-/* Clan card v2: the usual 64 section break (was 64 + 47 while the King
-   poked out of the card's top edge; the art sits inside it now). */
-.ac-card {
-  margin: 64px 0 0;
-}
 /* Whichever section comes last: 34 + .coc-content's 30px bottom padding
    = 64 to the footer. last-of-type, not last-child: the clan card's
    <script> tag comes after it, so it's never the last child. Not the
@@ -947,10 +942,6 @@
   .clan-card {
     margin: 72px 0 0;
   }
-  /* Clan card v2: the same 72 as the other sections on phones. */
-  .ac-card {
-    margin: 72px 0 0;
-  }
   /* mobile .coc-content has no bottom padding */
   .coc-content > section:last-of-type,
   .coc-content:not(:has(+ .t18-band)) > .t18-lower:last-child {
@@ -969,7 +960,7 @@ html.loaded {
 
 /* =======================================================================
    TH18 COC-HOME THEME -- /coc/town-hall-18/layouts restyled to match
-   /coc/: its kicker (mono caps + pulsing red dots), Orbitron
+   /coc/: its kicker (mono caps + pulsing red dots), Figtree
    headline with one red word, stats row, hero card with a red badge,
    and its button materials (dark ghost with a hard offset
    shadow; red primary with a dark-red offset shadow). Red is the one
@@ -1001,9 +992,8 @@ html.loaded {
    (Oct 2026; replaced the starfield hero and its event clock here, and
    moved from coc-tools.css so both page sets share it):
      - art on the right, faded into the card on the left (.tb-art);
-     - an icon, the title (Orbitron, second word red), then one line:
+     - an icon, the title (Figtree, second word red), then one line:
        "Did you know?" on the TH pages, a sentence (.tb-desc) on Tools;
-     - fact chips (.tb-facts, Tools only): one row of real numbers;
      - "Back to tools" in the top-right corner (tool pages only).
    Swap a banner's picture by changing .tb-art's src; if the subject sits
    off-centre, set --tb-pos on that <img> (e.g. style="--tb-pos: 70% 20%"). */
@@ -1084,7 +1074,7 @@ html.loaded {
 
 .tb-title {
   margin: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
   font-size: clamp(26px, 2.5vw, 38px);
   font-weight: 900;
   line-height: 1.04;
@@ -1096,7 +1086,7 @@ html.loaded {
 }
 /* Named in full: a broader rule elsewhere sets <em> in Oxanium. */
 .tb-title em {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
   font-weight: 900;
   font-style: normal;
   color: var(--t18-red);
@@ -1135,35 +1125,6 @@ html.loaded {
   line-height: 1.5;
   color: #b9bdc4;
   text-wrap: pretty;
-}
-
-/* One row, never wraps: small chips so they fit a 360px phone. */
-.tb-facts {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.tb-fact {
-  padding: 5px 9px 4px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 0;
-  background: rgba(18, 19, 22, 0.72);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: var(--t18-muted);
-  white-space: nowrap;
-}
-.tb-fact b {
-  margin-right: 2px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: #fff;
 }
 
 /* "Back to tools" (tool pages): top-right corner of the banner, over the
@@ -1295,14 +1256,6 @@ html.loaded {
     margin-top: 6px;
     font-size: 13px;
     color: #c4c7cd;
-  }
-  .tb-facts {
-    gap: 5px;
-    margin-top: 10px;
-  }
-  .tb-fact {
-    padding: 5px 7px 4px;
-    font-size: 10px;
   }
 }
 
@@ -1828,7 +1781,7 @@ html.loaded {
 /* ---- Coming soon (a Town Hall with no bases yet, e.g. TH8) ----------------
    Takes the place of the bases grid and page numbers. Clan-card material
    (#121316, faint red glow, hairline border); construction icon in the
-   event-icon tile; Orbitron title with one red phrase; two buttons -- the
+   event-icon tile; Figtree title with one red phrase; two buttons -- the
    keycap for the main way on (the next Town Hall's layouts) and the ghost
    style for the army page. */
 .th-soon {
@@ -1860,7 +1813,7 @@ html.loaded {
 }
 .th-soon-title {
   margin: 0 0 12px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
   font-size: 22px;
   font-weight: 900;
   letter-spacing: -0.2px;
@@ -1869,7 +1822,7 @@ html.loaded {
 }
 .th-soon-title em {
   font-style: normal;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
   color: #c23b3b;
   text-shadow: 0 0 18px rgba(194, 59, 59, 0.4);
 }
@@ -1939,24 +1892,69 @@ html.loaded {
   }
 }
 
-/* NEW tag: top-right of a base image, set per base with "new": true in
-   thNN-layouts.json. The page's red accent (--t18-red). */
-.new-tag {
+/* BASE TAGS (Oct 25 2026): top-right of a base image, set per base in
+   thNN-layouts.json. "hot": true = HOT, /coc/'s .ch-card-hot recipe (a small
+   red key, a white flame that flickers); it wins over "new". "new": true =
+   NEW, deliberately quieter (Adrian: HOT must stand out more): a pale steel
+   key, dark ink, a sparkle on the left, no motion. */
+.base-tag {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 2;
-  padding: 4px 8px;
-  border-radius: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px 5px 7px;
+  border-radius: 4px;
+  font: 800 10.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
-  color: #fff;
-  background: #c23b3b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   pointer-events: none;
+}
+.base-tag::before {
+  content: '';
+  flex: none;
+}
+.base-tag--hot {
+  border: 2px solid var(--lb-red-edge);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red), 0 4px 12px -2px rgba(0, 0, 0, 0.55);
+  color: #fff;
+}
+.base-tag--hot::before {
+  width: 9px;
+  height: 11px;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M8 0c1 3.5 6 6 6 11.5A6 6 0 0 1 2 11.5c0-2.6 1.3-4.3 2.6-5.6.2 1.9 1 3 2.2 3.6C6.4 6.2 6.9 3 8 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M8 0c1 3.5 6 6 6 11.5A6 6 0 0 1 2 11.5c0-2.6 1.3-4.3 2.6-5.6.2 1.9 1 3 2.2 3.6C6.4 6.2 6.9 3 8 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  transform-origin: 50% 100%;
+  animation: base-hot-flicker 1.8s ease-in-out infinite alternate;
+}
+@keyframes base-hot-flicker {
+  0%   { transform: scale(1, 1); }
+  40%  { transform: scale(0.92, 1.08); }
+  70%  { transform: scale(1.06, 0.94); }
+  100% { transform: scale(0.96, 1.05); }
+}
+/* NEW: a four-point sparkle in the tag's ink */
+.base-tag--new {
+  border: 2px solid var(--lb-edge);
+  background: #c4c8cf;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -2px 0 rgba(0, 0, 0, 0.18), 0 4px 12px -2px rgba(0, 0, 0, 0.55);
+  color: #2a2c33;
+}
+.base-tag--new::before {
+  width: 12px;
+  height: 12px;
+  background: #2a2c33;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 19 18'%3E%3Cpath d='M10 0c.9 5.6 3.4 8.1 9 9-5.6.9-8.1 3.4-9 9-.9-5.6-3.4-8.1-9-9 5.6-.9 8.1-3.4 9-9z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 19 18'%3E%3Cpath d='M10 0c.9 5.6 3.4 8.1 9 9-5.6.9-8.1 3.4-9 9-.9-5.6-3.4-8.1-9-9 5.6-.9 8.1-3.4 9-9z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+@media (prefers-reduced-motion: reduce) {
+  .base-tag--hot::before {
+    animation: none;
+  }
 }
 
 /* ---- Lower sections (TH layouts / army / tools pages) ---------------------------------
@@ -2281,5 +2279,31 @@ html.loaded {
   }
   .coc-content .action-row.card-bar {
     --bar-h: 38px;
+  }
+}
+
+/* Bottom sheets' grab handle (phones; Oct 25 2026: the Equipment panel and the
+   Damage Calculator's attack sheet, cocSheetDrag in th-layouts.js). Same as
+   Genshin's .gi-grip and the More sheet's handle, with a wider invisible hit area. */
+.sheet-grip {
+  display: none;
+}
+@media (max-width: 970px) {
+  .sheet-grip {
+    display: block;
+    flex: none;
+    position: relative;
+    width: 36px;
+    height: 4px;
+    margin: 8px auto 0;
+    border-radius: 4px;
+    background: #3a3a3e;
+    touch-action: none;
+    cursor: grab;
+  }
+  .sheet-grip::before {
+    content: '';
+    position: absolute;
+    inset: -14px -40px;
   }
 }

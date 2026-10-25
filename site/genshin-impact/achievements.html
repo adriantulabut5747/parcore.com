@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genshin Impact achievements: checklist, Primogems and namecards | Parchrome</title>
+    <meta
+      name="description"
+      content="Every Genshin Impact achievement in one checklist: tick each tier, track the Primogems left and the namecards you're closest to, and import or back up your progress (UIAF)."
+    />
+    <meta name="theme-color" content="#0a0a0b" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" href="/icons/home.jpg" />
+    <link rel="shortcut icon" href="/icons/home.jpg" />
+    <link rel="apple-touch-icon" href="/icons/home.jpg" />
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/11layout.css?v=20261024fb" />
+    <link rel="stylesheet" href="/coc-more.css?v=20261022gn" />
+    <link rel="stylesheet" href="/coc-help.css?v=20261024cc" />
+    <link rel="stylesheet" href="/genshin.css?v=20261025a" />
+    <link rel="stylesheet" href="/genshin-achievements.css?v=20261025a" />
+  </head>
+  <body class="gi-page" data-game-nav="genshin-impact">
+    <div id="page-loader">
+      <div class="parchrome-fade">
+        <div class="parchrome-ring"></div>
+      </div>
+      <span class="parchrome-label">Parchrome</span>
+    </div>
+
+    <!-- Top Nav -->
+    <div class="top-bar">
+      <div class="top-bar-left-avatar"></div>
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <div class="top-bar-title">
+        <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" /></div>
+        Parchrome
+      </div>
+      <button
+        id="search-btn"
+        onclick="toggleSearch()"
+        style="background: transparent; border: none; padding: 0; cursor: pointer; right: 15px; position: fixed; margin-top: 2px"
+      >
+        <span id="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+            <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none" />
+            <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span id="close-icon">✖</span>
+      </button>
+      <div id="search-overlay">
+        <div id="search-input-wrap">
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Find your next game"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+          <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display: none">✖</button>
+        </div>
+        <div id="search-results"></div>
+        <div id="search-view-more" class="search-viewmore-sentinel" style="display: none">Loading more…</div>
+      </div>
+    </div>
+
+    <!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+    <div class="secondary-top-bar" id="secondary-top-bar">
+      <div class="secondary-left">
+        <img src="/icons/genshin.jpg" alt="" class="th-icon" />
+        <div class="secondary-content">Genshin Impact</div>
+      </div>
+      <div class="stb-divider" aria-hidden="true"></div>
+      <nav class="stb-hub-nav" id="stbHubNav" aria-label="Genshin Impact pages">
+        <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+      </nav>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="sidebar" id="sidebar">
+        <div class="top-box" id="top-box"></div>
+        <div class="games-container" id="games-container"></div>
+        <div class="triple-a-container">
+          <div class="triple-a-header" onclick="toggleTripleA()">
+            <img src="/icons/controllericon.png" class="tripleimg" alt="" />
+            Triple A Games <span class="arrow">></span>
+          </div>
+          <div class="triple-a-list" id="triple-a-list"></div>
+        </div>
+      </div>
+
+      <div class="coc-main">
+        <div class="coc-content">
+          <main class="gi ac">
+            <div class="gi-frame">
+              <!-- HEADER: the shared .gi-tb (genshin.css). Icon = the game's gold trophy (Wonders of the World's
+             medal); art = six nation medals on a shelf arch (genshin-achievements.css "HEADER SHELF").
+             Static on purpose. Facts: counted from /genshin-achievements.json + your ticks. -->
+              <header class="gi-tb ac-tb">
+                <div class="gi-tb-art ac-shelf" aria-hidden="true">
+                  <span><img src="/images/genshin/achievement/A004.webp" alt="" width="128" height="128" /></span
+                  ><span><img src="/images/genshin/achievement/A005.webp" alt="" width="128" height="128" /></span
+                  ><span><img src="/images/genshin/achievement/A008.webp" alt="" width="128" height="128" /></span
+                  ><span><img src="/images/genshin/achievement/A012.webp" alt="" width="128" height="128" /></span
+                  ><span><img src="/images/genshin/achievement/A016.webp" alt="" width="128" height="128" /></span
+                  ><span><img src="/images/genshin/achievement/A019.webp" alt="" width="128" height="128" /></span>
+                </div>
+                <div class="gi-tb-body">
+                  <img class="gi-tb-icon" src="/images/genshin/nav/achievements.webp" alt="" width="76" height="76">
+                  <div class="gi-tb-copy">
+                    <h1 class="gi-title"><span class="gi-vh">Genshin Impact </span>All <em>achievements</em></h1>
+                    <p class="gi-tb-desc">
+                      Every achievement in the game, category by category. Tick what you've done, see the Primogems left and the namecards
+                      you're closest to.
+                    </p>
+                    <ul class="gi-tb-facts" id="acFacts"></ul>
+                  </div>
+                </div>
+              </header>
+
+              <!-- Jump tray (sections) + Your data. -->
+              <div class="gi-bar ac-bar">
+                <nav class="gi-tray ac-jump" aria-label="On this page">
+                  <a class="gi-tab" href="#progress">Progress</a>
+                  <a class="gi-tab" href="#checklist">Checklist</a>
+                  <a class="gi-tab" href="#numbers">Numbers</a>
+                  <a class="gi-tab" href="#data">Your data</a>
+                </nav>
+                <p class="ac-saved" id="acSaved">Ticks are saved on this device.</p>
+              </div>
+
+              <!-- YOUR PROGRESS (genshin-achievements.js "PROGRESS"): the drawn wheel (one segment per category,
+             its length = its tiers, filled from the inside by how many you've done) | numbers + the in-game
+             count from Enka | the three categories closest to their namecard. -->
+              <section class="ac-prog-wrap" id="progress" aria-label="Your progress">
+                <div class="gi-box ac-prog" id="acProg"><p class="gi-empty">Loading the achievements&hellip;</p></div>
+              </section>
+
+              <!-- NAMECARDS: all 71 a category gives, in the game's order. Earned = full colour; the rest dimmed
+             with how many are left. A card opens its category. -->
+              <section class="gi-sec" id="namecards" aria-labelledby="acCardsT">
+                <header class="gi-sec-head">
+                  <div>
+                    <h2 class="gi-title" id="acCardsT">The namecard <em>shelf.</em></h2>
+                    <p class="mch-sec-sub" id="acCardsSub">Finish a category to earn its namecard.</p>
+                  </div>
+                  <div class="gi-acts">
+                    <div class="gi-tray gi-tray--sm" id="acShelfF" role="group" aria-label="Show">
+                      <button type="button" class="gi-tab active" data-shelf="">All</button>
+                      <button type="button" class="gi-tab" data-shelf="got">Earned</button>
+                      <button type="button" class="gi-tab" data-shelf="left">Not yet</button>
+                    </div>
+                    <button type="button" class="gi-key gi-arrow" data-row="acShelf" data-dir="-1" aria-label="Scroll left">
+                      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+                    </button>
+                    <button type="button" class="gi-key gi-arrow" data-row="acShelf" data-dir="1" aria-label="Scroll right">
+                      <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                    <button type="button" class="gi-key ac-shelf-all" id="acShelfAll" aria-haspopup="dialog" aria-controls="acNcd">View more</button>
+                  </div>
+                </header>
+                <div class="ac-shelf-row" id="acShelf"></div>
+                <!-- VIEW MORE: the whole shelf, two a row, scrolling down. Centred on desktop, a bottom sheet with a grip
+                     on phones (GI.sheetDrag). genshin-achievements.js copies the shelf's cards in on open. -->
+                <dialog class="ac-ncd" id="acNcd" aria-labelledby="acNcdT">
+                  <div class="ac-ncd-panel" id="acNcdPanel">
+                    <div class="gi-grip" id="acNcdGrip" aria-hidden="true"></div>
+                    <header class="ac-ncd-bar" id="acNcdBar">
+                      <span class="ac-ncd-ttl"><b id="acNcdT">The namecard shelf</b><span id="acNcdN"></span></span>
+                      <button type="button" class="gi-key ac-ncd-x" id="acNcdX" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
+                    </header>
+                    <div class="ac-ncd-body" id="acNcdBody" tabindex="-1"><div class="ac-ncd-grid" id="acNcdGrid"></div></div>
+                  </div>
+                </dialog>
+              </section>
+
+              <!-- NEW: the latest version's achievements, tickable right here. -->
+              <section class="gi-sec" id="new" aria-labelledby="acNewT">
+                <header class="gi-sec-head">
+                  <div>
+                    <h2 class="gi-title" id="acNewT">New in <em id="acNewV">this version.</em></h2>
+                    <p class="mch-sec-sub" id="acNewSub"></p>
+                  </div>
+                  <div class="gi-acts">
+                    <button type="button" class="gi-key gi-arrow" data-row="acNew" data-dir="-1" aria-label="Scroll left">
+                      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+                    </button>
+                    <button type="button" class="gi-key gi-arrow" data-row="acNew" data-dir="1" aria-label="Scroll right">
+                      <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                  </div>
+                </header>
+                <div class="ac-new-row" id="acNew"></div>
+              </section>
+
+              <!-- CHECKLIST: categories on the left (phones: a picker key that opens them as a sheet), the picked one
+             on the right. Search covers every category. Filters + the category are kept in the address
+             (?c=<slug>&show=todo&ver=4&q=). A tier = one game id = one tick (UIAF's ids). -->
+              <section class="gi-sec" id="checklist" aria-labelledby="acListT">
+                <header class="gi-sec-head">
+                  <div>
+                    <h2 class="gi-title" id="acListT">The <em>checklist.</em></h2>
+                    <p class="mch-sec-sub">Tap the stars to tick each tier. Search looks through every category.</p>
+                  </div>
+                </header>
+                <div class="ac-tools">
+                  <label class="lb-search ac-find" for="acQ">
+                    <span class="gi-vh">Find an achievement</span>
+                    <input
+                      id="acQ"
+                      class="lb-search-input"
+                      type="search"
+                      placeholder="Find an achievement, quest or category"
+                      autocomplete="off"
+                      spellcheck="false"
+                    />
+                    <span class="lb-search-btn" aria-hidden="true"
+                      ><svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2" />
+                        <line
+                          x1="15.3"
+                          y1="15.3"
+                          x2="20.5"
+                          y2="20.5"
+                          stroke="currentColor"
+                          stroke-width="2.2"
+                          stroke-linecap="round"
+                        /></svg
+                    ></span>
+                  </label>
+                  <div class="ac-tool-trays">
+                    <div class="gi-tray gi-tray--sm" id="acShow" role="group" aria-label="Show">
+                      <button type="button" class="gi-tab" data-show="">All</button>
+                      <button type="button" class="gi-tab" data-show="todo">To do</button>
+                      <button type="button" class="gi-tab" data-show="done">Done</button>
+                    </div>
+                    <div class="gi-tray gi-tray--sm ac-ver" id="acVer" role="group" aria-label="Added in version"></div>
+                  </div>
+                </div>
+                <div class="ac-list">
+                  <button type="button" class="gi-box ac-pick" id="acPick" aria-haspopup="dialog" aria-controls="acSheet"></button>
+                  <nav class="gi-box ac-rail-box" id="acRailBox" aria-label="Categories">
+                    <div class="ac-rail-head">
+                      <span class="gi-label" id="acRailN">Categories</span
+                      ><button type="button" class="ac-rail-close" id="acSheetClose" aria-label="Close">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                      </button>
+                    </div>
+                    <div class="ac-rail" id="acRail" tabindex="-1"></div>
+                  </nav>
+                  <div class="gi-box ac-pane" id="acPane"></div>
+                </div>
+                <dialog class="ac-sheet" id="acSheet" aria-label="Categories"></dialog>
+              </section>
+
+              <!-- BY THE NUMBERS: counted from the data. Achievements per version as bars (yours vs left), then four facts. -->
+              <section class="gi-sec" id="numbers" aria-labelledby="acNumT">
+                <header class="gi-sec-head">
+                  <div>
+                    <h2 class="gi-title" id="acNumT">By the <em>numbers.</em></h2>
+                    <p class="mch-sec-sub">Every update since 1.0, and what's left of each.</p>
+                  </div>
+                </header>
+                <div class="gi-box ac-chart" id="acChart"></div>
+                <div class="ac-facts" id="acNumFacts"></div>
+              </section>
+
+              <!-- YOUR DATA: UIAF (uigf.org's achievement format, v1.1) in and out, so Snap.Hutao and the achievement
+             scanners can fill the checklist. Export doubles as the backup. Nothing leaves the browser. -->
+              <section class="gi-sec" id="data" aria-labelledby="acDataT">
+                <header class="gi-sec-head">
+                  <div>
+                    <h2 class="gi-title" id="acDataT">Your <em>data.</em></h2>
+                    <p class="mch-sec-sub">
+                      Your ticks live in this browser only. Back them up, move them, or bring them in from another app.
+                    </p>
+                  </div>
+                </header>
+                <div class="ac-data">
+                  <div class="gi-box ac-io">
+                    <div class="ac-io-art" aria-hidden="true">
+                      <span class="ac-file"><b>UIAF</b><i></i><i></i><i></i></span>
+                    </div>
+                    <div class="ac-io-copy">
+                      <h3>Import or back up</h3>
+                      <p>
+                        Files use <b>UIAF</b>, the shared achievement format that Snap.Hutao and the achievement scanners export. Import
+                        adds what the file marks as done; tick "Replace" to start from the file instead.
+                      </p>
+                      <div class="ac-io-keys">
+                        <button type="button" class="gi-key gi-key--red" id="acExport">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>Download backup
+                        </button>
+                        <label class="gi-key ac-imp"
+                          ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V9M7 14l5-5 5 5M5 4h14" /></svg>Import a file<input
+                            type="file"
+                            id="acImport"
+                            accept=".json,application/json"
+                        /></label>
+                        <label class="ac-check"><input type="checkbox" id="acReplace" /><span>Replace my ticks</span></label>
+                      </div>
+                      <p class="ac-io-msg" id="acIoMsg" aria-live="polite">You can also drop a file on this box.</p>
+                    </div>
+                  </div>
+                  <div class="gi-box ac-reset">
+                    <h3>Start over</h3>
+                    <p>Clears every tick on this device. Download a backup first if you might want them back.</p>
+                    <button type="button" class="gi-key" id="acReset">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" /></svg
+                      ><span>Clear all ticks</span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- HOW ACHIEVEMENTS WORK: static, hand-written (Oct 24 2026). Adrian to fact-check every line. -->
+              <section class="gi-sec" id="how" aria-labelledby="acHowT">
+                <header class="gi-sec-head">
+                  <div>
+                    <h2 class="gi-title" id="acHowT">How achievements <em>work.</em></h2>
+                    <p class="mch-sec-sub">The rules behind the checklist.</p>
+                  </div>
+                </header>
+                <div class="gi-tips">
+                  <ul class="gi-box">
+                    <li>
+                      <b>Stars are tiers</b>
+                      <p>
+                        An achievement with two or three stars is two or three achievements in one. Each star pays its own Primogems:
+                        usually 5, then 10, then 20.
+                      </p>
+                    </li>
+                    <li>
+                      <b>Claim the Primogems yourself</b>
+                      <p>
+                        Finishing one isn't enough. Open Paimon Menu, then Achievements, and claim the reward, or the Primogems wait there.
+                      </p>
+                    </li>
+                    <li>
+                      <b>A full category pays a namecard</b>
+                      <p>
+                        Finish every achievement in a category and its namecard is yours to wear on your profile. 71 categories give one.
+                      </p>
+                    </li>
+                    <li>
+                      <b>Two never finish</b>
+                      <p>
+                        Wonders of the World and Memories of the Heart grow with every update, so they give no namecard and never reach
+                        100%.
+                      </p>
+                    </li>
+                    <li>
+                      <b>Some are hidden</b>
+                      <p>
+                        Hidden achievements don't show in the menu until you've earned them, so the game's list can look shorter than this
+                        one.
+                      </p>
+                    </li>
+                    <li>
+                      <b>Quests lead to many</b>
+                      <p>Hundreds come from a quest. The checklist names that quest under the achievement ("Part of").</p>
+                    </li>
+                  </ul>
+                </div>
+              </section>
+
+              <div class="gi-more">
+                <a class="gi-box gi-card" href="/genshin-impact/player">
+                  <div>
+                    <b>Player lookup</b>
+                    <p>Any UID's profile, achievement count and character builds.</p>
+                  </div>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+                <a class="gi-box gi-card" href="/genshin-impact/nations">
+                  <div>
+                    <b>Nations</b>
+                    <p>Every nation's people, farming, bosses and specialties.</p>
+                  </div>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+              </div>
+              <p class="gi-note">
+                The list includes hidden achievements. The in-game count comes from Enka.Network and is the number your profile shows; it
+                updates when the game sends it.
+              </p>
+              <p class="gi-credit">
+                Game assets &copy; HoYoverse. Parchrome is a fan site and isn't affiliated with HoYoverse. Achievements, medals and
+                namecards: Project Amber (gi.yatta.moe). In-game count: Enka.Network. Checked for new achievements every three hours.
+              </p>
+            </div>
+          </main>
+          <footer class="pf-footer">
+            <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+            <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+            <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+            <div class="pf-footer-divider"></div>
+
+            <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+            <div class="pf-footer-divider"></div>
+
+            <div class="pf-footer-bottom">
+              <div class="pf-footer-legal" id="pfFooterLegal"></div>
+            </div>
+
+            <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+            <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+    <div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+      <div class="more-sheet" onclick="event.stopPropagation()">
+        <div class="more-sheet-scroll">
+          <div class="more-sheet-top">
+            <div class="more-sheet-handle"></div>
+            <div class="more-sheet-header mx-hdr">
+              <span class="mx-hdr-ico"><img src="/icons/genshin.jpg" alt="" /></span
+              ><span class="mx-hdr-text"
+                ><span class="more-sheet-title">All Genshin Impact Pages</span><span class="mx-hdr-count"></span
+              ></span>
+              <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="more-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bn-bar" id="bottomNav">
+      <div class="bn-more-wrap" id="bnMoreWrap">
+        <div class="bn-more-spacer"></div>
+        <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8" />
+            <rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8" />
+            <rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8" />
+            <rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8" />
+          </svg>
+        </button>
+        <span class="bn-more-label">More</span>
+      </div>
+    </div>
+
+    <script src="/11layout.js?v=20261024fb"></script>
+    <script src="/genshin-core.js?v=20261025a"></script>
+    <script src="/genshin-achievements.js?v=20261025a"></script>
+  </body>
+</html>

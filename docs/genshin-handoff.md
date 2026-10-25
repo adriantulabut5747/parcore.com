@@ -7,9 +7,14 @@ comes from, and a full spec for each of the 28 planned pages. This file is priva
 
 **Status in one line:** the whole Live group is built locally (Oct 23 2026): Lobby, Banners, Rerun
 tracker, Events timeline, Redeem codes, Endgame and Player lookup (`/genshin-impact/player/<UID>`, section 9).
-Database: **Characters** and **Weapons** built (Oct 23 2026, Adrian to QC); **Farm today** built Oct 24 2026 (Adrian to QC, 7.12). The rest of Database / Tools / Guides is planned and listed on the Lobby, in the nav menus and in the More
+Database: **Characters** and **Weapons** built (Oct 23 2026, Adrian to QC); **Farm today** built Oct 24 2026 (Adrian to QC, 7.12); **Birthdays** built Oct 24 2026 (Adrian to QC, 7.13); **Nations** built Oct 24 2026 (Adrian to QC, 7.14); **Enemies** built Oct 24 2026 (Adrian to QC, 7.15); **Achievements** built Oct 24 2026 (Adrian to QC, 7.16). The rest of Database / Tools / Guides is planned and listed on the Lobby, in the nav menus and in the More
 sheet as "Soon".
 Nothing of this session is committed yet (see section 13).
+
+**Oct 24 2026, nav restructure (section 5.7):** the bar is now **Lobby / Events / Database / Tools** (Guides killed, its pages moved),
+each group opens on its own group page ("All events" / "Full database" / "All tools", `/genshin-impact/events`, `/database`, `/tools`, section 7b), the Events timeline
+moved to **`/genshin-impact/timeline`**, every page has an in-game icon, phones got the breadcrumb, and every page has the
+"Traveler's notes" help button (section 5.8).
 
 ---
 
@@ -38,14 +43,22 @@ Nothing of this session is committed yet (see section 13).
 | Originals of that art, upright, unpublished | `_tools/genshin/art-source/` (incl. `fatui-table-petradragoon.png` — signed fan art, NOT used, see 1) |
 | Older local art | `site/genshin-impact-icons/` (abyss.webp, wish.webp, songofthewelkinmoon.png, ...) |
 | Section nav (top bar menus, phone bottom nav, More sheet) | `site/game-nav.json` key `"genshin-impact"` → `groups` (see 5.7) |
+| Nav page icons (in-game art, 64px WebP) | `site/images/genshin/nav/<page>.webp` (5.7) |
+| Group pages (Events / Database / Tools) | `site/genshin-impact/{events,database,tools}.html` + `site/genshin-discover.css` / `.js` (7b) |
+| Events timeline (moved Oct 24 2026) | `site/genshin-impact/timeline.html` (was events.html) + `genshin-events.css/.js` |
+| Help button + "Traveler's notes" panel | `genshin-core.js` `help()` + genshin.css "HELP PANEL"; shell = CoC's `coc-help.css` (linked on every Genshin page) (5.8) |
 | Group icons (seelie.me's traces of the in-game menu icons, all 11) | `_tools/genshin/seelie-icons.json` (unpublished) |
 | Backup of the old (pre-redesign) page | `Downloads/parcore.com/_backup/genshin/index.html` (outside the repo) |
 | Player lookup page + its CSS / JS | `site/genshin-impact/player/index.html` (every `/genshin-impact/player/<UID>`, `_redirects` 200 rule), `site/genshin-player.css` / `.js` |
-| Characters page + its CSS / JS | `site/genshin-impact/characters.html`, `site/genshin-characters.css` / `.js` (7.8 as built) |
+| Characters page + its CSS / JS | `site/genshin-impact/characters/index.html` (moved into the folder Oct 25 2026 so the character pages can sit beside it; `/genshin-impact/characters` 301s to the slash), `site/genshin-characters.css` / `.js` (7.8 as built) |
+| Character pages (generated, PILOT = Ayaka only) | `site/genshin-impact/characters/<slug>.html` from `scripts/genshin-characters.py` + hand-written builds `scripts/genshin-builds.json`; `site/genshin-character.css` / `.js`; outfit art `site/images/genshin/costume/` (7.9 as built) |
 | Character cards (generated) | `site/images/genshin/strip/<icon key>.webp`: each character's wish-result card (Enka `UI_Gacha_AvatarIcon_*`, 320x1024), a 320x512 cut starting `STRIP_TOP` (0.12) down, WebP q80, ~40 KB; `Traveler.webp` drawn once by `_tools/genshin/traveler-strip.py` |
 | Weapons page + its CSS / JS + data | `site/genshin-impact/weapons.html`, `site/genshin-weapons.css` / `.js` (+ `genshin-characters.css`), `site/genshin-weapons.json` (feed script `weapons()`), art `site/images/genshin/weapon/` (7.10 as built) |
 | Nation list (shared) | `GI.NATIONS` in genshin-core.js (moved from genshin-lobby.js Oct 23 2026): Lobby Nations + Farm, Characters bands |
 | Player lookup backend | `netlify/functions/genshin-api.mjs` (`/api/genshin?uid=`); locally `_tools/serve.py` calls Enka itself |
+| Nations page + its CSS / JS + data | `site/genshin-impact/nations.html`, `site/genshin-nations.css` / `.js` (+ characters + farm CSS), `site/genshin-nations.json` (feed script `nations()`, daily) (7.14 as built) |
+| Enemies page + its CSS / JS + data | `site/genshin-impact/enemies.html`, `site/genshin-enemies.css` / `.js`, `site/genshin-enemies.json` + `genshin-enemies-more.json` (feed script `enemies()`, daily), icons `site/images/genshin/enemy/` (7.15 as built) |
+| Achievements page + its CSS / JS + data | `site/genshin-impact/achievements.html`, `site/genshin-achievements.css` / `.js`, `site/genshin-achievements.json` (feed script `achievements()`), medals `site/images/genshin/achievement/<key>.webp` (128px), category namecards in `images/genshin/namecard/char/` (7.16 as built) |
 | Enka id maps (generated) | `site/genshin-enka-map.json` (`enka_map()` in the feed script, from EnkaNetwork/API-docs `store/gi`) |
 
 Preview: `python _tools/serve.py` → http://localhost:8765/genshin-impact/ (see CLAUDE.md for
@@ -322,6 +335,7 @@ badges; needs the script to keep its own memory), `history[]` banner log (or its
 | `.gi-row` | horizontal snap-scroll row (events) |
 | `.gi-stat` | sunken number tile (pity) |
 | `.gi-empty` | loading / error / empty line |
+| `GI.jumpNav(tray)` / `GI.glide(el)` | (genshin-core.js, Oct 24 2026) in-page jump tray: eased glide to the section, a sliding raised pill (`.gi-pill`) for "you are here", arrival animation (`.gi-arrive`: title rises, red line sweeps). Achievements uses jumpNav; Birthdays uses glide only (its tray keeps the plain lit tab until Adrian OKs the pill there) |
 
 ### 5.3 Images (how to add one)
 1. Find it on yatta (3.2) or another official source. 2. Download it, convert to WebP with Pillow
@@ -464,26 +478,42 @@ animation with the real splash (Simulator), a world map of nations (Nations page
   and re-measures on resize and once the fonts load (`nations()` in genshin.js). Do the same for
   any new tabbed section.
 
-### 5.7 Section nav: four groups (Oct 22 2026)
-Adrian: "these are 4 main tabs we should see on the top bar which has dropdowns too... do the same
-on the bn bar too, and inside the more sheet, display all the pages... even tho theyre coming soon".
-- Data: `site/game-nav.json` → `"genshin-impact".groups` = `[{name, icon, pages:[{name, link, soon}]}]`.
-  Live, Database, Tools, Guides, every page of section 7 except the 136 character pages (they sit
-  under Characters). `pages` beside it is now only the home page's Featured tiles (home.json
-  `gameNav`); leave it short.
-- Code: `buildGroups()` in 11layout.js (`initHubNav`). Desktop: each group is a top-bar link
-  (`href="#gn-<i>"`) with a hover menu of its pages (the shared `stbHubMenus` engine; soon rows are
-  greyed and dead); a click opens the menu too. Phones: the four groups ARE the bottom bar
-  (2 + More + 2); a tap opens the More sheet scrolled to that group. A group is lit when you're on
-  one of its built pages (Live on the Lobby). More sheet: one labelled section per group, two-across
-  `.mx-tool` tiles from coc-more.css (Minecraft/CoC look), soon = dimmed; header `.mx-hdr` shows
-  "N live · 27 pages".
-- When a page ships: drop its `"soon": true` in `groups` (nav + sheet update everywhere).
-- Icons: seelie.me's 24×24 traces of the in-game menu icons (pulled from its JS bundle;
-  all 11 saved in `_tools/genshin/seelie-icons.json`). Live = `planner` (the "!" notice banner),
-  Database = `characters`, Tools = `settings`, Guides = `map`. Spare: weapons, inventory,
-  achievements, anecdotes, furnishing, tracker (wish sparkle), tier. They're seelie's drawings of
-  HoYoverse art, not files from the game; if seelie ever asks, swap them for game-extracted icons.
+### 5.7 Section nav: Lobby + three groups (Oct 24 2026; was four groups Oct 22)
+Adrian (Oct 24 2026): "LOBBY (no drop down), EVENTS, DATABASE, TOOLS ... were killing the guide button", "making it look like
+the clash of clans", Discover as the first entry of each group, a coloured in-game icon on every page.
+- Data: `site/game-nav.json` → `"genshin-impact".groups` = `[{name, link, icon, pages:[{name, link, icon, soon?, activePrefix?}]}]`.
+  Lobby = `pages: []` (a plain link). Events: Discover, Banners, Rerun tracker, Events timeline, Redeem codes, Endgame, Articles
+  (soon). Database: Discover, Characters, Weapons, Artifacts, Enemies, Nations, Achievements, Birthdays, Farm today, Tier list,
+  Reactions chart, Glossary, Beginner path (last four soon). Tools: Discover, Player lookup (moved from Live), Primogem planner,
+  Pity calculator, Wish simulator, Resin & timers, Ascension calculator, Artifact scorer (all soon). "Tools directory" was dropped:
+  the Tools Discover page holds the community sites. Placement was Claude's call, Adrian approved it.
+  **Oct 24 2026 (later):** "Discover" renamed "All events" / "Full database" / "All tools" (Adrian), and the group pages cut to banner + cards (7b); the community sites left the Tools page.
+- Code: `buildGroups()` in 11layout.js. A group's top-bar link and phone-bar item go to `link` (its Discover page; CoC's Tools
+  button); desktop hover opens the menu of its pages (`stbHubMenus`, rows with picture icons). The More sheet lists the three
+  groups (not Lobby) as `.mx-tool` tiles with `.mx-tool-ico` pictures. A group is lit on any of its built pages.
+- **Breadcrumb**: `buildCrumbs(home, name, pages, {short, mid, here})`: "Genshin Impact › Events › Banners", a Discover page =
+  "Genshin Impact › Events", Lobby none, the player page "… › Tools › Player lookup". Phones show it too ("Genshin › …",
+  genshin.css "PHONE BREADCRUMB", Genshin only: 11layout still hides it on phones elsewhere). Every step flat grey, the current
+  page included (Adrian: never a white last crumb).
+- **Icons**: parent icons stay white (seelie traces; Lobby = a two-tone house drawn to match). Page icons = real game art,
+  `images/genshin/nav/<key>.webp` (64px, lossy q88): Discover = Anemo Treasure Compass, Banners = Intertwined Fate, Reruns =
+  Masterless Starglitter, Timeline = Xiao Lantern manual (Lantern Rite), Codes = Primogem, Endgame = the Spiral Abyss icon, Articles
+  = Teyvat Travel Guide, Characters = Lumine, Weapons = Mistsplitter Reforged, Artifacts = Emblem of Severed Fate flower, Enemies =
+  Hilichurl (rounded), Achievements = Wonders of the World medal, Birthdays = Volcano Cake, Farm = Philosophies of Freedom, Tier list
+  = Crown of Insight, Reactions = Pyro/Hydro/Electro emblems (composited), Glossary = The Little Witch's Dictionary, Beginner =
+  Knights of Favonius Handbook, Player lookup = Kamera, Planner = Blessing of the Welkin Moon, Pity = Masterless Stardust, Wish sim =
+  Acquaint Fate, Timers = Original Resin, Ascension = Mora, Artifact scorer = Gladiator's circlet. Sources: yatta `UI_ItemIcon_*`
+  etc., our artifact/enemy/achievement folders. **Nations = the wiki's gold Mondstadt emblem, hotlinked** (Fandom's CDN 403s bots;
+  same no-workaround rule as Nations/Enemies, so no local copy).
+- When a page ships: drop its `"soon": true` (nav, sheet and its group page update everywhere); give a new page an `icon`.
+
+### 5.8 Help button "Traveler's notes" (Oct 24 2026)
+CoC's "i" button (`.stb-icon-btn`) at the bar's right end on every Genshin page, built by `genshin-core.js` `help()` (so no page
+carries markup); shell CSS = `coc-help.css` (linked on every Genshin page, unchanged), Genshin look = genshin.css "HELP PANEL"
+(night ground, the header's gold frame, Cinzel title, rows led by the nav icons in wells). Rows: 04:00 daily reset (+ Monday weekly)
+with a live countdown and its own server tray, wishes and pity (160 / 90 / 80 / 50-50), endgame resets (live, feed), codes (AR 10,
+live count + Primogems), Original Resin (1 per 8 min, cap 200); red "Today's codes" key. **Adrian to fact-check**: weekly reset
+Monday 04:00, "livestream codes expire fast", resin numbers (section 10).
 
 ---
 
@@ -574,7 +604,7 @@ since, number of runs, list of past runs; sort by "longest wait"; filters elemen
 Drawn idea: a horizontal timeline per character (one tick per run since 1.0).
 Open: licence of the seed data; whether to include weapons.
 
-**4. Events timeline** · `/genshin-impact/events` · BUILT Oct 23 2026 (Adrian to QC). Adrian's calls:
+**4. Events timeline** · `/genshin-impact/timeline` (was `/events` until Oct 24 2026; that address is the Events group page now) · BUILT Oct 23 2026 (Adrian to QC). Adrian's calls:
 lanes + art (not a colour per kind), list on phones, current version only. Files: `genshin-impact/events.html`,
 `genshin-events.css/.js`. Desktop: one box, lanes Wishes / Events / Endgame (seelie icons tracker / planner /
 weapons), bars = grey keys with their own art dimmed, elapsed part shaded, packed into rows; axis = a tick per
@@ -650,16 +680,74 @@ splash path) — the Lobby feed's `characters` is the lite version. Front end: g
 (like the official site) with filters (element, weapon, rarity, nation) and search; each card =
 portrait on rarity backing + name + element emblem; "New" for recent releases. Links to 9.
 
-**9. Character pages ×136** · `/genshin-impact/characters/<slug>` · planned
+**9. Character pages** · `/genshin-impact/characters/<slug>` · **How to add one: `docs/genshin-character-pages.md`** (the steps, the builds JSON shape, the checks). PILOT BUILT Oct 25 2026: **Kamisato Ayaka only**, Adrian to QC
+before the rest are generated. Adrian's calls: slug = full name (`kamisato-ayaka`, = the Rerun tracker's `#c-` slug); builds = **Adrian's
+own picks** (Game8 / genshintrack.com are reference only, never credited), Claude flags anything doubtful, Adrian checks (teams confirmed by him Oct 25 2026); "go all in".
+- **Generator** `scripts/genshin-characters.py <slug...>` (no slug = everyone; the Traveler is skipped for now). Imports the feed script's
+  helpers (`get`, `yatta`, `splash`, `namecard_art`, `game_text`). Per character: yatta `avatar/{id}` + `avatarFetter/{id}`, plus
+  `static/avatarCurve` once. Also reads our own feed, weapons, artifacts, enemies, nations, birthdays and history JSON. **The shell
+  is the list page's** (`characters/index.html`: head, bars, footer, More sheet) with title/meta, CSS/JS links and `<main>` swapped, so a
+  `?v=` bump there reaches every character page on the next run (asserts fail loudly if that markup changes). Every word is in the HTML
+  (SEO: title, description, canonical, og, BreadcrumbList JSON-LD); the numbers the page needs ride in `#cpData`.
+- **Builds** `scripts/genshin-builds.json`, keyed by slug: role, tags, summary (our words), cons priority, weapons `{name, tag BiS/Alt
+  5★/4★/F2P, from, r, note}`, sets `{name, pc, with?, best?, note}`, mains, subs, talents `{k, lv, why}`, targets `{stat, min, max,
+  scale, unit, note}`, teams `{name, tier, members[[name, role]], note}`. Names must match our weapons/artifacts/roster files exactly. A
+  character with no entry gets no Build section and no "At a glance" box. Never copy another site's text.
+- **Page v2 (rework, same day; Adrian: v1 "looks so AI slop... information overload", the wish-banner hero "so common")**: a
+  **player profile**, his pick over a genshin.gg-style sheet (references screenshotted: genshin.gg, paimon.moe, Enka). Left = sticky
+  profile card (portrait = her wish art over her dimmed namecard in a thin gold frame, element + stars, outfit faces, name, title,
+  tags, live wish tag, then the game's attribute rows: role, ascension stat, release, birthday countdown, constellation, affiliation,
+  voice). Right = **Best build** (the biggest block: summary, weapons | artifacts, one sunken strip of main stats / substats / talent
+  levels / targets) -> **Teams** (2x2, 66px faces) -> **Farm for <name>** (one slim strip of six chips, server tray, book "Open
+  today") -> **one tab card**: Talents (icon row, text | scaling slider; panels share one grid cell) / Constellations (2 columns) /
+  Materials (totals + "Plan your goal") / Base stats (one table, Lv 1-90 + 95/100 from the curve, which paimon.moe also lists) /
+  Wishes (numbers, the drawn line, one row per banner). **Deleted** (Adrian): voice lines, stories, birthday letter, related
+  characters, the jump tray, the stats chart, big section titles + subtitles. yatta `avatarFetter` is no longer fetched.
+- **Page v3 (same day, Adrian)**: the profile moved to the RIGHT and went quiet (260px, sticky `top: 72px` = level with the body,
+  because sticky offsets count from `.coc-main`'s 16px padding edge): the Rerun tracker's wish card (`strip` art, name, days since her
+  last banner + the "x usual" meter, filled by the script) over plain attribute rows. Body order: **Farm -> Best teams -> Best build ->
+  Video guide -> tab card**. Build = genshin.gg's layout (his screenshot): 5 weapons beside 5 artifact rows (`.cp-gl`, 2pc + 2pc rows
+  split in two, piece-count badge; notes are tooltips, a set's `when` is shown), then Sands / Goblet / Circlet boxes and one line each
+  for substats, talents, targets. **Video** = builds JSON `video {id, title, by, channel, date, note}`: the creator's newest build guide
+  for that character (Adrian: Zy0x for every character; found on youtube.com/@Zy0x/search, checked with YouTube oEmbed), a thumbnail
+  until clicked, then the youtube-nocookie player. Gap under the bar = 24px (`.cp-page` padding 72 + .coc-main's 16 = 88). The outfit
+  switch and Enka costume art were dropped with the wish-banner portrait.
+- **v3.1 (same day, Adrian)**: no tab card any more: Talents / Constellations / Materials / Base stats / Wish history are five plain
+  blocks (`.cp-pane`, ids talents / cons / mats / stats / wishes), all shown, same size the panes had. **Phones** = a Facebook-style
+  profile: `.cp-cv` (hidden on desktop) = her namecard as the cover, the days-since-banner pill top right (`[data-wait]`; the script
+  fills both it and the desktop card), best in slot bottom right (links #build), her face in a circle over the cover's foot with the
+  name beside it; the desktop wish-card art is hidden there (`.cp-wc > .cp-wc-art`: plain `.cp-wc-art` loses to genshin.css's
+  `.gi img { display: block }`).
+- **v3.2 (same day, Adrian: "the same banner profile thingy on desktop")**: the Facebook-style header is now on desktop too and
+  the tall wish card is gone. `.cp-head` spans the page (grid areas `head head / col card`): cover = namecard (290px tall on
+  desktop, the namecard's own 840:400 on phones), element emblem, the days-since-banner pill top right (`[data-wait]`; desktop shows
+  the "x usual" meter too, phones only the days + since), best in slot bottom right (#build), her face in a 136px circle (92 on phones)
+  over the cover's foot, name + title + tags beside it. The right column (`.cp-card`, sticky) is only the attribute rows + summary.
+- **v3.3 (same day, Adrian)**: no Ascension stat row on the card; the desktop card leads with **Her story** (`.cp-story`: the game's
+  one-line description as a quote + the first paragraph of her Character Details, the rest behind Read more; yatta `avatarFetter`
+  is fetched again for it; hidden on phones), and the card scrolls inside itself if it outgrows the screen. Phones: **Talents |
+  Constellations tabs** (`#cpMTabs` sets `#cpCol[data-m]`, Talents first; desktop shows both). **Phone sideways-scroll bug** (found
+  at 375px in an iframe: headless Chrome can't go under 500): the talent icon row scrolls, and each icon's hidden label (`.gi-vh` is
+  `position: absolute`) escaped it and widened the page; `.cp-ttabs { position: relative }` contains them. Watch for this in any
+  scrolling row that holds `.gi-vh`.
+- **v3.4 (same day, Adrian)**: the days-since-banner pill is gone from the cover (the Wish history block still shows the wait).
+  Her story lost its box background (it sits on the page like the rows); voice actors one per line. Tried and REVERTED by Adrian:
+  name + tags inside the cover, and the whole right column as one box. Credit line no longer names Game8 / genshintrack.com: the
+  builds are Adrian's own.
+- **v3.5 (same day, Adrian)**: Materials rows get a breakdown key (`.cp-brk-key`, list icon) that opens the total step by step
+  (ascension Lv 20→40 … 80→90 + Total; talents Lv 1→2 … 9→10 + One talent + All three). **Similar to <name>** block at the very
+  bottom (builds JSON `similar`: [name, why], wish-card art like the Characters list; Ayaka: Ayato, Thoma, Skirk, Ganyu). Fixes: wish
+  rows' faces wrap (a Chronicled Wish's 7 co-stars ran under the tag); the cover's dark overlay used the outer radius (6px) over a
+  4px-radius picture, leaving slivers of bright art in the corners: it's `calc(var(--lb-r) - 2px)` now.
+- Not yet: the other characters, linking cards elsewhere (Characters list, Lobby, Farm, Birthdays, Reruns, Banners, Enemies), the
+  Traveler page, `sitemap.xml` entries, the 4th breadcrumb step (the trail ends at "Characters", which links back).
+Original plan:
 Generator: `_tools/genshin/build_characters.py` (not published) reads yatta `avatar/{id}` and writes
 static HTML per character + downloads/converts its splash (reuse the feed's `splash()` logic).
 Content: hero with splash + title + element + weapon + affiliation + constellation name + voice
 actors (fetter.cv); ascension materials and totals (upgrade.promote costItems/coinCost), talent
 materials per level (talent.promote), talent book days (from dailyDungeon), constellations
-(names/descriptions), birthday, release date, banner history (from 3). Descriptions contain
-`<color=#...>` tags and `\n` — convert to HTML safely. Rerun the generator when a character is
-added (could be a workflow step when the roster grows). Open: slugs (use yatta `route`
-lowercased-hyphenated), how much talent text to show.
+(names/descriptions), birthday, release date, banner history (from 3).
 
 **10. Weapons** · `/genshin-impact/weapons` · BUILT Oct 23 2026 (Adrian to QC). Adrian's calls: mirror the Characters
 page; include 1-2★; show whatever yatta has (no hand check for unreleased weapons); stats as rows per ascension step
@@ -694,12 +782,41 @@ series, weapon material first, cream count strips; Mora; each phase), refinement
 characters of that weapon type, 12 faces + "+N", link to Characters `?weapon=`), lore as a quote. The list also gained
 an **"On the weapon wish now"** strip (`#wpLive`, feed banner whose name has "weapon") and an "On wish" tag on those cards.
 Gotcha: `.gi-tile` is a `<span>` sized only as a flex/grid child, so the drawer sets `.wp-d-main .gi-tile { display: block }`.
+**Cards v2 (Oct 24 2026, Adrian: the tall wish-art cards were mostly empty space, "i cant see what is what")**: the list
+cards are now squares like the in-game inventory: the weapon's `icon` (yatta `UI_EquipIcon_*`, the diagonal one) on the
+game's rarity backing with its knot pattern (`site/images/genshin/rarity/<1-5>.webp` = the wiki's
+`Background_Item_<n>_Star`, saved once by hand: static game art, not in the feed script), framed/lifted like the
+Artifacts page's `.af-tile`, substat tag top left, name + stars on a dark foot. They no longer use `.ch-card`
+(genshin-weapons.css "CARDS"). The wish art (`art`) is still used by the drawer, the band heads and the live wish strip.
 Original plan:
 Data: `genshin-db/weapons.json` from yatta `weapon` + `weapon/{id}` (278; passive per refinement,
 base ATK/substat curves, ascension mats). Front end: filterable grid (type, rarity, substat), detail
 drawer with passive R1-R5 switch, materials and which domain/day. Optional static pages later.
 
-**11. Artifacts** · `/genshin-impact/artifacts` · planned
+**11. Artifacts** · `/genshin-impact/artifacts` · BUILT Oct 24 2026 (Adrian to QC). Adrian's calls: **its own design, not
+a Characters/Weapons mirror**; **square tiles** (the in-game inventory square), not tall cards; **Newest first** by default
+(A-Z the other sort; no "By domain" view); low-rarity sets **shown normally**; **build Best for** (Claude drafts, Adrian
+checks). Files: `genshin-impact/artifacts.html`, `genshin-artifacts.css/.js`, data `site/genshin-artifacts.json` (feed
+script `artifacts()`), icons `images/genshin/artifact/<setid>_<n>.webp` (256px; `_4` flower, `_2` plume, `_5` sands, `_1`
+goblet, `_3` circlet = yatta's EQUIP_BRACER / NECKLACE / SHOES / RING / DRESS), Best for `site/genshin-artifact-picks.json`
+(hand-written, never touched by the script: `{slug: [feed character names]}`; a set not in it shows no Best for).
+Data facts found while building: yatta's `source` is useless ("Obtained from Mystic Offering" for nearly every set), so the
+domain comes from the **wiki** (`Artifact Set Infobox` `source<rarity>.<n>`; a source page whose `Domain Infobox` type
+has "Blessing" = the artifact domain, its `region` + `area`), and the version from `{{Change History|x}}`. The wiki names
+6.x as **"Luna I", "Luna II"...** (`version_key()` sorts them after 5.x, before 7.0 -- confirm that's the real order).
+**Artifact domains are open every day** (the original plan's "domain + days" was wrong). Old domains drop 3-4 sets, newer
+ones 2; `pair` lists the others. `tag` = the 2-piece's stat for the filter (`BONUS_TAGS`, first match wins; RES first).
+`new` = the newest version's sets. "20 Original Resin a run" on the domain card (confirm). Best for draft (Oct 24 2026):
+28 sets up to 5.x, picks from common community use; 6.0+ sets left empty for Adrian. Page: `.gi-tb` header with five
+gold piece squares in an arc (three below 1600px) -> Newest | A-Z tray + search (set, piece, bonus text, Best for names)
+-> filters (2-piece stat with element emblems / stat icons, Drops in = region or "Not a domain", Rarity = highest
+rarity; phones fold the last two behind "Filters") -> the grid. Tile: rarity backing toned down on near-black, flower,
+2-piece tag top-left (element colour for elemental sets), "New" (red), name on the foot; hover = lift, a slow light ring
+behind the flower, the other four pieces rise into the foot. Inspect (`?s=<slug>`, a `<dialog>` centred on desktop, bottom
+sheet on phones): stage = the picked piece floating in a ring + the five slot keys + piece name and lore | name, rarity,
+version, tag, the bonuses in wells, Best for faces (link to Characters `?q=`), Where to farm (domain on its nation's art,
+"Open every day", resin), "Drops alongside" keys, other sources. Prev / next (arrow keys) walk the visible tiles.
+Original plan:
 Data: yatta `reliquary` + `reliquary/{id}` (63 sets, 2/4-pc text, pieces, `source` domain).
 Front end: set grid with piece icons, 2/4-pc bonuses, where it drops (domain + days), "best for"
 only if Adrian writes it (no invented recommendations).
@@ -729,26 +846,159 @@ feed). Front end: weekday tabs (default = today by server), every book with its 
 weapon material with its weapons; "My characters" picker saved in localStorage that highlights
 what YOU need today. Sunday = all open.
 
-**13. Birthdays** · `/genshin-impact/birthdays` · planned
+**13. Birthdays** · `/genshin-impact/birthdays` · BUILT Oct 24 2026 (Adrian to QC)
+As built: `site/genshin-impact/birthdays.html` + `genshin-birthdays.css/.js`; data = feed `characters` + `site/genshin-birthdays.json`
+(feed script `birthdays()`: `people` by id = yatta avatar title/bio/constellation/affiliation/special dish/namecard + the
+"Birthday" voice line from `avatarFetter` (titles vary: "Birthday", "Birthday: Wishing" (Xingqiu), "Birth Date" (Yae)), fetched
+once per id; `letters` by name = the newest mail in the wiki's Category:Birthday Mails, re-read once a day; namecard pictures
+`UI_NameCardPic_<key>_P` -> `images/genshin/namecard/char/`, once). "Today" = `GI.gameDay()` (04:00 reset, Adrian's call).
+**Feb 29 = Bennett**: the game sends his mail on Feb 28 in other years (wiki mail dates), so `dayIn()` moves him there;
+the ring counts in a 366-day year; his .ics rule is `BYMONTHDAY=-1`. Sections: header (next five wish cards fanned) ->
+jump tray / Add to calendar / server -> Spotlight (`?c=<slug>`, fixed height: 540 / 560 / 616 phone; wish card on the namecard,
+facts, countdown, drawn letter with a red wax seal + the real attachments) + Coming up (8) -> The year (drawn ring: dots in
+element colours, today's hand; 12 month calendars, phones = one month + month tray; filters `?el= ?nation= ?r= ?mine=1` dim
+instead of hide) -> Your birthday (localStorage `gi-bday`; twins / closest / same month + every character's line as a swipe row)
+-> By the numbers (all counted) -> Never miss one (.ics in the browser: all / mine / filtered / one) -> How birthdays work
+(`.gi-tips`, **Adrian to fact-check all six**). "Yours" = Farm today's `gi-farm-mine`; no picker on this page (it links to Farm).
+10 newer characters have no letter on the wiki yet (the letter box says so). The header fan changes with the date (decorative,
+fixed size) -- flagged to Adrian against the "one fixed picture" hero rule.
+Original plan:
 Data: feed `characters` (birthday). Front end: 12-month calendar grid with avatars on their days,
 today (server day) highlighted red, "next 5 birthdays" strip; in-game you get a birthday mail/cake
 (confirm wording).
 
-**14. Nations** · `/genshin-impact/nations` · planned (Lobby has the band)
+**14. Nations** · `/genshin-impact/nations` · BUILT Oct 24 2026 (Adrian to QC; he said "im not updated anymore": Claude
+checked every fact against the wiki itself, nothing hand-typed except `ARCHON_AS`). Files: `genshin-impact/nations.html`
+(shell spliced from farm.html), `genshin-nations.css/.js`; the page also links `genshin-characters.css` (wish cards) and
+`genshin-farm.css` (`.fm-tiers`, `.fm-face`). Data: `site/genshin-nations.json` from the feed script's `nations()` job,
+**checked once a day** (`checked` date gate, ~150 requests): facts from each nation's wiki `{{Region Infobox}}` (element,
+archon, ideal, `main city`, chapter, controlling_entity, festivals) + the official one-line description (`{{Description}}`, split
+at `<br>`, Liyue at its first sentence) + `{{Change History}}` -> `Version/<v>` (title, date); world bosses from the wiki's
+Normal Boss wikitext (`===Nation===` tables: boss, location, first drop = its material, `* Sliver` = gem series); weekly bosses
+from the RENDERED Weekly Boss page (DPL table; cut at `id="Gameplay_Notes"`, not the bare id, the contents box links it first);
+local specialties = yatta material `type` `localSpecialty<Nation>`; every drop's users = yatta `material/{id}` requiredBy.avatar.
+`ARCHON_AS` (god -> playable character, in the script) is the one hand-written map. Snezhnaya has no weekly boss on the wiki's
+list yet (Oct 24 2026), the page says so. **No nation emblems**: Fandom's image CDN answers 403 to bots (Claude didn't work
+around it); the page uses our element emblems + Moonsign. Nod-Krai: no archon, no ideal, Element "None (its mark is the
+Moonsign)". Page: `.gi-tb` on `art/teyvat-map.webp` + seelie `map` icon, facts = totals -> **The Traveler's road**: a drawn SVG
+map (genshin-nations.js MAP: hand coast + Inazuma islands, dot texture, element glows, compass, "Not to scale"; positions from
+each nation's official description, which the hover glass panel quotes), dashed road in release order, legs up to the open
+nation red + marching, node pulse; beside it the release list (version key, name, version name, date; hidden on phones) ->
+nation tray (`?n=`, Mondstadt = no param) + jump tray (People / Farming / Bosses / Specialties / Artifacts) -> **hero** on the
+namecard (eyebrow chapter + version, name, quoted tagline, facts well 3x2, stats line, the archon's wish card tilted with an
+"Archon" tag; one height for all 8, `measure()`, checked 420px phone / 422 desktop) -> People (element mix bar + wish cards,
+archon tagged) -> Farming (books + weapon materials: tiers, domain, Mon-Sun pips with today ringed, Open/Closed today per server
+tray, faces / weapon count linking Farm `?day=`) -> Bosses (world: material, area, gems, users; weekly: three drops + users;
+resin note from the wiki pages; phones = swipe rows) -> Local specialties (faces max 3 + "+N") -> Artifact domains (sets as
+keys to Artifacts `?s=`, tile = the set's top rarity) -> **Side by side** board (every nation's numbers, element mix, books; a row
+opens it) -> links. Faces link Characters `?q=<name>`.
+Original plan:
 Data: feed `characters` by region + static nation facts (archon element, ideal — currently in
 `NATIONS` in genshin.js; Nod-Krai text "An autonomous region of Snezhnaya" (confirm)). Front end:
 one big band per nation (namecard art), characters, talent book/weapon material series of that
 nation, release version. Drawn idea: a stylised Teyvat map with the nations as clickable regions.
 
-**15. Enemies** · `/genshin-impact/enemies` · planned (weak — Adrian approved anyway)
+**15. Enemies** · `/genshin-impact/enemies` · BUILT Oct 24 2026 (Adrian to QC). Adrian's calls: **combat enemies only** (no
+wildlife: yatta's 223 animals/fish/birds/critters left out); **dossier art = the wiki's archive picture hotlinked** in the browser
+(Fandom's CDN 403s bots, same as Nations; our yatta icon shows first and stays if the picture fails); **HP slider only if it checked
+out** (it did: yatta's `monsterCurve` x initValue == the wiki's `hp_ratio` x `Module:Enemy Stats/HP` table at Lv 1/50/90/100 for
+5 of 6 test enemies; Childe differed only because yatta's first entry is another phase); **all four extras** (Fighting now, hunt
+list, resistance board, tips). Files: `genshin-impact/enemies.html` (shell spliced from artifacts.html), `genshin-enemies.css/.js`.
+Data (feed script `enemies()`, checked once a day, each enemy's yatta detail fetched once):
+- **List** = the wiki's Category:Common Enemies / Elite Enemies / Normal Bosses / Weekly Bosses, pages with an `{{Enemy Infobox}}`
+  and at least one `{{Enemy Stats}}` (365; Wavebinder, 7.2, has no stats yet and is skipped). Name = page title minus a trailing
+  "(...)" (Azhdaha (Weekly Boss) -> Azhdaha).
+- **Resistances** = every `{{Enemy Stats}}` on the page = one form (heading above it, e.g. Phase 1..3), each with states
+  (`res1`..`res6` labels; a missing value = `resglobalN` or 10%, and state N falls back to ITS OWN resglobalN, not state 1's: the
+  template's rule). `Immune` -> `'I'`. Order Pyro Hydro Anemo Electro Dendro Cryo Geo Physical. **yatta's resistances are never
+  used: they miss immunities** (Pyro Slime reads 10% Pyro there). Cryo Regisvine's page types `res` for `res1`: accepted.
+- **Level stats** = `hp: [ratio, type]`, `atk: [ratio, type]`; `tables` in the file = the wiki's Module:Enemy Stats/HP + /ATK,
+  levels 1-100 per type. HP = ratio x table[lv]; DEF = 500 x (1 + 0.01 x lv). Open world only (the page says so).
+- **Energy** = `{{Energy Drops}}`: `[hp %, particles, orbs]` + element.
+- **Attacks** = `{{Enemy Attacks}}` name + first paragraph (cut near 260 chars); `enemy_text()` keeps the words inside
+  `{{Pyro}}` / `{{Color|Pyro DMG}}`. Stored in the -more file with yatta's `specialName`, lore (description) and in-game `tips`.
+- **yatta match**: English name, then the wiki's `{{Other Languages}}` zhs against yatta's `chs` list, then `ENEMY_ALIAS`
+  (Andrius, Rhodeia of Loch, Everlasting Lord of Arcane Wisdom). 28 stay wiki-only (mostly Theater-only Tenebrous Mimesis):
+  icon = the wiki's `<Name> Icon.png` thumb, no drops.
+- **Drops** = yatta's reward ids of type common material / boss material (incl. weekly talent drops) / gem. Per-kill amounts
+  left out (they depend on world level). yatta has no reward for ~50 enemies: those take the common series their **wiki drop-table
+  mates** drop (`{{Drops Table|type=Abyss Mages}}`, `{{Drops|Natlan Saurian}}`; marked `shared`, re-asked next run). 18 still have
+  none (special encounters). A common **series** = consecutive ids climbing in rarity (two-series enemies are split).
+  `materials{id}` = name, icon, rarity, kind, users (yatta requiredBy, one lookup per series' top tier), weapons (count).
+- `newest` = the newest version among listed enemies (7.1 now); the "New" tag = that version.
+Page: `.gi-tb` (five weekly bosses as tilted archive cards, middle raised) -> **Fighting now** (feed endgame: every enemy in Abyss
+floors 9-12 + the Theater season, matched by name / variants / " - suffix" stripped; toughest first; 8 on desktop + "Show all",
+a two-row swipe on phones; unmatched Local Legends show the feed's wiki icon and "Not in the archive yet") -> **The archive**: class
+tray with counts, search (name, family, group, faction, area, titles, variants, drop names, **character names** via drop users),
+filters Resists (any form/state above 10% or Immune) / Hits with / Family (phones fold the last two), sort By family (default,
+the in-game Archive's family order; weekly -> boss -> elite -> common inside) / Newest / A-Z; everything in the address
+(`?cls= &res= &deals= &fam= &sort= &q=`, `?e=<slug>` = dossier). **Not all 365 at once** (21,000px on a phone): By family = two
+rows per family + "Show all N", Newest/A-Z = six rows + "Show more" (rows = the grid's live column count). Tiles = the archive
+icon full-bleed, class colour strip at the foot (common grey, elite purple, world boss gold, weekly our red), up to 3 notable
+resistance chips (2 on phones), "Now" (in endgame) or "New". **Dossier** (`<dialog>`, Artifacts' recipe; bottom sheet on phones):
+stage = wiki art (fades in over the icon), class tag, name, archive titles, facts well (family, faction, where, hits with, weak
+point, added in), ability chips; sticky on desktop. Info = Fighting now box (links Endgame) -> form tray -> **drawn resistance
+chart** (8 columns from a zero line, dashed 10% line, Immune = hatched full column, below 10% = dashed outline) + state tray +
+verdict ("Hit it with X", "Anything but X works", "Shrugs off everything in this state" when the lowest is 50%+) -> **Stats by
+level** (slider 1-100, default 90; HP/ATK/DEF) -> **Energy drops** (drawn HP bar draining left to right, a tick per mark with
+orbs (circles) / particles (diamonds) above, % + what below) -> **Drops** (one row per series / boss material / gems; users'
+faces, yours ringed red) -> tip, attacks (5 + "Show all"), lore, variants. Prev/next (arrow keys) walk the filtered list.
+**Hunt list**: Ascension materials | Boss drops tray; per series: tiers, users + weapons count, "N of yours", Dropped by (6 +N,
+opens the dossier), Needed by (10 +N); yours first; "Only mine" key when `gi-farm-mine` has picks, else "Pick your characters"
+(links Farm). **Resistance board**: element tray; lanes Immune / Resists / Takes more from each enemy's first state (its name
+shown when it isn't Base/Normal, e.g. Regisvines open "Shielded" at 310%); desktop 18 + "Show all", phones two-row swipes.
+Hunt and board keep one height across their tabs (measured, re-measured on width change and font load). **How enemies work** =
+`.gi-tips`, six tips, **Adrian to fact-check** (10% base, Immune, states, below zero = half, DEF 500 + 5 per level, orbs = 3
+particles).
+Original plan:
 Data: yatta `monster` (577) + `monster/{id}` (drops, resistances if present — verify). Front end:
 searchable grid by type (bosses, weekly bosses, elites, common), detail with drops. Split into
 weekly-boss / boss / common files.
 
-**16. Achievements** · `/genshin-impact/achievements` · planned (weak — approved)
+**16. Achievements** · `/genshin-impact/achievements` · BUILT Oct 24 2026 (Adrian to QC). Adrian's calls: two panes (category
+rail | checklist), the game's category order, all four extras (UIAF import/export, compare with the game by UID, By the numbers
+chart, How it works tips), all 71 category namecards downloaded. Files: `genshin-impact/achievements.html` (shell from
+artifacts.html), `genshin-achievements.css/.js`. Data: ONE file `site/genshin-achievements.json` (~245 KB, ~69 KB gzipped; one
+file, not one per category, because search, the wheel and "closest" need every category) from the feed script's
+`achievements()`: yatta `achievement` + `namecard` (namecard names). Shape: `{source, latest, cats[{id, name, slug, medal,
+card: [name, art] | null, ach[{n, v, t[[tier id, text, Primogems, target]], tn? (tier names, only Tundra Gunsmith), q? (quest
+titles)}]}]}`. **A tier = one game id** (Zoo Tycoon = 80127/80128/80129), the same ids UIAF uses, so the page ticks tiers.
+`{param0}` in a description = that tier's target. 73 categories, 1,855 tiers, 14,090 Primogems, 71 namecards (Wonders of the
+World + Memories of the Heart have none), versions 1.0-7.1 (= the live game on Oct 24 2026). Not in any source: which ones
+are hidden or missable (the page claims neither). Storage: `gi-ach` = `{tier id: unix seconds ticked}` (one key, not one per
+id), `gi-ach-game` = last in-game count `{u, nick, n, t}`. Page: header (six nation medals on a shelf arch, trophy icon) ->
+jump tray -> **Progress** (drawn wheel: one segment per category, length = sqrt of its tiers so Wonders doesn't eat the ring,
+filled outward by your share, gold when a namecard category is done, red outer line = all ticked; hover = that category in
+the middle, click opens it | four number wells | Compare with the game = `GI.lookup` + `GI.API`, Enka's
+`finishAchievementNum` vs your ticks | Closest to a namecard (Quickest namecards before any tick)) -> **Namecard shelf** (71,
+two sideways rows, dimmed until earned, All / Earned / Not yet) -> **New in <latest>** (cards you can tick) -> **Checklist**
+(search over every category incl. quest names, To do / Done, major version tray; rail with medals + bars; pane head on the
+namecard; rows = tier stars (tap the top lit star again to untick it) + title + next tier's text + version + "Part of
+<quest>"; tap the text for the tier list; 40 rows a time, 20 on phones, "Show more"; Tick all / Untick all (two taps);
+`?c= &show= &ver= &q=`) -> **By the numbers** (bar per version, ticked vs left, readout on hover/focus; 4 counted facts incl.
+"Your oldest gap" with a To do link) -> **Your data** (UIAF v1.1 export = the backup, status 3 + target as `current`;
+import counts status 2/3 as done, merges or replaces, skips unknown ids; drop a file on the box; Clear all = two taps) ->
+**How achievements work** (6 `.gi-tips`). Phones: wheel + slim number rows side by side, closest as a swipe row, the rail
+becomes a picker key that opens it as a bottom sheet (`<dialog>`, the rail box is moved in and back), rows one line (text
+clamps; tap opens). **Adrian to fact-check**: the six tips (5/10/20 per star, claiming in the menu, hidden ones exist), and
+that Enka's `finishAchievementNum` counts tiers like the page does (the compare line assumes it).
+Original plan:
 Data: yatta `achievement` (571 KB) split per category into `genshin-db/achievements/*.json`.
 Front end: category list + checklist; ticks saved in localStorage (key per achievement id, wrapped
 in try/catch), progress bars, export/import as a file. Primogem rewards per achievement if present.
+
+### GROUP PAGES (7b, Oct 24 2026; cut down the same day, Adrian to QC)
+`/genshin-impact/events`, `/database`, `/tools`: each group's first page, named **"All events" / "Full database" / "All tools"** in
+the menus and More sheet (was "Discover": Adrian found it confusing). Adrian's rule: **banner, then the cards, nothing else**:
+straight to the footer. Header = `.gi-tb` (namecard live/database/tools art, the group's white nav icon drawn into `#dxIcon`, no
+facts line). `#dxDir` = one card per page of the group from game-nav.json: in-game icon in a sunken well, name, the page's `"desc"`
+(2 lines max), arrow in the top-right corner; "soon" pages last, dimmed, a Soon tag in that corner, not links. Three across on
+desktop (971-1280px: icon above the text so three still fit beside the sidebar), one on phones. **Card lines = `"desc"` in
+game-nav.json** next to each page; Adrian's rule: the first word says what the page is ("Redeem codes that still work, ...", "Pity
+odds of ..."), specific, no filler, ~55 characters so two lines hold it at 1440px. The script only reads game-nav.json (no feed).
+Removed Oct 24 2026 (Adrian): Events' wish-phase rail, Ending soonest, week rings, codes; Database's search, Today, roster; Tools'
+player lookup box, Wish math, community sites list (the Lobby still has its own copy of the sites).
+- The Lobby's "Coming to Parchrome" shows the three groups, each linking its group page.
 
 ### TOOLS (all client-side math; numbers in section 10 must be confirmed by Adrian)
 
@@ -787,7 +1037,7 @@ Current banners from the feed, real rates (P5 model + 4★ pity 10), the splash 
 with the real art, history + pity in localStorage, Primogems "spent" counter (160 each). Clearly a
 simulation.
 
-**23. Tools directory** · `/genshin-impact/tools` · planned
+**23. Tools directory** · folded into the Tools group page, then dropped from it (Oct 24 2026, 7b: cards only) · was planned
 The 11 curated sites (currently static in the Lobby HTML) moved to a JSON (`genshin-tools.json`)
 with categories + search, Web Resources card style (no live screenshots). Lobby keeps 6.
 

@@ -16,10 +16,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261023bc">
+<link rel="stylesheet" href="/11layout.css?v=20261024fb">
 <link rel="stylesheet" href="/coc-more.css?v=20261022gn">
-<link rel="stylesheet" href="/genshin.css?v=20261023ud">
-<link rel="stylesheet" href="/genshin-reruns.css?v=20261023v2">
+<link rel="stylesheet" href="/coc-help.css?v=20261024cc">
+<link rel="stylesheet" href="/genshin.css?v=20261025a">
+<link rel="stylesheet" href="/genshin-reruns.css?v=20261025a">
 </head>
 <body class="gi-page" data-game-nav="genshin-impact">
 
@@ -97,7 +98,7 @@
         <header class="gi-tb">
           <img class="gi-tb-art" src="/images/genshin/art/fatui-harbingers.webp" alt="" fetchpriority="high">
           <div class="gi-tb-body">
-            <img class="gi-tb-icon" src="/images/genshin/fate.webp" alt="" width="76" height="76">
+            <img class="gi-tb-icon" src="/images/genshin/nav/reruns.webp" alt="" width="76" height="76">
             <div class="gi-tb-copy">
               <h1 class="gi-title"><span class="gi-vh">Genshin Impact </span>Rerun <em>tracker</em></h1>
               <p class="gi-tb-desc">Every banner each character has been on since 1.0, how long since their last one, and who's overdue.</p>
@@ -106,25 +107,8 @@
           </div>
         </header>
 
-        <!-- ON THE WISHES NOW: each live phase, which run this is and how long everyone waited for it.
-             Hidden until genshin-reruns.js finds a live phase. -->
-        <section class="gi-sec rt-sec--first" id="rtNowSec" hidden>
-          <div class="gi-sec-head">
-            <div>
-              <h2 class="gi-title">On the wishes <em>now.</em></h2>
-              <p class="mch-sec-sub">Who's back, which run this is, and how long they were gone.</p>
-            </div>
-            <div class="gi-tray gi-tray--sm" id="rtSrv" role="group" aria-label="Server">
-              <button type="button" class="gi-tab" data-server="asia">Asia</button>
-              <button type="button" class="gi-tab" data-server="america">NA</button>
-              <button type="button" class="gi-tab" data-server="europe">EU</button>
-            </div>
-          </div>
-          <div class="rt-now-list" id="rtNow"></div>
-        </section>
-
         <!-- LONGEST WAITS: the top five as wish cards. Its own rarity tray. -->
-        <section class="gi-sec">
+        <section class="gi-sec rt-sec--first">
           <div class="gi-sec-head">
             <div>
               <h2 class="gi-title">Longest <em>waits.</em></h2>
@@ -136,6 +120,21 @@
             </div>
           </div>
           <div class="rt-top" id="rtTop"></div>
+        </section>
+
+        <!-- EVERY WISH SINCE 1.0: one column per phase, grouped by version, newest in view. -->
+        <section class="gi-sec">
+          <div class="gi-sec-head">
+            <div>
+              <h2 class="gi-title">Every wish since <em>1.0.</em></h2>
+              <p class="mch-sec-sub">Each phase's featured 5&#9733; and 4&#9733; characters, newest on the right. Tap a face for their history.</p>
+            </div>
+            <div class="gi-acts">
+              <button type="button" class="gi-key gi-arrow" id="rtRibPrev" aria-label="Older wishes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <button type="button" class="gi-key gi-arrow" id="rtRibNext" aria-label="Newer wishes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="gi-box rt-ribbon" id="rtRibbon"></div>
         </section>
 
         <!-- EVERY CHARACTER: rarity + sort, then element + weapon + search (kept in the address).
@@ -170,21 +169,6 @@
           </div>
           <div class="rt-head"><span class="rt-count"><span id="rtCount"></span><button type="button" class="rt-clear" id="rtClear" hidden>Clear filters</button></span><div class="rt-axis" id="rtAxis" aria-hidden="true"></div><span class="gi-label">Last banner</span><span class="gi-label">Waiting</span></div>
           <div class="rt-list" id="rtList"><p class="gi-empty">Loading the banner history&hellip;</p></div>
-        </section>
-
-        <!-- EVERY WISH SINCE 1.0: one column per phase, grouped by version, newest in view. -->
-        <section class="gi-sec">
-          <div class="gi-sec-head">
-            <div>
-              <h2 class="gi-title">Every wish since <em>1.0.</em></h2>
-              <p class="mch-sec-sub">Each phase's featured 5&#9733; and 4&#9733; characters, newest on the right. Tap a face for their history.</p>
-            </div>
-            <div class="gi-acts">
-              <button type="button" class="gi-key gi-arrow" id="rtRibPrev" aria-label="Older wishes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-              <button type="button" class="gi-key gi-arrow" id="rtRibNext" aria-label="Newer wishes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-            </div>
-          </div>
-          <div class="gi-box rt-ribbon" id="rtRibbon"></div>
         </section>
 
         <!-- RERUN RECORDS: tiles, then every 5-star comeback by how long it took. -->
@@ -276,8 +260,8 @@
   </div>
 </div>
 
-<script src="/11layout.js?v=20261023gp"></script>
-<script src="/genshin-core.js?v=20261023ci"></script>
-<script src="/genshin-reruns.js?v=20261023v2"></script>
+<script src="/11layout.js?v=20261024fb"></script>
+<script src="/genshin-core.js?v=20261025a"></script>
+<script src="/genshin-reruns.js?v=20261025a"></script>
 </body>
 </html>

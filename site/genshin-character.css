@@ -1,0 +1,412 @@
+/* ============================================================
+   GENSHIN IMPACT -- CHARACTER PAGES (Oct 25 2026, rework v2): /genshin-impact/characters/<slug>.
+   Written by scripts/genshin-characters.py (edit it and rerun, never the pages); behaviour:
+   genshin-character.js. Linked after genshin.css.
+
+   Layout (v3.2, Adrian): a Facebook-style profile header (her namecard as the cover, best in slot on it, her
+   face in a circle over its foot), then the body -- Farm, Teams, Best build
+   (genshin.gg's five weapons beside five artifact rows), Zy0x's video guide, then talents / constellations /
+   materials / base stats / wish history as plain blocks -- with her story and the quiet attribute rows on the
+   right.
+   Colour: the character's element (--el = "r,g,b") marks her own things; the site's red stays for #1 /
+   "best" / "open today". Everything else grey.
+   ============================================================ */
+
+.cp { --el: 152, 216, 240; }
+.cp .gi-tile { display: block; }
+/* Layout: the profile header across the top, then the body (farm, teams, build, video, the rest) with the
+   quiet attribute rows on the right. 24px under the bar: .coc-main already gives 16px of the bar's 64 back,
+   so 72 + 16 = 88 = 64 + 24. */
+.cp-page { display: grid; grid-template-columns: minmax(0, 1fr) 260px; grid-template-areas: 'head head' 'col card'; align-items: start; gap: 0 20px; padding-top: 72px; }
+.cp-head { grid-area: head; margin-bottom: 18px; }
+.cp-col { grid-area: col; min-width: 0; }
+/* Sticky offsets count from .coc-main's padding edge (16px under the window top): 72 lands 24px under the bar. */
+.cp-card { grid-area: card; position: sticky; top: 72px; max-height: calc(100vh - 100px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #2a2c35 transparent; } /* her story's Read more can't push it off screen */
+
+/* ---- PROFILE HEADER (Adrian: "like facebook"): namecard cover, face circle over its foot, name beside it ---- */
+.cp-cv { position: relative; height: 290px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: #15161b; box-shadow: var(--lb-shadow); }
+.cp-cv-nc { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%; border-radius: calc(var(--lb-r) - 2px); }
+.cp-cv::after { content: ''; position: absolute; inset: 0; border-radius: calc(var(--lb-r) - 2px); pointer-events: none; background: linear-gradient(0deg, rgba(10, 10, 12, 0.78), rgba(10, 10, 12, 0) 50%), linear-gradient(180deg, rgba(10, 10, 12, 0.35), rgba(10, 10, 12, 0) 30%); }
+.cp-cv-el { position: absolute; z-index: 2; top: 14px; left: 14px; width: 34px; height: 34px; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7)); }
+/* Best in slot: a glass pill on the cover, bottom right. */
+.cp-cv-bis { position: absolute; z-index: 2; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 8px; max-width: calc(100% - 200px); padding: 8px 14px 8px 8px; border-radius: 8px; background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(8px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); color: inherit; text-decoration: none; }
+.cp-cv-bis:hover { background: rgba(10, 10, 12, 0.72); }
+.cp-cv-bis .gi-tile { width: 44px; height: 44px; }
+.cp-cv-bis > span:last-child { display: grid; gap: 2px; min-width: 0; margin-left: 2px; }
+.cp-cv-bis small { font: 700 9.5px/1.2 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--gi-muted); }
+.cp-cv-bis b { overflow: hidden; font: 700 13px/1.3 'Sora', sans-serif; text-overflow: ellipsis; white-space: nowrap; color: #fff; }
+/* Her face: a circle over the cover's foot, ringed in her element. */
+.cp-cv-av { position: absolute; z-index: 3; left: 28px; bottom: -64px; width: 136px; height: 136px; overflow: hidden; border-radius: 50%; background: linear-gradient(160deg, #c99648, #8d5d2a); box-shadow: 0 0 0 5px #0b0b0c, 0 0 0 7px rgba(var(--el), 0.6); }
+.cp-cv-av.r4 { background: linear-gradient(160deg, #8a6cc2, #5b4785); }
+.cp-cv-av img { width: 100%; height: 100%; object-fit: cover; }
+.cp-me { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; min-height: 76px; padding: 14px 0 0 188px; }
+.cp-name { font: 800 32px/1.1 'Cinzel', serif !important; text-transform: uppercase; color: #fff; }
+.cp-sub { font-size: 13px; color: var(--gi-muted); }
+.cp-sub span { margin-left: 4px; letter-spacing: 1px; color: #f2c45a; }
+.cp-me .cp-tags { flex-basis: 100%; }
+.cp-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.cp-tags span { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 4px; background: var(--lb-well); box-shadow: var(--lb-ring-well); font: 700 10.5px/1 'Sora', sans-serif; color: #c9ccd2; }
+.cp-tags img { width: 14px; height: 14px; margin: -2px 0; }
+/* Her story (desktop only): the game's one-line description as a quote, the first paragraph of her Character
+   Details, the rest behind Read more. No box (Adrian): it sits on the page like the rows under it. */
+.cp-story { margin-bottom: 14px; padding: 2px 2px 0; }
+.cp-story .cp-sh { margin-bottom: 8px; }
+.cp-story blockquote { position: relative; margin-bottom: 10px; padding-left: 18px; font-size: 12.5px; font-style: italic; line-height: 1.55; color: #e6e8ec; }
+.cp-story blockquote::before { content: '“'; position: absolute; top: -4px; left: 0; font: 700 28px/1 Georgia, serif; color: rgb(var(--el)); } /* Cinzel has no curly quote */
+.cp-story p { font-size: 12px; line-height: 1.65; color: var(--gi-muted); }
+.cp-story details p { margin-top: 8px; }
+.cp-story summary { margin-top: 8px; cursor: pointer; font: 600 11.5px/1.4 'Sora', sans-serif; color: #e6e8ec; }
+.cp-story summary:hover { color: #fff; }
+/* The phone tab switch for Talents | Constellations (desktop shows both). */
+.cp-mtabs { display: none; }
+/* The right column: attribute rows, no box, small and grey. */
+.cp-attrs > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 2px; border-top: 1px solid var(--gi-line); }
+.cp-attrs > div:first-child { border-top: 0; padding-top: 2px; }
+.cp-attrs dt { flex: none; font-size: 11.5px; color: var(--gi-dim); }
+.cp-attrs dd { min-width: 0; font: 600 11.5px/1.35 'Sora', sans-serif; text-align: right; color: #c9ccd2; }
+.cp-attrs dd b { font-weight: 700; color: #e6e8ec; }
+.cp-attrs small { font-size: 10px; font-weight: 600; color: var(--gi-dim); }
+.cp-attrs #cpBday { color: var(--gi-acc-text); }
+.cp-about { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gi-line); font-size: 11.5px; line-height: 1.6; color: var(--gi-dim); }
+
+/* ---- BLOCKS (the body) ---- */
+.cp-block { margin-bottom: 14px; padding: 20px 22px 22px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.cp-bh { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 16px; }
+.cp-h { font: 800 22px/1.1 'Cinzel', serif !important; text-transform: uppercase; color: #fff; }
+.cp-bh-r { display: flex; flex: 1; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 10px; font-size: 12px; color: var(--gi-muted); }
+.cp-bh-r b { color: #fff; }
+.cp-bh-r i { padding: 3px 7px; border-radius: 4px; background: rgba(var(--el), 0.12); font: 700 10.5px/1.2 'Sora', sans-serif; font-style: normal; color: #e8f4fa; }
+.cp-bh-r small { font-size: 11px; color: var(--gi-dim); }
+.cp-sh { margin-bottom: 10px; font: 700 10.5px/1 'Sora', sans-serif; letter-spacing: 1.3px; text-transform: uppercase; color: #8e939b; }
+.cp-quiet { margin-top: 12px; font-size: 12px; line-height: 1.5; color: var(--gi-muted); }
+.cp-quiet a { color: #e6e8ec; }
+.cp-tag { flex: none; padding: 3px 6px 2px; border-radius: 4px; background: rgba(255, 255, 255, 0.07); font: 800 9px/1.2 'Sora', sans-serif; font-style: normal; letter-spacing: 0.8px; text-transform: uppercase; color: #c9ccd2; white-space: nowrap; }
+.cp-tag--bis { background: var(--gi-acc); color: #fff; }
+.cp-tag--f2p { background: none; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); color: #e6e8ec; }
+.cp-kind { font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: rgb(var(--el)); }
+
+/* ---- BUILD, genshin.gg's layout: five weapons beside five artifact rows, one line each for the rest ---- */
+.cp-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+.cp-gls { display: grid; gap: 6px; list-style: none; }
+.cp-gl { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 10px 6px 8px; border-radius: var(--lb-r); background: var(--lb-row); box-shadow: var(--lb-row-ring); color: inherit; text-decoration: none; transition: background-color 0.15s ease; }
+.cp-gl:hover { background: rgba(255, 255, 255, 0.06); }
+.cp-n { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 4px; background: var(--lb-raise); box-shadow: var(--lb-btn); font: 800 11px/1 'Sora', sans-serif; color: #c9ccd2; }
+.cp-gls > li:first-child .cp-n { background: var(--gi-acc); color: #fff; }
+.cp-gl .gi-tile { position: relative; flex: none; width: 42px; height: 42px; }
+.cp-gl .gi-tile > b { position: absolute; right: 1px; bottom: 1px; padding: 1px 4px; border-radius: 3px; background: rgba(10, 10, 12, 0.85); font: 800 10px/1.2 'Sora', sans-serif; color: #fff; }
+.cp-gl-t { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.cp-gl-t b { overflow: hidden; font: 700 13.5px/1.25 'Sora', sans-serif; text-overflow: ellipsis; white-space: nowrap; color: #fff; }
+.cp-gl-t small { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; color: var(--gi-muted); }
+.cp-pc { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; }
+.cp-gl.is-two .cp-pc + .cp-pc { padding-left: 10px; border-left: 1px solid var(--gi-line); }
+.cp-gl.is-two .cp-gl-t b { font-size: 12.5px; }
+.cp-mains { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 14px; list-style: none; }
+.cp-mains li { display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 10px 8px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); font-size: 12.5px; text-align: center; }
+.cp-mains span { color: var(--gi-muted); }
+.cp-mains span::after { content: ':'; }
+.cp-mains b { font-weight: 700; color: #fff; }
+.cp-line { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; margin-top: 10px; padding: 9px 4px 0; border-top: 1px solid var(--gi-line); font-size: 12.5px; line-height: 1.5; color: #c9ccd2; }
+.cp-line > span:first-child { font: 700 10px/1.9 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--gi-dim); }
+.cp-line b { color: #fff; }
+.cp-line i { margin: 0 7px; font-style: normal; color: #5d616b; }
+.cp-mains + .cp-line { margin-top: 14px; }
+
+/* ---- VIDEO: a thumbnail until clicked (no YouTube player loads before that) ---- */
+.cp-yt { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--lb-r); background: #000; box-shadow: var(--lb-ring-well); }
+.cp-yt button { position: absolute; inset: 0; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.cp-yt img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.82); transition: filter 0.2s ease; }
+.cp-yt button::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(8, 8, 10, 0.85), transparent 40%); }
+.cp-yt-play { position: absolute; z-index: 1; top: 50%; left: 50%; width: 68px; height: 48px; border-radius: 12px; background: var(--gi-acc); transform: translate(-50%, -50%); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); transition: transform 0.2s var(--gi-ease), background-color 0.2s ease; }
+.cp-yt-play::after { content: ''; position: absolute; top: 50%; left: 50%; border-style: solid; border-width: 10px 0 10px 17px; border-color: transparent transparent transparent #fff; transform: translate(-40%, -50%); }
+.cp-yt-t { position: absolute; z-index: 1; left: 18px; right: 18px; bottom: 14px; font: 700 14px/1.35 'Sora', sans-serif; text-align: left; color: #fff; }
+.cp-yt button:hover img { filter: brightness(1); }
+.cp-yt button:hover .cp-yt-play { background: var(--gi-acc-hover); transform: translate(-50%, -50%) scale(1.06); }
+.cp-yt button:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+.cp-yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.cp-bh-r a { color: #fff; }
+
+/* ---- TEAMS: the second biggest ---- */
+.cp-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; list-style: none; }
+.cp-team { padding: 16px 18px 18px; border-radius: var(--lb-r); background: var(--lb-row); box-shadow: var(--lb-row-ring); }
+.cp-team header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cp-team header b { font: 800 15px/1.2 'Cinzel', serif; text-transform: uppercase; color: #fff; }
+.cp-team-faces { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); justify-items: center; gap: 6px; margin: 14px 0 12px; }
+.cp-team > p { font-size: 12.5px; line-height: 1.5; color: var(--gi-muted); }
+.cp-face { position: relative; display: grid; justify-items: center; gap: 5px; width: 100%; color: inherit; text-decoration: none; }
+.cp-face .gi-tile { width: 66px; height: 66px; border-radius: 50%; box-shadow: 0 0 0 2px var(--lb-edge); transition: transform 0.2s var(--gi-ease), box-shadow 0.2s ease; }
+span.cp-face .gi-tile { box-shadow: 0 0 0 2px rgba(var(--el), 0.8); }
+.cp-face-el { position: absolute; top: -2px; left: calc(50% + 18px); width: 20px; height: 20px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)); }
+.cp-face-n { display: -webkit-box; max-width: 100%; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; font: 600 11px/1.2 'Sora', sans-serif; text-align: center; text-wrap: balance; color: #e6e8ec; }
+.cp-face small { font: 700 9px/1 'Sora', sans-serif; letter-spacing: 0.7px; text-transform: uppercase; color: var(--gi-muted); }
+a.cp-face:hover .gi-tile { transform: translateY(-3px); box-shadow: 0 0 0 2px rgba(var(--el), 0.7); }
+a.cp-face:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 8px; }
+
+/* ---- FARM: a slim strip ---- */
+.cp-farm { padding: 18px 20px 20px; }
+.cp-farm .cp-bh { margin-bottom: 14px; }
+.cp-farm .cp-h { font-size: 18px; }
+.cp-farm .cp-bh-r { justify-content: flex-start; }
+.cp-farms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; list-style: none; }
+.cp-fi { display: flex; align-items: center; gap: 10px; height: 100%; padding: 8px 10px 8px 8px; border-radius: var(--lb-r); background: var(--lb-row); box-shadow: var(--lb-row-ring); color: inherit; text-decoration: none; transition: background-color 0.15s ease; }
+.cp-fi:hover { background: rgba(255, 255, 255, 0.06); }
+.cp-fi .gi-tile { width: 40px; height: 40px; }
+.cp-fi-t { display: grid; gap: 2px; min-width: 0; }
+.cp-fi-t small { font: 600 9px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--gi-dim); }
+.cp-fi-t b { overflow: hidden; font: 700 12.5px/1.25 'Sora', sans-serif; text-overflow: ellipsis; white-space: nowrap; color: #fff; }
+.cp-fi-t em { overflow: hidden; font-size: 11px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; color: var(--gi-muted); }
+.is-book em span { padding: 1px 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.07); font-weight: 700; color: #c9ccd2; }
+.is-book em span.is-open { background: var(--gi-acc); color: #fff; }
+
+/* ---- THE REST: talents, constellations, materials, base stats, wish history -- one plain block each (no tabs, Adrian) ---- */
+.cp-pane-note { margin-bottom: 14px; font-size: 12.5px; line-height: 1.5; color: var(--gi-muted); }
+.cp-pane-note b { color: #fff; }
+.cp-text p { font-size: 13.5px; line-height: 1.65; color: #c9ccd2; }
+.cp-text p + p { margin-top: 10px; }
+.cp-text b { font-weight: 700; }
+.cp-hl { color: #fff; }
+.cp-cryo { color: #98d8f0; }
+.cp-pyro { color: #ef8a4c; }
+.cp-hydro { color: #4cb8ef; }
+.cp-anemo { color: #5fd3b4; }
+.cp-electro { color: #b48ef0; }
+.cp-dendro { color: #a5c83b; }
+.cp-geo { color: #efc35e; }
+.cp-text i { color: var(--gi-muted); }
+/* Talents: a row of icons, then the picked one's text beside its numbers. */
+/* position: relative so the buttons' hidden labels (.gi-vh is absolute) stay inside this scroller: without it they
+   escaped it and stretched the page sideways on phones. */
+.cp-ttabs { position: relative; display: flex; gap: 4px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none; }
+.cp-ttabs::-webkit-scrollbar { display: none; }
+.cp-ttab { display: grid; flex: 0 0 auto; justify-items: center; gap: 5px; width: 64px; padding: 7px 2px 6px; border: 2px solid transparent; border-radius: var(--lb-r); background: none; color: #8b9099; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; }
+.cp-ttab:hover { background: rgba(255, 255, 255, 0.04); color: #c9ccd2; }
+.cp-ttab.active { border-color: var(--lb-edge); background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.cp-ttab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.cp-ttab-k { font: 800 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; }
+.cp-tico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #1b1c22; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.cp-tico img { width: 28px; height: 28px; opacity: 0.7; }
+.cp-ttab.active .cp-tico { background: rgba(var(--el), 0.2); box-shadow: inset 0 0 0 1px rgba(var(--el), 0.55); }
+.cp-ttab.active .cp-tico img { opacity: 1; }
+.cp-tico--lg { width: 46px; height: 46px; background: rgba(var(--el), 0.2); box-shadow: inset 0 0 0 1px rgba(var(--el), 0.55); }
+.cp-tico--lg img { width: 34px; height: 34px; opacity: 1; }
+/* Every talent in one grid cell (visibility, not display), so switching never changes the height. */
+.cp-tpanels { display: grid; grid-template-columns: minmax(0, 1fr); } /* minmax(0): an auto column grows to the widest panel and the page scrolls sideways */
+.cp-tpanel { grid-area: 1 / 1; display: grid; gap: 24px; align-content: start; visibility: hidden; }
+.cp-tpanel.has-table { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.cp-tpanel.is-on { visibility: visible; }
+.cp-thead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.cp-thead h3 { margin-top: 5px; font: 800 17px/1.2 'Cinzel', serif !important; text-transform: uppercase; color: #fff; }
+.cp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.cp-chips span { display: inline-flex; align-items: baseline; gap: 5px; padding: 5px 8px 4px; border-radius: 4px; background: var(--lb-well); box-shadow: var(--lb-ring-well); font: 800 12px/1 'Sora', sans-serif; color: #fff; }
+.cp-chips small { font: 600 9px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--gi-muted); }
+.cp-chips .is-con small { color: rgb(var(--el)); }
+.cp-chips .is-goal { background: rgba(var(--gi-acc-rgb), 0.18); box-shadow: inset 0 0 0 1px rgba(var(--gi-acc-rgb), 0.4); }
+.cp-why { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: var(--gi-muted); }
+.cp-why b { color: #e6e8ec; }
+.cp-tech { margin-top: 12px; }
+.cp-tech summary { cursor: pointer; font: 600 11.5px/1.4 'Sora', sans-serif; color: var(--gi-dim); }
+.cp-tech summary:hover { color: #fff; }
+.cp-tech { overflow-x: auto; }
+.cp-tech table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 11.5px; }
+.cp-tech th, .cp-tech td { padding: 6px; text-align: left; border-bottom: 1px solid var(--gi-line); }
+.cp-tech thead th { font: 600 9px/1.2 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--gi-dim); }
+.cp-tech tbody th { color: #fff; }
+.cp-tech td { color: #c9ccd2; }
+.cp-scale { align-self: start; padding: 14px 16px 10px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.cp-scale-head { display: flex; align-items: center; justify-content: space-between; }
+.cp-scale-head output { font: 800 18px/1 'Cinzel', serif; color: #fff; }
+.cp-range { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; margin: 8px 0 0; background: none; cursor: pointer; }
+.cp-range::-webkit-slider-runnable-track { height: 5px; border-radius: 3px; background: linear-gradient(90deg, rgb(var(--el)) var(--p), #2a2c34 var(--p)); }
+.cp-range::-moz-range-track { height: 5px; border-radius: 3px; background: linear-gradient(90deg, rgb(var(--el)) var(--p), #2a2c34 var(--p)); }
+.cp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border: 2px solid var(--lb-edge); border-radius: 50%; background: #f1f3f6; }
+.cp-range::-moz-range-thumb { width: 14px; height: 14px; border: 2px solid var(--lb-edge); border-radius: 50%; background: #f1f3f6; }
+.cp-range:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 4px; }
+.cp-range-marks { position: relative; height: 14px; margin-bottom: 4px; font: 600 9.5px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.cp-range-marks span { position: absolute; top: 3px; }
+.cp-range-marks span:first-child { left: 0; }
+.cp-range-marks span:nth-child(2) { left: calc(var(--m10, 100%) - 6px); }
+.cp-range-marks span:nth-child(2):last-child { left: auto; right: 0; }
+.cp-range-marks .is-con { right: 0; color: rgb(var(--el)); }
+.cp-scale-t { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.cp-scale-t th, .cp-scale-t td { padding: 6px 4px; border-top: 1px solid var(--gi-line); }
+.cp-scale-t th { font-weight: 500; text-align: left; color: #b9bdc4; }
+.cp-scale-t td { font-weight: 700; text-align: right; color: #fff; }
+.cp-scale-t td.is-new { color: rgb(var(--el)); }
+/* Constellations: two columns, icon + text. */
+.cp-cons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 22px; list-style: none; }
+.cp-cons li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--gi-line); }
+.cp-cons img { width: 40px; height: 40px; padding: 5px; border-radius: 50%; background: rgba(var(--el), 0.14); box-shadow: inset 0 0 0 1px rgba(var(--el), 0.4); }
+.cp-cons h4 { margin: 5px 0 6px; font: 700 14px/1.25 'Sora', sans-serif; color: #fff; }
+.cp-cons .cp-text p { font-size: 12.5px; line-height: 1.55; }
+/* Materials: tiles with the game's cream count strip; then the goal planner. */
+.cp-matrow { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto auto; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--gi-line); }
+.cp-matrow .cp-sh { margin: 0; }
+.cp-mats { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+.cp-mats li { display: grid; width: 46px; }
+.cp-mats .gi-tile { width: 46px; height: 46px; border-radius: 5px 5px 0 0; }
+.cp-mats li > b { padding: 3px 0 2px; border-radius: 0 0 5px 5px; background: #e9e2d2; text-align: center; font: 800 10px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #3b342a; }
+.cp-mora { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px 5px 5px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); vertical-align: middle; }
+.cp-mora img { width: 20px; height: 20px; }
+/* Breakdown: the key at a total's end opens the same total step by step (one row per level), sums at the foot. */
+.cp-brk-key { width: 34px; height: 34px; padding: 0; }
+.cp-brk-key[aria-expanded='true'] { background: var(--lb-well); box-shadow: var(--lb-ring-well); color: #fff; }
+.cp-brk { grid-column: 1 / -1; margin-top: 2px; padding: 4px 14px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); list-style: none; }
+.cp-brk > li { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--gi-line); }
+.cp-brk > li:first-child { border-top: 0; }
+.cp-brk > li > span:first-child { font: 700 12px/1.2 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #c9ccd2; }
+.cp-brk > li.is-total > span:first-child { font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: #fff; }
+.cp-brk > li.is-total { border-top-color: rgba(255, 255, 255, 0.16); }
+.cp-brk .cp-mats { gap: 5px; }
+.cp-brk .cp-mats li { width: 34px; }
+.cp-brk .cp-mats .gi-tile { width: 34px; height: 34px; }
+.cp-brk .cp-mats li > b { font-size: 9px; }
+.cp-brk .cp-mora { padding: 3px 8px 3px 4px; }
+.cp-brk .cp-mora img { width: 16px; height: 16px; }
+.cp-brk .cp-mora b { font-size: 11.5px; }
+.cp-mora b { font: 800 13px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; letter-spacing: 0; text-transform: none; color: #f1d58f; }
+.cp-goal { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 24px; margin-top: 18px; }
+.cp-goal-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 8px; margin-top: 8px; font-size: 12.5px; color: #e6e8ec; }
+.cp-goal-row i { font-style: normal; color: #5d616b; }
+.cp-step { display: flex; align-items: center; padding: 2px; border: 2px solid var(--lb-edge); border-radius: calc(var(--lb-r) + 2px); background: var(--lb-well); }
+.cp-step button { width: 24px; height: 24px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-raise); box-shadow: var(--lb-btn); font: 700 13px/1 'Sora', sans-serif; color: #e6e8ec; cursor: pointer; }
+.cp-step button:hover { background: var(--lb-raise-hover); color: #fff; }
+.cp-step button:disabled { opacity: 0.3; cursor: default; }
+.cp-step button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.cp-step output { min-width: 44px; text-align: center; font: 800 12px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #fff; }
+.cp-goal-out .cp-sh { display: flex; align-items: center; justify-content: space-between; }
+.cp-goal-out .cp-mats:empty::before { content: 'Nothing: she is already there.'; font-size: 12.5px; color: var(--gi-muted); }
+/* Similar characters: hand-picked, the Characters list's wish-card art, why on the card's foot. */
+.cp-sims { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; list-style: none; }
+.cp-sim { position: relative; display: block; aspect-ratio: 5 / 8; overflow: hidden; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: linear-gradient(160deg, #4a3c68, #211b30); box-shadow: var(--lb-shadow); color: inherit; text-decoration: none; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+.cp-sim.r5 { background: linear-gradient(160deg, #6a4c2a, #2b2014); }
+.cp-sim > .cp-sim-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; filter: brightness(0.78) saturate(0.78); transition: filter 0.3s ease; }
+.cp-sim > .cp-sim-el { position: absolute; z-index: 2; top: 7px; left: 7px; width: 22px; height: 22px; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8)); }
+.cp-sim-foot { position: absolute; z-index: 2; inset: auto 0 0; display: grid; gap: 3px; padding: 36px 10px 11px; background: linear-gradient(180deg, rgba(10, 10, 12, 0) 0%, rgba(10, 10, 12, 0.82) 45%, rgba(10, 10, 12, 0.95) 100%); }
+.cp-sim-foot b { overflow: hidden; font: 700 13px/1.2 'Sora', sans-serif; text-overflow: ellipsis; white-space: nowrap; color: #fff; }
+.cp-sim-foot span { font-size: 10px; line-height: 1; letter-spacing: 1px; color: #f1c95f; }
+.cp-sim-foot small { margin-top: 2px; font-size: 11px; line-height: 1.35; color: #c4c7cd; }
+.cp-sim:hover { border-color: rgba(var(--gi-acc-rgb), 0.6); box-shadow: var(--lb-shadow-hover); }
+.cp-sim:hover > .cp-sim-art { filter: none; }
+.cp-sim:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* Base stats: one small table. */
+.cp-stbl { overflow-x: auto; }
+.cp-stbl table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.cp-stbl th, .cp-stbl td { padding: 8px 10px; text-align: right; white-space: nowrap; }
+.cp-stbl thead th { font: 700 10px/1 'Sora', sans-serif; letter-spacing: 0.8px; color: var(--gi-muted); border-bottom: 1px solid var(--gi-line); }
+.cp-stbl tbody th { text-align: left; font-weight: 700; color: #fff; }
+.cp-stbl td { color: #c9ccd2; }
+.cp-stbl tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+.cp-stbl td:nth-child(9) { font-weight: 800; color: #fff; }
+/* Wishes (genshin-character.js): numbers, a drawn line, then each banner as one row. */
+.cp-wnums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.cp-wnums > div { padding: 12px 14px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.cp-wnums small { display: block; font: 600 9.5px/1 'Sora', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--gi-muted); }
+.cp-wnums b { display: block; margin-top: 7px; font: 800 19px/1 'Cinzel', serif; color: #fff; font-variant-numeric: tabular-nums; }
+.cp-wnums span { display: block; margin-top: 5px; font-size: 11px; color: var(--gi-dim); }
+.cp-wnums .is-now b { color: var(--gi-acc-text); }
+.cp-wline { margin-top: 12px; }
+.cp-wline svg { display: block; width: 100%; height: auto; overflow: visible; }
+.cp-wline .axis { stroke: rgba(255, 255, 255, 0.12); stroke-width: 2; }
+.cp-wline .yr { stroke: rgba(255, 255, 255, 0.05); }
+.cp-wline text { font: 600 10px 'Sora', sans-serif; fill: #6f737b; text-anchor: middle; }
+.cp-wline text.v { font-weight: 800; fill: #e6e8ec; }
+.cp-wline text.now-t { fill: var(--gi-acc-text); }
+.cp-wline .ev { fill: rgb(var(--el)); }
+.cp-wline .ch { fill: #0d0e12; stroke: rgb(var(--el)); stroke-width: 1.5; }
+.cp-wline .live { fill: var(--gi-acc); }
+.cp-wline .now { stroke: var(--gi-acc); stroke-width: 1.5; }
+.cp-wline .wait { stroke: rgba(var(--gi-acc-rgb), 0.55); stroke-width: 2; stroke-dasharray: 3 4; }
+.cp-runs { margin-top: 8px; list-style: none; }
+.cp-runs li { display: grid; grid-template-columns: 54px 110px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--gi-line); font-size: 12px; color: var(--gi-muted); }
+.cp-runs b { font: 800 14px/1 'Cinzel', serif; color: #fff; }
+.cp-runs .cp-tag.is-live { background: var(--gi-acc); color: #fff; }
+.cp-run-faces { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.cp-run-faces .gi-tile { width: 26px; height: 26px; border-radius: 50%; }
+
+/* ---- LAPTOPS (sidebar in) ---- */
+@media (min-width: 971px) and (max-width: 1500px) {
+  .cp-face .gi-tile { width: 54px; height: 54px; }
+  .cp-face-el { left: calc(50% + 13px); width: 18px; height: 18px; }
+  .cp-team { padding: 14px 12px 16px; }
+  .cp-face-n { font-size: 10px; letter-spacing: -0.1px; } /* Sangonomiya, one long word, still fits */
+  .cp-team-faces { gap: 0; }
+  .cp-team { padding: 14px 8px 16px; }
+  .cp-team header, .cp-team > p { padding: 0 4px; }
+  .cp-page { grid-template-columns: minmax(0, 1fr) 232px; gap: 16px; }
+  .cp-tpanel.has-table { grid-template-columns: minmax(0, 1fr); }
+  .cp-goal { grid-template-columns: minmax(0, 1fr); }
+  .cp-farms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cp-matrow { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .cp-matrow > .cp-mats { grid-column: 1 / -1; grid-row: 2; }
+  .cp-cons { grid-template-columns: minmax(0, 1fr); }
+}
+@media (min-width: 971px) and (max-width: 1300px) {
+  .cp-two { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---- PHONES: the profile is a slim band on top, then the body ---- */
+@media (max-width: 970px) {
+  .cp-page { display: block; padding-top: 52px; }
+  /* Phones: the same header, smaller (cover at the namecard's own 840:400), then the attribute rows in two columns. */
+  .cp-head { margin-bottom: 10px; }
+  .cp-cv { height: auto; aspect-ratio: 840 / 400; }
+  .cp-cv-el { top: 10px; left: 10px; width: 26px; height: 26px; }
+  .cp-cv-bis { right: 8px; bottom: 8px; gap: 6px; max-width: calc(100% - 124px); padding: 6px 10px 6px 6px; }
+  .cp-cv-bis .gi-tile { width: 34px; height: 34px; }
+  .cp-cv-bis small { font-size: 8.5px; letter-spacing: 0.8px; }
+  .cp-cv-bis b { font-size: 11px; }
+  .cp-cv-av { left: 12px; bottom: -44px; width: 92px; height: 92px; box-shadow: 0 0 0 4px #0b0b0c, 0 0 0 6px rgba(var(--el), 0.6); }
+  .cp-me { display: block; min-height: 54px; padding: 8px 2px 0 118px; }
+  .cp-name { font-size: 21px !important; }
+  .cp-sub { margin-top: 4px; font-size: 12px; }
+  .cp-me .cp-tags { margin-top: 10px; }
+  .cp-card { position: static; margin-bottom: 10px; }
+  .cp-attrs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+  .cp-attrs > div,
+  .cp-attrs > div:first-child { display: grid; gap: 3px; padding: 7px 0; border-top: 1px solid var(--gi-line); }
+  .cp-attrs dd { text-align: left; }
+  .cp-about, .cp-story { display: none; }
+  .cp-card { max-height: none; overflow: visible; }
+  /* Talents | Constellations: one at a time, Talents first; the tray stands in for their titles. */
+  .cp-mtabs { display: flex; margin-bottom: 10px; }
+  .cp-col[data-m='talents'] #cons,
+  .cp-col[data-m='cons'] #talents { display: none; }
+  #talents > .cp-bh, #cons > .cp-bh { display: none; }
+  .cp-cons li { padding: 10px 0; gap: 10px; grid-template-columns: 34px minmax(0, 1fr); }
+  .cp-cons img { width: 34px; height: 34px; padding: 4px; }
+  .cp-cons .cp-text p { font-size: 12px; }
+
+  .cp-block, .cp-build { margin-bottom: 10px; padding: 16px; }
+  .cp-h { font-size: 18px; }
+  .cp-bh { margin-bottom: 12px; }
+  .cp-bh-r { justify-content: flex-start; flex-basis: 100%; }
+  .cp-two { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .cp-gl.is-two { flex-wrap: wrap; }
+  .cp-gl.is-two .cp-pc { flex: 1 1 40%; }
+  .cp-mains { grid-template-columns: minmax(0, 1fr); }
+  .cp-mains li { justify-content: space-between; }
+  .cp-line { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .cp-teams { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .cp-team { padding: 14px; }
+  .cp-face .gi-tile { width: 54px; height: 54px; }
+  .cp-face-el { left: calc(50% + 14px); width: 18px; height: 18px; }
+  .cp-farm .cp-bh-r { flex-basis: auto; }
+  .cp-farms { display: flex; margin: 0 -16px; padding: 0 16px 2px; overflow-x: auto; scrollbar-width: none; }
+  .cp-farms::-webkit-scrollbar { display: none; }
+  .cp-farms li { flex: 0 0 168px; }
+  .cp-yt-t { font-size: 12px; left: 12px; right: 12px; bottom: 10px; }
+  .cp-yt-play { width: 56px; height: 40px; }
+
+  .cp-tpanel, .cp-tpanel.has-table { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .cp-cons { grid-template-columns: minmax(0, 1fr); }
+  .cp-matrow { grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; }
+  .cp-matrow > .cp-mats { grid-column: 1 / -1; grid-row: 2; }
+  .cp-brk { padding: 2px 12px; }
+  .cp-brk > li { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .cp-brk > li > .cp-mats { grid-column: 1 / -1; grid-row: 2; }
+  .cp-sims { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .cp-sim { aspect-ratio: 4 / 5; } /* 5:8 in a 2x2 grid is a whole phone screen tall */
+  .cp-goal { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .cp-wnums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cp-runs li { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .cp-runs li > span:nth-child(2) { display: none; }
+}

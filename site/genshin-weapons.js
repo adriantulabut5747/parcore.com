@@ -27,6 +27,7 @@
   let subs = [];
   let feed = { characters: [], banners: [] };
   let wish = null; // the live Weapon Event Wish, if any
+  let hasLive = false; // #wpLive got filled
 
   // Address <-> state. Unknown values fall back to "all", so a hand-edited link can't break the page.
   const url = new URLSearchParams(location.search);
@@ -64,13 +65,15 @@
   };
   const onWish = (w) => wish && wish.weapons.some((x) => x.name === w.name);
 
-  // One card: a button (opens the drawer). Info line on hover / focus, like the character cards.
+  // One card: a square button (opens the drawer) like the in-game inventory: the weapon's icon on
+  // the game's rarity backing (/images/genshin/rarity/<n>.webp, set in the CSS), substat top left.
+  const SUB_SHORT = { 'Elemental Mastery': 'EM', 'Energy Recharge': 'ER', 'Physical DMG Bonus': 'Phys DMG' };
   function card(w) {
-    const art = w.art ? `<img class="ch-art wp-art" src="${esc(w.art)}" alt="" loading="lazy" decoding="async" width="256" height="512">` : `<img class="ch-art wp-art is-icon" src="${esc(w.icon)}" alt="" loading="lazy" decoding="async">`;
-    const info = [w.type, w.sub || 'No substat', `${top(w)[2]} ATK`].map(esc).join(' &middot; ');
-    return `<li><button type="button" class="ch-card wp-card r${w.rarity}" data-id="${w.id}" aria-label="${esc(w.name)}, ${w.rarity} stars">
-      ${art}${onWish(w) ? '<span class="ch-tags"><span class="ch-live">On wish</span></span>' : ''}
-      <div class="ch-foot"><b>${esc(w.name)}</b><span class="ch-stars" aria-hidden="true">${stars(w.rarity)}</span><span class="ch-info">${info}</span></div>
+    const sub = w.sub ? `<span class="wp-tile-tag">${si(SUB_ICON[w.sub])}${esc(SUB_SHORT[w.sub] || w.sub)}</span>` : '';
+    return `<li><button type="button" class="wp-card r${w.rarity}" data-id="${w.id}" aria-label="${esc(w.name)}, ${w.rarity} stars">
+      <img class="wp-tile-ico" src="${esc(w.icon)}" alt="" loading="lazy" decoding="async" width="256" height="256">
+      ${sub}${onWish(w) ? '<span class="ch-tags"><span class="ch-live">On wish</span></span>' : ''}
+      <span class="wp-tile-foot"><b>${esc(w.name)}</b><span class="wp-tile-stars" aria-hidden="true">${stars(w.rarity)}</span></span>
     </button></li>`;
   }
   const grid = (list) => `<ul class="ch-grid wp-grid">${list.map(card).join('')}</ul>`;
@@ -113,6 +116,7 @@
     $('wpMoreN').hidden = !hidden;
     $('wpMoreN').textContent = hidden;
     $('wpClear').hidden = !(state.type || state.rarity || state.sub || state.day || state.q.trim());
+    $('wpLive').hidden = !hasLive || !!(state.type || state.rarity || state.sub || state.day); // a ticked filter = you're hunting, not browsing
     paint();
     save();
     if (open) position();
@@ -173,7 +177,7 @@
       </div>
       <ul class="wp-live-five">${five.map(mini).join('')}</ul>
       <ul class="wp-live-four">${four.map(mini).join('')}</ul>`;
-    box.hidden = false;
+    hasLive = true; // render() shows it
     GI.countdowns();
   }
   $('wpLive').addEventListener('click', (e) => {
@@ -186,6 +190,9 @@
   const dlg = $('wpDrawer');
   const sheet = $('wpSheet');
   const body = $('wpDBody');
+  // What scrolls: the right column on desktop (the hero stays put), the whole sheet on phones.
+  const phone = () => matchMedia('(max-width: 970px)').matches;
+  const scroller = () => (phone() ? body : $('wpDInfo'));
   let refine = 0;
   let opener = null;
   GI.stars($('wpHero')); // one sky for the drawer's life; only #wpHeroIn / #wpDMain are swapped
@@ -382,7 +389,7 @@
         if (!vis) return;
         $('wpJump').querySelectorAll('.gi-tab').forEach((b) => b.classList.toggle('active', b.dataset.to === vis.target.id));
       },
-      { root: body, rootMargin: '-30% 0px -60% 0px' }
+      { root: scroller(), rootMargin: '-30% 0px -60% 0px' }
     );
     secs.forEach((s) => spy.observe(s));
   }
@@ -390,7 +397,8 @@
     const b = e.target.closest('[data-to]');
     if (!b) return;
     const s = $(b.dataset.to);
-    body.scrollTo({ top: s.offsetTop - $('wpJump').offsetHeight - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    const sc = scroller();
+    sc.scrollTo({ top: sc.scrollTop + s.getBoundingClientRect().top - sc.getBoundingClientRect().top - $('wpJump').offsetHeight - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   });
 
   // Prev / next walk the cards in the order they're shown now (view + filters).
@@ -428,7 +436,7 @@
     $('wpDMain').innerHTML = main(w);
     jumpTray();
     position();
-    body.scrollTop = 0;
+    body.scrollTop = $('wpDInfo').scrollTop = 0;
     sheet.style.transform = '';
     if (!dlg.open) dlg.showModal();
     GI.countdowns();
@@ -485,33 +493,8 @@
       .catch(() => {});
   });
 
-  // Phones: drag the handle (or the header) down to close, like the More sheet.
-  let drag = null;
-  const startDrag = (e) => {
-    if (e.target.closest('button') || !matchMedia('(max-width: 970px)').matches) return;
-    drag = { y: e.clientY, dy: 0, t: performance.now() };
-    sheet.classList.add('is-dragging');
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-  const moveDrag = (e) => {
-    if (!drag) return;
-    drag.dy = Math.max(0, e.clientY - drag.y);
-    sheet.style.transform = `translateY(${drag.dy}px)`;
-  };
-  const endDrag = () => {
-    if (!drag) return;
-    const fast = drag.dy / (performance.now() - drag.t) > 0.6;
-    sheet.classList.remove('is-dragging');
-    if (drag.dy > 120 || (fast && drag.dy > 30)) hide();
-    else sheet.style.transform = '';
-    drag = null;
-  };
-  [$('wpGrip'), $('wpDBar')].forEach((el) => {
-    el.addEventListener('pointerdown', startDrag);
-    el.addEventListener('pointermove', moveDrag);
-    el.addEventListener('pointerup', endDrag);
-    el.addEventListener('pointercancel', endDrag);
-  });
+  // Phones: drag the grip / header down (or pull the content down at the top) to close.
+  GI.sheetDrag(sheet, [$('wpGrip'), $('wpDBar')], body, hide);
 
   $('wpList').addEventListener('click', (e) => {
     const b = e.target.closest('.wp-card');

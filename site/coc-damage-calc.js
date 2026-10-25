@@ -2,10 +2,11 @@
    DAMAGE CALCULATOR (/coc/tools/damage-calculator) -- everything inside
    #damageCalc, built from coc-damage-calc.json (numbers from the Clash of
    Clans wiki). Two boxes:
-   - Your attack (#dcAttack): one row per spell / equipment. Unused ones
-     are a slim row with a +; used ones open up with their count, level and
-     damage ("720 each · 2,160 total"). On phones the box docks above the
-     bottom nav as a tray (#dcTray) and opens as a sheet.
+   - Your attack (#dcAttack): one row per spell / equipment, the same row
+     whether it's used or not (Oct 25 2026): picture, name, a level key that
+     opens the level list, its damage, one count stepper; a row at 0 is
+     dimmed. On phones the box is a bottom sheet opened by a round key
+     (#dcFab) bottom-right.
    - Targets (#dcGrid): a card per building / hero: picture at its level
      (tap the Lv pill to change it), hitpoints left, a bar split by which
      attack took what, and a DESTROYED stamp when nothing is left. Tap the
@@ -57,7 +58,7 @@
   };
 
   var data;
-  var s = { th: 18, kit: {}, lv: {}, cat: 'all', q: '', sort: false, open: {}, lvOpen: null, sheet: false };
+  var s = { th: 18, kit: {}, lv: {}, cat: 'all', q: '', sort: false, open: {}, lvOpen: null, kitLv: null, sheet: false };
   var wasDead = {}; // which cards were destroyed last render -- the stamp only lands on new ones
 
   var $ = (sel) => root.querySelector(sel);
@@ -73,7 +74,6 @@
     plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
     minus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>',
     chev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
-    up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>',
     list: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
     close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     sort: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h5"/></svg>',
@@ -307,62 +307,80 @@
         return '<b>' + fmt(r[1]) + '</b> damage';
     }
   }
-  // What one of it does, for the slim (unused) row.
-  function brief(a, k) {
-    var r = row(a.levels, k.l);
+  // What one of it does at level l (the level list).
+  function brief(a, l) {
+    var r = row(a.levels, l);
     if (a.id === 'earthquake') return pct1(r[1]) + '%';
     if (a.id === 'rocket-spear') return fmt(rcHit() + r[1]) + ' a throw';
     return fmt(r[1]);
   }
+  // One row look for every spell / equipment (Oct 25 2026, Adrian: the +
+  // that turned into two steppers was confusing): picture with its count,
+  // name, a level key (the CoC drop-down: .am-th + .am-pop list), what it
+  // does, and one count stepper. A row at 0 is dimmed.
   function kitRow(a) {
     var k = kitOf(a);
     var top = maxAt(a.levels, s.th);
     var cap = capOf(a, k.l);
     var on = k.n > 0;
-    var tile =
-      '<span class="as-tile dc-kit-tile"><img src="' +
+    var open = s.kitLv === a.id;
+    var lvls = [];
+    for (var l = top; l >= 1; l--) lvls.push(l);
+    return (
+      '<li class="dc-kit-row' +
+      (on ? ' is-on' : '') +
+      '" data-a="' +
+      a.id +
+      '"><span class="as-tile dc-kit-tile"><img src="' +
       UNIT_IMG +
       esc(a.img) +
       '" alt="" width="48" height="48" loading="lazy">' +
       (on ? '<span class="as-n">&times;' + k.n + '</span>' : '') +
-      '</span>';
-    var who = a.hero ? '<span class="dc-kit-hero">' + esc(a.hero) + '</span>' : '<span class="dc-kit-hero">Spell</span>';
-    if (!on) {
-      return (
-        '<li class="dc-kit-row" data-a="' +
-        a.id +
-        '">' +
-        tile +
-        '<span class="dc-kit-text"><span class="dc-kit-name">' +
-        esc(a.name) +
-        '</span>' +
-        who +
-        '</span><span class="dc-kit-brief">' +
-        brief(a, k) +
-        '</span><button type="button" class="dc-add" data-cnt="1" data-id="' +
-        a.id +
-        '" aria-label="Add ' +
-        esc(a.name) +
-        '">' +
-        ICON.plus +
-        '</button></li>'
-      );
-    }
-    return (
-      '<li class="dc-kit-row is-on" data-a="' +
-      a.id +
-      '">' +
-      tile +
-      '<span class="dc-kit-text"><span class="dc-kit-name">' +
+      '</span><span class="dc-kit-text"><span class="dc-kit-name">' +
       esc(a.name) +
-      '</span>' +
-      who +
-      '</span>' +
-      stepper('cnt', a.id, 'number of ' + a.name, k.n, true, k.n < cap, 'dc-step-count') +
-      '<span class="dc-kit-dmg">' +
-      damageLine(a, k) +
-      '</span>' +
-      stepper('lvl', a.id, a.name + ' level', 'Lv ' + k.l, k.l > 1, k.l < top, 'dc-step-level') +
+      '</span><span class="dc-kit-sub"><button type="button" class="am-th dc-kit-lv" data-kitlv="' +
+      a.id +
+      '" aria-haspopup="listbox" aria-expanded="' +
+      open +
+      '" aria-label="' +
+      esc(a.name) +
+      ' level ' +
+      k.l +
+      ', change level"' +
+      (top > 1 ? '' : ' disabled') +
+      '>Lv ' +
+      k.l +
+      (top > 1 ? ICON.chev.replace('<svg', '<svg class="am-chev"') : '') +
+      '</button><span class="dc-kit-hero">' +
+      esc(a.hero || 'Spell') +
+      '</span></span><span class="dc-kit-dmg">' +
+      damageLine(a, { l: k.l, n: Math.max(1, k.n) }) +
+      '</span></span>' +
+      stepper('cnt', a.id, 'number of ' + a.name, k.n, on, k.n < cap, 'dc-step-count') +
+      (open
+        ? '<div class="am-pop dc-kit-menu" role="listbox" aria-label="' +
+          esc(a.name) +
+          ' level">' +
+          lvls
+            .map(
+              (l) =>
+                '<button type="button" role="option" class="am-th-opt' +
+                (l === k.l ? ' is-on' : '') +
+                '" data-setlv="' +
+                l +
+                '" data-id="' +
+                a.id +
+                '" aria-selected="' +
+                (l === k.l) +
+                '"><span>Level ' +
+                l +
+                '</span><b>' +
+                brief(a, l) +
+                '</b></button>',
+            )
+            .join('') +
+          '</div>'
+        : '') +
       '</li>'
     );
   }
@@ -376,38 +394,19 @@
       ? 'Unlocks later: ' + locked.map((a) => esc(a.name) + ' <span>TH' + Math.max(a.levels[0][2], heroTh(a)) + '</span>').join(', ')
       : '';
     $('#dcClear').hidden = !used().length;
-    renderTray();
+    renderFab();
   }
-  // Phone tray: the attack at a glance (tiles + counts) and the tally.
-  function renderTray() {
+  // Phones: the round key shows how many spells / pieces you're bringing;
+  // the sheet's bar shows the tally.
+  function renderFab() {
     var u = used();
-    var tiles = u.length
-      ? '<span class="dc-tray-tiles">' +
-        u
-          .map(
-            (a) =>
-              '<span class="as-tile"><img src="' +
-              UNIT_IMG +
-              esc(a.img) +
-              '" alt="" width="32" height="32"><span class="as-n">&times;' +
-              kitOf(a).n +
-              '</span></span>',
-          )
-          .join('') +
-        '</span>'
-      : '<span class="dc-tray-empty">Add spells and equipment</span>';
-    $('#dcTray').innerHTML =
-      '<span class="dc-tray-label">Your attack</span>' +
-      tiles +
-      '<span class="dc-tray-score">' +
-      tally(true) +
-      '</span><span class="dc-tray-chev">' +
-      ICON.up +
-      '</span>';
-    $('#dcTray').setAttribute(
+    var n = u.reduce((x, a) => x + kitOf(a).n, 0);
+    $('#dcFab').innerHTML = ICON.plus + (n ? '<span class="dc-fab-n">' + n + '</span>' : '');
+    $('#dcFab').setAttribute(
       'aria-label',
-      'Your attack: ' + (u.length ? u.map((a) => kitOf(a).n + ' ' + a.name).join(', ') : 'empty') + '. Edit',
+      'Your attack: ' + (u.length ? u.map((a) => kitOf(a).n + ' ' + a.name).join(', ') : 'empty') + '. Add spells and equipment',
     );
+    $('#dcBarTally').innerHTML = u.length ? tally(false) : 'Add spells and equipment';
   }
   function tally(short) {
     var all = data.targets.filter(targetOpen);
@@ -591,10 +590,13 @@
   function sheet(open) {
     s.sheet = open;
     root.classList.toggle('is-sheet', open);
-    $('#dcTray').setAttribute('aria-expanded', open);
+    $('#dcFab').setAttribute('aria-expanded', open);
     $('#dcScrim').hidden = !open;
     document.documentElement.classList.toggle('dc-lock', open);
+    $('#dcAttack').style.transform = ''; // a drag's leftover
   }
+  // Drag the grip / bar down, or pull the list down at its top, to close (phones).
+  cocSheetDrag($('#dcAttack'), [$('#dcGrip'), $('#dcBar')], $('#dcAttackBody'), () => sheet(false));
 
   // ---- Events -------------------------------------------------------------------
   function refocus(sel) {
@@ -605,7 +607,29 @@
     if (e.target.id === 'dcScrim') return sheet(false);
     var b = e.target.closest('button');
     if (!b || !root.contains(b) || b.disabled) return;
-    if (b.id === 'dcTray') return sheet(!s.sheet);
+    if (b.id === 'dcFab') {
+      sheet(true);
+      return refocus('#dcClose');
+    }
+    if (b.id === 'dcClose') {
+      sheet(false);
+      return refocus('#dcFab');
+    }
+    if (b.dataset.kitlv) {
+      s.kitLv = s.kitLv === b.dataset.kitlv ? null : b.dataset.kitlv;
+      renderKit();
+      return refocus(s.kitLv ? '.dc-kit-menu .is-on' : '[data-kitlv="' + b.dataset.kitlv + '"]');
+    }
+    if (b.dataset.setlv) {
+      var ka = data.attacks.filter((x) => x.id === b.dataset.id)[0];
+      var kk = s.kit[ka.id] || (s.kit[ka.id] = { l: maxAt(ka.levels, s.th), n: 0 });
+      kk.l = +b.dataset.setlv;
+      kk.n = Math.min(capOf(ka, kk.l), kk.n);
+      s.kitLv = null;
+      renderKit();
+      renderGrid();
+      return refocus('[data-kitlv="' + ka.id + '"]');
+    }
     if (b.id === 'dcThBtn') return thMenu();
     if (b.classList.contains('am-th-opt')) {
       thMenu(false);
@@ -644,9 +668,7 @@
         if (tile) tile.classList.add('is-bump');
       }
       var kind = b.dataset.lvl ? 'lvl' : 'cnt';
-      return refocus(
-        '[data-id="' + id + '"][data-' + kind + '="' + dir + '"]:not([disabled])' + (k.n ? '' : ', .dc-add[data-id="' + id + '"]'),
-      );
+      return refocus('[data-id="' + id + '"][data-' + kind + '="' + dir + '"]:not([disabled]), [data-id="' + id + '"][data-' + kind + ']:not([disabled])');
     }
     if (b.dataset.lvpill) {
       s.lvOpen = b.dataset.lvpill;
@@ -668,6 +690,10 @@
   // Clicking anywhere else closes the Town Hall list and an open level pill.
   document.addEventListener('click', function (e) {
     if (!e.target.closest('#dcThs')) thMenu(false);
+    if (s.kitLv && !e.target.closest('.dc-kit-menu, .dc-kit-lv')) {
+      s.kitLv = null;
+      renderKit();
+    }
     if (s.lvOpen && !e.target.closest('.dc-lv-step, .dc-lv')) {
       s.lvOpen = null;
       renderGrid();
@@ -679,6 +705,12 @@
       thMenu(false);
       return refocus('#dcThBtn');
     }
+    if (s.kitLv) {
+      var kid = s.kitLv;
+      s.kitLv = null;
+      renderKit();
+      return refocus('[data-kitlv="' + kid + '"]');
+    }
     if (s.lvOpen) {
       var id = s.lvOpen;
       s.lvOpen = null;
@@ -687,7 +719,7 @@
     }
     if (s.sheet) {
       sheet(false);
-      refocus('#dcTray');
+      refocus('#dcFab');
     }
   });
   root.addEventListener('animationend', function (e) {

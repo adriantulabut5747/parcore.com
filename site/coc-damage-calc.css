@@ -147,7 +147,9 @@
 .dc-attack {
   padding: 20px;
 }
-.dc-tray {
+/* phones only: the round key, the sheet's bar */
+.dc-fab,
+.dc-sheet-bar {
   display: none;
 }
 .dc-kit {
@@ -159,21 +161,26 @@
   list-style: none;
 }
 
-/* Unused: a slim row -- tile, name, what one does, and a +. */
+/* One row look for every spell / equipment, used or not (Oct 25 2026, Adrian:
+   the + that opened into two steppers was confusing): picture (with its
+   count), name, a level key + where it's from, its damage, one count
+   stepper. At 0 the row is dimmed; in use it's a lifted strip. */
 .dc-kit-row {
+  position: relative;
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) auto auto;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 9px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
 }
 .dc-kit-row:first-child {
   border-top: 0;
 }
 .dc-kit-tile.as-tile {
-  width: 38px;
-  height: 38px;
+  align-self: start;
+  width: 44px;
+  height: 44px;
   transition: transform 0.2s var(--dc-ease);
 }
 .dc-kit-row:not(.is-on) .dc-kit-tile img {
@@ -186,6 +193,7 @@
 .dc-kit-text {
   display: flex;
   flex-direction: column;
+  gap: 5px;
   min-width: 0;
 }
 .dc-kit-name {
@@ -193,100 +201,59 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   font:
-    600 13.5px/1.3 'Sora',
+    600 13.5px/1.2 'Sora',
     sans-serif;
   color: #e6e7ea;
 }
 .dc-kit-row:not(.is-on) .dc-kit-name {
   color: #c6c9ce;
 }
-.dc-kit-hero {
-  font:
-    500 11px/1.4 'Sora',
-    sans-serif;
-  color: var(--dc-faint);
+.dc-kit-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
-.dc-kit-brief {
+/* the level key: the Town Hall picker's key, small */
+.dc-kit-lv.am-th {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 3px;
+  height: 24px;
+  padding: 0 4px 1px 7px;
   font:
-    600 12px 'Oxanium',
+    700 11px/1 'Oxanium',
     sans-serif;
-  color: var(--dc-faint);
-}
-.dc-add {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  border: 2px solid var(--lb-edge);
-  background: var(--lb-raise);
-  box-shadow: var(--lb-btn);
-  color: #c8cbcd;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
 }
-.dc-add:hover {
-  background: var(--lb-raise-hover);
-  color: #fff;
+.dc-kit-lv .am-chev {
+  width: 13px;
+  height: 13px;
 }
-.dc-add:active {
-  transform: translateY(1px);
-  box-shadow: var(--lb-btn-down);
+.dc-kit-lv:disabled {
+  padding-right: 7px;
+  cursor: default;
 }
-
-/* Used: the row opens -- bigger tile with its count chip, the count
-   stepper, the damage line, then the level. A lifted strip, not a card. */
-.dc-kit-row.is-on {
-  grid-template-columns: 48px minmax(0, 1fr) auto;
-  grid-template-areas:
-    'tile text count'
-    'tile dmg dmg'
-    '. lvl lvl';
-  row-gap: 6px;
-  margin: 4px -10px;
-  padding: 12px 10px;
-  border-top-color: transparent;
-  border-radius: 4px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-.dc-kit-row.is-on + .dc-kit-row {
-  border-top-color: transparent;
-}
-.dc-kit-row.is-on .dc-kit-tile {
-  grid-area: tile;
-  align-self: start;
-  width: 48px;
-  height: 48px;
-}
-.dc-kit-row.is-on .dc-kit-text {
-  grid-area: text;
-}
-.dc-kit-row.is-on .dc-step-count {
-  grid-area: count;
-}
-.dc-step-count button {
-  width: 32px;
-  height: 32px;
-}
-.dc-step-count output {
-  min-width: 32px;
-  font-size: 15px;
+.dc-kit-hero {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font:
+    500 11px/1.3 'Sora',
+    sans-serif;
+  color: var(--dc-faint);
 }
 .dc-kit-dmg {
-  grid-area: dmg;
   font:
-    600 12px/1.4 'Oxanium',
+    600 11.5px/1.35 'Oxanium',
     sans-serif;
   color: var(--dc-muted);
 }
 .dc-kit-dmg b {
   margin-right: 2px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #f4f5f7;
@@ -295,16 +262,48 @@
   font-style: normal;
   color: #4a4e55;
 }
-.dc-step-level {
-  grid-area: lvl;
-  justify-self: start;
+.dc-kit-row:not(.is-on) .dc-kit-dmg,
+.dc-kit-row:not(.is-on) .dc-kit-dmg b {
+  color: var(--dc-faint);
 }
-.dc-step-level button {
-  width: 24px;
-  height: 24px;
+.dc-kit-row.is-on {
+  margin: 0 -10px;
+  padding: 10px;
+  border-top-color: transparent;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
-.dc-step-level output {
-  font-size: 11px;
+.dc-kit-row.is-on + .dc-kit-row {
+  border-top-color: transparent;
+}
+.dc-step-count button {
+  width: 32px;
+  height: 32px;
+}
+.dc-step-count output {
+  min-width: 30px;
+  font-size: 15px;
+}
+.dc-kit-row:not(.is-on) .dc-step-count output {
+  color: var(--dc-faint);
+}
+/* the level list (the CoC drop-down), under the level key */
+.dc-kit-menu {
+  top: calc(100% - 6px);
+  left: 56px;
+  width: 210px;
+  max-height: 260px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.dc-kit-menu .am-th-opt {
+  padding: 8px 10px;
+}
+.dc-kit-menu .am-th-opt b {
+  font-weight: 600;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
   color: var(--dc-muted);
 }
 .dc-kit-tile.is-bump {
@@ -975,135 +974,129 @@
     display: inline-flex;
   }
 
+  /* The attack is a bottom sheet over everything (the bottom nav is z 9999),
+     off-screen until the round key opens it. Drag = cocSheetDrag (th-layouts.js). */
   .dc-attack {
     position: fixed;
-    left: 10px;
-    right: 10px;
-    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
-    z-index: 900;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10001;
     display: flex;
     flex-direction: column;
+    max-height: calc(100% - 40px);
     margin: 0;
     padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: #17181c;
-    box-shadow: 0 -10px 36px -8px rgba(0, 0, 0, 0.85);
-    transition: bottom 0.3s ease;
+    border: 2px solid var(--lb-edge);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: var(--lb-box);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      0 -20px 50px -10px rgba(0, 0, 0, 0.85);
+    visibility: hidden;
+    transform: translateY(100%);
+    transition:
+      transform 0.3s var(--dc-ease),
+      visibility 0s 0.3s;
   }
-  /* The bottom nav slides away on scroll; the tray follows it down. */
-  body:has(.bn-bar.bn-hidden) .dc-attack {
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  .dc.is-sheet .dc-attack {
+    visibility: visible;
+    transform: none;
+    transition: transform 0.3s var(--dc-ease);
   }
-  .dc-tray {
+  .dc-attack.is-dragging {
+    transition: none;
+  }
+  .dc-sheet-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    min-height: 58px;
-    padding: 0 12px 0 14px;
-    border: 0;
-    background: none;
-    color: inherit;
-    text-align: left;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    gap: 12px;
+    padding: 10px 10px 12px 16px;
+    border-bottom: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
+    touch-action: none;
   }
-  .dc-tray-label {
-    flex: none;
-    font:
-      700 13px 'Sora',
-      sans-serif;
-    color: var(--dc-text);
-  }
-  .dc-tray-tiles {
+  .dc-sheet-ttl {
     display: flex;
-    flex: 1;
+    flex-direction: column;
     gap: 5px;
-    min-width: 0;
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 18px), transparent);
-    mask-image: linear-gradient(90deg, #000 calc(100% - 18px), transparent);
-  }
-  .dc-tray-tiles .as-tile {
-    width: 34px;
-    height: 34px;
-  }
-  .dc-tray-tiles .as-n {
-    font-size: 10px;
-  }
-  .dc-tray-empty {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    font:
-      12.5px 'Sora',
-      sans-serif;
-    color: var(--dc-faint);
   }
-  .dc-tray-score {
-    flex: none;
+  .dc-sheet-ttl b {
     font:
-      600 12px 'Oxanium',
+      700 14px/1 'Sora',
+      sans-serif;
+    color: #fff;
+  }
+  .dc-sheet-ttl span {
+    font:
+      600 11.5px/1.2 'Sora',
       sans-serif;
     color: var(--dc-muted);
   }
-  .dc-tray-score b {
-    font-size: 17px;
+  .dc-sheet-ttl span b {
+    display: inline;
+    font:
+      800 12px/1 'Oxanium',
+      sans-serif;
     color: var(--dc-red);
   }
-  .dc-tray-chev {
+  /* close = an X key (Genshin Artifacts' sheet) */
+  .dc-sheet-x {
     display: grid;
     place-items: center;
     flex: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 4px;
+    width: 38px;
+    height: 36px;
+    padding: 0 0 2px;
     border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
     background: var(--lb-raise);
     box-shadow: var(--lb-btn);
-    color: #c8cbcd;
-    transition: transform 0.3s var(--dc-ease);
+    color: #e6e8ec;
+    cursor: pointer;
   }
-  .dc.is-sheet .dc-tray-chev {
-    transform: rotate(180deg);
+  .dc-sheet-x:active {
+    transform: translateY(1px);
+    box-shadow: var(--lb-btn-down);
+  }
+  .dc-sheet-x svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
   }
   .dc-attack-body {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.34s var(--dc-ease);
-  }
-  .dc.is-sheet .dc-attack-body {
-    grid-template-rows: 1fr;
-  }
-  .dc-attack-inner {
+    flex: 1;
     min-height: 0;
-    overflow: hidden;
-  }
-  .dc.is-sheet .dc-attack-inner {
-    max-height: calc(78vh - 58px);
-    padding: 4px 16px 16px;
     overflow-y: auto;
     overscroll-behavior: contain;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .dc.is-sheet .dc-head {
+  .dc-attack-inner {
+    padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+  /* the bar already says "Your attack" */
+  .dc-attack .dc-head {
     align-items: center;
     padding-top: 12px;
   }
-  /* The tray already says \"Your attack\" above it. */
-  .dc.is-sheet .dc-attack .dc-title {
+  .dc-attack .dc-title {
     display: none;
   }
-  .dc.is-sheet .dc-attack .dc-intro {
+  .dc-attack .dc-intro {
     margin: 0;
+    font-size: 12.5px;
+  }
+  .dc-kit {
+    margin-top: 12px;
   }
   .dc-scrim {
     position: fixed;
     inset: 0;
-    z-index: 899;
+    z-index: 10000;
     display: block;
     background: rgba(5, 6, 8, 0.6);
     animation: dcFade 0.2s ease-out;
@@ -1121,28 +1114,85 @@
   .dc-kit-row:nth-child(2) {
     border-top: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
   }
-
-  /* Bigger touch targets: 40px+ on every control a thumb reaches for. */
-  .dc-add,
+  .dc-kit-row.is-on + .dc-kit-row {
+    border-top-color: transparent;
+  }
+  /* Bigger touch targets: 40px on the count a thumb reaches for. */
   .dc-step-count button {
     width: 40px;
     height: 40px;
   }
-  .dc-step-level button {
-    width: 34px;
-    height: 34px;
+  .dc-kit-lv.am-th {
+    height: 30px;
+    padding: 0 6px 1px 9px;
+  }
+
+  /* the round key: bottom-right, above the bottom nav (and down with it when it hides) */
+  .dc-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    z-index: 950;
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    padding: 0 0 3px;
+    border: 2px solid var(--lb-red-edge);
+    border-radius: 50%;
+    background: var(--lb-red);
+    box-shadow:
+      var(--lb-btn-red),
+      0 10px 24px -6px rgba(0, 0, 0, 0.8);
+    color: #fff;
+    cursor: pointer;
+    transition:
+      bottom 0.3s ease,
+      transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body:has(.bn-bar.bn-hidden) .dc-fab {
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  .dc-fab:active {
+    transform: translateY(1px) scale(0.97);
+  }
+  .dc-fab svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  /* how many spells / pieces are in the attack */
+  .dc-fab-n {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    border: 2px solid var(--lb-edge);
+    border-radius: 11px;
+    background: #f4f5f7;
+    font:
+      800 11.5px/18px 'Oxanium',
+      sans-serif;
+    text-align: center;
+    color: #14151a;
   }
 
   .dc-targets {
-    margin-bottom: 92px;
+    margin-bottom: 72px;
     padding: 16px 12px;
   }
   .dc-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
   .dc-card {
-    padding: 6px 6px 0;
+    padding: 4px 4px 0;
   }
   .dc-hp b {
     font-size: 19px;
@@ -1157,6 +1207,97 @@
   }
   .dc-info {
     padding: 8px 2px 10px;
+  }
+}
+
+/* Narrow cards (3 a row on phones, ~110-150px): the card is its own size
+   container, so everything inside shrinks to fit only when the card is small. */
+@container (max-width: 160px) {
+  .dc-card .dc-lv {
+    left: 4px;
+    bottom: 4px;
+    height: 26px;
+    padding: 0 4px 0 6px;
+    font-size: 10.5px;
+  }
+  .dc-card .dc-lv svg {
+    width: 10px;
+    height: 10px;
+  }
+  .dc-card .dc-lv-step {
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    padding: 2px;
+  }
+  .dc-card .dc-lv-step button {
+    width: 26px;
+    height: 26px;
+  }
+  .dc-card .dc-lv-step button svg {
+    width: 11px;
+    height: 11px;
+  }
+  .dc-card .dc-lv-step output {
+    min-width: 0;
+    padding: 0 2px;
+    font-size: 11px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .dc-card .dc-info {
+    padding: 7px 1px 9px;
+  }
+  .dc-card .dc-name {
+    gap: 4px;
+    font-size: 11.5px;
+  }
+  .dc-card .dc-info-ico svg {
+    width: 12px;
+    height: 12px;
+  }
+  .dc-card .dc-hp {
+    flex-wrap: wrap;
+    column-gap: 3px;
+  }
+  .dc-card .dc-hp b {
+    font-size: 15px;
+  }
+  .dc-card .dc-hp span {
+    font-size: 10px;
+  }
+  .dc-card .dc-meter {
+    height: 5px;
+    margin-top: 5px;
+  }
+  .dc-card .dc-st {
+    font-size: 10px;
+  }
+  .dc-card .dc-bd {
+    padding: 6px;
+  }
+  .dc-card .dc-bd li {
+    gap: 4px;
+    font-size: 9.5px;
+  }
+  .dc-card .dc-bd-val {
+    font-size: 10px;
+  }
+}
+
+/* Smallest phones (360px): the stepper's keys give the level room. */
+@container (max-width: 110px) {
+  .dc-card .dc-lv-step {
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+  }
+  .dc-card .dc-lv-step button {
+    width: 22px;
+    height: 24px;
+  }
+  .dc-card .dc-lv-step output {
+    font-size: 10px;
   }
 }
 

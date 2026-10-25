@@ -1,4 +1,4 @@
-// Genshin Impact events timeline (/genshin-impact/events, Oct 23 2026). Everything
+// Genshin Impact events timeline (/genshin-impact/timeline, Oct 23 2026; moved from /events Oct 24 2026). Everything
 // running this version on one chart: wishes (this version's phases from
 // /genshin-history.json + the live weapon wish), events and endgame (the feed), in
 // three lanes on a shared date axis with a red "today" line. Hover / tap a bar for
@@ -180,7 +180,7 @@
       .map((i) => {
         const x = items[i];
         const done = state(x, t) === 'live' ? ((t - x.s) / (x.e - x.s)) * 100 : 0;
-        return `<article class="gi-box ev-item"><div class="ev-item-art${x.weapon ? ' is-weapon' : ''}">${x.faces ? faces(x.faces) : art(x, '') || svg(LANE_ICON[x.lane])}</div>
+        return `<article class="gi-box ev-item"><div class="ev-item-art${x.weapon ? ' is-weapon' : ''}">${x.faces ? faces(x.faces) : art(x, '') + svg(LANE_ICON[x.lane])}</div>
           <div class="ev-item-body"><b>${esc(x.name)}</b><small>${LANE_NAME[x.lane]} &middot; ${day(x.s)} – ${day(x.e)}</small></div>
           <div class="ev-item-left">${left(x, t)}</div><i class="ev-item-bar" style="width:${done.toFixed(1)}%"></i></article>`;
       })
@@ -209,7 +209,8 @@
       .forEach((b) => b.classList.toggle('is-picked', +b.dataset.i === i));
     const t = now();
     const label = state(x, t) === 'next' ? 'Starts in' : 'Ends in';
-    const media = x.art ? art(x, 'ev-d-img', true) : x.faces ? faces(x.faces) : '';
+    // The lane icon always rides along: CSS shows it (on a namecard) only when there's no picture, or it failed to load.
+    const media = (x.art ? art(x, 'ev-d-img', true) : x.faces ? faces(x.faces) : '') + svg(LANE_ICON[x.lane]);
     const d = $('evDetail');
     d.hidden = false;
     d.innerHTML = `<div class="ev-d-art${x.lane === 'wish' ? ' is-wish' : ''}${x.weapon ? ' is-weapon' : ''}">${media}</div>
@@ -227,7 +228,6 @@
   };
   ['mouseover', 'focusin', 'click'].forEach((ev) => $('evChart').addEventListener(ev, pick));
 
-  $('evIcon').innerHTML = `<g fill="currentColor" stroke="none">${ICON.planner}</g>`;
   GI.serverTray($('evServer'), render);
 
   Promise.all([

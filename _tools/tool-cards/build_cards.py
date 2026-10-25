@@ -171,7 +171,6 @@ def ember_kf(name, hits, span, fall):
 
 FX = []  # generated keyframes, written into the page's <style>
 FX.append(streak_kf('plh-st', [57.5], 10))
-FX.append(streak_kf('lrh-st', [44.5], 10))
 FX.append(streak_kf('wch-st', [13.2], 6))
 FX.append(ember_kf('wch-coin', [41.5], 16, 34))
 FX.append(ember_kf('wch-em', [58], 24, -12))
@@ -209,124 +208,184 @@ def eq_wind(n, seed, t):
     return ''.join(f'<i class="eq-wind" style="left:{EQ_C[0] + rnd.uniform(-34, 34):.0f}px;height:{rnd.uniform(14, 30):.0f}px;'
                    f'--t:{rnd.uniform(*t):.2f}s;--d:{-rnd.uniform(0, 2):.2f}s"></i>' for _ in range(n))
 
-# ---------------- Tier lists (shared by Troop + Equipment) ----------------
-# 3 rows (S, A, B) x 3 tiles; tile i = row i // 3, col i % 3. Hover: the board
-# clears, then tiles drop in B1, A1, S1, B2 ... S3 -- S fills last and
-# celebrates. The loop ends with the board full = the idle state.
-TL_ORDER = [6, 3, 0, 7, 4, 1, 8, 5, 2]
-TL_T0, TL_STEP = 8, 5.5
-tl_land = {}
-for k, i in enumerate(TL_ORDER):
-    t = TL_T0 + k * TL_STEP
-    r = i // 3
-    tl_land.setdefault(r, []).append(t + 4)
-    FX.append(f"@keyframes tlh-t{i} {{ 0% {{ opacity: 1; transform: none; }} 4% {{ opacity: 0; transform: translateY(-8px); }} "
-              f"{f(t)}% {{ opacity: 0; transform: translateY({-(r * 28 + 60)}px); animation-timing-function: cubic-bezier(.55,0,.9,.55); }} {f(t + .4)}% {{ opacity: 1; }} "
-              f"{f(t + 4)}% {{ opacity: 1; transform: translateY(0); }} {f(t + 5.2)}% {{ transform: translateY(1px) scale(1.14, .82); }} {f(t + 7)}%, 100% {{ opacity: 1; transform: none; }} }}")
-for r, lands in tl_land.items():
-    fr = ['0% { filter: brightness(1); transform: none; }']
-    for t in lands:
-        fr += [f'{f(t - .1)}% {{ filter: brightness(1); transform: none; }}', f'{f(t + .6)}% {{ filter: brightness(1.3); transform: scale(1.12); }}', f'{f(t + 4)}% {{ filter: brightness(1); transform: none; }}']
-    FX.append(f"@keyframes tlh-lab{r} {{ {' '.join(fr)} 100% {{ filter: brightness(1); transform: none; }} }}")
-TL_WIN = max(tl_land[0])  # S row complete
-FX.append(streak_kf('tlh-st', [TL_WIN], 10))
-FX.append(f"@keyframes tlh-rays {{ 0%, {f(TL_WIN)}% {{ opacity: 0; transform: scale(.4); }} {f(TL_WIN + 4)}% {{ opacity: 1; transform: scale(1.08); }} 80% {{ opacity: .5; transform: scale(1); }} 92%, 100% {{ opacity: 0; transform: scale(1); }} }}")
-FX.append(f"@keyframes tlh-srow {{ 0%, {f(TL_WIN)}% {{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 2px 0 rgba(0,0,0,.45); background-color: var(--well); }} "
-          f"{f(TL_WIN + 1.5)}% {{ box-shadow: inset 0 0 0 1px rgba(224,99,99,.9), 0 0 18px rgba(224,99,99,.55); background-color: rgba(224,99,99,.32); }} "
-          f"80% {{ box-shadow: inset 0 0 0 1px rgba(224,99,99,.45), 0 0 10px rgba(224,99,99,.2); background-color: rgba(224,99,99,.12); }} 94%, 100% {{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 2px 0 rgba(0,0,0,.45); background-color: var(--well); }} }}")
-FX.append(f"@keyframes tlh-glint {{ 0%, {f(TL_WIN + 1)}% {{ transform: translateX(0) skewX(-18deg); opacity: 0; }} {f(TL_WIN + 2)}% {{ opacity: 1; }} {f(TL_WIN + 14)}% {{ transform: translateX(520%) skewX(-18deg); opacity: 1; }} {f(TL_WIN + 15)}%, 100% {{ opacity: 0; transform: translateX(520%) skewX(-18deg); }} }}")
+# ---------------- Tier List: one tier row ----------------
+# One focal point (Adrian, Oct 25 2026: the 3 x 3 board had none): a single
+# tier row up close -- the tier maker's big S label with a Dragon card
+# docked beside it (the Dragon is also the nav icon). Idle 6s: the Dragon
+# bobs, a glint runs over the S. Hover 2.4s: the Dragon is picked up, the
+# label spins through the tiers like a reel (F, E, D, C, B, A) and lands on
+# S; the Dragon drops back into its slot, sparkles pop. The reel starts and
+# ends on S, so the loop is seamless and leaving never snaps.
+TL_TIERS = 'SABCDEF'
+TL_PAL = ['224, 99, 99', '230, 140, 64', '222, 190, 72', '120, 194, 92', '64, 184, 140', '84, 156, 232', '160, 116, 232']  # coc-tierlist.js PAL
+TL_REEL = [0, 6, 5, 4, 3, 2, 1, 0]  # S, F, E, D, C, B, A, S
+TL_H = 56
+reel_end = -(len(TL_REEL) - 1) * TL_H
+FX.append(f"@keyframes tlh-reel {{ 0%, 8% {{ transform: translateY(0); filter: blur(0); animation-timing-function: cubic-bezier(.3,0,.15,1); }} "
+          f"16% {{ filter: blur(1.6px); }} 40% {{ filter: blur(.3px); }} "
+          f"50% {{ transform: translateY({reel_end - 6}px); filter: blur(0); animation-timing-function: ease-in-out; }} 55%, 100% {{ transform: translateY({reel_end}px); filter: blur(0); }} }}")
+tl_reel = ''.join(f'<b style="--tl:{TL_PAL[i]}">{TL_TIERS[i]}</b>' for i in TL_REEL)
+
+# ---------------- shared: 4-point glints ----------------
+# Gold sparkles in the game's style (a 4-point star that spins open and
+# shut). No rays or sunbursts behind the art (Adrian, Oct 25 2026).
+def sparks(cls, pts):
+    """pts: (x, y, size px[, delay s]) -- delay staggers one burst"""
+    return ''.join(f'<i class="fx-spark {cls}" style="left:{p[0]}px;top:{p[1]}px;--z:{p[2]}px'
+                   + (f';animation-delay:{p[3]}s' if len(p) > 3 else '') + '"></i>' for p in pts)
 
 
-def tl_board(tiles, kind):
-    """tiles: 9 (src, class) in reading order S1..S3, A1..A3, B1..B3"""
-    rows = ''.join(f'<div class="tl-row tl-r{r}"><b class="tl-lab">{"SAB"[r]}</b></div>' for r in range(3))
-    t = ''.join(f'<span class="tl-tile tl-t{i} {c}" style="left:{26 + (i % 3) * 25}px;top:{1 + (i // 3) * 28}px"><img src="{s}" alt=""></span>' for i, (s, c) in enumerate(tiles))
-    return (f'<div class="tl-board tl-{kind}"><div class="fx-rays tl-rays"></div>{rows}{t}<i class="tl-glint"></i>'
-            f'{streaks("tl-st", 12, 10, 12, 44, seed=11, length=9)}</div>')
+def spark_kf(name, hits, span):
+    rest = 'opacity: 0; transform: scale(0) rotate(0deg);'
+    fr = [f'0% {{ {rest} }}']
+    for h in hits:
+        fr += [f'{f(h)}% {{ {rest} }}', f'{f(h + span * .35)}% {{ opacity: 1; transform: scale(1) rotate(45deg); }}',
+               f'{f(h + span)}% {{ opacity: 0; transform: scale(.2) rotate(90deg); }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ {rest} }} }}"
 
 
-UN = f'{U}/clashofclans/coctools/units/'
-troop_board = tl_board([(UN + n + '.webp', '') for n in ['rocket-balloon', 'super-minion', 'healer', 'yeti', 'headhunter', 'ice-golem', 'archer', 'minion', 'wall-breaker']], 'troop')
+# ---------------- Leaderboards: the trophy ----------------
+# The nav's own Leaderboards picture (icons/leaderboards.webp: the gold cup on
+# its rubble). Idle 6s: a glint runs over the cup, sparkles wink on it. Hover
+# 2.4s: the game's tap bounce (squash, stretch, settle, a flash), a ring of
+# sparkles pops round the cup and the glint runs again.
+FX.append(spark_kf('lri-tw', [8], 12))
+FX.append(spark_kf('lrh-sp', [4], 26))
+FX.append(spark_kf('tlh-sp', [52], 24))
 
-# ---------------- Glossary: an open book ----------------
-# One leaf flips per term. Before flip k the leaf shows term k and the page
-# under it already shows term k+1; when the leaf lands on the left (its back
-# looks like the left page) it jumps home showing k+1 -- invisible, so the
-# book seems to turn forever. Idle 12s (4s a term), hover 2.4s.
+# ---------------- Legend Tracker: the Legend Trophy ----------------
+# The game's Legend Trophy (icons/legend-trophy.webp, also the nav icon) on a
+# purple glow. A Legend League attack wins up to +40 trophies (three stars),
+# so the only number shown is +40. Idle 6s: one hit, a +40 rises off the cup.
+# Hover 2.4s: three hits in a row, each a bounce, a +40 and sparkles.
+def lgt_chip(name, hits, span):
+    rest = 'opacity: 0; transform: translateY(6px) scale(.7);'
+    fr = [f'0% {{ {rest} }}']
+    for h in hits:
+        fr += [f'{f(h)}% {{ {rest} }}', f'{f(h + span * .14)}% {{ opacity: 1; transform: translateY(-2px) scale(1.12); }}',
+               f'{f(h + span * .3)}% {{ opacity: 1; transform: translateY(-6px) scale(1); }}', f'{f(h + span)}% {{ opacity: 0; transform: translateY(-24px) scale(1); }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ {rest} }} }}"
+
+
+def lgt_cup(name, hits):
+    fr = ['0% { transform: none; filter: none; }']
+    for h in hits:
+        fr += [f'{f(h - .1)}% {{ transform: none; filter: none; }}', f'{f(h + 2.5)}% {{ transform: scale(1.07, .88); filter: brightness(1.3); }}',
+               f'{f(h + 7)}% {{ transform: translateY(-3px) scale(.95, 1.07); filter: brightness(1.15); }}', f'{f(h + 12)}% {{ transform: scale(1.02, .98); filter: none; }}',
+               f'{f(h + 17)}% {{ transform: none; filter: none; }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ transform: none; filter: none; }} }}"
+
+
+LGT_HOVER = [4, 34, 64]
+FX.append(lgt_chip('lgti-chip', [40], 22))
+FX.append(lgt_cup('lgti-cup', [40]))
+FX += [lgt_chip(f'lgth-c{k}', [h], 30) for k, h in enumerate(LGT_HOVER)]
+FX.append(lgt_cup('lgth-cup', LGT_HOVER))
+FX.append(spark_kf('lgth-sp', LGT_HOVER, 16))
+
+# ---------------- War Planner: crossed swords ----------------
+# Two swords (clashofclans/coctools/sword.webp, the second mirrored) crossed
+# like the game's war icon. They swing back on their grips and clash: a flash,
+# sparkles and streaks where the blades meet. Idle 6s: one clash. Hover 2.4s:
+# two clashes, harder. Both swords share one keyframes block: the second is
+# mirrored, so the same rotation opens it the other way.
+def ws_swing(name, hits, back):
+    """hits = impact %; each swing: pull back over 9%, snap in over 2.5%, settle"""
+    fr = ['0% { rotate: 0deg; }']
+    for h in hits:
+        fr += [f'{f(h - 12)}% {{ rotate: 0deg; animation-timing-function: cubic-bezier(.2,.7,.3,1); }}', f'{f(h - 3)}% {{ rotate: {back}deg; animation-timing-function: cubic-bezier(.7,0,1,.6); }}',
+               f'{f(h)}% {{ rotate: -5deg; }}', f'{f(h + 3)}% {{ rotate: 2deg; }}', f'{f(h + 7)}% {{ rotate: 0deg; }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ rotate: 0deg; }} }}"
+
+
+def ws_flash(name, hits, span):
+    rest = 'opacity: 0; transform: scale(.3);'
+    fr = [f'0% {{ {rest} }}']
+    for h in hits:
+        fr += [f'{f(h)}% {{ {rest} }}', f'{f(h + span * .2)}% {{ opacity: 1; transform: scale(1); }}', f'{f(h + span)}% {{ opacity: 0; transform: scale(1.5); }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ {rest} }} }}"
+
+
+WS_IDLE, WS_HOVER = [70], [30, 76]
+FX.append(ws_swing('wsi-sw', WS_IDLE, 14))
+FX.append(ws_swing('wsh-sw', WS_HOVER, 20))
+FX.append(ws_flash('wsi-fl', WS_IDLE, 8))
+FX.append(ws_flash('wsh-fl', WS_HOVER, 14))
+FX.append(spark_kf('wsi-sp', WS_IDLE, 12))
+FX.append(spark_kf('wsh-sp', WS_HOVER, 18))
+FX.append(streak_kf('wsh-st', WS_HOVER, 14))
+
+# ---------------- Glossary: the Book of Everything ----------------
+# The nav's Glossary picture (icons/Book_of_Everything.webp) drawn in CSS so
+# it can open: red leather, gold frame, gold hourglass, cream pages. It lies
+# tilted toward you. Three leaves sit on the right page (top one carries the
+# term, the two under it are blank); the page under them shows the next term.
+# A leaf that lands on the left jumps home unseen (its back looks exactly like
+# the cover's inside), so the book seems to turn forever.
+# Idle 12s: open on Queen Walk, a leaf turns (Lavaloon), another (Funneling),
+# the cover swings shut (the hourglass shows, the book slides to the middle),
+# then it opens again on Queen Walk.
+# Hover 3.6s: three riffles (three leaves in quick succession), each lands on
+# the next term with a little thump and gold sparkles. Starts and ends open
+# on Queen Walk, the idle's first frame, so leaving never snaps.
 GL_TERMS = ['Queen Walk', 'Lavaloon', 'Funneling']
+GL_EASE = 'animation-timing-function: cubic-bezier(.45,.05,.35,1);'
 
 
-def gl_kf(p, flips, dur):
-    ends = [a + dur for a in flips]
-    leaf = ['0% { transform: rotateY(0deg); }']
-    shade = ['0% { opacity: 0; }']
-    for a, e in zip(flips, ends):
-        leaf += [f'{f(a)}% {{ transform: rotateY(0deg); animation-timing-function: cubic-bezier(.45,.05,.35,1); }}', f'{f(e)}% {{ transform: rotateY(-180deg); }}', f'{f(e + .03)}% {{ transform: rotateY(0deg); }}']
-        shade += [f'{f(a)}% {{ opacity: 0; }}', f'{f(a + dur * .5)}% {{ opacity: 1; }}', f'{f(e)}% {{ opacity: 0; }}']
-    out = [f"@keyframes {p}-leaf {{ {' '.join(leaf)} 100% {{ transform: rotateY(0deg); }} }}", f"@keyframes {p}-shade {{ {' '.join(shade)} 100% {{ opacity: 0; }} }}"]
-    # which term each face shows: leaf = k until flip k lands, page = k + 1.
-    # The leaf swaps while it faces away (last third of its turn); the page
-    # swaps just after the leaf is home again covering it.
-    for face, off, sw in (('lt', 0, [e - dur * .3 for e in ends]), ('pt', 1, [e + .1 for e in ends])):
-        b = [0] + sw + [100]
-        for k in range(3):
-            fr = []
-            for s in range(len(b) - 1):
-                on = 1 if (s + off) % 3 == k else 0
-                fr += [f'{f(b[s])}% {{ opacity: {on}; }}', f'{f(b[s + 1] - .05 if b[s + 1] < 100 else 100)}% {{ opacity: {on}; }}']
-            out.append(f"@keyframes {p}-{face}{k} {{ {' '.join(fr)} }}")
+def gl_rot(name, r0, moves, jumps=()):
+    """rotateY keyframes from r0: moves = [(a%, b%, from, to)] eased; jumps = [(t%, from, to)] instant"""
+    fr = [f'0% {{ transform: rotateY({r0}deg); }}']
+    for a, b, x, y in moves:
+        fr += [f'{f(a)}% {{ transform: rotateY({x}deg); {GL_EASE} }}', f'{f(b)}% {{ transform: rotateY({y}deg); }}']
+    for t, x, y in jumps:
+        fr += [f'{f(t - .05)}% {{ transform: rotateY({x}deg); }}', f'{f(t)}% {{ transform: rotateY({y}deg); }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ transform: rotateY({r0}deg); }} }}"
+
+
+def gl_steps(name, sw):
+    """term k on one face: sw = [(from%, term)], the first at 0"""
+    out = []
+    for k in range(3):
+        fr = []
+        for i, (a, t) in enumerate(sw):
+            b = sw[i + 1][0] - .05 if i + 1 < len(sw) else 100
+            fr += [f'{f(a)}% {{ opacity: {int(t == k)}; }}', f'{f(b)}% {{ opacity: {int(t == k)}; }}']
+        out.append(f"@keyframes {name}{k} {{ {' '.join(fr)} }}")
     return out
 
 
-FX += gl_kf('gli', [18, 51.33, 84.67], 7)
-FX += gl_kf('glh', [8, 41.33, 74.67], 14)
-FX.append(ember_kf('glh-em', [22, 55.33, 88.67], 11, -14))
-# per-element animation rules (plain CSS, one per tile / row / term)
-for i in range(9):
-    FX.append(f'.tl-go .tl-t{i} {{ animation: tlh-t{i} 3.2s linear infinite; }}')
-for k, i in enumerate([2, 4, 7]):  # idle: one tile hops in its slot now and then
-    a = 14 + k * 30
-    FX.append(f"@keyframes tli-hop{i} {{ 0%, {a}% {{ transform: none; }} {a + 2}% {{ transform: translateY(-7px); }} {a + 4}% {{ transform: translateY(0) scale(1.12, .85); }} {a + 6}%, 100% {{ transform: none; }} }}")
-    FX.append(f'.tl-t{i} {{ animation: tli-hop{i} 8s ease-out infinite; }}')
-for r in range(3):
-    FX.append(f'.tl-go .tl-r{r} .tl-lab {{ animation: tlh-lab{r} 3.2s ease-out infinite; }}')
-FX.append('.tl-go .tl-r0 { animation: tlh-srow 3.2s ease-out infinite; }')
-for face in ('lt', 'pt'):
-    for k in range(3):
-        FX.append(f'.gl-{face}{k} {{ animation: gli-{face}{k} 12s linear infinite; }}')
-        FX.append(f'.gl-go .gl-{face}{k} {{ animation: glh-{face}{k} 2.4s linear infinite; }}')
+def gl_shade(name, spans):
+    fr = ['0% { opacity: 0; }']
+    for a, b in spans:
+        fr += [f'{f(a)}% {{ opacity: 0; }}', f'{f((a + b) / 2)}% {{ opacity: 1; }}', f'{f(b)}% {{ opacity: 0; }}']
+    return f"@keyframes {name} {{ {' '.join(fr)} 100% {{ opacity: 0; }} }}"
+
+
+# idle
+FX.append(gl_rot('gli-l0', 0, [(14, 23, 0, -180), (38, 47, 0, -180)], [(23.1, -180, 0), (47.1, -180, 0)]))
+FX.append(gl_rot('gli-cover', -180, [(60, 70, -180, 0), (84, 94, 0, -180)]))
+FX += gl_steps('gli-lt', [(0, 0), (21, 1), (45, 2), (76, 0)])
+FX += gl_steps('gli-pt', [(0, 1), (23.2, 2), (47.2, 0), (76, 1)])
+FX.append(gl_shade('gli-shade', [(14, 23), (38, 47)]))
+FX.append('@keyframes gli-slide { 0%, 60% { translate: 0 0; } 70%, 84% { translate: -27px 0; } 94%, 100% { translate: 0 0; } }')
+# hover: riffle r starts at s; leaf i turns s+3i -> s+3i+10; all jump home after the last lands
+GL_S = [4 + r * 100 / 3 for r in range(3)]
+for i in range(3):
+    FX.append(gl_rot(f'glh-l{i}', 0, [(s + 3 * i, s + 3 * i + 10, 0, -180) for s in GL_S], [(s + 16.1, -180, 0) for s in GL_S]))
+FX += gl_steps('glh-lt', [(0, 0)] + [(s + 12, (r + 1) % 3) for r, s in enumerate(GL_S)])
+FX += gl_steps('glh-pt', [(0, 1)] + [(s + 16.2, (r + 2) % 3) for r, s in enumerate(GL_S)])
+FX.append(gl_shade('glh-shade', [(s, s + 16) for s in GL_S]))
+FX.append(spark_kf('glh-sp', [s + 15 for s in GL_S], 11))
+FX.append('@keyframes glh-thump { ' + ' '.join(f'{f(s + 15.9)}% {{ scale: 1; }} {f(s + 17.5)}% {{ scale: 1.035 .95; }} {f(s + 20)}% {{ scale: .99 1.02; }} {f(s + 23)}% {{ scale: 1; }}' for s in GL_S) + ' }')
+for k in range(3):
+    FX.append(f'.gl-l0 .gl-t{k} {{ animation: gli-lt{k} 12s linear infinite; }}')
+    FX.append(f'.gl-pr .gl-t{k}, .gl-l1 .gl-t{k} {{ animation: gli-pt{k} 12s linear infinite; }}')
+    FX.append(f'.gl-go .gl-l0 .gl-t{k} {{ animation: glh-lt{k} 3.6s linear infinite; }}')
+    FX.append(f'.gl-go .gl-pr .gl-t{k} {{ animation: glh-pt{k} 3.6s linear infinite; }}')
+for i in range(3):
+    FX.append(f'.gl-go .gl-l{i} {{ animation: glh-l{i} 3.6s linear infinite; }}')
 fx_css = '\n'.join(FX)
 
-# ---------------- Leaderboards: "You" climbs ----------------
-# Rank numbers are fixed slots (1-4); the rows move between them like a real
-# board. Faceless rows A, B, C sit at 1-3, "You" at 4. Each beat: You goes
-# up one slot while the row it passes drops one. P = row pitch (px).
-P = 28
-
-
-def lr_kf(name, moves, reset):
-    """moves: {row: [(start%, end%, slots)]} -> one keyframes block per row;
-    the rows jump home at reset% while the list is faded out"""
-    out = []
-    for row, steps in moves.items():
-        fr, y = ['0% { transform: translateY(0); }'], 0
-        for a, b, d in steps:
-            fr += [f'{f(a)}% {{ transform: translateY({y}px); }}']
-            y += d * P
-            fr += [f'{f(b)}% {{ transform: translateY({y}px); }}']
-        if reset:
-            fr += [f'{f(reset)}% {{ transform: translateY({y}px); }}', f'{f(reset + .5)}%, 100% {{ transform: translateY(0); }}']
-        else:
-            fr += ['100% { transform: translateY(0); }']
-        out.append(f"@keyframes {name}-{row} {{ {' '.join(fr)} }}")
-    return out
-
-
-# idle 8s: You swaps up with C, holds, swaps back
-L = lr_kf('lri', {'you': [(25, 31, -1), (62, 68, 1)], 'c': [(25, 31, 1), (62, 68, -1)]}, None)
-# hover 3s: three beats 4 -> 3 -> 2 -> 1, hold on #1, fade, jump home, fade in
-L += lr_kf('lrh', {'you': [(12, 20, -1), (24, 32, -1), (36, 44, -1)], 'c': [(12, 20, 1)], 'b': [(24, 32, 1)], 'a': [(36, 44, 1)]}, 85)
-lr_kf_css = '\n'.join(L)
 
 html = f'''<!doctype html>
 <html lang="en">
@@ -335,7 +394,7 @@ html = f'''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tool cards</title>
 <base href="http://localhost:8765/">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Oxanium:wght@500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@900&family=Orbitron:wght@900&family=Oxanium:wght@500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 * {{ box-sizing: border-box; margin: 0; padding: 0; }}
 body {{ min-height: 100vh; padding: 72px 7%; background: #0a0a0b; color: #eff1f4; font-family: 'Oxanium', sans-serif; -webkit-font-smoothing: antialiased; }}
@@ -345,10 +404,11 @@ h2 {{ font: 900 37px/1.1 'Orbitron', sans-serif; letter-spacing: -.5px; text-tra
 /* ===================================================================
    PARCHROME TOOL CARDS (ptc-) -- the /coc/ "Parchrome tools" band.
    GENERATED by _tools/tool-cards/build_cards.py: edit there, not here.
-   Each card is a raised-UI box; the art is a right-hand column drawn at
-   160px tall and scaled down by --s (so every animation keeps the
-   geometry it was designed at), the copy takes the rest.
-   The box is the same neutral raised-UI box on every card: a card's colour
+   Each card is a raised-UI WELL (Oct 24 2026, Adrian: sunken, was a raised
+   box): the art sits in it like a display case. The art is a right-hand
+   column drawn at 160px tall and scaled down by --s (so every animation keeps
+   the geometry it was designed at), the copy takes the rest.
+   The well is the same neutral one on every card: a card's colour
    lives only in its art's own glow. Art and copy share the one surface (no
    panel between them, Adrian's call). The art gets a column of the same
    width (--well-w) on every card, centred in it, so it lines up down the grid;
@@ -359,25 +419,43 @@ h2 {{ font: 900 37px/1.1 'Orbitron', sans-serif; letter-spacing: -.5px; text-tra
   --shadow: var(--lb-shadow, inset 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.09), 0 10px 24px -12px rgba(0,0,0,.85));
   --shadow-h: var(--lb-shadow-hover, inset 0 0 0 1px rgba(255,255,255,.11), inset 0 1px 0 rgba(255,255,255,.14), 0 16px 30px -14px rgba(0,0,0,.9));
   --ring-btn: inset 0 0 0 2px var(--edge), inset 0 3px 0 rgba(255,255,255,.1), inset 0 -5px 0 rgba(0,0,0,.3);
-  display: grid; grid-template-columns: 1fr; gap: 10px;
+  /* the well: dark fill, shadow inside the top edge, a faint light line under the bottom one */
+  --sunk: #0d0e11; --sunk-h: #131418;
+  --sink: inset 0 3px 0 rgba(0,0,0,.4), inset 0 14px 22px -14px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05);
+  --sink-h: inset 0 3px 0 rgba(0,0,0,.4), inset 0 14px 22px -14px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.05), 0 1px 0 rgba(255,255,255,.07);
+  display: grid; grid-template-columns: 1fr; gap: 8px;
 }}
 /* columns follow the band's own width (the /coc/ sidebar eats 245px), not the
    window's: 1 -> 2 (4 x 2) -> 3 (3 + 3 + 2; the last slot is left empty, Adrian's call) */
 .ptc-wrap {{ container-type: inline-size; }}
-@container (min-width: 620px) {{ .ptc-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }} }}
+@container (min-width: 620px) {{ .ptc-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }} }}
 @container (min-width: 960px) {{ .ptc-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }} }}
-.ptc {{ --art-w: 150px; --s: .75; --well-w: 136px; position: relative; isolation: isolate; display: flex; align-items: center;
-  min-height: 122px; padding: 15px calc(var(--well-w) + 18px) 15px 20px; overflow: hidden;
-  border: 2px solid var(--edge); border-radius: var(--r); background: var(--box); box-shadow: var(--shadow); font-family: 'Oxanium', sans-serif;
+.ptc {{ --art-w: 150px; --s: .66; --well-w: 122px; position: relative; isolation: isolate; display: flex; align-items: center;
+  min-height: 104px; padding: 12px calc(var(--well-w) + 14px) 12px 18px; overflow: hidden;
+  border: 2px solid var(--edge); border-radius: var(--r); background: var(--sunk); box-shadow: var(--sink); font-family: 'Oxanium', sans-serif;
   color: #eff1f4; text-decoration: none; transition: background-color .25s, box-shadow .25s; }}
-.ptc:hover {{ background: var(--box-h); box-shadow: var(--shadow-h); }}
+.ptc:hover {{ background: var(--sunk-h); box-shadow: var(--sink-h); }}
 .ptc:focus-visible {{ outline: 2px solid #e6e8ec; outline-offset: 3px; }}
 .ptc-copy {{ position: relative; z-index: 2; }}
 /* the hover arrow takes no width (margin-right cancels it), so it never makes a title wrap */
-.ptc-name {{ font: 700 16px/1.2 'Oxanium', sans-serif; }}
+.ptc-name {{ font: 700 18px/1.15 'Oxanium', sans-serif; }}
 .ptc-name svg {{ display: inline-block; vertical-align: -2px; margin: 0 -21px 0 6px; width: 15px; height: 15px; fill: none; stroke: #858a92; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: translateX(-4px); transition: .25s cubic-bezier(.22,1,.36,1); }}
 .ptc:hover .ptc-name svg, .ptc:focus-visible .ptc-name svg {{ opacity: 1; transform: none; stroke: #fff; }}
-.ptc-desc {{ margin-top: 5px; font-size: 13px; line-height: 1.45; color: #b5b8c0; }}
+/* Two blurbs per card (Oct 24 2026, Adrian): desktop = the long one, never past
+   2 lines; phones = the short one (~34 letters, the Player Tracker's length),
+   always 1 line. Either is cut with an ellipsis if it runs over. */
+.ptc-copy {{ flex: 1; min-width: 0; }}
+.ptc-desc {{ max-width: 31ch; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 12px; line-height: 1.4; color: #a4a8b0; }}
+.ptc-short {{ display: none; }}
+/* HOT tag (Oct 25 2026, Adrian): the TH layouts pages' .base-tag--hot look,
+   a red key with a flame. Desktop: its own line above the name (the copy column gets as narrow as
+   155px, too narrow for name + tag); tiles: the top-left corner. */
+.ptc-hot {{ display: flex; width: max-content; align-items: center; gap: 3px; margin: 0 0 5px; padding: 3px 6px 3px 5px; border-radius: 4px;
+  border: 1.5px solid var(--lb-red-edge, #5c1515); background: var(--lb-red, #c73a3a); box-shadow: var(--lb-btn-red, inset 0 1px 0 rgba(255,255,255,.25), inset 0 -2px 0 rgba(0,0,0,.25));
+  font: 800 9px/1 'Oxanium', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #fff; }}
+.ptc-hot::before {{ content: ""; width: 7px; height: 9px; background: #fff;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M8 0c1 3.5 6 6 6 11.5A6 6 0 0 1 2 11.5c0-2.6 1.3-4.3 2.6-5.6.2 1.9 1 3 2.2 3.6C6.4 6.2 6.9 3 8 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M8 0c1 3.5 6 6 6 11.5A6 6 0 0 1 2 11.5c0-2.6 1.3-4.3 2.6-5.6.2 1.9 1 3 2.2 3.6C6.4 6.2 6.9 3 8 0z'/%3E%3C/svg%3E") center / contain no-repeat; }}
 /* the art column: a 160px stage centred on the card, scaled by --s from its
    right edge; three depths inside lean toward the pointer */
 .ptc-art {{ position: absolute; top: 50%; right: calc((var(--well-w) - var(--art-w) * var(--s)) / 2); width: var(--art-w); height: 160px; margin-top: -80px; pointer-events: none; --mx: 0; --my: 0; }}
@@ -540,58 +618,82 @@ h2 {{ font: 900 37px/1.1 'Orbitron', sans-serif; letter-spacing: -.5px; text-tra
 {pl_kf}
 
 /* ===================================================================
-   LEADERBOARDS (lr-; lb- is taken on the live site). A slim board: rank
-   slots 1-4 on the left, rows that move between them. Three faceless rows
-   and one "You" row -- no names, no scores, so nothing on it can be false.
-   Rows wear the game's league-panel blue (Adrian: "game coloured rows"),
-   ranks 1-3 are gold / silver / bronze, and You is a brighter blue key.
-   Idle (8s): You nudges up past #3 (a green arrow), holds, slips back.
-   Hover / focus (.lr-go, 3s): You climbs 4 -> 3 -> 2 -> 1, each row it
-   passes drops a place, #1 flashes gold; the list fades, resets, fades in.
+   LEADERBOARDS (lr-; lb- is taken on the live site). The nav's own
+   Leaderboards picture: the gold cup on its rubble, on a soft gold glow.
+   Idle (6s): a glint runs over the cup and sparkles wink on it, one at a
+   time. Hover / focus (.lr-go, 2.4s): the game's tap bounce (squash,
+   stretch, settle, a flash) and a ring of sparkles pops round the cup, then
+   the glint runs. No numbers: nothing on it can be false.
    =================================================================== */
-.ptc-lr {{ --art-w: 150px; }}
-.lr-glow {{ position: absolute; right: 0; top: -20px; width: 150px; height: 140px; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(232,182,76,.15), rgba(232,182,76,.04) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; transition: filter .6s; }}
-.lr-go .lr-glow {{ filter: brightness(1.5); }}
-.lr-board {{ position: absolute; right: 14px; top: 22px; width: 122px; height: 106px; }}
-.lr-ranks span {{ position: absolute; left: 0; width: 12px; height: 22px; display: grid; place-items: center; font: 800 10px/1 'Sora', sans-serif; color: #7d86a8; }}
-.lr-ranks span:nth-child(1) {{ top: 0; color: #e8b64c; }}
-.lr-ranks span:nth-child(2) {{ top: 28px; color: #c9d2e0; }}
-.lr-ranks span:nth-child(3) {{ top: 56px; color: #d4874a; }}
-.lr-ranks span:nth-child(4) {{ top: 84px; }}
-.lr-rows {{ position: absolute; left: 18px; right: 0; top: 0; bottom: 0; }}
-.lr-go .lr-rows {{ animation: lrh-fade 3s linear infinite; }}
-/* a league-panel row: indigo-blue, a light top edge, a dark ledge under it */
-.lr-row {{ position: absolute; left: 0; right: 0; height: 22px; display: flex; align-items: center; gap: 6px; padding: 0 7px; border-radius: 4px;
-  background-color: #34407c; background-image: linear-gradient(rgba(255,255,255,.1), rgba(0,0,0,.14));
-  box-shadow: inset 0 0 0 1px rgba(150,170,255,.16), inset 0 1px 0 rgba(255,255,255,.2), 0 2px 0 #10132a; }}
-.lr-row i {{ display: block; height: 5px; border-radius: 3px; background: rgba(205,215,255,.32); }}
-.lr-row .lr-name {{ width: 40%; }}
-.lr-row .lr-score {{ width: 18%; margin-left: auto; }}
-.lr-a {{ top: 0; }} .lr-b {{ top: 28px; }} .lr-c {{ top: 56px; }}
-/* You: the brighter blue key, above the rows it passes */
-.lr-you {{ --you: #3d86e6; top: 84px; z-index: 2; background-color: var(--you); box-shadow: var(--ring-btn), 0 6px 12px -6px rgba(0,0,0,.8); }}
-.lr-you b {{ font: 700 10.5px/1 'Oxanium', sans-serif; color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,.45); }}
-.lr-you .lr-score {{ background: rgba(255,255,255,.6); }}
-.lr-up {{ font: 700 8px/1 'Sora', sans-serif; color: #6fc531; opacity: 0; }}
-.lr-c {{ animation: lri-c 8s ease-in-out infinite; }}
-.lr-you {{ animation: lri-you 8s ease-in-out infinite; }}
-.lr-you .lr-up {{ animation: lri-up 8s linear infinite; }}
-.lr-go .lr-a {{ animation: lrh-a 3s ease-in-out infinite; }}
-.lr-go .lr-b {{ animation: lrh-b 3s ease-in-out infinite; }}
-.lr-go .lr-c {{ animation: lrh-c 3s ease-in-out infinite; }}
-.lr-go .lr-you {{ animation: lrh-you 3s ease-in-out infinite, lrh-gold 3s ease-out infinite; }}
-.lr-go .lr-you .lr-up {{ animation: lrh-up 3s linear infinite; }}
-.lr-go .lr-ranks span:nth-child(1) {{ animation: lrh-one 3s ease-out infinite; }}
-@keyframes lri-up {{ 0%, 24% {{ opacity: 0; }} 27%, 40% {{ opacity: 1; }} 46%, 100% {{ opacity: 0; }} }}
-@keyframes lrh-up {{ 0%, 11% {{ opacity: 0; }} 14%, 44% {{ opacity: 1; }} 50%, 100% {{ opacity: 0; }} }}
-@keyframes lrh-gold {{ 0%, 11% {{ background-color: var(--you); box-shadow: var(--ring-btn), 0 6px 12px -6px rgba(0,0,0,.8); }}
-  15%, 42% {{ background-color: var(--you); box-shadow: var(--ring-btn), 0 0 16px rgba(111,197,49,.55); }}
-  44% {{ background-color: var(--you); box-shadow: var(--ring-btn), 0 0 10px rgba(243,200,90,.4); }} 47% {{ background-color: #e0ad3a; box-shadow: var(--ring-btn), 0 0 24px rgba(243,200,90,.95); }}
-  58%, 82% {{ background-color: #b8862a; box-shadow: var(--ring-btn), 0 0 12px rgba(243,200,90,.35); }} 85%, 100% {{ background-color: var(--you); box-shadow: var(--ring-btn), 0 6px 12px -6px rgba(0,0,0,.8); }} }}
-@keyframes lrh-one {{ 0%, 44% {{ color: #e8b64c; text-shadow: none; }} 47% {{ color: #fff3cf; text-shadow: 0 0 8px rgba(232,182,76,.9); }} 60%, 100% {{ color: #e8b64c; text-shadow: none; }} }}
-@keyframes lrh-fade {{ 0%, 80% {{ opacity: 1; }} 84%, 87% {{ opacity: 0; }} 94%, 100% {{ opacity: 1; }} }}
-{lr_kf_css}
+.ptc-lr {{ --art-w: 136px; }}
+.lr-glow {{ position: absolute; right: -6px; top: 22px; width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(240,190,80,.17), rgba(240,190,80,.05) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; }}
+.lr-cup {{ position: absolute; right: 22px; top: 38px; width: 92px; height: 101px; transform-origin: 50% 86%; }}
+.lr-cup::before {{ content: ""; position: absolute; left: 6%; right: 6%; bottom: 8%; height: 16%; border-radius: 50%; background: rgba(0,0,0,.55); filter: blur(5px); }}
+.lr-cup img {{ position: absolute; inset: 0; width: 100%; height: 100%; }}
+.lr-go .lr-cup {{ animation: lrh-cup 2.4s linear infinite; }}
+/* the glint: a bleached copy of the picture seen through a moving band, cut to the cup (not the rubble) */
+.lr-shine {{ opacity: 0; filter: brightness(2.6) saturate(.25); clip-path: inset(0 26% 32% 14%);
+  -webkit-mask: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%) 100% 0 / 300% 100% no-repeat;
+  mask: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%) 100% 0 / 300% 100% no-repeat; animation: lri-shine 6s ease-in-out infinite; }}
+.lr-go .lr-shine {{ animation: lrh-shine 2.4s ease-out infinite; }}
+.lr-tw {{ animation: lri-tw 6s ease-out infinite; }}
+.lr-go .lr-sp {{ animation: lrh-sp 2.4s ease-out infinite; }}
+@keyframes lrh-cup {{ 0% {{ transform: none; filter: none; }} 5% {{ transform: scale(1.08, .86); filter: brightness(1.35); }}
+  12% {{ transform: translateY(-4px) scale(.94, 1.09); filter: brightness(1.2); }} 19% {{ transform: scale(1.04, .96); }} 26% {{ transform: scale(.99, 1.01); filter: none; }} 32%, 100% {{ transform: none; filter: none; }} }}
+@keyframes lri-shine {{ 0%, 54% {{ opacity: 0; -webkit-mask-position: 100% 0; mask-position: 100% 0; }} 55% {{ opacity: .7; }}
+  70% {{ opacity: .7; -webkit-mask-position: 0 0; mask-position: 0 0; }} 71%, 100% {{ opacity: 0; -webkit-mask-position: 0 0; mask-position: 0 0; }} }}
+@keyframes lrh-shine {{ 0%, 14% {{ opacity: 0; -webkit-mask-position: 100% 0; mask-position: 100% 0; }} 15% {{ opacity: .85; }}
+  40% {{ opacity: .85; -webkit-mask-position: 0 0; mask-position: 0 0; }} 41%, 100% {{ opacity: 0; -webkit-mask-position: 0 0; mask-position: 0 0; }} }}
+
+/* ===================================================================
+   LEGEND TRACKER (lgt-; lg- is the tracker page's own). The game's Legend
+   Trophy on a purple glow. A Legend League attack wins up to +40 trophies
+   (three stars), so +40 is the one number on it. Idle (6s): one hit, the
+   trophy gives the tap bounce and a +40 rises off it. Hover / focus
+   (.lgt-go, 2.4s): three hits in a row, each with a +40 and sparkles.
+   =================================================================== */
+.ptc-lgt {{ --art-w: 136px; }}
+.lgt-glow {{ position: absolute; right: -6px; top: 22px; width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(170,110,255,.2), rgba(170,110,255,.05) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; }}
+.lgt-cup {{ position: absolute; right: 22px; top: 46px; width: 90px; height: 96px; transform-origin: 50% 88%; animation: lgti-cup 6s linear infinite; }}
+.lgt-cup::before {{ content: ""; position: absolute; left: 10%; right: 10%; bottom: 6%; height: 16%; border-radius: 50%; background: rgba(0,0,0,.55); filter: blur(5px); }}
+.lgt-cup img {{ position: relative; width: 100%; height: 100%; }}
+.lgt-go .lgt-cup {{ animation: lgth-cup 2.4s linear infinite; }}
+/* +40: the trophy icon and the number in the game's white-on-black, like the Damage Calculator's -720 */
+.lgt-chip {{ position: absolute; right: 38px; top: 30px; display: flex; align-items: center; gap: 2px; opacity: 0; white-space: nowrap;
+  font: 800 13px/1 'Oxanium', sans-serif; color: #fff; text-shadow: 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000; }}
+.lgt-chip img {{ width: 15px; height: 15px; filter: drop-shadow(0 1px 0 #000); }}
+.lgt-c0 {{ animation: lgti-chip 6s ease-out infinite; }}
+.lgt-go .lgt-c0 {{ animation: lgth-c0 2.4s ease-out infinite; }}
+.lgt-go .lgt-c1 {{ right: 64px; top: 40px; animation: lgth-c1 2.4s ease-out infinite; }}
+.lgt-go .lgt-c2 {{ right: 14px; top: 44px; animation: lgth-c2 2.4s ease-out infinite; }}
+.lgt-go .lgt-sp {{ animation: lgth-sp 2.4s ease-out infinite; }}
+
+/* ===================================================================
+   WAR PLANNER (ws-; wp- is the planner page's own). Two swords crossed
+   like the game's war icon (the second is a mirrored copy), on a red
+   glow. They swing back on their grips and clash: a flash, sparkles and
+   streaks where the blades meet. Idle (6s): one clash. Hover / focus
+   (.ws-go, 2.4s): two clashes, swung harder. Leaving finishes the loop.
+   =================================================================== */
+.ptc-ws {{ --art-w: 136px; }}
+.ws-glow {{ position: absolute; right: -6px; top: 22px; width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(230,90,80,.17), rgba(230,90,80,.04) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; }}
+.ws-x {{ position: absolute; left: 22px; top: 36px; width: 92px; height: 92px; filter: drop-shadow(0 6px 6px rgba(0,0,0,.6)); }}
+.ws-b {{ position: absolute; inset: 0; }}
+.ws-b + .ws-b {{ transform: scaleX(-1); }}
+.ws-b img {{ position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 12% 88%; animation: wsi-sw 6s linear infinite; }}
+.ws-go .ws-b img {{ animation: wsh-sw 2.4s linear infinite; }}
+/* where the blades meet */
+.ws-hit {{ position: absolute; left: 68px; top: 82px; width: 0; height: 0; }}
+.ws-flash {{ position: absolute; left: -16px; top: -16px; width: 32px; height: 32px; border-radius: 50%; opacity: 0; mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255,255,240,.95), rgba(255,220,150,.45) 45%, transparent); animation: wsi-fl 6s ease-out infinite; }}
+.ws-go .ws-flash {{ animation: wsh-fl 2.4s ease-out infinite; }}
+.ws-sp {{ animation: wsi-sp 6s ease-out infinite; }}
+.ws-go .ws-sp {{ animation: wsh-sp 2.4s ease-out infinite; }}
+.ws-st {{ --c: #fff1c8; z-index: 3; }}
+.ws-go .ws-st {{ animation: wsh-st 2.4s ease-out infinite; }}
 
 /* ===================================================================
    WALL CALCULATOR (wc-). Real numbers (coc-guides.js COST): one wall
@@ -666,6 +768,9 @@ img.fx-em {{ width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius
   background: repeating-conic-gradient(rgba(var(--rc),0) 0deg 8deg, rgba(var(--rc),.5) 11deg 13deg, rgba(var(--rc),0) 16deg 22.5deg);
   -webkit-mask: radial-gradient(closest-side, #000 12%, transparent); mask: radial-gradient(closest-side, #000 12%, transparent); animation: fx-spin 14s linear infinite; }}
 @keyframes fx-spin {{ to {{ transform: rotate(360deg); }} }}
+.fx-spark {{ position: absolute; width: var(--z); height: var(--z); margin: calc(var(--z) / -2) 0 0 calc(var(--z) / -2); opacity: 0; pointer-events: none; z-index: 3;
+  background: radial-gradient(closest-side, #fff 25%, #ffe9a8 60%, #f2b53c);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }}
 {fx_css}
 
 /* Player Tracker extras: the reel blurs at speed (in plh-reel); on landing
@@ -675,18 +780,6 @@ img.fx-em {{ width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius
 .pl-st {{ --c: #ffd98a; }}
 .pl-go .pl-st {{ animation: plh-st 2.8s ease-out infinite; }}
 @keyframes plh-rays {{ 0%, 56% {{ opacity: 0; transform: scale(.5); }} 60% {{ opacity: 1; transform: scale(1.08); }} 78% {{ opacity: .55; transform: scale(1); }} 92%, 100% {{ opacity: 0; transform: scale(1); }} }}
-
-/* Leaderboards extras: You glows green while it climbs; at #1 a crown
-   drops onto the row, gold rays open behind it and streaks burst */
-.lr-rays {{ --rc: 243,200,90; left: 0; top: -59px; width: 140px; height: 140px; }}
-.lr-go .lr-rays {{ animation: lrh-rays 3s ease-out infinite; }}
-.lr-st {{ --c: #ffe08a; z-index: 3; }}
-.lr-go .lr-st {{ animation: lrh-st 3s ease-out infinite; }}
-.lr-crown {{ position: absolute; left: -7px; top: -10px; width: 17px; height: 12px; opacity: 0; transform-origin: 50% 100%; overflow: visible; }}
-.lr-go .lr-crown {{ animation: lrh-crown 3s cubic-bezier(.2,1.4,.4,1) infinite; }}
-@keyframes lrh-crown {{ 0%, 45% {{ opacity: 0; transform: translateY(-16px) rotate(-50deg) scale(.4); }} 50% {{ opacity: 1; transform: translateY(0) rotate(-20deg) scale(1.25); }}
-  55%, 82% {{ opacity: 1; transform: rotate(-20deg) scale(1); }} 85%, 100% {{ opacity: 0; transform: rotate(-20deg) scale(1); }} }}
-@keyframes lrh-rays {{ 0%, 44% {{ opacity: 0; transform: scale(.4); }} 49% {{ opacity: 1; transform: scale(1.1); }} 75% {{ opacity: .5; transform: scale(1); }} 84%, 100% {{ opacity: 0; transform: scale(1); }} }}
 
 /* Wall Calculator extras: the hammer's hit shakes the scene and throws
    sparks; each old price falls off struck through; the Gold Pass cut
@@ -768,90 +861,153 @@ img.fx-em {{ width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius
 @keyframes eqh-core {{ 0%, 100% {{ transform: scale(1); }} 20% {{ transform: scale(1.15); }} 40% {{ transform: scale(.95); }} 60% {{ transform: scale(1.2); }} 80% {{ transform: scale(1.02); }} }}
 
 /* ===================================================================
-   TIER LIST (tl-): the Clash Tier List card (troop and equipment lists are being merged into one).
-   S / A / B rows in the tier maker's own colours (PAL in coc-tierlist.js).
-   Idle (8s): the board is full; now and then one tile hops in its slot.
-   Hover / focus (.tl-go, 3.2s): the board clears and the tiles drop in
-   (B, A, S, B, A, S ...), each landing squashes and lights its row's
-   label; S fills last: the row glows red, rays and streaks burst from
-   the S label and a glint runs across it. Ends full = the idle board.
+   TIER LIST (tl-): one tier row up close, so the card has one focal point
+   (Adrian, Oct 25 2026, replacing the 3 x 3 board): the tier maker's big S
+   label (its colours, PAL in coc-tierlist.js) with a Dragon card docked
+   beside it in a sunken row. Idle (6s): the Dragon bobs, a glint runs over
+   the S. Hover / focus (.tl-go, 2.4s): the Dragon is picked up, the label
+   spins through F, E, D, C, B, A like a reel and lands on S, the Dragon
+   drops back into its slot and sparkles pop. Leaving finishes the loop.
    =================================================================== */
 .ptc-tl {{ --art-w: 136px; }}
-.tl-glow {{ position: absolute; right: -8px; top: 14px; width: 140px; height: 140px; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(224,99,99,.14), rgba(224,99,99,.04) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; transition: filter .6s; }}
-.tl-go .tl-glow {{ filter: brightness(1.6); }}
-.tl-board {{ position: absolute; right: 14px; top: 30px; width: 108px; height: 80px; }}
-.tl-row {{ position: absolute; left: 22px; right: 0; height: 24px; border-radius: 4px; background-color: var(--well); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 2px 0 rgba(0,0,0,.45); }}
-.tl-r0 {{ top: 0; --tl: 224, 99, 99; }} .tl-r1 {{ top: 28px; --tl: 230, 140, 64; }} .tl-r2 {{ top: 56px; --tl: 222, 190, 72; }}
-.tl-lab {{ position: absolute; left: -22px; top: 0; width: 20px; height: 24px; display: grid; place-items: center; border-radius: 4px;
-  background: rgb(var(--tl)); box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.28); font: 800 12px/1 'Oxanium', sans-serif; color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,.45); }}
-.tl-r0 .tl-lab {{ animation: tli-s 4s ease-in-out infinite; }}
-.tl-tile {{ position: absolute; width: 22px; height: 22px; z-index: 2; border-radius: 4px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), 0 2px 3px rgba(0,0,0,.4); }}
-.tl-tile img {{ display: block; width: 100%; height: 100%; }}
-.tl-rays {{ --rc: 255,160,130; left: -64px; top: -63px; width: 150px; height: 150px; }}
-.tl-go .tl-rays {{ animation: tlh-rays 3.2s ease-out infinite; }}
-.tl-st {{ --c: #ffc7b0; z-index: 3; }}
-.tl-go .tl-st {{ animation: tlh-st 3.2s ease-out infinite; }}
-.tl-glint {{ position: absolute; left: 22px; top: 0; width: 20px; height: 24px; z-index: 3; pointer-events: none; opacity: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent); }}
-.tl-go .tl-glint {{ animation: tlh-glint 3.2s ease-out infinite; }}
-@keyframes tli-s {{ 0%, 100% {{ box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.28); }} 50% {{ box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.28), 0 0 12px rgba(224,99,99,.55); }} }}
+.tl-glow {{ position: absolute; right: -6px; top: 22px; width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(224,99,99,.17), rgba(224,99,99,.04) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; }}
+/* the row: a sunken well like the tier maker's, label left, card right */
+.tl-row {{ position: absolute; left: 6px; top: 46px; width: 124px; height: 66px; border-radius: 9px; background: #0b0c0f;
+  box-shadow: inset 0 0 0 2px #060708, inset 0 3px 0 rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.06); }}
+.tl-lab {{ position: absolute; left: 5px; top: 5px; width: {TL_H}px; height: {TL_H}px; border-radius: 7px; overflow: hidden;
+  box-shadow: 0 0 0 2px #060708, 0 6px 12px -6px rgba(0,0,0,.8); }}
+.tl-go .tl-lab {{ animation: tlh-lab 2.4s ease-out infinite; }}
+.tl-reel {{ position: absolute; left: 0; top: 0; width: 100%; }}
+.tl-go .tl-reel {{ animation: tlh-reel 2.4s linear infinite; }}
+.tl-reel b {{ display: grid; place-items: center; height: {TL_H}px; background: rgb(var(--tl)) linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,0) 48%, rgba(0,0,0,.14));
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.3), inset 0 -3px 0 rgba(0,0,0,.18); font: 900 34px/1 'Figtree', 'Oxanium', sans-serif; color: #fff;
+  text-shadow: 0 2px 0 rgba(0,0,0,.55), 1.5px 0 0 rgba(0,0,0,.4), -1.5px 0 0 rgba(0,0,0,.4), 0 -1px 0 rgba(0,0,0,.35); }}
+/* the glint: a bright band across the label */
+.tl-glint {{ position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.55) 50%, transparent 62%) 100% 0 / 300% 100% no-repeat;
+  animation: tli-glint 6s ease-in-out infinite; }}
+.tl-go .tl-glint {{ animation: tlh-glint 2.4s ease-out infinite; }}
+.tl-card {{ position: absolute; left: 65px; top: 5px; width: {TL_H}px; height: {TL_H}px; border-radius: 7px; overflow: hidden; z-index: 2;
+  box-shadow: 0 0 0 2px #060708, 0 6px 12px -6px rgba(0,0,0,.8); animation: tli-bob 3s ease-in-out infinite alternate; }}
+.tl-card img {{ display: block; width: 100%; height: 100%; }}
+.tl-go .tl-card {{ animation: tlh-card 2.4s linear infinite; }}
+.tl-go .tl-sp {{ animation: tlh-sp 2.4s ease-out infinite; }}
+@keyframes tli-bob {{ from {{ transform: translateY(0); }} to {{ transform: translateY(-2px); }} }}
+@keyframes tli-glint {{ 0%, 58% {{ opacity: 0; background-position: 100% 0; }} 60% {{ opacity: 1; }} 74% {{ opacity: 1; background-position: 0 0; }} 76%, 100% {{ opacity: 0; background-position: 0 0; }} }}
+@keyframes tlh-glint {{ 0%, 55% {{ opacity: 0; background-position: 100% 0; }} 57% {{ opacity: 1; }} 74% {{ opacity: 1; background-position: 0 0; }} 76%, 100% {{ opacity: 0; background-position: 0 0; }} }}
+@keyframes tlh-lab {{ 0%, 49.5% {{ transform: none; filter: none; }} 52% {{ transform: scale(1.12); filter: brightness(1.3); }} 58% {{ transform: scale(.97); filter: none; }} 64%, 100% {{ transform: none; filter: none; }} }}
+@keyframes tlh-card {{ 0% {{ transform: none; box-shadow: 0 0 0 2px #060708, 0 6px 12px -6px rgba(0,0,0,.8); animation-timing-function: cubic-bezier(.2,.8,.3,1); }}
+  7%, 47% {{ transform: translateY(-13px) rotate(-6deg) scale(1.08); box-shadow: 0 0 0 2px #060708, 0 16px 16px -8px rgba(0,0,0,.75); animation-timing-function: cubic-bezier(.6,0,.9,.5); }}
+  53% {{ transform: translateY(1px) scale(1.1, .86); box-shadow: 0 0 0 2px #060708, 0 6px 12px -6px rgba(0,0,0,.8); }} 59% {{ transform: scale(.97, 1.04); }} 65%, 100% {{ transform: none; }} }}
 
 /* ===================================================================
-   GLOSSARY (gl-). A red-and-gold book (the Book of Everything's colours)
-   lies open, tilted toward you. One leaf turns at a time; the right page
-   names the term: Queen Walk -> Lavaloon -> Funneling (all three are real
-   entries in coc-glossary.json). The turning leaf casts a shadow on the
-   page under it. Idle: a turn every 4s. Hover / focus (.gl-go, 2.4s):
-   fast turns, the book lifts, rays open behind it and gold motes rise
-   off each page as it lands.
+   GLOSSARY (gl-): the Book of Everything (the nav's Glossary picture),
+   drawn in CSS so it can open. Red leather with a dark edge, a gold frame
+   and hourglass on the cover, cream pages; it lies tilted toward you.
+   Idle (12s): open on Queen Walk, a leaf turns to Lavaloon, another to
+   Funneling (all real entries in coc-glossary.json), the cover swings shut
+   and the book slides to the middle, then it opens on Queen Walk again.
+   Hover / focus (.gl-go, 3.6s): the book lifts and riffles (three leaves in
+   quick succession) to each term in turn; every landing gives a thump and
+   gold sparkles. No glow change, no rays behind it (Adrian, Oct 25 2026).
    =================================================================== */
-.ptc-gl {{ --art-w: 136px; }}
-.gl-glow {{ position: absolute; right: -10px; top: 8px; width: 150px; height: 150px; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255,190,110,.17), rgba(255,190,110,.04) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; transition: filter .6s; }}
-.gl-go .gl-glow {{ filter: brightness(1.6); }}
-.gl-rays {{ --rc: 255,205,130; right: -7px; top: 4px; width: 150px; height: 150px; transition: opacity .6s; }}
-.gl-go .gl-rays {{ opacity: .75; }}
-.gl-stage {{ position: absolute; right: 12px; top: 42px; width: 112px; height: 72px; perspective: 420px; }}
-.gl-book {{ position: absolute; inset: 0; transform: rotateX(30deg); transform-style: preserve-3d; transform-origin: 50% 100%; transition: transform .6s cubic-bezier(.22,1,.36,1); }}
-.gl-go .gl-book {{ transform: rotateX(22deg) translateY(-5px); }}
-.gl-cover {{ position: absolute; inset: -4px -5px -6px; border-radius: 4px; background: linear-gradient(#a3342b, #7a231d);
-  box-shadow: inset 0 0 0 1.5px #d9a441, inset 0 0 0 3px #5e1a15, 0 16px 18px -8px rgba(0,0,0,.85); }}
+.ptc-gl {{ --art-w: 136px; --red: #a8352b; --red-d: #6e1d17; --ink: #2a0907; --gold: #f0bb48; --gold-d: #9c6618;
+  --paper: #f6ead0; --paper-d: #dcc79a; }}
+.gl-glow {{ position: absolute; right: -10px; top: 12px; width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(220,90,70,.16), rgba(220,90,70,.04) 60%, transparent); animation: dc-glow 5s ease-in-out infinite; }}
+.gl-stage {{ position: absolute; right: 12px; top: 46px; width: 112px; height: 72px; perspective: 420px; }}
+.gl-book {{ position: absolute; inset: 0; transform: rotateX(30deg); transform-style: preserve-3d; transform-origin: 50% 100%;
+  transition: transform .6s cubic-bezier(.22,1,.36,1); animation: gli-slide 12s cubic-bezier(.45,.05,.35,1) infinite; }}
+.gl-go .gl-book {{ transform: rotateX(22deg) translateY(-5px); animation: glh-thump 3.6s linear infinite; }}
+/* back board (right half) + the page block's cream edge showing under the pages */
+.gl-board {{ position: absolute; left: 53px; top: -5px; width: 65px; height: 86px; border-radius: 2px 7px 7px 2px;
+  background: linear-gradient(var(--red), var(--red-d)); box-shadow: inset 0 0 0 2px var(--ink), 0 14px 16px -8px rgba(0,0,0,.85); }}
 .gl-page {{ position: absolute; top: 0; width: 56px; height: 72px; overflow: hidden; }}
-.gl-pl {{ left: 0; border-radius: 3px 0 0 3px; background: linear-gradient(90deg, #f3e8cb, #e6d6ae 86%, #c9b484); box-shadow: -1px 1px 0 #d8c79f, -2px 2px 0 #b9a77c; }}
-.gl-pr {{ left: 56px; border-radius: 0 3px 3px 0; background: linear-gradient(90deg, #c9b484, #e6d6ae 14%, #f6ecd2); box-shadow: 1px 1px 0 #d8c79f, 2px 2px 0 #b9a77c; }}
-.gl-lines {{ position: absolute; left: 8px; right: 8px; top: 34px; height: 30px; background: repeating-linear-gradient(transparent 0 4px, rgba(90,66,36,.28) 4px 5.5px);
+.gl-pr {{ left: 56px; border-radius: 0 3px 3px 0; background: linear-gradient(90deg, var(--paper-d), #eadbb7 14%, var(--paper));
+  box-shadow: 0 1.5px 0 #e3d1a6, 0 3px 0 #c9b182, 0 4px 0 var(--ink); overflow: visible; }}
+.gl-lines {{ position: absolute; left: 8px; right: 8px; top: 34px; height: 30px; background: repeating-linear-gradient(transparent 0 4px, rgba(110,60,30,.26) 4px 5.5px);
   -webkit-mask: linear-gradient(90deg, #000 60%, transparent 98%); mask: linear-gradient(90deg, #000 60%, transparent 98%); }}
-.gl-pl .gl-lines, .gl-back .gl-lines {{ top: 12px; height: 52px; }}
-.gl-term {{ position: absolute; left: 4px; right: 4px; top: 8px; text-align: center; font: 800 10px/1.12 'Oxanium', sans-serif; color: #3b2a17; opacity: 0; }}
-.gl-term::after {{ content: ""; display: block; width: 18px; height: 1.5px; margin: 4px auto 0; background: #b0402f; }}
-.gl-lt0, .gl-pt1 {{ opacity: 1; }}
-.gl-shade {{ position: absolute; inset: 0; background: linear-gradient(90deg, rgba(40,25,10,.5), rgba(40,25,10,0) 75%); opacity: 0; pointer-events: none; }}
-.gl-pr .gl-shade {{ animation: gli-shade 12s linear infinite; }}
-.gl-go .gl-pr .gl-shade {{ animation: glh-shade 2.4s linear infinite; }}
-.gl-leaf {{ position: absolute; left: 56px; top: 0; width: 56px; height: 72px; transform-origin: 0 50%; transform-style: preserve-3d; animation: gli-leaf 12s linear infinite; }}
-.gl-go .gl-leaf {{ animation: glh-leaf 2.4s linear infinite; }}
-.gl-face {{ position: absolute; inset: 0; left: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; }}
-.gl-front {{ border-radius: 0 3px 3px 0; background: linear-gradient(90deg, #d4c194, #ebdcb6 14%, #f7eed6); }}
-.gl-back {{ transform: rotateY(180deg); border-radius: 3px 0 0 3px; background: linear-gradient(90deg, #f3e8cb, #e6d6ae 86%, #c9b484); }}
-.gl-front .gl-shade {{ background: linear-gradient(270deg, rgba(40,25,10,.35), rgba(40,25,10,0)); animation: gli-shade 12s linear infinite; }}
-.gl-go .gl-front .gl-shade {{ animation: glh-shade 2.4s linear infinite; }}
-.gl-ribbon {{ position: absolute; left: 53px; top: 64px; width: 6px; height: 20px; background: linear-gradient(#e4b14d, #b98a2c); transform-origin: 50% 0;
+.gl-back .gl-lines, .gl-cb .gl-lines, .gl-blank .gl-lines {{ top: 12px; height: 52px; }}
+.gl-term {{ position: absolute; left: 3px; right: 3px; top: 8px; text-align: center; font: 900 10px/1.1 'Figtree', 'Oxanium', sans-serif; color: #4a1c10; opacity: 0; }}
+.gl-term::after {{ content: ""; display: block; width: 18px; height: 2px; margin: 4px auto 0; border-radius: 1px; background: var(--red); }}
+.gl-l0 .gl-t0, .gl-pr .gl-t1, .gl-l1 .gl-t1 {{ opacity: 1; }}
+.gl-go .gl-l1 .gl-term {{ animation: none; opacity: 0; }}
+/* leaves: hinged on the spine; front = a right page, back = a left page */
+.gl-leaf {{ position: absolute; left: 56px; top: 0; width: 56px; height: 72px; transform-origin: 0 50%; transform-style: preserve-3d; }}
+.gl-l0 {{ animation: gli-l0 12s linear infinite; }}
+.gl-face {{ position: absolute; inset: 0; overflow: hidden; -webkit-backface-visibility: hidden; backface-visibility: hidden; }}
+.gl-front {{ border-radius: 0 3px 3px 0; background: linear-gradient(90deg, #d8c393, #ecdcb4 14%, var(--paper)); }}
+.gl-back {{ transform: rotateY(180deg); border-radius: 3px 0 0 3px; background: linear-gradient(90deg, var(--paper), #eadbb7 86%, var(--paper-d)); }}
+/* the shadow a lifting leaf throws on whatever lies under it */
+.gl-shade {{ position: absolute; left: 56px; top: 0; width: 56px; height: 72px; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(50,20,8,.5), rgba(50,20,8,0) 75%); animation: gli-shade 12s linear infinite; }}
+.gl-go .gl-shade {{ animation: glh-shade 3.6s linear infinite; }}
+/* the front cover: hinged on the spine; open = lying on the left (its inside is the left page) */
+.gl-cover {{ position: absolute; left: 56px; top: -5px; width: 62px; height: 86px; transform-origin: 0 50%; transform-style: preserve-3d; transform: rotateY(-180deg);
+  animation: gli-cover 12s linear infinite; }}
+.gl-go .gl-cover {{ animation: none; }}
+.gl-cf, .gl-cb {{ position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; }}
+.gl-cf {{ border-radius: 2px 7px 7px 2px; background: linear-gradient(170deg, #c4473a, var(--red) 35%, var(--red-d));
+  box-shadow: inset 0 0 0 2px var(--ink), inset 0 4px 0 rgba(255,255,255,.14), inset 6px 0 0 rgba(0,0,0,.22); }}
+.gl-cf::before {{ content: ""; position: absolute; inset: 7px 7px 8px 11px; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--gold), inset 0 0 0 1.5px rgba(0,0,0,.3); }}
+.gl-cf svg {{ position: absolute; left: 21px; top: 21px; width: 30px; height: 40px; overflow: visible; filter: drop-shadow(0 2px 0 rgba(0,0,0,.35)); }}
+.gl-cb {{ transform: rotateY(180deg); border-radius: 7px 2px 2px 7px; background: linear-gradient(var(--red), var(--red-d)); box-shadow: inset 0 0 0 2px var(--ink); }}
+.gl-cb i:first-child {{ position: absolute; left: 6px; right: 0; top: 5px; bottom: 9px; border-radius: 3px 0 0 3px; background: linear-gradient(90deg, var(--paper), #eadbb7 86%, var(--paper-d)); }}
+.gl-cb .gl-lines {{ left: 14px; right: 8px; top: 17px; }}
+.gl-ribbon {{ position: absolute; left: 53px; top: 66px; width: 6px; height: 20px; background: linear-gradient(var(--gold), var(--gold-d)); transform-origin: 50% 0;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%); animation: gl-sway 4s ease-in-out infinite; }}
-.gl-em {{ --c: #ffd98a; z-index: 3; }}
-.gl-go .gl-em {{ animation: glh-em 2.4s ease-out infinite; }}
+.gl-go .gl-sp {{ animation: glh-sp 3.6s ease-out infinite; }}
 @keyframes gl-sway {{ 0%, 100% {{ transform: rotate(-4deg); }} 50% {{ transform: rotate(5deg); }} }}
 
 @media (prefers-reduced-motion: reduce) {{
   .pl-art {{ --lx: 40px; --ly: 52px; }}
   .ptc-art, .ptc-art * {{ animation: none !important; }}
+  /* still frames: Army Maker = the camp with its three troop cards round it,
+     Damage Calculator = the Monolith destroyed (stamp on, no bar) */
+  .am-t {{ width: 40px; height: 40px; margin: -6px 0 0 -6px; opacity: 1; border-radius: 8px; outline-width: 2px; }}
+  .am-t0 {{ transform: translate(-50px, 50px) rotate(-10deg); }}
+  .am-t1 {{ transform: translate(44px, 46px) rotate(9deg); }}
+  .am-t2 {{ transform: translate(0, 10px) rotate(-3deg); }}
+  .dc-bar, .dc-dmg {{ display: none; }}
+  .dc-mono {{ filter: brightness(.68) saturate(.85); }}
+  .dc-stamp {{ opacity: 1; transform: rotate(-9deg); }}
   .ptc-layer {{ transition: none; }}
 }}
 
 @media (max-width: 760px) {{
-  .ptc {{ --s: .74; --well-w: 128px; min-height: 118px; padding: 14px calc(var(--well-w) + 14px) 14px 16px; }}
-  .ptc-name {{ font-size: 15px; }}
-  .ptc-desc {{ font-size: 12.5px; }}
+  .ptc {{ --s: .6; --well-w: 108px; min-height: 92px; padding: 10px calc(var(--well-w) + 10px) 10px 15px; }}
+  .ptc-name {{ font-size: 17px; }}
+  .ptc-desc {{ display: block; margin-top: 3px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; }}
+  .ptc-long {{ display: none; }}
+  .ptc-short {{ display: inline; }}
+  /* /coc/ phones: the reduced-motion still frames (Oct 25 2026, Adrian: the
+     animations lagged there). /coc/tools/ (no .coc-home) keeps them. */
+  .coc-home .pl-art {{ --lx: 40px; --ly: 52px; }}
+  .coc-home .ptc-art, .coc-home .ptc-art * {{ animation: none !important; }}
+  .coc-home .am-t {{ width: 40px; height: 40px; margin: -6px 0 0 -6px; opacity: 1; border-radius: 8px; outline-width: 2px; }}
+  .coc-home .am-t0 {{ transform: translate(-50px, 50px) rotate(-10deg); }}
+  .coc-home .am-t1 {{ transform: translate(44px, 46px) rotate(9deg); }}
+  .coc-home .am-t2 {{ transform: translate(0, 10px) rotate(-3deg); }}
+  .coc-home .dc-bar, .coc-home .dc-dmg {{ display: none; }}
+  .coc-home .dc-mono {{ filter: brightness(.68) saturate(.85); }}
+  .coc-home .dc-stamp {{ opacity: 1; transform: rotate(-9deg); }}
+}}
+/* Phones and narrow bands (Oct 25 2026, Adrian): two cards a row as tiles --
+   the art on top, centred (scaled from its top centre instead of its right
+   edge), the name and short blurb under it. A container query, so it follows
+   the band's width like the column rules above. */
+@container (max-width: 619px) {{
+  .ptc-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
+  .ptc {{ --s: .5; flex-direction: column; align-items: stretch; justify-content: flex-start; min-height: 0; padding: 82px 10px 11px; text-align: center; }}
+  .ptc-art {{ top: 2px; right: auto; left: 50%; margin: 0 0 0 calc(var(--art-w) / -2); }}
+  .ptc-layer {{ transform-origin: 50% 0; }}
+  .ptc-name {{ font-size: 14px; line-height: 1.2; }}
+  .ptc-name svg {{ display: none; }}
+  .ptc-copy {{ position: static; }}  /* so the HOT tag sits in the tile's corner, not the copy's */
+  .ptc-hot {{ position: absolute; top: 7px; left: 7px; margin: 0; z-index: 3; }}
+  .ptc-desc {{ display: -webkit-box; -webkit-line-clamp: 2; margin: 2px auto 0; font-size: 11px; line-height: 1.35; white-space: normal; text-wrap: balance; }}
+  .ptc-long {{ display: none; }}
+  .ptc-short {{ display: inline; }}
 }}
 /* @@CSS-END */
 @media (max-width: 760px) {{
@@ -867,37 +1023,6 @@ img.fx-em {{ width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius
 
   <div class="ptc-wrap"><div class="ptc-grid">
 <!-- @@CARDS -->
-    <a class="ptc ptc-army" href="{U}/coc/tools/army-maker">
-      <div class="ptc-art am-art" data-go="am-go" data-clock="amh-camp" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="am-light"></div><i class="am-mote"></i><i class="am-mote"></i><i class="am-mote"></i></div>
-        <div class="ptc-layer ptc-mid"><div class="am-ring"></div><div class="am-camp"><img src="{U}/clashofclans/coctools/army-camp.webp" alt=""></div></div>
-        <div class="ptc-layer ptc-near"><img class="am-t am-t0" src="{U}/clashofclans/coctools/units/rocket-balloon.webp" alt=""><img class="am-t am-t1" src="{U}/clashofclans/coctools/units/super-minion.webp" alt=""><img class="am-t am-t2" src="{U}/clashofclans/coctools/units/healer.webp" alt=""></div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Army Maker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Build an army for TH8 to TH18 and open it straight in the game.</p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-dc" href="{U}/coc/tools/damage-calculator">
-      <div class="ptc-art dc-art" data-go="dc-go" data-clock="dch-hp" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="dc-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="dc-ring"></div>
-          <div class="dc-mono"><img src="{U}/clashofclans/buildings/monolith/1.webp" alt=""></div>
-          <svg class="dc-bolt" viewBox="0 0 50 76">
-            <path class="glow" pathLength="1" d="M4 0 L15 19 L9 25 L25 45 L19 51 L42 74"/>
-            <path class="core" pathLength="1" d="M4 0 L15 19 L9 25 L25 45 L19 51 L42 74"/>
-          </svg>
-        </div>
-        <div class="ptc-layer ptc-near"><div class="dc-bar"><i class="dc-ghost"></i><i class="dc-fill"></i></div>{'<b class="dc-dmg">−720</b>' * 7}<div class="dc-stamp"><span>Destroyed</span></div></div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Damage Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">See what your spells and equipment leave of any building.</p>
-      </div>
-    </a>
-
     <a class="ptc ptc-pl" href="{U}/coc/tools/player-tracker">
       <div class="ptc-art pl-art" data-go="pl-go" data-clock="plh-lens" aria-hidden="true">
         <div class="ptc-layer ptc-far"><div class="pl-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
@@ -919,32 +1044,103 @@ img.fx-em {{ width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius
         </div>
       </div>
       <div class="ptc-copy">
-        <div class="ptc-name">Player Tracker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Look up any player or clan by tag.</p>
+        <div class="ptc-name"><b class="ptc-hot">Hot</b>Player Tracker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc"><span class="ptc-long">Any player or clan by tag, live from the game.</span><span class="ptc-short">Look up any player or clan by their tag.</span></p>
       </div>
     </a>
-    <a class="ptc ptc-lr" href="{U}/coc/tools/leaderboards">
-      <div class="ptc-art lr-art" data-go="lr-go" data-clock="lrh-fade" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="lr-glow"></div></div>
+
+    <a class="ptc ptc-eq" href="{U}/coc/tools/equipment">
+      <div class="ptc-art eq-art" data-go="eq-go" data-clock="eqh-heat" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="eq-glow"></div>{eq_wind(5, 21, (1.3, 1.9))}<div class="eq-hot">{eq_wind(7, 22, (.55, .85))}</div></div>
         <div class="ptc-layer ptc-mid">
-          <div class="lr-board">
-            <div class="fx-rays lr-rays"></div>
-            <div class="lr-ranks"><span>1</span><span>2</span><span>3</span><span>4</span></div>
-            <div class="lr-rows">
-              <div class="lr-row lr-a"><i class="lr-name"></i><i class="lr-score"></i></div>
-              <div class="lr-row lr-b"><i class="lr-name" style="width:52%"></i><i class="lr-score"></i></div>
-              <div class="lr-row lr-c"><i class="lr-name" style="width:34%"></i><i class="lr-score"></i></div>
-              <div class="lr-row lr-you"><svg class="lr-crown" viewBox="0 0 20 14"><path d="M1.5 12.5 L2.5 3 L7 7.5 L10 1.5 L13 7.5 L17.5 3 L18.5 12.5 Z" fill="#f3c44e" stroke="#060708" stroke-width="1.6" stroke-linejoin="round"/></svg><b>You</b><span class="lr-up">▲</span><i class="lr-score"></i></div>
-            </div>
-            {streaks('lr-st', 14, 70, 11, 50, seed=4, length=12)}
+          <i class="eq-trail"></i>
+          <div class="eq-ball"><img src="{U}/clashofclans/coctools/units/fireball.webp" alt=""><i class="eq-core"></i></div>
+        </div>
+        <div class="ptc-layer ptc-near">{eq_particles(14, 23, (1.6, 2.8))}<div class="eq-hot">{eq_particles(14, 24, (.8, 1.4), hot=True)}</div></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name"><b class="ptc-hot">Hot</b>Equipment<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc"><span class="ptc-long">Stats, ore costs and tips for all 42 hero items.</span><span class="ptc-short">All 42 hero items: stats, ore and tips.</span></p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-army" href="{U}/coc/tools/army-maker">
+      <div class="ptc-art am-art" data-go="am-go" data-clock="amh-camp" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="am-light"></div><i class="am-mote"></i><i class="am-mote"></i><i class="am-mote"></i></div>
+        <div class="ptc-layer ptc-mid"><div class="am-ring"></div><div class="am-camp"><img src="{U}/clashofclans/coctools/army-camp.webp" alt=""></div></div>
+        <div class="ptc-layer ptc-near"><img class="am-t am-t0" src="{U}/clashofclans/coctools/units/rocket-balloon.webp" alt=""><img class="am-t am-t1" src="{U}/clashofclans/coctools/units/super-minion.webp" alt=""><img class="am-t am-t2" src="{U}/clashofclans/coctools/units/healer.webp" alt=""></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Army Maker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc"><span class="ptc-long">Build an army for TH8 to TH18, open it in game.</span><span class="ptc-short">Build an army and open it in the game.</span></p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-dc" href="{U}/coc/tools/damage-calculator">
+      <div class="ptc-art dc-art" data-go="dc-go" data-clock="dch-hp" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="dc-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="dc-ring"></div>
+          <div class="dc-mono"><img src="{U}/clashofclans/buildings/monolith/1.webp" alt=""></div>
+          <svg class="dc-bolt" viewBox="0 0 50 76">
+            <path class="glow" pathLength="1" d="M4 0 L15 19 L9 25 L25 45 L19 51 L42 74"/>
+            <path class="core" pathLength="1" d="M4 0 L15 19 L9 25 L25 45 L19 51 L42 74"/>
+          </svg>
+        </div>
+        <div class="ptc-layer ptc-near"><div class="dc-bar"><i class="dc-ghost"></i><i class="dc-fill"></i></div>{'<b class="dc-dmg">−720</b>' * 7}<div class="dc-stamp"><span>Destroyed</span></div></div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Damage Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc"><span class="ptc-long">Spell and equipment damage on any building.</span><span class="ptc-short">Spell and equipment damage on any building.</span></p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-lgt" href="{U}/coc/tools/legend-tracker">
+      <div class="ptc-art lgt-art" data-go="lgt-go" data-clock="lgth-cup" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="lgt-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="lgt-cup"><img src="{U}/icons/legend-trophy.webp" alt="">{sparks('lgt-sp', [(14, 20, 9), (74, 14, 10, -.05), (82, 52, 7, -.1), (8, 58, 7, -.08)])}</div>
+        </div>
+        <div class="ptc-layer ptc-near">{''.join(f'<span class="lgt-chip lgt-c{k}"><img src="{U}/clashofclans/coctools/trophy.webp" alt="">+40</span>' for k in range(3))}</div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">Legend Tracker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc"><span class="ptc-long">Every Legend attack and defense, trophies each.</span><span class="ptc-short">Every Legend attack, with trophies each.</span></p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-ws" href="{U}/coc/tools/war-planner">
+      <div class="ptc-art ws-art" data-go="ws-go" data-clock="wsh-sw" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="ws-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="ws-x"><div class="ws-b"><img src="{U}/clashofclans/coctools/sword.webp" alt=""></div><div class="ws-b"><img src="{U}/clashofclans/coctools/sword.webp" alt=""></div></div>
+          <div class="ws-hit"><i class="ws-flash"></i>{sparks('ws-sp', [(-14, -12, 10), (12, -16, 8, -.04), (16, 8, 7, -.08), (-12, 12, 6, -.06)])}{streaks('ws-st', 10, 0, 0, 34, seed=13, length=9)}</div>
+        </div>
+      </div>
+      <div class="ptc-copy">
+        <div class="ptc-name">War Planner<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <p class="ptc-desc"><span class="ptc-long">Give every attacker a target and share the plan.</span><span class="ptc-short">Give every attacker a target, share the plan.</span></p>
+      </div>
+    </a>
+
+    <a class="ptc ptc-lr" href="{U}/coc/tools/leaderboards">
+      <div class="ptc-art lr-art" data-go="lr-go" data-clock="lrh-cup" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="lr-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="lr-cup">
+            <img src="{U}/icons/leaderboards.webp" alt="">
+            <img class="lr-shine" src="{U}/icons/leaderboards.webp" alt="">
+            {sparks('lr-tw', [(26, 12, 9, 0), (60, 4, 7, -2), (22, 44, 6, -4)])}
+            {sparks('lr-sp', [(10, 18, 10), (68, 2, 11, -.06), (80, 34, 8, -.12), (2, 50, 7, -.09), (40, -4, 8, -.03), (76, 66, 7, -.15), (30, 70, 6, -.18)])}
           </div>
         </div>
       </div>
       <div class="ptc-copy">
         <div class="ptc-name">Leaderboards<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Today’s top 200 in the Philippines and the world.</p>
+        <p class="ptc-desc"><span class="ptc-long">This week’s top 200, Philippines and world.</span><span class="ptc-short">This week’s top 200 in PH and the world.</span></p>
       </div>
     </a>
+
     <a class="ptc ptc-wc" href="{U}/coc/tools/walls">
       <div class="ptc-art wc-art" data-go="wc-go" data-clock="wch-num" aria-hidden="true">
         <div class="ptc-layer ptc-far"><div class="wc-glow"></div></div>
@@ -970,58 +1166,49 @@ img.fx-em {{ width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius
       </div>
       <div class="ptc-copy">
         <div class="ptc-name">Wall Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Wall costs, including Gold Pass and Hammer Jam savings.</p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-eq" href="{U}/coc/tools/equipment">
-      <div class="ptc-art eq-art" data-go="eq-go" data-clock="eqh-heat" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="eq-glow"></div>{eq_wind(5, 21, (1.3, 1.9))}<div class="eq-hot">{eq_wind(7, 22, (.55, .85))}</div></div>
-        <div class="ptc-layer ptc-mid">
-          <i class="eq-trail"></i>
-          <div class="eq-ball"><img src="{U}/clashofclans/coctools/units/fireball.webp" alt=""><i class="eq-core"></i></div>
-        </div>
-        <div class="ptc-layer ptc-near">{eq_particles(14, 23, (1.6, 2.8))}<div class="eq-hot">{eq_particles(14, 24, (.8, 1.4), hot=True)}</div></div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Equipment<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Stats, ore costs, and tips for all 42 hero items.</p>
+        <p class="ptc-desc"><span class="ptc-long">Wall costs with Gold Pass and Hammer Jam savings.</span><span class="ptc-short">Wall upgrade costs with Hammer Jam savings.</span></p>
       </div>
     </a>
 
     <a class="ptc ptc-tl" href="{U}/coc/tools/tier-list">
-      <div class="ptc-art tl-art" data-go="tl-go" data-clock="tlh-t0" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="tl-glow"></div></div>
-        <div class="ptc-layer ptc-mid">{troop_board}</div>
+      <div class="ptc-art tl-art" data-go="tl-go" data-clock="tlh-reel" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="tl-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
+        <div class="ptc-layer ptc-mid">
+          <div class="tl-row">
+            <div class="tl-lab"><div class="tl-reel">{tl_reel}</div><i class="tl-glint"></i></div>
+            <div class="tl-card"><img src="{U}/clashofclans/coctools/units/dragon.webp" alt=""></div>
+            {sparks('tl-sp', [(4, 2, 11), (58, -4, 9, -.05), (62, 40, 8, -.1), (2, 58, 8, -.08), (30, -10, 7, -.03)])}
+          </div>
+        </div>
       </div>
       <div class="ptc-copy">
         <div class="ptc-name">Clash Tier List<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Rank anything in Clash from S to F and share your list.</p>
+        <p class="ptc-desc"><span class="ptc-long">Rank anything in Clash from S to F and share it.</span><span class="ptc-short">Rank anything in Clash from S to F, share it.</span></p>
       </div>
     </a>
 
     <a class="ptc ptc-gl" href="{U}/coc/tools/slang">
-      <div class="ptc-art gl-art" data-go="gl-go" data-clock="glh-leaf" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="gl-glow"></div><div class="fx-rays gl-rays"></div></div>
+      <div class="ptc-art gl-art" data-go="gl-go" data-clock="glh-l0" aria-hidden="true">
+        <div class="ptc-layer ptc-far"><div class="gl-glow"></div></div>
         <div class="ptc-layer ptc-mid">
           <div class="gl-stage">
             <div class="gl-book">
-              <div class="gl-cover"></div>
-              <div class="gl-page gl-pl"><i class="gl-lines"></i></div>
-              <div class="gl-page gl-pr">{''.join(f'<b class="gl-term gl-pt{k}">{t}</b>' for k, t in enumerate(GL_TERMS))}<i class="gl-lines"></i><i class="gl-shade"></i></div>
-              <div class="gl-leaf">
-                <div class="gl-face gl-front">{''.join(f'<b class="gl-term gl-lt{k}">{t}</b>' for k, t in enumerate(GL_TERMS))}<i class="gl-lines"></i><i class="gl-shade"></i></div>
-                <div class="gl-face gl-back"><i class="gl-lines"></i></div>
-              </div>
+              <i class="gl-board"></i>
+              <div class="gl-page gl-pr">{''.join(f'<b class="gl-term gl-t{k}">{t}</b>' for k, t in enumerate(GL_TERMS))}<i class="gl-lines"></i></div>
+              <div class="gl-leaf gl-l2"><div class="gl-face gl-front gl-blank"><i class="gl-lines"></i></div><div class="gl-face gl-back"><i class="gl-lines"></i></div></div>
+              <div class="gl-leaf gl-l1"><div class="gl-face gl-front">{''.join(f'<b class="gl-term gl-t{k}">{t}</b>' for k, t in enumerate(GL_TERMS))}<i class="gl-lines"></i></div><div class="gl-face gl-back"><i class="gl-lines"></i></div></div>
+              <div class="gl-leaf gl-l0"><div class="gl-face gl-front">{''.join(f'<b class="gl-term gl-t{k}">{t}</b>' for k, t in enumerate(GL_TERMS))}<i class="gl-lines"></i></div><div class="gl-face gl-back"><i class="gl-lines"></i></div></div>
+              <i class="gl-shade"></i>
+              <div class="gl-cover"><div class="gl-cf"><svg viewBox="0 0 24 32"><defs><linearGradient id="glHg" x1="0" x2="1"><stop offset="0" stop-color="#ffd978"/><stop offset=".55" stop-color="#f0bb48"/><stop offset="1" stop-color="#b77d22"/></linearGradient></defs><path d="M2 1h20v3.5h-2.2L14 14v4l5.8 9.5H22V31H2v-3.5h2.2L10 18v-4L4.2 4.5H2Z" fill="url(#glHg)" stroke="#2a0907" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 3h9" stroke="rgba(255,255,255,.7)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="gl-cb"><i></i><i class="gl-lines"></i></div></div>
               <i class="gl-ribbon"></i>
             </div>
-            {embers('gl-em', 10, 84, 22, 26, 44, seed=12)}
+            {sparks('gl-sp', [(30, -6, 10), (82, -12, 12, -.08), (108, 10, 8, -.15), (4, 16, 8, -.05), (60, -20, 7, -.12), (100, 44, 7, -.2)])}
           </div>
         </div>
       </div>
       <div class="ptc-copy">
         <div class="ptc-name">Glossary<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc">Queen Walk, Lavaloon, and 32 more terms in plain English.</p>
+        <p class="ptc-desc"><span class="ptc-long">Queen Walk, Lavaloon and 32 more terms, explained.</span><span class="ptc-short">Clash slang and terms in plain English.</span></p>
       </div>
     </a>
 <!-- @@CARDS-END -->

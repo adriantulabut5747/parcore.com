@@ -459,19 +459,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // sits beside it, not inside it (no links inside a link); CSS swaps
   // them (BREADCRUMB in 11layout.css).
   // The game sections use the same trail: "Valorant › Crosshairs".
-  function buildCrumbs(homeLink, homeName, pages) {
+  // Genshin (Oct 24 2026): `opts.short` = the first step's phone wording ("Genshin", like CoC's
+  // "COC"); `opts.mid` = a middle step (the page's group: "Genshin Impact › Events › Banners"),
+  // `opts.here` = the page when it isn't in `pages` (a group's own page, e.g. /genshin-impact/tools).
+  function buildCrumbs(homeLink, homeName, pages, opts) {
+    opts = opts || {};
     const left = document.querySelector('.secondary-left');
     const title = left && left.querySelector('.secondary-content');
     if (!title || left.querySelector('.stb-crumbs')) return;
-    const here = pages.find(item => !item.soon && normalizePage(item.link) === currentPage);
+    const here = opts.here || pages.find(item => !item.soon && normalizePage(item.link) === currentPage);
     if (!here || normalizePage(here.link) === normalizePage(homeLink)) return;
     const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const sep = `<span class="stb-crumb-sep" aria-hidden="true">›</span>`;
+    const home = opts.short
+      ? `<span class="stb-crumb-long">${esc(homeName)}</span><span class="stb-crumb-short">${esc(opts.short)}</span>`
+      : esc(homeName);
     const crumbs = document.createElement('nav');
     crumbs.className = 'stb-crumbs';
     crumbs.setAttribute('aria-label', 'Breadcrumb');
     crumbs.innerHTML =
-      `<a href="${homeLink}">${esc(homeName)}</a>` +
-      `<span class="stb-crumb-sep" aria-hidden="true">›</span>` +
+      `<a href="${homeLink}">${home}</a>` + sep +
+      (opts.mid ? `<a href="${opts.mid.link}">${esc(opts.mid.name)}</a>` + sep : '') +
       `<a href="${here.link}" aria-current="page">${esc(here.name)}</a>`;
     title.after(crumbs);
     left.classList.add('has-crumbs');
@@ -484,55 +492,56 @@ document.addEventListener('DOMContentLoaded', () => {
   // sheet (coc-more.css's .mx tiles, like Minecraft and CoC). A group link
   // isn't a page itself (href "#gn-<i>"); it's lit when you're on one of
   // its built pages.
+  // Oct 24 2026 (Adrian, "like the clash of clans"): every group has a "link". A group with no
+  // pages (Lobby) is a plain link; the others link to their group page ("All tools" etc., CoC's Tools button):
+  // a click / phone tap goes there, desktop hover opens the menu of its pages. Page icons are
+  // pictures (in-game art), shown in the menu rows and the sheet's tiles; group icons stay SVG.
   function buildGroups(game) {
     const groups = game.groups;
     // A page with "activePrefix" is also "here" on every address under it
     // (Player lookup: /genshin-impact/player/<UID>).
     const here = p => !p.soon && (normalizePage(p.link) === currentPage ||
       !!(p.activePrefix && currentPage.startsWith(normalizePage(p.activePrefix) + '/')));
-    buildHubNav({ hubNav: groups.map((g, i) => ({
-      name: g.name, link: '#gn-' + i, icon: g.icon,
+    buildHubNav({ hubNav: groups.map(g => ({
+      name: g.name, link: g.link, icon: g.icon,
       activeOn: g.pages.some(here) ? [currentPage] : []
     })) });
+    const menus = groups.filter(g => g.pages.length);
+    const keyOf = {};
+    menus.forEach((g, i) => (keyOf[normalizePage(g.link)] = 'gn-' + i));
     if (buildHubStrip) {
       window.stbHubMenus(stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav, {
-        keyOf: link => ((link.getAttribute('href') || '').match(/^#(gn-\d+)$/) || [])[1] || '',
-        labels: Object.fromEntries(groups.map((g, i) => ['gn-' + i, g.name])),
-        lists: Object.fromEntries(groups.map((g, i) => ['gn-' + i, g.pages.map(p => ({ href: p.soon ? '' : p.link, name: p.name, soon: p.soon }))]))
+        keyOf: link => keyOf[normalizePage(link.getAttribute('href') || '')] || '',
+        labels: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.name])),
+        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.pages.map(p => ({ href: p.soon ? '' : p.link, name: p.name, soon: p.soon, icon: p.icon }))]))
       });
     }
 
     const list = document.querySelector('#moreOverlay .more-list');
     if (list) {
       const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const ico = p => (p.icon ? `<span class="mx-tool-ico"><img src="${p.icon}" alt="" loading="lazy" decoding="async"></span>` : '');
       const tile = p => p.soon
-        ? `<a class="mx-tool is-soon" aria-disabled="true"><span class="mx-tool-name">${esc(p.name)}</span></a>`
-        : `<a class="mx-tool${here(p) ? ' active' : ''}" href="${p.link}"><span class="mx-tool-name">${esc(p.name)}</span></a>`;
+        ? `<a class="mx-tool is-soon" aria-disabled="true">${ico(p)}<span class="mx-tool-name">${esc(p.name)}</span></a>`
+        : `<a class="mx-tool${here(p) ? ' active' : ''}" href="${p.link}">${ico(p)}<span class="mx-tool-name">${esc(p.name)}</span></a>`;
       list.classList.add('mx');
-      list.innerHTML = groups.map((g, i) =>
+      list.innerHTML = menus.map((g, i) =>
         `<section class="mx-sec" id="gn-sec-${i}"><div class="mx-head"><h3 class="mx-label mx-label--ico"><svg viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>${esc(g.name)}</h3></div>` +
         `<div class="mx-tools">${g.pages.map(tile).join('')}</div></section>`).join('');
       const count = document.querySelector('#moreOverlay .mx-hdr-count');
-      const all = [].concat(...groups.map(g => g.pages));
+      const all = [].concat(...menus.map(g => g.pages));
       if (count) count.textContent = all.filter(p => !p.soon).length + ' live · ' + all.length + ' pages';
     }
 
-    // Group links: on phones open the sheet at that group; on desktop a click
-    // opens the hover menu (for touch laptops and anyone who clicks).
-    document.addEventListener('click', e => {
-      const a = e.target.closest('a[href^="#gn-"]');
-      if (!a) return;
-      e.preventDefault();
-      if (a.classList.contains('stb-hub-link')) return a.dispatchEvent(new Event('mouseenter'));
-      const overlay = document.getElementById('moreOverlay');
-      const sec = document.getElementById('gn-sec-' + a.getAttribute('href').slice(4));
-      if (!overlay) return;
-      if (!overlay.classList.contains('open')) window.toggleMoreMenu();
-      const sc = sec && sec.closest('.more-sheet-scroll');
-      const top = sc && sc.querySelector('.more-sheet-top'); // sticky: it covers the list's top
-      if (sc) sc.scrollTop += sec.getBoundingClientRect().top - sc.getBoundingClientRect().top - (top ? top.offsetHeight : 0) - 12;
+    // Trail: "Genshin Impact › Events › Banners"; a group page is "Genshin Impact › Events".
+    const crumb = { short: game.short };
+    menus.forEach(g => {
+      const page = g.pages.find(here);
+      if (!page) return;
+      if (normalizePage(page.link) === normalizePage(g.link)) crumb.here = { name: g.name, link: g.link };
+      else Object.assign(crumb, { here: page, mid: { name: g.name, link: g.link } });
     });
-    buildCrumbs(game.home, game.name, [].concat(...groups.map(g => g.pages)));
+    buildCrumbs(game.home, game.name, [], crumb);
   }
 
   if (gameKey) {
@@ -641,6 +650,63 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   handle.addEventListener('pointerup', endDrag);
   handle.addEventListener('pointercancel', endDrag);
+})();
+
+/* MORE SHEET PULL-TO-CLOSE (every page, Oct 24 2026): pulling the sheet's list down once it is
+   at the top drags the whole sheet, like app sheets (also mid-swipe: scroll up to the top and keep
+   going); same rule as the handle drag: past ~28% of its height or a fast flick closes it. NOT gated
+   on data-game-nav: CoC, Minecraft and Web Resources keep their own open/close copies, but all of
+   them have #moreOverlay > .more-sheet and a global closeMoreMenu() (the overlay's onclick), so this
+   one listener serves every page. Touch events, not pointer ones: a scroller cancels pointers. */
+(function initMorePull() {
+  function init() {
+    const overlay = document.getElementById('moreOverlay');
+    const sheet = overlay && overlay.querySelector('.more-sheet');
+    if (!sheet || typeof window.closeMoreMenu !== 'function') return;
+    let p = null;
+    // At the top = nothing between the finger and the overlay is scrolled down.
+    const atTop = el => { for (; el && el !== overlay; el = el.parentNode) if (el.scrollTop > 0) return false; return true; };
+    sheet.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      p = e.touches.length === 1 && !e.target.closest('.more-sheet-handle') ? { x: t.clientX, y: t.clientY, on: false } : null;
+    }, { passive: true });
+    sheet.addEventListener('touchmove', e => {
+      if (!p) return;
+      const { clientX: x, clientY: y } = e.touches[0];
+      const now = Date.now();
+      if (!p.on && y - p.y > Math.abs(x - p.x) && atTop(e.target)) {
+        Object.assign(p, { on: true, y0: y, dy: 0, v: 0, t: now, h: sheet.getBoundingClientRect().height || 1 });
+        sheet.classList.add('dragging');
+      }
+      if (p.on) {
+        if (e.cancelable) e.preventDefault();
+        if (now > p.t) p.v = (y - p.y) / (now - p.t); // px per ms
+        p.t = now;
+        p.dy = Math.max(0, y - p.y0);
+        sheet.style.transform = `translateY(${p.dy}px)`;
+        overlay.style.opacity = String(1 - Math.min(p.dy / p.h, 1) * 0.9);
+      }
+      p.x = x;
+      p.y = y;
+    }, { passive: false });
+    const end = () => {
+      if (p && p.on) {
+        sheet.classList.remove('dragging');
+        overlay.style.opacity = '';
+        if (p.dy > p.h * 0.28 || p.v > 0.6) {
+          window.closeMoreMenu();
+          requestAnimationFrame(() => { sheet.style.transform = ''; }); // animate from where the finger left it
+        } else {
+          sheet.style.transform = '';
+        }
+      }
+      p = null;
+    };
+    sheet.addEventListener('touchend', end);
+    sheet.addEventListener('touchcancel', end);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 
 /* PAGE LOADER + SCROLL RESTORE (game sections) -- was pasted at the bottom
@@ -1922,3 +1988,168 @@ window.stbHubMenus = function (hubScroll, opts) {
   }, { capture: true, passive: true });
   if (desk.addEventListener) desk.addEventListener('change', () => close(true));
 };
+
+// ============================================================
+// FEEDBACK BOX (Oct 24 2026; was the home page's own script)
+// Builds the form inside every <div data-feedback> and sends it to Firestore
+// "feedback" (type, message, email, rating, createdAt, page). Look: 11layout.css
+// "FEEDBACK BOX". Firebase (~300 KB) loads the first time someone touches a
+// form, not with the page. Spam guard: 5 sends per 10 minutes per browser.
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const mounts = document.querySelectorAll('[data-feedback]');
+  if (!mounts.length) return;
+
+  const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>';
+  // [value, tab label, message placeholder]; the first one is the default tab.
+  const TYPES = [
+    ['suggestion', 'Suggestion', 'Which guide, game or tool would you like to see?'],
+    ['rating', 'Rate us', 'Tell us why you gave this rating (optional)'],
+    ['bug', 'Report a bug', 'Describe the bug and the page you found it on']
+  ];
+  const ICONS = {
+    error: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v6"/><path d="M12 17h.01"/></svg>',
+    success: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'
+  };
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyAa8B5rIP0Y9w9jBN_mzKzkFW3xMdI9wgo',
+    authDomain: 'parchrome-feedback.firebaseapp.com',
+    projectId: 'parchrome-feedback',
+    storageBucket: 'parchrome-feedback.firebasestorage.app',
+    messagingSenderId: '546895020356',
+    appId: '1:546895020356:web:f145067c0b71dde2341711'
+  };
+  const LIMIT = 5;
+  const WINDOW_MS = 10 * 60 * 1000;
+  const LOG_KEY = 'parchrome_feedback_log';
+
+  let fbLoad = null;
+  function loadScript(src) {
+    return new Promise((ok, fail) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = ok;
+      s.onerror = fail;
+      document.head.appendChild(s);
+    });
+  }
+  function firebaseReady() {
+    if (!fbLoad) {
+      const base = 'https://www.gstatic.com/firebasejs/10.13.0/';
+      fbLoad = (window.firebase && firebase.firestore
+        ? Promise.resolve()
+        : loadScript(base + 'firebase-app-compat.js').then(() => loadScript(base + 'firebase-firestore-compat.js'))
+      ).catch(e => { fbLoad = null; throw e; }); // a failed load is retried on the next send
+    }
+    return fbLoad;
+  }
+
+  let modal = null;
+  function showModal(text, type) {
+    if (!modal) {
+      modal = document.createElement('dialog');
+      modal.className = 'fb-modal';
+      modal.innerHTML = '<div class="fb-modal-icon"></div><p></p><form method="dialog"><button class="fb-ok">OK</button></form>';
+      modal.addEventListener('click', e => { if (e.target === modal) modal.close(); }); // the backdrop closes it
+      document.body.appendChild(modal);
+    }
+    const icon = modal.querySelector('.fb-modal-icon');
+    icon.innerHTML = ICONS[type === 'success' ? 'success' : 'error'];
+    icon.classList.toggle('is-success', type === 'success');
+    modal.querySelector('p').textContent = text;
+    if (modal.showModal) modal.showModal(); else alert(text);
+  }
+
+  function sentLog() {
+    try {
+      const cutoff = Date.now() - WINDOW_MS;
+      return (JSON.parse(localStorage.getItem(LOG_KEY)) || []).filter(t => t > cutoff);
+    } catch (e) { return []; }
+  }
+  function recordSend() {
+    try { localStorage.setItem(LOG_KEY, JSON.stringify(sentLog().concat(Date.now()))); } catch (e) {}
+  }
+  function wait(ms) {
+    const s = Math.ceil(ms / 1000);
+    return s >= 60 ? Math.floor(s / 60) + 'm ' + (s % 60) + 's' : s + 's';
+  }
+
+  mounts.forEach((mount, n) => {
+    const id = 'fb' + n; // keeps names/ids unique if a page has two boxes
+    mount.innerHTML =
+      '<form class="fb" novalidate>' +
+        '<fieldset class="fb-seg"><legend class="sr-only">Feedback type</legend>' +
+          TYPES.map((t, i) => '<label><input type="radio" name="' + id + 'Type" value="' + t[0] + '"' + (i ? '' : ' checked') + '><span>' + t[1] + '</span></label>').join('') +
+        '</fieldset>' +
+        '<fieldset class="fb-stars" hidden><legend class="sr-only">Your rating</legend>' +
+          [1, 2, 3, 4, 5].map(v => '<label><input type="radio" name="' + id + 'Rating" value="' + v + '" aria-label="' + v + ' star' + (v > 1 ? 's' : '') + '">' + STAR + '</label>').join('') +
+        '</fieldset>' +
+        '<label class="sr-only" for="' + id + 'Msg">Message</label>' +
+        '<textarea class="fb-field" id="' + id + 'Msg" placeholder="' + TYPES[0][2] + '"></textarea>' +
+        '<div class="fb-row">' +
+          '<label class="sr-only" for="' + id + 'Who">Email or in-game name</label>' +
+          '<input class="fb-field" id="' + id + 'Who" type="text" placeholder="Email or in-game name (required)" autocomplete="email">' +
+          '<button class="fb-send" type="submit">Send</button>' +
+        '</div>' +
+      '</form>';
+
+    const form = mount.querySelector('form');
+    const stars = form.querySelector('.fb-stars');
+    const message = form.querySelector('textarea');
+    const email = form.querySelector('input[type="text"]');
+    const submit = form.querySelector('.fb-send');
+    let type = TYPES[0][0];
+    let rating = 0;
+
+    function paint() {
+      stars.hidden = type !== 'rating';
+      message.placeholder = TYPES.find(t => t[0] === type)[2];
+      stars.querySelectorAll('label').forEach((l, i) => l.classList.toggle('is-on', i < rating));
+    }
+    form.addEventListener('focusin', () => firebaseReady().catch(() => {}), { once: true });
+    form.addEventListener('change', e => {
+      if (e.target.name === id + 'Type') type = e.target.value;
+      if (e.target.name === id + 'Rating') rating = Number(e.target.value);
+      paint();
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = message.value.trim();
+      const who = email.value.trim();
+      if (type === 'rating' && !rating) return showModal('Pick a star rating before sending.');
+      if (type !== 'rating' && !text) return showModal('Write a message before sending.');
+      if (!who) { showModal('Add your email or in-game name before sending.'); email.focus(); return; }
+      const log = sentLog();
+      if (log.length >= LIMIT) {
+        return showModal('You have sent ' + LIMIT + ' messages in the last 10 minutes. Wait ' + wait(Math.min(...log) + WINDOW_MS - Date.now()) + ' before sending another.');
+      }
+      submit.disabled = true;
+      submit.textContent = 'Sending...';
+      firebaseReady().then(() => {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        return firebase.firestore().collection('feedback').add({
+          type: type,
+          message: text,
+          email: who,
+          rating: type === 'rating' ? rating : null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          page: location.pathname
+        });
+      }).then(() => {
+        recordSend();
+        showModal('Thanks. Your feedback was sent.', 'success');
+        form.reset();
+        type = TYPES[0][0];
+        rating = 0;
+        paint();
+      }).catch(err => {
+        console.error('Feedback submit error:', err);
+        showModal('Your feedback could not be sent. Check your connection and try again.');
+      }).finally(() => {
+        submit.disabled = false;
+        submit.textContent = 'Send';
+      });
+    });
+  });
+});

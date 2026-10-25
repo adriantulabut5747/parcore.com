@@ -3,7 +3,7 @@
 // paimon.moe's banner list + our live feed), drawn against the roster in
 // /genshin-feed.json. Shared helpers: genshin-core.js. Styles: genshin-reruns.css.
 //
-// Sections it fills: On the wishes now (#rtNow), Longest waits (#rtTop), Every character
+// Sections it fills: Longest waits (#rtTop), Every character
 // (filters + #rtList, state kept in the address), Every wish since 1.0 (#rtRibbon) and
 // Rerun records (#rtRecs + #rtHist). Any face with data-go="<name>" opens that row.
 //
@@ -14,7 +14,7 @@
 //   pool as "featured" (50 names in 6.7), which isn't a rate-up.
 // - A gap = days from the end of one banner to the start of their next (overlaps skipped).
 (function () {
-  const { $, esc, now, MONTHS, tile, elIcon, EL } = window.GI;
+  const { $, esc, now, MONTHS, tile, elIcon } = window.GI;
   const DAY = 86400;
   // History times are Asia server time (UTC+8); dates are shown as that day.
   const asia = (t) => new Date((t + 8 * 3600) * 1000);
@@ -26,7 +26,6 @@
   const span = (s, e) => (asia(s).getUTCFullYear() === asia(e).getUTCFullYear() ? date(s) : date(s, true)) + ' – ' + date(e, true);
   const days = (a, b) => Math.round((b - a) / DAY);
   const plural = (n, w) => n.toLocaleString() + ' ' + w + (n === 1 ? '' : 's');
-  const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
   const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const ELEMENTS = ['Pyro', 'Hydro', 'Anemo', 'Electro', 'Dendro', 'Cryo', 'Geo'];
   const WEAPONS = ['Sword', 'Claymore', 'Polearm', 'Bow', 'Catalyst'];
@@ -147,54 +146,6 @@
     const tracked = rowOf[name];
     const inner = tile(c.icon, c.rarity, name);
     return tracked ? `<button type="button" class="rt-face ${cls || ''}" data-go="${esc(name)}" aria-label="${esc(name)}: open their banner history">${inner}</button>` : `<span class="rt-face ${cls || ''}">${inner}</span>`;
-  }
-  const back = (r) => (r.gap ? `back after <b>${plural(r.gap, 'day')}</b>` : r.n === 1 && !r.chron ? '<b>debut</b>' : 'back');
-
-  // ---- ON THE WISHES NOW ----
-  function live(banners) {
-    const t = now();
-    const on = banners.filter((b) => b.s <= t && t < b.e).sort((a, b) => a.chron - b.chron);
-    if (!on.length) return;
-    $('rtNowSec').hidden = false;
-    $('rtNow').innerHTML = on
-      .map((b) => {
-        const fives = b.five.map((n) => ({ c: byName[n], r: rowOf[n] && rowOf[n].list.find((x) => x.b === b) })).filter((x) => x.c);
-        const el = fives[0] && EL[fives[0].c.element];
-        const art = fives
-          .map((x) => (x.c.strip ? `<img src="${esc(x.c.strip)}" alt="" loading="lazy" decoding="async">` : ''))
-          .join('');
-        const who = fives
-          .map(
-            ({ c, r }) => `<div class="rt-lv-five">
-              <button type="button" class="rt-lv-name" data-go="${esc(c.name)}">${c.element ? `<img src="${elIcon(c.element.toLowerCase())}" alt="">` : ''}<span>${esc(c.name)}</span></button>
-              <p>${r ? (r.chron ? 'Chronicled pick' : `${ord(r.n)} run`) + ' &middot; ' + back(r) : ''}</p></div>`
-          )
-          .join('');
-        const four = b.chron
-          ? ''
-          : `<div class="rt-lv-four"><span class="gi-label">Featured 4&#9733;</span><ul>${b.four
-              .map((n) => {
-                const r = rowOf[n] && rowOf[n].list.find((x) => x.b === b);
-                return `<li>${face(n)}<span><b>${esc(n)}</b><small>${r ? back(r) : ''}</small></span></li>`;
-              })
-              .join('')}</ul></div>`;
-        return `<article class="gi-box rt-lv${b.chron ? ' is-chron' : ''}" style="${el ? '--gi-el:' + el : ''}">
-          <div class="rt-lv-art${fives.length > 2 ? ' is-many' : ''}" aria-hidden="true">${art}</div>
-          <div class="rt-lv-info">
-            <p class="gi-eyebrow">${b.chron ? 'Chronicled Wish' : 'Character Event Wish'} &middot; v${esc(b.v)}</p>
-            <div class="rt-lv-fives">${who}</div>
-            ${four}
-            <div class="rt-lv-foot">
-              <div><span class="gi-label">Ends in</span><b class="gi-ends rt-lv-clock" data-end-srv="${b.e}"></b><small>${GI.srvDate(b.e)} server time</small></div>
-              <a class="gi-key" href="/genshin-impact/banners">Rates and details<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-            </div>
-          </div>
-        </article>`;
-      })
-      .join('');
-    GI.serverTray($('rtSrv'));
-    GI.countdowns();
-    setInterval(GI.countdowns, 1000);
   }
 
   // ---- LONGEST WAITS: the top five, wish-card art ----
@@ -493,7 +444,6 @@
         `<li><b>${five.length}</b>limited 5&#9733;</li><li><b>${rows[4].length}</b>4&#9733;</li>` +
         (longest ? `<li>longest wait <b>${esc(longest.c.name)}, ${plural(longest.wait, 'day')}</b></li>` : '') +
         (onNow ? `<li><b>${onNow}</b>on the wishes now</li>` : '');
-      live(banners);
       axis(banners);
       paints = [
         tray('rtRarity', () => state.rarity, (v) => ((state.rarity = +v), render())),

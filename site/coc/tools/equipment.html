@@ -29,10 +29,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <!-- Oxanium -->
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet" />
-    <!-- Teko Russo Orbitron Sora -->
+    <!-- Teko Russo Figtree Sora -->
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -45,21 +45,21 @@
       content="Every Clash of Clans hero equipment with stats at every level, ore costs, summoned units and tips."
     />
 
-    <link rel="stylesheet" href="/11layout.css?v=20261023bc" />
+    <link rel="stylesheet" href="/11layout.css?v=20261024fb" />
     <link rel="stylesheet" href="/1coclayouts.css?v=20261021fx" />
     <!-- Live events + official clan card, shared with /coc/ -->
-    <link rel="stylesheet" href="/coc-clan-clock.css?v=20261020wt" />
+    <link rel="stylesheet" href="/coc-clan-clock.css?v=20261024cc" />
 
     <!-- Look + behaviour shared by every Town Hall layouts page -->
-    <link rel="stylesheet" href="/th-layouts.css?v=20261021tm" />
+    <link rel="stylesheet" href="/th-layouts.css?v=20261025hot2" />
     <!-- The guides pages' own content (websites, glossary, equipment, wall calculator) -->
     <link rel="stylesheet" href="/coc-armymaker.css?v=20261021tm" />
-    <link rel="stylesheet" href="/coc-guides.css?v=20261021tm" />
-    <link rel="stylesheet" href="/coc-help.css" />
+    <link rel="stylesheet" href="/coc-guides.css?v=20261025eq" />
+    <link rel="stylesheet" href="/coc-help.css?v=20261024cc" />
     <link rel="stylesheet" href="/coc-more.css?v=20261021hd" />
-    <link rel="stylesheet" href="/coc-hub-menus.css?v=20261021fs" />
+    <link rel="stylesheet" href="/coc-hub-menus.css?v=20261024cc" />
     <!-- The Tools banner -->
-    <link rel="stylesheet" href="/coc-tools.css?v=20261021tm" />
+    <link rel="stylesheet" href="/coc-tools.css?v=20261024cc" />
   </head>
   <body>
     <!-- Shared ember gradient for the liked flame. -->
@@ -196,10 +196,6 @@
               <div class="tb-copy">
                 <h1 class="tb-title">Hero <em>equipment</em></h1>
                 <p class="tb-desc">Every hero equipment&rsquo;s stats at each level, the ore it costs, and how to use it.</p>
-                <ul class="tb-facts">
-                  <li class="tb-fact"><b>42</b> equipment</li>
-                  <li class="tb-fact"><b>6</b> heroes</li>
-                </ul>
               </div>
             </div>
           </div>
@@ -211,17 +207,42 @@
             <header class="am-head">
               <div>
                 <h2 class="am-title" id="gd-title">All hero equipment</h2>
-                <p class="am-intro">Tap any piece to see its stats at every level, the ore it costs and how to use it.</p>
+                <p class="am-intro">Tap any piece for its stats at every level, the ore it costs, what to pair it with and how to use it.</p>
               </div>
             </header>
             <div class="am-part gd-part">
               <div class="gd-eq-tools">
-                <span class="gd-eq-count" id="eqCount"></span>
-                <div class="gd-chips" id="eqSort" role="group" aria-label="Sort equipment"></div>
+                <div class="gd-chips gd-eq-heroes" id="eqHero" role="group" aria-label="Show one hero's equipment"></div>
+                <div class="gd-eq-sortrow">
+                  <span class="gd-eq-count" id="eqCount"></span>
+                  <div class="gd-chips" id="eqSort" role="group" aria-label="Sort equipment"></div>
+                </div>
               </div>
               <div class="gd-eq-grid" id="eqGrid" data-src="/coc-equipment.json"></div>
             </div>
           </section>
+
+          <!-- INSPECT (Oct 25 2026, the Genshin Artifacts panel in CoC dress; coc-guides.css "EQUIPMENT PANEL"):
+               a <dialog> holding one panel, centred on desktop, a sheet from the bottom on phones (drag the
+               grip / header down, or pull the content down at its top, to close: cocSheetDrag in th-layouts.js).
+               Left = the stage (the piece on a purple (Epic) or blue (Common) glow, its hero's other pieces
+               under it); right = level + stats, top-200 pick rate, pairs, tips, every level. Only #eqIn is swapped. -->
+          <dialog class="eq-dlg" id="eqDlg" aria-labelledby="eqDName">
+            <div class="eq-panel" id="eqPanel">
+              <div class="sheet-grip" id="eqGrip" aria-hidden="true"></div>
+              <header class="eq-d-bar" id="eqDBar">
+                <span class="eq-d-ttl"><b>Hero equipment</b><span id="eqDPos"></span></span>
+                <div class="eq-d-keys">
+                  <button type="button" class="eq-key eq-sq" id="eqDPrev" aria-label="Previous piece" title="Previous (left arrow)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg></button>
+                  <button type="button" class="eq-key eq-sq" id="eqDNext" aria-label="Next piece" title="Next (right arrow)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg></button>
+                  <span class="eq-d-sep" aria-hidden="true"></span>
+                  <button type="button" class="eq-key eq-d-copy" id="eqDCopy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></svg><span>Copy link</span></button>
+                  <button type="button" class="eq-key eq-sq" id="eqDClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
+                </div>
+              </header>
+              <div class="eq-d-body" id="eqDBody" tabindex="-1"><div class="eq-in" id="eqIn"></div></div>
+            </div>
+          </dialog>
 
           <!-- Lower sections: the clan card and the FAQ, on the page's own flat
                  background (no panel or divider since Oct 2026; the live events moved
@@ -391,14 +412,14 @@
     <!-- /.main: was never closed, so the browser closed it at the end of the body;
      closed here to match (the More sheet, bottom nav and viewer above sit
      inside it, as they always have). -->
-    <script src="/11layout.js?v=20261023gp" defer></script>
+    <script src="/11layout.js?v=20261024fb" defer></script>
     <script src="/thz-script.js?v=20261021nav"></script>
-    <script src="/coc-events.js"></script>
+    <script src="/coc-events.js?v=20261024cc"></script>
 
     <!-- Hero ("Did you know?", event tags) and the secondary top bar. -->
-    <script src="/th-layouts.js?v=20261021ext7" defer></script>
+    <script src="/th-layouts.js?v=20261025hot" defer></script>
     <!-- This guide's content: built from its JSON file. -->
-    <script src="/coc-guides.js?v=20261021tk" defer></script>
+    <script src="/coc-guides.js?v=20261025sa" defer></script>
     <script src="/coc-help.js" defer></script>
     <script src="/coc-more.js?v=20261021hd" defer></script>
     <script src="/coc-hub-menus.js" defer></script>

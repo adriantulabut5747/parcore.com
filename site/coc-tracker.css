@@ -1,5 +1,5 @@
 /* Player Tracker (Oct 2026): search on /coc/tools/player-tracker, profile at
-   /coc/player/<TAG>. Built by coc-tracker.js. Orbitron headings, Oxanium
+   /coc/player/<TAG>. Built by coc-tracker.js. Figtree headings, Oxanium
    labels, Sora text, one red accent. Buttons reuse .th-soon-btn.
    Raised UI (Oct 21 2026), the same three recipes as every CoC page:
    - box (panels: search, header, groups, members table, war cards):
@@ -600,7 +600,7 @@
 }
 .pt-name {
   margin: 0;
-  font-family: 'Orbitron', 'Sora', sans-serif;
+  font-family: 'Figtree', 'Sora', sans-serif;
   font-size: clamp(22px, 3vw, 32px);
   font-weight: 900;
   line-height: 1.15;
@@ -800,7 +800,7 @@
 .pt-group-head h3 {
   margin: 0;
   font:
-    900 14px 'Orbitron',
+    900 14px 'Figtree',
     sans-serif;
   text-transform: uppercase;
   color: #f2f3f5;
@@ -859,12 +859,9 @@
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
-/* MAX: the badge reads MAX in the accent red (the level is in the tooltip). */
+/* Maxed for this Town Hall: the level badge turns the accent red. */
 .pt-tile.is-max .pt-lvl {
-  padding: 2px 4px 1px;
   background: #c23b3b;
-  font-size: 9.5px;
-  letter-spacing: 0.6px;
 }
 .pt-tile.is-active .pt-tile-art {
   box-shadow:
@@ -1030,18 +1027,43 @@
 }
 /* Scroll lists: a fade on the edge that has more (coc-tracker.js
    scrollEdges); no fade on an edge means you're at that end. */
-.pt-results.more-b,
-.pt-quick-panel.more-b {
+.pt-results.more-b {
   -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
   mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
 }
-.pt-results.more-t,
-.pt-quick-panel.more-t {
+.pt-results.more-t {
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 36px);
   mask-image: linear-gradient(180deg, transparent, #000 36px);
 }
-.pt-results.more-t.more-b,
-.pt-quick-panel.more-t.more-b {
+/* The dropdown floats over the page, so a mask would fade its own
+   background too and let the page show through. It fades its rows into
+   its background instead: sticky shades pinned to the edge with more. */
+.pt-quick-panel::before,
+.pt-quick-panel::after {
+  content: '';
+  position: sticky;
+  z-index: 1;
+  display: block;
+  height: 36px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.pt-quick-panel::before {
+  top: -6px; /* the panel's padding */
+  margin: -6px -6px -30px;
+  background: linear-gradient(180deg, var(--lb-box2), transparent);
+}
+.pt-quick-panel::after {
+  bottom: -6px;
+  margin: -30px -6px -6px;
+  background: linear-gradient(0deg, var(--lb-box2), transparent);
+}
+.pt-quick-panel.more-t::before,
+.pt-quick-panel.more-b::after {
+  opacity: 1;
+}
+.pt-results.more-t.more-b {
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 36px, #000 calc(100% - 36px), transparent);
   mask-image: linear-gradient(180deg, transparent, #000 36px, #000 calc(100% - 36px), transparent);
 }
@@ -1707,15 +1729,17 @@
   background: #1f2126;
   color: #e9eaed;
 }
-/* One row of seven: Overall (bigger) then each group. In every cell the
-   percentage, the name, a hairline bar and what's left; cells split by
-   hairlines and bottom-aligned so the bars run along one line. */
+/* Overall (bigger) across the top, then the groups three to a row. In
+   every cell the percentage, the name, a hairline bar and what's left;
+   cells split by hairlines and bottom-aligned so the bars run along one
+   line. (Phones: four to a row, Overall first -- end of this file.) */
 .pt-pg {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  row-gap: 16px;
 }
 .pt-pg li {
   display: grid;
@@ -1725,9 +1749,15 @@
   padding: 0 14px;
   border-left: 1px solid #1f2126;
 }
-.pt-pg li:first-child {
+.pt-pg li:nth-child(3n + 2) {
   padding-left: 0;
   border-left: 0;
+}
+.pt-pg li.is-total {
+  grid-column: 1 / -1;
+  padding: 0 0 14px;
+  border-left: 0;
+  border-bottom: 1px solid #1f2126;
 }
 .pt-pg b {
   font:
@@ -1938,7 +1968,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font:
-    800 15px 'Orbitron',
+    800 15px 'Figtree',
     sans-serif;
   text-transform: uppercase;
   color: #f2f3f5;
@@ -2120,22 +2150,14 @@
     justify-content: center;
     margin-top: 14px;
   }
-  /* Overall across the top, the six groups 3 x 2 under it */
-  .pt-pg {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    row-gap: 16px;
-  }
   .pt-pg li {
     padding: 0 10px;
   }
   .pt-pg li:nth-child(3n + 2) {
     padding-left: 0;
-    border-left: 0;
   }
   .pt-pg li.is-total {
-    grid-column: 1 / -1;
-    padding-bottom: 14px;
-    border-bottom: 1px solid #1f2126;
+    padding: 0 0 14px;
   }
   .pt-pg li.is-total b {
     font-size: 30px;
@@ -2785,5 +2807,1202 @@
   .pt-race-stars {
     min-width: 48px;
     font-size: 16px;
+  }
+}
+
+/* ---- History tabs (Oct 25 2026) -----------------------------------------
+   Profile: Wars / Battles / Clans (ClashKing data), clan page: Raid
+   weekends. Built from the pieces above: .pt-facts trays, .pt-group and
+   .pt-wars boxes, .pt-war-res pills, .pt-war-opp / .pt-war-score text,
+   .pt-war-sides switches. Rows here are flex so a row can wrap (battle
+   army strip, clan time bar). */
+.pt-ck-facts {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pt-ck-facts .pt-stars svg {
+  width: 13px;
+  height: 13px;
+}
+.pt-ck-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 4px 6px;
+}
+.pt-ck-war .pt-ck-list {
+  margin: 0 -8px -8px;
+  padding: 0;
+}
+.pt-ck-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.pt-ck-row:last-child {
+  border-bottom: 0;
+}
+.pt-ck-row .pt-war-opp {
+  flex: 1;
+}
+.pt-ck-row .pt-war-res {
+  min-width: 80px;
+  text-align: center;
+}
+.pt-ck-row a {
+  color: inherit;
+  text-decoration: none;
+}
+.pt-ck-row a:hover {
+  text-decoration: underline;
+}
+.pt-ck-row .pt-stars {
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.pt-ck-none,
+.pt-ck-row.pt-ck-none {
+  margin: 0;
+  font:
+    400 13px 'Sora',
+    sans-serif;
+  color: #7c818a;
+}
+.pt-ck-rank {
+  width: 22px;
+  text-align: right;
+  font:
+    700 12px 'Oxanium',
+    sans-serif;
+  color: #6d7178;
+}
+.pt-ck-gold {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  vertical-align: -2px;
+}
+.pt-war-score b i {
+  font-style: normal;
+  color: #6d7178;
+}
+
+/* Wars: one box per war; its result pill uses the war log's colours. */
+.pt-ck-war h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.pt-ck-war h3 img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.pt-ck-war .pt-group-head > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.pt-ck-war.is-win .pt-war-res {
+  background: rgba(92, 201, 138, 0.14);
+  color: #6fd59a;
+}
+.pt-ck-war.is-lose .pt-war-res {
+  background: rgba(224, 99, 99, 0.14);
+  color: #f08a8a;
+}
+.pt-ck-war .pt-ck-list .pt-war-res {
+  background: #23252a;
+  color: #c9ccd2;
+}
+.pt-ck-more {
+  display: flex;
+  margin: 4px auto 14px;
+}
+
+/* Average stars by month: attacks grey, defenses red, 0-3 gridlines. */
+.pt-ck-key {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pt-ck-key i {
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+  border-radius: 2px;
+}
+.pt-ck-key i.is-atk,
+.pt-ck-bars i.is-atk {
+  background: #c9ccd2;
+}
+.pt-ck-key i.is-def,
+.pt-ck-bars i.is-def {
+  background: #d0575d;
+}
+.pt-ck-plot {
+  position: relative;
+  display: flex;
+  padding-left: 24px;
+  background: repeating-linear-gradient(to top, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 50px) 24px 0 / calc(100% - 24px) 151px no-repeat;
+}
+.pt-ck-plot > b {
+  position: absolute;
+  left: 0;
+  transform: translateY(50%);
+  font:
+    600 11px 'Oxanium',
+    sans-serif;
+  color: #6d7178;
+}
+.pt-ck-month {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.pt-ck-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 150px;
+  margin-bottom: 1px;
+}
+.pt-ck-bars i {
+  width: 10px;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+}
+.pt-ck-bars i.is-none {
+  background: transparent;
+}
+.pt-ck-month span {
+  margin-top: 4px;
+  font:
+    600 11px 'Oxanium',
+    sans-serif;
+  text-transform: uppercase;
+  color: #8d929a;
+}
+
+/* Battles: loot, then the army on its own line. */
+.pt-ck-loot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font:
+    700 12px 'Oxanium',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #c9ccd2;
+}
+.pt-ck-loot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+/* The army, drawn as the army pages' card (army-sheet.css): its own line
+   under the result and loot, in a sunken well. */
+.pt-ck-sheet {
+  flex-basis: 100%;
+  padding: 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+/* Legend League battles: the league emblem in place of the text pill. */
+.pt-ck-league {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* Clans: time in the clan as a bar under the row. */
+.pt-ck-bar {
+  flex-basis: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.pt-ck-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: #d0575d;
+}
+
+/* Raid weekends: ‹ Oct 9 – Oct 12 › */
+.pt-ck-season {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.pt-ck-season b {
+  min-width: 150px;
+  text-align: center;
+  font:
+    900 16px 'Figtree',
+    sans-serif;
+  color: #f2f3f5;
+}
+.pt-ck-season b i {
+  margin-left: 6px;
+  font:
+    800 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #f08a8a;
+}
+.pt-ck-season .th-soon-btn {
+  justify-content: center;
+  min-width: 44px;
+  padding: 0;
+  font-size: 20px;
+}
+.pt-ck-season .th-soon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .pt-ck-war .pt-group-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .pt-ck-bars i {
+    width: 7px;
+  }
+}
+
+/* ==== REDESIGN v2 (Oct 25 2026) =========================================
+   Player + clan header as a dossier: the hall on a sunken plinth with the
+   Home / Builder switch under it, a big name with an XP star, the league
+   emblem with trophies on the right, and every number in its own sunken
+   well (the /coc/ Raid Weekend clock's digit wells). Plus: village
+   show/hide, star strips, achievement bars, the clan's Town Hall mix.
+   Later than everything above on purpose; the phone part is at the end. */
+
+/* One village at a time (coc-tracker.js wireVillage). */
+#ptProfile[data-village='home'] [data-show='builder'],
+#ptProfile[data-village='builder'] [data-show='home'] {
+  display: none !important;
+}
+
+.pt-head {
+  padding: 28px 32px 30px;
+  gap: 22px 32px;
+}
+.pt-head--player {
+  grid-template-areas: 'th id league';
+}
+.pt-plinth {
+  display: grid;
+  place-items: center;
+  width: 148px;
+  height: 128px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background:
+    radial-gradient(55% 45% at 50% 78%, rgba(194, 59, 59, 0.28), rgba(194, 59, 59, 0) 70%),
+    rgba(6, 7, 9, 0.72);
+  box-shadow: var(--card-well);
+}
+.pt-plinth img,
+.pt-head--clan .pt-plinth img {
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.6));
+}
+.pt-th {
+  align-self: start;
+  gap: 10px;
+}
+.pt-th > span {
+  font-size: 11.5px;
+  letter-spacing: 1.4px;
+  color: #e6e8ec;
+}
+
+/* Home / Builder: the key on the hall's corner shows the OTHER village's
+   hall (coc-tracker.js villageSwitch). The plinth and the key each hold
+   both pictures in one grid cell; [data-on] says which village a picture
+   belongs to, and the other village's fades and shrinks away, so a swap
+   cross-fades the hall and the key together. */
+.pt-plinth {
+  position: relative;
+}
+.pt-plinth > img,
+.pt-swap > img {
+  grid-area: 1 / 1;
+  transition:
+    opacity 0.3s ease,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#ptProfile[data-village='home'] [data-on='builder'],
+#ptProfile[data-village='builder'] [data-on='home'] {
+  opacity: 0;
+  transform: scale(0.6) translateY(10%);
+  pointer-events: none;
+}
+.pt-swap {
+  position: absolute;
+  right: -12px;
+  bottom: -12px;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+}
+.pt-plinth .pt-swap > img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+.pt-swap:hover {
+  background: var(--lb-raise-hover);
+}
+.pt-swap:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.pt-swap:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pt-plinth > img,
+  .pt-swap > img {
+    transition: none;
+  }
+}
+
+/* Name: big, with the XP star after it. */
+.pt-id {
+  align-self: center;
+}
+.pt-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  font-size: clamp(28px, 3.6vw, 46px);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
+}
+.pt-xp {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  flex: none;
+}
+.pt-xp svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #c23b3b;
+  stroke: #060708;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
+}
+.pt-xp::after {
+  /* the badge's light top half, like the game's */
+  content: '';
+  position: absolute;
+  inset: 22% 22% 50%;
+  border-radius: 50% 50% 0 0;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+}
+.pt-xp b {
+  position: relative;
+  font:
+    900 14px 'Figtree',
+    sans-serif;
+  letter-spacing: -0.02em;
+  color: #fff;
+  -webkit-text-stroke: 3px #3a0c0c;
+  paint-order: stroke fill;
+  text-shadow: 0 1px 0 #3a0c0c;
+}
+.pt-tagline {
+  margin-top: 12px;
+}
+.pt-clan {
+  margin-top: 12px;
+  font-size: 13.5px;
+}
+
+/* League: emblem, name, trophies. */
+.pt-league {
+  align-self: start;
+  gap: 6px;
+  min-width: 128px;
+  max-width: 170px;
+  padding: 14px 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(6, 7, 9, 0.6);
+  box-shadow: var(--card-well);
+}
+.pt-league img {
+  width: 76px;
+  height: 76px;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+.pt-league > b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font:
+    900 20px 'Figtree',
+    sans-serif;
+  letter-spacing: 0;
+  color: #f2f3f5;
+  font-variant-numeric: tabular-nums;
+}
+.pt-trophy {
+  width: 17px;
+  height: 17px;
+  fill: #e0a63b;
+}
+.pt-head--clan .pt-league {
+  align-self: center;
+}
+
+/* Numbers (the player's Overview, the clan header): each in its own well,
+   the group name above them. */
+.pt-wellfacts {
+  display: grid;
+  gap: 16px;
+}
+.pt-panel > .pt-wellfacts {
+  margin-bottom: 14px;
+  padding: 18px 20px 20px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background-color: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.pt-wellfacts .pt-facts {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.pt-wellfacts .pt-facts-h {
+  padding: 0;
+  border: 0;
+  font-size: 10.5px;
+  letter-spacing: 1.6px;
+  color: #9ea3ab;
+}
+.pt-wellfacts .pt-facts dl {
+  gap: 8px;
+}
+.pt-wellfacts .pt-facts dl > div,
+.pt-wellfacts .pt-facts dl > div + div {
+  padding: 12px 14px 11px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(6, 7, 9, 0.66);
+  box-shadow: var(--card-well);
+}
+.pt-wellfacts .pt-facts dd {
+  font:
+    900 22px 'Figtree',
+    sans-serif;
+  letter-spacing: -0.01em;
+  white-space: normal; /* "Silver League III" wraps instead of being cut */
+  line-height: 1.1;
+}
+.pt-wellfacts .pt-facts dt {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #a3a8b0;
+}
+.pt-head--player::before {
+  background:
+    linear-gradient(90deg, rgba(10, 10, 12, 0.96) 0%, rgba(10, 10, 12, 0.84) 38%, rgba(10, 10, 12, 0.5) 74%, rgba(10, 10, 12, 0.34) 100%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.94) 0%, rgba(10, 10, 12, 0.7) 40%, rgba(10, 10, 12, 0) 78%),
+    url('/clashofclans/tracker-battlefield.webp') 72% 62% / cover no-repeat;
+}
+/* Builder Base: the same field at night. */
+#ptProfile[data-village='builder'] .pt-head--player::before {
+  filter: saturate(0.35) hue-rotate(185deg) brightness(0.8);
+}
+#ptProfile[data-village='builder'] .pt-plinth {
+  background:
+    radial-gradient(55% 45% at 50% 78%, rgba(120, 140, 190, 0.22), rgba(120, 140, 190, 0) 70%),
+    rgba(6, 7, 9, 0.72);
+}
+
+/* ---- Star strip ---------------------------------------------------------- */
+.pt-strip .pt-group-head {
+  flex-wrap: wrap;
+}
+.pt-strip-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.pt-strip-key > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pt-strip-key b {
+  color: #e6e8ec;
+}
+.pt-strip-key i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.pt-strip-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.pt-strip-cells i {
+  width: 16px;
+  height: 11px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.pt-strip-cells i:hover {
+  transform: scale(1.4);
+}
+.pt-strip .s3 {
+  background: #5cc98a;
+}
+.pt-strip .s2 {
+  background: #e0b54a;
+}
+.pt-strip .s1 {
+  background: #e06363;
+}
+.pt-strip .s0 {
+  background: #b4b8c0;
+}
+/* the row a square was clicked for */
+@keyframes pt-flash {
+  0%,
+  35% {
+    box-shadow:
+      var(--lb-shadow),
+      0 0 0 2px #e6e8ec;
+  }
+  100% {
+    box-shadow:
+      var(--lb-shadow),
+      0 0 0 2px rgba(230, 232, 236, 0);
+  }
+}
+.is-flash {
+  animation: pt-flash 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+li.is-flash {
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Achievements: a bar towards the next star -------------------------- */
+.pt-ach-bar {
+  display: block;
+  height: 3px;
+  margin-top: 7px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+.pt-ach-bar i {
+  display: block;
+  height: 100%;
+  background: #e0a63b;
+}
+.pt-ach em i {
+  font-style: normal;
+  color: #6d7178;
+}
+.pt-ach li.is-done b {
+  color: #c9ccd2;
+}
+
+/* ---- Clan: Town Hall mix + season totals over the members table --------- */
+.pt-glance .pt-mu-ths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pt-glance .pt-ck-facts {
+  margin: 14px 0 0;
+}
+
+/* Raid weekend arrows */
+.pt-ck-season svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 640px) {
+  .pt-head {
+    padding: 18px 16px 20px;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'th id'
+      'league league'
+      'facts facts';
+    gap: 16px 14px;
+  }
+  .pt-head--player {
+    grid-template-areas:
+      'th id'
+      'league league';
+  }
+  .pt-swap {
+    width: 40px;
+    height: 40px;
+    right: -9px;
+    bottom: -9px;
+  }
+  .pt-plinth .pt-swap > img {
+    width: 30px;
+    height: 30px;
+  }
+  .pt-head.pt-head--clan {
+    grid-template-areas:
+      'th id'
+      'league league'
+      'desc desc'
+      'facts facts';
+  }
+  .pt-plinth {
+    width: 104px;
+  }
+  .pt-plinth {
+    height: 92px;
+  }
+  .pt-plinth img,
+  .pt-head--clan .pt-plinth img {
+    width: 78px;
+    height: 78px;
+  }
+  .pt-name {
+    font-size: 26px;
+    gap: 4px 10px;
+  }
+  .pt-xp {
+    width: 40px;
+    height: 40px;
+  }
+  .pt-xp b {
+    font-size: 11.5px;
+  }
+  .pt-league {
+    max-width: none;
+    min-width: 0;
+    grid-auto-flow: column;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .pt-league img {
+    width: 40px;
+    height: 40px;
+  }
+  .pt-league > b {
+    margin-left: auto;
+    font-size: 17px;
+  }
+  /* compact: three small wells a row, the group name tight above */
+  .pt-wellfacts {
+    gap: 10px;
+  }
+  .pt-panel > .pt-wellfacts {
+    padding: 12px;
+  }
+  .pt-wellfacts .pt-facts {
+    gap: 5px;
+  }
+  .pt-wellfacts .pt-facts-h {
+    font-size: 9.5px;
+  }
+  .pt-wellfacts .pt-facts dl {
+    gap: 4px;
+  }
+  .pt-wellfacts .pt-facts dl > div,
+  .pt-wellfacts .pt-facts dl > div + div,
+  .pt-wellfacts .pt-facts dl > div:not(:nth-child(3n + 1)),
+  .pt-wellfacts .pt-facts dl > div:nth-child(n + 4) {
+    padding: 6px 8px 5px;
+    border: 2px solid var(--lb-edge);
+  }
+  .pt-wellfacts .pt-facts dd {
+    font-size: 14.5px;
+  }
+  .pt-wellfacts .pt-facts dt {
+    margin-top: 1px;
+    font-size: 9.5px;
+    line-height: 1.25;
+  }
+  /* battles: loot on its own line under the result */
+  .pt-ck-battle .pt-ck-loot {
+    flex-basis: 100%;
+    order: 3;
+  }
+  .pt-ck-battle .pt-ck-sheet {
+    order: 4;
+    padding: 8px;
+  }
+  .pt-dist li b {
+    font-size: 15px;
+  }
+  .pt-dist li span {
+    font-size: 10px;
+  }
+  .pt-strip-cells {
+    gap: 3px;
+    padding: 10px;
+  }
+  .pt-strip-cells i {
+    width: 12px;
+    height: 9px;
+  }
+}
+
+/* ---- v2.1 (Oct 25 2026): Attacks / Stats tabs ---------------------------- */
+/* Classic | Clan war: the switch that opens both tabs */
+.pt-ck-mode .pt-war-sides {
+  margin-top: 0;
+}
+/* Star counts, the game's way: stars on top, "65 (90.28%)" under them. */
+.pt-dist ul {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pt-dist li {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  text-align: center;
+}
+.pt-dist li + li {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+.pt-dist li b {
+  font:
+    900 20px 'Figtree',
+    sans-serif;
+  color: #f2f3f5;
+  font-variant-numeric: tabular-nums;
+}
+.pt-dist li span {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #8d929a;
+}
+/* Battle rows: the result keeps its width; loot moves under it when the
+   row is too narrow, instead of squeezing the text to a few letters. */
+.pt-ck-battle .pt-war-opp {
+  flex: 1 1 170px;
+}
+.pt-ck-battle .pt-war-opp b {
+  overflow: visible;
+}
+.pt-ck-battle .pt-ck-loot {
+  margin-left: auto;
+}
+
+/* ---- v2.2 (Oct 25 2026): no jump on swap, compact phones ---------------- */
+/* Home and Builder versions of the hall name and the league box share one
+   grid cell: the hidden one keeps its space (visibility), so the header is
+   always as big as the larger of the two and swapping moves nothing. */
+.pt-stack {
+  display: grid;
+}
+.pt-stack > * {
+  grid-area: 1 / 1;
+}
+#ptProfile[data-village='home'] .pt-stack > [data-show='builder'],
+#ptProfile[data-village='builder'] .pt-stack > [data-show='home'] {
+  display: grid !important;
+  visibility: hidden;
+}
+.pt-leagues {
+  grid-area: league;
+  align-self: start;
+}
+.pt-hall {
+  justify-items: center;
+  text-align: center;
+}
+.pt-hall i {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.9em;
+  color: #8d929a;
+}
+
+@media (max-width: 640px) {
+  /* a fixed hall column, so a long label never squeezes the name */
+  .pt-th {
+    width: 112px;
+  }
+  .pt-th > span {
+    font-size: 9.5px;
+    letter-spacing: 0.6px;
+  }
+  /* Progress: Overall is just the first cell, four to a row */
+  .pt-pg {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 14px;
+  }
+  .pt-pg li,
+  .pt-pg li:nth-child(3n + 2) {
+    padding: 0 8px;
+    border-left: 1px solid #1f2126;
+  }
+  .pt-pg li:nth-child(4n + 1) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .pt-pg li.is-total {
+    grid-column: auto;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .pt-pg li.is-total b {
+    font-size: 21px;
+  }
+  .pt-pg b {
+    font-size: 17px;
+  }
+  .pt-pg-name {
+    font-size: 11px;
+  }
+  .pt-pg-left {
+    font-size: 10px;
+  }
+  /* Clan header numbers: four to a row */
+  .pt-head--clan .pt-wellfacts .pt-facts dl {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---- v2.3 (Oct 25 2026): Stats tab --------------------------------------
+   One page, no Classic | Clan war switch: the profile's numbers
+   (.pt-wellfacts), then Clan war (a split star bar per side + attacks vs
+   defenses table), Average stars by month, Classic battles (star counts,
+   averages, loot). Each block has its own shape so they read apart.
+   Star colours come from the star strip (.pt-strip .sN). */
+.pt-st-bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 28px;
+  margin-bottom: 16px;
+}
+.pt-st-bar-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+.pt-st-bar-h b {
+  font:
+    800 12.5px 'Figtree',
+    sans-serif;
+  color: #e6e8ec;
+}
+.pt-st-bar-h span {
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-st-track {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--lb-well);
+}
+.pt-st-track i {
+  min-width: 3px;
+}
+.pt-st-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font:
+    600 11.5px 'Oxanium',
+    sans-serif;
+  color: #8d929a;
+  font-variant-numeric: tabular-nums;
+}
+.pt-st-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pt-st-key i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+.pt-st-key b {
+  color: #e6e8ec;
+}
+/* Attacks vs defenses: label left, the two sides right-aligned. */
+.pt-st-vs {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pt-st-vs th,
+.pt-st-vs td {
+  padding: 9px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: right;
+}
+.pt-st-vs thead th {
+  border-top: 0;
+  padding-top: 0;
+  font:
+    800 10.5px 'Oxanium',
+    sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8d929a;
+}
+.pt-st-vs tbody th {
+  text-align: left;
+  font:
+    500 12.5px 'Sora',
+    sans-serif;
+  color: #c9ccd2;
+}
+.pt-st-vs td {
+  width: 22%;
+  font:
+    900 16px 'Figtree',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+/* Classic battles: averages as a plain row of three numbers */
+.pt-st-avg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 12px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.pt-st-avg > div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0 0;
+}
+.pt-st-avg dd {
+  order: -1;
+  margin: 0;
+  font:
+    900 20px 'Figtree',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+.pt-st-avg dt {
+  font:
+    400 11.5px 'Sora',
+    sans-serif;
+  color: #8d929a;
+}
+/* ...and the loot as three wells with the resource pictures */
+.pt-st-loot {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pt-st-loot li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.pt-st-loot img {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+.pt-st-loot span {
+  display: grid;
+  min-width: 0;
+  font:
+    400 11px 'Sora',
+    sans-serif;
+  color: #8d929a;
+}
+.pt-st-loot b {
+  font:
+    900 18px 'Figtree',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+
+@media (max-width: 640px) {
+  .pt-st-bars,
+  .pt-st-loot {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pt-st-vs tbody th {
+    font-size: 11.5px;
+  }
+  .pt-st-vs td {
+    font-size: 14.5px;
+  }
+  .pt-st-avg dd {
+    font-size: 17px;
+  }
+  .pt-st-avg dt {
+    font-size: 10.5px;
+  }
+
+  /* Battle armies keep heroes left, units right on phones too (Adrian's
+     call), so army-sheet.css's stacked phone arrangement is undone here
+     for .pt-ck-sheet only: back to its desktop grid, with smaller tiles. */
+  .pt-ck-sheet .army-sheet {
+    display: grid;
+    gap: 8px;
+    --as-tile: clamp(22px, 7.4cqi, 32px);
+    --as-gap: 2px;
+  }
+  .pt-ck-sheet .army-sheet .as-units {
+    display: flex;
+    gap: 6px;
+  }
+  .pt-ck-sheet .army-sheet .as-army {
+    display: none;
+  }
+  .pt-ck-sheet .army-sheet .as-troops {
+    display: block;
+  }
+  .pt-ck-sheet .army-sheet .as-pair {
+    display: flex;
+  }
+  .pt-ck-sheet .army-sheet .as-heroes {
+    order: 0;
+  }
+  .pt-ck-sheet .as-hero-row {
+    flex: 1;
+    grid-template-columns: repeat(var(--slots, 4), minmax(0, 1fr));
+    gap: var(--as-gap);
+  }
+  .pt-ck-sheet .as-hero {
+    flex-direction: column;
+    gap: var(--as-gap);
+    padding: 0;
+    overflow: visible;
+    background: none;
+    box-shadow: none;
+  }
+  .pt-ck-sheet .as-hero.as-empty {
+    min-height: 0;
+    box-shadow: none;
+  }
+  .pt-ck-sheet .as-portrait {
+    --ht: 0.63;
+    --ey: 0.7;
+  }
+  .pt-ck-sheet .as-portrait::before {
+    background:
+      radial-gradient(80% 45% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%),
+      linear-gradient(0deg, rgba(9, 10, 12, 0.96) 0%, rgba(9, 10, 12, 0.7) 26%, rgba(9, 10, 12, 0) 56%);
+  }
+  .pt-ck-sheet .as-portrait .as-pet {
+    display: block;
+  }
+  .pt-ck-sheet .as-gear {
+    width: auto;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--as-gap);
+  }
+  .pt-ck-sheet .as-gear .as-pet-side {
+    display: none;
+  }
+  .pt-ck-sheet .as-banner {
+    width: 30%;
+  }
+  .pt-ck-sheet .as-head {
+    margin-bottom: 3px;
+  }
+  .pt-ck-sheet .as-label,
+  .pt-ck-sheet .as-cap {
+    font-size: 10px;
+  }
+  .pt-ck-sheet .as-ico {
+    width: 11px;
+    height: 11px;
+  }
+  .pt-ck-sheet .as-n {
+    font-size: 9px;
   }
 }

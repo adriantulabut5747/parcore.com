@@ -56,15 +56,6 @@
     );
   }
 
-  function ago(iso) {
-    var h = Math.round((Date.now() - new Date(iso)) / 36e5);
-    return h < 1 ? 'Updated just now' : h < 24 ? 'Updated ' + h + 'h ago' : 'Updated ' + Math.round(h / 24) + 'd ago';
-  }
-  function fact(id, html) {
-    var el = $(id);
-    el.innerHTML = html;
-    el.hidden = false;
-  }
 
   // Region picker (Oct 21 2026): a native select's open list can't be
   // styled (it showed the OS's white list with a blue row), so on screen
@@ -215,9 +206,6 @@
 
   Promise.all([fetch('/coc-lobby-stats.json').then((r) => r.json()), fetch('/coc-equipment.json').then((r) => r.json()).catch(() => ({}))])
     .then(([data, eq]) => {
-      fact('#stUpdated', ago(data.updated));
-      var days = Math.ceil((new Date(data.goldPass.end) - Date.now()) / 864e5);
-      if (days > 0) fact('#stSeason', 'Season ends in <b>' + days + '</b> ' + (days === 1 ? 'day' : 'days'));
       leaderboards(data);
       equipment(data, eq);
     })

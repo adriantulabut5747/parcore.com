@@ -1,20 +1,18 @@
 /* Player Tracker (Oct 2026): the search on /coc/tools/player-tracker, the
-   player profile at /coc/player/<TAG> and the clan page at /coc/clan/<TAG>. Data comes from /api/coc (the Netlify
-   function netlify/functions/coc-api.mjs, which holds the API key); icons and
-   unit groups come from coc-army-data.json, the army maker's data.
+   player profile at /coc/player/<TAG> and the clan page at /coc/clan/<TAG>. Data comes from the Cloudflare
+   Worker cloudflare/coc-api/worker.js (it holds the API key; every host calls it
+   directly); icons and unit groups come from coc-army-data.json, the army maker's data.
 
-   GitHub Pages can't run that function or the /coc/player/<TAG> rewrite, so
-   there the page calls the Netlify test site directly and profiles use
+   GitHub Pages can't do the /coc/player/<TAG> rewrite, so there profiles use
    /coc/player/?tag=<TAG> (clans: /coc/clan/?tag=<TAG>). Plan: docs/player-tracker-plan.md. */
 (function () {
   'use strict';
 
   var ON_PAGES = location.hostname.endsWith('github.io');
-  // Change to the live site once the tracker launches there.
-  var API = ON_PAGES ? 'https://extraordinary-donut-f21bde.netlify.app/api/coc' : '/api/coc';
+  var API = 'https://parchrome-coc.adriantulabut5747.workers.dev/api/coc'; // Cloudflare Worker: cloudflare/coc-api/worker.js
   var RECENT_KEY = 'pt-recent';
 
-  // Same rules as cleanTag in coc-api.mjs: "#abc o" -> "ABC0"; null if it
+  // Same rules as cleanTag in cloudflare/coc-api/worker.js: "#abc o" -> "ABC0"; null if it
   // isn't a real tag (tags only use 0289PYLQGRJCUV).
   function cleanTag(raw) {
     var t = String(raw || '')
@@ -32,14 +30,39 @@
   }
 
   // GET /api/coc?<query>; rejects with Error('notFound' | 'maintenance' |
-  // 'private' | 'other').
+  // 'private' | 'down' | 'server' | 'slow' | 'offline'), so the visitor is told
+  // WHICH link broke (MESSAGES): down = the Worker answered but Supercell's API
+  // (or RoyaleAPI's proxy in front of it) didn't; server = our Worker; slow /
+  // offline = the visitor's own connection.
   function api(query) {
-    return fetch(API + '?' + query).then(function (res) {
-      return res.json().then(function (body) {
-        if (!res.ok) throw new Error(['notFound', 'maintenance', 'private'].indexOf(body.error) !== -1 ? body.error : 'other');
+    return fetch(API + '?' + query, { signal: AbortSignal.timeout(20000) }).then(function (res) {
+      // A Worker error is always JSON with an "error"; anything else (an HTML
+      // error page) means the Worker itself broke.
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (!res.ok) throw new Error(['notFound', 'maintenance', 'private'].indexOf(body.error) !== -1 ? body.error : body.error ? 'down' : 'server');
         return body;
       });
-    });
+    }, diagnose);
+  }
+  // The call itself never came back: work out whose end it is. The Worker turns
+  // an unknown type down at once without asking Supercell, so it answering =
+  // our server is up; our own site answering = the visitor's internet is up.
+  function diagnose(err) {
+    if (navigator.onLine === false) return Promise.reject(new Error('offline'));
+    var timedOut = err && (err.name === 'TimeoutError' || err.name === 'AbortError');
+    var t0 = Date.now();
+    function kind(k) { throw new Error(k); }
+    return fetch(API + '?type=ping', { cache: 'no-store', signal: AbortSignal.timeout(8000) }).then(
+      // Our server answered: a quick answer = the hang was Supercell's side.
+      function () { kind(!timedOut ? 'server' : Date.now() - t0 > 3000 ? 'slow' : 'down'); },
+      function (e) {
+        if (e && e.name === 'TimeoutError') kind('slow');
+        return fetch('/sidebar.json?ping=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(8000) }).then(
+          function () { kind('server'); },
+          function () { kind('offline'); },
+        );
+      },
+    );
   }
 
   function esc(s) {
@@ -168,8 +191,20 @@
       badTag: 'That isn&rsquo;t a clan tag. Tags start with # and only use the characters 0 2 8 9 P Y L Q G R J C U V.',
       notFound: 'No clan has this tag. Copy it from the clan&rsquo;s in-game profile and try again.',
     },
-    maintenance: 'Clash of Clans is in maintenance, so its data is unavailable. Try again when the game is back.',
+    maintenance: 'Clash of Clans is on a maintenance break, so its data is unavailable. Try again when the game is back.',
+    down: 'Supercell&rsquo;s Clash of Clans API isn&rsquo;t answering right now, so no game data can be loaded. Your connection is fine. Try again in a few minutes.',
+    server: 'Parchrome&rsquo;s tracker server can&rsquo;t be reached right now. Your connection is fine. Try again in a few minutes.',
+    slow: 'Your connection is too slow to load this right now. Try again on a stronger signal.',
+    offline: 'You&rsquo;re offline. Check your internet connection and try again.',
     other: 'This couldn&rsquo;t be loaded. Check your connection and try again.',
+  };
+  // The error panel's title per kind ("Couldn't load" for the rest).
+  var TITLES = {
+    maintenance: 'Maintenance <em>break</em>',
+    down: 'Clash data <em>is down</em>',
+    server: 'Tracker <em>unreachable</em>',
+    slow: 'Slow <em>connection</em>',
+    offline: 'You&rsquo;re <em>offline</em>',
   };
   // A list that scrolls inside its box (search results, the quick search
   // dropdown): a fade on whichever edge has more (.more-t / .more-b), so
@@ -378,9 +413,9 @@
       (info
         ? '<img src="' + info.img + '" alt="" loading="lazy" decoding="async" />'
         : '<span class="pt-tile-initials">' + esc(u.name.replace(/[^A-Z]/g, '').slice(0, 2)) + '</span>') +
-      // Maxed for this Town Hall: the badge reads MAX (the level stays in the title / label).
+      // Maxed for this Town Hall: the level badge turns red (.is-max).
       '<b class="pt-lvl">' +
-      (maxed ? 'MAX' : u.level) +
+      u.level +
       '</b></span><span class="pt-sr">' +
       esc(label) +
       '</span></' +
@@ -543,7 +578,71 @@
         miss += Math.max(0, prev[name] - (have[k] || 0));
       }
     });
-    return { th: th, rows: rows, total: total, rushed: prev && prevNeed ? miss / prevNeed : null };
+    return {
+      hall: 'Town Hall',
+      lvl: th,
+      groups: PROGRESS_GROUPS,
+      rows: rows,
+      total: total,
+      rushed: prev && prevNeed ? miss / prevNeed : null,
+      note: 'Equipment counts only the items this player owns.',
+    };
+  }
+
+  // The same for the Builder Base: Battle Machine / Battle Copter and the
+  // builder troops against coc-max-levels.json "bh" (per Builder Hall).
+  var BB_HEROES = ['Battle Machine', 'Battle Copter'];
+  function builderUnits(p) {
+    return p.troops.concat(p.heroes).filter(function (u) {
+      return u.village === 'builderBase';
+    });
+  }
+  function setBuilderCaps(p, maxTable) {
+    var table = maxTable && maxTable.bh && maxTable.bh[p.builderHallLevel];
+    if (!table) return;
+    builderUnits(p).forEach(function (u) {
+      if (table[u.name]) u.cap = table[u.name];
+    });
+  }
+  function builderProgress(p, maxTable) {
+    var bh = p.builderHallLevel;
+    var now = maxTable && maxTable.bh && maxTable.bh[bh];
+    if (!now) return null;
+    var prev = maxTable.bh[bh - 1];
+    var have = {};
+    builderUnits(p).forEach(function (u) {
+      have[u.name] = u.level;
+    });
+    var rows = {};
+    var total = { done: 0, need: 0 };
+    var miss = 0;
+    var prevNeed = 0;
+    Object.keys(now).forEach(function (name) {
+      var cap = now[name];
+      var lvl = Math.min(have[name] || 0, cap);
+      var g = BB_HEROES.indexOf(name) !== -1 ? 'heroes' : 'troops';
+      var r = (rows[g] = rows[g] || { done: 0, need: 0 });
+      r.done += lvl;
+      r.need += cap;
+      total.done += lvl;
+      total.need += cap;
+      if (prev && prev[name]) {
+        prevNeed += prev[name];
+        miss += Math.max(0, prev[name] - (have[name] || 0));
+      }
+    });
+    return {
+      hall: 'Builder Hall',
+      lvl: bh,
+      groups: [
+        ['heroes', 'Heroes'],
+        ['troops', 'Troops'],
+      ],
+      rows: rows,
+      total: total,
+      rushed: prev && prevNeed ? miss / prevNeed : null,
+      note: 'Max levels per Builder Hall come from the Clash of Clans wiki.',
+    };
   }
 
   // One row: Overall, then each group -- the percentage on top, the name,
@@ -574,13 +673,15 @@
         pr.rushed === 0 ? '<span class="pt-verdict is-ok">Not rushed</span>' : '<span class="pt-verdict">Rushed ' + pct + '%</span>';
     }
     return (
-      '<section class="pt-group pt-progress"><div class="pt-group-head"><h3>Town Hall ' +
-      pr.th +
+      '<section class="pt-group pt-progress"><div class="pt-group-head"><h3>' +
+      pr.hall +
+      ' ' +
+      pr.lvl +
       ' progress</h3>' +
       verdict +
       '</div><ul class="pt-pg">' +
       cell('Overall', pr.total, 'is-total') +
-      PROGRESS_GROUPS.filter(function (g) {
+      pr.groups.filter(function (g) {
         return pr.rows[g[0]];
       })
         .map(function (g) {
@@ -588,8 +689,24 @@
         })
         .join('') +
       '</ul><p class="pt-pg-note">' +
-      (pr.rushed !== null ? 'Rushed: heroes, pets, troops, spells or sieges below the Town Hall ' + (pr.th - 1) + ' max. ' : '') +
-      'Equipment counts only the items this player owns.</p></section>'
+      (pr.rushed !== null
+        ? 'Rushed: ' +
+          pr.groups
+            .map(function (g) {
+              return g[1].toLowerCase();
+            })
+            .filter(function (g) {
+              return g !== 'equipment';
+            })
+            .join(', ') +
+          ' below the ' +
+          pr.hall +
+          ' ' +
+          (pr.lvl - 1) +
+          ' max. '
+        : '') +
+      pr.note +
+      '</p></section>'
     );
   }
 
@@ -639,15 +756,26 @@
         '</span></p>'
       : '<p class="pt-clan pt-clan--none">Not in a clan</p>';
 
+    // An achievement's running total (all-time numbers the profile has no
+    // field for: troops donated, attacks won...), or null.
+    var achVal = function (name) {
+      var a = p.achievements.find(function (x) {
+        return x.name === name;
+      });
+      return a ? a.value : null;
+    };
+    var allTime = [
+      ['Best trophies', num(p.bestTrophies)],
+      ['War stars', num(p.warStars)],
+      achVal('Conqueror') != null ? ['Attacks won', num(achVal('Conqueror'))] : null,
+      achVal('Friend in Need') != null ? ['Troops donated', num(achVal('Friend in Need'))] : null,
+      ['Capital gold', num(p.clanCapitalContributions)],
+    ].filter(Boolean);
+
     // "This season" numbers reset when the season ends; the others never do.
     var stats =
-      '<div class="pt-head-facts">' +
-      facts('All time', [
-        ['XP level', p.expLevel],
-        ['Best trophies', num(p.bestTrophies)],
-        ['War stars', num(p.warStars)],
-        ['Capital gold', num(p.clanCapitalContributions)],
-      ]) +
+      '<div class="pt-wellfacts">' +
+      facts('All time', allTime) +
       facts('This season', [
         ['Trophies', num(p.trophies)],
         ['Attack wins', num(p.attackWins)],
@@ -657,9 +785,218 @@
       ]) +
       '</div>';
 
+    // Builder Base: everything that changes with the village switch.
+    var bh = p.builderHallLevel;
+    setBuilderCaps(p, maxTable);
+    var bb = p.troops.filter(function (u) {
+      return u.village === 'builderBase';
+    });
+    var bbHeroes = p.heroes.filter(function (u) {
+      return u.village === 'builderBase';
+    });
+    var bpr = bh ? builderProgress(p, maxTable) : null;
+    var bbStats = bh
+      ? '<div class="pt-wellfacts">' +
+        facts(
+          'Builder base',
+          [
+            ['Trophies', num(p.builderBaseTrophies)],
+            ['Best trophies', num(p.bestBuilderBaseTrophies)],
+            achVal('Un-Build It') != null ? ['Halls destroyed', num(achVal('Un-Build It'))] : null,
+            ['Troops', bb.length],
+          ].filter(Boolean),
+        ) +
+        '</div>'
+      : '';
+
+    // The swap key on the hall's corner shows the OTHER village's hall: tap
+    // it to go there. [data-on] pictures fade / scale in and out with the
+    // village (CSS), so the hall and the key swap smoothly. Players without
+    // a Builder Base don't get one.
+    var bhIcon = bh ? '/icons/bh' + bh + 'icon.webp' : '';
+    var hallPic = function (src, on) {
+      return src ? '<img data-on="' + on + '" src="' + src + '" alt="" width="112" height="112" />' : '';
+    };
+    var villageSwitch = bh
+      ? '<button type="button" class="pt-swap" aria-label="Show the Builder Base" title="Builder Base">' +
+        hallPic(bhIcon, 'home') +
+        hallPic(icon, 'builder') +
+        '</button>'
+      : '';
+
+    var tabs = function (village, list) {
+      return (
+        '<div class="pt-tabs" role="tablist" aria-label="' +
+        (village === 'home' ? 'Home village' : 'Builder base') +
+        ' sections" data-show="' +
+        village +
+        '">' +
+        list
+          .map(function (t, i) {
+            var on = i === 0 && village === 'home';
+            return (
+              '<button type="button" role="tab" id="ptTab' +
+              t[0] +
+              '" aria-controls="ptPanel' +
+              t[0] +
+              '" aria-selected="' +
+              on +
+              '"' +
+              (on ? '' : ' tabindex="-1"') +
+              '>' +
+              t[1] +
+              '</button>'
+            );
+          })
+          .join('') +
+        '</div>'
+      );
+    };
+    var panel = function (id, html, shown) {
+      return (
+        '<div class="pt-panel" id="ptPanel' + id + '" role="tabpanel" aria-labelledby="ptTab' + id + '"' + (shown ? '' : ' hidden') + '>' + html + '</div>'
+      );
+    };
+
     var heroHtml = heroCards(p.heroes.filter(home), idx);
 
-    var achievements = ['home', 'builderBase', 'clanCapital']
+    root.dataset.village = 'home';
+    root.innerHTML =
+      quickSearch('player') +
+      '<header class="pt-head pt-head--player">' +
+      '<div class="pt-th">' +
+      '<div class="pt-plinth">' +
+      hallPic(icon, 'home') +
+      hallPic(bhIcon, 'builder') +
+      villageSwitch +
+      '</div>' +
+      // Both villages' names share one cell (.pt-stack), so swapping never
+      // moves the layout. The weapon only exists at Town Hall 17 now.
+      '<span class="pt-stack pt-hall"><span data-show="home">Town Hall ' +
+      th +
+      (th === 17 && p.townHallWeaponLevel ? '<i>Weapon ' + p.townHallWeaponLevel + '</i>' : '') +
+      '</span>' +
+      (bh ? '<span data-show="builder">Builder Hall ' + bh + '</span>' : '') +
+      '</span></div>' +
+      '<div class="pt-id"><h1 class="pt-name">' +
+      esc(p.name) +
+      '<span class="pt-xp" title="XP level ' +
+      p.expLevel +
+      '"><svg viewBox="-1 -1 26 26" aria-hidden="true"><path d="M12.00 0.40L14.41 3.02L17.80 1.95L18.58 5.42L22.05 6.20L20.98 9.59L23.60 12.00L20.98 14.41L22.05 17.80L18.58 18.58L17.80 22.05L14.41 20.98L12.00 23.60L9.59 20.98L6.20 22.05L5.42 18.58L1.95 17.80L3.02 14.41L0.40 12.00L3.02 9.59L1.95 6.20L5.42 5.42L6.20 1.95L9.59 3.02Z"/></svg><b><span class="pt-sr">XP level </span>' +
+      p.expLevel +
+      '</b></span></h1>' +
+      '<p class="pt-tagline"><span>#' +
+      tag +
+      '</span><button type="button" class="pt-copy" data-copy="#' +
+      tag +
+      '">Copy tag</button>' +
+      '<button type="button" class="pt-copy pt-share"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4" /></svg><span>Share</span></button>' +
+      (labels ? '<span class="pt-labels">' + labels + '</span>' : '') +
+      '</p>' +
+      clan +
+      '</div>' +
+      '<div class="pt-stack pt-leagues">' +
+      (league
+        ? '<div class="pt-league" data-show="home">' +
+          (league.iconUrls ? '<img src="' + (league.iconUrls.medium || league.iconUrls.small) + '" alt="" width="72" height="72" />' : '') +
+          '<span>' +
+          esc(league.name) +
+          '</span><b>' +
+          TROPHY +
+          num(p.trophies) +
+          '</b></div>'
+        : '') +
+      (bh
+        ? '<div class="pt-league" data-show="builder"><span>' +
+          esc(p.builderBaseLeague ? p.builderBaseLeague.name : 'Unranked') +
+          '</span><b>' +
+          TROPHY +
+          num(p.builderBaseTrophies) +
+          '</b></div>'
+        : '') +
+      '</div></header>' +
+      tabs('home', [
+        ['Home', 'Overview'],
+        ['Attacks', 'Attacks'],
+        ['Ach', 'Achievements'],
+        ['Clans', 'Previous clans'],
+        ['Stats', 'Stats'],
+      ]) +
+      (bh
+        ? tabs('builder', [
+            ['BB', 'Overview'],
+            ['BBAch', 'Achievements'],
+          ])
+        : '') +
+      panel(
+        'Home',
+        (pr ? progressBox(pr) : '') +
+          heroHtml +
+          tileGroup('Hero equipment', p.heroEquipment.filter(home), idx) +
+          tileGroup('Pets', homeTroops.filter(inGroup('pets')), idx) +
+          tileGroup('Troops', troops, idx) +
+          tileGroup('Siege machines', homeTroops.filter(inGroup('sieges')), idx) +
+          tileGroup('Spells', p.spells.filter(home), idx),
+        true,
+      ) +
+      panel('Attacks', '') +
+      panel('Ach', achievementsOf(p, ['home', 'clanCapital'])) +
+      panel('Clans', '') +
+      // the profile's own numbers at once; ClashKing's war / battle stats
+      // load under them the first time the tab opens (loadStats)
+      panel('Stats', stats + '<div class="pt-ck-stats"></div>') +
+      (bh
+        ? panel('BB', bbStats + (bpr ? progressBox(bpr) : '') + heroCards(bbHeroes, idx) + tileGroup('Troops', bb, idx)) +
+          panel('BBAch', achievementsOf(p, ['builderBase']))
+        : '') +
+      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. A red level marks a unit that is maxed for this Town Hall or Builder Hall.</p>';
+
+    wireTabs(root);
+    wireCopy(root);
+    wireShare(root, p.name);
+    wireQuick(root);
+    wireVillage(root);
+    // ClashKing's history tabs load the first time they're opened.
+    [
+      ['Attacks', loadAttacks],
+      ['Stats', loadStats],
+      ['Clans', loadClans],
+    ].forEach(function (t) {
+      onFirstOpen(root.querySelector('#ptTab' + t[0]), function () {
+        t[1](root.querySelector('#ptPanel' + t[0]), tag, data, p);
+      });
+    });
+  }
+
+  // The gold trophy before trophy counts.
+  var TROPHY =
+    '<svg class="pt-trophy" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v2h3.5v2.5A4.5 4.5 0 0 1 16.6 12 5.5 5.5 0 0 1 13 14.8V17h3v4H8v-4h3v-2.2A5.5 5.5 0 0 1 7.4 12 4.5 4.5 0 0 1 3.5 7.5V5H7zm0 4H5.5v.5a2.5 2.5 0 0 0 1.7 2.4A6 6 0 0 1 7 8.5zm10 0v1.5a6 6 0 0 1-.2 1.4 2.5 2.5 0 0 0 1.7-2.4V7z"/></svg>';
+
+  // Home / Builder: root[data-village] shows one village's hall, league,
+  // tabs and panels (CSS hides the other's [data-show]); the swap key flips
+  // it and opens that village's first tab. #builder in the address opens
+  // the Builder Base.
+  function wireVillage(root) {
+    var key = root.querySelector('.pt-swap');
+    if (!key) return;
+    function pick(v) {
+      root.dataset.village = v;
+      key.setAttribute('aria-label', v === 'home' ? 'Show the Builder Base' : 'Show the Home Village');
+      key.title = v === 'home' ? 'Builder Base' : 'Home Village';
+      root.querySelector('.pt-tabs[data-show="' + v + '"] [role=tab]').click();
+      history.replaceState(null, '', location.pathname + location.search + (v === 'builder' ? '#builder' : ''));
+    }
+    key.addEventListener('click', function () {
+      pick(root.dataset.village === 'home' ? 'builder' : 'home');
+    });
+    if (location.hash === '#builder') pick('builder');
+  }
+
+  // Achievement groups for the given villages (home + clanCapital on the
+  // Home side, builderBase on the Builder side): stars, name, what it asks,
+  // and a bar towards the next star.
+  function achievementsOf(p, villages) {
+    return villages
       .map(function (v) {
         var list = p.achievements.filter(function (a) {
           return a.village === v;
@@ -678,16 +1015,21 @@
           ' complete</span></div><ul class="pt-ach">' +
           list
             .map(function (a) {
+              var open = a.stars < 3 && a.target;
               return (
-                '<li>' +
+                '<li' +
+                (a.stars === 3 ? ' class="is-done"' : '') +
+                '>' +
                 stars(a.stars) +
                 '<div><b>' +
                 esc(a.name) +
                 '</b><span>' +
                 esc(a.stars === 3 ? a.completionInfo || a.info : a.info) +
-                '</span></div><em>' +
+                '</span>' +
+                (open ? '<i class="pt-ach-bar"><i style="width:' + Math.min(100, (a.value / a.target) * 100).toFixed(1) + '%"></i></i>' : '') +
+                '</div><em>' +
                 num(a.value) +
-                (a.stars < 3 ? ' / ' + num(a.target) : '') +
+                (open ? ' <i>/ ' + num(a.target) + '</i>' : '') +
                 '</em></li>'
               );
             })
@@ -696,82 +1038,6 @@
         );
       })
       .join('');
-
-    var bb = p.troops.filter(function (u) {
-      return u.village === 'builderBase';
-    });
-    var bbHeroes = p.heroes.filter(function (u) {
-      return u.village === 'builderBase';
-    });
-
-    root.innerHTML =
-      quickSearch('player') +
-      '<header class="pt-head pt-head--player">' +
-      '<div class="pt-th">' +
-      (icon ? '<img src="' + icon + '" alt="" width="88" height="88" />' : '') +
-      '<span>Town Hall ' +
-      th +
-      (p.townHallWeaponLevel ? ' <i>&middot; weapon ' + p.townHallWeaponLevel + '</i>' : '') +
-      '</span></div>' +
-      '<div class="pt-id"><h1 class="pt-name">' +
-      esc(p.name) +
-      '</h1>' +
-      '<p class="pt-tagline"><span>#' +
-      tag +
-      '</span><button type="button" class="pt-copy" data-copy="#' +
-      tag +
-      '">Copy tag</button>' +
-      '<button type="button" class="pt-copy pt-share"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4" /></svg><span>Share</span></button>' +
-      (labels ? '<span class="pt-labels">' + labels + '</span>' : '') +
-      '</p>' +
-      clan +
-      '</div>' +
-      (league
-        ? '<div class="pt-league">' +
-          (league.iconUrls ? '<img src="' + (league.iconUrls.medium || league.iconUrls.small) + '" alt="" width="64" height="64" />' : '') +
-          '<span>' +
-          esc(league.name) +
-          '</span></div>'
-        : '') +
-      stats +
-      '</header>' +
-      '<div class="pt-tabs" role="tablist" aria-label="Profile sections">' +
-      '<button type="button" role="tab" id="ptTabHome" aria-controls="ptPanelHome" aria-selected="true">Home village</button>' +
-      '<button type="button" role="tab" id="ptTabBB" aria-controls="ptPanelBB" aria-selected="false" tabindex="-1">Builder base</button>' +
-      '<button type="button" role="tab" id="ptTabAch" aria-controls="ptPanelAch" aria-selected="false" tabindex="-1">Achievements</button>' +
-      '</div>' +
-      '<div class="pt-panel" id="ptPanelHome" role="tabpanel" aria-labelledby="ptTabHome">' +
-      (pr ? progressBox(pr) : '') +
-      heroHtml +
-      tileGroup('Hero equipment', p.heroEquipment.filter(home), idx) +
-      tileGroup('Pets', homeTroops.filter(inGroup('pets')), idx) +
-      tileGroup('Troops', troops, idx) +
-      tileGroup('Siege machines', homeTroops.filter(inGroup('sieges')), idx) +
-      tileGroup('Spells', p.spells.filter(home), idx) +
-      '</div>' +
-      '<div class="pt-panel" id="ptPanelBB" role="tabpanel" aria-labelledby="ptTabBB" hidden>' +
-      (p.builderHallLevel
-        ? '<section class="pt-group">' +
-          facts('Builder Base', [
-            ['Builder Hall', p.builderHallLevel],
-            ['Trophies', num(p.builderBaseTrophies)],
-            ['Best trophies', num(p.bestBuilderBaseTrophies)],
-            ['League', p.builderBaseLeague ? esc(p.builderBaseLeague.name) : 'Unranked'],
-          ]) +
-          '</section>' +
-          heroCards(bbHeroes, idx) +
-          tileGroup('Troops', bb, idx)
-        : '<p class="pt-empty">This player hasn&rsquo;t unlocked the Builder Base yet.</p>') +
-      '</div>' +
-      '<div class="pt-panel" id="ptPanelAch" role="tabpanel" aria-labelledby="ptTabAch" hidden>' +
-      achievements +
-      '</div>' +
-      '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes, so a battle you just played can take a few minutes to show up. MAX marks a unit that is maxed for this Town Hall.</p>';
-
-    wireTabs(root);
-    wireCopy(root);
-    wireShare(root, p.name);
-    wireQuick(root);
   }
 
   function wireCopy(root) {
@@ -1026,11 +1292,11 @@
         ? noun + ' <em>not found</em>'
         : kind === 'badTag'
           ? 'Not a <em>' + noun.toLowerCase() + ' tag</em>'
-          : 'Couldn&rsquo;t <em>load</em>') +
+          : TITLES[kind] || 'Couldn&rsquo;t <em>load</em>') +
       '</h1><p class="th-soon-text">' +
       message(what, kind) +
       '</p><div class="th-soon-actions">' +
-      (retry && (kind === 'other' || kind === 'maintenance')
+      (retry && kind !== 'notFound' && kind !== 'badTag' && kind !== 'private'
         ? '<button type="button" class="th-soon-btn th-soon-btn--primary" data-retry>Try again</button>'
         : '') +
       '<a class="th-soon-btn" href="/coc/tools/player-tracker">Search again</a></div></section>';
@@ -1075,6 +1341,7 @@
         saveRecent({ kind: 'player', tag: tag, name: p.name, th: p.townHallLevel, icon: thIcon(p.townHallLevel, r[1]) });
       })
       .catch(function (err) {
+        if (!/^(notFound|maintenance|private|down|server|slow|offline|other)$/.test(err.message)) console.error(err); // a bug, not the API
         armyData = null; // a failed JSON load gets another go on retry
         showState(root, 'player', err.message, function () {
           loadProfile(root, tag);
@@ -1086,6 +1353,911 @@
     var tag = tagFromAddress('player');
     if (!tag) return showState(root, 'player', 'badTag');
     loadProfile(root, tag);
+  }
+
+  /* ------------------------------------------------------------- ClashKing */
+  // The profile's Attacks, Stats and Previous clans tabs (Oct 25 2026): history the
+  // official API doesn't keep (it only knows a player as they are now). It
+  // comes from ClashKing's public API (api.clashk.ing: no key, any site may
+  // call it), straight from the browser, so it costs the Worker nothing.
+  // ClashKing only has what its bot recorded, hence the "may be missing"
+  // notes. If ClashKing goes down, only these three tabs say so.
+  var CK = 'https://api.clashk.ing/v2/player/%23';
+  function ck(path) {
+    return fetch(CK + path)
+      .then(function (res) {
+        if (!res.ok) throw new Error('other');
+        return res.json();
+      })
+      .then(function (b) {
+        return b.items || [];
+      });
+  }
+  var CK_FAIL = '<p class="pt-empty">ClashKing couldn&rsquo;t be reached. Reload the page to try again.</p>';
+  function ckSource(what) {
+    return (
+      '<p class="pt-source">' +
+      what +
+      ' from ClashKing, which only has what its bot recorded, so some may be missing.</p>'
+    );
+  }
+  function onFirstOpen(tab, fn) {
+    tab.addEventListener('click', function go() {
+      tab.removeEventListener('click', go);
+      fn();
+    });
+  }
+  // Mean of fn over list, or null when it's empty.
+  function mean(list, fn) {
+    return list.length
+      ? list.reduce(function (t, x) {
+          return t + fn(x);
+        }, 0) / list.length
+      : null;
+  }
+  function fixed(v, digits, unit) {
+    return v == null ? '&ndash;' : v.toFixed(digits) + (unit || '');
+  }
+  function shortDay(d) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+  // STAR STRIP: one square per hit, oldest on the left, coloured by its
+  // stars (3 green, 2 amber, 1 red, 0 grey) -- a season's form at a glance.
+  // hits: [{ stars, label, go }]; go = the id of the row it stands for, so
+  // a click jumps there (wireStrip).
+  // legend (optional): [[stars, label], ...] -- the clan's war log uses
+  // 3 / 1 / 0 for win / loss / draw.
+  var STAR_KEY = [
+    [3, '3 stars'],
+    [2, '2 stars'],
+    [1, '1 star'],
+    [0, '0 stars'],
+  ];
+  function starStrip(title, hits, legend) {
+    legend = legend || STAR_KEY;
+    var count = [0, 0, 0, 0];
+    hits.forEach(function (h) {
+      count[h.stars]++;
+    });
+    return (
+      '<section class="pt-group pt-strip"><div class="pt-group-head"><h3>' +
+      title +
+      '</h3><span class="pt-strip-key">' +
+      legend
+        .map(function (k) {
+          return '<span><i class="s' + k[0] + '"></i>' + k[1] + ' <b>' + count[k[0]] + '</b></span>';
+        })
+        .join('') +
+      '</span></div><div class="pt-strip-cells" role="img" aria-label="' +
+      hits.length +
+      ' results, oldest first: ' +
+      legend
+        .map(function (k) {
+          return count[k[0]] + ' ' + k[1];
+        })
+        .join(', ') +
+      '">' +
+      hits
+        .map(function (h) {
+          return '<i class="s' + h.stars + '" title="' + esc(h.label) + '" data-go="' + h.go + '"></i>';
+        })
+        .join('') +
+      '</div></section>'
+    );
+  }
+  // A click on a square: show its row (a war past "Show all" included),
+  // bring it into view and flash it.
+  function wireStrip(box) {
+    var cells = box.querySelector('.pt-strip-cells');
+    if (!cells) return;
+    cells.addEventListener('click', function (e) {
+      var go = e.target.dataset && e.target.dataset.go;
+      var row = go && document.getElementById(go);
+      if (!row) return;
+      if (row.hidden) {
+        var more = box.querySelector('.pt-ck-more');
+        if (more) more.click();
+      }
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.classList.remove('is-flash');
+      void row.offsetWidth; // restart the flash on a second click
+      row.classList.add('is-flash');
+    });
+  }
+
+  // Attacks opens on Classic, with a Classic | Clan war switch (modeTab);
+  // each view is built the first time it's picked. Stats shows both on one
+  // page. The two tabs share one download per player (ckOnce).
+  var ckCache = {};
+  function ckOnce(path) {
+    return (
+      ckCache[path] ||
+      (ckCache[path] = ck(path).catch(function (err) {
+        delete ckCache[path]; // a failed load gets another go
+        throw err;
+      }))
+    );
+  }
+  function warsOf(tag) {
+    return ckOnce(tag + '/war/stats?limit=100');
+  }
+  // Battles come from two places, merged newest first:
+  // - the official API's battle log (Worker type=battlelog): the player's
+  //   recent battles (about the last 50), every player, with the opponent;
+  // - ClashKing: older battles, but only for players its bot follows (it
+  //   allows at most 365 days a request).
+  // The same battle in both keeps the official copy. Either source may fail
+  // (null); both failing is an error. Attacks only: the official log also
+  // lists defenses (attack: false).
+  var battleCache = {};
+  var LOOT_KEY = { Gold: 'gold', Elixir: 'elixir', DarkElixir: 'darkElixir' };
+  // An official entry in ClashKing's shape (battleTime there is the
+  // duration in seconds; the date is battleTimestamp).
+  function fromApi(a) {
+    var t = apiTime(a.battleTimestamp);
+    var loot = {};
+    (a.lootedResources || []).forEach(function (r) {
+      if (LOOT_KEY[r.name]) loot[LOOT_KEY[r.name]] = r.amount;
+    });
+    return {
+      api: true,
+      battleMode: a.battleType,
+      battleTime: t ? t.toISOString() : null,
+      stars: a.stars,
+      destructionPercentage: a.destructionPercentage,
+      duration: a.battleTime,
+      lootedResources: loot,
+      shareCode: a.armyShareCode,
+      opponent: { tag: a.opponentPlayerTag, name: a.opponentName, th: a.opponentTownHallLevel },
+    };
+  }
+  function battlesOf(tag) {
+    if (battleCache[tag]) return battleCache[tag];
+    var none = function () {
+      return null;
+    };
+    var official = api('type=battlelog&tag=' + tag).then(function (b) {
+      return (b.items || [])
+        .filter(function (a) {
+          return a.attack;
+        })
+        .map(fromApi)
+        .filter(function (b) {
+          return b.battleTime;
+        });
+    }, none);
+    var logged = ckOnce(tag + '/battlelog/history?time%5Bafter%5D=' + new Date(Date.now() - 364 * 864e5).toISOString().slice(0, 10)).then(null, none);
+    return (battleCache[tag] = Promise.all([official, logged]).then(function (r) {
+      if (!r[0] && !r[1]) {
+        delete battleCache[tag]; // a failed load gets another go
+        throw new Error('other');
+      }
+      var list = r[0] || [];
+      (r[1] || []).forEach(function (b) {
+        var t = Date.parse(b.battleTime);
+        var dup = list.some(function (a) {
+          return a.api && a.stars === b.stars && Math.abs(Date.parse(a.battleTime) - t) < 60000;
+        });
+        if (!dup) list.push(b);
+      });
+      return list.sort(function (a, b) {
+        return Date.parse(b.battleTime) - Date.parse(a.battleTime);
+      });
+    }));
+  }
+  function modeTab(box, views) {
+    box.innerHTML =
+      '<div class="pt-ck-mode">' +
+      switchKeys('Attack type', [
+        ['classic', 'Classic'],
+        ['war', 'Clan war'],
+      ]) +
+      '</div><div class="pt-ck-pane" data-pane="classic"></div><div class="pt-ck-pane" data-pane="war" hidden></div>';
+    var built = {};
+    function show(v) {
+      [].forEach.call(box.querySelectorAll('.pt-ck-pane'), function (p) {
+        p.hidden = p.dataset.pane !== v;
+      });
+      if (built[v]) return;
+      built[v] = true;
+      views[v](box.querySelector('.pt-ck-pane[data-pane="' + v + '"]'));
+    }
+    wireSwitch(box.querySelector('.pt-ck-mode'), show);
+    show('classic');
+  }
+  function loadAttacks(box, tag, data, p) {
+    modeTab(box, {
+      classic: function (pane) {
+        battlesView(pane, tag, p);
+      },
+      war: function (pane) {
+        warsView(pane, tag);
+      },
+    });
+  }
+  // Stats: the profile's numbers are already in the panel; under them,
+  // everything ClashKing has in one place -- clan war (a star bar per side,
+  // attacks vs defenses), average stars by month, classic battles (star
+  // counts, averages, loot). Each source fails on its own.
+  function loadStats(box, tag) {
+    box = box.querySelector('.pt-ck-stats');
+    box.innerHTML = skeleton('tab', 'Loading stats');
+    var soft = function (load) {
+      return load.then(null, function () {
+        return null; // null = couldn't be loaded, [] = nothing recorded
+      });
+    };
+    Promise.all([soft(warsOf(tag)), soft(battlesOf(tag))]).then(function (r) {
+      var wars = r[0];
+      var battles = r[1];
+      if (!wars && !battles) {
+        box.innerHTML = CK_FAIL;
+        return;
+      }
+      var none = function (title, msg) {
+        return '<section class="pt-group"><div class="pt-group-head"><h3>' + title + '</h3></div><p class="pt-ck-none">' + msg + '</p></section>';
+      };
+      box.innerHTML =
+        (wars && wars.length
+          ? warSummary(wars) + warChart(wars)
+          : none('Clan war', wars ? 'ClashKing hasn&rsquo;t recorded any wars for this player.' : 'War stats couldn&rsquo;t be loaded.')) +
+        (battles && battles.length
+          ? battleSummary(battles)
+          : none('Classic battles', battles ? 'No battles found for this player.' : 'Battle stats couldn&rsquo;t be loaded.')) +
+        BATTLE_SOURCE +
+        ckSource('War stats');
+    });
+  }
+
+  function starCounts(hits) {
+    var n = [0, 0, 0, 0];
+    hits.forEach(function (h) {
+      n[h.stars]++;
+    });
+    return n;
+  }
+  function pctOf(n, total) {
+    return total ? Math.round((n / total) * 100) + '%' : '&ndash;';
+  }
+  // One side's stars as a single split bar (3 / 2 / 1 / 0, the star
+  // strip's colours), counts under it.
+  var STAR_ORDER = [3, 2, 1, 0];
+  function starBar(title, hits) {
+    if (!hits.length) return '';
+    var n = starCounts(hits);
+    return (
+      '<div class="pt-st-bar"><div class="pt-st-bar-h"><b>' +
+      title +
+      '</b><span>' +
+      num(hits.length) +
+      '</span></div><div class="pt-st-track pt-strip" role="img" aria-label="' +
+      STAR_ORDER.map(function (s) {
+        return n[s] + ' with ' + s + ' stars';
+      }).join(', ') +
+      '">' +
+      STAR_ORDER.map(function (s) {
+        return n[s] ? '<i class="s' + s + '" style="flex-grow:' + n[s] + '"></i>' : '';
+      }).join('') +
+      '</div><ul class="pt-st-key pt-strip">' +
+      STAR_ORDER.map(function (s) {
+        return '<li><i class="s' + s + '"></i>' + s + '&#9733; <b>' + n[s] + '</b>' + pctOf(n[s], hits.length) + '</li>';
+      }).join('') +
+      '</ul></div>'
+    );
+  }
+
+  // Clan war: a star bar per side, then attacks vs defenses side by side.
+  function warSummary(list) {
+    var atk = warHits(list, 'attacks');
+    var def = warHits(list, 'defenses');
+    var slots = list.reduce(function (t, w) {
+      return t + (w.attacksPerMember || 1);
+    }, 0);
+    var side = function (hits) {
+      var avg = function (k) {
+        return mean(hits, function (h) {
+          return h[k];
+        });
+      };
+      var thd = avg('thd');
+      return [
+        pctOf(starCounts(hits)[3], hits.length),
+        fixed(avg('stars'), 2),
+        fixed(avg('pct'), 1, '%'),
+        hits.length ? mmss(avg('dur')) : '&ndash;',
+        thd == null ? '&ndash;' : (thd > 0 ? '+' : '') + thd.toFixed(2),
+      ];
+    };
+    var a = side(atk);
+    var d = side(def);
+    return (
+      '<section class="pt-group pt-st-war"><div class="pt-group-head"><h3>Clan war</h3><span>' +
+      list.length +
+      ' wars &middot; ' +
+      atk.length +
+      '/' +
+      slots +
+      ' attacks used</span></div><div class="pt-st-bars">' +
+      starBar('Attacks', atk) +
+      starBar('Defenses', def) +
+      '</div><table class="pt-st-vs"><thead><tr><th></th><th scope="col">Attacks</th><th scope="col">Defenses</th></tr></thead><tbody>' +
+      ['Three-star rate', 'Avg stars', 'Avg destruction', 'Avg time', 'Avg TH difference']
+        .map(function (label, i) {
+          return '<tr><th scope="row">' + label + '</th><td>' + a[i] + '</td><td>' + d[i] + '</td></tr>';
+        })
+        .join('') +
+      '</tbody></table></section>'
+    );
+  }
+
+  // Classic battles: star counts, averages, then the loot those battles took.
+  function battleSummary(list) {
+    var n = starCounts(list);
+    var avg = function (k) {
+      return mean(list, function (b) {
+        return b[k];
+      });
+    };
+    return (
+      '<section class="pt-group pt-st-battles"><div class="pt-group-head"><h3>Classic battles</h3><span>' +
+      list.length +
+      ' attacks</span></div><div class="pt-dist"><ul>' +
+      STAR_ORDER.map(function (s) {
+        return '<li>' + stars(s) + '<b>' + num(n[s]) + '</b><span>' + pctOf(n[s], list.length) + '</span></li>';
+      }).join('') +
+      '</ul></div><dl class="pt-st-avg"><div><dt>Avg stars</dt><dd>' +
+      fixed(avg('stars'), 2) +
+      '</dd></div><div><dt>Avg destruction</dt><dd>' +
+      fixed(avg('destructionPercentage'), 1, '%') +
+      '</dd></div><div><dt>Avg time</dt><dd>' +
+      mmss(avg('duration')) +
+      '</dd></div></dl><ul class="pt-st-loot">' +
+      LOOT.map(function (l) {
+        var total = list.reduce(function (t, b) {
+          return t + ((b.lootedResources || {})[l[0]] || 0);
+        }, 0);
+        return (
+          '<li><img src="/clashofclans/articles/clan-games/' +
+          l[1] +
+          '.webp" alt="" width="32" height="32" /><span><b>' +
+          num(total) +
+          '</b>' +
+          l[2] +
+          ' looted &middot; ' +
+          num(Math.round(total / list.length)) +
+          ' a battle</span></li>'
+        );
+      }).join('') +
+      '</ul></section>'
+    );
+  }
+
+  // WARS: every war ClashKing saw this player in (newest first): the star
+  // strip and each war's attacks and defenses (Attacks tab). Wars carry no
+  // army, so these rows have no army sheet.
+  var WAR_TYPE = { random: 'Regular', cwl: 'CWL', friendly: 'Friendly' };
+  var WARS_SHOWN = 15; // the rest behind "Show all"
+
+  function warsView(pane, tag) {
+    pane.innerHTML = skeleton('tab', 'Loading wars');
+    warsOf(tag).then(
+      function (wars) {
+        if (!wars.length) {
+          pane.innerHTML = '<p class="pt-empty">ClashKing hasn&rsquo;t recorded any wars for this player.</p>' + ckSource('War history');
+          return;
+        }
+        var types = wars
+          .map(function (w) {
+            return w.type;
+          })
+          .filter(function (t, i, all) {
+            return all.indexOf(t) === i;
+          });
+        pane.innerHTML =
+          (types.length > 1
+            ? switchKeys(
+                'War type',
+                [['all', 'All wars']].concat(
+                  types.map(function (t) {
+                    return [t, WAR_TYPE[t] || t];
+                  }),
+                ),
+              )
+            : '') +
+          '<div class="pt-ck-body"></div>' +
+          ckSource('War history');
+        var body = pane.querySelector('.pt-ck-body');
+        function show(type) {
+          var list = wars.filter(function (w) {
+            return type === 'all' || w.type === type;
+          });
+          var hits = [];
+          for (var i = list.length - 1; i >= 0; i--) addHits(list[i], i); // oldest war first
+          function addHits(w, i) {
+            var end = apiTime(w.endTime);
+            w.attacks.forEach(function (a) {
+              hits.push({
+                stars: a.stars,
+                go: 'ptWar' + i,
+                label:
+                  (end ? shortDay(end) + ' · ' : '') +
+                  'vs ' +
+                  a.player.name +
+                  ' (TH' +
+                  a.player.townhallLevel +
+                  ') · ' +
+                  a.stars +
+                  ' stars, ' +
+                  Math.round(a.destructionPercentage) +
+                  '%',
+              });
+            });
+          }
+          body.innerHTML = (hits.length ? starStrip('Last ' + hits.length + ' war attacks', hits) : '') + warList(list);
+          wireStrip(body);
+          var more = body.querySelector('.pt-ck-more');
+          if (more)
+            more.addEventListener('click', function () {
+              [].forEach.call(body.querySelectorAll('.pt-ck-war[hidden]'), function (s) {
+                s.hidden = false;
+              });
+              more.remove();
+            });
+        }
+        wireSwitch(pane, show);
+        show('all');
+      },
+      function () {
+        pane.innerHTML = CK_FAIL;
+      },
+    );
+  }
+
+  // side: 'attacks' | 'defenses'. thd = the other player's Town Hall minus ours.
+  function warHits(list, side) {
+    var out = [];
+    list.forEach(function (w) {
+      (w[side] || []).forEach(function (a) {
+        out.push({ stars: a.stars, pct: a.destructionPercentage, dur: a.duration, thd: a.player.townhallLevel - w.player.townhallLevel });
+      });
+    });
+    return out;
+  }
+  // Average stars per month, attacks vs defenses: bars on a 0-3 scale.
+  function warChart(list) {
+    var months = {};
+    list.forEach(function (w) {
+      var d = apiTime(w.endTime);
+      if (!d) return;
+      var m = months[d.toISOString().slice(0, 7)] || (months[d.toISOString().slice(0, 7)] = { atk: [], def: [], d: d });
+      w.attacks.forEach(function (a) {
+        m.atk.push(a.stars);
+      });
+      w.defenses.forEach(function (a) {
+        m.def.push(a.stars);
+      });
+    });
+    var keys = Object.keys(months).sort().slice(-8);
+    if (keys.length < 2) return '';
+    var bar = function (m, side, label) {
+      var v = mean(m[side], Number);
+      var name = m.d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      return v == null
+        ? '<i class="is-' + side + ' is-none"></i>'
+        : '<i class="is-' +
+            side +
+            '" style="height:' +
+            (v / 3) * 100 +
+            '%" title="' +
+            name +
+            ', ' +
+            label +
+            ': ' +
+            v.toFixed(2) +
+            ' stars on average (' +
+            m[side].length +
+            ')"></i>';
+    };
+    return (
+      '<section class="pt-group pt-ck-chart"><div class="pt-group-head"><h3>Average stars by month</h3>' +
+      '<span class="pt-ck-key"><i class="is-atk"></i>Attacks<i class="is-def"></i>Defenses</span></div>' +
+      '<div class="pt-ck-plot"><b style="bottom:21px">0</b><b style="bottom:71px">1</b><b style="bottom:121px">2</b><b style="bottom:171px">3</b>' +
+      keys
+        .map(function (k) {
+          var m = months[k];
+          return (
+            '<div class="pt-ck-month"><div class="pt-ck-bars">' +
+            bar(m, 'atk', 'attacks') +
+            bar(m, 'def', 'defenses') +
+            '</div><span>' +
+            m.d.toLocaleDateString('en-US', { month: 'short' }) +
+            '</span></div>'
+          );
+        })
+        .join('') +
+      '</div></section>'
+    );
+  }
+
+  // One box per war: opponent, result, then each attack and defense.
+  function warList(list) {
+    var hit = function (kind, a) {
+      return (
+        '<li class="pt-ck-row"><span class="pt-war-res">' +
+        kind +
+        '</span><span class="pt-war-opp"><span><b><a href="' +
+        playerHref(a.player.tag.slice(1)) +
+        '">' +
+        esc(a.player.name) +
+        '</a></b><span>TH' +
+        a.player.townhallLevel +
+        ' &middot; #' +
+        a.player.mapPosition +
+        '</span></span></span><span class="pt-war-score"><b>' +
+        stars(a.stars) +
+        Math.round(a.destructionPercentage) +
+        '%</b><span>' +
+        mmss(a.duration) +
+        '</span></span></li>'
+      );
+    };
+    return (
+      list
+        .map(function (w, i) {
+          var res = outcome(w.clan, w.opponent);
+          var end = apiTime(w.endTime);
+          var rows = w.attacks
+            .map(function (a) {
+              return hit('Attack', a);
+            })
+            .concat(
+              w.defenses.map(function (a) {
+                return hit('Defense', a);
+              }),
+            );
+          return (
+            '<section class="pt-group pt-ck-war is-' +
+            res +
+            '" id="ptWar' +
+            i +
+            '"' +
+            (i >= WARS_SHOWN ? ' hidden' : '') +
+            '><div class="pt-group-head"><h3><img src="' +
+            w.opponent.badgeUrls.small +
+            '" alt="" width="24" height="24" loading="lazy" />vs ' +
+            esc(w.opponent.name) +
+            '</h3><span><span class="pt-war-res">' +
+            { win: 'Win', lose: 'Loss', tie: 'Draw' }[res] +
+            '</span>' +
+            (WAR_TYPE[w.type] || 'War') +
+            ' &middot; ' +
+            w.clan.stars +
+            '&ndash;' +
+            w.opponent.stars +
+            (end ? ' &middot; ' + shortDay(end) : '') +
+            '</span></div>' +
+            (rows.length ? '<ul class="pt-ck-list">' + rows.join('') + '</ul>' : '<p class="pt-ck-none">No attacks used, none taken.</p>') +
+            '</section>'
+          );
+        })
+        .join('') +
+      (list.length > WARS_SHOWN ? '<button type="button" class="th-soon-btn pt-ck-more">Show all ' + list.length + ' wars</button>' : '')
+    );
+  }
+
+  // BATTLES: multiplayer attacks (battlesOf: the official log + ClashKing).
+  // Each carries the army's Copy Army code, drawn as the army pages' card
+  // (ArmySheet.html, army-sheet.js).
+  var BATTLE_MODE = { legend: 'Legend', ranked: 'Ranked', homeVillage: 'Regular' };
+  var LOOT = [
+    ['gold', 'gold', 'Gold'],
+    ['elixir', 'elixir', 'Elixir'],
+    ['darkElixir', 'dark-elixir', 'Dark elixir'],
+  ];
+
+  var NO_BATTLES =
+    '<p class="pt-empty">No battles found for this player. The game only keeps a player&rsquo;s recent battles, and ClashKing only logs older ones for players its bot follows.</p>';
+  var BATTLE_SOURCE =
+    '<p class="pt-source">Battles from the official Clash of Clans API (the game keeps about the last 50), plus older ones ClashKing&rsquo;s bot logged.</p>';
+
+  // Attacks > Classic: the star strip, then every battle with its loot and army.
+  // p: the player (their Town Hall now sets the sheet's slots and caps).
+  function battlesView(pane, tag, p) {
+    pane.innerHTML = skeleton('tab', 'Loading battles');
+    Promise.all([battlesOf(tag), window.ArmySheet ? window.ArmySheet.load() : null]).then(
+      function (r) {
+        var list = r[0];
+        if (!list.length) {
+          pane.innerHTML = NO_BATTLES + BATTLE_SOURCE;
+          return;
+        }
+        pane.innerHTML =
+          starStrip(
+            'Last ' + list.length + ' battles',
+            list
+              .map(function (b, i) {
+                var t = new Date(b.battleTime);
+                return {
+                  stars: b.stars,
+                  go: 'ptBattle' + i,
+                  label:
+                    shortDay(t) +
+                    ' · ' +
+                    (BATTLE_MODE[b.battleMode] || 'Battle') +
+                    (b.opponent ? ' vs ' + b.opponent.name + ' (TH' + b.opponent.th + ')' : '') +
+                    ' · ' +
+                    b.stars +
+                    ' stars, ' +
+                    Math.round(b.destructionPercentage) +
+                    '%',
+                };
+              })
+              .reverse(),
+          ) +
+          '<ul class="pt-wars pt-ck-list">' +
+          list
+            .map(function (b, i) {
+              return battleRow(b, p, i);
+            })
+            .join('') +
+          '</ul>' +
+          BATTLE_SOURCE;
+        wireStrip(pane);
+        if (window.ArmySheet) window.ArmySheet.wire(pane);
+      },
+      function () {
+        pane.innerHTML = CK_FAIL;
+      },
+    );
+  }
+
+  // League emblems in place of a text pill: Legend League battles, and
+  // ranked battles from the official log (recent, so the player's league
+  // now is the league they were played in).
+  function leagueIcon(src, name) {
+    return '<img class="pt-ck-league" src="' + src + '" alt="' + esc(name) + '" title="' + esc(name) + '" width="36" height="36" />';
+  }
+  function battleRow(b, p, i) {
+    var t = new Date(b.battleTime);
+    var loot = b.lootedResources || {};
+    var sheet = b.shareCode && window.ArmySheet ? window.ArmySheet.html(p.townHallLevel, b.shareCode) : '';
+    var league = p.leagueTier || p.league;
+    var badge =
+      b.battleMode === 'legend'
+        ? leagueIcon('/clashofclans/coctools/legend-league.png', 'Legend League')
+        : b.api && b.battleMode === 'ranked' && league && league.iconUrls
+          ? leagueIcon(league.iconUrls.small, 'Ranked · ' + league.name)
+          : '<span class="pt-war-res">' + esc(BATTLE_MODE[b.battleMode] || b.battleMode || 'Battle') + '</span>';
+    var opp = b.opponent;
+    return (
+      '<li class="pt-ck-row pt-ck-battle" id="ptBattle' +
+      i +
+      '">' +
+      badge +
+      '<span class="pt-war-opp"><span><b>' +
+      stars(b.stars) +
+      Math.round(b.destructionPercentage) +
+      '%</b><span>' +
+      (opp ? 'vs <a href="' + playerHref(opp.tag.slice(1)) + '">' + esc(opp.name) + '</a> TH' + opp.th + ' &middot; ' : '') +
+      mmss(b.duration) +
+      ' &middot; ' +
+      shortDay(t) +
+      ', ' +
+      t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) +
+      '</span></span></span><span class="pt-ck-loot">' +
+      LOOT.map(function (l) {
+        return loot[l[0]]
+          ? '<span><img src="/clashofclans/articles/clan-games/' + l[1] + '.webp" alt="' + l[2] + '" width="16" height="16" />' + num(loot[l[0]]) + '</span>'
+          : '';
+      }).join('') +
+      '</span>' +
+      (sheet ? '<div class="has-sheet pt-ck-sheet">' + sheet + '</div>' : '') +
+      '</li>'
+    );
+  }
+
+  // CLANS: every clan ClashKing saw this player in, longest stay first.
+  function loadClans(box, tag) {
+    box.innerHTML = skeleton('tab', 'Loading clans');
+    ck(tag + '/join-leave/totals').then(
+      function (list) {
+        if (!list.length) {
+          box.innerHTML = '<p class="pt-empty">ClashKing hasn&rsquo;t seen this player in a clan yet.</p>' + ckSource('Clan history');
+          return;
+        }
+        list.sort(function (a, b) {
+          return b.minutes - a.minutes;
+        });
+        box.innerHTML =
+          '<ul class="pt-wars pt-ck-list">' +
+          list
+            .map(function (c) {
+              var m = c.minutes;
+              return (
+                '<li class="pt-ck-row"><span class="pt-war-opp"><span><b><a href="' +
+                clanHref(c.clan.tag.slice(1)) +
+                '">' +
+                esc(c.clan.name) +
+                '</a></b><span>' +
+                esc(c.clan.tag) +
+                ' &middot; ' +
+                c.visits +
+                (c.visits === 1 ? ' visit' : ' visits') +
+                '</span></span></span><span class="pt-war-score"><b>' +
+                Math.floor(m / 1440) +
+                'd ' +
+                Math.floor((m % 1440) / 60) +
+                'h</b><span>in the clan</span></span><i class="pt-ck-bar"><i style="width:' +
+                Math.max(1, (m / list[0].minutes) * 100) +
+                '%"></i></i></li>'
+              );
+            })
+            .join('') +
+          '</ul>' +
+          ckSource('Clan history');
+      },
+      function () {
+        box.innerHTML = CK_FAIL;
+      },
+    );
+  }
+
+  // RAID WEEKENDS (clan page): the official API's last 10 Capital raid
+  // weekends (Worker type=raids), one at a time with arrows: totals, then
+  // members, the clans raided and the clans that raided us.
+  function loadRaids(box, tag) {
+    box.innerHTML = skeleton('tab', 'Loading raid weekends');
+    api('type=raids&tag=' + tag).then(
+      function (b) {
+        var seasons = b.items || [];
+        if (!seasons.length) {
+          box.innerHTML = '<p class="pt-empty">This clan hasn&rsquo;t taken part in a raid weekend yet.</p>';
+          return;
+        }
+        var at = 0;
+        box.innerHTML =
+          '<div class="pt-ck-season"><button type="button" class="th-soon-btn" data-step="1" aria-label="Older weekend">' +
+          CHEV_LEFT +
+          '</button><b aria-live="polite"></b>' +
+          '<button type="button" class="th-soon-btn" data-step="-1" aria-label="Newer weekend">' +
+          CHEV_RIGHT +
+          '</button></div><div class="pt-ck-body"></div>' +
+          '<p class="pt-source">From the official Clash of Clans API: the last ' +
+          seasons.length +
+          ' raid weekends. Attack medals are per attack, times the 6 attacks a member gets.</p>';
+        var label = box.querySelector('.pt-ck-season b');
+        var body = box.querySelector('.pt-ck-body');
+        var steps = box.querySelectorAll('[data-step]');
+        function show() {
+          var s = seasons[at];
+          var start = apiTime(s.startTime);
+          var end = apiTime(s.endTime);
+          label.innerHTML = (start ? shortDay(start) : '') + ' &ndash; ' + (end ? shortDay(end) : '') + (s.state === 'ongoing' ? ' <i>Live</i>' : '');
+          steps[0].disabled = at === seasons.length - 1;
+          steps[1].disabled = at === 0;
+          body.innerHTML = raidView(s);
+          wireSwitch(body, function (pane) {
+            [].forEach.call(body.querySelectorAll('[data-pane]'), function (l) {
+              l.hidden = l.dataset.pane !== pane;
+            });
+          });
+        }
+        [].forEach.call(steps, function (btn) {
+          btn.addEventListener('click', function () {
+            at += +btn.dataset.step;
+            show();
+          });
+        });
+        show();
+      },
+      function (err) {
+        showTabError(box, err);
+      },
+    );
+  }
+  var CHEV_LEFT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+  var CHEV_RIGHT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+  function showTabError(box, err) {
+    box.innerHTML =
+      '<p class="pt-empty">' +
+      (MESSAGES[err.message] || 'This couldn&rsquo;t be loaded. Reload the page to try again.') +
+      '</p>';
+  }
+
+  function raidView(s) {
+    var members = (s.members || []).slice().sort(function (a, b) {
+      return b.capitalResourcesLooted - a.capitalResourcesLooted;
+    });
+    var gold = '<img class="pt-ck-gold" src="/clashofclans/coctools/capital-gold.webp" alt="" width="16" height="16" />';
+    var clanRow = function (c, other) {
+      return (
+        '<li class="pt-ck-row"><span class="pt-war-opp"><img src="' +
+        c.badgeUrls.small +
+        '" alt="" width="32" height="32" loading="lazy" /><span><b><a href="' +
+        clanHref(c.tag.slice(1)) +
+        '">' +
+        esc(c.name) +
+        '</a></b><span>Level ' +
+        c.level +
+        '</span></span></span><span class="pt-war-score"><b>' +
+        other.districtsDestroyed +
+        '<i>/' +
+        other.districtCount +
+        '</i></b><span>districts &middot; ' +
+        other.attackCount +
+        ' attacks</span></span></li>'
+      );
+    };
+    var list = function (pane, rows, empty, hidden) {
+      return (
+        '<ul class="pt-wars pt-ck-list" data-pane="' +
+        pane +
+        '"' +
+        (hidden ? ' hidden' : '') +
+        '>' +
+        (rows.length ? rows.join('') : '<li class="pt-ck-row pt-ck-none">' + empty + '</li>') +
+        '</ul>'
+      );
+    };
+    var ended = s.state !== 'ongoing';
+    return (
+      '<div class="pt-ck-facts">' +
+      facts('Raids', [
+        ['Capital gold', num(s.capitalTotalLoot)],
+        ['Per attack', s.totalAttacks ? num(Math.round(s.capitalTotalLoot / s.totalAttacks)) : '&ndash;'],
+        ['Raids done', s.raidsCompleted],
+        ['Attacks', s.totalAttacks],
+        ['Districts', s.enemyDistrictsDestroyed],
+      ]) +
+      facts('Medals', [
+        ['Attack', ended && s.offensiveReward ? num(s.offensiveReward * 6) + ' <i>' + s.offensiveReward + ' &times; 6</i>' : '&ndash;'],
+        ['Defense', ended && s.defensiveReward ? num(s.defensiveReward) : '&ndash;'],
+      ]) +
+      '</div>' +
+      switchKeys('Raid details', [
+        ['members', 'Members'],
+        ['raids', 'Raids'],
+        ['defenses', 'Defenses'],
+      ]) +
+      list(
+        'members',
+        members.map(function (m, i) {
+          return (
+            '<li class="pt-ck-row"><span class="pt-ck-rank">' +
+            (i + 1) +
+            '</span><span class="pt-war-opp"><span><b><a href="' +
+            playerHref(m.tag.slice(1)) +
+            '">' +
+            esc(m.name) +
+            '</a></b><span>' +
+            m.attacks +
+            '/' +
+            (m.attackLimit + m.bonusAttackLimit) +
+            ' attacks</span></span></span><span class="pt-war-score"><b>' +
+            gold +
+            num(m.capitalResourcesLooted) +
+            '</b></span></li>'
+          );
+        }),
+        'Nobody has attacked yet.',
+      ) +
+      list(
+        'raids',
+        (s.attackLog || []).map(function (r) {
+          return clanRow(r.defender, r);
+        }),
+        'No clans raided yet.',
+        true,
+      ) +
+      list(
+        'defenses',
+        (s.defenseLog || []).map(function (r) {
+          return clanRow(r.attacker, r);
+        }),
+        'No clan has raided this one yet.',
+        true,
+      )
+    );
   }
 
   /* ------------------------------------------------------------------ clan */
@@ -1249,10 +2421,40 @@
     if (log === 'private') return '<p class="pt-empty">This clan keeps its war log private, so its past wars can&rsquo;t be shown.</p>';
     if (!log) return '<p class="pt-empty">The war log couldn&rsquo;t be loaded. Reload the page to try again.</p>';
     if (!log.length) return '<p class="pt-empty">This clan hasn&rsquo;t finished a war yet.</p>';
+    var played = [];
+    log.forEach(function (w, i) {
+      if (w.result) played.unshift({ w: w, i: i }); // oldest first
+    });
     return (
+      (played.length
+        ? starStrip(
+            'Last ' + played.length + ' wars',
+            played.map(function (x) {
+              var d = apiTime(x.w.endTime);
+              return {
+                stars: { win: 3, lose: 1, tie: 0 }[x.w.result],
+                go: 'ptLog' + x.i,
+                label:
+                  (d ? shortDay(d) + ' · ' : '') +
+                  { win: 'Win', lose: 'Loss', tie: 'Draw' }[x.w.result] +
+                  ' vs ' +
+                  x.w.opponent.name +
+                  ' · ' +
+                  x.w.clan.stars +
+                  '–' +
+                  x.w.opponent.stars,
+              };
+            }),
+            [
+              [3, 'Win'],
+              [1, 'Loss'],
+              [0, 'Draw'],
+            ],
+          )
+        : '') +
       '<ul class="pt-wars">' +
       log
-        .map(function (w) {
+        .map(function (w, i) {
           var cwl = !w.result; // Clan War League weeks come without a result or an opponent
           var res = cwl ? 'cwl' : w.result;
           var day = /^(\d{4})(\d{2})(\d{2})/.exec(w.endTime || '');
@@ -1260,6 +2462,8 @@
           return (
             '<li class="pt-war is-' +
             res +
+            '" id="ptLog' +
+            i +
             '"><span class="pt-war-res">' +
             { win: 'Win', lose: 'Loss', tie: 'Draw', cwl: 'CWL' }[res] +
             '</span><span class="pt-war-opp">' +
@@ -1604,15 +2808,47 @@
   }
 
   function wireWarSides(box) {
+    wireSwitch(box, function (side) {
+      [].forEach.call(box.querySelectorAll('.pt-wms'), function (l) {
+        l.hidden = l.dataset.side !== side;
+      });
+    });
+  }
+
+  // A row of switch keys (.pt-war-sides look). opts: [[value, label], ...];
+  // the first is picked. wireSwitch calls fn(value) on each pick.
+  function switchKeys(label, opts) {
+    return (
+      '<div class="pt-war-sides" role="tablist" aria-label="' +
+      label +
+      '">' +
+      opts
+        .map(function (o, i) {
+          return (
+            '<button type="button" role="tab" aria-selected="' +
+            !i +
+            '"' +
+            (i ? ' tabindex="-1"' : '') +
+            ' data-side="' +
+            o[0] +
+            '">' +
+            o[1] +
+            '</button>'
+          );
+        })
+        .join('') +
+      '</div>'
+    );
+  }
+  function wireSwitch(box, fn) {
     var btns = [].slice.call(box.querySelectorAll('.pt-war-sides button'));
     btns.forEach(function (b) {
       b.addEventListener('click', function () {
         btns.forEach(function (x) {
-          var on = x === b;
-          x.setAttribute('aria-selected', on);
-          x.tabIndex = on ? 0 : -1;
-          box.querySelector('.pt-wms[data-side="' + x.dataset.side + '"]').hidden = !on;
+          x.setAttribute('aria-selected', x === b);
+          x.tabIndex = x === b ? 0 : -1;
         });
+        fn(b.dataset.side);
       });
     });
   }
@@ -2306,6 +3542,37 @@
     });
   }
 
+  // Above the members table: the clan's Town Hall line-up and this
+  // season's donations, summed over the members.
+  function clanGlance(members, data) {
+    var sum = function (k) {
+      return members.reduce(function (t, m) {
+        return t + (m[k] || 0);
+      }, 0);
+    };
+    return (
+      '<section class="pt-group pt-glance"><div class="pt-group-head"><h3>Town Hall mix</h3><span>Average TH ' +
+      (sum('townHallLevel') / members.length).toFixed(1) +
+      '</span></div><div class="pt-mu-ths">' +
+      thMixHtml(
+        {
+          members: members.map(function (m) {
+            return { townhallLevel: m.townHallLevel };
+          }),
+        },
+        data,
+      ) +
+      '</div><div class="pt-ck-facts">' +
+      facts('This season', [
+        ['Donated', num(sum('donations'))],
+        ['Received', num(sum('donationsReceived'))],
+        ['Avg trophies', num(Math.round(sum('trophies') / members.length))],
+        ['Builder trophies', num(Math.round(sum('builderBaseTrophies') / members.length)) + '<i> avg</i>'],
+      ]) +
+      '</div></section>'
+    );
+  }
+
   function renderClan(c, log, data, root) {
     var tag = c.tag.slice(1);
     var members = (c.memberList || []).slice().sort(function (a, b) {
@@ -2326,9 +3593,9 @@
     root.innerHTML =
       quickSearch('clan') +
       '<header class="pt-head pt-head--clan">' +
-      '<div class="pt-th"><img src="' +
+      '<div class="pt-th"><div class="pt-plinth"><img src="' +
       c.badgeUrls.large +
-      '" alt="" width="88" height="88" /><span>Level ' +
+      '" alt="" width="112" height="112" /></div><span>Level ' +
       c.clanLevel +
       '</span></div>' +
       '<div class="pt-id"><h1 class="pt-name">' +
@@ -2346,7 +3613,7 @@
       '</div>' +
       (league ? '<div class="pt-league"><span>' + esc(league.name) + '</span><i>War league</i></div>' : '') +
       (c.description ? '<p class="pt-desc">' + esc(c.description) + '</p>' : '') +
-      '<div class="pt-head-facts">' +
+      '<div class="pt-head-facts pt-wellfacts">' +
       facts('Clan', [
         ['Members', c.members + '<i>/50</i>'],
         ['Clan points', num(c.clanPoints)],
@@ -2375,21 +3642,24 @@
       '<button type="button" role="tab" id="ptTabWar" aria-controls="ptPanelWar" aria-selected="false" tabindex="-1">War</button>' +
       '<button type="button" role="tab" id="ptTabHist" aria-controls="ptPanelHist" aria-selected="false" tabindex="-1">History</button>' +
       '<button type="button" role="tab" id="ptTabWars" aria-controls="ptPanelWars" aria-selected="false" tabindex="-1">War log</button>' +
+      '<button type="button" role="tab" id="ptTabRaids" aria-controls="ptPanelRaids" aria-selected="false" tabindex="-1">Raid weekends</button>' +
       '</div>' +
       '<div class="pt-panel" id="ptPanelMembers" role="tabpanel" aria-labelledby="ptTabMembers">' +
-      (members.length ? membersTable(members, data) : '<p class="pt-empty">This clan has no members.</p>') +
+      (members.length ? clanGlance(members, data) + membersTable(members, data) : '<p class="pt-empty">This clan has no members.</p>') +
       '</div>' +
       '<div class="pt-panel" id="ptPanelWar" role="tabpanel" aria-labelledby="ptTabWar" hidden></div>' +
       '<div class="pt-panel" id="ptPanelHist" role="tabpanel" aria-labelledby="ptTabHist" hidden></div>' +
       '<div class="pt-panel" id="ptPanelWars" role="tabpanel" aria-labelledby="ptTabWars" hidden>' +
       warLog(log) +
       '</div>' +
+      '<div class="pt-panel" id="ptPanelRaids" role="tabpanel" aria-labelledby="ptTabRaids" hidden></div>' +
       '<p class="pt-source">Live data from the official Clash of Clans API, refreshed every 5 minutes. Donations count this season only. Tap a heading to sort the members.</p>';
 
     wireTabs(root);
     wireCopy(root);
     wireQuick(root);
     if (members.length) wireSort(root, members, data);
+    wireStrip(root.querySelector('#ptPanelWars'));
     // The war report loads the first time its tab is opened (CWL can mean 28 lookups).
     var warTab = root.querySelector('#ptTabWar');
     function openWar() {
@@ -2409,6 +3679,9 @@
       loadHistory(histBox, c, data);
     });
     if (location.hash === '#history') histTab.click();
+    onFirstOpen(root.querySelector('#ptTabRaids'), function () {
+      loadRaids(root.querySelector('#ptPanelRaids'), tag);
+    });
     liveBanner(
       root.querySelector('#ptLive'),
       c,

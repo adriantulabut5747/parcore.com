@@ -3,7 +3,9 @@
    and /coc/town-hall-18/layouts. One copy of the look, so the two pages can't drift:
    change it here and both pages change. The MARKUP is still copied into
    each page (a static site can't include HTML), so keep the two copies of
-   the <section>s in step by hand. coc-clan-clock.js holds their script.
+   the <section>s in step by hand. The clan card v2 (.ac-card) and its
+   coc-clan-clock.js went in Oct 2026 (Adrian dropped the card from /coc/,
+   the last page with it); the old .clan-card rules below are unused history.
 
    Only the look lives here. Each page sets its own spacing around the two
    sections (margins), and the character art is the page's choice: th18
@@ -18,8 +20,7 @@
    ======================================================================= */
 
 .cc-section,
-.clan-card,
-.ac-card{
+.clan-card{
   /* Button + tag tokens. Same values as /coc/town-hall-18/layouts's :root ghost /
      keycap tokens (which came from coc-home's .ch-btn-ghost), scoped here
      so this file doesn't depend on the page defining them. */
@@ -182,7 +183,7 @@
 }
 .clan-title{
   margin:0;
-  font-family:'Orbitron', sans-serif;
+  font-family:'Figtree', sans-serif;
   font-size:20px;
   font-weight:900;
   letter-spacing:-0.2px;
@@ -191,7 +192,7 @@
 }
 .clan-title em{
   font-style:normal;
-  font-family:'Orbitron', sans-serif;  /* set again: the pages' * rule puts Oxanium on every element */
+  font-family:'Figtree', sans-serif;  /* set again: the pages' * rule puts Oxanium on every element */
   color:#fff;
 }
 
@@ -466,7 +467,7 @@
   content:counter(faq, decimal-leading-zero);
   flex:none;
   min-width:22px;
-  font-family:'Orbitron', sans-serif;
+  font-family:'Figtree', sans-serif;
   font-size:12px; font-weight:800;
   color:#5d6168;
   transition:color .25s ease;
@@ -512,212 +513,38 @@
   .t18-faq-item, .t18-faq-item summary::before, .t18-faq-item summary::after{ transition:none; }
 }
 
-/* ---- Clan card v2 (.ac-card) -- TH layouts / army / tools pages, Oct 2026 ----
-   A simpler card that replaces .clan-card page by page. One #121316 panel
-   in the page's card material -- no starfield, no logo tile -- in two rows:
-   - top: the title, the two buttons (Copy Layout's soft key face, see
-     th-layouts.css .layout-link) and the last 10 wars on the left; the
-     art (.ac-art) on the right, fading out to the left like the banners.
-   - bottom: the live stats as one full-width strip split by hairlines
-     (the same board pattern as the red live band).
-   Sized by the card's own width (container queries), not the window's:
-   the card is narrower than the window by the sidebar and margins.
-   coc-clan-clock.js fills it through the ids and data-stat hooks; the
-   old .clan-card rules above are untouched. */
-.ac-card{
-  container: ac / inline-size;
-  position:relative;
-  background:
-    radial-gradient(34% 70% at 82% 62%, rgba(194,59,59,0.14), rgba(194,59,59,0) 70%),
-    #121316;
-}
-.ac-card {
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background-color: var(--lb-box);
-  box-shadow: var(--lb-shadow);
-}
-.ac-top{ position:relative; isolation:isolate; }
-.ac-body{
-  position:relative; z-index:1;
-  display:flex; flex-direction:column; align-items:flex-start; gap:20px;
-  min-width:0;
-  max-width:min(620px, 58%);          /* keeps the words on the plain side of the fade */
-  padding:28px 30px 26px;
-}
-
-/* Buttons: Copy Layout's key face -- top-lit gradient, light top edge,
-   soft contact shadow; one step lighter on hover, sunk 1px when pressed.
-   Icons are inline Lucide SVGs (copy / check / message-circle).
-   The two are one matched pair: equal widths (a shrink-to-fit grid of
-   two 1fr columns = both as wide as the wider one), icon then label.
-   (The clan tag on Join and an external-link arrow on Global Chat were
-   dropped Oct 2026; Join still copies the tag via data-copy.) */
-.ac-actions{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; min-width:0; }
-.ac-btn{
-  display:flex; align-items:center; gap:9px;
-  height:38px;
-  margin:0; padding:0 16px 0 14px;
-  border:0; border-radius:0;
-  background:linear-gradient(180deg, #26282e, #1b1c21);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 2px rgba(0,0,0,0.4), 0 4px 10px -4px rgba(0,0,0,0.45);
-  color:#c9ccd2;
-  font-family:'Oxanium', sans-serif;
-  font-size:11.5px; font-weight:800; line-height:1;
-  letter-spacing:0.7px; text-transform:uppercase;
-  text-decoration:none; white-space:nowrap;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .15s ease, color .15s ease, transform .1s ease;
-}
-.ac-btn:hover{ background:linear-gradient(180deg, #31343b, #24262b); color:#fff; }
-.ac-btn:active{ transform:translateY(1px); box-shadow:inset 0 1px 3px rgba(0,0,0,0.45); }
-.ac-btn:focus-visible{ outline:2px solid rgba(255,255,255,0.4); outline-offset:2px; }
-.ac-ico{
-  flex-shrink:0; width:15px; height:15px;
-  fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
-}
-.ac-ico-check{ display:none; stroke-width:2.6; }
-.ac-btn.copied{ color:#8fe0ac; }
-.ac-btn.copied .ac-ico-copy{ display:none; }
-.ac-btn.copied .ac-ico-check{ display:block; }
-
-/* Last 10 wars: label + squares (.clan-wars, shared above), "Updated ..."
-   on its own line under them (.clan-updated is flex-basis 100%). */
-/* Logo before the title: phones only (see the narrow card rules). */
-.ac-title-logo{ display:none; }
-.ac-form{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; }
-.ac-form[hidden]{ display:none; }
-
-/* The art (Oct 2026; was the Dragon-skin King standing out of the card):
-   fills the right two-thirds of the top area and fades out to the left,
-   the same treatment as the page banners (.tb-art in th-layouts.css), so
-   the title and buttons sit on the plain card colour. Swap the picture
-   in the markup; if its subject sits off-centre, set --ac-pos on the
-   <img> (e.g. style="--ac-pos: 70% 30%"). */
-.ac-art{
-  position:absolute; z-index:0; top:0; right:0; bottom:0;
-  width:64%;
-  overflow:hidden;
-  border-radius:0;
-  pointer-events:none;
-  -webkit-mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.3) 34%, #000 78%);
-  mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.3) 34%, #000 78%);
-}
-.ac-art img{
-  display:block; width:100%; height:100%;
-  object-fit:cover; object-position:var(--ac-pos, 50% 40%);
-  filter:brightness(0.4);          /* darkened a lot so the words stay on top */
-}
-
-/* Stats: the card's bottom row, full width, cells split by 1px hairlines
-   (the gap shows the row's line colour through). grid-auto-flow:column
-   shares the width evenly among the cells showing -- 4, or 2 if the war
-   log is private. */
-.ac-stats{
-  display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr);
-  gap:1px;
-  margin:0;
-  border-top:1px solid rgba(255,255,255,0.07);
-  border-radius:0;
-  overflow:hidden;
-  background:rgba(255,255,255,0.07);
-}
-.ac-stats[hidden], .ac-stat[hidden]{ display:none; }
-.ac-stat{ min-width:0; padding:15px 30px 16px; background:#141519; }
-.ac-stat:not(:first-child){ padding-left:22px; }
-.ac-stat dt{
-  margin:0 0 9px;
-  font-family:'Oxanium', sans-serif;
-  font-size:9.5px; font-weight:700; line-height:1.2;
-  letter-spacing:1.3px; text-transform:uppercase;
-  color:#8b9099;
-  white-space:nowrap;
-}
-.ac-stat dd{
-  margin:0;
-  font-family:'Oxanium', sans-serif;
-  font-size:19px; font-weight:800; line-height:1.1;
-  font-variant-numeric:tabular-nums;
-  color:#f1f2f4;
-  white-space:nowrap;
-}
-.ac-stat dd small{ margin-left:2px; font-size:11px; font-weight:700; color:#8b9099; }
-
-/* Medium card: shorter button labels ("Join Clan" / "Global Chat",
-   tag kept) so both buttons stay on one row beside the King. */
-@container ac (max-width: 899px){
-  .ac-card .clan-sm-hide{ display:none; }
-}
-/* Narrow card (phones, narrow laptop windows): compressed to four slim
-   lines -- title, the two buttons side by side, the last 10 wars, then
-   the four stats 2 x 2 (one row of 4 squeezed "199W 15L"). No "Updated ..."
-   line. The art runs the full width behind the words here, dimmed on the
-   left where they are (as the banners do on phones). */
-@container ac (max-width: 719px){
-  .ac-art{
-    width:100%;
-    border-radius:0;
-    -webkit-mask-image:linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%);
-    mask-image:linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%);
-  }
-  .ac-body{ max-width:none; gap:14px; padding:18px 16px 16px; }
-  .ac-body .clan-title{ font-size:18px; white-space:nowrap; }
-  /* Ascendere logo before the title, phones only. Sized a little taller than
-     the capitals (0.98em vs Orbitron's ~0.72em caps) and centred on them:
-     the mark is a thin, pointed triangle, so at exact cap height it read
-     smaller than the solid letters. The file is
-     cropped tight (icons/aclogonobg-tight.webp) so no empty margin shrinks it. */
-  .ac-title-logo{ display:inline-block; height:0.98em; width:auto; margin-right:0.38em; vertical-align:-0.13em; }
-  .ac-actions{ align-self:stretch; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
-  .ac-btn{ justify-content:center; height:36px; padding:0 10px; }
-  .ac-form{ flex-wrap:nowrap; gap:10px; }
-  .ac-form .clan-updated{ display:none; }
-  .ac-card .clan-wars{ flex-wrap:nowrap; flex-shrink:0; gap:3px; }
-  .ac-card .clan-wars li{ width:19px; height:19px; font-size:9.5px; border-radius:0; }
-  .ac-stats{ grid-auto-flow:row; grid-template-columns:repeat(2, minmax(0, 1fr)); }
-  .ac-stat, .ac-stat:not(:first-child){ padding:11px 16px 12px; }
-  .ac-stat dt{ margin-bottom:7px; }
-  .ac-stat dd{ font-size:17px; }
-  .ac-form .clan-form-label{ white-space:nowrap; }
-}
-/* Narrowest phones (card under 340px, ~360px screens and smaller). */
-@container ac (max-width: 339px){
-  .ac-card .clan-wars{ gap:2px; }
-  .ac-card .clan-wars li{ width:17px; height:17px; font-size:9px; }
-  .ac-form{ gap:8px; }
-}
-
-/* ---- Live band (every CoC page with events: TH layouts / army / tools, coc-home) -------------------------------
-   The six events on a band that sits flush on the footer, with the Dragon
-   Warden poking out of the top edge, embers rising off him.
-   Layout from supercell.com's careers band (straight edge, mascot right).
-   Material = the clan card's: near-black red, warming a little toward the
-   right where the clan card's red glow (#c23b3b at 16%) sits behind the
-   Warden (Dragon skin), and the same drifting starfield (the ::before star list
-   is shared in coc-clan-clock.css). A sibling of .coc-content, not inside
-   it, so it runs edge to edge. Content starts at 12% = the column above;
-   the right padding leaves room for the Warden (Dragon skin).
-   .cc-section.t18-band (2 classes) outranks the .cc-section margins. */
+/* ---- Live band (every CoC page with events: TH layouts / army, coc-home) ---------------------------------------
+   v2, Oct 24 2026 (Adrian: match the page). The six events above the footer,
+   with the Dragon Warden poking out of the band's top edge, embers rising off
+   him. Was a near-black red band with one hairline board; now the site's
+   raised UI on a dark steel band:
+   - ground: a box-recipe band (2px edge, light top line), a quiet red glow
+     behind the Warden only, and the shared drifting starfield (::before).
+   - header: a small "Clan events" kicker with the live dot over the section
+     title (Figtree caps, white-to-steel fill, as every /coc/ title).
+   - board: six raised boxes. Each: the event icon on a grey key, the name,
+     "Ends in 1d 23h" (coc-events.js: data-label="phrase" + data-timer), a
+     sunken progress well (data-progress), the local end time (data-date),
+     and a state chip top-right: red "Live" while a timed event runs (Raid /
+     CWL / Clan Games, .is-live), a sunken "Soon" while one is only counting
+     down to its start (.is-upcoming). Red stays on the live ones only.
+   A sibling of .coc-content, not inside it, so it runs edge to edge. Content
+   starts at the column above (--coc-side); the right padding leaves room for
+   the Warden. .cc-section.t18-band (2 classes) outranks .cc-section margins. */
 .cc-section.t18-band {
-  --band-ink: #f4ecea;
-  --band-soft: rgba(255, 226, 220, 0.62);
-  --band-faint: rgba(255, 226, 220, 0.42);
-  --band-cell: #110607;
-  --band-cell-hover: #180909;
-  --band-line: rgba(255, 214, 206, 0.07);
   position: relative;
   isolation: isolate; /* keeps the star layer behind the content */
   margin: 0;
-  padding: 44px var(--coc-side, 12%) 48px; /* = the content column above (/coc/ sets --coc-side) */
+  padding: 48px var(--coc-side, 12%) 52px; /* = the content column above (/coc/ sets --coc-side) */
+  border-top: 2px solid var(--lb-edge, #060708);
   background:
-    linear-gradient(90deg, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0.45)) top / 100% 1px no-repeat,
-    radial-gradient(40% 110% at 86% 100%, rgba(194, 59, 59, 0.16), rgba(194, 59, 59, 0) 72%),
-    linear-gradient(90deg, #0f0506 0%, #130607 50%, #230a0c 100%);
+    linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)) top / 100% 1px no-repeat,
+    radial-gradient(34% 120% at 88% 100%, rgba(194, 59, 59, 0.2), rgba(194, 59, 59, 0) 70%),
+    linear-gradient(180deg, #131417 0%, #0d0e10 100%);
 }
-/* The band butts straight onto the grey lower panel: no .coc-content
-   bottom padding between them (it showed as a lighter strip). The panel
-   gets the room instead, so the FAQ clears the Warden's head. */
+/* The band butts straight onto the lower panel: no .coc-content bottom
+   padding between them (it showed as a lighter strip). The panel gets the
+   room instead, so the FAQ clears the Warden's head. */
 .coc-content:has(+ .t18-band) {
   padding-bottom: 0;
 }
@@ -733,99 +560,196 @@
   margin-right: 274px;
 }
 
-/* Header: secondary text tinted from the red, not grey. */
-.t18-band .cc-label {
-  color: var(--band-ink);
+/* Header: kicker + title on the left, "Your local time" as a small well on
+   the right, level with the title's foot. */
+.t18-band .cc-label-row {
+  align-items: flex-end;
+  margin: 0 0 20px;
 }
+.t18-band-head { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.t18-band-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font: 700 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #8b9099;
+}
+.t18-band-kicker::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: var(--cc-red);
+  box-shadow: 0 0 6px rgba(194, 59, 59, 0.8);
+  animation: cc-dot 2.6s ease-in-out infinite;
+}
+html body .t18-band .cc-label {
+  display: block;
+  font-family: 'Figtree', sans-serif;
+  font-size: var(--fs-title, 30px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #ffffff, #c0c9d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+html body .t18-band .cc-label::before { display: none; }
 .t18-band .cc-label-note {
-  color: var(--band-faint);
+  flex: none;
+  padding: 7px 10px 6px;
+  border: 2px solid var(--lb-edge, #060708);
+  border-radius: var(--lb-r, 6px);
+  background: var(--lb-well, #121317);
+  box-shadow: var(--lb-ring-well);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #8b9099;
 }
 
-/* The six events as one board: a single dark panel split into slots by
-   1px hairlines (the grid gap shows the panel's line colour through),
-   instead of six floating cards. Each slot: icon, name, countdown, and
-   a status mark at the right of the countdown row -- a solid red dot while the event is running
-   (pulsing when it's a timed event that's live right now), a hollow ring
-   while it's only counting down to its start (.is-upcoming). */
+/* The board: six raised boxes, 3 across. */
 .t18-band .t18-clock {
-  gap: 1px;
+  gap: 12px;
   padding: 0;
-  margin-top: 6px;
-  border-radius: 0;
-  overflow: hidden;
-  background: var(--band-line);
-  border: 1px solid var(--band-line);
-  box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.9);
 }
 .t18-band .t18-clock-tag,
 .t18-band .t18-clock-tag:hover {
   transform: none;
-  gap: 12px;
-  padding: 15px 14px;
-  border: 0;
-  border-radius: 0;
-  background: var(--band-cell);
-  box-shadow: none;
-  color: var(--band-ink);
-  transition: background-color 0.2s ease;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px 12px;
+  padding: 14px 14px 13px;
+  border: 2px solid var(--lb-edge, #060708);
+  border-radius: var(--lb-r, 6px);
+  background: var(--lb-box, #141518);
+  box-shadow: var(--lb-shadow);
+  color: #e6e8ec;
+  white-space: normal;
 }
-.t18-band .t18-clock-tag:hover {
-  background: var(--band-cell-hover);
+.t18-band .t18-clock-tag.is-live {
+  background:
+    radial-gradient(70% 90% at 0% 0%, rgba(194, 59, 59, 0.12), transparent 70%),
+    var(--lb-box, #141518);
 }
 .t18-band .t18-clock-tag .cc-event-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 0;
-  background: rgba(194, 59, 59, 0.08);
-  border: 1px solid rgba(255, 214, 206, 0.08);
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 2px solid var(--lb-edge, #060708);
+  border-radius: var(--lb-r, 6px);
+  background: var(--lb-raise, #2a2c35);
+  box-shadow: var(--lb-btn);
+}
+.t18-band .t18-clock-tag .cc-event-icon img {
+  width: 26px;
+  height: 26px;
 }
 .t18-band .t18-clock-text {
   gap: 8px;
 }
 .t18-band .t18-tag-name {
   font-size: 10px;
-  letter-spacing: 1.1px;
-  color: var(--band-soft);
+  letter-spacing: 1.4px;
+  color: #9aa0a8;
+}
+.t18-clock-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.t18-clock-line em {
+  font: 700 10px/1 'Oxanium', sans-serif;
+  font-style: normal;
+  letter-spacing: 0.6px;
+  text-transform: none;
+  color: #6f747c;
 }
 .t18-band .t18-clock-tag .t18-tag-time {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  color: var(--band-ink);
+  font-family: 'Figtree', sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #fff;
 }
-.t18-band .t18-tag-time::before {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.6px;
-  color: var(--band-faint);
-}
+.t18-band .t18-tag .t18-tag-time::before { content: none; } /* the label says it: no stock "ends " / "starts " */
 .t18-band .t18-tag-time span {
-  color: var(--band-soft);
+  margin: 0 3px 0 1px;
+  font-size: 0.62em;
+  font-weight: 800;
+  color: #8b9099;
 }
-/* Status mark, level with the countdown: the name row has no room
-   for it in narrow slots ("Clan War League"). */
-.t18-band .t18-clock-tag::after {
-  content: '';
-  position: absolute;
-  bottom: 21px;
-  right: 16px;
-  width: 6px;
+/* How far through it we are: a sunken well, filled red on the live ones and
+   steel on the rest. */
+.t18-clock-bar {
+  grid-column: 1 / -1;
   height: 6px;
-  border-radius: 0;
-  background: var(--cc-red);
-  box-shadow: 0 0 0 3px rgba(194, 59, 59, 0.16);
+  overflow: hidden;
+  border: 1px solid var(--lb-edge, #060708);
+  border-radius: 2px;
+  background: var(--lb-well, #121317);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+.t18-clock-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #4a4e57, #8b9099);
+  transition: width 0.6s ease;
+}
+.t18-clock-tag.is-live .t18-clock-bar i {
+  background: linear-gradient(90deg, #8f2a2a, var(--lb-red-text, #e86a6a));
+  box-shadow: 0 0 8px rgba(232, 106, 106, 0.35);
+}
+.t18-clock-date {
+  grid-column: 1 / -1;
+  margin-top: -4px;
+  font: 600 10.5px/1 'Sora', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6f747c;
+}
+/* State chip, bottom-right on the date row. Always-on resets (Trader,
+   season, Legend) get none. */
+.t18-band .t18-clock-tag::after {
+  position: absolute;
+  bottom: 9px;
+  right: 12px;
+  padding: 5px 7px 4px;
+  border-radius: 4px;
+  font: 800 9px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
 }
 .t18-band .t18-clock-tag.is-live::after {
-  animation: cc-dot 2.6s ease-in-out infinite;
+  content: 'Live';
+  border: 2px solid var(--lb-red-edge, #320b0d);
+  background: var(--lb-red, #c23b3b);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+  animation: t18-live 2.6s ease-in-out infinite;
 }
 .t18-band .t18-clock-tag.is-upcoming::after {
-  background: transparent;
-  box-shadow: inset 0 0 0 1.5px var(--band-faint);
+  content: 'Soon';
+  border: 2px solid var(--lb-edge, #060708);
+  background: var(--lb-well, #121317);
+  box-shadow: var(--lb-ring-well);
+  color: #8b9099;
+}
+@keyframes t18-live {
+  50% { box-shadow: var(--lb-btn-red), 0 0 12px rgba(232, 106, 106, 0.55); }
 }
 /* Upcoming: the countdown steps back a shade and the icon desaturates a
    touch, so running events read first. */
 .t18-band .t18-clock-tag.is-upcoming .t18-tag-time {
-  color: var(--band-soft);
+  color: #c9ccd2;
 }
 .t18-band .t18-clock-tag.is-upcoming .cc-event-icon img {
   filter: saturate(0.55) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
@@ -1008,7 +932,7 @@
 }
 /* Narrow band (content box under 680px: phones and the narrowest laptop
    windows): full-width board, 2 across; a smaller Warden peeks over the
-   top-right corner instead, and the label row stops short of him. */
+   top-right corner instead, and the header stops short of him. */
 @container cc (max-width: 679px) {
   .t18-band-body {
     margin-right: 0;
@@ -1016,30 +940,63 @@
   .t18-band .cc-label-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
-    margin-right: 136px;
+    gap: 12px;
+    margin-right: 128px;
+  }
+  .t18-band .t18-clock {
+    gap: 8px;
   }
   .t18-band .t18-clock-tag,
   .t18-band .t18-clock-tag:hover {
-    gap: 10px;
-    padding: 13px 12px;
+    gap: 10px 9px;
+    padding: 11px 10px 10px;
   }
   .t18-band .t18-clock-tag .cc-event-icon {
     width: 32px;
     height: 32px;
   }
+  .t18-band .t18-clock-tag .cc-event-icon img {
+    width: 21px;
+    height: 21px;
+  }
+  .t18-band .t18-clock-text {
+    gap: 6px;
+  }
   .t18-band .t18-tag-name {
-    font-size: 9.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 9px;
     letter-spacing: 1px;
   }
-  .t18-band .t18-clock-tag .t18-tag-time {
-    font-size: 13px;
+  .t18-clock-line em {
+    display: none;
   }
+  .t18-band .t18-clock-tag .t18-tag-time {
+    font-size: 17px;
+  }
+  .t18-clock-date {
+    font-size: 9.5px;
+  }
+  /* The chip shrinks to a dot on the icon's corner: no room beside the name. */
   .t18-band .t18-clock-tag::after {
-    bottom: 18px;
-    right: 10px;
-    width: 5px;
-    height: 5px;
+    top: 6px;
+    bottom: auto;
+    left: 34px;
+    right: auto;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-width: 0;
+    font-size: 0;
+    border-radius: 50%;
+  }
+  .t18-band .t18-clock-tag.is-upcoming::after {
+    background: #5a5e66;
+    box-shadow: 0 0 0 2px var(--lb-box, #141518);
+  }
+  .t18-band .t18-clock-tag.is-live::after {
+    box-shadow: 0 0 0 2px var(--lb-box, #141518), 0 0 8px rgba(232, 106, 106, 0.7);
   }
   .t18-band-art {
     top: -66px;
@@ -1057,6 +1014,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .t18-band .t18-clock-tag.is-live::after,
+  .t18-band-kicker::before,
   .t18-band-fx::before {
     animation: none;
   }

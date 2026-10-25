@@ -8,7 +8,9 @@
 //   Touch screens can't hover: they get one loop when the card scrolls in.
 (function () {
   var fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // /coc/ phones show still frames too (the CSS turns their animations off)
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    (document.body.classList.contains('coc-home') && matchMedia('(max-width: 760px)').matches);
   document.querySelectorAll('.ptc-art').forEach(function (art) {
     var card = art.closest('.ptc');
     var go = art.dataset.go, clock = art.dataset.clock, leaving = false;

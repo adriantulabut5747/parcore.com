@@ -74,6 +74,7 @@ function cocPagePath(u) {
           '" aria-pressed="' +
           (it.key === current) +
           '">' +
+          (it.img ? '<img src="' + esc(it.img) + '" alt="" width="22" height="22">' : '') +
           esc(it.label) +
           '</button>',
       )
@@ -262,28 +263,61 @@ function cocPagePath(u) {
   }
 
   // ---- Equipment ----------------------------------------------------------------
+  // Redesigned Oct 25 2026 (Adrian): tiles in their rarity's colour (purple =
+  // Epic, blue = Common), filtered by hero and sorted by the chips. A tile opens
+  // the INSPECT panel (#eqDlg, the Genshin Artifacts panel in CoC dress;
+  // coc-guides.css "EQUIPMENT PANEL"): a modal on desktop, a bottom sheet on
+  // phones. #<id> in the address opens one (shared links, the leaderboards
+  // and /coc/ link here that way).
   var grid = $('#eqGrid');
   if (grid) {
     var UNIT_DIR = '/clashofclans/coctools/units/';
+    var BANNERS = '/clashofclans/coctools/banners/'; // each hero's Hero Hall banner (also on /coc/'s hero cards)
     var ORE = [
       ['Shiny', '/clashofclans/coctools/Shiny_Ore.webp'],
       ['Glowy', '/clashofclans/coctools/Glowy_Ore.webp'],
       ['Starry', '/clashofclans/coctools/Starry_Ore.webp'],
     ];
     var HERO_ORDER = [0, 1, 6, 2, 4, 7]; // the order heroes unlock: King, Queen, Prince, Warden, Champion, Duke
+    var HERO_SHORT = { 0: 'King', 1: 'Queen', 2: 'Warden', 4: 'Champion', 6: 'Prince', 7: 'Duke' };
     var SORTS = [
       { key: 'hero', label: 'By hero' },
       { key: 'name', label: 'A–Z' },
       { key: 'epic', label: 'Epic first' },
       { key: 'unlock', label: 'Unlock order' },
+      { key: 'picked', label: 'Legend Picks' },
     ];
+    var slug = (n) =>
+      n
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+    var dlg = $('#eqDlg');
+    var dBody = $('#eqDBody');
+    var box = $('#eqIn');
     skeleton(grid, SK.eq, 12);
-    load(grid.dataset.src)
-      .then(function (d) {
+    // The top 200's picks (coc-lobby-stats.json, weekly) are a bonus: the page works without them.
+    Promise.all([load(grid.dataset.src), load('/coc-lobby-stats.json').catch(() => null)])
+      .then(function (res) {
+        var d = res[0];
+        var stats = res[1];
         grid.removeAttribute('aria-busy');
         var list = d.equipment;
         var byId = {};
         list.forEach((e, i) => ((byId[e.id] = e), (e._i = i)));
+        // name -> { n: players equipping it, of: players with that hero }. A hero's
+        // list counts every piece equipped, so a piece missing from it has 0.
+        var picks = {};
+        var counted = {};
+        if (stats)
+          stats.heroes.forEach(function (h) {
+            counted[h.name] = h.owners;
+            h.equipment.forEach((x) => (picks[x.name] = x.count));
+          });
+        var pickPct = function (e) {
+          var of = counted[d.heroes[e.hero].name];
+          return of ? Math.round(((picks[e.name] || 0) / of) * 100) : null;
+        };
         var heroRank = (e) => HERO_ORDER.indexOf(e.hero);
         var epicRank = (e) => (e.rarity === 'Epic' ? 1 : 0);
         var CMP = {
@@ -291,24 +325,40 @@ function cocPagePath(u) {
           name: (a, b) => a.name.localeCompare(b.name),
           epic: (a, b) => epicRank(b) - epicRank(a) || heroRank(a) - heroRank(b) || a._i - b._i,
           unlock: (a, b) => a.th - b.th || heroRank(a) - heroRank(b) || a._i - b._i,
+          picked: (a, b) => (pickPct(b) || 0) - (pickPct(a) || 0) || CMP.hero(a, b),
         };
         var sort = 'hero';
-        var open = null; // id of the piece whose panel is open
+        var hero = 'all';
+        var shown = []; // the grid's pieces in order: the panel's ‹ › walk through these
         var level = 0; // level shown in the open panel
         var showAll = false;
 
         $('#eqCount').textContent = list.length + ' pieces';
-        chips($('#eqSort'), SORTS, sort, function (k) {
+        chips($('#eqSort'), stats ? SORTS : SORTS.slice(0, -1), sort, function (k) {
           sort = k;
           renderGrid();
         });
+        chips(
+          $('#eqHero'),
+          [{ key: 'all', label: 'All heroes' }].concat(
+            HERO_ORDER.map((i) => ({ key: String(i), label: HERO_SHORT[i], img: UNIT_DIR + d.heroes[i].img })),
+          ),
+          hero,
+          function (k) {
+            hero = k;
+            renderGrid();
+          },
+        );
 
         function tile(e) {
           var h = d.heroes[e.hero];
+          var pct = sort === 'picked' ? pickPct(e) : null;
           return (
-            '<button type="button" class="gd-eq" data-id="' +
+            '<button type="button" class="gd-eq ' +
+            (e.rarity === 'Epic' ? 'is-epic' : 'is-common') +
+            '" data-id="' +
             e.id +
-            '" aria-expanded="false" aria-controls="eqPanel">' +
+            '" aria-haspopup="dialog">' +
             '<span class="gd-eq-pic"><img src="' +
             UNIT_DIR +
             esc(e.img) +
@@ -318,37 +368,36 @@ function cocPagePath(u) {
             '" alt="" title="' +
             esc(h.name) +
             '" width="128" height="128" loading="lazy"></span>' +
+            (pct != null ? '<span class="gd-eq-pct">' + pct + '%</span>' : '') +
             '<span class="gd-eq-name">' +
             esc(e.name) +
-            '</span><span class="gd-eq-meta' +
-            (e.rarity === 'Epic' ? ' is-epic' : '') +
-            '">' +
+            '</span><span class="gd-eq-meta">' +
             esc(e.rarity) +
             '</span></button>'
           );
         }
         function renderGrid() {
-          grid.innerHTML = list.slice().sort(CMP[sort]).map(tile).join('');
-          if (open) place();
-        }
-
-        // The panel goes right after the last tile in the tapped tile's row.
-        var panel = document.createElement('div');
-        panel.className = 'gd-eq-panel';
-        panel.id = 'eqPanel';
-        panel.setAttribute('role', 'region');
-        function place() {
-          var t = grid.querySelector('.gd-eq[data-id="' + open + '"]');
-          if (!t) return;
-          var last = t;
-          for (var n = t.nextElementSibling; n; n = n.nextElementSibling) {
-            if (!n.classList.contains('gd-eq')) continue;
-            if (n.offsetTop > t.offsetTop + 4) break;
-            last = n;
-          }
-          last.after(panel);
-          grid.querySelectorAll('.gd-eq').forEach((x) => x.setAttribute('aria-expanded', x === t));
-          t.classList.add('is-open');
+          shown = list.filter((e) => hero === 'all' || String(e.hero) === hero).sort(CMP[sort]);
+          // By hero, all heroes: a heading over each hero's pieces.
+          var html = '';
+          var last = null;
+          shown.forEach(function (e) {
+            if (sort === 'hero' && hero === 'all' && e.hero !== last) {
+              last = e.hero;
+              var h = d.heroes[e.hero];
+              html +=
+                '<h3 class="gd-eq-group"><img src="' +
+                UNIT_DIR +
+                esc(h.img) +
+                '" alt="" width="28" height="28">' +
+                esc(h.name) +
+                '<span>' +
+                list.filter((x) => x.hero === e.hero).length +
+                '</span></h3>';
+            }
+            html += tile(e);
+          });
+          grid.innerHTML = html;
         }
 
         function cell(v) {
@@ -455,76 +504,6 @@ function cocPagePath(u) {
             '</button>'
           );
         }
-
-        function renderPanel() {
-          var e = byId[open];
-          var h = d.heroes[e.hero];
-          var max = e.levels.length;
-          panel.setAttribute('aria-label', e.name);
-          panel.innerHTML =
-            '<div class="gd-eq-top"><img class="gd-eq-big" src="' +
-            UNIT_DIR +
-            esc(e.img) +
-            '" alt="" width="128" height="128">' +
-            '<div class="gd-eq-info"><h3 class="gd-eq-title">' +
-            esc(e.name) +
-            '</h3><div class="gd-pills"><span class="gd-pill"><img src="' +
-            UNIT_DIR +
-            esc(h.img) +
-            '" alt="" width="18" height="18">' +
-            esc(h.name) +
-            '</span><span class="gd-pill">' +
-            esc(e.type) +
-            '</span><span class="gd-pill' +
-            (e.rarity === 'Epic' ? ' is-epic' : '') +
-            '">' +
-            esc(e.rarity) +
-            '</span></div>' +
-            (e.desc ? '<p class="gd-eq-desc">' + esc(e.desc) + '.</p>' : '') +
-            '<p class="gd-eq-unlock"><b>Unlock:</b> ' +
-            esc(e.unlock) +
-            '</p></div>' +
-            '<button type="button" class="am-picker-close gd-close" data-act="close" aria-label="Close">&times;</button></div>' +
-            // Level picker
-            '<div class="gd-level"><label class="gd-level-k" for="eqLevel">Level <b id="eqLv">' +
-            level +
-            '</b> / ' +
-            max +
-            '</label><input type="range" id="eqLevel" min="1" max="' +
-            max +
-            '" value="' +
-            level +
-            '"></div>' +
-            '<div data-part="level">' +
-            levelParts(e) +
-            '</div>' +
-            (e.tips.length
-              ? '<div class="gd-sub"><h4 class="gd-sub-title">Tips</h4><ul class="gd-tips">' +
-                e.tips.map((t) => '<li>' + esc(t) + '</li>').join('') +
-                '</ul></div>'
-              : '') +
-            (e.images
-              ? '<div class="gd-sub"><h4 class="gd-sub-title">' +
-                esc(e.images.title) +
-                '</h4><div class="gd-shots">' +
-                e.images.files
-                  .map(
-                    (f, i) =>
-                      '<figure><img src="' +
-                      esc(f) +
-                      '" alt="' +
-                      esc(e.images.captions[i]) +
-                      '" loading="lazy" class="zoomable" onclick="openPalette(this)"><figcaption>' +
-                      esc(e.images.captions[i]) +
-                      '</figcaption></figure>',
-                  )
-                  .join('') +
-                '</div></div>'
-              : '') +
-            '<div class="gd-sub"><h4 class="gd-sub-title">Every level</h4><div data-part="table">' +
-            tableHtml(e) +
-            '</div></div>';
-        }
         // What the level slider changes: the stat cards, the summoned unit, the
         // ore still needed, and the rows shown in the table.
         function levelParts(e) {
@@ -540,66 +519,278 @@ function cocPagePath(u) {
               : oreLine('Ore from level ' + level + ' to ' + max, oreFrom(e, level)))
           );
         }
-        function updateLevel() {
-          var e = byId[open];
-          $('#eqLv', panel).textContent = level;
-          $('[data-part="level"]', panel).innerHTML = levelParts(e);
-          $('[data-part="table"]', panel).innerHTML = tableHtml(e);
+
+        // A piece as a small key (the stage's slot row, pairs): its art on its rarity's colour.
+        function chip(e, cls, self) {
+          var inner =
+            '<img src="' + UNIT_DIR + esc(e.img) + '" alt="" width="64" height="64" loading="lazy"><span class="eq-vh">' + esc(e.name) + '</span>';
+          var c = 'eq-chip ' + (e.rarity === 'Epic' ? 'is-epic' : 'is-common') + (cls ? ' ' + cls : '');
+          return self
+            ? '<span class="' + c + ' is-on" aria-current="true" title="' + esc(e.name) + '">' + inner + '</span>'
+            : '<button type="button" class="' + c + '" data-id="' + e.id + '" title="' + esc(e.name) + '">' + inner + '</button>';
+        }
+        // One pair card: both pieces (the open one not clickable), what the pair is for.
+        function pairCard(a, b, why, top, self) {
+          return (
+            '<div class="eq-pair' +
+            (top ? ' is-top' : '') +
+            '"><div class="eq-pair-pics">' +
+            chip(a, '', a.id === self) +
+            '<span class="eq-pair-plus" aria-hidden="true">+</span>' +
+            chip(b, '', b.id === self) +
+            '</div><div class="eq-pair-txt"><b>' +
+            esc(a.name) +
+            ' + ' +
+            esc(b.name) +
+            (top ? '<em>Top pair</em>' : '') +
+            '</b><span>' +
+            esc(why) +
+            '</span></div></div>'
+          );
+        }
+        function pairsHtml(e) {
+          var own = (e.pairs || []).slice().sort((x, y) => y.top - x.top);
+          if (own.length)
+            return own.map((p) => (byId[p.with] ? pairCard(e, byId[p.with], p.for, p.top, e.id) : '')).join('');
+          // Not in a pair: show this hero's top pairs instead, so the section still says what to run.
+          var seen = {};
+          var theirs = [];
+          list
+            .filter((x) => x.hero === e.hero)
+            .forEach((x) =>
+              (x.pairs || []).forEach(function (p) {
+                var k = [x.id, p.with].sort().join('|');
+                if (p.top && !seen[k] && byId[p.with]) (seen[k] = 1), theirs.push(pairCard(x, byId[p.with], p.for, true, e.id));
+              }),
+            );
+          return (
+            '<p class="eq-none">Not in a pair worth maxing. The ' +
+            esc(HERO_SHORT[e.hero]) +
+            '&rsquo;s best pairs:</p>' +
+            theirs.join('')
+          );
         }
 
-        function openEq(id, scroll) {
-          if (!byId[id]) return;
-          grid.querySelectorAll('.gd-eq.is-open').forEach((x) => x.classList.remove('is-open'));
-          open = id;
-          level = byId[id].levels.length;
+        function inspect(e) {
+          var h = d.heroes[e.hero];
+          var epic = e.rarity === 'Epic';
+          var max = e.levels.length;
+          var i = shown.indexOf(e);
+          var mates = list.filter((x) => x.hero === e.hero).sort(CMP.hero);
+          var pct = pickPct(e);
+          dlg.className = 'eq-dlg ' + (epic ? 'is-epic' : 'is-common');
+          dlg.dataset.id = e.id;
+          $('#eqDPos').textContent = e.rarity + (i >= 0 ? ' · ' + (i + 1) + ' of ' + shown.length : '');
+          $('#eqDPrev').disabled = $('#eqDNext').disabled = i < 0 || shown.length < 2;
+
+          var top200 =
+            pct == null
+              ? ''
+              : '<a class="eq-top" href="/coc/tools/leaderboards#equipment" style="--p:' +
+                pct +
+                '%"><span class="eq-top-n">' +
+                pct +
+                '<small>%</small></span><span class="eq-top-t"><b>' +
+                (pct ? 'of the world&rsquo;s top 200 equip it' : 'None of the world&rsquo;s top 200 equip it') +
+                '</b><span>' +
+                fmt(picks[e.name] || 0) +
+                ' of ' +
+                fmt(counted[h.name]) +
+                ' ' +
+                esc(h.name) +
+                's, this week</span><i class="eq-top-bar" aria-hidden="true"></i></span></a>';
+
+          box.innerHTML =
+            '<div class="eq-stage">' +
+            '<img class="eq-flag" src="' +
+            BANNERS +
+            slug(h.name) +
+            '.webp" alt="" width="64" height="88">' +
+            '<div class="eq-stage-art"><img src="' +
+            UNIT_DIR +
+            esc(e.img) +
+            '" alt="" width="128" height="128"></div>' +
+            '<div class="eq-stage-k"><span class="eq-rar">' +
+            esc(e.rarity) +
+            '</span><span>' +
+            esc(e.type) +
+            '</span></div>' +
+            '<div class="eq-slots" role="group" aria-label="' +
+            esc(h.name) +
+            '&rsquo;s equipment">' +
+            mates.map((x) => chip(x, 'eq-slot', x === e)).join('') +
+            '</div>' +
+            '<p class="eq-stage-h"><img src="' +
+            UNIT_DIR +
+            esc(h.img) +
+            '" alt="" width="24" height="24">' +
+            esc(h.name) +
+            ' &middot; ' +
+            mates.length +
+            ' pieces</p>' +
+            '</div>' +
+            '<div class="eq-info">' +
+            '<h2 class="eq-name" id="eqDName">' +
+            esc(e.name) +
+            '</h2>' +
+            '<p class="eq-meta"><span class="eq-tag eq-tag--rar">' +
+            esc(e.rarity) +
+            '</span><span class="eq-tag">' +
+            esc(e.type) +
+            '</span><span>' +
+            esc(h.name) +
+            '</span><span>Town Hall ' +
+            e.th +
+            '+</span><span>Max level ' +
+            max +
+            '</span></p>' +
+            (e.desc ? '<p class="eq-desc">' + esc(e.desc) + '.</p>' : '') +
+            '<p class="eq-unlock"><b>How to get it:</b> ' +
+            esc(e.unlock) +
+            '</p>' +
+            top200 +
+            '<section class="eq-sec"><h3 class="eq-h">Stats by level</h3>' +
+            '<div class="gd-level"><label class="gd-level-k" for="eqLevel">Level <b id="eqLv">' +
+            level +
+            '</b> / ' +
+            max +
+            '</label><input type="range" id="eqLevel" min="1" max="' +
+            max +
+            '" value="' +
+            level +
+            '"></div>' +
+            '<div data-part="level">' +
+            levelParts(e) +
+            '</div></section>' +
+            '<section class="eq-sec"><h3 class="eq-h">Best paired with</h3><div class="eq-pairs">' +
+            pairsHtml(e) +
+            '</div></section>' +
+            (e.tips.length
+              ? '<section class="eq-sec"><h3 class="eq-h">Tips</h3><ol class="eq-tips">' +
+                e.tips.map((t, n) => '<li><span class="eq-tip-n">' + (n + 1) + '</span><p>' + esc(t) + '</p></li>').join('') +
+                '</ol></section>'
+              : '') +
+            (e.images
+              ? '<section class="eq-sec"><h3 class="eq-h">' +
+                esc(e.images.title) +
+                '</h3><div class="gd-shots">' +
+                e.images.files
+                  .map(
+                    (f, n) =>
+                      '<figure><img src="' +
+                      esc(f) +
+                      '" alt="' +
+                      esc(e.images.captions[n]) +
+                      '" loading="lazy" class="zoomable" onclick="openPalette(this)"><figcaption>' +
+                      esc(e.images.captions[n]) +
+                      '</figcaption></figure>',
+                  )
+                  .join('') +
+                '</div></section>'
+              : '') +
+            '<section class="eq-sec"><h3 class="eq-h">Every level</h3><div data-part="table">' +
+            tableHtml(e) +
+            '</div></section>' +
+            '</div>';
+        }
+        function updateLevel() {
+          var e = byId[dlg.dataset.id];
+          $('#eqLv', box).textContent = level;
+          $('[data-part="level"]', box).innerHTML = levelParts(e);
+          $('[data-part="table"]', box).innerHTML = tableHtml(e);
+        }
+
+        function openEq(id) {
+          var e = byId[id];
+          if (!e) return;
+          level = e.levels.length;
           showAll = false;
-          renderPanel();
-          place();
+          inspect(e);
+          dlg.classList.remove('is-closing');
+          if (!dlg.open) {
+            dlg.showModal();
+            dBody.focus({ preventScroll: true });
+          }
+          dBody.scrollTop = 0;
           history.replaceState(null, '', '#' + id);
-          if (scroll) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
         function closeEq() {
-          var t = grid.querySelector('.gd-eq.is-open');
-          open = null;
-          panel.remove();
-          grid.querySelectorAll('.gd-eq').forEach((x) => {
-            x.classList.remove('is-open');
-            x.setAttribute('aria-expanded', 'false');
-          });
-          history.replaceState(null, '', location.pathname + location.search);
-          if (t) t.focus({ preventScroll: true });
+          if (!dlg.open || dlg.classList.contains('is-closing')) return;
+          var id = dlg.dataset.id;
+          var done = function () {
+            dlg.close();
+            dlg.classList.remove('is-closing');
+            history.replaceState(null, '', location.pathname + location.search);
+            var t = grid.querySelector('.gd-eq[data-id="' + id + '"]');
+            if (t) t.focus({ preventScroll: true });
+          };
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return done();
+          dlg.classList.add('is-closing');
+          setTimeout(done, 200);
         }
+        function step(n) {
+          var i = shown.indexOf(byId[dlg.dataset.id]);
+          if (i < 0 || shown.length < 2) return;
+          openEq(shown[(i + n + shown.length) % shown.length].id);
+        }
+        // Phones: drag the grip / header down (or pull the content down at its top) to close.
+        cocSheetDrag($('#eqPanel'), [$('#eqGrip'), $('#eqDBar')], dBody, closeEq);
 
         grid.addEventListener('click', function (ev) {
           var t = ev.target.closest('.gd-eq');
-          if (t) return open === t.dataset.id ? closeEq() : openEq(t.dataset.id, true);
-          var a = ev.target.closest('[data-act]');
-          if (!a) return;
-          if (a.dataset.act === 'close') return closeEq();
-          if (a.dataset.act === 'all') {
+          if (t) openEq(t.dataset.id);
+        });
+        box.addEventListener('click', function (ev) {
+          // Only a link inside the panel: the dialog itself carries data-id too, and
+          // reopening the open piece reset the table and scrolled to the top.
+          var t = ev.target.closest('[data-id]');
+          if (t && box.contains(t)) return openEq(t.dataset.id);
+          if (ev.target.closest('[data-act="all"]')) {
             showAll = !showAll;
             updateLevel();
           }
         });
         // The level slider: only the numbers are redrawn, never the slider
         // itself (replacing it mid-drag would drop the drag on phones).
-        grid.addEventListener('input', function (ev) {
+        box.addEventListener('input', function (ev) {
           if (ev.target.id !== 'eqLevel') return;
           level = parseInt(ev.target.value, 10);
           updateLevel();
         });
-        document.addEventListener('keydown', function (ev) {
-          if (ev.key === 'Escape' && open) closeEq();
+        $('#eqDClose').addEventListener('click', closeEq);
+        $('#eqDPrev').addEventListener('click', () => step(-1));
+        $('#eqDNext').addEventListener('click', () => step(1));
+        $('#eqDCopy').addEventListener('click', function (ev) {
+          var b = ev.currentTarget;
+          if (!navigator.clipboard) return;
+          navigator.clipboard.writeText(location.origin + location.pathname + '#' + dlg.dataset.id).then(
+            function () {
+              b.classList.add('is-done');
+              b.querySelector('span').textContent = 'Copied';
+              setTimeout(function () {
+                b.classList.remove('is-done');
+                b.querySelector('span').textContent = 'Copy link';
+              }, 1500);
+            },
+            function () {},
+          );
         });
-        var rt;
-        window.addEventListener('resize', function () {
-          clearTimeout(rt);
-          rt = setTimeout(() => open && place(), 120);
+        dlg.addEventListener('cancel', function (ev) {
+          ev.preventDefault();
+          closeEq();
+        });
+        dlg.addEventListener('click', function (ev) {
+          if (ev.target === dlg) closeEq(); // the backdrop
+        });
+        dlg.addEventListener('keydown', function (ev) {
+          if (ev.target.closest('input')) return; // the slider uses the arrows
+          if (ev.key === 'ArrowLeft') step(-1);
+          if (ev.key === 'ArrowRight') step(1);
         });
 
         renderGrid();
         var fromHash = decodeURIComponent(location.hash.slice(1));
-        if (byId[fromHash]) setTimeout(() => openEq(fromHash, true), 150);
+        if (byId[fromHash]) openEq(fromHash);
       })
       .catch(() => failed(grid, 'equipment list'));
   }

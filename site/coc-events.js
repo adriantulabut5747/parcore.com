@@ -166,6 +166,9 @@
     }
   }
 
+  // For /coc/'s hero raid clock, which ticks every second off the same schedule.
+  window.cocEvent = computeEvent;
+
   /* Events with a real start and end, as opposed to a recurring reset.
      Only these can be "live": the Trader and the season/Battle Pass are
      always running, so computeEvent always reports them active and

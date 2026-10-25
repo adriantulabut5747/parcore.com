@@ -1,0 +1,88 @@
+/* ============================================================
+   GENSHIN IMPACT -- GROUP PAGES (Oct 24 2026): /genshin-impact/events, /database, /tools, the first
+   page of each nav group. Banner (genshin.css .gi-tb), then one card per page of the group (built by
+   genshin-discover.js from game-nav.json), nothing else. Linked after genshin.css.
+   Cards: raised box, the in-game icon in a sunken well on the left, name + a two-line description,
+   arrow in the top-right corner (a column of its own squeezed the text). Three across on desktop, one on phones.
+   ============================================================ */
+
+/* The group's own icon (the bar's white trace), drawn by the script. */
+.dx-tb-icon { color: #eceef1; }
+
+.dx-dir { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 32px; }
+.dx-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-height: 112px;
+  padding: 18px 20px;
+  overflow: hidden;
+}
+/* The wish reveal's light sweep, once per hover (the Characters page's cards do the same). */
+.dx-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 244, 220, 0.09) 50%, transparent 65%);
+  transform: translateX(-110%);
+}
+.dx-card-ico {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: radial-gradient(circle at 50% 35%, rgba(211, 188, 142, 0.1), transparent 70%), var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.dx-card-ico img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5)); transition: transform 0.45s var(--gi-ease); }
+.dx-card-text { min-width: 0; padding-right: 14px; } /* clear of the corner arrow */
+.dx-card-name { display: block; font: 800 16px/1.25 'Sora', sans-serif; color: #fff; }
+.dx-card-desc {
+  display: -webkit-box;
+  margin-top: 6px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--gi-muted);
+}
+/* Soon: the corner the arrow takes on a live card, so it never squeezes the name. */
+.dx-tag { position: absolute; top: 12px; right: 12px; padding: 4px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.05); font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #80848d; }
+.dx-card-go { position: absolute; top: 14px; right: 14px; color: #6f737b; transition: color 0.2s ease, transform 0.3s var(--gi-ease); }
+.dx-card-go svg { display: block; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+a.dx-card:hover .dx-card-go { color: #fff; transform: translateX(3px); }
+@media (prefers-reduced-motion: no-preference) {
+  a.dx-card:hover .dx-card-ico img { transform: translateY(-3px) rotate(-6deg) scale(1.08); }
+  a.dx-card:hover::after { transform: translateX(110%); transition: transform 0.9s var(--gi-ease); }
+}
+/* Not built yet: a dead, dimmed box (no hover, no arrow). */
+.dx-card.is-later { opacity: 0.5; }
+.dx-card.is-later .dx-card-name { padding-right: 40px; } /* clear of the Soon tag */
+.dx-card.is-later .dx-card-ico img { filter: grayscale(0.6) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5)); }
+
+@media (min-width: 971px) and (max-width: 1280px) {
+  /* Laptop widths (a ~700px column beside the sidebar): icon above the text, so three across still fit. */
+  .dx-card { grid-template-columns: minmax(0, 1fr); align-items: start; align-content: start; gap: 12px; padding: 16px; }
+  .dx-card-go { top: 12px; right: 12px; }
+  .dx-card-text,
+  .dx-card.is-later .dx-card-name { padding-right: 0; } /* the arrow / tag sit beside the icon here */
+  .dx-card-ico { width: 54px; height: 54px; }
+  .dx-card-ico img { width: 36px; height: 36px; }
+}
+@media (max-width: 970px) {
+  .dx-dir { grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 20px; }
+  .dx-card { gap: 14px; min-height: 0; padding: 14px 16px; }
+  .dx-card-ico { width: 54px; height: 54px; }
+  .dx-card-ico img { width: 36px; height: 36px; }
+  .dx-card-name { font-size: 15px; }
+  .dx-card-desc { margin-top: 4px; }
+}

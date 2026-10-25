@@ -66,11 +66,23 @@ Adrian's additions (all required):
 | Army Maker | Approved direction; in preview. See below. |
 | Damage Calculator | In preview, last round of his feedback applied. Awaiting his QC. |
 | Player Tracker | In preview: Legend badge, magnifier idle; hover = league slot-spin lands on Legend + rays/streaks. Text "Look up any player or clan by tag." |
-| Leaderboards | In preview: faceless rows + a "You" row (Adrian rejected a fake "#1 parcore"). Hover = You climbs 4 -> 1, crown, gold rays. Text "Today's top 200 in the Philippines and the world." |
+| Leaderboards | Oct 25 2026 rework, LIVE: the nav's own trophy picture (`icons/leaderboards.webp`, cup on rubble). Idle 6s: glint over the cup + sparkles wink. Hover 2.4s: the game's tap bounce + a ring of 4-point sparkles. Replaced the "You climbs" board (Adrian: drop it). |
 | Wall Calculator | In preview: 10M tag -> Hammer Jam 5M -> Gold Pass 4M (old prices fall off, coins), wall 18 -> 19 with light pillar. |
 | Equipment | In preview: Rocket Spear turns over the Blacksmith; hover = 3 anvil strikes send Shiny/Glowy/Starry Ore up, 26 -> 27. |
-| Clash Tier List | Oct 21 2026: the troop and equipment tier lists are being merged into one page, so only one card stays (was Troop Tier List; Equipment Tier List card removed). Same animation, the troop board. Text "Rank anything in Clash from S to F and share your list." Still links to /coc/tools/troop-tier-list until the pages merge. |
-| Glossary | In preview: open red/gold book, a leaf turns per term (Queen Walk -> Lavaloon -> Funneling). |
+| Clash Tier List | Oct 25 2026 REDESIGN, LIVE (Adrian: the 3 x 3 board had no focal point): one tier row up close, the tier maker's big S label (PAL colours) + a Dragon card (= nav icon). Idle 6s: Dragon bobs, glint on S. Hover 2.4s: Dragon lifts, the label spins F E D C B A like a reel, lands on S, Dragon drops in, sparkles. |
+| Glossary | Oct 25 2026 rework, LIVE: the Book of Everything (nav icon) drawn in CSS so it opens: red leather, gold frame + hourglass, cream pages. Idle 12s: open, 2 page turns, cover shuts (slides to centre), reopens. Hover 3.6s: 3 riffles (3 leaves each) with a thump + gold sparkles. Adrian: NO rays / sunburst glow behind it on hover (removed). |
+| Legend Tracker | Oct 25 2026, LIVE (`lgt-`): the Legend Trophy decoration (`icons/legend-trophy.webp`, from ClashKing's assets, also the nav icon). Idle 6s: one hit, tap bounce + "+40" (max trophies per Legend attack) rises. Hover 2.4s: three hits. |
+| War Planner | Oct 25 2026, LIVE (`ws-`; `wp-` is the planner page's): two swords (`clashofclans/coctools/sword.webp`, ClashKing; the second mirrored) swing back on their grips and clash (flash, sparkles, streaks). Idle 6s: one clash. Hover 2.4s: two. |
+
+**Oct 25 2026 (Adrian): order + HOT.** Player Tracker and Equipment lead the band with a HOT tag (`.ptc-hot`, the TH pages' `.base-tag--hot` red key + flame): desktop = its own line above the name, tiles = top-left corner. Still frames (reduced motion + /coc/ phones): Army Maker shows its three troop cards round the camp; Damage Calculator shows the Monolith destroyed (DESTROYED stamp, no HP bar).
+
+**Oct 25 2026 (Adrian): every blurb = exactly 2 lines** (desktop long + phone short). `.ptc-desc` is capped at 31ch so a line holds ~the same letters at every width; long blurbs ~42-50 letters, short ~38-46. Measured 2 lines on /coc/ and /coc/tools/ at 360-1920px: re-measure after any text edit.
+
+**Oct 25 2026 (Adrian): phones = 2 tiles a row.** Below a 620px band (container query at the end of the CSS) each card is a tile: art on top, centred (`--s` .5, scaled from its top centre), name 14px + the short blurb (`text-wrap: balance`, max 2 lines), no hover arrow. ~150px a tile.
+
+**Oct 25 2026 (Adrian):** on /coc/ phones (≤760px, `.coc-home`) the cards are STILL (the reduced-motion frames: CSS turns animations off, cards.js.html skips the hover loop) because they lagged there. /coc/tools/ keeps the animation.
+
+**Oct 24 2026 (Adrian):** the cards are now sunken wells (`--sunk` / `--sink` in build_cards.py), shorter (104px desktop / 92px phones, art `--s` .66 / .6), names 18/17px, blurbs 12px.
 
 **LIVE since Oct 20 2026 (night).** All nine cards replaced the grouped link
 list in the /coc/ "Parchrome tools" band. `python build_cards.py` (in

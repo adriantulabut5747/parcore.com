@@ -57,18 +57,87 @@
 }
 .wp-stars { letter-spacing: 2px; color: #f1c95f; }
 
-/* ---- CARDS: a button, the weapon standing on its rarity backing ---- */
+/* ---- CARDS (Oct 24 2026): squares like the in-game inventory -- the weapon's icon on the game's
+   rarity backing (the knot pattern; site/images/genshin/rarity/<n>.webp, from the Genshin wiki's
+   Background_Item_<n>_Star), framed and lifted like the Artifacts page's .af-tile ---- */
+.wp-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
 .wp-grid > li { min-width: 0; }
-.wp-card { display: block; width: 100%; padding: 0; font: inherit; text-align: left; color: inherit; cursor: pointer; }
-.wp-card.r3 { background: linear-gradient(160deg, #2f4a68, #141d29); }
-.wp-card.r2 { background: linear-gradient(160deg, #2f5544, #13231b); }
-.wp-card.r1 { background: linear-gradient(160deg, #4a4d55, #1d1f23); }
-/* The wish art has wide empty margins: draw it bigger than its box. */
-.ch-card .wp-art { inset: 2% 4% 16%; width: 92%; height: 82%; object-fit: contain; object-position: 50% 50%; transform: scale(1.18); }
-.ch-card .wp-art.is-icon { inset: 14% 14% 30%; width: 72%; height: 56%; transform: none; }
-@media (prefers-reduced-motion: no-preference) {
-  .ch-card:hover .wp-art,
-  .ch-card:focus .wp-art { transform: scale(1.26); }
+.wp-card { --wr: 160, 128, 214; --bg: url('/images/genshin/rarity/4.webp'); }
+.wp-card.r5 { --wr: 214, 170, 92; --bg: url('/images/genshin/rarity/5.webp'); }
+.wp-card.r3 { --wr: 96, 146, 204; --bg: url('/images/genshin/rarity/3.webp'); }
+.wp-card.r2 { --wr: 98, 168, 128; --bg: url('/images/genshin/rarity/2.webp'); }
+.wp-card.r1 { --wr: 150, 154, 162; --bg: url('/images/genshin/rarity/1.webp'); }
+.wp-card {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  /* the game's backing toned down under a dark veil (lighter at the top, like the artifact tiles' glow) */
+  background: linear-gradient(165deg, rgba(14, 14, 18, 0.38), rgba(14, 14, 18, 0.66) 70%), var(--bg) 50% 50% / cover, rgb(var(--wr));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 22px -14px rgba(0, 0, 0, 0.9);
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.3s var(--gi-ease), box-shadow 0.3s ease;
+}
+.wp-tile-ico {
+  position: absolute;
+  inset: 3% 6% 14%;
+  width: 88%;
+  height: 83%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
+  transition: transform 0.45s var(--gi-ease);
+}
+.wp-tile-tag {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 14px);
+  padding: 4px 6px 4px 5px;
+  border-radius: 5px;
+  background: rgba(8, 8, 10, 0.62);
+  font: 700 9px/1 'Sora', sans-serif;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #dfe1e5;
+}
+.wp-tile-tag .wp-si { width: 12px; height: 12px; }
+/* Substat tag top left, "On wish" top right: the tag gives way when both are there. */
+.wp-card .ch-tags { top: 7px; right: 7px; }
+.wp-card:has(.ch-tags) .wp-tile-tag { max-width: calc(100% - 100px); }
+.wp-tile-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 4px;
+  padding: 18px 10px 9px;
+  background: linear-gradient(0deg, rgba(8, 8, 10, 0.9) 35%, rgba(8, 8, 10, 0.55) 70%, rgba(8, 8, 10, 0));
+}
+.wp-tile-foot b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 12.5px/1.2 'Sora', sans-serif; color: #f1f2f4; }
+.wp-tile-stars { font-size: 9px; line-height: 1; letter-spacing: 1.5px; color: #f1c95f; }
+.wp-card:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (hover: hover) {
+  .wp-card:hover { transform: translateY(-3px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 18px 30px -16px rgba(0, 0, 0, 0.95); }
+  .wp-card:hover .wp-tile-ico { transform: translateY(-4%) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wp-card,
+  .wp-tile-ico { transition: none; }
 }
 
 /* ---- LIVE WISH: the weapon wish running now (feed), above the list ---- */
@@ -137,8 +206,9 @@
 
 /* ============================================================
    DRAWER. The <dialog> is only the stage; .wp-sheet is the box: the More sheet's raised
-   recipe (11layout.css .more-sheet + coc-more.css .mx-hdr), floating at the right on
-   desktop, a bottom sheet with a grab handle on phones. --wr = the weapon's rarity colour,
+   recipe (11layout.css .more-sheet + coc-more.css .mx-hdr). Desktop (Oct 24 2026, Adrian:
+   "like the artifacts"): centred, the hero fixed in a left column, #wpDInfo (jump tray +
+   sections) scrolling on the right. Phones: a bottom sheet with a grab handle, one scroll. --wr = the weapon's rarity colour,
    used only inside the hero and for a few marks (stars, pips).
    ============================================================ */
 .wp-drawer { --wr: 160, 128, 214; }
@@ -164,17 +234,17 @@
 .wp-drawer::backdrop { background: rgba(4, 4, 6, 0.7); }
 .wp-sheet {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  bottom: 12px;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  width: min(600px, calc(100vw - 24px));
+  width: min(1080px, calc(100vw - 48px));
+  height: min(780px, calc(100vh - 48px));
+  margin: auto;
   overflow: hidden;
   border: 2px solid var(--lb-edge);
   border-radius: 14px;
   background: var(--lb-box);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), -24px 0 60px -10px rgba(0, 0, 0, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 30px 80px -20px rgba(0, 0, 0, 0.9);
   transition: transform 0.22s var(--lb-ease);
 }
 .wp-sheet.is-dragging { transition: none; }
@@ -184,10 +254,9 @@
   .wp-drawer.is-closing .wp-sheet { animation: wp-out 0.22s ease-in forwards; }
   .wp-drawer.is-closing::backdrop { animation: wp-fade 0.22s ease-in reverse forwards; }
 }
-@keyframes wp-in { from { transform: translateX(48px); opacity: 0; } }
-@keyframes wp-out { to { transform: translateX(48px); opacity: 0; } }
+@keyframes wp-in { from { transform: translateY(14px) scale(0.98); opacity: 0; } }
+@keyframes wp-out { to { transform: translateY(10px) scale(0.98); opacity: 0; } }
 @keyframes wp-fade { from { opacity: 0; } }
-.wp-grip { display: none; }
 
 /* Header: icon well, title + where you are, keys. A sunken line under it (.mx-hdr). */
 .wp-d-bar {
@@ -286,6 +355,19 @@
 .wp-plates dd { font: 800 19px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #fff; }
 .wp-plate-lv { grid-template-columns: auto !important; }
 .wp-si { flex: none; width: 16px; height: 16px; fill: currentColor; }
+
+/* Desktop: two columns. The hero fills the left one top to bottom (art over name, stars and plates);
+   only #wpDInfo scrolls. */
+@media (min-width: 971px) {
+  .wp-d-body { display: grid; grid-template-columns: 380px minmax(0, 1fr); overflow: hidden; }
+  .wp-hero { min-height: 0; background: radial-gradient(70% 46% at 50% 32%, rgba(var(--wr), 0.4), transparent 70%), linear-gradient(180deg, rgba(var(--wr), 0.14), transparent 60%), #0d0e12; box-shadow: inset -1px 0 0 var(--lb-edge); }
+  .wp-hero::before { -webkit-mask-image: linear-gradient(180deg, #000, transparent 80%); mask-image: linear-gradient(180deg, #000, transparent 80%); }
+  .wp-hero-in { grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 10px; height: 100%; min-height: 0; padding: 30px 28px; text-align: center; }
+  .wp-art-col { width: 100%; min-height: 300px; }
+  .wp-d-id h2 { font-size: 28px; }
+  .wp-plates { justify-content: center; }
+  .wp-d-info { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #2a2c35 transparent; }
+}
 
 /* ---- JUMP TRAY: sticks under the header while the drawer scrolls ---- */
 .wp-jump { position: sticky; z-index: 3; top: 0; padding: 10px 16px; background: rgba(20, 21, 24, 0.92); backdrop-filter: blur(8px); box-shadow: 0 1px 0 var(--lb-edge), 0 2px 0 rgba(255, 255, 255, 0.03); }
@@ -438,6 +520,14 @@
   .wp-fan span { margin-left: -12px; }
   #wpType { flex: 1 0 100%; }
   #wpType .gi-tab { flex: 1 0 auto; padding: 0 4px; }
+  .wp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .wp-card { border-radius: 8px; }
+  .wp-tile-tag { top: 5px; left: 5px; padding: 3px 5px 3px 4px; font-size: 8px; }
+  .wp-tile-tag .wp-si { width: 10px; height: 10px; }
+  .wp-card:has(.ch-tags) .wp-tile-tag { display: none; }
+  .wp-tile-foot { padding: 14px 8px 7px; gap: 3px; }
+  .wp-tile-foot b { font-size: 11px; }
+  .wp-tile-stars { font-size: 8px; letter-spacing: 1px; }
   .ch-nat-head > img.wp-head-art { right: 4%; height: 300%; }
 
   .wp-live { grid-template-columns: minmax(0, 1fr); gap: 14px; margin-bottom: 28px; padding: 16px; }
@@ -452,13 +542,11 @@
   .wp-live-four li { flex: 0 0 160px; }
 
   /* The bottom sheet: the More sheet's shape (20px top corners, grab handle). */
-  .wp-sheet { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 92dvh; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 -16px 40px -12px rgba(0, 0, 0, 0.9); }
+  .wp-sheet { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 92dvh; margin: 0; border-bottom: 0; border-radius: 20px 20px 0 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 -16px 40px -12px rgba(0, 0, 0, 0.9); }
   @media (prefers-reduced-motion: no-preference) {
     .wp-drawer[open] .wp-sheet { animation: wp-up 0.34s cubic-bezier(0.32, 0.72, 0, 1); }
     .wp-drawer.is-closing .wp-sheet { animation: wp-down 0.22s ease-in forwards; }
   }
-  .wp-grip { display: block; flex: none; position: relative; width: 36px; height: 4px; margin: 8px auto 0; border-radius: 4px; background: #3a3a3e; touch-action: none; cursor: grab; }
-  .wp-grip::before { content: ''; position: absolute; inset: -14px -40px; }
   .wp-d-bar { gap: 10px; padding: 10px 12px 12px; touch-action: none; }
   .wp-d-ico { width: 40px; height: 40px; }
   .wp-d-ico img { width: 28px; height: 28px; }

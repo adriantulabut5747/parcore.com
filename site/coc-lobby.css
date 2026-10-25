@@ -1,10 +1,11 @@
 /* =======================================================================
-   CoC home (/coc/) -- the two "lobby" sections under the tracker promo:
-     .hm  Hero meta: each hero's top 3 equipment among the world's top 200
-     .gt  World top 10 players (podium + list)
-   Filled by coc-lobby.js from /coc-lobby-home.json (daily GitHub Action,
-   scripts/lobby-stats.mjs). Same column as the rest of the page: 12% sides
-   on desktop, 5% on phones. Type: Orbitron titles (2nd word red, like
+   CoC home (/coc/) -- the lobby sections under the tools and guides:
+     .hm  Most picked equipment: each hero's top 3 among the world's top 200
+     .gt  Top players of the week (one compact board)
+     .qa  FAQ (help desk + questions)
+   .hm / .gt are filled by coc-lobby.js from /coc-lobby-home.json (weekly
+   GitHub Action, Monday before the league reset, scripts/lobby-stats.mjs). Same column as the rest of the page: 12% sides
+   on desktop, 5% on phones. Type: Figtree titles (2nd word red, like
    .cl-feature-title), Sora copy, Oxanium numbers.
    Art: Supercell Fan Kit -- Dragon Scale hero skins (clashofclans/coctools/
    dragonscale/), embers (firebg0.webp), Legend crests (ranks2.webp).
@@ -14,7 +15,8 @@
    ======================================================================= */
 
 .hm,
-.gt {
+.gt,
+.qa {
   --lb-red: #c23b3b;
   --lb-red-hi: #e05252;
   --lb-text: #eff2f5;
@@ -57,7 +59,7 @@
 }
 .lb-title {
   margin: 0 0 14px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
   text-transform: uppercase;
   font-weight: 900;
   line-height: 1.1;
@@ -68,14 +70,14 @@
   white-space: nowrap;
 }
 /* 1coclayouts.css puts Oxanium on every element, so any <span>/<em>
-   inside a title has to ask for Orbitron itself. */
+   inside a title has to ask for Figtree itself. */
 .lb-title * {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
 }
 .lb-title em {
   /* 1coclayouts.css puts Oxanium on every element, so the accent part has to
-     ask for Orbitron itself. */
-  font-family: 'Orbitron', sans-serif;
+     ask for Figtree itself. */
+  font-family: 'Figtree', sans-serif;
   font-style: normal;
   white-space: nowrap; /* "top 10" never splits across lines */
   color: #fff;
@@ -92,114 +94,6 @@
   box-shadow: none;
 }
 
-/* ---- CALL-TO-ACTION BUTTON ---------------------------------------------
-   Solid red, top-lit. .lb-cta--live adds a light sheen sweeping across
-   every ~4s (.lb-cta-shine, its own clipped layer). No red glow or pulsing
-   ring (Oct 12): with square corners both spread into a big red block. */
-.lb-cta {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  height: 48px;
-  padding: 0 20px 0 14px;
-  border-radius: 0;
-  background: linear-gradient(180deg, #e3524f 0%, #b83030 55%, #9c2627 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.25),
-    0 6px 14px -6px rgba(0, 0, 0, 0.6);
-  font-family: 'Orbitron', sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #fff;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.2s,
-    filter 0.2s;
-}
-.lb-cta img {
-  width: 28px;
-  height: auto;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
-}
-.lb-cta svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.2s;
-}
-.lb-cta .ac-ico {
-  width: 17px;
-  height: 17px;
-}
-.lb-cta:hover,
-.lb-cta:focus-visible {
-  filter: brightness(1.08);
-  transform: translateY(-2px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.25),
-    0 8px 18px -6px rgba(0, 0, 0, 0.65);
-}
-.lb-cta:hover svg:last-child {
-  transform: translateX(3px);
-}
-.lb-cta:active {
-  transform: translateY(0);
-}
-.lb-cta:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
-.lb-cta-shine {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 0;
-  pointer-events: none;
-}
-.lb-cta--live .lb-cta-shine::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -60%;
-  width: 45%;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-  transform: skewX(-20deg);
-  animation: lb-sheen 4s ease-in-out 1.2s infinite;
-}
-.lb-cta--live::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 0;
-  display: none; /* ring retired, see .lb-cta */
-  pointer-events: none;
-}
-@keyframes lb-sheen {
-  0%,
-  55% {
-    left: -60%;
-  }
-  100% {
-    left: 130%;
-  }
-}
-/* A fixed-width ring (box-shadow spread), not a scale -- scaling a
-   full-width button grew the ring ~60px past each side. */
-@keyframes lb-ring {
-  0% {
-    box-shadow: 0 0 0 0 rgba(224, 82, 82, 0.75);
-  }
-  100% {
-    box-shadow: 0 0 0 12px rgba(224, 82, 82, 0);
-  }
-}
 
 /* ---- HERO META ---------------------------------------------------------- */
 .hm {
@@ -310,10 +204,12 @@
   --bleed: var(--coc-side, 15.79%); /* = the page column's side inset; 15.79% = 12% of the section / the 76% column */
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: max(280px, (100% - 2 * 16px) / 2.75);
+  /* Capped at 340px (Oct 24 2026): on wide screens the cards ran ~450px and
+     the heroes looked small in them; now more of the row shows instead. */
+  grid-auto-columns: clamp(290px, (100% - 2 * 16px) / 2.75, 340px);
   gap: 16px;
   margin: 0 calc(-1 * var(--bleed));
-  padding: 160px var(--bleed) 24px; /* tallest action pose stands ~148px above its card */
+  padding: 184px var(--bleed) 24px; /* the tallest action pose (x1.12, below) stands ~178px above its card */
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
@@ -347,9 +243,11 @@
     box-shadow 0.4s,
     transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.hm-card:hover {
+.hm-card:hover,
+.hm-card.is-on {
   --lit: 1.5;
   transform: translateY(-4px);
+  box-shadow: var(--lb-shadow-hover), 0 0 0 1px rgba(var(--acc), 0.4), 0 26px 50px -26px rgba(var(--acc), 0.55);
 }
 .hm-card {
   border: 2px solid var(--lb-edge);
@@ -362,6 +260,9 @@
   height: 150px;
   margin: -48px -18px 0;
   pointer-events: none;
+  /* Heroes drawn 12% bigger on desktop (phones: 82%, below), feet fixed. */
+  scale: 1.12;
+  transform-origin: 50% 100%;
 }
 /* The hero's Hero Hall banner, hanging from the card's top edge on the
    left (its pole sits on the edge). Files are 84x91 (Duke 117x101), shown
@@ -385,7 +286,8 @@
   left: 10px;
 }
 /* A small swing on hover, like a flag catching air. */
-.hm-card:hover .hm-flag {
+.hm-card:hover .hm-flag,
+.hm-card.is-on .hm-flag {
   transform: rotate(-4deg);
 }
 
@@ -441,6 +343,57 @@
     transform: translateX(-50%) scale(1);
   }
 }
+/* Phones (Oct 24 2026): the card in the middle of the row (.is-on,
+   coc-lobby.js touchPose) changes pose by itself. */
+.hm-card.is-on .hm-still {
+  opacity: 0;
+  transform: translateX(-50%) scale(1.04);
+}
+.hm-card.is-on .hm-pose {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+/* The power-up as the pose changes (Oct 24 2026): one shockwave ring off the
+   floor and sparks rising off the hero, both in the hero's colour. */
+.hm-wave {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 70%;
+  aspect-ratio: 4 / 1;
+  translate: -50% 0;
+  border: 2px solid rgba(var(--acc), 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(var(--acc), 0.6), inset 0 0 12px rgba(var(--acc), 0.4);
+  opacity: 0;
+}
+.hm-card:hover .hm-wave,
+.hm-card.is-on .hm-wave {
+  animation: hm-wave 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes hm-wave {
+  from { opacity: 1; scale: 0.35; }
+  to { opacity: 0; scale: 1.6; }
+}
+.hm-sparks i {
+  position: absolute;
+  bottom: 14px;
+  left: var(--x);
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  box-shadow: 0 0 6px 2px rgba(var(--acc), 0.9);
+  opacity: 0;
+}
+.hm-card:hover .hm-sparks i,
+.hm-card.is-on .hm-sparks i {
+  animation: hm-spark var(--t) ease-out var(--d) infinite;
+}
+@keyframes hm-spark {
+  0% { opacity: 0; transform: translate(0, 0) scale(1); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), -140px) scale(0.3); }
+}
 /* The ground the hero stands on: a soft ellipse in the card's colour. */
 .hm-art::after {
   content: '';
@@ -464,7 +417,7 @@
 }
 .hm-name h3 {
   margin: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Figtree', sans-serif;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.4px;
@@ -482,24 +435,23 @@
   color: var(--lb-muted);
 }
 
+
+/* Top 3 per hero (Oct 24 2026, Adrian: no progress bars, items a bit
+   bigger): medal rank | item socket | name | pick rate as quiet text. */
 .hm-eqs {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .hm-eq {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
-  grid-template-areas:
-    'pic name pct'
-    'pic bar  bar';
+  grid-template-columns: 22px 48px minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 12px;
-  row-gap: 6px;
-  padding: 7px 8px;
-  border-radius: 0;
+  padding: 6px 10px 6px 6px;
+  border-radius: var(--lb-r);
   color: inherit;
   text-decoration: none;
   transition: background 0.15s;
@@ -508,69 +460,58 @@
 .hm-eq:focus-visible {
   background: rgba(255, 255, 255, 0.045);
 }
+.hm-eq:focus-visible {
+  outline: 2px solid #f2f3f5;
+  outline-offset: -2px;
+}
 .hm-eq-pic {
-  position: relative;
-  grid-area: pic;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0;
-  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.01) 70%);
+  width: 48px;
+  height: 48px;
+  box-sizing: border-box;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%), var(--lb-well);
+  box-shadow: var(--lb-ring-well);
 }
 .hm-eq-pic img {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
+  transition: transform 0.25s var(--lb-ease);
+}
+.hm-eq:hover .hm-eq-pic img {
+  transform: scale(1.08);
 }
 .hm-eq-name {
-  grid-area: name;
   overflow: hidden;
   font-family: 'Sora', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--lb-text);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .hm-eq-pct {
-  grid-area: pct;
   font-family: 'Oxanium', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #fff;
+  color: var(--lb-muted);
 }
-.hm-eq-bar {
-  grid-area: bar;
-  height: 4px;
-  overflow: hidden;
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.06);
-}
-.hm-eq-bar i {
-  display: block;
-  height: 100%;
-  border-radius: 0;
-  background: linear-gradient(90deg, #8f2a2a, var(--lb-red-hi));
-  box-shadow: 0 0 8px rgba(224, 82, 82, 0.5);
-}
-/* Rank 1-3 as a small medal on the socket's corner: gold, silver, bronze. */
+/* Rank 1-3 as a medal: gold, silver, bronze. */
 .hm-eq-rank {
   --medal: 205, 127, 50;
-  position: absolute;
-  top: -6px;
-  left: -6px;
   display: grid;
   place-items: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
   background: linear-gradient(180deg, rgb(var(--medal)), rgba(var(--medal), 0.65));
-  box-shadow: 0 0 0 2px #121316, 0 0 8px rgba(var(--medal), 0.5);
+  box-shadow: 0 0 0 2px var(--lb-edge), inset 0 1px 0 rgba(255, 255, 255, 0.45);
   font-family: 'Oxanium', sans-serif;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1;
   color: #141414;
@@ -584,16 +525,20 @@
 /* The #1 pick also gets the gold socket. */
 .hm-eqs li:first-child .hm-eq-pic {
   border-color: rgba(240, 192, 90, 0.45);
-  background: radial-gradient(circle at 50% 35%, rgba(240, 192, 90, 0.28), rgba(240, 192, 90, 0.04) 72%);
+  background: radial-gradient(circle at 50% 35%, rgba(240, 192, 90, 0.28), rgba(240, 192, 90, 0.04) 72%), var(--lb-well);
+}
+.hm-eqs li:first-child .hm-eq-pct {
+  color: #fff;
 }
 
-/* ---- WORLD TOP 10 ------------------------------------------------------- */
+/* ---- TOP PLAYERS OF THE WEEK -------------------------------------------
+   (Oct 24 2026; was a podium + list beside a text column, ~750px tall.)
+   Header row like the other sections (title left, link right), then ONE
+   board: 1-5 | 6-10 side by side on desktop, a single column on phones.
+   The top three wear their medal colour on the rank and a faint wash. */
 .gt {
-  padding: 112px 0 56px;
   background: #0a0a0b;
 }
-/* The three Legend crests on the right; dark on the left for the copy, and
-   faded top/bottom into the page. */
 .gt-bg {
   position: absolute;
   inset: 0;
@@ -602,7 +547,7 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 50%;
-  filter: brightness(0.8);
+  filter: brightness(0.7) saturate(0.8);
 }
 .gt::before {
   content: '';
@@ -610,205 +555,95 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 22%, rgba(10, 10, 11, 0) 78%, #0a0a0b 100%),
-    linear-gradient(to right, rgba(8, 8, 10, 0.94) 0%, rgba(8, 8, 10, 0.78) 34%, rgba(8, 8, 10, 0.3) 70%, rgba(8, 8, 10, 0.45) 100%);
+    linear-gradient(to bottom, #0a0a0b 0%, rgba(10, 10, 11, 0) 26%, rgba(10, 10, 11, 0) 74%, #0a0a0b 100%),
+    linear-gradient(to right, rgba(8, 8, 10, 0.94) 0%, rgba(8, 8, 10, 0.82) 45%, rgba(8, 8, 10, 0.6) 100%);
 }
 .gt-inner {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  align-items: center;
-  gap: 56px;
   margin: 0 var(--coc-side, 12%);
 }
-/* Wide screens: the eye-catching button under the text. Once the columns
-   stack (<=1200px) a plain one under the board instead -- no sheen, no ring,
-   a softer glow. */
-.gt-cta-wide {
-  margin-top: 26px;
-}
-.gt-cta-narrow {
-  display: none;
-}
-.gt-note {
-  margin: 18px 0 0;
-  font-family: 'Sora', sans-serif;
-  font-size: 12px;
-  color: var(--lb-faint);
-}
-
-/* Podium: 2nd, 1st, 3rd -- the 1st card stands taller. */
-.gt-podium {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: end;
-  gap: 12px;
-  margin: 0 0 14px;
-  padding: 0;
-  list-style: none;
-}
-.gt-pod {
-  --medal: 205, 127, 50;
-  position: relative;
+.gt-top {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 26px 12px 18px;
-  background:
-    radial-gradient(100% 60% at 50% 0%, rgba(var(--medal), 0.2), rgba(var(--medal), 0) 70%),
-    rgba(17, 18, 21, 0.62);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  color: inherit;
-  text-align: center;
-  text-decoration: none;
-  transition:
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 28px;
 }
-.gt-pod:hover,
-.gt-pod:focus-visible {
-  transform: translateY(-4px);
-}
-a.gt-pod:hover {
-  border-color: var(--lb-edge);
-  background-color: var(--lb-box-hover);
-  box-shadow: var(--lb-shadow-hover);
-}
-a.gt-pod {
-  transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
-}
-.gt-pod {
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background-color: var(--lb-box);
-  box-shadow: var(--lb-shadow);
-}
-.gt-pod--1 {
-  --medal: 240, 192, 90;
-  order: 2;
-  padding-top: 40px;
-  padding-bottom: 26px;
-}
-.gt-pod--2 {
-  --medal: 200, 208, 220;
-  order: 1;
-}
-.gt-pod--3 {
-  order: 3;
-}
-.gt-medal {
-  position: absolute;
-  top: -14px;
+.gt-board {
   display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 0;
-  background: linear-gradient(180deg, rgb(var(--medal)), rgba(var(--medal), 0.6));
-  box-shadow: 0 0 0 3px #0e0f12, 0 0 16px rgba(var(--medal), 0.55);
-  font-family: 'Oxanium', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  color: #141414;
-}
-.gt-pod-badge {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 10px;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
-}
-.gt-pod--1 .gt-pod-badge {
-  width: 72px;
-  height: 72px;
-}
-.gt-pod-name,
-.gt-pod-clan {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.gt-pod-name {
-  font-family: 'Sora', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-}
-.gt-pod-clan {
-  margin-top: 3px;
-  font-family: 'Sora', sans-serif;
-  font-size: 11.5px;
-  color: var(--lb-faint);
-}
-
-/* Trophy count: league icon + number */
-.gt-score {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: #fff;
-}
-.gt-score img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-}
-.gt-pod .gt-score {
-  margin-top: 12px;
-  padding: 5px 10px;
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.35);
-}
-
-/* 4 -> 10 */
-.gt-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  gap: 4px 6px;
   margin: 0;
   padding: 6px;
-  background: rgba(17, 18, 21, 0.62);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  list-style: none;
-}
-.gt-list {
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
   background-color: var(--lb-box);
   box-shadow: var(--lb-shadow);
+  list-style: none;
 }
 .gt-row {
+  --medal: 255, 255, 255;
   display: grid;
-  grid-template-columns: 30px 32px minmax(0, 1fr) auto;
+  grid-template-columns: 26px 30px minmax(0, 1fr) 38px auto;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
-  color: inherit;
-  text-decoration: none;
-  transition: background 0.15s;
+  min-height: 52px;
+  box-sizing: border-box;
+  padding: 6px 14px 6px 10px;
   border-radius: var(--lb-r);
   background-color: var(--lb-row);
   box-shadow: var(--lb-row-ring);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.15s;
 }
 .gt-row:hover,
 .gt-row:focus-visible {
-  background: rgba(255, 255, 255, 0.045);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+.gt-row:focus-visible {
+  outline: 2px solid #f2f3f5;
+  outline-offset: -2px;
+}
+.gt-row--1 {
+  --medal: 240, 192, 90;
+}
+.gt-row--2 {
+  --medal: 200, 208, 220;
+}
+.gt-row--3 {
+  --medal: 205, 127, 50;
+}
+.gt-row--1,
+.gt-row--2,
+.gt-row--3 {
+  background-image: linear-gradient(90deg, rgba(var(--medal), 0.11), rgba(var(--medal), 0) 55%);
+  box-shadow: inset 0 0 0 1px rgba(var(--medal), 0.16);
 }
 .gt-rank {
+  display: grid;
+  place-items: center;
+  height: 24px;
   font-family: 'Oxanium', sans-serif;
   font-size: 14px;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
   color: var(--lb-faint);
-  text-align: center;
+}
+.gt-row--1 .gt-rank,
+.gt-row--2 .gt-rank,
+.gt-row--3 .gt-rank {
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgb(var(--medal)), rgba(var(--medal), 0.65));
+  box-shadow: 0 0 0 2px var(--lb-edge), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  color: #141414;
 }
 .gt-badge {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
 }
 .gt-who {
@@ -834,114 +669,246 @@ a.gt-pod {
   font-size: 11.5px;
   color: var(--lb-faint);
 }
-
-/* ---- FAQ layout (coc-home only: .lb-faq) ---------------------------------
-   Header left / questions right, like the World top 10, plus the Queen.
-   The question cards themselves are the shared look in coc-clan-clock.css. */
-.coc-content .t18-faq.lb-faq {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  align-items: start;
-  gap: 56px;
-  margin-top: 72px;
-}
-/* The Queen as the guide figure under the header (desktop). */
-.lb-faq-art {
-  display: block;
-  width: 240px;
-  height: auto;
-  margin: 18px 0 0 -20px;
-  filter: drop-shadow(0 0 22px rgba(150, 175, 210, 0.25)) drop-shadow(0 18px 18px rgba(0, 0, 0, 0.7));
-  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
-  mask-image: linear-gradient(to bottom, #000 70%, transparent);
-}
-/* ---- ASCENDERE CARD (coc-home only: .lb-clan) ---------------------------- */
-.coc-content .ac-card.lb-clan {
-  background:
-    radial-gradient(40% 80% at 85% 40%, rgba(194, 59, 59, 0.22), rgba(194, 59, 59, 0) 70%),
-    linear-gradient(180deg, #17181c 0%, #111215 100%);
-}
-.lb-clan .ac-art {
-  border-radius: 0;
-}
-.lb-clan .ac-art img {
-  filter: brightness(0.6) saturate(1.05);
-}
-.lb-clan .ac-body {
-  gap: 0;
-  padding: 36px 36px 30px;
-}
-.lb-clan .lb-kicker {
-  margin-bottom: 12px;
-}
-/* Sized by the card's own width (cqi = 1% of it; the card is a container,
-   see coc-clan-clock.css) so "Play with Ascendere" + logo always fits one
-   line -- with a fixed 24px minimum it ran off narrow phone cards. */
-.lb-clan .clan-title {
-  margin-bottom: 24px;
-  /* The scale's title size, shrunk to fit when the card is narrow (nowrap). */
-  font-size: clamp(16px, 4.8cqi, var(--fs-title));
-  line-height: 1.1;
+/* Places moved since last week (same colours as the Leaderboards page). */
+.gt-move {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--lb-faint);
+  text-align: right;
   white-space: nowrap;
 }
-.lb-clan .ac-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
+.gt-up {
+  color: #4fbf7a;
 }
-.lb-clan .ac-btn {
-  height: 48px;
-  padding: 0 18px;
-  border-radius: 0;
-  font-size: 12px;
+.gt-down {
+  color: #d05a5a;
 }
-.lb-clan .ac-stats {
-  border-radius: 0;
+.gt-new {
+  color: #e0b04f;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
-.lb-clan .ac-stat {
-  background: rgba(16, 17, 20, 0.92);
+/* Trophy count: league icon + number */
+.gt-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 72px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
 }
-.lb-clan .ac-stat dd {
-  font-size: 22px;
+.gt-score img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* ---- FAQ (.qa, Oct 24 2026 rebuild) ------------------------------------
+   Help desk left (kicker, title, line, then the site's feedback box from
+   11layout.css "FEEDBACK BOX"), questions right. The left column is sticky
+   on desktop: it rides down beside the questions instead of leaving a hole
+   under itself. Each question is a raised box; its answer opens into a well
+   inside it. Phones: header, questions, then the feedback box. */
+.qa {
+  position: relative;
+  overflow: clip; /* not hidden: hidden makes the section a scroll box, and the sticky column would stick to it instead of the page */
+  interpolate-size: allow-keywords; /* lets the answers open smoothly (Chrome); others just open */
+}
+.qa-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 56px;
+  margin: 0 var(--coc-side, 12%);
+}
+.qa-side .lb-text {
+  max-width: 420px;
+}
+.qa-side [data-feedback] {
+  margin-top: 26px;
+}
+@media (min-width: 1201px) {
+  .qa-side {
+    position: sticky;
+    top: 96px; /* the 64px desktop bar + breathing room */
+  }
+}
+
+.qa-list {
+  display: grid;
+  gap: 8px;
+}
+.qa-item {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  transition: background-color 0.2s;
+}
+.qa-item[open] {
+  background: var(--lb-box2);
+}
+.qa-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.3s var(--lb-ease),
+    content-visibility 0.3s allow-discrete;
+}
+.qa-item[open]::details-content {
+  block-size: auto;
+}
+.qa-item summary {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  list-style: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.qa-item summary::-webkit-details-marker {
+  display: none;
+}
+.qa-item summary:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.qa-item summary:focus-visible {
+  outline: 2px solid #f2f3f5;
+  outline-offset: -2px;
+}
+.qa-ico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%), var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.qa-ico img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: grayscale(1);
+  transition: filter 0.25s;
+}
+.qa-item[open] .qa-ico img,
+.qa-item summary:hover .qa-ico img {
+  filter: none;
+}
+.qa-q {
+  font-family: 'Sora', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #e8eaee;
+}
+/* + that turns into - : a small grey key with two bars. */
+.qa-tog {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 2px solid var(--lb-edge);
+  border-radius: 5px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+}
+.qa-tog::before,
+.qa-tog::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 2px;
+  margin: -2px 0 0 -5px;
+  border-radius: 1px;
+  background: #e6e8ec;
+  transition: transform 0.3s var(--lb-ease);
+}
+.qa-tog::after {
+  transform: rotate(90deg);
+}
+.qa-item[open] .qa-tog::after {
+  transform: rotate(0deg);
+}
+.qa-item[open] .qa-tog {
+  background: var(--lb-well);
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+.qa-a {
+  margin: 0 12px 12px 66px;
+  padding: 14px 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+.qa-a p {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #a9aeb6;
+}
+.qa-a b {
+  font-weight: 600;
+  color: #e6e8ec;
 }
 
 /* ---- Phones / tablets ---------------------------------------------------- */
 @media (max-width: 1200px) {
-  .gt-cta-wide {
-    display: none;
+  .qa-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
-  .gt-cta-narrow {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 46px;
-    margin-top: 14px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      0 8px 20px -14px rgba(224, 82, 82, 0.6);
+  /* One column: header, questions, then the feedback box. */
+  .qa-side {
+    display: contents;
   }
-  .gt-inner {
-    grid-template-columns: 1fr;
-    gap: 40px;
+  .qa-list {
+    order: 1;
+    margin-top: 20px;
   }
-  .gt-head {
-    max-width: 560px;
+  .qa-side [data-feedback] {
+    order: 2;
+    margin-top: 56px;
   }
 }
 @media (max-width: 970px) {
-  .hm {
-    padding: 80px 0 32px;
-  }
   .hm-inner,
-  .gt-inner {
+  .gt-inner,
+  .qa-inner {
     margin: 0 5%;
   }
-  .hm-top {
+  .hm-top,
+  .gt-top {
     display: block;
   }
+  /* Phones (Oct 25 2026, Adrian): no subtitle; the link is the subtitle. */
+  .hm .lb-text {
+    display: none;
+  }
   .hm-actions {
-    margin-top: 20px;
+    margin-top: 8px;
+  }
+  .gt-top .art-all {
+    margin-top: 12px;
+  }
+  .gt-top {
+    margin-bottom: 18px;
   }
   /* Name on its own line, average level under it -- side by side, long
      names (Barbarian King) wrapped to 2 lines and short ones didn't. */
@@ -956,22 +923,6 @@ a.gt-pod {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .coc-content .t18-faq.lb-faq {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    margin-top: 64px;
-  }
-  .lb-faq-art {
-    display: none;
-  }
-  .lb-clan .ac-body {
-    padding: 28px 20px 24px;
-  }
-  .lb-clan .lb-cta,
-  .lb-clan .ac-btn {
-    flex: 1 1 auto;
-    justify-content: center;
-  }
   /* Phones swipe; the arrows would only crowd the link. */
   .hm-nav {
     display: none;
@@ -980,64 +931,125 @@ a.gt-pod {
     font-size: 10px;
     letter-spacing: 1.2px;
   }
-  /* Same scroller; the phone column is 90% with 5% sides. */
+  /* Same scroller; the phone column is 90% with 5% sides. The heroes are
+     drawn at 82% here, so the room above the cards shrinks with them
+     (was 160px of mostly empty space under the header). */
   .hm-grid {
     --bleed: 5.556%;
     grid-auto-columns: min(78%, 340px);
     gap: 12px;
-    padding-bottom: 8px;
+    padding-top: 108px; /* the phone's action pose (.is-on) stands ~103px above its card */
+    /* room for the card's glow below it (a scroller clips it, which left a
+       hard edge); the negative margin keeps the gap to the next section */
+    padding-bottom: 48px;
+    margin-bottom: -40px;
     -webkit-mask-image: none;
     mask-image: none;
   }
-  .gt {
-    padding: 72px 0 80px;
+  .hm-art {
+    scale: 0.82;
+    transform-origin: 50% 100%;
+  }
+  .hm-eq {
+    grid-template-columns: 22px 44px minmax(0, 1fr) auto;
+    column-gap: 10px;
+  }
+  .hm-eq-pic {
+    width: 44px;
+    height: 44px;
+  }
+  .hm-eq-pic img {
+    width: 36px;
+    height: 36px;
   }
   .gt-bg {
     object-position: 60% 50%;
   }
-  .gt-podium {
-    gap: 8px;
-  }
-  .gt-pod {
-    padding: 22px 8px 14px;
-  }
-  .gt-pod--1 {
-    padding-top: 30px;
-    padding-bottom: 20px;
-  }
-  .gt-pod-badge {
-    width: 44px;
-    height: 44px;
-  }
-  .gt-pod--1 .gt-pod-badge {
-    width: 56px;
-    height: 56px;
-  }
-  .gt-pod-name {
-    font-size: 12.5px;
-  }
-  .gt-pod .gt-score {
-    font-size: 13px;
-    padding: 4px 8px;
+  .gt-board {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-flow: row;
+    padding: 4px;
   }
   .gt-row {
+    grid-template-columns: 24px 28px minmax(0, 1fr) auto auto;
     gap: 10px;
-    padding: 8px 6px;
+    min-height: 50px;
+    padding: 6px 10px 6px 8px;
+  }
+  .gt-badge {
+    width: 28px;
+    height: 28px;
+  }
+  .gt-score {
+    min-width: 0;
+    font-size: 14px;
+  }
+  .gt-score img {
+    width: 18px;
+    height: 18px;
+  }
+  .qa-item summary {
+    grid-template-columns: 34px minmax(0, 1fr) 26px;
+    gap: 12px;
+    padding: 9px 10px;
+  }
+  .qa-ico {
+    width: 34px;
+    height: 34px;
+  }
+  .qa-ico img {
+    width: 26px;
+    height: 26px;
+  }
+  .qa-q {
+    font-size: 13.5px;
+  }
+  .qa-tog {
+    width: 26px;
+    height: 26px;
+  }
+  .qa-a {
+    margin: 0 10px 10px;
+    padding: 12px 14px;
+  }
+  .qa-a p {
+    font-size: 13px;
+  }
+  /* Phones open answers at once and fade them in. Animating the height
+     re-lays out this whole (long) page every frame, which stuttered on
+     phones; opacity + transform run on the GPU. */
+  .qa-item::details-content {
+    transition: none;
+  }
+  .qa-item[open] .qa-a {
+    animation: qa-in 0.2s var(--lb-ease);
+  }
+}
+@keyframes qa-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lb-cta--live::before,
-  .lb-cta--live .lb-cta-shine::before {
-    animation: none;
-  }
-  .lb-cta--live::before {
-    opacity: 0;
-  }
   .hm-card,
   .hm-art img,
   .hm-flag,
-  .gt-pod {
+  .hm-eq-pic img,
+  .qa-tog::before,
+  .qa-tog::after,
+  .qa-item::details-content {
     transition: none;
+  }
+  .hm-card:hover .hm-wave,
+  .hm-card.is-on .hm-wave,
+  .hm-card:hover .hm-sparks i,
+  .hm-card.is-on .hm-sparks i {
+    animation: none;
+  }
+  .qa-item[open] .qa-a {
+    animation: none;
   }
 }
