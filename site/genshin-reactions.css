@@ -1,0 +1,328 @@
+/* ============================================================
+   GENSHIN IMPACT -- REACTIONS (Oct 26 2026). The element wheel (the Lobby's section and the
+   Reactions chart's first one) + the chart page (/genshin-impact/reactions). Behaviour and
+   data: genshin-reactions.js + genshin-reactions.json.
+   Look: genshin.css's raised UI. Red only for picked marks (wheel links, the party's key
+   element, the share bars, slider fills); Lunar / Stellar carry the moonsign icon and the
+   header frame's gold star, never a new colour. The Lobby's phone tweaks for the wheel stay
+   in genshin-lobby.css "COMPACT".
+   ============================================================ */
+
+/* ---- THE WHEEL (moved from genshin-lobby.css) ---- */
+.gi-rx { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); gap: 48px; align-items: center; }
+.rx-wheel-col { display: flex; flex-direction: column; align-items: center; gap: 14px; min-width: 0; }
+.rx-mode { align-self: stretch; }
+.rx-mode .gi-tab img, .rx-mode .gi-tab .rx-star { width: 16px; height: 16px; border-radius: 0; object-fit: contain; }
+.rx-mode-note { min-height: 2.9em; max-width: 340px; font-size: 12px; line-height: 1.45; text-align: center; color: var(--gi-muted); }
+.rx-star { display: inline-block; flex: none; fill: rgba(211, 188, 142, 0.85); }
+.gi-wheel { width: 100%; height: auto; overflow: visible; }
+.gi-wheel .rx-ring { fill: none; stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
+.gi-wheel .rx-poly { fill: rgba(255, 255, 255, 0.015); stroke: rgba(255, 255, 255, 0.09); stroke-width: 1; stroke-dasharray: 3 6; }
+.gi-wheel .rx-link { stroke: var(--gi-acc); stroke-width: 3; stroke-linecap: round; }
+.gi-wheel .rx-node { cursor: pointer; outline: none; }
+.gi-wheel .rx-node circle { fill: #141518; stroke: #060708; stroke-width: 3; transition: stroke 0.15s ease, fill 0.15s ease; }
+.gi-wheel .rx-node:hover circle, .gi-wheel .rx-node:focus-visible circle { fill: #1f2027; stroke: #3a3d46; }
+.gi-wheel .rx-node.is-on circle { fill: #241619; stroke: var(--gi-acc); }
+/* The party's key element (Lunar = Hydro, Stellar = Cryo): a dashed red halo, so the swap's
+   rule ("needs Hydro") shows on the wheel itself. */
+.gi-wheel .rx-node .rx-halo { fill: none; stroke: var(--gi-acc); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: 0; transition: opacity 0.2s ease; }
+.gi-wheel[data-mode='lunar'] .rx-node[data-el='hydro'] .rx-halo,
+.gi-wheel[data-mode='stellar'] .rx-node[data-el='cryo'] .rx-halo { opacity: 1; }
+.gi-wheel .rx-node.is-on .rx-halo { fill: none; }
+.gi-wheel .rx-node text { font: 700 10px 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; fill: #8b9099; text-anchor: middle; }
+.gi-wheel .rx-node.is-on text { fill: #fff; }
+.gi-wheel .rx-mid { font: 900 15px 'Cinzel', serif; text-transform: uppercase; fill: #fff; text-anchor: middle; }
+.gi-wheel .rx-mid-k { font: 700 9px 'Sora', sans-serif; letter-spacing: 1.6px; text-transform: uppercase; fill: #8b9099; text-anchor: middle; }
+@media (prefers-reduced-motion: no-preference) {
+  .gi-wheel[data-mode='lunar'] .rx-node[data-el='hydro'] .rx-halo,
+  .gi-wheel[data-mode='stellar'] .rx-node[data-el='cryo'] .rx-halo { animation: rx-turn 14s linear infinite; transform-origin: 0 0; }
+}
+@keyframes rx-turn {
+  to { transform: rotate(360deg); }
+}
+
+.rx-card { min-width: 0; padding: 26px; }
+.rx-kind { display: flex; align-items: center; gap: 7px; font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: #8b9099; }
+.rx-kind img, .rx-kind .rx-star { width: 15px; height: 15px; }
+.rx-kind.is-new { color: #d3c3a0; }
+.rx-name { margin-top: 10px; font: 900 clamp(28px, 3vw, 44px)/1 'Cinzel', serif; text-transform: uppercase; color: #fff; }
+.rx-eq { display: flex; align-items: center; gap: 10px; margin-top: 14px; font: 700 13px 'Sora', sans-serif; color: #c9ccd2; }
+.rx-eq img { width: 26px; height: 26px; }
+.rx-desc { margin-top: 14px; font-size: 14px; line-height: 1.65; color: #c9ccd2; }
+/* Numbers: small wells in a row (wrap). */
+.rx-nums { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.rx-nums div { padding: 8px 10px 7px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.3); }
+.rx-nums dt { font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1.1px; text-transform: uppercase; color: var(--gi-dim); }
+.rx-nums dd { margin-top: 5px; font: 700 12.5px/1.2 'Sora', sans-serif; color: #fff; }
+/* The swap line: who turns it on / what it becomes / why nothing changed. */
+.rx-swap-t { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--gi-line); font-size: 13px; line-height: 1.55; color: #c9ccd2; }
+.rx-swap-t > img, .rx-swap-t > .rx-star { width: 18px; height: 18px; margin-top: 1px; flex: none; }
+.rx-swap-t b { color: #fff; }
+.rx-swap-t.is-none { color: var(--gi-muted); }
+.rx-go { padding: 0; border: 0; background: none; font: 700 13px/1.55 'Sora', sans-serif; color: #fff; text-decoration: underline; text-decoration-color: var(--gi-acc); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; }
+.rx-go:hover { color: var(--gi-acc-text); }
+/* Portraits: rarity tile + name. */
+.rx-faces { display: flex; flex-wrap: wrap; gap: 10px; }
+.rx-swap-t + .rx-faces { margin-top: 12px; }
+.rx-face { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 54px; }
+.rx-face .gi-tile { width: 44px; height: 44px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45); }
+.rx-face figcaption { width: 100%; font-size: 10px; font-weight: 600; line-height: 1.2; text-align: center; color: #c9ccd2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Every reaction as a chip; Lunar / Stellar lead with their mark. */
+.rx-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--gi-line); }
+.rx-list button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 11px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 11px/1 'Sora', sans-serif; letter-spacing: 0.5px; color: #8b9099; cursor: pointer; }
+.rx-list button img, .rx-list button .rx-star { width: 12px; height: 12px; }
+.rx-list button:hover { color: #fff; }
+.rx-list button.is-on { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.rx-more { margin-top: 18px; }
+
+/* The chart page's wheel: bigger, and the card sits at the top (it grows with the numbers). */
+.rx-big { grid-template-columns: minmax(300px, 480px) minmax(0, 1fr); align-items: start; }
+.rx-big .rx-card { padding: 30px; }
+
+/* ---- PAGE: bar + sections ---- */
+.rx-jump .gi-tab { text-decoration: none; }
+.rx-first { padding-top: 40px; }
+.rx h3 { font: 800 19px/1.25 'Sora', sans-serif; color: #fff; text-wrap: balance; }
+.rx-band-copy > p:not(.gi-eyebrow),
+.rx-share-copy > p:not(.gi-eyebrow),
+.rx-moon-lv > p:not(.gi-eyebrow),
+.rx-moon-buff > p,
+.rx-prism > p:not(.gi-eyebrow) { margin-top: 10px; font-size: 13.5px; line-height: 1.65; color: var(--gi-muted); }
+.rx b { color: #fff; }
+.rx .gi-eyebrow { margin-bottom: 10px; }
+
+/* SWAPS: classic -> moon / star -> new, then who. Buttons, so they reset the native look. */
+.rx-swaps { display: flex; flex-direction: column; gap: 8px; }
+.rx-sw {
+  display: grid;
+  grid-template-columns: 96px minmax(120px, 0.8fr) 92px minmax(150px, 1fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 14px 20px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rx-sw:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color: var(--lb-box-hover); box-shadow: var(--lb-shadow-hover); }
+.rx-sw:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.rx-sw-els, .rx-row-els, .rx-fc-els { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--gi-dim); }
+.rx-sw-els img, .rx-row-els img, .rx-fc-els img { width: 24px; height: 24px; }
+.rx-sw small, .rx-row-name small, .rx-row-num small { display: block; font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gi-dim); }
+.rx-sw-from b { display: block; margin-top: 6px; font: 700 14px/1.2 'Sora', sans-serif; color: #8b9099; }
+.rx-sw-to b { display: block; margin-top: 6px; font: 900 19px/1.1 'Cinzel', serif; text-transform: uppercase; color: #fff; }
+.rx-sw-to small { color: #b4a684; }
+.rx-sw-arrow { display: flex; align-items: center; gap: 6px; }
+.rx-sw-arrow i { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.22)); }
+.rx-sw-arrow i:last-child { position: relative; background: linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(var(--gi-acc-rgb), 0.8)); }
+.rx-sw-arrow i:last-child::after { content: ''; position: absolute; right: 0; top: -3px; width: 7px; height: 7px; border-top: 1px solid rgba(var(--gi-acc-rgb), 0.9); border-right: 1px solid rgba(var(--gi-acc-rgb), 0.9); transform: rotate(45deg); }
+.rx-sw-arrow img, .rx-sw-arrow .rx-star { width: 22px; height: 22px; flex: none; }
+.rx-sw .rx-faces { justify-content: flex-end; gap: 6px; }
+.rx-sw .rx-face { width: 48px; }
+.rx-sw .rx-face .gi-tile { width: 38px; height: 38px; }
+.rx-swap-note { margin-top: 14px; font-size: 12.5px; color: var(--gi-dim); }
+
+/* BANDS: Who turns it on, on that nation's namecard (like the Lobby's lookup box on its shore). */
+.rx-band { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 48px; padding: 32px; overflow: hidden; }
+.rx-band::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(14, 15, 19, 0.97) 30%, rgba(14, 15, 19, 0.72) 62%, rgba(14, 15, 19, 0.86) 100%), var(--art) right 30% / cover no-repeat; }
+.rx-band--lunar { --art: url('/images/genshin/nation/nodkrai.webp'); }
+.rx-band--stellar { --art: url('/images/genshin/nation/snezhnaya.webp'); }
+.rx-band-who { display: flex; flex-direction: column; gap: 10px; align-self: center; }
+.rx-band-who > div + .gi-label { margin-top: 10px; }
+.rx-band .rx-faces { gap: 12px; }
+.rx-band .rx-face { width: 62px; }
+.rx-band .rx-face .gi-tile { width: 52px; height: 52px; }
+
+/* SHARE: the 60 / 30 / 5 / 5 blend, drawn. */
+.rx-share { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 48px; margin-top: 16px; padding: 32px; }
+.rx-share-f { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; margin: 16px 0 6px !important; padding: 14px 16px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); font-size: 13px; color: #c9ccd2 !important; }
+.rx-share-f b { font: 800 18px/1 'Sora', sans-serif; color: #fff; }
+.rx-share-f span { color: var(--gi-dim); }
+.rx-share-demo { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.rx-share-demo > .gi-tray { align-self: flex-start; }
+.rx-sh { display: flex; flex-direction: column; gap: 10px; list-style: none; }
+.rx-sh li { display: grid; grid-template-columns: 84px minmax(0, 1fr) 72px; align-items: center; gap: 12px; transition: opacity 0.2s ease; }
+.rx-sh li.is-off { opacity: 0.32; }
+.rx-sh-k { font: 700 12px/1.2 'Sora', sans-serif; color: #fff; }
+.rx-sh-k small { display: block; margin-top: 3px; font-size: 10px; font-weight: 600; color: var(--gi-dim); }
+.rx-sh-bar { position: relative; height: 18px; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-well); overflow: hidden; }
+.rx-sh-bar i, .rx-sh-bar b { position: absolute; top: 0; bottom: 0; left: 0; }
+.rx-sh-bar i { background: #2c2e36; }
+.rx-sh-bar b { background: var(--gi-acc); transition: width 0.35s var(--gi-ease); }
+.rx-sh-v { font: 700 13px/1 'Sora', sans-serif; text-align: right; color: #fff; font-variant-numeric: tabular-nums; }
+.rx-sh-sum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; padding-top: 14px; border-top: 1px solid var(--gi-line); }
+.rx-sh-sum .gi-label { flex-basis: 100%; }
+.rx-sh-sum b { font: 800 34px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; }
+.rx-sh-sum small { font-size: 12.5px; color: var(--gi-muted); }
+.rx-sh-note { font-size: 11.5px; color: var(--gi-dim); }
+
+/* MOONSIGN: the two levels | the non-Moonsign buff. */
+.rx-moon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
+.rx-moon > .gi-box { padding: 28px; }
+.rx-levels { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; list-style: none; }
+.rx-levels li { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: start; gap: 14px; }
+.rx-lv-n { display: grid; place-items: center; height: 48px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); font: 800 17px/1 'Sora', sans-serif; color: #fff; }
+.rx-levels b { font: 800 15px/1.3 'Sora', sans-serif; }
+.rx-levels p { margin-top: 4px; font-size: 13px; line-height: 1.55; color: var(--gi-muted); }
+.rx-buffs { display: flex; flex-direction: column; margin-top: 16px; list-style: none; border-top: 1px solid var(--gi-line); }
+.rx-buffs li { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gi-line); }
+.rx-buff-els { display: flex; gap: 2px; }
+.rx-buff-els img { width: 22px; height: 22px; }
+.rx-buffs b { font: 700 14px/1.2 'Sora', sans-serif; }
+.rx-buffs small { font-size: 11.5px; color: var(--gi-muted); white-space: nowrap; }
+
+/* RULES: four boxes, the takeaway loud. */
+.rx-rules { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 16px; list-style: none; }
+.rx-rules li { padding: 20px 22px; }
+.rx-rules b { display: block; font: 800 16px/1.3 'Sora', sans-serif; }
+.rx-rules b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin: 0 10px 3px 0; background: var(--gi-acc); transform: rotate(45deg); }
+.rx-rules p { margin-top: 6px; font-size: 12.5px; line-height: 1.55; color: var(--gi-muted); }
+
+/* FAMILY CARDS: one per Lunar / Stellar reaction. */
+.rx-fcs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.rx-fcs--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rx-fc { display: flex; flex-direction: column; padding: 24px; }
+.rx-fc header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rx-fc h3 { margin-top: 14px; font: 900 24px/1.05 'Cinzel', serif; text-transform: uppercase; }
+.rx-fc-desc { margin-top: 10px; font-size: 13.5px; line-height: 1.65; color: #c9ccd2; }
+.rx-fc-tip { margin-top: 16px; padding: 12px 14px; border-left: 2px solid var(--gi-acc); background: rgba(255, 255, 255, 0.025); font-size: 12.5px; line-height: 1.55; color: var(--gi-muted); }
+.rx-fc-tip b { display: block; margin-bottom: 3px; font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: #c9ccd2; }
+.rx-fc footer { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--gi-line); }
+.rx-fc-go { align-self: flex-start; margin-top: auto; }
+.rx-fc footer + .rx-fc-go { margin-top: 18px; }
+
+/* STELLAR: Polestar Field slider | Vortex steps. */
+.rx-stellar-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
+.rx-stellar-two > .gi-box { padding: 28px; }
+.rx-prism-l { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 22px 0 6px; }
+.rx-prism-l output { font: 800 32px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.rx-prism-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 18px; margin-top: 14px; border-top: 1px solid var(--gi-line); }
+.rx-vx { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; list-style: none; }
+.rx-vx li { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 16px; }
+.rx-vx b { font: 800 15px/1.3 'Sora', sans-serif; }
+.rx-vx p { margin-top: 3px; font-size: 13px; line-height: 1.55; color: var(--gi-muted); }
+/* The Vortex, drawn: a ring that grows, then bursts. */
+.rx-vx-orb { position: relative; display: grid; place-items: center; width: 56px; height: 56px; border: 2px solid var(--lb-edge); border-radius: 50%; background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); }
+.rx-vx-orb::before { content: ''; border-radius: 50%; border: 2px solid #c9ccd2; }
+.rx-vx-orb--1::before { width: 14px; height: 14px; }
+.rx-vx-orb--2::before { width: 30px; height: 30px; box-shadow: 0 0 0 4px #141518, 0 0 0 5px rgba(201, 204, 210, 0.5); }
+.rx-vx-orb--3::before { width: 8px; height: 8px; border: 0; background: var(--gi-acc); box-shadow: 0 0 0 6px rgba(var(--gi-acc-rgb), 0.25), 0 0 0 13px rgba(var(--gi-acc-rgb), 0.1); }
+.rx-vx-orb--3::after { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1px dashed rgba(var(--gi-acc-rgb), 0.7); }
+
+/* EVERY REACTION: family tray + the board. */
+.rx-fams { margin-bottom: 16px; }
+.rx-fams .gi-tab img, .rx-fams .gi-tab .rx-star { width: 14px; height: 14px; border-radius: 0; }
+.rx-board { overflow: hidden; }
+.rx-row {
+  display: grid;
+  grid-template-columns: 92px minmax(170px, 0.9fr) minmax(0, 2fr) minmax(120px, 0.7fr);
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  border-top: 1px solid var(--gi-line);
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.rx-row:first-child { border-top: 0; }
+.rx-row:hover { background: var(--lb-box-hover); }
+.rx-row:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.rx-row-name b { display: flex; align-items: center; gap: 6px; font: 800 15px/1.2 'Sora', sans-serif; }
+.rx-row-name b img, .rx-row-name b .rx-star { width: 14px; height: 14px; }
+.rx-row-name small { margin-top: 5px; }
+.rx-row-desc { font-size: 12.5px; line-height: 1.55; color: var(--gi-muted); }
+.rx-row-num { text-align: right; }
+.rx-row-num b { display: block; margin-top: 5px; font: 700 13px/1.2 'Sora', sans-serif; }
+
+/* MASTERY: slider + family bars | base hits. */
+.rx-em { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.rx-em > .gi-box { padding: 28px; }
+.rx-em-in .rx-prism-l { margin-top: 0; }
+.rx-em-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; list-style: none; }
+.rx-em-bars li { display: grid; grid-template-columns: 140px minmax(0, 1fr) 56px; align-items: center; gap: 12px; font-size: 12.5px; color: #c9ccd2; }
+.rx-em-bar { height: 14px; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-well); overflow: hidden; }
+.rx-em-bar i { display: block; height: 100%; background: var(--gi-acc); transition: width 0.2s ease; }
+.rx-em-bars b { font: 700 13px/1 'Sora', sans-serif; text-align: right; font-variant-numeric: tabular-nums; }
+.rx-em-note { margin-top: 18px; font-size: 11.5px; line-height: 1.6; color: var(--gi-dim); }
+.rx-em-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.rx-em-hits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; margin-top: 14px; list-style: none; }
+.rx-em-hits li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gi-line); font-size: 12.5px; color: #c9ccd2; }
+.rx-em-hits li span { display: flex; align-items: center; gap: 6px; }
+.rx-em-hits li img, .rx-em-hits li .rx-star { width: 13px; height: 13px; }
+.rx-em-hits b { font: 700 13px/1 'Sora', sans-serif; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---- NARROW DESKTOP ---- */
+@media (max-width: 1280px) and (min-width: 971px) {
+  .gi-rx { grid-template-columns: minmax(260px, 360px) minmax(0, 1fr); gap: 32px; }
+  .rx-sw { grid-template-columns: 84px minmax(110px, 0.8fr) 64px minmax(140px, 1fr) minmax(0, 1.2fr); gap: 14px; }
+  .rx-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rx-fcs { grid-template-columns: minmax(0, 1fr); }
+  .rx-em-hits { grid-template-columns: minmax(0, 1fr); }
+  .rx-row { grid-template-columns: 84px minmax(150px, 1fr) minmax(0, 1.6fr); }
+  .rx-row-num { display: none; }
+}
+
+/* ---- PHONES ---- */
+@media (max-width: 970px) {
+  .gi-rx { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .gi-wheel { max-width: 360px; margin: 0 auto; }
+  .rx-card, .rx-big .rx-card { padding: 18px; }
+  .rx-first { padding-top: 28px; }
+  .rx-jump { width: 100%; }
+  .rx-jump .gi-tab { padding: 0 9px; font-size: 10px; letter-spacing: 0.6px; }
+  .rx h3 { font-size: 17px; }
+
+  .rx-sw {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'els to' 'from from' 'who who';
+    gap: 10px 14px;
+    padding: 14px 16px;
+  }
+  .rx-sw-els { grid-area: els; }
+  .rx-sw-to { grid-area: to; }
+  .rx-sw-from { grid-area: from; display: flex; align-items: baseline; gap: 6px; }
+  .rx-sw-from b { margin-top: 0; font-size: 12.5px; }
+  .rx-sw-from small::after { content: ':'; }
+  .rx-sw-arrow { display: none; }
+  .rx-sw .rx-faces { grid-area: who; justify-content: flex-start; }
+  .rx-sw-to b { font-size: 17px; }
+
+  .rx-band, .rx-share { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+  .rx-band::before { background: linear-gradient(180deg, rgba(14, 15, 19, 0.95) 0%, rgba(14, 15, 19, 0.82) 55%, rgba(14, 15, 19, 0.92) 100%), var(--art) 60% 30% / cover no-repeat; }
+  .rx-band .rx-face { width: 54px; }
+  .rx-band .rx-face .gi-tile { width: 44px; height: 44px; }
+  .rx-share-demo > .gi-tray { align-self: stretch; }
+  .rx-sh li { grid-template-columns: 64px minmax(0, 1fr) 62px; gap: 8px; }
+  .rx-moon, .rx-stellar-two, .rx-em, .rx-fcs, .rx-fcs--two { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .rx-moon > .gi-box, .rx-stellar-two > .gi-box, .rx-em > .gi-box { padding: 20px; }
+  .rx-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .rx-rules li { padding: 16px; }
+  .rx-rules b { font-size: 14px; }
+  .rx-fc { padding: 20px; }
+  .rx-fc h3 { font-size: 21px; }
+  .rx-buffs li { grid-template-columns: 70px minmax(0, 1fr); }
+  .rx-buffs small { grid-column: 2; margin-top: -8px; }
+
+  .rx-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'name els' 'desc desc';
+    gap: 6px 12px;
+    padding: 14px 16px;
+  }
+  .rx-row-name { grid-area: name; }
+  .rx-row-els { grid-area: els; }
+  .rx-row-els img { width: 20px; height: 20px; }
+  .rx-row-desc { grid-area: desc; display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+  .rx-row-num { display: none; }
+
+  .rx-em-bars li { grid-template-columns: 112px minmax(0, 1fr) 48px; gap: 8px; font-size: 11.5px; }
+  .rx-em-hits { grid-template-columns: minmax(0, 1fr); }
+  .rx-prism-out { column-gap: 10px; }
+  .rx-prism-out .gi-stat b { font-size: 19px; }
+}

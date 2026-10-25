@@ -1,0 +1,156 @@
+{
+  "_note": "Every elemental reaction, read by genshin-reactions.js (the Lobby wheel + /genshin-impact/reactions). Facts: Genshin Impact Wiki (Fandom, CC BY-SA) + the in-game tutorials, checked Oct 26 2026 for 7.1; research notes in docs/genshin-reactions-research.md. pair = the two elements that trigger it on the wheel (with = the partners for Swirl / Crystallize); on = a follow-up that needs another reaction first; swap = the reaction it replaces when one of `by` is in the party; coef = Base Reaction Coefficient x the level multiplier; dmg = which EM formula (trans 16, lunar 6, add 5, amp 2.78).",
+  "version": "7.1",
+  "checked": "Oct 26 2026",
+  "families": [
+    { "key": "amp", "name": "Amplifying", "line": "Multiply the hit that triggers them, so they scale with that hit and crit with it." },
+    { "key": "trans", "name": "Transformative", "line": "Deal their own damage from your level and Elemental Mastery. They can't crit and ignore enemy DEF." },
+    { "key": "cat", "name": "Catalyze", "line": "Quicken sets the enemy up; Aggravate and Spread add flat damage to the next hit." },
+    { "key": "status", "name": "Control & shields", "line": "No damage of their own: they freeze enemies or drop shields." },
+    { "key": "lunar", "name": "Lunar", "line": "Nod-Krai. Three Hydro reactions swapped for stronger ones when a Moon Wheel user or Columbina is in the party." },
+    { "key": "stellar", "name": "Stellar Glimmer", "line": "Snezhnaya. Two Cryo reactions swapped for stronger ones when a Stellar Linchpin user or the Cryo Traveler is in the party." }
+  ],
+  "reactions": [
+    {
+      "id": "vaporize", "name": "Vaporize", "fam": "amp", "pair": ["pyro", "hydro"], "dmg": "amp",
+      "desc": "Hydro and Pyro boil off and the hit that triggers it is multiplied: 2× when Hydro hits a Pyro enemy, 1.5× the other way round.",
+      "tip": "The 1.5× side uses up less of the aura, so it can trigger again sooner.",
+      "nums": [["Hydro on Pyro", "2×"], ["Pyro on Hydro", "1.5×"], ["Crits", "With the hit"]],
+      "amp": [2, 1.5]
+    },
+    {
+      "id": "melt", "name": "Melt", "fam": "amp", "pair": ["pyro", "cryo"], "dmg": "amp",
+      "desc": "Pyro and Cryo cancel out and the hit that triggers it is multiplied: 2× when Pyro hits a Cryo enemy, 1.5× the other way round.",
+      "tip": "Frozen enemies melt too: Pyro on a Frozen target triggers Melt.",
+      "nums": [["Pyro on Cryo", "2×"], ["Cryo on Pyro", "1.5×"], ["Crits", "With the hit"]],
+      "amp": [2, 1.5]
+    },
+    {
+      "id": "overloaded", "name": "Overloaded", "fam": "trans", "pair": ["pyro", "electro"], "dmg": "trans", "coef": 2.75,
+      "desc": "A Pyro explosion that hits every enemy around the target and knocks them back.",
+      "tip": "Great on small fry, a pain when it blasts them out of your attacks.",
+      "nums": [["Base", "2.75 × level"], ["Damage", "AoE Pyro"], ["Crits", "No"]]
+    },
+    {
+      "id": "superconduct", "name": "Superconduct", "fam": "trans", "pair": ["electro", "cryo"], "dmg": "trans", "coef": 1.5,
+      "desc": "Area Cryo damage that cuts enemies' Physical RES by 40% for 12 seconds.",
+      "tip": "Built for Physical teams: the shred is the point, not the damage.",
+      "nums": [["Base", "1.5 × level"], ["Physical RES", "−40% for 12 s"], ["Crits", "No"]]
+    },
+    {
+      "id": "electro-charged", "name": "Electro-Charged", "fam": "trans", "pair": ["hydro", "electro"], "dmg": "trans", "coef": 2,
+      "desc": "Both elements stay on the enemy, which takes Electro damage every second until one runs out. Each tick also arcs to one wet enemy nearby.",
+      "tip": "Because both auras stay on, a third element can trigger two reactions at once.",
+      "nums": [["Base", "2 × level, per tick"], ["Ticks", "Every 1 s"], ["Crits", "No"]]
+    },
+    {
+      "id": "frozen", "name": "Frozen", "fam": "status", "pair": ["hydro", "cryo"],
+      "desc": "Locks the enemy in ice. Keep putting Hydro and Cryo on to keep it frozen; a heavy hit breaks it with Shatter.",
+      "tip": "Bosses can't be frozen, so Freeze teams shine in the Abyss's smaller rooms.",
+      "nums": [["Damage", "None"], ["Breaks with", "Claymores, plunges, Geo"]]
+    },
+    {
+      "id": "swirl", "name": "Swirl", "fam": "trans", "pair": ["anemo"], "with": ["pyro", "hydro", "electro", "cryo"], "dmg": "trans", "coef": 0.6,
+      "desc": "Anemo picks up Pyro, Hydro, Electro or Cryo and spreads it to every enemy around, dealing that element's damage.",
+      "tip": "The spread element can react again: a Pyro Swirl onto wet enemies Vaporizes.",
+      "nums": [["Base", "0.6 × level"], ["Damage", "The swirled element, AoE"], ["Crits", "No"]]
+    },
+    {
+      "id": "crystallize", "name": "Crystallize", "fam": "status", "pair": ["geo"], "with": ["pyro", "hydro", "electro", "cryo"],
+      "desc": "Geo knocks a shard of the other element loose. Pick it up for a shield that blocks that element best.",
+      "tip": "The shard has to be picked up: walk over it or it fades.",
+      "nums": [["Damage", "None"], ["Shield", "Absorbs its element 250%"]]
+    },
+    {
+      "id": "bloom", "name": "Bloom", "fam": "trans", "pair": ["dendro", "hydro"], "dmg": "trans", "coef": 2,
+      "desc": "Spawns a Dendro Core that bursts after a few seconds for AoE Dendro damage, and nicks you too.",
+      "tip": "Only 5 cores fit on the field: a sixth makes the oldest burst at once.",
+      "nums": [["Base", "2 × level"], ["Cores", "5 at most"], ["Crits", "No"]]
+    },
+    {
+      "id": "burning", "name": "Burning", "fam": "trans", "pair": ["dendro", "pyro"], "dmg": "trans", "coef": 0.25,
+      "desc": "Sets the enemy alight: Pyro damage over time to it and anything standing in the fire, which keeps putting Pyro back on.",
+      "tip": "Ticks four times a second, which is how it keeps re-applying Pyro for Vaporize or Melt.",
+      "nums": [["Base", "0.25 × level, per tick"], ["Ticks", "Every 0.25 s"], ["Crits", "No"]]
+    },
+    {
+      "id": "quicken", "name": "Quicken", "fam": "cat", "pair": ["dendro", "electro"],
+      "desc": "Leaves the enemy Quickened. Nothing happens yet: the next Electro hit triggers Aggravate, the next Dendro hit Spread.",
+      "tip": "Quicken itself deals no damage. The payoff is every hit after it.",
+      "nums": [["Damage", "None by itself"], ["Sets up", "Aggravate, Spread"]]
+    },
+    {
+      "id": "aggravate", "name": "Aggravate", "fam": "cat", "on": "quicken", "els": ["dendro", "electro"], "dmg": "add", "coef": 1.15,
+      "desc": "An Electro hit on a Quickened enemy gets flat damage added before crit, scaling with level and Elemental Mastery.",
+      "tip": "The bonus is added before crit, so it crits with the hit.",
+      "nums": [["Adds", "1.15 × level"], ["Crits", "With the hit"]]
+    },
+    {
+      "id": "spread", "name": "Spread", "fam": "cat", "on": "quicken", "els": ["dendro", "electro"], "dmg": "add", "coef": 1.25,
+      "desc": "A Dendro hit on a Quickened enemy gets flat damage added before crit, scaling with level and Elemental Mastery.",
+      "tip": "A little stronger than Aggravate: 1.25 against 1.15.",
+      "nums": [["Adds", "1.25 × level"], ["Crits", "With the hit"]]
+    },
+    {
+      "id": "hyperbloom", "name": "Hyperbloom", "fam": "trans", "on": "bloom", "els": ["dendro", "hydro", "electro"], "dmg": "trans", "coef": 3,
+      "desc": "Electro hits a Dendro Core: it turns into a homing shot that slams one enemy.",
+      "tip": "The shots seek enemies, never you: the safe way to play Bloom.",
+      "nums": [["Base", "3 × level"], ["Damage", "Single-target Dendro"], ["Crits", "No"]]
+    },
+    {
+      "id": "burgeon", "name": "Burgeon", "fam": "trans", "on": "bloom", "els": ["dendro", "hydro", "pyro"], "dmg": "trans", "coef": 3,
+      "desc": "Pyro hits a Dendro Core: it explodes in a wider blast.",
+      "tip": "The blast can hurt your own character, like Bloom.",
+      "nums": [["Base", "3 × level"], ["Damage", "AoE Dendro"], ["Crits", "No"]]
+    },
+    {
+      "id": "shatter", "name": "Shatter", "fam": "trans", "on": "frozen", "els": ["hydro", "cryo", "geo"], "dmg": "trans", "coef": 3,
+      "desc": "Something heavy (a claymore, a plunge, Geo) breaks a Frozen enemy for Physical damage.",
+      "tip": "Breaking the ice ends the freeze, so Freeze teams usually avoid it.",
+      "nums": [["Base", "3 × level"], ["Damage", "Physical"], ["Crits", "No"]]
+    },
+    {
+      "id": "lunar-charged", "name": "Lunar-Charged", "fam": "lunar", "pair": ["hydro", "electro"], "swap": "electro-charged", "dmg": "lunar", "coef": 3,
+      "by": ["Ineffa", "Flins", "Columbina"], "since": "5.8",
+      "desc": "A thundercloud forms and strikes every enemy carrying both Electro and Hydro nearby with Electro damage, every 2 seconds. The damage blends everyone who put an element on, and it can crit.",
+      "tip": "Only one cloud at a time. Trigger it again and its 6 s timer starts over.",
+      "nums": [["Base", "3 × level"], ["Strikes", "Every 2 s"], ["Cloud lasts", "6 s"], ["Crits", "Yes"]]
+    },
+    {
+      "id": "lunar-bloom", "name": "Lunar-Bloom", "fam": "lunar", "pair": ["dendro", "hydro"], "swap": "bloom", "dmg": "lunar", "coef": 1,
+      "by": ["Lauma", "Nefer", "Columbina"], "since": "Luna I (6.0)", "direct": true,
+      "desc": "Bloom plus Verdant Dew: the Dendro Cores still appear, and the party collects Dew. The reaction deals no damage by itself; characters' talents deal Lunar-Bloom damage, many by spending the Dew.",
+      "tip": "Verdant Dew never runs out: it stays through team swaps, teleports, the daily reset and closing the game.",
+      "nums": [["Damage", "From talents only"], ["Verdant Dew", "1 every 2.5 s, 3 max"], ["Dew expires", "Never"], ["Crits", "Yes"]]
+    },
+    {
+      "id": "lunar-crystallize", "name": "Lunar-Crystallize", "fam": "lunar", "pair": ["geo"], "with": ["hydro"], "swap": "crystallize", "dmg": "lunar", "coef": 1.6,
+      "by": ["Zibai", "Linnea", "Columbina"], "since": "Luna IV (6.3)",
+      "desc": "Three Moondrifts form around the enemy. Every third Lunar-Crystallize makes them resonate: Moondrift Harmony fires a homing shot of Geo damage that blends everyone who put an element on, and it can crit.",
+      "tip": "Moondrifts count as Geo constructs: with two Geo characters, Enduring Rock's +15% DMG turns on even with no shield.",
+      "nums": [["Base", "1.6 × level"], ["Moondrifts", "3 per reaction"], ["Harmony", "Every 3rd reaction"], ["Crits", "Yes"]]
+    },
+    {
+      "id": "stellar-conduct", "name": "Stellar-Conduct", "fam": "stellar", "pair": ["electro", "cryo"], "swap": "superconduct", "dmg": "lunar", "coef": 1,
+      "by": ["Sandrone", "Odette", "Traveler (Cryo)"], "since": "Luna VIII (6.7)", "direct": true,
+      "desc": "A Starlight Prism appears and turns the area into a Polestar Field for 7 seconds: Cryo and Electro DMG up, enemies' Physical RES down 40%. Every 4 s the field counts your Cryo and Electro hits and grows stronger. The damage itself comes from characters' talents.",
+      "tip": "In Snezhnaya's open world the field also keeps you warm and powers up Prime Ice constructs and firearms.",
+      "nums": [["Field", "7 s"], ["Cryo / Electro DMG", "+20% to +40%"], ["Physical RES", "−40%"], ["Damage", "From talents only"]]
+    },
+    {
+      "id": "stellar-swirl", "name": "Stellar Swirl", "fam": "stellar", "pair": ["anemo"], "with": ["cryo"], "swap": "swirl", "dmg": "lunar", "coef": 0.75,
+      "by": ["Sandrone", "Odette", "Traveler (Cryo)", "Vesna"], "since": "7.0",
+      "desc": "A hit of Anemo damage, then a Stellar Vortex that explodes in AoE Cryo. Trigger it three times and the Vortex grows to a bigger, stronger Lv. 2; three more set it off at once.",
+      "tip": "When a Vortex explodes, your next jump within 5 s goes higher.",
+      "nums": [["First hit", "0.75 × level, Anemo"], ["Vortex Lv. 1", "2 × level, AoE Cryo"], ["Vortex Lv. 2", "3 × level"], ["Crits", "Yes"]]
+    }
+  ],
+  "moonsign": {
+    "enable": ["Ineffa", "Flins", "Lauma", "Nefer", "Zibai", "Linnea", "Columbina"],
+    "level": ["Aino", "Jahoda", "Illuga"]
+  },
+  "stellar": {
+    "enable": ["Sandrone", "Odette", "Vesna", "Traveler (Cryo)"]
+  },
+  "levels": { "80": 1077.443668, "90": 1446.853458, "95": 1561.468, "100": 1674.8092 }
+}

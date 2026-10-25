@@ -316,86 +316,7 @@
     if (document.fonts) document.fonts.ready.then(size); // Cinzel changes the name's height
   }
 
-  // ---- REACTIONS ----
-  const ELS = ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'];
-  const AURA4 = ['pyro', 'hydro', 'electro', 'cryo'];
-  const RX = [
-    { n: 'Vaporize', e: ['pyro', 'hydro'], k: 'Amplifying', d: 'Hydro hitting Pyro deals 2× damage; Pyro hitting Hydro deals 1.5×. Elemental Mastery raises the multiplier.' },
-    { n: 'Melt', e: ['pyro', 'cryo'], k: 'Amplifying', d: 'Pyro hitting Cryo deals 2× damage; Cryo hitting Pyro deals 1.5×. Elemental Mastery raises the multiplier.' },
-    { n: 'Overloaded', e: ['pyro', 'electro'], k: 'Transformative', d: 'A Pyro explosion that damages every enemy nearby and knocks them back.' },
-    { n: 'Superconduct', e: ['electro', 'cryo'], k: 'Transformative', d: "Area Cryo damage that cuts enemies' Physical RES by 40% for 12 seconds." },
-    { n: 'Electro-Charged', e: ['hydro', 'electro'], k: 'Transformative', d: 'Electro damage over time while both elements stay on the target, arcing to wet enemies nearby.' },
-    { n: 'Frozen', e: ['hydro', 'cryo'], k: 'Crowd control', d: 'Freezes the target in place. A heavy hit (claymores, plunges, Geo) breaks it with Shatter.' },
-    { n: 'Swirl', e: ['anemo'], with: AURA4, k: 'Transformative', d: "Pulls in Pyro, Hydro, Electro or Cryo and spreads it to the enemies around, dealing that element's damage." },
-    { n: 'Crystallize', e: ['geo'], with: AURA4, k: 'Shield', d: 'Drops a crystal shard of the element it hit. Pick it up for a shield that absorbs that element best.' },
-    { n: 'Bloom', e: ['dendro', 'hydro'], k: 'Transformative', d: 'Spawns a Dendro Core that bursts after a few seconds, damaging enemies around it (and you, a little).' },
-    { n: 'Burning', e: ['dendro', 'pyro'], k: 'Transformative', d: 'Sets the ground alight: Pyro damage over time to every enemy standing in it.' },
-    { n: 'Quicken', e: ['dendro', 'electro'], k: 'Catalyze', d: 'Leaves the enemy Quickened. More Electro then triggers Aggravate, more Dendro triggers Spread.' },
-    { n: 'Aggravate', e: ['dendro', 'electro'], k: 'Catalyze · Additive', d: 'An Electro hit on a Quickened enemy adds flat bonus damage, scaling with level and Elemental Mastery.', extra: true },
-    { n: 'Spread', e: ['dendro', 'electro'], k: 'Catalyze · Additive', d: 'A Dendro hit on a Quickened enemy adds flat bonus damage, scaling with level and Elemental Mastery.', extra: true },
-    { n: 'Hyperbloom', e: ['dendro', 'hydro', 'electro'], k: 'Transformative', d: 'Electro hits a Dendro Core: it turns into a homing sprawl shot that slams one enemy.', extra: true },
-    { n: 'Burgeon', e: ['dendro', 'hydro', 'pyro'], k: 'Transformative', d: 'Pyro hits a Dendro Core: it explodes in a wider blast.', extra: true },
-    { n: 'Shatter', e: ['hydro', 'cryo', 'geo'], k: 'Transformative', d: 'Hit a Frozen enemy with something heavy (claymore, plunge, Geo) to break the ice for Physical damage.', extra: true },
-  ];
-  function rxFor(a, b) {
-    if (a === b) return null;
-    return RX.find((r) => !r.extra && (r.with ? (r.e[0] === a && r.with.includes(b)) || (r.e[0] === b && r.with.includes(a)) : r.e.includes(a) && r.e.includes(b))) || null;
-  }
-  function reactions() {
-    const svg = $('giWheel');
-    const C = 200;
-    const R = 140;
-    const pos = ELS.map((_, i) => {
-      const t = -Math.PI / 2 + (i * 2 * Math.PI) / ELS.length;
-      return [C + R * Math.cos(t), C + R * Math.sin(t)];
-    });
-    svg.innerHTML =
-      `<circle class="rx-ring" cx="${C}" cy="${C}" r="${R + 44}"/><circle class="rx-ring" cx="${C}" cy="${C}" r="${R - 44}"/>` +
-      `<polygon class="rx-poly" points="${pos.map((p) => p.join(',')).join(' ')}"/><g id="rxLinks"></g>` +
-      `<text class="rx-mid-k" x="${C}" y="${C - 8}" id="rxMidK"></text><text class="rx-mid" x="${C}" y="${C + 14}" id="rxMid"></text>` +
-      ELS.map(
-        (el, i) =>
-          `<g class="rx-node" data-el="${el}" tabindex="0" role="button" aria-label="${cap(el)}" transform="translate(${pos[i][0]},${pos[i][1]})"><circle r="30"/><image href="${elIcon(el)}" x="-17" y="-17" width="34" height="34"/><text y="50">${cap(el)}</text></g>`
-      ).join('');
-    let picked = ['pyro', 'hydro'];
-    const draw = (els, r) => {
-      svg.querySelectorAll('.rx-node').forEach((g) => g.classList.toggle('is-on', els.includes(g.dataset.el)));
-      const pts = els.map((el) => pos[ELS.indexOf(el)]);
-      $('rxLinks').innerHTML = pts.length > 1 ? pts.map((p, i) => (i < pts.length - 1 || pts.length > 2 ? `<line class="rx-link" x1="${p[0]}" y1="${p[1]}" x2="${pts[(i + 1) % pts.length][0]}" y2="${pts[(i + 1) % pts.length][1]}"/>` : '')).join('') : '';
-      $('rxMidK').textContent = r ? r.k : els.length > 1 ? 'No reaction' : 'Tap one more';
-      $('rxMid').textContent = r ? r.n : '';
-      $('rxKind').textContent = r ? r.k : els.length > 1 ? 'No reaction' : 'Tap a second element';
-      $('rxName').textContent = r ? r.n : els.length > 1 ? 'Nothing happens' : cap(els[0]);
-      $('rxEq').innerHTML = els.map((el) => `<img src="${elIcon(el)}" alt="">${cap(el)}`).join('<span aria-hidden="true">+</span>');
-      $('rxDesc').textContent = r ? r.d : els.length > 1 ? "Anemo, Geo and Dendro don't react with each other, and no element reacts with itself." : 'Choose another element on the wheel.';
-      $('rxList').querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', !!r && b.textContent === r.n));
-    };
-    $('rxList').innerHTML = RX.map((r) => `<button type="button">${esc(r.n)}</button>`).join('');
-    $('rxList').addEventListener('click', (e) => {
-      const b = e.target.closest('button');
-      if (!b) return;
-      const r = RX.find((x) => x.n === b.textContent);
-      picked = r.with ? [r.e[0], r.with[0]] : r.e.slice();
-      draw(picked, r);
-    });
-    const choose = (el) => {
-      // A third pick starts a new pair from the last one.
-      picked = picked.length >= 2 ? [el] : picked[0] === el ? [el] : [picked[0], el];
-      draw(picked, picked.length === 2 ? rxFor(picked[0], picked[1]) : null);
-    };
-    svg.addEventListener('click', (e) => {
-      const g = e.target.closest('.rx-node');
-      if (g) choose(g.dataset.el);
-    });
-    svg.addEventListener('keydown', (e) => {
-      const g = e.target.closest('.rx-node');
-      if (g && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault();
-        choose(g.dataset.el);
-      }
-    });
-    draw(picked, rxFor('pyro', 'hydro'));
-  }
+  // ---- REACTIONS: the wheel moved to genshin-reactions.js (Oct 26 2026), shared with the Reactions chart. ----
 
   // ---- PITY: chance of a 5-star on pull n since the last one (community model) ----
   const P5 = (n) => (n >= 90 ? 1 : n <= 73 ? 0.006 : Math.min(1, 0.006 + 0.06 * (n - 73)));
@@ -449,7 +370,6 @@
     });
     update();
   }
-  reactions();
   pity();
 
   // ---- go ----

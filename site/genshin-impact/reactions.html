@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genshin Impact reactions chart: every reaction, Lunar and Stellar Glimmer explained | Parchrome</title>
+<meta name="description" content="Every elemental reaction in Genshin Impact on one interactive wheel, with Nod-Krai's Lunar reactions (Lunar-Charged, Lunar-Bloom, Lunar-Crystallize), Moonsign and Snezhnaya's Stellar Glimmer reactions explained: what swaps them in, how the damage is shared, and what your Elemental Mastery is worth.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261024fb">
+<link rel="stylesheet" href="/coc-more.css?v=20261022gn">
+<link rel="stylesheet" href="/coc-help.css?v=20261024cc">
+<link rel="stylesheet" href="/genshin.css?v=20261026a">
+<link rel="stylesheet" href="/genshin-reactions.css?v=20261026a">
+</head>
+<body class="gi-page" data-game-nav="genshin-impact">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/genshin.jpg" alt="" class="th-icon">
+    <div class="secondary-content">Genshin Impact</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Genshin Impact pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main">
+    <div class="coc-content">
+      <main class="gi rx">
+      <div class="gi-frame">
+
+        <!-- HEADER: the shared .gi-tb (genshin.css) on the element-emblem namecard. Icon = the nav's
+             reactions icon (seelie.me's traces, composited Pyro / Hydro / Electro). Facts from genshin-reactions.json. -->
+        <header class="gi-tb">
+          <img class="gi-tb-art rx-tb-art" src="/images/genshin/namecard/guides.webp" alt="" fetchpriority="high">
+          <div class="gi-tb-body">
+            <img class="gi-tb-icon" src="/images/genshin/nav/reactions.webp" alt="" width="76" height="76">
+            <div class="gi-tb-copy">
+              <h1 class="gi-title"><span class="gi-vh">Genshin Impact </span>Elemental <em>reactions</em></h1>
+              <p class="gi-tb-desc">Every reaction in Teyvat, Nod-Krai's Lunar reactions and Snezhnaya's Stellar ones included: what sets them off, what they do and what makes them hit harder.</p>
+              <ul class="gi-tb-facts" id="rxFacts"></ul>
+            </div>
+          </div>
+        </header>
+
+        <!-- Jump tray (GI.jumpNav: one sliding pill, lights the section you're in). -->
+        <div class="gi-bar">
+          <nav class="gi-tray rx-jump" id="rxJump" aria-label="On this page">
+            <a class="gi-tab" href="#wheel">Wheel</a>
+            <a class="gi-tab" href="#swaps">Swaps</a>
+            <a class="gi-tab" href="#lunar">Lunar</a>
+            <a class="gi-tab" href="#stellar">Stellar</a>
+            <a class="gi-tab" href="#all">All reactions</a>
+            <a class="gi-tab" href="#mastery">Mastery</a>
+            <a class="gi-tab" href="#faq">Questions</a>
+          </nav>
+        </div>
+
+        <!-- THE WHEEL (genshin-reactions.js "THE WHEEL", same engine as the Lobby's): pick two elements; the
+             Classic / Lunar / Stellar tray = who's in your party, which is what swaps a reaction. ?r=<id> in the address. -->
+        <section class="gi-sec rx-first" id="wheel" aria-labelledby="rxWheelT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxWheelT">The reaction <em>wheel.</em></h2><p class="mch-sec-sub">Tap two elements. Then flip your party to Lunar or Stellar and watch the same pair turn into something else.</p></div>
+          </header>
+          <div class="gi-rx rx-big" data-rx="page"><p class="gi-box gi-empty">Loading the reactions&hellip;</p></div>
+        </section>
+
+        <!-- THE SWAPS: the one idea people miss. Same elements, a different reaction, because of who's in the party. -->
+        <section class="gi-sec" id="swaps" aria-labelledby="rxSwapT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxSwapT">Same elements, <em>new reaction.</em></h2><p class="mch-sec-sub">Lunar and Stellar reactions aren't new element pairs. They replace a classic reaction when the right character is in your party.</p></div>
+          </header>
+          <div class="rx-swaps" id="rxSwap"></div>
+          <p class="rx-swap-note">No one from the list in your party? You get the classic reaction, exactly as before.</p>
+        </section>
+
+        <!-- LUNAR (Nod-Krai): who turns it on, how the damage is shared, Moonsign, the rules, the three reactions. -->
+        <section class="gi-sec" id="lunar" aria-labelledby="rxLunarT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxLunarT">Lunar <em>reactions.</em></h2><p class="mch-sec-sub">Nod-Krai's three Hydro reactions, from Version 5.8 on. Everything that makes them different, step by step.</p></div>
+          </header>
+
+          <!-- 1. Who: on the Nod-Krai namecard (nation/nodkrai.webp), like the Lobby's Nations band. -->
+          <div class="gi-box rx-band rx-band--lunar">
+            <div class="rx-band-copy">
+              <p class="gi-eyebrow">Step 1 · The switch</p>
+              <h3>A Moon Wheel in the party</h3>
+              <p>Some of Nod-Krai's fighters (and Zibai, from Liyue) carry a <b>Moon Wheel</b> instead of a Vision, running on kuuvahki, an older, purer elemental power. Their passive (<b>Moonsign Benediction</b>) swaps Hydro's reactions for Lunar ones for the whole party. Columbina swaps all three; everyone else swaps one.</p>
+            </div>
+            <div class="rx-band-who">
+              <span class="gi-label">Turns Lunar on</span>
+              <div id="rxMoonOn"></div>
+              <span class="gi-label">Raises Moonsign only</span>
+              <div id="rxMoonLv"></div>
+            </div>
+          </div>
+
+          <!-- 2. Everyone pays in: the 60 / 30 / 5 / 5 blend, with example numbers (genshin-reactions.js "share"). -->
+          <div class="gi-box rx-share" id="rxShare">
+            <div class="rx-share-copy">
+              <p class="gi-eyebrow">Step 2 · The damage</p>
+              <h3>Everyone who touched it pays in</h3>
+              <p>A Lunar-Charged strike isn't the trigger's hit. The game works out a separate hit for <b>every character who put Hydro or Electro on the enemy</b>, each with their own level, Elemental Mastery and crit, then blends them:</p>
+              <p class="rx-share-f"><b>60%</b> of the best <span>+</span> <b>30%</b> of the 2nd <span>+</span> <b>5%</b> <span>+</span> <b>5%</b></p>
+              <p>So build the support's EM and crit too: their hit is a third of the damage. Lunar-Crystallize and Stellar Swirl blend the same way.</p>
+            </div>
+            <div class="rx-share-demo">
+              <div class="gi-tray gi-tray--sm" role="tablist" aria-label="Characters who applied an element">
+                <button type="button" class="gi-tab" data-n="1" role="tab">1 character</button>
+                <button type="button" class="gi-tab" data-n="2" role="tab">2</button>
+                <button type="button" class="gi-tab" data-n="3" role="tab">3</button>
+                <button type="button" class="gi-tab" data-n="4" role="tab">4</button>
+              </div>
+              <ol class="rx-sh" id="rxShareBars"></ol>
+              <div class="rx-sh-sum"><span class="gi-label">The strike lands for</span><b id="rxShareSum"></b><small id="rxShareVs"></small></div>
+              <p class="rx-sh-note">Example hits, not real ones. Grey = each character's own hit; red = what it adds.</p>
+            </div>
+          </div>
+
+          <!-- 3. Moonsign: Team Bonus screen, from the wiki's Team Bonuses page. -->
+          <div class="rx-moon">
+            <div class="gi-box rx-moon-lv">
+              <p class="gi-eyebrow">Step 3 · Moonsign</p>
+              <h3>Count your Moonsign characters</h3>
+              <p>Every Nod-Krai character (and Zibai) raises the party's Moonsign level by one. It shows on the Team Bonus screen, next to Elemental Resonance.</p>
+              <ol class="rx-levels">
+                <li><span class="rx-lv-n">1</span><div><b>Nascent Gleam</b><p>Everyone gets the Nascent Gleam effect, which these characters' talents read.</p></div></li>
+                <li><span class="rx-lv-n">2+</span><div><b>Ascendant Gleam</b><p>Moonsign characters' talents get stronger, and your <b>other</b> characters start buffing Lunar damage (right).</p></div></li>
+              </ol>
+            </div>
+            <div class="gi-box rx-moon-buff">
+              <span class="gi-label">Ascendant Gleam: the non-Moonsign buff</span>
+              <p>For 20 s after a character <b>without</b> Moonsign uses their Skill or Burst, the party's Lunar Reaction DMG goes up by their stat. Up to <b>36%</b>, and it doesn't stack.</p>
+              <ul class="rx-buffs">
+                <li><span class="rx-buff-els"><img src="/images/genshin/element/pyro.webp" alt="Pyro"><img src="/images/genshin/element/electro.webp" alt="Electro"><img src="/images/genshin/element/cryo.webp" alt="Cryo"></span><b>0.9% per 100 ATK</b><small>Max at 4,000 ATK</small></li>
+                <li><span class="rx-buff-els"><img src="/images/genshin/element/hydro.webp" alt="Hydro"></span><b>0.6% per 1,000 HP</b><small>Max at 60,000 HP</small></li>
+                <li><span class="rx-buff-els"><img src="/images/genshin/element/geo.webp" alt="Geo"></span><b>1% per 100 DEF</b><small>Max at 3,600 DEF</small></li>
+                <li><span class="rx-buff-els"><img src="/images/genshin/element/anemo.webp" alt="Anemo"><img src="/images/genshin/element/dendro.webp" alt="Dendro"></span><b>2.25% per 100 EM</b><small>Max at 1,600 EM</small></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 4. The rules every Lunar (and Stellar) hit follows. -->
+          <ul class="rx-rules" aria-label="Lunar damage rules">
+            <li class="gi-box"><b>Can crit</b><p>With the character's normal Crit Rate and Crit DMG. Classic Bloom or Overloaded can't.</p></li>
+            <li class="gi-box"><b>Ignores enemy DEF</b><p>Like the classic transformative reactions. Enemy RES still counts, so shred helps.</p></li>
+            <li class="gi-box"><b>Ignores DMG Bonus</b><p>Elemental DMG goblets and % DMG buffs (Furina's, Yelan's) do nothing here. EM and Lunar bonuses do.</p></li>
+            <li class="gi-box"><b>Needs Hydro</b><p>All three are Hydro reactions. A Lunar team with no Hydro just gets classic reactions.</p></li>
+          </ul>
+
+          <!-- 5. The three reactions (genshin-reactions.js famCards). -->
+          <div class="rx-fcs" id="rxLunarCards"></div>
+        </section>
+
+        <!-- STELLAR GLIMMER (Snezhnaya): the same idea for Cryo, 6.7 / 7.0. -->
+        <section class="gi-sec" id="stellar" aria-labelledby="rxStellarT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxStellarT">Stellar <em>Glimmer.</em></h2><p class="mch-sec-sub">Snezhnaya's answer for Cryo, since Version 6.7. Same swap, same blended crits, a different family.</p></div>
+          </header>
+
+          <div class="gi-box rx-band rx-band--stellar">
+            <div class="rx-band-copy">
+              <p class="gi-eyebrow">The switch</p>
+              <h3>A Stellar Linchpin in the party</h3>
+              <p>Some of Snezhnaya's fighters wield a <b>Stellar Linchpin</b>, a Vision-like gem tied to the Third Descender's otherworldly power. Their passive (<b>Stellar Jubilee</b>) swaps Cryo's reactions for Stellar ones; the Cryo Traveler's does too. Vesna swaps Stellar Swirl only.</p>
+            </div>
+            <div class="rx-band-who">
+              <span class="gi-label">Turns Stellar on</span>
+              <div id="rxStarOn"></div>
+            </div>
+          </div>
+
+          <!-- Polestar Field: the field counts Cryo / Electro hits every 4 s (wiki's table; genshin-reactions.js "prism"). -->
+          <div class="rx-stellar-two">
+            <div class="gi-box rx-prism">
+              <p class="gi-eyebrow">Stellar-Conduct · Polestar Field</p>
+              <h3>Feed the Prism</h3>
+              <p>Every 4 seconds the field counts the Cryo and Electro hits that landed inside it (up to 12) and powers up for the next 4. Drag to see how much.</p>
+              <label class="rx-prism-l" for="rxPrismHits"><span class="gi-label">Hits in the last 4 s</span><output id="rxPrismN">0</output></label>
+              <input type="range" class="gi-range" id="rxPrismHits" min="0" max="12" step="1" value="0">
+              <div class="rx-prism-out">
+                <div class="gi-stat"><b id="rxPrismDmg">+20%</b><small>Cryo &amp; Electro DMG</small></div>
+                <div class="gi-stat"><b id="rxPrismCoef">1.00×</b><small>Stellar-Conduct base</small></div>
+                <div class="gi-stat"><b>−40%</b><small>Enemy Physical RES</small></div>
+              </div>
+            </div>
+            <!-- Stellar Swirl's Vortex, drawn as three steps. -->
+            <div class="gi-box rx-vortex">
+              <p class="gi-eyebrow">Stellar Swirl · The Vortex</p>
+              <h3>Swirl it up</h3>
+              <ol class="rx-vx">
+                <li><span class="rx-vx-orb rx-vx-orb--1" aria-hidden="true"></span><div><b>1st Stellar Swirl</b><p>A hit of Anemo damage, and a Lv. 1 Stellar Vortex that bursts in AoE Cryo a moment later.</p></div></li>
+                <li><span class="rx-vx-orb rx-vx-orb--2" aria-hidden="true"></span><div><b>3rd one</b><p>The Vortex grows to Lv. 2: a bigger blast that hits harder (3× level instead of 2×).</p></div></li>
+                <li><span class="rx-vx-orb rx-vx-orb--3" aria-hidden="true"></span><div><b>3 more</b><p>It bursts right away. Your next jump within 5 s goes higher.</p></div></li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="rx-fcs rx-fcs--two" id="rxStellarCards"></div>
+        </section>
+
+        <!-- EVERY REACTION: the board, filtered by family (genshin-reactions.js "board"). -->
+        <section class="gi-sec" id="all" aria-labelledby="rxAllT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxAllT">Every <em>reaction.</em></h2><p class="mch-sec-sub" id="rxFamLine">Every reaction in the game. Tap one to see it on the wheel.</p></div>
+          </header>
+          <div class="gi-tray gi-tray--sm rx-fams" id="rxFams" role="tablist" aria-label="Family"></div>
+          <div class="gi-box rx-board" id="rxBoard"></div>
+        </section>
+
+        <!-- MASTERY: the game's EM formulas + each reaction's base hit at a level (genshin-reactions.js "emCalc"). -->
+        <section class="gi-sec" id="mastery" aria-labelledby="rxEmT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxEmT">What your EM is <em>worth.</em></h2><p class="mch-sec-sub">Elemental Mastery boosts each family by a different curve. Drag it and compare.</p></div>
+          </header>
+          <div class="rx-em">
+            <div class="gi-box rx-em-in">
+              <label class="rx-prism-l" for="rxEm"><span class="gi-label">Elemental Mastery</span><output id="rxEmN">0</output></label>
+              <input type="range" class="gi-range" id="rxEm" min="0" max="1500" step="10" value="300">
+              <ul class="rx-em-bars" id="rxEmBars"></ul>
+              <p class="rx-em-note">Lunar and Stellar get less from EM than the classic transformative reactions (6× against 16× in the formula), but they can crit, which makes up for it.</p>
+            </div>
+            <div class="gi-box rx-em-out">
+              <div class="rx-em-head">
+                <span class="gi-label">Base hit, one character</span>
+                <div class="gi-tray gi-tray--sm" id="rxEmLv" role="tablist" aria-label="Character level">
+                  <button type="button" class="gi-tab" data-lv="80" role="tab">Lv. 80</button>
+                  <button type="button" class="gi-tab active" data-lv="90" role="tab" aria-selected="true">Lv. 90</button>
+                  <button type="button" class="gi-tab" data-lv="95" role="tab">95</button>
+                  <button type="button" class="gi-tab" data-lv="100" role="tab">100</button>
+                </div>
+              </div>
+              <ul class="rx-em-hits" id="rxEmHits"></ul>
+              <p class="rx-em-note">Before enemy RES, crit and any other bonus. Vaporize and Melt show the multiplier; Aggravate and Spread the flat damage they add; Stellar Swirl its first hit / Lv. 1 / Lv. 2 Vortex. Lunar-Bloom and Stellar-Conduct come from talents only, so they aren't here.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- DID YOU KNOW: static, from the wiki (checked Oct 26 2026). -->
+        <section class="gi-sec" aria-labelledby="rxTipsT">
+          <div class="gi-tips">
+            <p class="gi-eyebrow" id="rxTipsT">Did you know</p>
+            <ul class="gi-box">
+              <li><b>Aino, Jahoda and Illuga don't swap anything</b><p>They count toward Moonsign, but only Moon Wheel users and Columbina turn Lunar reactions on.</p></li>
+              <li><b>Verdant Dew never expires</b><p>Up to 3, kept through team swaps, teleports, the daily reset and closing the game.</p></li>
+              <li><b>Moondrifts count as Geo constructs</b><p>Two Geo characters' resonance gets its +15% DMG and Geo shred from them, shield or no shield.</p></li>
+              <li><b>The best contributor decides the crit</b><p>A blended Lunar hit counts as a crit (for Favonius and the like) only if the best character's own hit crit.</p></li>
+              <li><b>One thundercloud at a time</b><p>Trigger Lunar-Charged far from the cloud and a new one forms there; the old one vanishes.</p></li>
+              <li><b>Lunar-Bloom's cores are plain Bloom</b><p>The Dendro Cores it leaves deal normal Bloom damage. Only talents deal Lunar-Bloom damage.</p></li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- QUESTIONS: the shared .gi-faq (genshin.css), one open at a time. -->
+        <section class="gi-sec" id="faq" aria-labelledby="rxFaqT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="rxFaqT">Questions, <em>answered.</em></h2><p class="mch-sec-sub">What players ask most about the new reactions.</p></div>
+          </header>
+          <div class="gi-faq">
+            <details class="gi-box" name="rx-faq"><summary>Why am I still getting Electro-Charged with Ineffa?</summary><p>Check that Ineffa (or Flins, or Columbina) is actually in the active party of four: the swap only works while they're in it.</p></details>
+            <details class="gi-box" name="rx-faq"><summary>Is Lunar-Charged just a stronger Electro-Charged?</summary><p>No. It hits every 2 seconds instead of every second, but each strike is bigger (3× level against 2×), can crit, and blends the stats of everyone who applied Hydro or Electro. It also ignores % DMG Bonus, so build EM and crit instead.</p></details>
+            <details class="gi-box" name="rx-faq"><summary>Does Furina buff Lunar damage?</summary><p>No. Her buff is DMG Bonus, which Lunar damage ignores. She still applies Hydro, her own attacks still get the buff, and her stats count if she's one of the characters blended into the hit.</p></details>
+            <details class="gi-box" name="rx-faq"><summary>What does Moonsign do if I only have one Nod-Krai character?</summary><p>One gives Nascent Gleam, which their own talents need. Two or more give Ascendant Gleam: stronger Moonsign talents, plus a Lunar DMG buff from your other characters' Skills and Bursts.</p></details>
+            <details class="gi-box" name="rx-faq"><summary>Can a team have both Lunar and Stellar reactions?</summary><p>Yes. They swap different pairs (Lunar = Hydro, Stellar = Cryo), so a party with both kinds of characters gets both swaps. Hydro and Cryo together still just Freeze.</p></details>
+            <details class="gi-box" name="rx-faq"><summary>Why does Lunar-Bloom show no damage when it triggers?</summary><p>Because the reaction deals none. It makes Dendro Cores (normal Bloom damage) and Verdant Dew. Lunar-Bloom damage only comes from talents, like Lauma's and Nefer's, many of which spend the Dew.</p></details>
+          </div>
+        </section>
+
+        <div class="gi-more">
+          <a class="gi-box gi-card" href="/genshin-impact/characters">
+            <div><b>All characters</b><p>Every playable character, by nation or newest first.</p></div>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="gi-box gi-card" href="/genshin-impact/enemies">
+            <div><b>Enemies</b><p>Every enemy's resistances, so you know what to react with.</p></div>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+        <p class="gi-note">The Lunar and Stellar damage formulas come from community testing that the wiki cites; HoYoverse hasn't published them. Base hits use the character level multipliers from the wiki and leave out enemy RES, crit, Elevation and every talent or artifact bonus.</p>
+        <p class="gi-credit">Game assets &copy; HoYoverse. Parchrome is a fan site and isn't affiliated with HoYoverse. Reactions, formulas and character lists: the Genshin Impact Wiki (Fandom, CC BY-SA) and the in-game tutorials. Portraits: Project Amber (gi.yatta.moe).</p>
+
+      </div>
+      </main>
+ <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/genshin.jpg" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Genshin Impact Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261024fb"></script>
+<script src="/genshin-core.js?v=20261025a"></script>
+<script src="/genshin-reactions.js?v=20261026a"></script>
+</body>
+</html>
