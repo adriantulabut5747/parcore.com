@@ -1056,10 +1056,16 @@ drag tiles, share link `?r=…`) with Genshin characters. Open: which modes/role
 often he'll update it (a stale tier list hurts more than none), whether weapons get their own tab
 (gamevika has a separate weapon tier list).
 
-**24. Reactions chart** · `/genshin-impact/reactions` · planned (Lobby has the wheel)
-The wheel full-size + every reaction with multipliers/formulas, examples, Lunar reactions (Nod-Krai,
-not covered yet — Adrian to supply), Elemental Mastery explained. Data from `RX` in genshin.js
-(move to a shared JSON when this page is built).
+**24. Reactions chart** · `/genshin-impact/reactions` · BUILT Oct 26 2026 (awaiting Adrian's QC)
+Files: `genshin-reactions.json` (every reaction: pair / follow-up `on` / `swap` + `by` for Lunar & Stellar,
+numbers, coefficients, level multipliers) + `genshin-reactions.js/.css`. The wheel engine is shared: any
+`.gi-rx[data-rx]` gets it (Lobby = `data-rx="lobby"`, adds the "Full reactions chart" key; the Lobby's old `RX`
+code is gone). Wheel has a Classic / Lunar / Stellar party tray (the party's key element gets a dashed halo);
+`?r=<id>` in the address. Page order: wheel, Swaps (classic -> new + who), Lunar (Moon Wheel band on the
+Nod-Krai namecard, 60/30/5/5 share demo with example hits, Moonsign levels + Ascendant Gleam buff table,
+4 rules, 3 cards), Stellar Glimmer (Linchpin band, Polestar Field slider, Vortex steps, 2 cards), every-reaction
+board with a family tray, EM worth (slider + Lv 80/90/95/100 base hits), tips, FAQ (shared `.gi-faq`, moved from
+Codes). Facts + sources: `docs/genshin-reactions-research.md` (Stellar Glimmer = Snezhnaya, 6.7 / 7.0).
 
 **25. Glossary** · `/genshin-impact/glossary` · planned
 Terms (C6, R5, CV, ER, EM, soft pity, 50/50, Capturing Radiance, AR/WL, ley line, etc.), like CoC's
