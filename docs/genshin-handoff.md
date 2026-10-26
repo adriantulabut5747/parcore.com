@@ -1027,10 +1027,17 @@ compact cost file per character/weapon in `genshin-db/`. Inputs: character, leve
 ascension, three talents from→to. Output: every material with counts and icons, Mora, EXP books
 (Hero's Wit 20,000 EXP etc. — confirm), which days to farm.
 
-**21. Artifact scorer** · `/genshin-impact/artifact-scorer` · planned
-Input: main stat + 4 substats (or from a player lookup build). Output: crit value (2×CR + CD),
-estimated roll count per substat from the known roll values (section 10), a drawn in-game artifact
-card with roll pips. Never claim "best artifact" — just numbers.
+**21. Artifact scorer** · `/genshin-impact/artifact-scorer` · BUILT Oct 26 2026 (awaiting Adrian's QC)
+Files: `genshin-scorer.js/.css` (game numbers are constants at the top of the JS: the 4 roll tiers per substat, substat
+weights, main stat curves +0..+20, main stat odds per slot, all from the wiki's Artifact/Stats, /Scaling, /Distribution pages,
+checked Oct 26 2026; set names + piece art from `genshin-artifacts.json`). 5★ only. Inputs: slot, main stat, level, 4
+substats, stats you want (+ presets), optional set. Output: the drawn in-game card (pips = one per roll, height = tier),
+crit value, roll value (Σ value / max roll for the wanted stats), useful rolls / total, per-substat roll count + average
+roll size, start 3 vs 4 substats, and for <+20 the odds of k more rolls landing in wanted stats + average CV at +20.
+Roll counts: every tier combination that rounds to the shown value, then only combinations whose total fits the level
+((3 or 4) + floor(lv/4)), weighted by the game's odds (80/20 start, 25% per upgrade, 25% per tier). Checked against 14
+random pieces generated with the real rules: all exact. State in the address (`?a=slot.main.lv.k~v_… &w=… &set=…`).
+Never a verdict (Adrian's rule): numbers only.
 
 **22. Wish simulator** · `/genshin-impact/wish-simulator` · planned (weak — approved)
 Current banners from the feed, real rates (P5 model + 4★ pity 10), the splash reveal animation drawn

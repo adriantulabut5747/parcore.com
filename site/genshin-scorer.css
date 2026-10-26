@@ -1,0 +1,178 @@
+/* ============================================================
+   GENSHIN IMPACT -- ARTIFACT SCORER (/genshin-impact/artifact-scorer, Oct 26 2026). Inputs box |
+   the drawn in-game artifact card + numbers. Behaviour + game numbers: genshin-scorer.js.
+   The card is the one place the game's own colours come in (the 5★ gold header, the cream body,
+   the green set name), because it's a drawing of the real panel; everything around it is the
+   raised UI from genshin.css, red only for picks and fills.
+   ============================================================ */
+
+.as-first { padding-top: 40px; }
+.as-jump .gi-tab { text-decoration: none; }
+.as b { color: #fff; }
+.as-grid { display: grid; grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr); gap: 16px; align-items: start; }
+
+/* ---- INPUTS ---- */
+.as-in { display: flex; flex-direction: column; gap: 22px; padding: 24px; }
+/* Desktop: the inputs stay in view while the results (taller) scroll past. */
+@media (min-width: 971px) {
+  .as-in { position: sticky; top: 84px; }
+}
+.as-field { display: flex; flex-direction: column; gap: 10px; }
+.as-slots .gi-tab { flex: 1 0 auto; }
+.as-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.as-chip, .as-pre { padding: 8px 11px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 11.5px/1 'Sora', sans-serif; color: #8b9099; cursor: pointer; transition: color 0.15s ease; }
+.as-chip:hover, .as-pre:hover { color: #fff; }
+.as-chip.is-on { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.as-chip:focus-visible, .as-pre:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.as-pres { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.as-pre { padding: 4px 0; border: 0; background: none; font-size: 11px; font-weight: 600; color: var(--gi-dim); text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; }
+.as-pre.is-on { color: #fff; text-decoration-color: var(--gi-acc); text-decoration-thickness: 2px; }
+.as-lv-l { display: flex; align-items: baseline; justify-content: space-between; }
+.as-lv-l output { font: 800 24px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.as-ticks { display: flex; justify-content: space-between; font: 600 10px/1 'Sora', sans-serif; color: var(--gi-dim); }
+/* Substat rows: the Birthdays page's styled menu (genshin-birthdays.css .bd-sel) + a sunken value well. */
+.as-subs { display: flex; flex-direction: column; gap: 8px; }
+.as-sub { display: grid; grid-template-columns: minmax(0, 1fr) 118px; gap: 8px; }
+.as-sel { position: relative; display: flex; flex-direction: column; gap: 10px; }
+.as-sel select {
+  width: 100%;
+  height: 44px;
+  padding: 0 30px 0 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23c9ccd2' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 9px center / 14px no-repeat;
+  box-shadow: var(--lb-btn);
+  font: 600 13.5px/1 'Sora', sans-serif;
+  color: #fff;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.as-sel select:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.as-sel option { background: #16171b; color: #e6e8ec; }
+.as-val { position: relative; display: flex; align-items: center; height: 44px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); }
+.as-val:focus-within { border-color: #3a3d46; }
+.as-val input { flex: 1; min-width: 0; height: 100%; padding: 0 4px 0 12px; border: 0; outline: 0; background: none; font: 700 15px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.as-val input::placeholder { color: #565a63; }
+.as-val input:disabled { cursor: not-allowed; }
+.as-val > span { flex: none; padding-right: 12px; font: 700 13px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.as-reset { align-self: flex-start; padding: 0; border: 0; background: none; font: 600 12px/1.4 'Sora', sans-serif; color: var(--gi-dim); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.as-reset:hover { color: #fff; }
+
+/* ---- THE CARD: the in-game artifact panel, drawn ---- */
+.as-res { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.as-card { overflow: hidden; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); box-shadow: var(--lb-shadow), 0 18px 40px -20px rgba(0, 0, 0, 0.9); }
+.as-card-top { position: relative; isolation: isolate; min-height: 196px; padding: 16px 20px 18px; overflow: hidden; background: linear-gradient(160deg, #a4693a 0%, #b77b42 38%, #c99a5a 100%); }
+.as-card-top::after { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(70% 90% at 85% 40%, rgba(255, 230, 180, 0.35), transparent 70%); }
+.as-card-art { position: absolute; z-index: -1; right: 10px; top: 46px; width: 150px; height: 150px; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.35)); }
+.as-card-name { margin: -16px -20px 14px; padding: 10px 20px; background: rgba(0, 0, 0, 0.12); font: 700 18px/1.25 'Sora', sans-serif; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
+.as-card-type { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.85); }
+.as-card-mk { margin-top: 22px; font-size: 12.5px; font-weight: 600; color: rgba(255, 255, 255, 0.72); }
+.as-card-mv { margin-top: 2px; font: 800 32px/1.1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+.as-card-stars { margin-top: 6px; font-size: 17px; letter-spacing: 2px; color: #ffcc32; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.as-card-body { padding: 16px 20px 20px; background: #ece5d8; color: #495366; }
+.as-card-lv { display: inline-block; padding: 3px 7px; border-radius: 3px; background: #3b4354; font: 700 13px/1 'Sora', sans-serif; color: #fff; }
+.as-card-subs { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; list-style: none; }
+.as-card-subs li { display: flex; align-items: center; justify-content: space-between; gap: 12px; font: 600 14.5px/1.3 'Sora', sans-serif; color: #495366; }
+.as-card-subs li > span:first-child::before { content: '•'; margin-right: 8px; color: #495366; }
+.as-card-subs li.is-want > span:first-child { color: #2b3242; font-weight: 800; }
+.as-card-subs li.is-bad > span:first-child { color: #b04a4a; }
+.as-card-subs li.is-empty { color: #8a8f99; }
+.as-card-subs li.is-empty::before { content: none; }
+/* Roll pips: one per roll, its height = that roll's size (70 / 80 / 90 / 100% of the max). */
+.as-pips { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+.as-pips i { width: 7px; border-radius: 2px; background: #a3464b; }
+.as-pips .t0 { height: 70%; opacity: 0.55; }
+.as-pips .t1 { height: 80%; opacity: 0.7; }
+.as-pips .t2 { height: 90%; opacity: 0.85; }
+.as-pips .t3 { height: 100%; }
+.as-card-set { margin-top: 16px; font: 700 14px/1.3 'Sora', sans-serif; color: #5c9a3b; }
+.as-card-bonus { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; list-style: none; font-size: 12.5px; line-height: 1.5; color: #626b7c; }
+.as-card-bonus b { color: #495366; }
+
+/* ---- NUMBERS ---- */
+.as-nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.as-num { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; }
+.as-num > b { font: 800 30px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; }
+.as-num > b small { margin-left: 2px; font-size: 16px; color: var(--gi-dim); }
+.as-num small { font-size: 11.5px; line-height: 1.4; color: var(--gi-muted); }
+.as-break { padding: 6px 20px 14px; }
+.as-warn { margin: 12px 0 4px; padding: 10px 12px; border-left: 2px solid var(--gi-acc); background: rgba(var(--gi-acc-rgb), 0.1); font-size: 12.5px; line-height: 1.5; color: #ffd6d2; }
+.as-rows { list-style: none; }
+.as-rows li { display: grid; grid-template-columns: minmax(0, 1.2fr) 70px 92px minmax(90px, 1fr); align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--gi-line); font-size: 13px; color: #c9ccd2; }
+.as-rows li.is-want .as-r-k { color: #fff; font-weight: 700; }
+.as-rows li.is-want .as-r-k::before { content: ''; display: inline-block; width: 6px; height: 6px; margin: 0 8px 2px 0; background: var(--gi-acc); transform: rotate(45deg); }
+.as-r-v { font-weight: 700; color: #fff; text-align: right; font-variant-numeric: tabular-nums; }
+.as-r-n { color: var(--gi-muted); }
+.as-r-q { position: relative; display: flex; align-items: center; height: 18px; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-well); overflow: hidden; }
+.as-r-q i { position: absolute; inset: 0 auto 0 0; background: #2c2e36; }
+.as-r-q b { position: relative; padding-left: 6px; font: 700 10px/1 'Sora', sans-serif; }
+.as-start { padding-top: 10px; font-size: 11.5px; color: var(--gi-dim); }
+.as-start:empty { display: none; }
+
+/* What's left to roll: the odds, as bars. */
+.as-left { padding: 20px; }
+.as-left-h { font-size: 14px; color: #c9ccd2; }
+.as-left-h b { font-size: 18px; }
+.as-left-done { font-size: 13px; line-height: 1.55; color: var(--gi-muted); }
+.as-dist { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-top: 16px; list-style: none; }
+.as-dist li { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; }
+.as-dist-bar { position: relative; flex: 1; width: 100%; max-width: 44px; }
+.as-dist-bar i { position: absolute; left: 0; right: 0; bottom: 0; border: 2px solid var(--lb-edge); border-radius: 4px 4px 2px 2px; background: var(--gi-acc); transition: height 0.3s var(--gi-ease); }
+.as-dist b { font: 700 11px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; }
+.as-dist small { font: 700 12px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.as-dist-x { margin-top: 6px; font: 600 10px/1 'Sora', sans-serif; letter-spacing: 1px; text-align: center; text-transform: uppercase; color: var(--gi-dim); }
+.as-left-facts { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--gi-line); list-style: none; font-size: 13px; color: var(--gi-muted); }
+.as-left-facts b { margin-right: 4px; font-size: 15px; }
+
+/* ---- HOW ROLLS WORK ---- */
+.as-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; list-style: none; }
+.as-how li { display: flex; flex-direction: column; gap: 8px; padding: 22px; }
+.as-how-n { display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 6px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); font: 800 16px/1 'Sora', sans-serif; color: #fff; }
+.as-how b { font: 800 16px/1.3 'Sora', sans-serif; }
+.as-how p { font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+.as-table { margin-top: 16px; overflow-x: auto; }
+.as-tr { display: grid; grid-template-columns: minmax(150px, 1.4fr) repeat(4, minmax(70px, 1fr)) minmax(90px, 1fr); gap: 12px; min-width: 640px; padding: 11px 20px; border-top: 1px solid var(--gi-line); font-size: 13px; color: #c9ccd2; font-variant-numeric: tabular-nums; }
+.as-tr > span:first-child { font-weight: 700; color: #fff; }
+.as-tr > span:nth-child(5) { color: #fff; font-weight: 700; }
+.as-tr small { display: block; margin-top: 2px; font-size: 10.5px; color: var(--gi-dim); }
+.as-th { border-top: 0; font: 700 10px/1 'Sora', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gi-dim); }
+.as-th > span:first-child, .as-th > span:nth-child(5) { color: var(--gi-dim); font-weight: 700; }
+.as-formulas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.as-formulas p { padding: 18px 20px; font-size: 13px; line-height: 1.6; color: var(--gi-muted); }
+
+/* ---- NARROW DESKTOP ---- */
+@media (max-width: 1280px) and (min-width: 971px) {
+  .as-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .as-nums { grid-template-columns: minmax(0, 1fr); }
+  .as-rows li { grid-template-columns: minmax(0, 1fr) 64px 84px; }
+  .as-r-q { display: none; }
+}
+
+/* ---- PHONES ---- */
+@media (max-width: 970px) {
+  .as-first { padding-top: 28px; }
+  .as-jump { width: 100%; }
+  #score .gi-sec-head { flex-direction: column; align-items: stretch; gap: 14px; }
+  #score .gi-acts .gi-key { flex: 1; }
+  .as-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .as-in { padding: 18px; gap: 18px; }
+  .as-slots .gi-tab { padding: 0 6px; }
+  .as-sub { grid-template-columns: minmax(0, 1fr) 100px; }
+  .as-card-top { min-height: 176px; padding: 14px 16px 16px; }
+  .as-card-name { margin: -14px -16px 12px; padding: 9px 16px; font-size: 16px; }
+  .as-card-art { width: 120px; height: 120px; top: 50px; }
+  .as-card-mv { font-size: 28px; }
+  .as-card-body { padding: 14px 16px 18px; }
+  .as-card-subs li { font-size: 13.5px; }
+  .as-nums { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .as-num { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 12px; padding: 14px 16px; }
+  .as-num .gi-label { flex-basis: 100%; }
+  .as-num > b { font-size: 26px; }
+  .as-break { padding: 4px 16px 12px; }
+  .as-rows li { grid-template-columns: minmax(0, 1fr) 60px 74px; gap: 8px; font-size: 12.5px; }
+  .as-r-q { display: none; }
+  .as-left { padding: 16px; }
+  .as-how, .as-formulas { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .as-how li { padding: 18px; }
+}
