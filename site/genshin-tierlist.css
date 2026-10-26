@@ -1,0 +1,147 @@
+/* ============================================================
+   GENSHIN IMPACT -- TIER LIST MAKER (/genshin-impact/tier-list, Oct 26 2026).
+   The CoC maker's layout (coc-tierlist.css) in Genshin dress: genshin.css keys and
+   trays, each tier's plate glowing in its row colour (--tl-rgb, PAL in
+   genshin-tierlist.js, which the downloaded picture uses too), letters in Cinzel,
+   tiles on the game's rarity backings (.gi-tile's gradients).
+   ============================================================ */
+.tl { --tl-tile: 64px; --tl-label: 112px; --tl-red: var(--gi-acc-rgb); }
+.tl-first { padding-top: 40px; }
+.gi [data-mode][hidden] { display: none; }
+
+/* Import: a sunken field + key, under the head. */
+.tl-import { display: flex; gap: 8px; margin: -8px 0 18px; }
+.tl-import-well { flex: 1; display: flex; height: 40px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); }
+.tl-import-well:focus-within { border-color: #3a3d46; }
+.tl-import input { flex: 1; min-width: 0; padding: 0 12px; border: 0; outline: 0; background: none; font: 600 13px/1 'Sora', sans-serif; color: #fff; }
+.tl-import input::placeholder { color: #565a63; }
+.tl-import .gi-key { height: 40px; }
+
+/* Characters / Weapons / Artifacts + the filter chips. */
+.tl-bar { display: flex; flex-direction: column; gap: 12px; }
+.tl-modes { align-self: flex-start; }
+.tl-modes .gi-tab { flex: 0 0 auto; padding: 0 16px; }
+.tl-modes .gi-tab img { width: 22px; height: 22px; border-radius: 0; object-fit: contain; }
+.tl-filters { display: flex; flex-wrap: nowrap; gap: 6px; padding: 2px 2px 4px; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.tl-filters::-webkit-scrollbar { display: none; }
+.tl-chip { flex: none; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 11.5px/1 'Sora', sans-serif; color: #8b9099; cursor: pointer; transition: color 0.15s ease; }
+.tl-chip:hover { color: #fff; }
+.tl-chip[aria-pressed='true'] { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; }
+.tl-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.tl-el { padding-left: 7px; }
+.tl-el img { width: 20px; height: 20px; filter: grayscale(1); opacity: 0.7; transition: filter 0.2s, opacity 0.2s; }
+.tl-el:hover img, .tl-el[aria-pressed='true'] img { filter: none; opacity: 1; }
+
+/* ---- Board: one row = label plate + slot ---- */
+.tl-board { display: grid; gap: 8px; margin-top: 16px; }
+.tl-row { position: relative; display: grid; grid-template-columns: var(--tl-label) 1fr; align-items: stretch; gap: 8px; }
+.tl-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--tl-tile) + 22px);
+  padding: 8px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: radial-gradient(circle at 50% 30%, rgba(var(--tl-rgb), 0.3), rgba(var(--tl-rgb), 0.05) 72%), linear-gradient(180deg, #17181c 0%, #131417 100%);
+  box-shadow: inset 0 0 0 1px rgba(var(--tl-rgb), 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 18px -12px rgba(0, 0, 0, 0.85);
+  cursor: text;
+  transition: box-shadow 0.2s;
+}
+.tl-plate:hover { box-shadow: inset 0 0 0 1px rgba(var(--tl-rgb), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 18px -12px rgba(0, 0, 0, 0.85); }
+.tl-plate:focus-within { outline: 2px solid #e6e8ec; outline-offset: 2px; }
+.tl-name { max-width: 100%; min-width: 0.6em; color: rgb(var(--tl-rgb)); font: 900 36px/1.1 'Cinzel', serif; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; outline: none; caret-color: #eff2f5; }
+/* A renamed tier: small Sora caps. */
+.tl-name.tl-long { font: 800 12px/1.25 'Sora', sans-serif; letter-spacing: 1.3px; }
+/* Slot: a sunken well. Right padding = room for the remove key; the bottom strip stays empty so a
+   full row can still take a tap. */
+.tl-zone { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-width: 0; min-height: calc(var(--tl-tile) + 22px); padding: 8px 44px 14px 8px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); transition: background-color 0.15s; }
+.tl-over,
+.tl-picking .tl-row:hover .tl-zone,
+.tl-picking .tl-pool:hover { background: rgba(var(--tl-rgb, var(--tl-red)), 0.08); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(var(--tl-rgb, var(--tl-red)), 0.55); }
+.tl-picking .tl-row, .tl-picking .tl-pool { cursor: pointer; }
+.tl-del { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-raise); box-shadow: var(--lb-btn); color: #8b9099; cursor: pointer; transition: color 0.15s, background-color 0.15s, transform 0.1s; }
+.tl-del svg { width: 14px; height: 14px; }
+.tl-del:hover { background: var(--lb-raise-hover); color: var(--gi-acc-text); }
+.tl-del:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
+.tl-del:focus-visible { outline: 2px solid #e6e8ec; outline-offset: 2px; }
+.tl-one-row .tl-del { display: none; }
+.tl-add { justify-self: start; }
+.tl-add[hidden] { display: none; }
+
+/* ---- Pool ---- */
+.tl-pool-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--gi-line); }
+.tl-pool-label { flex: none; font: 700 16px/1 'Sora', sans-serif; color: #fff; white-space: nowrap; }
+.tl-pool-label span { font-weight: 500; color: var(--gi-muted); }
+.tl-actions { display: flex; flex-wrap: nowrap; gap: 8px; min-width: 0; }
+.tl-actions .gi-key { min-width: 0; }
+.tl-pool { margin-top: 12px; padding-right: 8px; }
+
+/* ---- Tiles: the game's rarity backings ---- */
+.tl-tile {
+  position: relative;
+  flex: none;
+  width: var(--tl-tile);
+  height: var(--tl-tile);
+  padding: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: linear-gradient(160deg, #3d3f4a, #2a2b33);
+  box-shadow: var(--lb-btn);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: filter 0.15s, transform 0.15s, opacity 0.15s;
+}
+.tl-tile.r5 { background: linear-gradient(160deg, #c99648, #8d5d2a); }
+.tl-tile.r4 { background: linear-gradient(160deg, #8a6cc2, #5b4785); }
+.tl-tile.r3 { background: linear-gradient(160deg, #5a7fa8, #3a5574); }
+.tl-tile[hidden] { display: none; }
+.tl-tile img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.tl-tile .tl-badge { position: absolute; right: 1px; bottom: 1px; width: 20px; height: 20px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7)); }
+.tl-one-filter .tl-badge { display: none; }
+.tl-tile:hover { filter: brightness(1.12); }
+.tl-tile:focus-visible { outline: 2px solid #e6e8ec; outline-offset: 2px; }
+.tl-tile.is-picked { box-shadow: var(--lb-btn), 0 0 0 2px var(--gi-acc); transform: translateY(-2px); }
+.tl-tile.is-dragging { opacity: 0.25; }
+.tl-ghost { position: fixed; top: 0; left: 0; z-index: 9999; box-shadow: var(--lb-btn), 0 14px 30px rgba(0, 0, 0, 0.6); pointer-events: none; transition: none; }
+
+/* ---- Confirm box + toast ---- */
+.tl-dlg { margin: auto; padding: 0; border: 0; background: none; color: inherit; }
+.tl-dlg::backdrop { background: rgba(5, 5, 7, 0.72); backdrop-filter: blur(3px); }
+.tl-dlg-box { width: min(420px, calc(100vw - 32px)); padding: 24px; }
+.tl-dlg-title { font: 800 18px/1.3 'Sora', sans-serif; color: #fff; }
+.tl-dlg-text { margin-top: 8px; font-size: 13.5px; line-height: 1.6; color: var(--gi-muted); }
+.tl-dlg-acts { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.tl-toast { position: fixed; left: 50%; bottom: 84px; z-index: 50; padding: 10px 16px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-raise); box-shadow: var(--lb-shadow); font: 600 13px/1 'Sora', sans-serif; color: #fff; opacity: 0; transform: translate(-50%, 8px); pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
+.tl-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---- Phones ---- */
+@media (max-width: 970px) {
+  .tl-first { padding-top: 28px; }
+  .tl-modes { align-self: stretch; }
+  .tl-modes .gi-tab { flex: 1 0 auto; padding: 0 8px; }
+}
+@media (max-width: 600px) {
+  .tl { --tl-tile: 50px; --tl-label: 64px; }
+  .tl-row { gap: 6px; }
+  .tl-zone { gap: 6px; min-height: calc(var(--tl-tile) + 34px); padding: 6px 36px 28px 6px; }
+  .tl-plate { min-height: calc(var(--tl-tile) + 34px); padding: 6px 3px; }
+  .tl-name { font-size: 26px; }
+  .tl-name.tl-long { font-size: 9.5px; letter-spacing: 0.3px; overflow-wrap: break-word; }
+  .tl-del { top: 6px; right: 6px; width: 26px; height: 26px; }
+  .tl-pool { padding: 6px; }
+  .tl-pool-head { flex-direction: column; align-items: stretch; gap: 10px; }
+  .tl-actions { display: grid; grid-template-columns: 0.8fr 1fr 1.35fr; gap: 6px; }
+  .tl-actions .gi-key { gap: 6px; padding: 0 6px 2px; font-size: 11px; }
+  .tl-actions .gi-key span { overflow: hidden; text-overflow: ellipsis; }
+  .tl-badge { width: 16px; height: 16px; }
+}
+@media (max-width: 400px) {
+  .tl-actions .gi-key svg { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-tile, .tl-del, .tl-el img, .tl-toast { transition: none; }
+}

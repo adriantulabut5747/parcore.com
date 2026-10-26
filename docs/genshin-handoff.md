@@ -1050,18 +1050,13 @@ with categories + search, Web Resources card style (no live screenshots). Lobby 
 
 ### GUIDES (Adrian writes; evergreen)
 
-**28. Tier list** · `/genshin-impact/tier-list` · planned (added Oct 22 2026, Adrian: "i want this
-tierlist too", reference https://www.genshintools.com/tierlist)
-Data: the character roster from the feed (names, icons, element, weapon, rarity) +
-`site/genshin-tierlist.json` = **Adrian's** placements (tier per character, per mode: Spiral Abyss /
-Imaginarium Theater; optional role: Main DPS / Sub-DPS / Support / Healer-Shield). Real opinions
-only — never generated, never copied from another site's list; the page shows the date it was last
-updated. Front end: rows SS / S / A / B / C on rarity-backed portraits, filters (element, weapon,
-rarity, role), a mode switch, tap a character for one line of why (Adrian's text). Second half:
-"Make your own" — reuse the CoC tier maker engine (`/coc/tools/tier-list`, `coc-tierlist.js/.css`:
-drag tiles, share link `?r=…`) with Genshin characters. Open: which modes/roles Adrian wants, how
-often he'll update it (a stale tier list hurts more than none), whether weapons get their own tab
-(gamevika has a separate weapon tier list).
+**28. Tier list** · `/genshin-impact/tier-list` · BUILT Oct 26 2026 as a MAKER, moved to the Tools group (Adrian: "make it
+similar to how the clash of clans works"). Files: `genshin-tierlist.js/.css`, a port of `coc-tierlist.js` (same engine: drag,
+tap-to-place, Enter + 1-9 / 0, rename / add / remove tiers, the board in the address, Import list, Reset, Download image
+on a canvas) with three lists: characters (feed, id = feed id − 10000000, element filter + element badge), `?type=weapons`
+(genshin-weapons.json, 3★ and up, square `icon` from yatta, weapon-type filter), `?type=artifacts` (genshin-artifacts.json
+sets, Flower piece art, 5★ / 4★-and-below filter). Filter = `f=`. Rows S to D. Yatta sends CORS `*`, so its icons draw
+on the export canvas (crossOrigin set). The old plan (Adrian's own placements per mode) is not built; the maker is blank.
 
 **24. Reactions chart** · `/genshin-impact/reactions` · BUILT Oct 26 2026 (awaiting Adrian's QC)
 Files: `genshin-reactions.json` (every reaction: pair / follow-up `on` / `swap` + `by` for Lunar & Stellar,
