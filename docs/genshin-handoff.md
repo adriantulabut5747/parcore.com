@@ -1067,9 +1067,11 @@ Nod-Krai namecard, 60/30/5/5 share demo with example hits, Moonsign levels + Asc
 board with a family tray, EM worth (slider + Lv 80/90/95/100 base hits), tips, FAQ (shared `.gi-faq`, moved from
 Codes). Facts + sources: `docs/genshin-reactions-research.md` (Stellar Glimmer = Snezhnaya, 6.7 / 7.0).
 
-**25. Glossary** · `/genshin-impact/glossary` · planned
-Terms (C6, R5, CV, ER, EM, soft pity, 50/50, Capturing Radiance, AR/WL, ley line, etc.), like CoC's
-slang page (`/coc/tools/slang`). JSON-driven, searchable.
+**25. Glossary** · `/genshin-impact/glossary` · BUILT Oct 26 2026 (awaiting Adrian's QC)
+Files: `genshin-glossary.json` (110 terms in 8 topics, picked from the wiki's 338-term community Glossary for what's
+common AND confusing, + Capturing Radiance and the Nod-Krai / Snezhnaya terms; ids permanent = `#t-<id>` links; `hot` =
+Most asked, `decode` = the decoder's lines) + `genshin-glossary.js/.css`. Page: Most asked (6 cards), Decoder (a chat line,
+tap the jargon), Every term (topic tray + shared `.lb-search`; `?q=` / `?s=` in the address). Add a term = one JSON entry.
 
 **26. Beginner path** · `/genshin-impact/beginner` · planned
 First 30 days: AR milestones, what to spend resin on, which banner to pull on, free characters.
