@@ -1015,11 +1015,17 @@ hard 80, Epitomized Path), standard banner. Inputs: pity, guarantee state, pulls
 Output: probability curve for the featured 5★ within N pulls (simulate the chain exactly; it's a
 small Markov chain, no Monte Carlo needed). Reuse the drawn bar chart.
 
-**19. Resin & timers** · `/genshin-impact/timers` · planned
-Original Resin (1 per 8 min, cap 200 — confirm), Parametric Transformer, Serenitea Pot realm
-currency, expeditions, daily/weekly resets per server. Each timer: start time saved in
-localStorage; optional browser notification (Notification API, ask permission on click only).
-Drawn idea: a resin orb that fills.
+**19. Resin & timers** · `/genshin-impact/timers` · BUILT Oct 26 2026 (awaiting Adrian's QC)
+Files: `genshin-timers.js/.css`. Game numbers checked on the wiki Oct 26 2026: resin 1 / 8 min, cap 200 (refills to 2,000),
+Primogem refills 50/100/100/150/200/200 (6 a day); domain / ley line 20 (40 = double), Condensed = triple (crafted from 60,
+hold 5, not on bosses), Fragile / Transient = +60 or triple; normal boss 40, weekly 30 (60 after 3 a week); Transformer
+6 d 22 h; expeditions 4/8/12/20 h; Jar of Riches 4-30/h by Adeptal Energy, cap 300-2,400 by Trust Rank; respawns 12 h /
+2 d / 3 d (wiki Reset page; Local Specialties page says 46 h); resets 04:00 daily, Monday weekly, Abyss 16th, Theater +
+Paimon's Bargains 1st. Resin is saved as {r, at} (at = start of the current 8-min tick), so it's exact after a reload;
+the optional "Fully replenished in" input fixes the phase to the second. Timers / jar / resin in localStorage
+(`gi-resin`, `gi-timers`, `gi-jar`). Reminders: .ics with a VALARM (works with the tab closed) + Notification API (asked on
+click, fires only while the tab is open). Drawn: the resin orb (liquid height = resin / 200; red ring when full).
+Tested in-page (temporary script, removed): resin ticks, spend keeps the phase, full-in to the second, jar, resets per server.
 
 **20. Ascension calculator** · `/genshin-impact/ascension` · planned
 Data: yatta `avatar/{id}` (`upgrade.promote`, `talent.promote`) and `weapon/{id}` — generate one

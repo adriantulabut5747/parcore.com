@@ -1,0 +1,188 @@
+/* ============================================================
+   GENSHIN IMPACT -- RESIN & TIMERS (/genshin-impact/timers, Oct 26 2026). The drawn resin orb
+   (handoff 5.5: "a drawn resin orb that fills"), the timer cards, the Jar of Riches, resets and
+   the resin costs. Behaviour + game numbers: genshin-timers.js. Raised UI from genshin.css; the
+   orb's liquid is Original Resin's own blue-violet, the one colour from the game here.
+   ============================================================ */
+.tm-first { padding-top: 40px; }
+.tm-jump .gi-tab { text-decoration: none; }
+.tm b { color: #fff; }
+.tm h3 { font: 800 19px/1.25 'Sora', sans-serif; color: #fff; }
+
+/* ---- RESIN ---- */
+.rs { display: grid; grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr); gap: 16px; align-items: start; }
+.rs-orb-box { display: flex; flex-direction: column; align-items: center; padding: 30px 24px 26px; text-align: center; }
+/* The orb: a sunken glass sphere; the liquid's top sits at --lv (0..1) of its height. */
+.rs-orb {
+  position: relative;
+  width: min(220px, 70vw);
+  aspect-ratio: 1;
+  border: 3px solid var(--lb-edge);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #1a1b22, #0d0e12 70%);
+  box-shadow: inset 0 6px 0 rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  isolation: isolate;
+}
+.rs-liquid {
+  position: absolute;
+  inset: 0;
+  top: calc((1 - var(--lv)) * 100%);
+  background: linear-gradient(180deg, #8f8cf0 0%, #5f5bd0 30%, #3b3699 100%);
+  transition: top 0.6s var(--gi-ease);
+}
+/* The surface: a soft light line where the liquid meets the glass. */
+.rs-liquid::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, transparent, rgba(220, 218, 255, 0.85), transparent); }
+.rs-shine { position: absolute; inset: 0; z-index: 1; border-radius: 50%; background: radial-gradient(40% 30% at 32% 24%, rgba(255, 255, 255, 0.28), transparent 70%); pointer-events: none; }
+.rs-orb.is-full { box-shadow: inset 0 6px 0 rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 0 3px rgba(var(--gi-acc-rgb), 0.55), 0 0 36px rgba(var(--gi-acc-rgb), 0.35); }
+.rs-count { margin-top: 18px; font-variant-numeric: tabular-nums; }
+.rs-count b { font: 800 46px/1 'Sora', sans-serif; }
+.rs-count span { font: 700 18px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.rs-next { margin-top: 8px; font-size: 13.5px; color: #c9ccd2; font-variant-numeric: tabular-nums; }
+.rs-full { margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--gi-muted); font-variant-numeric: tabular-nums; }
+.rs-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.rs-form { display: flex; flex-direction: column; gap: 10px; padding: 22px; }
+.rs-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.rs-fields .gi-key { height: 44px; padding: 0 20px 2px; }
+.rs-field { display: flex; flex-direction: column; gap: 8px; }
+.rs-field small { font-weight: 600; letter-spacing: 0.4px; text-transform: none; color: var(--gi-dim); }
+.rs-well { display: flex; align-items: center; height: 44px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); }
+.rs-well:focus-within { border-color: #3a3d46; }
+.rs-well input { flex: 1; min-width: 0; height: 100%; padding: 0 12px; border: 0; outline: 0; background: none; font: 700 16px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.rs-well input::-webkit-outer-spin-button, .rs-well input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.rs-well input::placeholder { color: #565a63; }
+.rs-hint { font-size: 11.5px; line-height: 1.5; color: var(--gi-dim); }
+.rs-msg { min-height: 1.4em; font-size: 12.5px; color: #d3c3a0; }
+.rs-sub { margin-top: 4px; }
+.rs-spend { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.rs-spend .gi-key { flex-direction: column; gap: 4px; height: auto; padding: 10px 6px 11px; white-space: normal; text-align: center; }
+.rs-spend b { font-size: 16px; }
+.rs-spend small { font: 600 10px/1.25 'Sora', sans-serif; color: var(--gi-muted); }
+.rs-targets-box { padding: 18px 22px; }
+.rs-targets { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 12px; list-style: none; }
+.rs-targets li { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 12px 10px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.3); font-variant-numeric: tabular-nums; }
+.rs-targets b { font: 800 20px/1 'Sora', sans-serif; }
+.rs-targets span { font: 700 12px/1.2 'Sora', sans-serif; color: #c9ccd2; }
+.rs-targets small { font-size: 10.5px; line-height: 1.3; color: var(--gi-dim); }
+.rs-targets li.is-there { background: rgba(var(--gi-acc-rgb), 0.12); box-shadow: inset 0 0 0 1px rgba(var(--gi-acc-rgb), 0.5); }
+.rs-ics { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--gi-dim); cursor: pointer; }
+.rs-ics:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.rs-ics svg, .tm-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- TIMERS ---- */
+.tm-add { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.tm-pre { justify-content: flex-start; gap: 10px; height: auto; min-height: 48px; padding: 8px 12px 10px; white-space: normal; text-align: left; }
+.tm-pre svg { flex: none; width: 18px; height: 18px; }
+.tm-pre span { flex: 1; font-size: 12.5px; line-height: 1.3; }
+.tm-pre small { flex: none; font: 700 11px/1 'Sora', sans-serif; color: var(--gi-muted); }
+.tm-left-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; font-size: 12.5px; color: var(--gi-muted); }
+.tm-num { width: 84px; height: 38px; }
+.tm-num input { padding-right: 2px; font-size: 14px; }
+.tm-num small { padding-right: 10px; font: 700 12px/1 'Sora', sans-serif; color: var(--gi-dim); }
+.tm-left-form .gi-key { height: 38px; }
+.tm-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; list-style: none; }
+.tm-empty { grid-column: 1 / -1; padding: 18px 20px; border: 2px dashed rgba(255, 255, 255, 0.08); border-radius: var(--lb-r); font-size: 13px; color: var(--gi-dim); }
+.tm-card { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 16px; }
+.tm-ico { display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35); color: #c9ccd2; }
+.tm-ico svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.tm-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.tm-main b { font: 700 13.5px/1.3 'Sora', sans-serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tm-left { font: 800 18px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.tm-bar { height: 6px; border-radius: 3px; background: var(--lb-well); overflow: hidden; }
+.tm-bar i { display: block; height: 100%; background: var(--gi-acc); transition: width 1s linear; }
+.tm-main small { font-size: 11px; color: var(--gi-dim); }
+.tm-acts { display: grid; grid-template-columns: repeat(2, 32px); gap: 4px; }
+.tm-ib { width: 32px; height: 32px; padding: 0; }
+.tm-ib:disabled { opacity: 0.35; cursor: default; }
+.tm-card.is-done { border-color: rgba(var(--gi-acc-rgb), 0.6); background: linear-gradient(90deg, rgba(var(--gi-acc-rgb), 0.12), transparent 70%), var(--lb-box); }
+.tm-card.is-done .tm-left { color: var(--gi-acc-text); font-size: 15px; }
+.tm-card.is-done .tm-ico { color: var(--gi-acc-text); }
+
+/* Jar of Riches. Its menus: the Birthdays page's styled select (genshin-birthdays.css .bd-sel). */
+.jr { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); gap: 16px 32px; margin-top: 24px; padding: 24px; }
+.jr .gi-eyebrow { margin-bottom: 8px; }
+.jr-rate { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--gi-muted); }
+.jr-fields { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr) 110px auto; gap: 10px; align-items: end; }
+.jr-fields .gi-key { height: 44px; }
+.tm-sel { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tm-sel select {
+  width: 100%;
+  height: 44px;
+  padding: 0 30px 0 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23c9ccd2' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 9px center / 14px no-repeat;
+  box-shadow: var(--lb-btn);
+  font: 600 13px/1 'Sora', sans-serif;
+  color: #fff;
+  text-overflow: ellipsis;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.tm-sel select:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.tm-sel option { background: #16171b; color: #e6e8ec; }
+.jr-out { grid-column: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; color: #c9ccd2; font-variant-numeric: tabular-nums; }
+
+.jr-out svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- RESETS ---- */
+.rz { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.rz-card { display: flex; flex-direction: column; gap: 6px; padding: 20px; }
+.rz-left { margin-top: 6px; font: 800 26px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; }
+.rz-when { font-size: 12px; color: var(--gi-muted); }
+.rz-card ul { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gi-line); list-style: none; }
+.rz-card li { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.45; color: #c9ccd2; }
+.rz-card li::before { content: ''; flex: none; width: 5px; height: 5px; margin-top: 7px; background: #4a4d56; transform: rotate(45deg); }
+.tm .gi-note a { color: #fff; }
+
+/* ---- SPENDING ---- */
+.sp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-bottom: 16px; }
+.sp-box { padding: 20px 22px; }
+.sp-rows { margin-top: 10px; list-style: none; }
+.sp-rows li { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: 2px 12px; padding: 11px 0; border-bottom: 1px solid var(--gi-line); }
+.sp-rows span { font-size: 13.5px; font-weight: 600; color: #fff; }
+.sp-rows b { grid-row: span 2; align-self: center; font: 800 20px/1 'Sora', sans-serif; text-align: right; }
+.sp-rows small { font-size: 11.5px; color: var(--gi-muted); }
+.sp-refill { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-top: 14px; list-style: none; }
+.sp-refill li { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); }
+.sp-refill b { font: 800 16px/1 'Sora', sans-serif; }
+.sp-refill small { font-size: 10.5px; color: var(--gi-dim); }
+.sp-note { margin-top: 14px; font-size: 12.5px; line-height: 1.55; color: var(--gi-muted); }
+
+/* ---- NARROW DESKTOP ---- */
+@media (max-width: 1280px) and (min-width: 971px) {
+  .rs { grid-template-columns: minmax(0, 1fr); }
+  .rz { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .jr { grid-template-columns: minmax(0, 1fr); }
+  .jr-out { grid-column: 1; }
+}
+
+/* ---- PHONES ---- */
+@media (max-width: 970px) {
+  .tm-first { padding-top: 28px; }
+  .tm-jump { width: 100%; }
+  .rs, .sp, .tm-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .rs-orb-box { padding: 22px 18px; }
+  .rs-orb { width: 170px; }
+  .rs-count b { font-size: 38px; }
+  .rs-form { padding: 18px; }
+  .rs-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .rs-fields .gi-key { grid-column: 1 / -1; }
+  .rs-spend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rs-spend .gi-key:last-child { grid-column: 1 / -1; }
+  .rs-targets-box { padding: 16px 18px; }
+  .rs-targets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rs-targets li:last-child { grid-column: 1 / -1; }
+  .tm-add { grid-template-columns: minmax(0, 1fr); }
+  .tm-card { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; padding: 12px 14px; }
+  .tm-ico { width: 40px; height: 40px; }
+  .jr { grid-template-columns: minmax(0, 1fr); padding: 18px; }
+  .jr-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .jr-fields .tm-sel { grid-column: 1 / -1; }
+  .jr-out { grid-column: 1; }
+  #resets .gi-sec-head { flex-direction: column; align-items: stretch; gap: 14px; }
+  .rz { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .rz-card { padding: 16px 18px; }
+  .sp-refill { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
