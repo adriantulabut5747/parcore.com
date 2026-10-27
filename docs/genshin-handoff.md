@@ -59,6 +59,7 @@ moved to **`/genshin-impact/timeline`**, every page has an in-game icon, phones 
 | Nations page + its CSS / JS + data | `site/genshin-impact/nations.html`, `site/genshin-nations.css` / `.js` (+ characters + farm CSS), `site/genshin-nations.json` (feed script `nations()`, daily) (7.14 as built) |
 | Enemies page + its CSS / JS + data | `site/genshin-impact/enemies.html`, `site/genshin-enemies.css` / `.js`, `site/genshin-enemies.json` + `genshin-enemies-more.json` (feed script `enemies()`, daily), icons `site/images/genshin/enemy/` (7.15 as built) |
 | Achievements page + its CSS / JS + data | `site/genshin-impact/achievements.html`, `site/genshin-achievements.css` / `.js`, `site/genshin-achievements.json` (feed script `achievements()`), medals `site/images/genshin/achievement/<key>.webp` (128px), category namecards in `images/genshin/namecard/char/` (7.16 as built) |
+| Wish simulator page + its CSS / JS + data | `site/genshin-impact/wish-simulator.html`, `site/genshin-wishsim.css` / `.js`, `site/genshin-wishpool.json` (feed script `wish_pool()`), icons `site/images/genshin/wish/` (7, page 22 as built) |
 | Enka id maps (generated) | `site/genshin-enka-map.json` (`enka_map()` in the feed script, from EnkaNetwork/API-docs `store/gi`) |
 
 Preview: `python _tools/serve.py` → http://localhost:8765/genshin-impact/ (see CLAUDE.md for
@@ -1045,10 +1046,30 @@ Roll counts: every tier combination that rounds to the shown value, then only co
 random pieces generated with the real rules: all exact. State in the address (`?a=slot.main.lv.k~v_… &w=… &set=…`).
 Never a verdict (Adrian's rule): numbers only.
 
-**22. Wish simulator** · `/genshin-impact/wish-simulator` · planned (weak — approved)
-Current banners from the feed, real rates (P5 model + 4★ pity 10), the splash reveal animation drawn
-with the real art, history + pity in localStorage, Primogems "spent" counter (160 each). Clearly a
-simulation.
+**22. Wish simulator** · `/genshin-impact/wish-simulator` · BUILT Oct 26 2026 (awaiting Adrian's QC)
+Files: `genshin-wishsim.js/.css`; data = the feed's banners + `site/genshin-wishpool.json` (feed script `wish_pool()`: the
+Standard pool from the wiki's Wanderlust Invocation `{{Wish Pool}}`, so new 4★s join on their own, + every pool / banner
+character's full wish art via `splash()` into `images/genshin/splash/` (~157 KB each, ~11.6 MB for all 74) and the 5★ weapons'
+400×800 art; 4★/3★ weapons use the weapons database art). Icons: `images/genshin/wish/` (Acquaint Fate, Starglitter, Stardust,
+yatta UI_ItemIcon_224/221/222). Rates = the wiki's community model (char 0.6% to 73, +6%/wish from 74, 90; weapon 0.7% to 62,
++7% from 63, 100% at 77; 4★ 5.1% / 56.1% on the 9th / sure on the 10th, weapon 6% / 66% on the 8th / 9th). Each wish rolls the
+5★ first, then the 4★ (a 5★ doesn't reset the 4★ counter, as the wiki says). 50/50 + **Capturing Radiance = community model
+(confirm with Adrian)**: a loss +1, a win −1, at 3 the next 50/50 is won by Radiance, counter back to 1 → 54.5% over many wishes
+(HoYoverse: "55% consolidated", 3 losses in a row = a sure win). Weapon: 75/25, Epitomized Path 1 Fate Point, reset when the
+weapon wish ends (`S.k.weapon.end`). Off-rate drops = the Standard pool minus the featured items, char/weapon 50/50. Dupes →
+Starglitter / Stardust (2/10 per 4/5★ copy, 5/25 past C6, weapons 2/10, 3★ 15 Stardust). Checked with 1M wishes per type
+(temporary in-page test, removed): 5★ 1.610% / 1.875% / 1.601%, 4★ 13.04% / 14.85%, featured share 68.6%, max 171 wishes
+to the featured 5★, 144 to the Path weapon, average pity 62.1 / 53.3 -- all match the wiki's numbers.
+Page: the wish screen `.wsb` (the `.gw` ground, fixed 600px desktop, 685 phone, same on every tab: tray, art, name, featured
+4★ cards or Path keys, end time, three pity wells, Wish ×1 grey / ×10 red), options (skip 3★ reveals, results only), Start
+over (two taps). The stage is a `<dialog>` (top layer): **canvas** sky (stars, the main meteor in the best rarity's colour
+from the top right + up to 6 side streaks for a ten-wish, sparks, landing ring + rays for a 5★) → flash → reveals lowest
+rarity first (characters = white silhouette filling with colour, CSS filter blend; weapons drop in tilted; stars pop one
+by one; New / Constellation / Starglitter) → summary (the game's tall cards, best first, glint sweep). Tap / Space / Enter =
+next; Skip; Esc. Haul (totals per wish type, every 5★ as a bar of its pity with W/L/G/R/P, collection with C/R levels),
+History (the game's table + pity, 10 a page), Odds (a drawn chance-per-wish chart per type) + FAQ. State: localStorage
+`gi-wish` (log capped at 6,000), tab `gi-wish-tab`. Testing: transitions + rAF need real time, so drive Chrome over CDP
+(not `--virtual-time-budget`); set `gi-wish` pity to 85 first to force a 5★.
 
 **23. Tools directory** · folded into the Tools group page, then dropped from it (Oct 24 2026, 7b: cards only) · was planned
 The 11 curated sites (currently static in the Lobby HTML) moved to a JSON (`genshin-tools.json`)

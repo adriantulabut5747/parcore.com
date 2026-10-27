@@ -1,10 +1,11 @@
 # Refreshes site/coc-lobby-stats.json (leaderboards + equipment counts for
 # /coc/tools/leaderboards) and site/coc-lobby-home.json (the /coc/ sections)
-# once a week (Oct 24 2026, Adrian: was daily). It runs Monday 03:00 UTC, two
+# once a week (Oct 24 2026, Adrian: was daily). It runs Sunday 22:00 UTC, seven
 # hours before the Monday 05:00 UTC league reset, so the files hold the week's
-# final standings ("Top players of the week" on /coc/). The 2h gap absorbs
-# GitHub's late cron starts. Each run makes ~610 API calls and every commit is
-# a new deploy. See scripts/lobby-stats.mjs.
+# final standings ("Top players of the week" on /coc/). The gap absorbs
+# GitHub's late cron starts: the Monday 03:00 slot started at 08:42 on Oct 26,
+# after the reset. Each run makes ~610 API calls and every commit is a new
+# deploy. See scripts/lobby-stats.mjs.
 #
 # Uses the same COC_API_KEY secret as clan-stats. Run it by hand any time
 # from the Actions tab ("Run workflow").
@@ -12,7 +13,7 @@ name: Update lobby stats
 
 on:
   schedule:
-    - cron: "0 3 * * 1" # Monday 03:00 UTC = Monday 11:00 AM Philippines time
+    - cron: "0 22 * * 0" # Sunday 22:00 UTC = Monday 6:00 AM Philippines time
   workflow_dispatch:
 
 permissions:

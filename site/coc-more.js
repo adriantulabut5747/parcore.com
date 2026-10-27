@@ -80,7 +80,8 @@ function cocPagePath(u) {
             return (
               '<a href="' + g.href + '" class="mx-tool' + act + '">' +
               '<span class="mx-tool-ico"><img src="' + g.icon + '" alt=""></span>' +
-              '<span class="mx-tool-name">' + g.label + '</span></a>'
+              '<span class="mx-tool-name">' + g.label + '</span>' +
+              (g.hot ? '<b class="mx-hot">Hot</b>' : '') + '</a>'
             );
           })
           .join(''),

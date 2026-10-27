@@ -33,16 +33,35 @@ What this means when writing:
   rejected as too loud next to the sidebar;
   vector art drawn by _tools/articles-band.py) with the title ("Your unfair advantage" / "Read one. Leave with at least one
   move most players never learned. What the top of the ladder knows,
-  written down for you."), then the newest live article as a big
-  cover story with the next three beside it ("Also new", #artLead, built by
-  article-cards.js); its blurred picture tints the page behind it. Every
-  other article sits below in a card grid (3 across max; the .ah column
-  caps at 1240px). The game chips and the search sit under the "More
-  articles" heading; filtering or searching keeps the lead and lists every
-  match in the grid. Earlier tries, both rejected: a patch-notes header
+  written down for you."), then **"Hot right now"** (Oct 26 2026, Adrian;
+  replaced the cover story + "Also new"): `articles.json` `hub.hot` as
+  raised boxes with a red HOT tag, the first one big on the left (two rows
+  tall, red "Read now" key), the other four in a 2x2 beside it; small
+  laptops = big box as a full-width row, phones = big box then compact rows.
+  Pictures always show whole at 16:9 (never cropped: the thumbnails carry
+  their titles). The big one's blurred picture tints the page behind it.
+  Every other article sits below in a card grid (3 across max; the .ah
+  column caps at 1240px), opening with `hub.first` (Base Building, then
+  Crafted Defenses), the rest newest first. The game chips and the search
+  sit under the "More articles" heading; filtering or searching keeps the
+  Hot boxes and lists every match in the grid. Earlier tries, both rejected: a patch-notes header
   (too plain), then a rounded banner with a placeholder Valorant cast
   (hero didn't match a CoC-only list; site/images/articles/hub-cast.webp
   is now unused).
+  **Hub upgrade (Oct 26 2026, built on Adrian's "go crazy" brief, awaiting his
+  QC):** under the band subtitle a stats line (avatar "Written by Parcore",
+  live article / game counts, total minutes, "N/M read by you"); after the
+  lead, "Browse by game" tiles (the home page's Featured Games art, from
+  `articles.json` games `tile` / `icon` / `glow`; a tile picks that game's
+  chip and scrolls to the grid); the grid (`#all`) has two chip rows, games
+  and types (`?game=`, `?type=` in the address), raised grey keys with the
+  off-white `--lb-pick` when picked, and the site's `.lb-search` bar; cards
+  show "N min read" and a "Read" mark for articles this browser opened
+  (localStorage `art-read`, written by article-cards.js on article pages).
+  **Soon articles left the grid** for a numbered "Coming next" box (game
+  icon, title, "Game · Tag"; no placeholder pictures). /articles/coc/ still
+  has them in its grid, dimmed. Last: "What should we write next?" with the
+  shared feedback box (Suggestion tab).
 
 ---
 
@@ -166,7 +185,7 @@ What this means when writing:
 
 ---
 
-## 4. Titles, deks, tags and headings
+## 4. Titles, tags and headings
 
 | Where | Rule | Example |
 |---|---|---|
@@ -174,20 +193,15 @@ What this means when writing:
 | Page `<title>` (Google) | Keyword version **with** the game name + " \| Parchrome" | Clash of Clans Hammer Jam Guide: What to Upgrade First \| Parchrome |
 | Page H1 | The card title (Hammer Jam's currently starts with "Clash of Clans", see 9) | Clash of Clans Hammer Jam Explained: What to Upgrade While It's Cheap |
 
-**Dek** (the line under the title): **3–7 words**, unique, eye-catching.
-Mottos, rhymes and punchlines. It names the payoff with personality and must
-not repeat the title's words.
-
-- Good: "Half the price, double the gains." / "Stop giving away free triples."
-  / "Full storages, within minutes." / "S tier or straight to the bench." /
-  "One more hammer, zero excuses." / "Pure drip, properly ranked."
-- Bad: "Every discount, ranked by value." (flat), anything with the banned
-  words, anything a generic AI would write.
+**No deks (Oct 26 2026, Adrian).** Articles have no line under the title,
+on the page or on any card. Under a card's title come two grey lines
+instead: **"Clash of Clans · Guide"** (game · category tag, no red) and
+**"Published Oct 2026"**, or **"Updated Nov 2026"** once the article has an
+`"updated"` date in `articles.json` (plus "· N min read").
 
 **Category tag:** Event, Guide, Tier List, Skins. Add a new one only when none
-fits. It shows as the white chip on the article banner, the red word on the
-right of a strip card's eyebrow, and the red word at the top right of a feed
-row.
+fits. It shows as the white chip on the article banner, the chip on a
+card's picture, and in the grey "Game · Tag" line under every card title.
 
 **Section headings (`<h2>`):** Title Case, and either a real question
 answered in its first line ("What Is Hammer Jam?") or a clear statement
@@ -205,7 +219,7 @@ In page order:
    1920px wide.
 2. **Author block**: avatar `/icons/parcore-avatar.webp`, "Written by
    Parcore", "Published Oct 2026" (**month + year only**, never the day).
-3. **H1 + dek + "N min read · Updated for 2026"**. Read time = body words ÷
+3. **H1 + "N min read · Updated for 2026"** (no dek). Read time = body words ÷
    220, rounded.
 4. **Table of contents**: sticky column on the **right** on desktop; on
    phones a collapsible box under the header **and** a dropdown button at the
@@ -368,7 +382,7 @@ every 11layout link site-wide (CLAUDE.md rule).
 
 ```json
 { "id": "hammer-jam", "game": "coc", "category": "Event",
-  "title": "Card title", "dek": "3-7 word dek.",
+  "title": "Card title", "read": 6,
   "image": "/clashofclans/articles/hammer-jam/thumb.webp",
   "date": "2026-10-08", "status": "live" }
 ```
@@ -385,11 +399,11 @@ every 11layout link site-wide (CLAUDE.md rule).
 
 - **/coc/ strip card:** picture (watermark top-left, "Coming soon" badge
   top-right on soon cards), eyebrow "CLASH OF CLANS" left + red category
-  right, title (2 lines max), dek (1 line). 4 / 3 / 2 whole cards per row by
+  right, title (2 lines max), month. 4 / 3 / 2 whole cards per row by
   width, ‹ › arrows on desktop, swipe on phones.
 - **Feed card (grid, Oct 9 2026):** picture on top (watermark top left, red
-  category chip top right), full title, dek, then a quiet line "Clash of
-  Clans · Oct 2026". 3 across on desktop, 1 column on phones. Soon cards
+  category chip top right), full title, then grey lines "Clash of
+  Clans · Guide" and "Published Oct 2026 · 8 min read". 3 across on desktop, 1 column on phones. Soon cards
   are dimmed with **no "Coming soon" text** (Adrian's pick).
 - **Read next card:** `<div class="art-next" data-article="<id>" data-label="Read next"></div>`
   inside the article. Shows "Read next · Coming soon" until the target is
@@ -427,13 +441,14 @@ every 11layout link site-wide (CLAUDE.md rule).
    - `<title>`, meta description, canonical URL
    - the desktop breadcrumb (`.stb-crumbs`, last step = short article name)
      and the phone trail (`.secondary-content`, same steps, short names)
-   - banner `src` + alt + category tag; H1; dek; read time; published month
+   - banner `src` + alt + category tag; H1; read time; published month
    - the table of contents (`#apToc`): one row per `<h2>`
    - the body, FAQ, Summary card, "More for <game>"
 3. Another game? Set `<body data-game-nav="articles-<game>">` (section 6).
 4. Images into `site/clashofclans/articles/<id>/` (5b).
 5. In `articles.json`: point `image` at `thumb.webp`, set `status` to
-   `"live"` and the `date`. The /coc/ strip, both feeds and any "Read next"
+   `"live"`, the `date` and `read` (the page's "N min read" number; the
+   cards and the hub's minutes total use it). The /coc/ strip, both feeds and any "Read next"
    card pointing at it update by themselves.
 6. Preview: `python _tools/serve.py` → http://localhost:8765/articles/ on
    desktop and phone width (headless notes in CLAUDE.md). The scroll-spy
@@ -450,7 +465,7 @@ every 11layout link site-wide (CLAUDE.md rule).
 - [ ] The "real secret" has its own section
 - [ ] Question headings answered in 2 words; at least one "Not X. Y." line; headings in Title Case
 - [ ] No outside sources; stats general; rule-of-thumb numbers where useful; unconfirmed facts say "expected"
-- [ ] Card title without the game name; `<title>` with it; dek 3–7 words, not echoing the title, no slop words
+- [ ] Card title without the game name; `<title>` with it; no slop words; no dek
 - [ ] Byline Parcore, "Published <Mon> <Year>", "Updated for <Year>"
 - [ ] Every `<h2>` has an id and a contents row (incl. FAQ and Summary)
 - [ ] 4–7 body photos, each with SHOT note or real image + caption + alt; tool links carry their icon

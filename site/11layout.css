@@ -858,8 +858,8 @@ body { visibility: hidden; }
 
 /* ============================================================
    TOP-BAR SEARCH MODAL — SHARED
-   Icon morph (magnifying glass <-> ✖), tile results grid
-   fed by the Featured Topics data, clear button, body scroll lock, and
+   Icon morph (magnifying glass <-> ✖), the dropdown (desktop) / panel
+   (phones) with result rows fed by search.json, clear key, scroll lock, and
    mobile back-button support (handled in 11layout.js).
    ============================================================ */
 @media (min-width:969px) {
@@ -925,31 +925,32 @@ body.search-modal-open .coc-main {
   }
 }
 
-/* Sits below the top bar and fills everything under it. This used to be
-   `top:0; height:100%` pushed down with `margin-top:52px`, which left the
-   bottom 52px of the overlay hanging past the bottom of the screen — the
-   last of the results were unreachable. Offsetting with `top` and taking
-   the same amount back off the height keeps it exactly within the viewport,
-   and --topbar-height already carries the 52px/40px split so the separate
-   desktop override is no longer needed. */
-#search-overlay { position: fixed;  top: var(--topbar-height);  left: 0; width: 100%;
+/* Phones: a full panel under the top bar. Desktop: a dim layer under the
+   64px bar holding the dropdown, which hangs from the bar's search box
+   (11layout.js openSearch sets --sp-right / --sp-w from that box); a click
+   on the dim closes. The panel (#search-panel, added by 11layout.js around
+   the input and results) is a column: the input stays put, the results scroll. */
+#search-overlay { position: fixed; top: var(--topbar-height); left: 0; width: 100%;
   height: calc(100% - var(--topbar-height));
-  background: #0f0f10; display: none;  z-index: 9999;
-  overflow: hidden; padding: 0; box-sizing: border-box;}
-
-/* #search-panel is added by 11layout.js around the input, the results and
-   the "Loading more" line (no page markup changes needed). Phones: it fills
-   the overlay and scrolls. Desktop: a centered card over the dimmed page,
-   scrolling inside; clicking the dim area around it closes the search. */
-#search-panel { height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 100px; box-sizing: border-box; }
+  background: var(--lb-well); display: none; z-index: 9999;
+  overflow: hidden; padding: 0; box-sizing: border-box; }
+#search-panel {
+  display: flex; flex-direction: column; height: 100%; padding: 12px 16px 0; box-sizing: border-box;
+}
 @media (min-width: 971px) {
-  #search-overlay { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); }
+  #search-overlay { top: 64px; height: calc(100% - 64px); background: rgba(0, 0, 0, 0.5); }
   #search-panel {
-    width: min(760px, calc(100% - 48px)); height: auto; max-height: calc(100% - 96px); margin: 48px auto 0; padding: 0 0 8px;
-    background: #141416; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    position: absolute; top: 8px; right: var(--sp-right, 24px);
+    width: min(var(--sp-w, 560px), calc(100% - 32px)); height: auto; max-height: min(640px, calc(100% - 32px));
+    padding: 10px;
+    border: 2px solid var(--lb-edge); border-radius: var(--lb-r);
+    background: var(--lb-box);
+    box-shadow: var(--lb-shadow), 0 28px 60px -16px rgba(0, 0, 0, 0.95);
+    animation: sp-drop 0.18s var(--lb-ease);
   }
 }
+@keyframes sp-drop { from { opacity: 0; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { #search-panel { animation: none; } }
 
 /* The search box is type="search" rather than type="text" so Android's
    autofill service treats it as a search field and stops offering its
@@ -964,51 +965,47 @@ body.search-modal-open .coc-main {
   display: none;
 }
 
-/* The bar: a flat input with the search icon, a hairline under it and an
-   Esc hint (desktop). Sticky, so it stays put while the results scroll. */
+/* The input: a sunken well (the .lb-search recipe) with the magnifier, a
+   clear key once you type, and an Esc hint on desktop. */
 #search-input-wrap {
-  position: sticky; top: 0; z-index: 2;
-  margin: 0 -16px 14px; padding: 0 16px;
-  background: #0f0f10; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative; flex: none; margin-bottom: 10px;
+  border: 2px solid var(--lb-edge); border-radius: var(--lb-r);
+  background: var(--lb-well); box-shadow: var(--card-well);
+  transition: border-color 0.2s ease, box-shadow 0.25s ease;
 }
+#search-input-wrap:focus-within { border-color: #000; }
 #search-input-wrap::before {
   content: '';
   position: absolute;
-  top: 50%; left: 16px;
+  top: 50%; left: 14px;
   width: 18px; height: 18px;
   transform: translateY(-50%);
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a8d93' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='6.5'/%3E%3Cline x1='15' y1='15' x2='20.5' y2='20.5'/%3E%3C/svg%3E") no-repeat center / contain;
   pointer-events: none;
 }
 #search-input {
-  display: block; width: 100%; max-width: 100%; height: 56px; margin: 0;
-  padding: 0 40px 0 30px; box-sizing: border-box;
+  display: block; width: 100%; max-width: 100%; height: 48px; margin: 0;
+  padding: 0 46px 0 42px; box-sizing: border-box;
   border: 0; border-radius: 0; outline: none; background: transparent; box-shadow: none;
-  font: 500 16px 'Sora', sans-serif; /* 16px: phones don't zoom in on focus */
-  color: #f2f3f5;
+  font: 600 16px 'Sora', sans-serif; /* 16px: phones don't zoom in on focus */
+  color: #fff; caret-color: var(--lb-red);
 }
-#search-input::placeholder { color: #6f727a; font-weight: 400; }
-#search-input-wrap:focus-within { border-bottom-color: rgba(224, 48, 47, 0.55); }
+#search-input::placeholder { color: rgba(255, 255, 255, 0.45); font-weight: 500; }
+/* clear (X) and the Esc hint: small grey keys */
+#search-input-clear, #search-input-wrap::after {
+  position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+  border-radius: 4px; background: var(--lb-raise);
+  box-shadow: inset 0 0 0 1px var(--lb-edge), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+  color: #c9ccd2;
+}
 #search-input-clear {
-  position: absolute; top: 50%; right: 16px; transform: translateY(-50%);
-  width: 22px; height: 22px; border: none; border-radius: 50%;
-  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
-  font-size: 11px; line-height: 1; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background 0.2s ease, color 0.2s ease;
+  width: 26px; height: 26px; border: 0; padding: 0;
+  font-size: 11px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-#search-input-clear:hover { background: rgba(255,255,255,0.2); color: #fff; }
+#search-input-clear:hover { background: var(--lb-raise-hover); color: #fff; }
 @media (min-width: 971px) {
-  #search-input-wrap { margin: 0 0 14px; padding: 0 18px; background: #141416; border-radius: 14px 14px 0 0; }
-  #search-input-wrap::before { left: 18px; }
-  #search-input { height: 60px; padding-right: 64px; }
-  /* "Esc" key hint while the box is empty; the clear (X) takes its place once you type */
-  #search-input-wrap::after {
-    content: 'Esc'; position: absolute; top: 50%; right: 18px; transform: translateY(-50%);
-    padding: 3px 7px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 5px;
-    font: 600 11px/1 'Sora', sans-serif; color: #8a8d93; pointer-events: none;
-  }
+  #search-input-wrap::after { content: 'Esc'; padding: 5px 7px; font: 600 11px/1 'Sora', sans-serif; pointer-events: none; }
   #search-input-wrap:has(#search-input:not(:placeholder-shown))::after { display: none; }
-  #search-input-clear { right: 18px; }
 }
 
 /* ---- Tile (.ft-tile): compact name + subtitle over the page's faded art.
@@ -1059,25 +1056,46 @@ a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
   .ft-art { transition: none; }
 }
 
-/* Results grid: the same tiles, one per row on phones, two in the desktop panel. */
+/* Results: one row per page -- game icon, name, tags. Rows are flat until
+   pointed at (or picked with the arrow keys), then they rise as a grey key. */
 #search-results {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: 2px;
 }
-/* one line each here: long names end in "..." instead of wrapping */
-#search-results .ft-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (min-width: 971px) {
-  #search-results { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0 16px; }
+@media (max-width: 970px) { #search-results { padding-bottom: 100px; } }
+.sr-row {
+  display: flex; align-items: center; gap: 12px; flex: none;
+  padding: 8px 10px; border: 2px solid transparent; border-radius: var(--lb-r);
+  color: #e6e8ec; text-decoration: none;
 }
-
-/* "Loading more..." line under the results -- auto-loads the next batch
-   when it scrolls into view (11layout.js). Styled by id: pages give it
-   either .hero-search-viewmore or .search-viewmore-sentinel. */
-#search-view-more {
-  margin: 14px auto 6px; padding: 6px; background: none; border: 0;
-  text-align: center; color: #8a8d93; font: 600 12px 'Sora', sans-serif; letter-spacing: 0.3px;
+.sr-row:hover, .sr-row.is-sel { border-color: var(--lb-edge); background: var(--lb-raise); box-shadow: var(--lb-btn); }
+/* the mouse wins over the keyboard pick: only one row looks raised */
+#search-results:hover .sr-row.is-sel:not(:hover) { border-color: transparent; background: none; box-shadow: none; }
+.sr-row:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
+.sr-row:focus-visible, .sr-chip:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
+.sr-icon {
+  flex: none; width: 34px; height: 34px; box-sizing: border-box;
+  border: 2px solid var(--lb-edge); border-radius: 7px; object-fit: cover; background: #18191d;
 }
+.sr-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sr-name, .sr-tags { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-name { font: 700 14px/1.2 'Sora', sans-serif; color: #fff; }
+.sr-tags { font: 500 12px/1.2 'Sora', sans-serif; color: #8f939b; }
+.sr-row:hover .sr-tags, .sr-row.is-sel .sr-tags { color: #b9bdc5; }
+/* the Articles icon on article rows: top-right, in the row's flow so long titles stop short of it */
+.sr-badge { flex: none; align-self: flex-start; width: 20px; height: 20px; margin-left: auto; box-sizing: border-box; border: 2px solid var(--lb-edge); border-radius: 5px; }
+/* empty box: suggestion chips (grey keys) */
+.sr-suggest { padding: 6px 2px 4px; }
+.sr-label { margin: 0 0 10px; font: 700 10.5px/1 'Sora', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #7d8189; }
+.sr-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.sr-chip {
+  padding: 9px 12px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r);
+  background: var(--lb-raise); box-shadow: var(--lb-btn);
+  font: 600 12.5px/1 'Sora', sans-serif; color: #d4d6da; cursor: pointer;
+}
+.sr-chip:hover { background: var(--lb-raise-hover); color: #fff; }
+.sr-chip:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
+.sr-empty { margin: 0; padding: 28px 0; text-align: center; font: 500 13px 'Sora', sans-serif; color: #8a8d93; }
 
 .result-icon {
   width: 18px;
@@ -1882,6 +1900,19 @@ removing the color doesn't shift the row's padding/alignment. */
      .stb-dsn-wrap .dsn-chip-icon {
        width: 14px;
        height: 14px;
+     }
+
+     /* HOT on a CoC tool chip (coc-nav-data.json "hot", th-layouts.js). */
+     .dsn-hot {
+       margin-left: -2px;
+       padding: 2px 4px 1px;
+       border: 1px solid var(--lb-red-edge, #5c1515);
+       border-radius: 3px;
+       background: var(--lb-red, #c73a3a);
+       font: 800 8px/1 'Oxanium', sans-serif;
+       letter-spacing: 0.8px;
+       text-transform: uppercase;
+       color: #fff;
      }
 
      /* .stb-hub-link sits inside .stb-hub-nav's own scroll strip
@@ -3128,6 +3159,7 @@ cursor: pointer; transition: background .2s ease, border-color .2s ease, color .
   }
   html body .stb-search:hover { border: 0; background: #0d0e11; box-shadow: inset 0 0 0 2px #000, inset 0 4px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08); color: #d4d6da; }
   html body .stb-search:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
+  html body.search-modal-open .stb-search { color: #d4d6da; }
   html body .stb-search svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; }
   html body .stb-search span { flex: 1; min-width: 0; text-align: left; font: 400 13.5px/1 'Sora', sans-serif; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   html body .stb-search kbd {
@@ -3373,6 +3405,12 @@ cursor: pointer; transition: background .2s ease, border-color .2s ease, color .
   color: #fff;
   border-radius: 3px;
   box-shadow: inset 0 0 0 1px var(--lb-red-edge), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+/* HOT (CoC tools, coc-nav-data.json "hot"): the same tag, compressed. */
+.stb-dd-tag--hot {
+  padding: 2px 5px;
+  font-size: 8px;
+  letter-spacing: 0.8px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3674,10 +3712,7 @@ html body.coc-home .lob-sub strong {
   cursor: text;
   transition: border-color 0.2s ease, box-shadow 0.25s ease;
 }
-.lb-search:focus-within {
-  border-color: #000;
-  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px var(--lb-red-text);
-}
+.lb-search:focus-within { border-color: #000; }
 .lb-search-input {
   width: 100%;
   min-width: 0;

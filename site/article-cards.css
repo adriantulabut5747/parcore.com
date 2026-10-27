@@ -327,9 +327,12 @@ a.art-row:focus-visible {
   line-height: 1.4;
   text-wrap: pretty;
 }
-.art-row .art-dek {
+/* "Clash of Clans · Guide" under the title (Oct 26 2026: replaced the dek),
+   all grey, then the date line (.art-row-meta). */
+.art-row-tags {
   margin: 0;
-  font-size: 14px;
+  font: 600 13px/1.4 'Sora', sans-serif;
+  color: #a9adb3;
 }
 .art-row.is-soon .art-row-media img {
   filter: grayscale(0.55) brightness(0.6);
@@ -337,7 +340,7 @@ a.art-row:focus-visible {
 .art-row.is-soon .art-title {
   color: #a9adb3;
 }
-.art-row.is-soon .art-dek {
+.art-row.is-soon .art-row-tags {
   color: #80858c;
 }
 /* Category chip on the picture, top right (also the hub cover's). */
@@ -356,6 +359,31 @@ a.art-row:focus-visible {
   box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.6);
   pointer-events: none;
 }
+/* "Read" mark (Oct 26 2026): articles this browser has opened (localStorage
+   "art-read", article-cards.js). Bottom left of the picture, so the
+   watermark (top left) and category (top right) stay where they are. */
+.art-read-mark {
+  position: absolute;
+  left: 9px;
+  bottom: 9px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 6px;
+  background: rgba(10, 10, 12, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font: 800 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #e6e8ec;
+  pointer-events: none;
+}
+.art-read-mark svg { width: 12px; height: 12px; fill: none; stroke: #e86a6a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+/* Read articles step back a little; new ones keep the eye. */
+.art-row.is-read .art-row-media img { filter: saturate(0.7) brightness(0.85); }
+
 @media (max-width: 970px) {
   /* Phones: one column, rows split by a hairline as before. */
   .art-feed {
@@ -435,7 +463,7 @@ a.art-next-card {
    stay clean. */
 .art-media::before,
 .art-row-media::before,
-.ah-cover-media::before {
+.ah-hot-media::before {
   content: '';
   position: absolute;
   top: 13px;
@@ -449,7 +477,7 @@ a.art-next-card {
 }
 .art-media::after,
 .art-row-media::after,
-.ah-cover-media::after {
+.ah-hot-media::after {
   content: 'Parcore';
   position: absolute;
   top: 9px;

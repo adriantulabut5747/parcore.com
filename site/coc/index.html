@@ -15,9 +15,9 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css?v=20261024fb">
+<link rel="stylesheet" href="/11layout.css?v=20261026as">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
-<link rel="stylesheet" href="/coc-clan-clock.css?v=20261024cc">
+<link rel="stylesheet" href="/coc-clan-clock.css?v=20261027or">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoC Base Layouts, Army Comps &amp; Tools | Clash of Clans | Parchrome</title>
@@ -48,18 +48,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 
-<!-- Figtree (CoC titles since Oct 24 2026: the free stand-in for supercell.com's
-     own Supercell Headline, which is Supercell's typeface; was Orbitron) and Sora -- referenced all over this file's CSS (.ch-title,
+<!-- Orbitron (CoC home titles again since Oct 27 2026, Adrian: Orbitron went back out) and Sora -- referenced all over this file's CSS (.ch-title,
      .layouts-title, .ch-desc, etc.) but the actual Google Fonts stylesheets
      were never linked here, unlike /web-resources/ which loads both.
      Without this, the browser silently falls back to the generic
      sans-serif in each font-family list -- DevTools' Computed panel still
-     shows "Figtree, sans-serif" as the CSS value either way, which is why
+     shows "Orbitron, sans-serif" as the CSS value either way, which is why
      this was easy to miss just by inspecting the rule instead of the
      Rendered Fonts row. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -313,10 +312,10 @@ margin: auto;
   });
 })();
 </script>
-  <link rel="stylesheet" href="/coc-help.css?v=20261024cc" />
-  <link rel="stylesheet" href="/coc-more.css?v=20261021hd" />
-  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261024cc" />
-  <link rel="stylesheet" href="/tool-cards.css?v=fd4ab4d4" />
+  <link rel="stylesheet" href="/coc-help.css?v=20261027or" />
+  <link rel="stylesheet" href="/coc-more.css?v=20261026hot" />
+  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261027or" />
+  <link rel="stylesheet" href="/tool-cards.css?v=87999251" />
 </head>
 <body class="coc-home">
 
@@ -646,6 +645,57 @@ Please open this page in Chrome for the best experience.</li><br>
             <div class="ch-found" id="chFound" aria-live="polite" hidden></div>
           </div>
 
+          <!-- Proof row, desktop only (hidden at <=970px). Real counts from
+               the data files (Oct 2026: 251 layouts in thNN-layouts.json, 109
+               armies in thNN-army.json; 7 tools in coc-nav-data.json) -- rounded down, so update them when
+               the totals pass the next step rather than rounding up. -->
+          <div class="ch-stats">
+            <div class="ch-stat">
+              <span class="ch-stat-lbl">Layouts</span>
+              <span class="ch-stat-num">250<span>+</span></span>
+            </div>
+            <div class="ch-stat">
+              <span class="ch-stat-lbl">Armies</span>
+              <span class="ch-stat-num">100<span>+</span></span>
+            </div>
+            <div class="ch-stat">
+              <span class="ch-stat-lbl">Tools</span>
+              <span class="ch-stat-num">8</span>
+            </div>
+          </div>
+          <script>
+          /* Stats count-up (Oct 2026): every number in the row counts from 0
+             to its value once, ~1s, when the row scrolls into view. Set to 0
+             here, before first paint, so the real value never flashes first.
+             Reduced motion: left alone. */
+          (function () {
+            var row = document.currentScript.previousElementSibling;
+            if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            var nodes = [];
+            row.querySelectorAll('.ch-stat-num').forEach(function (el) {
+              el.childNodes.forEach(function (n) {
+                var v = n.nodeType === 3 ? parseInt(n.nodeValue, 10) : NaN;
+                if (!isNaN(v)) { nodes.push({ n: n, v: v }); n.nodeValue = '0'; }
+              });
+            });
+            function run() {
+              var t0 = null, D = 1000;
+              function step(t) {
+                if (t0 === null) t0 = t;
+                var k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+                nodes.forEach(function (o) { o.n.nodeValue = String(Math.round(o.v * e)); });
+                if (k < 1) requestAnimationFrame(step);
+              }
+              requestAnimationFrame(step);
+            }
+            if (!('IntersectionObserver' in window)) return run();
+            var io = new IntersectionObserver(function (es) {
+              if (es[0].isIntersecting) { io.disconnect(); setTimeout(run, 350); }
+            }, { threshold: 0.25 });
+            io.observe(row);
+          })();
+          </script>
+
         </div>
 
         <!-- RIGHT (Oct 24 2026, Adrian: the left was cramped): the Raid Weekend
@@ -931,7 +981,7 @@ Please open this page in Chrome for the best experience.</li><br>
    hero headlines on the site are the same scale. Negative tracking is the
    "pulled-in" display setting esports sites use for impact. */
 .ch-title {
-  font-family: 'Figtree', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: clamp(33px, 3.6vw, 60px);
   font-weight: 900;
   line-height: 1.02;
@@ -1022,7 +1072,7 @@ Please open this page in Chrome for the best experience.</li><br>
   padding: 0 16px;
   gap: 4px;
 }
-.ch-find-hash { font: 800 16px/1 'Figtree', sans-serif; color: var(--lb-red-text); }
+.ch-find-hash { font: 800 16px/1 'Orbitron', sans-serif; color: var(--lb-red-text); }
 .ch-find-field .lb-search-input { font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 .ch-find-field .lb-search-input::placeholder { text-transform: none; letter-spacing: 0.2px; font-weight: 600; color: rgba(255, 255, 255, 0.42); }
 .ch-find-go { padding: 0 20px; }
@@ -1060,11 +1110,11 @@ Please open this page in Chrome for the best experience.</li><br>
 .ch-found-card:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 3px; }
 .ch-found-th { width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); }
 .ch-found-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.ch-found-main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 17px/1.1 'Figtree', sans-serif; color: #fff; }
+.ch-found-main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 17px/1.1 'Orbitron', sans-serif; color: #fff; }
 .ch-found-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px/1.3 'Sora', sans-serif; color: #9aa0a8; }
 .ch-found-nums { display: flex; gap: 16px; }
 .ch-found-num { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-.ch-found-num b { font: 900 16px/1 'Figtree', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.ch-found-num b { font: 900 16px/1 'Orbitron', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
 .ch-found-num small { font: 700 9px/1 'Oxanium', sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: #8b9099; }
 .ch-found-card .cl-result-arrow { width: 16px; height: 16px; color: #8b9099; transition: transform 0.2s var(--lb-ease), color 0.15s ease; }
 .ch-found-card:hover .cl-result-arrow { color: #fff; transform: translateX(3px); }
@@ -1125,7 +1175,7 @@ Please open this page in Chrome for the best experience.</li><br>
 .ch-raid-name { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .ch-raid-t {
   margin: 0;
-  font: 900 17px/1 'Figtree', sans-serif;
+  font: 900 17px/1 'Orbitron', sans-serif;
   letter-spacing: 0.2px;
   text-transform: uppercase;
   color: #fff;
@@ -1184,7 +1234,7 @@ Please open this page in Chrome for the best experience.</li><br>
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .ch-raid-u b {
-  font: 900 28px/1 'Figtree', sans-serif;
+  font: 900 28px/1 'Orbitron', sans-serif;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
   color: #d9dce1;
@@ -1326,6 +1376,51 @@ Please open this page in Chrome for the best experience.</li><br>
    screenshot on top (its own sunken edge under it), then a footer strip --
    the nav icon on a grey key, the name in the title face, a live count, and
    an arrow in a well that turns into the red key on hover. */
+/* PROOF ROW (desktop only): small label over a large numeral, under a
+   hairline. */
+.ch-stats {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  /* Hairline only as wide as the three stats (desktop); phones reset it. */
+  width: fit-content;
+  padding-top: 22px;
+  padding-right: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.ch-stat { min-width: 0; }
+
+.ch-stat-lbl {
+  display: block;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #9aa0a8; /* Oct 12: was #6d7178, under 4.5:1 on the art */
+  margin-bottom: 7px;
+}
+
+.ch-stat-num {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  color: #f2f3f5;
+  letter-spacing: 0.5px;
+}
+
+.ch-stat-num span {
+  color: #8b9097; /* Oct 12: was red */
+  font-size: 16px;
+}
+
+@media (max-width: 970px) {
+  .ch-stats { display: none; } /* desktop only (Adrian, Oct 27 2026) */
+}
+
 .ch-hero-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1435,7 +1530,7 @@ Please open this page in Chrome for the best experience.</li><br>
   white-space: nowrap;
 }
 .ch-card-name {
-  font: 900 13px/1 'Figtree', sans-serif;
+  font: 900 13px/1 'Orbitron', sans-serif;
   letter-spacing: 0.2px;
   text-transform: uppercase;
   color: #fff;
@@ -1576,6 +1671,10 @@ Please open this page in Chrome for the best experience.</li><br>
     margin-top: 0;
     object-position: 38% 18%;
     filter: brightness(0.9) saturate(1.05);
+    /* King = the focal point (Adrian, Oct 27 2026): zoom in on him, which
+       pushes the Builder's face up and out; the overlay darkens what's left. */
+    transform: translate(3%, -8%) scale(1.45);
+    transform-origin: 60% 56%;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%), linear-gradient(to bottom, #000 62%, transparent 100%);
     -webkit-mask-composite: source-in;
             mask-image: linear-gradient(to right, transparent 0%, #000 38%), linear-gradient(to bottom, #000 62%, transparent 100%);
@@ -1592,6 +1691,8 @@ Please open this page in Chrome for the best experience.</li><br>
     padding: 50px 5% 20px;
     min-height: 0;
     background:
+      linear-gradient(to bottom, rgba(10,10,11,0.85) 0, rgba(10,10,11,0.45) 80px, rgba(10,10,11,0) 140px),
+      radial-gradient(ellipse 34% 150px at 76% 165px, rgba(10,10,11,0) 55%, rgba(10,10,11,0.55) 100%),
       linear-gradient(to right, rgba(10,10,11,0.9) 0%, rgba(10,10,11,0.6) 46%, rgba(10,10,11,0) 74%),
       linear-gradient(to bottom, rgba(10,10,11,0) 200px, rgba(10,10,11,0.9) 280px, #0c0c0d 330px);
   }
@@ -1602,11 +1703,11 @@ Please open this page in Chrome for the best experience.</li><br>
     top: 0;
     width: 100%;
     height: 330px;
-    background: radial-gradient(ellipse 34% 40% at 72% 42%,
-      rgba(255, 190, 110, 0.2) 0%,
+    background: radial-gradient(ellipse 30% 36% at 76% 50%,
+      rgba(255, 190, 110, 0.28) 0%,
       rgba(255, 190, 110, 0) 70%);
     animation: none;
-    opacity: 0.85;
+    opacity: 1;
   }
 
   .ch-hero {
@@ -1619,14 +1720,17 @@ Please open this page in Chrome for the best experience.</li><br>
   .ch-hero-left {
     display: flex;
     flex-direction: column;
+    container-type: inline-size; /* the title's cqi size below */
   }
 
   .ch-kicker { display: none; }
 
   /* Left ~60%: the King has the rest. */
+  /* Max 3 lines (Adrian, Oct 27 2026): "STOP COPYING", the widest line, is
+     ~10.4em in Orbitron, so the size follows the column to keep it on one. */
   .ch-title {
-    max-width: 62%;
-    font-size: clamp(26px, 7.4vw, 34px);
+    max-width: 84%;
+    font-size: min(34px, calc(84cqi / 10.4));
     line-height: 1;
     letter-spacing: -0.5px;
     margin: 6px 0 10px;
@@ -1648,8 +1752,8 @@ Please open this page in Chrome for the best experience.</li><br>
   }
 
   .ch-desc {
-    max-width: 58%;
-    font-size: 13px;
+    max-width: 80%; /* 3 lines max down to 320px */
+    font-size: 12px;
     line-height: 1.5;
     margin: 0;
     color: #c3c7cd;
@@ -1962,7 +2066,7 @@ function warModalEscHandler(e) {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-family: 'Figtree', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   background: linear-gradient(90deg, #ffffff, #c0c9d4);
   -webkit-background-clip: text;
   background-clip: text;
@@ -2069,11 +2173,11 @@ function warModalEscHandler(e) {
 
 </style>
 <!-- Town Hall + Clash tools cards: shared with /coc/tools/. -->
-<link rel="stylesheet" href="/coc-cards.css?v=20261024cc" />
+<link rel="stylesheet" href="/coc-cards.css?v=20261027or" />
 <!-- Popular Articles strip: shared with every game section. -->
-<link rel="stylesheet" href="/article-cards.css?v=20261021as" />
+<link rel="stylesheet" href="/article-cards.css?v=20261026hot3" />
 <!-- Most picked equipment + Top players of the week + FAQ (coc-lobby.css). -->
-<link rel="stylesheet" href="/coc-lobby.css?v=20261025hm" />
+<link rel="stylesheet" href="/coc-lobby.css?v=20261027or" />
 
 <!-- The .ql-wrap "Quality Over Quantity" block that used to sit here (its
      own <style> block plus markup) was merged into the hero section at the
@@ -2146,7 +2250,7 @@ function warModalEscHandler(e) {
   align-items: center;
   gap: 10px;
   margin-right: 40px;
-  font-family: 'Figtree', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: 10.5px;
   font-weight: 600;
   line-height: 1;
@@ -2228,7 +2332,7 @@ function warModalEscHandler(e) {
            per row. Both styles live in coc-cards.css. -->
 
       <a class="th-card th-card--wide th-card--feat" href="/coc/town-hall-18/layouts">
-        <img class="th-bg" src="/clashofclans/home/th18-face.webp" alt="" loading="lazy" decoding="async">
+        <picture><source media="(min-width: 971px)" srcset="/clashofclans/th18layouts/th18-25.webp"><img class="th-bg" src="/clashofclans/home/th18-face.webp" alt="" loading="lazy" decoding="async"></picture>
         <span class="th-tag">Latest</span>
         <div class="th-foot">
           <img class="th-icon" src="/icons/th18icon.png" alt="">
@@ -2397,7 +2501,7 @@ function warModalEscHandler(e) {
 
     <style>
     /* TH8 filler is phones-only; the picker's display:flex would show it. */
-    @media (min-width: 971px) { .th-pick .layouts-list .th-card.th-card--soon { display: none; } }
+    @media (min-width: 971px) { .th-pick .layouts-list .th-card.th-card--soon, .th-pick .th-card .th-tag { display: none; } }
     /* TOWN HALL PICKER (>=1200px). Placed after coc-cards.css on purpose, so
        equal-specificity rules here win over the grid's. The rail is quiet --
        solid rows, colour icon, name, count, arrow -- so the big preview is
@@ -2486,20 +2590,8 @@ function warModalEscHandler(e) {
         color: #c9ccd2;
       }
       .th-pick .th-card .th-name::before { content: 'Town Hall '; white-space: pre; margin-right: -8px; }
-      /* TH18's "Latest": a small pill after the name, in place of the corner tag. */
+      /* No "Latest" on desktop (Adrian, Oct 27 2026). */
       .th-pick .th-card .th-tag { display: none; }
-      .th-pick .th-card:has(.th-tag) .th-name::after {
-        content: 'Latest';
-        padding: 2px 7px;
-        border-radius: 0;
-        background: #c23b3b;
-        font-family: 'Sora', sans-serif;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.4px;
-        text-transform: uppercase;
-        color: #fff;
-      }
       .th-pick .th-card .th-count,
       .th-pick .th-card.th-card--wide .th-count,
       .th-pick .th-card:not(.th-card--wide) .th-count {
@@ -2675,12 +2767,12 @@ function warModalEscHandler(e) {
       var view = document.querySelector('.pk-view');
       var cards = [].slice.call(document.querySelectorAll('.th-pick .th-card:not(.th-card--soon)'));
       if (!view || !cards.length) return;
-      var PICK = { 18: 21, 17: 4, 16: 3, 15: 5, 14: 6, 13: 3, 12: 3, 11: 2, 10: 4, 9: 4 };
+      var PICK = { 18: 25, 17: 4, 16: 3, 15: 5, 14: 6, 13: 3, 12: 3, 11: 2, 10: 4, 9: 4 };
       var shots = view.querySelector('.pk-shots');
       var $ = function (id) { return document.getElementById(id); };
       var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
       var thOf = function (c) { return (c.getAttribute('href').match(/town-hall-(\d+)/) || [])[1]; };
-      var big = function (c) { return '/clashofclans/home/pick/th' + thOf(c) + '.webp?v=20261025'; }; // bump ?v when a pick/thNN.webp is replaced
+      var big = function (c) { return '/clashofclans/home/pick/th' + thOf(c) + '.webp?v=20261027b'; }; // bump ?v when a pick/thNN.webp is replaced
       // Sharp copies load lazily: TH18's up front, the rest the first time
       // the mouse reaches the rail. Phones never load them (display:none).
       var imgs = cards.map(function (c, i) {
@@ -3413,7 +3505,7 @@ function warModalEscHandler(e) {
         <div class="ptc-layer ptc-near"><img class="am-t am-t0" src="/clashofclans/coctools/units/rocket-balloon.webp" alt=""><img class="am-t am-t1" src="/clashofclans/coctools/units/super-minion.webp" alt=""><img class="am-t am-t2" src="/clashofclans/coctools/units/healer.webp" alt=""></div>
       </div>
       <div class="ptc-copy">
-        <div class="ptc-name">Army Maker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="ptc-name"><b class="ptc-hot">Hot</b>Army Maker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         <p class="ptc-desc"><span class="ptc-long">Build an army for TH8 to TH18, open it in game.</span><span class="ptc-short">Build an army and open it in the game.</span></p>
       </div>
     </a>
@@ -3432,7 +3524,7 @@ function warModalEscHandler(e) {
         <div class="ptc-layer ptc-near"><div class="dc-bar"><i class="dc-ghost"></i><i class="dc-fill"></i></div><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><b class="dc-dmg">−720</b><div class="dc-stamp"><span>Destroyed</span></div></div>
       </div>
       <div class="ptc-copy">
-        <div class="ptc-name">Damage Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="ptc-name"><b class="ptc-hot">Hot</b>Damage Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         <p class="ptc-desc"><span class="ptc-long">Spell and equipment damage on any building.</span><span class="ptc-short">Spell and equipment damage on any building.</span></p>
       </div>
     </a>
@@ -3741,7 +3833,7 @@ function warModalEscHandler(e) {
 }
 /* /coc/'s `* { Oxanium }` reset beats inheritance: every text element is set. */
 .wc,
-.wc * { font-family: 'Figtree', sans-serif; }
+.wc * { font-family: 'Orbitron', sans-serif; }
 .wc::before {
   content: '';
   position: absolute;
@@ -3772,7 +3864,7 @@ function warModalEscHandler(e) {
 .wc-load,
 .wc-note {
   margin: auto;
-  font: 800 2.4cqw/1.3 'Figtree', sans-serif;
+  font: 800 2.4cqw/1.3 'Orbitron', sans-serif;
   color: #c9ccd2;
   text-align: center;
 }
@@ -4375,7 +4467,7 @@ function warModalEscHandler(e) {
   .th-pick .th-card .th-name,
   .th-pick .th-card.th-card--wide .th-name,
   .th-pick .th-card:not(.th-card--wide) .th-name {
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 15px;
     font-weight: 800;
   }
@@ -4403,7 +4495,7 @@ function warModalEscHandler(e) {
     box-shadow: none;
   }
   .pk-title {
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-weight: 900;
     letter-spacing: 0;
   }
@@ -4511,16 +4603,16 @@ function warModalEscHandler(e) {
 .cl-feature-copy { grid-area: copy; min-width: 0; }
 .cl-feature-title {
   margin: 0 0 12px;
-  font-family: 'Figtree', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.5px;
   text-transform: uppercase;
   color: #f2f3f5;
 }
-/* Same white Figtree as the line: /coc/'s `* { Oxanium }` reset beats inheritance. */
+/* Same white Orbitron as the line: /coc/'s `* { Oxanium }` reset beats inheritance. */
 .cl-feature-title em {
-  font-family: 'Figtree', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-style: normal;
   color: inherit;
 }
@@ -4736,11 +4828,11 @@ function warModalEscHandler(e) {
 .cl-pick:hover { background: var(--lb-raise); box-shadow: var(--lb-btn); transform: translateY(-1px); }
 .cl-pick:focus-visible { outline: 2px solid #f2f3f5; outline-offset: 2px; }
 .cl-pick img { flex: none; width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5)); }
-.cl-pick-th { flex: none; width: 24px; font: 800 10px/1 'Figtree', sans-serif; color: #c9ccd2; text-align: center; }
+.cl-pick-th { flex: none; width: 24px; font: 800 10px/1 'Orbitron', sans-serif; color: #c9ccd2; text-align: center; }
 .cl-pick > span:last-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .cl-pick b,
 .cl-pick small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cl-pick b { font: 800 12px/1.1 'Figtree', sans-serif; color: #f2f3f5; }
+.cl-pick b { font: 800 12px/1.1 'Orbitron', sans-serif; color: #f2f3f5; }
 .cl-pick small { font: 600 9.5px/1.1 'Sora', sans-serif; color: #7d828a; }
 .cl-track-modes button:focus-visible,
 .cl-track-go:focus-visible,
@@ -4884,7 +4976,7 @@ function warModalEscHandler(e) {
 <!-- TOP PLAYERS OF THE WEEK (Oct 24 2026, was "Current top 10 in the world").
      One compact board: 1-5 | 6-10 side by side on desktop, one column on
      phones; each row = rank, badge, name + clan, move since last week, trophies.
-     The data is saved once a week, Monday 03:00 UTC, two hours before the
+     The data is saved once a week, Sunday 22:00 UTC, seven hours before the
      league reset (lobby-stats.yml), so it's the week's final standings. -->
 <section class="gt" id="worldTop" aria-labelledby="gtTitle" hidden>
   <!-- Background: Supercell Fan Kit dungeon gate, cropped to 16:9 and re-saved as WebP (321 KB -> 63 KB) from
@@ -4903,7 +4995,7 @@ function warModalEscHandler(e) {
   </div>
 </section>
 <script src="/coc-lobby.js?v=20261024fb" defer></script>
-<script src="/article-cards.js?v=20261021as" defer></script>
+<script src="/article-cards.js?v=20261026hot3" defer></script>
 
 <!-- FAQ (Oct 24 2026 rebuild; was the TH pages' shared .t18-faq cards). Its own
      look (coc-lobby.css "FAQ"): help desk on the left (title, then the site's
@@ -5090,7 +5182,7 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js?v=20261024fb" defer></script>
+<script src="/11layout.js?v=20261026as" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
@@ -6474,9 +6566,9 @@ function cocPagePath(u) {
     if (svg) svg.outerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5.5\"/><path d=\"M12 7.7v.1\"/></svg>';
   });
   </script>
-  <script src="/coc-more.js?v=20261021hd" defer></script>
+  <script src="/coc-more.js?v=20261026hot" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
-  <script src="/tool-cards.js?v=fd4ab4d4" defer></script>
+  <script src="/tool-cards.js?v=87999251" defer></script>
 <style>
 /* ONE SPACING RHYTHM (Oct 2026, Adrian's pick). Every lobby section, from
    the Town Halls down to the clan card, gets the same --sy top and bottom.
@@ -6499,7 +6591,7 @@ function cocPagePath(u) {
 .coc-main .qa { padding-top: var(--sy); padding-bottom: 112px; } /* room for the Live band's Warden */
 
 /* SECTION TITLES (Oct 21 2026, Adrian): every lobby heading below the hero
-   wears the Minecraft section title (mc-home.css SECTION TITLES): Figtree
+   wears the Minecraft section title (mc-home.css SECTION TITLES): Orbitron
    900 caps on the --fs-title scale (28-36px desktop, 18px phones), the home
    page's white-to-grey gradient fill, and the section link (.art-all: raised
    key on desktop, underlined text on phones) on the same row. Subtitles are
@@ -6509,7 +6601,7 @@ html body.coc-home .lob-title,
 html body.coc-home .lb-title,
 html body.coc-home .cl-feature-title,
 html body.coc-home .cc-label {
-  font-family: 'Figtree', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.5px;

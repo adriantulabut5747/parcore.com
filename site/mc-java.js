@@ -57,57 +57,6 @@ document.querySelector('.secondary-top-bar').addEventListener('click', () => {
 // ── PAGE LOAD ──
 window.addEventListener("load", () => { document.documentElement.classList.add("loaded"); });
 
-// ── SEARCH ──
-
-// Search data: 11layout.js fills topSearchItems from the Featured Topics.
-
-
-// Main search function — called on every keystroke and when the
-// overlay first opens (with an empty query, showing a random sample).
-
-// `fromPopstate` is true when triggered by the back button/gesture itself —
-// in that case the browser is already consuming the history entry, so we
-// must NOT call history.back() again (that would navigate off the page).
-
-window.addEventListener('popstate', () => {
-  if (searchoverlay && searchoverlay.style.display === 'block') {
-    closeSearch(true);
-  }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  searchoverlay = document.getElementById('search-overlay');
-  resultsContainer = document.getElementById('search-results');
-  searchinput = document.getElementById('search-input');
-  searchIcon = document.getElementById('search-icon');
-  topSearchViewMoreBtn = document.getElementById('search-view-more');
-  searchInputClearBtn = document.getElementById('search-input-clear');
-
-  searchinput.addEventListener('input', searchItems);
-  searchoverlay.addEventListener('click', e => { if (e.target === searchoverlay) closeSearch(); });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeSearch();
-  });
-
-  // Auto-loads the next batch of results a bit before the user actually
-  // reaches the bottom (rootMargin gives it a head start), so scrolling
-  // feels continuous instead of hitting a button.
-  searchScrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && topSearchVisibleCount < topSearchCurrentMatches.length) {
-        topSearchVisibleCount += TOP_SEARCH_LOAD_MORE_COUNT;
-        renderTopSearchVisible();
-      }
-    });
-  }, { root: document.getElementById('search-panel') || searchoverlay, rootMargin: '0px 0px 400px 0px' });
-
-  searchInputClearBtn.addEventListener('click', () => {
-    searchinput.value = '';
-    searchItems();
-    searchinput.focus();
-  });
-});
-
 /* ===== PAGE FEATURES ===== */
 
 /* ── HERO TAGLINE: at most two lines on phones ──

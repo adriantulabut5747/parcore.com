@@ -420,6 +420,7 @@ function cocSheetDrag(sheet, handles, body, hide) {
               (g.name && g.name !== g.label
                 ? '<span class="lbl-full">' + g.name + '</span><span class="lbl-short">' + g.label + '</span>'
                 : '<span>' + g.label + '</span>') +
+              (g.hot ? '<b class="dsn-hot">Hot</b>' : '') +
               '</a>'
             );
           })

@@ -32,8 +32,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/11layout.css?v=20261024fb">
-<link rel="stylesheet" href="/article-cards.css?v=20261021as">
+<link rel="stylesheet" href="/11layout.css?v=20261026as">
+<link rel="stylesheet" href="/article-cards.css?v=20261026hot3">
 
 <!-- ============================================================
      HOME PAGE STYLES (one block, Oct 2026 rebuild)
@@ -248,12 +248,6 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   .hero-searchbar-wrap { max-width: 100%; margin: 0 auto; }
 }
 
-/* Featured Games "show more" button only -- the search overlay's "Loading more..."
-   sentinel shares the class and keeps its plain-text look from 11layout.css. */
-/* Layout only: the grey key look comes from .hero-search-viewmore (an id
-   rule here used to beat it and left the button flat and square). */
-#ggMore { display: block; margin: 32px auto 0; padding: 11px 28px; cursor: pointer; font: 600 14px 'Sora', sans-serif; letter-spacing: 0.3px; }
-#ggMore:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
 
 /* ============================================================
    JUMP TO A GAME: the old Popular Topics section's look (smoke at the
@@ -566,8 +560,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .hm-ember, .hm-laptop-lid::before { border-radius: 50%; }
 .hm-pt-dot { border-radius: 999px; transition: background 0.2s ease, width 0.25s var(--hm-ease); }
 .hm-pt-dot.is-on { width: 20px; }
-.ft-logo, .gg-icon { border-radius: 5px; }
-.gg-meta::before { border-radius: 2px; }
+.ft-logo { border-radius: 5px; }
 .pf-to-top-ring { border-radius: var(--lb-r); } /* shared footer: rounded here only */
 
 /* Recently Added: each card is a box; the art sits inside with a 4px inset */
@@ -591,7 +584,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 
 /* Featured Games: the "Coming soon" pill is a small well */
 .gg-pill { background: rgba(10, 11, 13, 0.82); border: 1px solid var(--lb-edge); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
-.gg-ph, .ft-ph { border: 2px solid var(--lb-edge); }
+.ft-ph { border: 2px solid var(--lb-edge); }
 
 /* Featured Topics: the band is raised, each group a well sunk into it
    (the /coc/ articles band's recipe), its tiles the raised grey keys */
@@ -853,12 +846,15 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 
 
   <!-- ============================================================
-       GAMES GRID — portrait cover cards, one per game.
+       FEATURED GAMES — one wide tile per game (icon + name left on the dark fade, art right).
        Built at runtime from sidebar.json (the same file as the sidebar):
-       every entry with a "card" object gets a card, in sidebar order --
-       the live games first, then the Triple A list as "Coming soon".
-       To add/rename a game or change its cover/subtitle, edit
-       sidebar.json, not this markup. Covers: /icons/covers/*.webp, 600x900.
+       every entry whose "card" has a "tile" gets a tile, in sidebar order
+       (live games, then the "upcoming" ones as "Coming soon" tiles);
+       Triple A entries (no tile yet) are summed up in the grid's last cell,
+       the "Also on the way" well (count + icon stack + names).
+       card fields: name (tileName wins if set), sub, tile, glow (the hover
+       glow + rule colour), soon. Tile pictures: /icons/tiles/*.webp, baked by
+       _tools/game-tiles/build.py (art + blur + colour fade in one image).
        Lives inside .latest-section2 so the hero search hides it along
        with everything else below the carousel.
        ============================================================ -->
@@ -868,10 +864,10 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
       <p class="hm-head-sub" id="ggLede"></p>
     </div>
     <div class="gg-grid" id="ggGrid" aria-busy="true">
-      <!-- placeholders until sidebar.json arrives; same size as a card so nothing jumps -->
-      <div class="gg-card gg-ph"></div><div class="gg-card gg-ph"></div><div class="gg-card gg-ph"></div><div class="gg-card gg-ph"></div>
+      <!-- placeholders until sidebar.json arrives; same size as a tile so nothing jumps -->
+      <div class="gg-tile gg-ph"></div><div class="gg-tile gg-ph"></div><div class="gg-tile gg-ph"></div>
+      <div class="gg-tile gg-ph"></div><div class="gg-tile gg-ph"></div><div class="gg-tile gg-ph"></div>
     </div>
-    <button type="button" class="hero-search-viewmore" id="ggMore" hidden></button>
   </section>
 
   <style>
@@ -884,179 +880,235 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   }
   .gg-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: clamp(18px, 1.8vw, 26px) clamp(14px, 1.5vw, 22px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(14px, 1.4vw, 20px);
   }
-  @media (max-width: 1280px) {
-    .gg-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  }
+  @media (max-width: 1100px) { .gg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .gg-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
 
-  .gg-card {
+  /* A tile = the raised box recipe (2px edge, light ring + top line, soft drop)
+     with the baked art filling it. The art keeps its right edge (the character)
+     whatever the tile's width; only solid colour is lost on the left. */
+  .gg-tile {
+    --glow: #e0302f;
     position: relative;
-    display: block;
-    aspect-ratio: 20 / 29; /* playzip's 1 : 1.45 */
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 1.1vw, 16px);
+    padding-left: clamp(18px, 1.7vw, 26px);
+    aspect-ratio: 5 / 2;
     isolation: isolate;
-    background: #18181b;
+    overflow: hidden;
+    border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
+    background: #0c0d10;
+    box-shadow: var(--lb-shadow);
     color: #fff;
     text-decoration: none;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s var(--lb-ease), box-shadow 0.3s ease;
   }
-  .gg-card[hidden] { display: none; }
   .gg-art {
     position: absolute;
     inset: 0;
+    z-index: -1;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+    object-position: right center;
+    transform-origin: 70% 50%;
+    transition: transform 0.8s var(--lb-ease), filter 0.5s ease;
   }
-  /* Fade the bottom of the art into near-black so the name reads on any cover. */
-  .gg-card::after {
+  /* the box's light ring + top line, drawn OVER the art so the edge reads on bright pictures */
+  .gg-tile::after {
     content: "";
     position: absolute;
     inset: 0;
-    z-index: 1;
-    background: linear-gradient(to top, rgba(9, 9, 10, 0.95) 0%, rgba(9, 9, 10, 0.7) 26%, rgba(9, 9, 10, 0) 56%);
+    z-index: 3;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.13);
     pointer-events: none;
   }
-  .gg-meta {
+  /* hover: one sheen sweeps across the glass */
+  .gg-tile::before {
+    content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 2;
-    padding: 0 10px 12px;
+    background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.13) 50%, transparent 62%);
+    transform: translateX(-110%);
+    pointer-events: none;
   }
-  /* Game icon on the left, name + subtitle stacked beside it. */
-  .gg-row {
+
+  .gg-meta {
+    position: relative;
+    z-index: 1;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 52%;
   }
-  .gg-icon {
-    flex: none;
-    width: 26px;
-    height: 26px;
-    border-radius: var(--lb-r);
-    object-fit: cover;
-    background: #222226;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 4px 10px rgba(0, 0, 0, 0.45);
-  }
-  .gg-text { min-width: 0; }
-  /* The one moving detail: a red rule that draws out above the name on hover. */
+  /* the rule that draws out above the name on hover, in the game's colour */
   .gg-meta::before {
     content: "";
-    display: block;
-    width: 28px;
-    height: 2px;
+    width: 26px;
+    height: 3px;
     margin-bottom: 9px;
-    border-radius: var(--lb-r);
-    background: #e0302f;
+    border-radius: 2px;
+    background: var(--glow);
+    box-shadow: 0 0 10px var(--glow);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.45s var(--lb-ease);
   }
   .gg-name {
     margin: 0;
-    font: 700 14px/1.25 'Sora', sans-serif;
-    letter-spacing: -0.01em;
-    /* one line each, so every card's text block is the same height */
-    white-space: nowrap;
+    font: 800 clamp(16px, 1.2vw, 19px)/1.16 'Sora', sans-serif;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .gg-sub {
-    margin: 3px 0 0;
-    font: 500 11.5px/1.3 'Sora', sans-serif;
-    color: rgba(255, 255, 255, 0.72);
+    max-width: 100%;
+    margin: 7px 0 0;
+    font: 500 12px/1.3 'Sora', sans-serif;
+    color: rgba(255, 255, 255, 0.68);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  a.gg-card:hover {
-    transform: translateY(-5px);
-  }
-  a.gg-card:hover .gg-art { transform: scale(1.05); }
-  a.gg-card:hover .gg-meta::before,
-  a.gg-card:focus-visible .gg-meta::before { transform: scaleX(1); }
-  a.gg-card:focus-visible {
-    outline: 2px solid #e0302f;
-    outline-offset: 3px;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    a.gg-card:hover {
-      transform: translateY(-3px);
-    }
-  }
-  a.gg-card:hover {
-    border-color: var(--lb-edge);
-    background-color: var(--lb-box-hover);
-    box-shadow: var(--lb-shadow-hover);
-  }
-  a.gg-card {
-    transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;
-  }
-  .gg-card {
+  /* the game's icon: a small raised badge left of the name */
+  .gg-icon {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    width: clamp(46px, 3.9vw, 58px);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
     border: 2px solid var(--lb-edge);
-    border-radius: var(--lb-r);
-    background-color: var(--lb-box);
-    box-shadow: var(--lb-shadow);
-    overflow: hidden;
+    border-radius: 10px;
+    background: #18191d;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 20px -8px rgba(0, 0, 0, 0.85);
+    transition: transform 0.45s var(--lb-ease), box-shadow 0.3s ease;
   }
 
-  /* Coming soon: not a link, art in greyscale, pill in the corner. */
-  .gg-soon .gg-art { filter: grayscale(1) brightness(0.55); }
-  .gg-soon .gg-icon { filter: grayscale(1); opacity: 0.8; }
-  .gg-soon .gg-name { color: rgba(255, 255, 255, 0.82); }
-  .gg-soon .gg-sub { color: rgba(255, 255, 255, 0.55); }
+  a.gg-tile:hover,
+  a.gg-tile:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: var(--lb-shadow-hover), 0 16px 34px -18px var(--glow);
+  }
+  a.gg-tile:hover .gg-art,
+  a.gg-tile:focus-visible .gg-art { transform: scale(1.05); }
+  a.gg-tile:hover::before,
+  a.gg-tile:focus-visible::before { transform: translateX(110%); transition: transform 0.9s var(--lb-ease); }
+  a.gg-tile:hover .gg-meta::before,
+  a.gg-tile:focus-visible .gg-meta::before { transform: scaleX(1); }
+  a.gg-tile:hover .gg-icon,
+  a.gg-tile:focus-visible .gg-icon {
+    transform: translateY(-3px) rotate(-5deg) scale(1.05);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 14px 24px -8px rgba(0, 0, 0, 0.9);
+  }
+  a.gg-tile:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+  a.gg-tile:active { transform: translateY(-1px); transition-duration: 0.1s; }
+
+  /* Coming soon: not a link; the art waits in grey and wakes up when pointed at */
+  .gg-soon .gg-art { filter: grayscale(0.9) brightness(0.62); }
+  .gg-soon .gg-icon { filter: grayscale(1); opacity: 0.75; }
+  .gg-soon .gg-sub { color: rgba(255, 255, 255, 0.5); }
+  .gg-soon:hover .gg-art { filter: grayscale(0.25) brightness(0.8); }
   .gg-pill {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 2;
-    padding: 5px 9px;
-    border-radius: var(--lb-r);
-    background: rgba(9, 9, 10, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    font: 700 10px/1 'Sora', sans-serif;
-    letter-spacing: 0.08em;
+    margin-bottom: 9px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font: 700 9.5px/1 'Sora', sans-serif;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  /* Also on the way: the grid's last cell, a sunken well the size of a tile.
+     On 2 columns it spans the row so the grid always ends even. */
+  .gg-later {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 0 clamp(18px, 1.7vw, 26px);
+    border-radius: var(--lb-r);
+    background: var(--lb-well);
+    box-shadow: var(--lb-ring-well);
+  }
+  @media (max-width: 1100px) { .gg-later { grid-column: 1 / -1; padding-block: 18px; } }
+  .gg-later-label {
+    margin: 0;
+    font: 700 10.5px/1 'Sora', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .gg-later-row { display: flex; align-items: center; gap: 14px; }
+  .gg-later-count { font: 800 clamp(24px, 2vw, 30px)/1 'Sora', sans-serif; color: #fff; }
+  /* icons overlap like a hand of cards and fan out when the well is pointed at */
+  .gg-stack { display: flex; min-width: 0; }
+  .gg-stack img {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    margin-left: -9px;
+    border: 2px solid var(--lb-edge);
+    border-radius: 7px;
+    object-fit: cover;
+    background: #18191d;
+    filter: grayscale(0.5) brightness(0.9);
+    box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.8);
+    transition: margin 0.4s var(--lb-ease), filter 0.3s ease, transform 0.4s var(--lb-ease);
+  }
+  .gg-stack img:first-child { margin-left: 0; }
+  .gg-later:hover .gg-stack img { margin-left: -2px; filter: none; }
+  .gg-later:hover .gg-stack img:first-child { margin-left: 0; }
+  .gg-stack img:hover { transform: translateY(-3px); }
+  .gg-later-names {
+    margin: 0;
+    font: 500 12px/1.4 'Sora', sans-serif;
+    color: rgba(255, 255, 255, 0.6);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   .gg-ph { background: linear-gradient(90deg, #18181b 25%, #222226 50%, #18181b 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
-  .gg-ph::after { display: none; }
-  .hero-search-viewmore:hover {
-    border-color: var(--lb-edge);
-    background: var(--lb-raise-hover);
-    color: #fff;
-  }
-  .hero-search-viewmore {
-    border: 2px solid var(--lb-edge);
-    border-radius: var(--lb-r);
-    background: var(--lb-raise);
-    box-shadow: var(--lb-btn);
-    color: #e6e8ec;
-    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
-  }
+  .gg-ph::before, .gg-ph::after { display: none; }
 
   @media (max-width: 970px) {
     .gg-section { padding: 56px 5% 36px; }
-    .gg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 22px; }
-    .gg-meta { padding: 0 10px 11px; }
+  }
+  /* phones: one column of shorter tiles (3:1) so nine of them stay a short scroll */
+  @media (max-width: 640px) {
+    .gg-tile { aspect-ratio: 3 / 1; }
+    .gg-tile { gap: 12px; padding-left: 16px; }
+    .gg-meta { max-width: 56%; }
     .gg-meta::before { margin-bottom: 7px; }
-    .gg-row { gap: 7px; }
-    .gg-icon { width: 24px; height: 24px; border-radius: var(--lb-r); }
-    .gg-name { font-size: 12.5px; }
-    .gg-sub { font-size: 10px; margin-top: 2px; }
-    .gg-pill { top: 9px; left: 9px; font-size: 9px; padding: 4px 7px; }
+    .gg-name { font-size: 16px; }
+    .gg-sub { font-size: 11px; margin-top: 4px; }
+    .gg-pill { margin-bottom: 7px; }
+    .gg-icon { width: 44px; border-radius: 9px; }
+    .gg-later { gap: 8px; padding-block: 16px; }
+    .gg-stack img { width: 28px; height: 28px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .gg-card, .gg-art, .gg-meta::before { transition: none; }
-    a.gg-card:hover { transform: none; }
-    a.gg-card:hover .gg-art { transform: none; }
+    .gg-tile, .gg-art, .gg-icon, .gg-tile::before, .gg-meta::before, .gg-stack img { transition: none !important; }
+    a.gg-tile:hover, a.gg-tile:focus-visible { transform: none; }
+    a.gg-tile:hover .gg-art { transform: none; }
+    a.gg-tile:hover .gg-icon { transform: none; }
+    a.gg-tile:hover::before { transform: translateX(-110%); }
     .gg-ph { animation: none; }
   }
   </style>
@@ -1245,7 +1297,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 </div><!-- /.main -->
 
 <!-- Sidebar, top-bar search, scroll-to-top, pull-to-refresh: all shared, from 11layout.js. -->
-<script src="/11layout.js?v=20261024fb"></script>
+<script src="/11layout.js?v=20261026as"></script>
 <script>
 /* ============================================================
    HOME PAGE SCRIPT (Oct 2026 rebuild). Needs 11layout.js first
@@ -1512,61 +1564,61 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
     io.observe(band);
   })();
 
-  // ---------- GAME GUIDES: one portrait card per sidebar.json entry with a
-  // "card" object. Live games link to their page; Triple A ones carry
-  // "soon": true and render as greyed "Coming soon" cards.
+  // ---------- FEATURED GAMES: one wide tile per sidebar.json entry whose
+  // "card" has a "tile" picture. Live games link to their page; "soon" ones
+  // render as greyed "Coming soon" tiles. Entries with a card but no tile
+  // (the Triple A list) are summed up in the grid's last cell, the "Also on the way" well.
   (function () {
     const grid = document.getElementById('ggGrid');
     const lede = document.getElementById('ggLede');
     if (!grid) return;
 
-    function card(entry) {
+    function tile(entry) {
       const c = entry.card;
       const soon = !!c.soon;
-      const box = soon ? el('div', 'gg-card gg-soon') : el('a', 'gg-card');
+      const box = soon ? el('div', 'gg-tile gg-soon') : el('a', 'gg-tile');
       if (!soon) box.href = entry.link;
-      box.appendChild(img(c.cover, 'gg-art', 600, 900));
-      if (soon) box.appendChild(el('span', 'gg-pill', 'Coming soon'));
+      if (c.glow) box.style.setProperty('--glow', c.glow);
+      box.appendChild(img(c.tile, 'gg-art', 900, 312));
+      if (entry.icon) box.appendChild(img(entry.icon, 'gg-icon', 58, 58));
       const meta = el('div', 'gg-meta');
-      const row = el('div', 'gg-row');
-      if (entry.icon) row.appendChild(img(entry.icon, 'gg-icon', 30, 30));
-      const text = el('div', 'gg-text');
-      text.appendChild(el('h3', 'gg-name', c.name));
-      // A card without a subtitle still gets the line (blank), so every name in a row sits at the same height.
-      const sub = el('p', 'gg-sub', c.sub || (soon ? 'Page in progress' : ' '));
-      if (!c.sub && !soon) sub.setAttribute('aria-hidden', 'true');
-      text.appendChild(sub);
-      row.appendChild(text);
-      meta.appendChild(row);
+      if (soon) meta.appendChild(el('span', 'gg-pill', 'Coming soon'));
+      meta.appendChild(el('h3', 'gg-name', c.tileName || c.name));
+      const sub = c.sub || (soon ? 'Guides in the works' : '');
+      if (sub) meta.appendChild(el('p', 'gg-sub', sub));
       box.appendChild(meta);
+      return box;
+    }
+
+    function laterWell(list) {
+      const box = el('div', 'gg-later');
+      box.appendChild(el('p', 'gg-later-label', 'Also on the way'));
+      const row = el('div', 'gg-later-row');
+      row.appendChild(el('span', 'gg-later-count', '+' + list.length));
+      const stack = el('div', 'gg-stack');
+      list.filter(e => e.icon).slice(0, 7).forEach(e => {
+        const i = img(e.icon, '', 32, 32);
+        i.title = e.card.name;
+        stack.appendChild(i);
+      });
+      row.appendChild(stack);
+      box.appendChild(row);
+      // the three shortest names read best in two lines; every icon still carries its name as a tooltip
+      const names = list.map(e => e.card.name).sort((x, y) => x.length - y.length).slice(0, 3).join(', ');
+      box.appendChild(el('p', 'gg-later-names', list.length > 3 ? names + ' and ' + (list.length - 3) + ' more.' : names + '.'));
       return box;
     }
 
     loadSidebarData().then(data => {
       if (!data) throw new Error('no sidebar data');
-      // live games, then the upcoming mobile games, then Triple A
-      const entries = (data.games || []).concat(data.upcoming || [], data.tripleA || []).filter(e => e.card && e.card.cover);
+      const entries = (data.games || []).concat(data.upcoming || [], data.tripleA || []).filter(e => e.card);
+      const tiles = entries.filter(e => e.card.tile);
+      const later = entries.filter(e => !e.card.tile);
       const live = entries.filter(e => !e.card.soon).length;
-      // Live games plus enough "Coming soon" cards to finish the last row (rows
-      // are 5 wide on desktop, 2 on phones -- a multiple of 10 suits both).
-      const shown = Math.min(entries.length, Math.ceil(live / 10) * 10);
-      grid.replaceChildren(...entries.map((e, i) => {
-        const c = card(e);
-        if (i >= shown) c.hidden = true;
-        return c;
-      }));
+      grid.replaceChildren(...tiles.map(tile));
+      if (later.length) grid.appendChild(laterWell(later));
       grid.removeAttribute('aria-busy');
       lede.textContent = live + ' games with guides now, ' + (entries.length - live) + ' more on the way.';
-      const more = document.getElementById('ggMore');
-      const rest = entries.length - shown;
-      if (more && rest > 0) {
-        more.textContent = 'Show ' + rest + ' more coming soon';
-        more.hidden = false;
-        more.addEventListener('click', () => {
-          grid.querySelectorAll('.gg-card[hidden]').forEach(c => { c.hidden = false; });
-          more.remove();
-        });
-      }
     }).catch(() => {
       grid.removeAttribute('aria-busy');
       grid.replaceChildren();
@@ -1593,6 +1645,6 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 
 })();
 </script>
-<script src="/article-cards.js?v=20261021as" defer></script>
+<script src="/article-cards.js?v=20261026hot3" defer></script>
 </body>
 </html>

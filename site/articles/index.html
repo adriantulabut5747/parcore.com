@@ -12,9 +12,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Sora:wght@400;500;600;650;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261024fb">
-<link rel="stylesheet" href="/article-cards.css?v=20261021as">
-<link rel="stylesheet" href="/articles.css?v=20261024bf">
+<link rel="stylesheet" href="/11layout.css?v=20261026as">
+<link rel="stylesheet" href="/article-cards.css?v=20261026hot3">
+<link rel="stylesheet" href="/articles.css?v=20261026raised">
 </head>
 <!-- Articles section. Shell copied from the game sections (tekken/index.html);
      nav comes from game-nav.json "articles-<game>", cards/feed from articles.json. -->
@@ -103,6 +103,8 @@
   <div class="ah-band-text">
     <h1 class="ah-band-title">Your unfair advantage</h1>
     <p class="ah-band-sub">Read one. Leave with at least one move most players never learned. What the top of the ladder knows, written down for you.</p>
+    <!-- Real counts from articles.json + "N/M read by you" (article-cards.js stats()). -->
+    <p class="ah-stats" id="artStats" hidden></p>
   </div>
 </header>
 
@@ -115,18 +117,51 @@
        then lists every match, lead ones included. Styles: "Hub" in articles.css. -->
   <section class="ah-lead" id="artLead" aria-label="Latest articles" hidden></section>
 
-  <div class="ah-feed-head">
-    <h2 id="artFeedHead">All articles</h2>
-  </div>
-  <div class="ah-tools">
-    <div class="ah-filters" id="artFilters" role="group" aria-label="Filter by game"></div>
-    <label class="ah-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
-      <input type="search" id="artSearch" placeholder="Search articles" aria-label="Search articles" autocomplete="off">
-    </label>
-  </div>
-  <div class="art-feed" data-game="all" aria-labelledby="artFeedHead"></div>
-  <p class="ah-empty" id="artEmpty" hidden></p>
+  <!-- Browse by game (Oct 26 2026): one tile per game with live articles,
+       art = the home page's Featured Games tiles (articles.json games.tile).
+       Tapping one picks that game's chip below and scrolls to the grid. -->
+  <section class="ah-sec" aria-labelledby="artGamesHead" hidden>
+    <div class="ah-feed-head"><h2 id="artGamesHead">Browse by game</h2></div>
+    <div class="ah-games" id="artGameTiles"></div>
+  </section>
+
+  <!-- The grid: game chips, type chips (Guide, Tier List…) and the search
+       (the site's sunken search bar, 11layout.css "SUNKEN SEARCH BAR").
+       Both chip rows and the search are kept in the address (?game=, ?type=). -->
+  <section class="ah-sec" id="all">
+    <div class="ah-feed-head">
+      <h2 id="artFeedHead">All articles</h2>
+    </div>
+    <div class="ah-tools">
+      <div class="ah-chips">
+        <div class="ah-filters" id="artFilters" role="group" aria-label="Filter by game"></div>
+        <div class="ah-filters ah-types" id="artTypes" role="group" aria-label="Filter by type"></div>
+      </div>
+      <label class="lb-search ah-search" for="artSearch">
+        <input class="lb-search-input" type="search" id="artSearch" placeholder="Search articles" aria-label="Search articles" autocomplete="off">
+        <span class="lb-search-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+      </label>
+    </div>
+    <div class="art-feed" data-game="all" aria-labelledby="artFeedHead"></div>
+    <p class="ah-empty" id="artEmpty" hidden></p>
+  </section>
+
+  <!-- Coming next: the "soon" articles as plain rows (no picture: theirs are
+       placeholders). Follows the game chip and the search. -->
+  <section class="ah-sec" aria-labelledby="artSoonHead" hidden>
+    <div class="ah-feed-head"><h2 id="artSoonHead">Coming next</h2></div>
+    <ol class="ah-soon" id="artSoon"></ol>
+  </section>
+
+  <!-- Ask for an article: the site's shared feedback box (11layout.js
+       "FEEDBACK BOX"), which opens on Suggestion. -->
+  <section class="ah-ask" aria-labelledby="artAskHead">
+    <div class="ah-ask-copy">
+      <h2 id="artAskHead">What should we write next?</h2>
+      <p>Name the game and the question you want answered. A guide, a tier list, an event: if it's on a game we cover, it's fair game.</p>
+    </div>
+    <div data-feedback></div>
+  </section>
 </main>
 
 <footer class="pf-footer">
@@ -156,7 +191,7 @@
 </div>  </div>
 
 <!-- No bottom nav or More sheet on the articles pages (Adrian, Oct 2026). -->
-<script src="/11layout.js?v=20261024fb"></script>
-<script src="/article-cards.js?v=20261021as" defer></script>
+<script src="/11layout.js?v=20261026as"></script>
+<script src="/article-cards.js?v=20261026hot3" defer></script>
 </body>
 </html>

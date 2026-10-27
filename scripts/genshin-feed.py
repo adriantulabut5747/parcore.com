@@ -747,6 +747,54 @@ def wish_weapons(banners):
                     w['art'] = x['art']
 
 
+# ---- WISH POOL (Oct 26 2026): /genshin-impact/wish-simulator, its own file ------------------------
+# What a wish can drop besides its featured items: the Standard wish's pool from the wiki's Wanderlust
+# Invocation page ({{Wish Pool}}, CC BY-SA). It's also every event wish's off-rate pool (the wiki's
+# Wish page: event wishes draw their non-featured items from it). Each pool + banner character gets its
+# full wish art (splash(), once), so the reveal can show it; 5-star weapons get their 400x800 wish art
+# too, 4/3-star weapons use the weapons database's 256x512 art. No timestamp: rewritten on change only.
+WISHPOOL_OUT = ROOT / 'genshin-wishpool.json'
+
+
+def wish_pool(roster, live):
+    p = params(template(wikitext('Wanderlust Invocation'), 'Wish Pool'))
+    names = lambda k: [n.strip() for n in p.get(k, '').split(';') if n.strip()]
+    pool = {'5c': names('character_5'), '4c': names('character_4'), '5w': names('weapon_5'), '4w': names('weapon_4'), '3w': names('weapon_3')}
+    if not pool['5c'] or not pool['3w']:
+        raise ValueError('Wish Pool template not found')
+    by_name = {c['name']: c for c in roster}
+    wdb = {w['name']: w for w in json.loads(WEAPONS_OUT.read_text(encoding='utf-8'))['weapons']}
+    want_c = pool['5c'] + pool['4c'] + [c['name'] for b in live for c in b.get('characters', [])]
+    want_w = pool['5w'] + pool['4w'] + pool['3w'] + [w['name'] for b in live for w in b.get('weapons', [])]
+    chars, weps = {}, {}
+    for n in dict.fromkeys(want_c):
+        c = by_name.get(n)
+        if not c:
+            print('wish pool: no character', n, file=sys.stderr)
+            continue
+        key = c['icon'].rsplit('/', 1)[-1][:-4]
+        try:
+            art = splash(key)
+        except Exception as e:
+            print('wish pool: splash', n, 'failed:', e, file=sys.stderr)
+            art = ''
+        chars[n] = {'r': c['rarity'], 'el': c['element'], 'wp': c['weapon'], 'strip': c['strip'], 'splash': art}
+    for n in dict.fromkeys(want_w):
+        w = wdb.get(n)
+        if not w:
+            print('wish pool: no weapon', n, file=sys.stderr)
+            continue
+        art = w.get('art', '')
+        if w['rarity'] == 5:
+            try:
+                art = splash(w['icon'].rsplit('/', 1)[-1][:-4])
+            except Exception as e:
+                print('wish pool: weapon splash', n, 'failed:', e, file=sys.stderr)
+        weps[n] = {'r': w['rarity'], 'type': w['type'], 'art': art, 'icon': w['icon']}
+    pool = {k: [n for n in v if n in (chars if k.endswith('c') else weps)] for k, v in pool.items()}
+    return {'source': "The Genshin Impact Wiki's Wanderlust Invocation page (Fandom, CC BY-SA)", 'pool': pool, 'chars': chars, 'weapons': weps}
+
+
 # ---- BIRTHDAYS (Oct 24 2026): /genshin-impact/birthdays, its own file ---------------------------
 # Who each character is (yatta avatar: title, one-line bio, constellation, affiliation, special dish,
 # namecard) + the "Birthday" voice line (yatta avatarFetter: what they say on YOUR birthday). Fetched
@@ -1355,6 +1403,15 @@ def main():
     except Exception as e:
         print('weapons failed, keeping the old file:', e, file=sys.stderr)
     wish_weapons(data.get('banners', []))
+
+    # The wish simulator's pool + art: its own file too; kept if it fails.
+    try:
+        wp = wish_pool(data.get('characters', []), data.get('banners', []))
+        if not WISHPOOL_OUT.exists() or json.loads(WISHPOOL_OUT.read_text(encoding='utf-8')) != wp:
+            WISHPOOL_OUT.write_text(json.dumps(wp, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+            print('Wrote', WISHPOOL_OUT)
+    except Exception as e:
+        print('wish pool failed, keeping the old file:', e, file=sys.stderr)
 
     # The artifact sets: their own file too; kept if it fails.
     try:

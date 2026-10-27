@@ -62,7 +62,7 @@
           })
           .concat(
             (data.guides || []).map(function (g) {
-              return { href: g.href, icon: g.icon, name: g.name, sub: g.desc };
+              return { href: g.href, icon: g.icon, name: g.name, sub: g.desc, hot: g.hot };
             }),
           ),
       },

@@ -26,17 +26,29 @@
 
     $('glFacts').innerHTML = `<li><b>${all.length}</b>terms</li><li><b>${D.sections.length}</b>topics</li><li>Checked for <b>${esc(D.version)}</b></li>`;
 
+    // One dictionary row: the word (+ other spellings) left, meaning / example / see also right.
+    // Most asked reuses it without the id (the full list owns #t-<id>).
+    const row = (t, withId) => `<article class="gl-row"${withId ? ` id="t-${t.id}"` : ''}>
+        <div class="gl-row-w"><h4>${esc(t.term)}</h4>${(t.also || []).length ? `<p class="gl-also">${t.also.map(esc).join(', ')}</p>` : ''}</div>
+        <div class="gl-row-d">
+          <p class="gl-def">${esc(t.def)}</p>
+          ${t.ex ? `<q>${esc(t.ex)}</q>` : ''}
+          ${
+            (t.see || []).length || t.link
+              ? `<p class="gl-more">${
+                  (t.see || []).length
+                    ? `<span>See also ${t.see.map((id) => `<a class="gl-see" href="#t-${id}" data-term="${id}">${esc(byId[id].term)}</a>`).join(', ')}</span>`
+                    : ''
+                }${t.link ? `<a class="gl-link" href="${esc(t.link)}">${esc(pageName(t.link))}${ARROW}</a>` : ''}</p>`
+              : ''
+          }
+        </div>
+      </article>`;
+
     // ---- MOST ASKED ----
     $('glHot').innerHTML = all
       .filter((t) => t.hot)
-      .map(
-        (t) => `<a class="gi-box gi-card gl-hot" href="#t-${t.id}" data-term="${t.id}">
-          <span class="gi-label"><img src="${esc(t.sec.icon)}" alt="">${esc(t.sec.label)}</span>
-          <b>${esc(t.term)}</b>
-          <p>${esc(t.def)}</p>
-          ${t.ex ? `<q>${esc(t.ex)}</q>` : ''}
-        </a>`
-      )
+      .map((t) => row(t, false))
       .join('');
 
     // ---- DECODER: a line of jargon; tap a word to read it ----
@@ -73,18 +85,6 @@
     chips.innerHTML =
       '<button type="button" class="gi-tab" data-s="" role="tab">All</button>' +
       D.sections.map((s) => `<button type="button" class="gi-tab" data-s="${s.id}" role="tab"><img src="${esc(s.icon)}" alt="">${esc(s.label)}</button>`).join('');
-    const termCard = (t) => `<article class="gi-box gl-term" id="t-${t.id}">
-        <header><h4>${esc(t.term)}</h4>${(t.also || []).length ? `<p class="gl-also">${t.also.map((a) => `<span>${esc(a)}</span>`).join('')}</p>` : ''}</header>
-        <p class="gl-def">${esc(t.def)}</p>
-        ${t.ex ? `<q>${esc(t.ex)}</q>` : ''}
-        ${
-          (t.see || []).length || t.link
-            ? `<footer>${(t.see || []).map((id) => `<a class="gl-see" href="#t-${id}" data-term="${id}">${esc(byId[id].term)}</a>`).join('')}${
-                t.link ? `<a class="gl-link" href="${esc(t.link)}">${esc(pageName(t.link))}${ARROW}</a>` : ''
-              }</footer>`
-            : ''
-        }
-      </article>`;
     let topic = '';
     let q = '';
     const params = new URLSearchParams(location.search);
@@ -101,7 +101,7 @@
           const list = s.terms.map((t) => byId[t.id]).filter(hit);
           n += list.length;
           return list.length
-            ? `<section class="gl-sec" aria-label="${esc(s.label)}"><h3 class="gl-sec-h"><img src="${esc(s.icon)}" alt="">${esc(s.label)}<small>${list.length}</small></h3><div class="gl-grid">${list.map(termCard).join('')}</div></section>`
+            ? `<section class="gl-sec" aria-label="${esc(s.label)}"><h3 class="gl-sec-h"><img src="${esc(s.icon)}" alt="">${esc(s.label)}<small>${list.length}</small></h3><div class="gi-box gl-dict">${list.map((t) => row(t, true)).join('')}</div></section>`
             : '';
         })
         .join('');

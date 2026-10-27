@@ -74,6 +74,8 @@ Adrian's additions (all required):
 | Legend Tracker | Oct 25 2026, LIVE (`lgt-`): the Legend Trophy decoration (`icons/legend-trophy.webp`, from ClashKing's assets, also the nav icon). Idle 6s: one hit, tap bounce + "+40" (max trophies per Legend attack) rises. Hover 2.4s: three hits. |
 | War Planner | Oct 25 2026, LIVE (`ws-`; `wp-` is the planner page's): two swords (`clashofclans/coctools/sword.webp`, ClashKing; the second mirrored) swing back on their grips and clash (flash, sparkles, streaks). Idle 6s: one clash. Hover 2.4s: two. |
 
+**Oct 26 2026 (Adrian): Army Maker + Damage Calculator are HOT too** (4 HOT cards). The top bar's Tools menu, the More sheet's Tools tiles and the tool-page chips follow the band's order, read from `coc-nav-data.json` `guides` (array order = menu order; `"hot": true` = the tag: `.stb-dd-tag--hot` in 11layout.css, `.mx-hot` in coc-more.css (straddles the tile's top edge so it costs the name no width), `.dsn-hot`). Change the band's order or HOT set? Change that JSON too.
+
 **Oct 25 2026 (Adrian): order + HOT.** Player Tracker and Equipment lead the band with a HOT tag (`.ptc-hot`, the TH pages' `.base-tag--hot` red key + flame): desktop = its own line above the name, tiles = top-left corner. Still frames (reduced motion + /coc/ phones): Army Maker shows its three troop cards round the camp; Damage Calculator shows the Monolith destroyed (DESTROYED stamp, no HP bar).
 
 **Oct 25 2026 (Adrian): every blurb = exactly 2 lines** (desktop long + phone short). `.ptc-desc` is capped at 31ch so a line holds ~the same letters at every width; long blurbs ~42-50 letters, short ~38-46. Measured 2 lines on /coc/ and /coc/tools/ at 360-1920px: re-measure after any text edit.

@@ -1,5 +1,5 @@
 /* ============================================================
-   GENSHIN IMPACT -- GLOSSARY (/genshin-impact/glossary, Oct 26 2026). Most asked cards, the
+   GENSHIN IMPACT -- GLOSSARY (/genshin-impact/glossary, Oct 26 2026). Most asked + every term as dictionary rows, the
    decoder (a chat line whose jargon you tap), every term by topic with the shared sunken
    search (11layout.css SUNKEN SEARCH BAR). Behaviour + data: genshin-glossary.js / .json.
    Raised UI from genshin.css; red only on the picked word, the example's rule and the flash.
@@ -8,17 +8,20 @@
 .gl-first { padding-top: 40px; }
 .gl-jump .gi-tab { text-decoration: none; }
 .gl b { color: #fff; }
-/* An example line: a quote with a red rule, like the Reactions cards' "Good to know". */
-.gl q { display: block; padding: 2px 0 2px 12px; border-left: 2px solid var(--gi-acc); font-size: 12.5px; font-style: italic; line-height: 1.5; color: #c9ccd2; quotes: '“' '”'; }
 
-/* ---- MOST ASKED ---- */
-.gl-hots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.gl-hot { display: flex; flex-direction: column; gap: 10px; padding: 22px 24px; }
-.gl-hot .gi-label { display: flex; align-items: center; gap: 7px; }
-.gl-hot .gi-label img { width: 18px; height: 18px; object-fit: contain; }
-.gl-hot > b { font: 900 26px/1.05 'Cinzel', serif; text-transform: uppercase; }
-.gl-hot p { font-size: 13.5px; line-height: 1.6; color: var(--gi-muted); }
-.gl-hot q { margin-top: auto; }
+/* ---- DICTIONARY (Most asked + every topic) ----
+   One box per topic, one row per term: the word left, its meaning right. No cards, no chips. */
+.gl-dict { padding: 0 28px; }
+.gl-row { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 32px; padding: 20px 0; border-top: 1px solid var(--gi-line); scroll-margin-top: 90px; }
+.gl-row:first-child { border-top: 0; }
+.gl-row-w h4 { font: 700 16px/1.4 'Sora', sans-serif; color: #fff; }
+.gl-also { margin-top: 4px; font-size: 12px; line-height: 1.5; color: var(--gi-dim); }
+.gl-row-d { display: flex; flex-direction: column; gap: 8px; max-width: 72ch; }
+.gl-def { font-size: 14.5px; line-height: 1.65; color: #d4d6db; }
+.gl q { font-size: 13px; font-style: italic; line-height: 1.55; color: var(--gi-muted); quotes: '“' '”'; }
+.gl-more { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; font-size: 12.5px; color: var(--gi-dim); }
+.gl-see { margin-left: 3px; color: #b4b8bf; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.2); text-underline-offset: 3px; }
+.gl-see:hover { color: #fff; text-decoration-color: currentColor; }
 
 /* ---- DECODER ---- */
 .gl-dec-tabs { margin-bottom: 16px; }
@@ -48,40 +51,35 @@
 .gl-sec-h { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font: 800 13px/1 'Sora', sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: #fff; }
 .gl-sec-h img { width: 24px; height: 24px; object-fit: contain; }
 .gl-sec-h small { padding: 4px 7px; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-well); font: 700 10px/1 'Sora', sans-serif; letter-spacing: 0.5px; color: var(--gi-muted); }
-.gl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
-.gl-term { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; scroll-margin-top: 90px; }
-.gl-term header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
-.gl-term h4 { font: 800 17px/1.25 'Sora', sans-serif; color: #fff; }
-.gl-also { display: flex; flex-wrap: wrap; gap: 4px; }
-.gl-also span { padding: 3px 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.05); font: 600 10.5px/1.2 'Sora', sans-serif; color: var(--gi-muted); }
-.gl-def { font-size: 13.5px; line-height: 1.6; color: #c9ccd2; }
-.gl-term footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--gi-line); }
-.gl-see { padding: 5px 9px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); font: 700 11px/1 'Sora', sans-serif; color: #8b9099; text-decoration: none; }
-.gl-see:hover { color: #fff; }
-.gl-link { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; font: 700 12px/1 'Sora', sans-serif; color: #fff; text-decoration: underline; text-decoration-color: var(--gi-acc); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.gl-link { display: inline-flex; align-items: center; gap: 5px; font: 700 12px/1 'Sora', sans-serif; color: #fff; text-decoration: underline; text-decoration-color: var(--gi-acc); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .gl-link svg, .gl-dec-go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .gl-link:hover { color: var(--gi-acc-text); }
-/* A term you jumped to: its edge lights red for a moment. */
+/* A term you jumped to: its row glows red for a moment (the shadow reaches past the box's padding). */
 @keyframes gl-flash {
-  0%, 40% { border-color: var(--gi-acc); box-shadow: var(--lb-shadow), 0 0 0 3px rgba(var(--gi-acc-rgb), 0.3); }
-  100% { border-color: var(--lb-edge); box-shadow: var(--lb-shadow); }
+  0%, 40% { background: rgba(var(--gi-acc-rgb), 0.16); box-shadow: -28px 0 0 rgba(var(--gi-acc-rgb), 0.16), 28px 0 0 rgba(var(--gi-acc-rgb), 0.16); }
+  100% { background: transparent; box-shadow: none; }
 }
-.gl-term.is-flash { animation: gl-flash 1.8s ease both; }
+.gl-row.is-flash { animation: gl-flash 1.8s ease both; }
 .gl-empty { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; padding: 18px 20px; font-size: 14px; color: var(--gi-muted); }
 
 /* ---- NARROW DESKTOP ---- */
 @media (max-width: 1280px) and (min-width: 971px) {
-  .gl-hots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .gl-grid { grid-template-columns: minmax(0, 1fr); }
+  .gl-row { grid-template-columns: 190px minmax(0, 1fr); gap: 24px; }
 }
 
-/* ---- PHONES ---- */
+/* ---- PHONES: the word sits over its meaning ---- */
 @media (max-width: 970px) {
   .gl-first { padding-top: 28px; }
   .gl-jump { width: 100%; }
-  .gl-hots, .gl-dec, .gl-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .gl-hot { padding: 18px; }
-  .gl-hot > b { font-size: 22px; }
+  .gl-dec { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .gl-dict { padding: 0 18px; }
+  .gl-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 16px 0; scroll-margin-top: 70px; }
+  .gl-also { margin-top: 2px; }
+  .gl-def { font-size: 14px; }
+  @keyframes gl-flash {
+    0%, 40% { background: rgba(var(--gi-acc-rgb), 0.16); box-shadow: -18px 0 0 rgba(var(--gi-acc-rgb), 0.16), 18px 0 0 rgba(var(--gi-acc-rgb), 0.16); }
+    100% { background: transparent; box-shadow: none; }
+  }
   .gl-dec-tabs { width: 100%; }
   .gl-chat { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 18px; }
   .gl-chat-who { width: 40px; height: 40px; }
@@ -92,6 +90,4 @@
   .gl-dec-out > b { font-size: 22px; }
   .gl-all-head { flex-direction: column; align-items: stretch; gap: 14px; }
   .gl-find { width: auto; }
-  .gl-term { padding: 16px; scroll-margin-top: 70px; }
-  .gl-link { margin-left: 0; }
 }

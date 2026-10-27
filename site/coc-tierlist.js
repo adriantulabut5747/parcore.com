@@ -575,7 +575,7 @@
     var imgs = {};
     btn.disabled = true;
     Promise.all(
-      [document.fonts.load('900 40px Figtree'), document.fonts.load('800 14px Oxanium')].concat(
+      [document.fonts.load('900 40px Orbitron'), document.fonts.load('800 14px Oxanium')].concat(
         [...srcs].map(
           (s) =>
             new Promise((ok) => {
@@ -591,7 +591,7 @@
       // Name font + lines first: a long name can make its row taller than its pieces.
       list.forEach((r) => {
         r.long = r.name.length > 2;
-        r.font = r.long ? '800 15px Oxanium' : '900 44px Figtree';
+        r.font = r.long ? '800 15px Oxanium' : '900 44px Orbitron';
         x.font = r.font;
         x.letterSpacing = r.long ? '1.5px' : '0px'; // measure with the spacing it's drawn with
         r.lines = r.long ? wrap(x, r.name, LABEL - 24) : [r.name];
@@ -607,8 +607,8 @@
       x.fillStyle = bg;
       x.fillRect(0, 0, W, H);
       x.textBaseline = 'middle';
-      // Title: the banner's Figtree caps, "TIER LIST" in red.
-      x.font = '900 40px Figtree';
+      // Title: the banner's Orbitron caps, "TIER LIST" in red.
+      x.font = '900 40px Orbitron';
       var t1 = LIST.title(data, filter);
       x.fillStyle = '#eff2f5';
       x.fillText(t1, PAD, TOP / 2);

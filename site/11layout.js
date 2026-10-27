@@ -771,27 +771,24 @@ document.addEventListener('click', () => {
 });
 
 /* ============================================================
-   TOP-BAR SEARCH MODAL — SHARED
-   Searches the home page's Featured Topics (loadFeaturedGroups below)
-   and renders .ft-tile result tiles.
-   Requires #search-btn, #search-icon, #search-overlay,
-   #search-input, #search-input-clear, #search-results,
-   #search-view-more, and .coc-main on the page.
+   TOP-BAR SEARCH — SHARED (Oct 26 2026)
+   A dropdown under the bar's search box on desktop, a full-screen panel
+   on phones. Empty box = suggestion chips; typing = one row per page
+   (game icon, name, tags). Data: /search.json (see its _readme), plus
+   live articles and the Genshin nav pages it doesn't list.
+   Requires #search-btn, #search-overlay, #search-input,
+   #search-input-clear and #search-results on the page.
    ============================================================ */
 let topSearchItems = [];
-let topSearchIsLoaded = false;
-let topSearchVisibleCount = 12;
-const TOP_SEARCH_INITIAL_COUNT = 12;
-const TOP_SEARCH_LOAD_MORE_COUNT = 12;
-let topSearchCurrentMatches = [];
+let topSearchSuggest = [];
+let searchSel = 0; // the row Enter opens (arrow keys move it)
 
-let searchoverlay, searchinput, searchIcon, resultsContainer, topSearchViewMoreBtn, searchInputClearBtn;
-let searchScrollObserver = null;
+let searchoverlay, searchinput, searchIcon, resultsContainer, searchInputClearBtn;
 
-// ---- Featured Topics data: the home page's tile groups AND the search
-// index. home.json "featured" lists the groups; a group either lists its
-// tiles or pulls them from hwr-categories.json ("from": "hwr") or
-// game-nav.json ("gameNav": key). Edit those files, not this code.
+// ---- Featured Topics data: the home page's tile groups. home.json
+// "featured" lists the groups; a group either lists its tiles or pulls
+// them from hwr-categories.json ("from": "hwr") or game-nav.json
+// ("gameNav": key). Edit those files, not this code.
 // (404.html has a short copy of this for its "Find a page" box.)
 const featuredJSON = {};
 function getFeaturedJSON(url) {
@@ -821,98 +818,102 @@ function loadFeaturedGroups() {
   )));
 }
 
-// Search index = every Featured Topics tile, with its group's logo and name.
-loadFeaturedGroups()
-  .then(groups => {
-    topSearchItems = [].concat(...groups.map(g => g.tiles.map(t => Object.assign({}, t, { icon: g.icon, group: g.title }))));
-    topSearchIsLoaded = true;
-  })
-  .catch(err => console.error('Top-bar search data failed to load:', err));
+// Search index. Each item carries `hay` = every word it can be found by.
+// A query word matches the START of a word ("lay" finds Layouts, "ai" doesn't find Repair).
+const searchWords = t => t.toLowerCase().split(/[^a-z0-9★+]+/).filter(Boolean);
+Promise.all([
+  getFeaturedJSON('/search.json'),
+  getFeaturedJSON('/articles.json').catch(() => ({})),
+  getFeaturedJSON('/game-nav.json').catch(() => ({}))
+]).then(([s, arts, nav]) => {
+  const add = (p, g) => topSearchItems.push(Object.assign({ icon: g.icon, group: g.name,
+    hay: searchWords([p.name, p.tags, g.name, p.k].join(' ')) }, p));
+  s.groups.forEach(g => {
+    g.pages.forEach(p => add(p, g));
+    if (!g.gameNav) return;
+    const listed = new Set(g.pages.map(p => p.link));
+    ((nav[g.gameNav] || {}).groups || []).forEach(x => (x.pages || []).forEach(p => {
+      if (!p.soon && !listed.has(p.link)) add({ name: p.name, tags: p.desc || '', link: p.link }, g);
+    }));
+  });
+  (arts.articles || []).filter(a => a.status === 'live').forEach(a => {
+    const g = s.groups.find(x => x.game === a.game) || { name: 'Articles', icon: '/icons/articles.svg' };
+    add({ name: a.title, tags: [a.category, (a.dek || '').replace(/\.$/, '')].filter(Boolean).join(' · '),
+      link: '/articles/' + a.game + '/' + a.id, k: 'article guide', article: true }, g);
+  });
+  topSearchSuggest = s.suggest || [];
+  if (searchoverlay && searchoverlay.style.display === 'block') searchItems();
+}).catch(err => console.error('Top-bar search data failed to load:', err));
 
-// Fisher-Yates shuffle — avoids the bias a naive sort-by-random can introduce.
-function shuffleArray(array) {
-  const copy = [...array];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
+function searchEl(tag, cls, text) {
+  const n = document.createElement(tag);
+  n.className = cls;
+  if (text) n.textContent = text;
+  return n;
 }
 
-// Renders a single result as a .ft-tile -- the same tile as the home page's
-// Featured Topics, with the game's logo before the name.
-function renderHeroSearchCard(item) {
-  const a = document.createElement(item.soon ? 'div' : 'a');
-  if (!item.soon) a.href = item.link || '#';
-  a.className = item.soon ? 'ft-tile ft-soon' : 'ft-tile';
-  const art = document.createElement('img');
-  art.className = 'ft-art';
-  art.src = item.image;
-  art.alt = '';
-  art.loading = 'lazy';
-  art.decoding = 'async';
-  const name = document.createElement('span');
-  name.className = 'ft-name';
-  if (item.icon) {
-    const logo = document.createElement('img');
-    logo.className = 'ft-name-logo';
-    logo.src = item.icon;
-    logo.alt = '';
-    name.appendChild(logo);
+// One result: the game's icon, the name, the tags under it.
+function searchRow(item) {
+  const a = searchEl('a', 'sr-row');
+  a.href = item.link;
+  const icon = searchEl('img', 'sr-icon');
+  icon.src = item.icon;
+  icon.alt = '';
+  icon.loading = 'lazy';
+  const text = searchEl('span', 'sr-text');
+  text.append(searchEl('span', 'sr-name', item.name), searchEl('span', 'sr-tags', item.tags));
+  a.append(icon, text);
+  if (item.article) {
+    // articles wear the Articles icon top-right, so they read apart from tools and pages
+    const badge = searchEl('img', 'sr-badge');
+    badge.src = '/icons/articles.svg';
+    badge.alt = 'Article';
+    badge.title = 'Article';
+    a.appendChild(badge);
   }
-  name.append(item.name || '');
-  const sub = document.createElement('span');
-  sub.className = 'ft-sub';
-  sub.textContent = item.soon ? 'Coming soon' : item.sub || '';
-  a.append(art, name, sub);
   return a;
 }
 
-function renderTopSearchVisible() {
-  resultsContainer.innerHTML = '';
-  const visible = topSearchCurrentMatches.slice(0, topSearchVisibleCount);
-  if (visible.length === 0) {
-    resultsContainer.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#949ba4; padding:30px 0;">No results found.</p>`;
-    topSearchViewMoreBtn.style.display = 'none';
-    if (searchScrollObserver) searchScrollObserver.unobserve(topSearchViewMoreBtn);
-    return;
-  }
-  visible.forEach(item => resultsContainer.appendChild(renderHeroSearchCard(item)));
-
-  const hasMore = topSearchCurrentMatches.length > topSearchVisibleCount;
-  topSearchViewMoreBtn.style.display = hasMore ? 'block' : 'none';
-  if (searchScrollObserver) {
-    // Re-observe after every render: observe() reports the current state once,
-    // so if the sentinel is still on screen (short tiles) the next batch loads.
-    // Watching it continuously would only fire when visibility changes.
-    searchScrollObserver.unobserve(topSearchViewMoreBtn);
-    if (hasMore) searchScrollObserver.observe(topSearchViewMoreBtn);
-  }
+function searchSelect(i) {
+  const rows = resultsContainer.querySelectorAll('.sr-row');
+  if (!rows.length) return;
+  searchSel = (i + rows.length) % rows.length;
+  rows.forEach((r, j) => r.classList.toggle('is-sel', j === searchSel));
+  rows[searchSel].scrollIntoView({ block: 'nearest' });
 }
 
-// Main search function — called on every keystroke and when the
-// overlay first opens (with an empty query, showing a random sample).
+// Called on every keystroke and when the panel opens.
 function searchItems() {
-  const query = searchinput.value.toLowerCase().trim();
+  const q = searchinput.value.toLowerCase().trim();
+  if (searchInputClearBtn) searchInputClearBtn.style.display = q ? 'flex' : 'none';
+  resultsContainer.innerHTML = '';
 
-  if (searchInputClearBtn) searchInputClearBtn.style.display = query ? 'flex' : 'none';
-
-  const boxOne = document.getElementById('box-one');
-  if (boxOne) boxOne.style.display = query ? 'none' : '';
-
-  if (!query) {
-    topSearchCurrentMatches = shuffleArray(topSearchItems);
-  } else {
-    topSearchCurrentMatches = topSearchItems.filter(item => {
-      if (item.name && item.name.toLowerCase().includes(query)) return true;
-      if (item.sub && item.sub.toLowerCase().includes(query)) return true;
-      if (item.group && item.group.toLowerCase().includes(query)) return true; // "minecraft" finds every Minecraft tile
-      return false;
+  if (!q) {
+    if (!topSearchSuggest.length) return;
+    const box = searchEl('div', 'sr-suggest');
+    box.appendChild(searchEl('p', 'sr-label', 'Try searching'));
+    const chips = searchEl('div', 'sr-chips');
+    topSearchSuggest.forEach(s => {
+      const b = searchEl('button', 'sr-chip', s);
+      b.type = 'button';
+      b.addEventListener('click', () => { searchinput.value = s; searchItems(); searchinput.focus(); });
+      chips.appendChild(b);
     });
+    box.appendChild(chips);
+    resultsContainer.appendChild(box);
+    return;
   }
 
-  topSearchVisibleCount = TOP_SEARCH_INITIAL_COUNT;
-  renderTopSearchVisible();
+  // every word must appear somewhere; pages whose NAME holds the whole query come first
+  const words = searchWords(q);
+  const hits = topSearchItems.filter(it => words.every(w => it.hay.some(h => h.startsWith(w))));
+  hits.sort((a, b) => b.name.toLowerCase().includes(q) - a.name.toLowerCase().includes(q));
+  if (!hits.length) {
+    resultsContainer.appendChild(searchEl('p', 'sr-empty', 'Nothing matches "' + searchinput.value.trim() + '".'));
+    return;
+  }
+  hits.forEach(it => resultsContainer.appendChild(searchRow(it)));
+  searchSelect(0);
 }
 
 // Defined at the top level (not nested inside DOMContentLoaded) so the
@@ -920,6 +921,14 @@ function searchItems() {
 let searchModalHistoryState = false; // tracks whether we've pushed a history entry for the open modal
 
 function openSearch() {
+  // desktop: the dropdown hangs from the bar's search box, right edges lined up
+  const box = document.querySelector('.stb-search');
+  const r = box && box.offsetWidth ? box.getBoundingClientRect() : null;
+  const panel = document.getElementById('search-panel');
+  if (r && panel) {
+    panel.style.setProperty('--sp-right', Math.max(16, window.innerWidth - r.right) + 'px');
+    panel.style.setProperty('--sp-w', Math.max(560, r.width) + 'px');
+  }
   searchoverlay.style.display = 'block';
   const searchBtn = document.getElementById('search-btn');
   searchBtn.classList.add('active'); // morphs the icon into an ✖, same pattern as the hamburger menu
@@ -951,9 +960,6 @@ function closeSearch(fromPopstate) {
   searchBtn.setAttribute('aria-label', 'Search');
   document.body.classList.remove('search-modal-open');
   if (window.bnResyncAfterModal) window.bnResyncAfterModal();
-
-  const boxOne = document.getElementById('box-one');
-  if (boxOne) boxOne.style.display = '';
 
   if (searchModalHistoryState) {
     searchModalHistoryState = false;
@@ -1045,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     bar.querySelectorAll('.stb-search').forEach(b => {
       b.removeAttribute('onclick');
-      b.addEventListener('click', () => openSearch());
+      b.addEventListener('click', toggleSearch);
     });
 
     // Desktop layout (11layout.css ONE DESKTOP BAR): title/breadcrumb on the
@@ -1123,7 +1129,6 @@ document.addEventListener('DOMContentLoaded', function () {
   resultsContainer = document.getElementById('search-results');
   searchinput = document.getElementById('search-input');
   searchIcon = document.getElementById('search-icon');
-  topSearchViewMoreBtn = document.getElementById('search-view-more');
   searchInputClearBtn = document.getElementById('search-input-clear');
 
   if (!searchoverlay || !resultsContainer || !searchinput) return; // page has no search UI
@@ -1142,17 +1147,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Auto-loads the next batch of results a bit before the user actually
-  // reaches the bottom (rootMargin gives it a head start), so scrolling
-  // feels continuous instead of hitting a button.
-  searchScrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && topSearchVisibleCount < topSearchCurrentMatches.length) {
-        topSearchVisibleCount += TOP_SEARCH_LOAD_MORE_COUNT;
-        renderTopSearchVisible();
-      }
-    });
-  }, { root: document.getElementById('search-panel'), rootMargin: '0px 0px 400px 0px' });
+  searchinput.placeholder = 'Search games, tools and guides';
+  // typing searches (replaces the inline oninput some pages still carry, so it never runs twice)
+  searchinput.oninput = searchItems;
+  // arrows move the highlighted row, Enter opens it
+  searchinput.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      searchSelect(searchSel + (e.key === 'ArrowDown' ? 1 : -1));
+    } else if (e.key === 'Enter') {
+      const row = resultsContainer.querySelectorAll('.sr-row')[searchSel];
+      if (row) location.href = row.href;
+    }
+  });
 
   // Guarded like the other use of this button further up: the clear (X) is
   // optional markup, and several pages' search boxes simply don't have one.
@@ -1778,7 +1785,7 @@ window.toggleThMiniDropdown = toggleThMiniDropdown;
        lists:  { key: [row, ...] },       // rows: { href, name, sub, icon (img
                                           //   src) or svg (inner markup), meta,
                                           //   src + kind (count from a JSON),
-                                          //   soon, children: [row, ...] }
+                                          //   soon, hot, children: [row, ...] }
        keyOf:  function (link) -> key,     // which list a top-bar link opens
        labels: { key: 'Layouts' },         // aria-label per menu
        countWords: { kind: ['layout', 'layouts'] }
@@ -1812,6 +1819,7 @@ window.stbHubMenus = function (hubScroll, opts) {
     const on = !!o.href && o.href.indexOf('#') < 0 && norm(o.href) === here;
     const kids = !!(o.children && o.children.length);
     const tail = o.soon ? '<span class="stb-dd-tag">Soon</span>'
+      : o.hot ? '<span class="stb-dd-tag stb-dd-tag--hot">Hot</span>'
       : kids ? SIDE
       : '<span class="stb-dd-meta"' + (o.src ? ' data-src="' + o.src + '" data-kind="' + o.kind + '"' : '') + '>' + (o.meta || '') + '</span>';
     return '<a class="stb-dd-row' + (on ? ' is-on' : '') + (o.soon ? ' is-soon' : '') + (kids ? ' has-kids' : '') +

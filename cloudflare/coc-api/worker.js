@@ -44,7 +44,7 @@ const ROUTES = {
 // and _tools/serve.py (localhost or a phone on the same Wi-Fi).
 function allowedOrigin(origin) {
   return (
-    /^https:\/\/([a-z0-9-]+--)?(parchrome|extraordinary-donut-f21bde)\.netlify\.app$/.test(origin) ||
+    /^https:\/\/([a-z0-9-]+--)?(parchrome|parchrome3|extraordinary-donut-f21bde)\.netlify\.app$/.test(origin) ||
     origin === 'https://adriantulabut5747.github.io' ||
     /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+):8765$/.test(origin)
   );
