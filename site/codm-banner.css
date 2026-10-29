@@ -3,13 +3,25 @@
    The CODM take on CoC's .tb card / Minecraft's tool banner / Genshin's gold-framed .gi-tb:
    one raised box in the page column, a gun in a sunken well on the left, the title, one line,
    then a strip of live facts (like Minecraft's versions): the season (ggseason, the lobby
-   hero's source) and the page's own counts. Its personality = the lobby's "target lock":
-   four red reticle brackets frame it (Genshin's gold frame, in CODM red), a red tab on the
-   top edge, a crosshair mark on the frame's top centre; Ghost fades in on the right.
+   hero's source) and the page's own counts. A red tab on the top edge, a faint tactical grid,
+   Ghost fading in on the right. (The red reticle corners + top crosshair were removed the
+   same day, Adrian.)
    Under it, the Loadouts tab's pages as a tray (sunken tray, the current page raised as the
    grey key, like the TH pages' Layouts / Army / Tools).
    Markup: /call-of-duty-mobile/loadouts + /attachments. Facts: codm-banner.js + the page.
    ============================================================ */
+/* SIDE INSET for every CODM sub-page (Oct 29 2026, Adrian: "like the CoC layouts / armies"): desktop =
+   the shared page column (--coc-side, 11layout.css PAGE COLUMN, which the top bar uses too), phones =
+   CoC's 10px. Every margin on /loadouts and /attachments reads this (was 15% / 5%). */
+:root {
+  --codm-side: 10px;
+}
+@media (min-width: 971px) {
+  :root {
+    --codm-side: var(--coc-side, 8.5vw);
+  }
+}
+
 .cb {
   position: relative;
   isolation: isolate;
@@ -19,7 +31,7 @@
   align-items: center;
   gap: 24px;
   min-height: 196px;
-  margin: 69px 15% 0;
+  margin: 69px var(--codm-side) 0;
   padding: 26px 30px;
   overflow: hidden;
   border: 2px solid var(--lb-edge);
@@ -62,40 +74,6 @@
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
-}
-
-/* the frame: four reticle brackets just inside the edge, and a crosshair on its top centre */
-.cb-lock {
-  position: absolute;
-  z-index: 2;
-  inset: 9px;
-  pointer-events: none;
-  --c: rgba(232, 106, 106, 0.75);
-  --l: 22px;
-  background:
-    linear-gradient(var(--c), var(--c)) left top / var(--l) 2px, linear-gradient(var(--c), var(--c)) left top / 2px var(--l),
-    linear-gradient(var(--c), var(--c)) right top / var(--l) 2px, linear-gradient(var(--c), var(--c)) right top / 2px var(--l),
-    linear-gradient(var(--c), var(--c)) left bottom / var(--l) 2px, linear-gradient(var(--c), var(--c)) left bottom / 2px var(--l),
-    linear-gradient(var(--c), var(--c)) right bottom / var(--l) 2px, linear-gradient(var(--c), var(--c)) right bottom / 2px var(--l);
-  background-repeat: no-repeat;
-  animation: cbLock 0.7s var(--lb-ease, ease) 0.15s both;
-}
-.cb-lock::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  width: 11px;
-  height: 11px;
-  margin-left: -5.5px;
-  background:
-    linear-gradient(var(--c), var(--c)) center / 11px 1.5px no-repeat,
-    linear-gradient(var(--c), var(--c)) center / 1.5px 11px no-repeat;
-}
-/* the lock closes in once, like aiming down sights; then it stays still */
-@keyframes cbLock {
-  from { opacity: 0; transform: scale(1.03); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 /* the gun, in a sunken well (the lobby's loadout-slot look) */
@@ -217,7 +195,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
-  margin: 16px 15% 0;
+  margin: 16px var(--codm-side) 0;
   padding: 6px;
   border-radius: var(--lb-r);
   background: var(--lb-well);
@@ -272,15 +250,11 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
     min-height: 0;
-    margin: 54px 5% 0;
+    margin: 54px var(--codm-side) 0;
     padding: 16px 16px 14px;
   }
   .cb::before {
     left: 16px;
-  }
-  .cb-lock {
-    inset: 6px;
-    --l: 14px;
   }
   .cb-art {
     width: 70%;
@@ -334,7 +308,7 @@
     display: none;
   }
   .cb-tabs {
-    margin: 10px 5% 0;
+    margin: 10px var(--codm-side) 0;
     padding: 4px;
   }
   .cb-tabs a {
@@ -343,9 +317,6 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cb-lock {
-    animation: none;
-  }
   .cb-tabs a {
     transition: none;
   }
