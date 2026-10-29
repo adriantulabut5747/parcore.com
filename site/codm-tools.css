@@ -844,8 +844,441 @@ a.ct-card:focus-visible {
   color: #9a9da1;
 }
 
+/* ---- Gun Stats (codm-gunstats.js): one control bar (search well | distance | Chest/Head switch),
+   Compare = chart box + the picked guns' sheet, then the sortable list. Chart series colours are
+   set in the script (SLOTS); everything else here is the house raised/sunken recipe. ---- */
+.gs-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.gs-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px) auto;
+  gap: 10px;
+  align-items: stretch;
+  margin: 16px var(--codm-side) 0;
+}
+.gs-find {
+  min-height: 56px;
+}
+.gs-dist {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.gs-dist label,
+.gs-dist output {
+  flex: none;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.gs-dist output {
+  min-width: 44px;
+  text-align: right;
+  color: #f2f3f5;
+  font-variant-numeric: tabular-nums;
+}
+/* the slider: a sunken groove, red up to the thumb, the thumb a grey key */
+.gs-dist input {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.gs-dist input::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--lb-red) var(--fill, 16%), #0b0c0e var(--fill, 16%));
+  box-shadow: inset 0 0 0 1px var(--lb-edge);
+}
+.gs-dist input::-moz-range-track {
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--lb-red) var(--fill, 16%), #0b0c0e var(--fill, 16%));
+  box-shadow: inset 0 0 0 1px var(--lb-edge);
+}
+.gs-dist input::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  margin-top: -6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--lb-pick);
+  box-shadow: var(--lb-btn);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.gs-dist input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--lb-pick);
+}
+.gs-dist input:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+/* Chest | Head: a well, the picked one raised (CoC chip recipe) */
+.gs-seg {
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.gs-seg button {
+  min-width: 72px;
+  padding: 0 14px;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: transparent;
+  color: #8d8f95;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+.gs-seg button:hover {
+  color: #e6e8ec;
+}
+.gs-seg [aria-pressed='true'] {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+
+/* compare */
+.gs-cmp {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.gs-chartbox,
+.gs-sheet:not(:empty) {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.gs-chartbox {
+  padding: 16px;
+}
+.gs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.gs-legend:empty {
+  display: none;
+}
+.gs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 10px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 13px;
+  font-weight: 600;
+  color: #e6e8ec;
+}
+.gs-chip i,
+.gs-vs thead i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.gs-chip button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #8d8f95;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+.gs-chip button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+.gs-chart {
+  position: relative;
+}
+.gs-chart svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  touch-action: pan-y;
+}
+.gs-grid {
+  stroke: #24262c;
+  stroke-width: 1;
+}
+.gs-ax {
+  fill: #7d7f86;
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 11px;
+}
+.gs-now {
+  stroke: #5d5f66;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.gs-cross {
+  stroke: #c4c6cb;
+  stroke-width: 1;
+}
+.gs-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.gs-none {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-size: 13px;
+  color: #8a8a8f;
+}
+.gs-tip {
+  position: absolute;
+  top: 8px;
+  display: grid;
+  gap: 4px;
+  min-width: 170px;
+  padding: 10px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: #1b1c21;
+  box-shadow: var(--lb-shadow);
+  pointer-events: none;
+  font-size: 12px;
+  color: #c4c6cb;
+}
+.gs-tip[hidden] {
+  display: none;
+}
+.gs-tip b {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.gs-tip span {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.gs-tip i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.gs-tip em {
+  overflow: hidden;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gs-tip strong {
+  color: #f2f3f5;
+  font-variant-numeric: tabular-nums;
+}
+/* the picked guns side by side */
+.gs-vs {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.gs-vs th,
+.gs-vs td {
+  padding: 9px 12px;
+  border-top: 1px solid #1f2025;
+  text-align: left;
+  vertical-align: top;
+  color: #e6e8ec;
+}
+.gs-vs thead th {
+  border-top: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.gs-vs thead i {
+  display: inline-block;
+  margin-right: 7px;
+}
+.gs-vs tbody th {
+  width: 30%;
+  font-weight: 500;
+  color: #8d8f95;
+}
+.gs-vs small,
+.gs-table small {
+  color: #8a8a8f;
+}
+.gs-vs a,
+.gs-table a {
+  color: #c4c6cb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* the list */
+.gs-table-wrap {
+  overflow-x: auto;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.gs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.gs-table th,
+.gs-table td {
+  padding: 8px 12px;
+  border-top: 1px solid #1f2025;
+  text-align: left;
+  color: #e6e8ec;
+  font-variant-numeric: tabular-nums;
+}
+.gs-table thead th {
+  position: sticky;
+  top: 0;
+  border-top: 0;
+  background: var(--lb-box);
+}
+.gs-table thead button {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #8d8f95;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+.gs-table thead button:hover,
+.gs-table [aria-sort] button {
+  color: #fff;
+}
+.gs-table [aria-sort='ascending'] button::after {
+  content: ' ↑';
+}
+.gs-table [aria-sort='descending'] button::after {
+  content: ' ↓';
+}
+.gs-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.gs-table tr.is-on {
+  background: rgba(255, 255, 255, 0.035);
+}
+.gs-c-pick {
+  width: 40px;
+}
+.gs-c-pick input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--sw, #8d8f95);
+  cursor: pointer;
+}
+.gs-c-pick input:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+.gs-gun {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* wiki gun art = wide side views: a sunken well keeps them one size */
+.gs-gun img,
+.gs-gun i {
+  flex: none;
+  width: 72px;
+  height: 36px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  object-fit: contain;
+}
+.gs-gun span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.gs-gun b {
+  font-weight: 700;
+}
+.gs-gun small {
+  font-size: 11.5px;
+}
+.gs-ttk b {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+}
+.gs-ttk b small {
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+.gs-ttk.is-no small {
+  font-size: 12px;
+}
+.gs-empty {
+  padding: 24px !important;
+  text-align: center;
+  color: #8a8a8f !important;
+}
+.gs-log-empty {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
 /* phones */
 @media (max-width: 1150px) and (min-width: 971px) {
+  .gs-cmp {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .cs-groups {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -880,6 +1313,36 @@ a.ct-card:focus-visible {
   .bc-badge {
     width: 52px;
     height: 52px;
+  }
+  .gs-bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .gs-find {
+    grid-column: 1 / -1;
+  }
+  .gs-dist {
+    padding: 0 12px;
+  }
+  .gs-cmp {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gs-chartbox {
+    padding: 12px;
+  }
+  /* the list: gun, TTK, damage, rpm (mag + reload live in Compare) */
+  .gs-c-x {
+    display: none;
+  }
+  .gs-table th,
+  .gs-table td {
+    padding: 8px 6px;
+  }
+  .gs-gun img,
+  .gs-gun i {
+    width: 52px;
+  }
+  .gs-gun small {
+    display: none;
   }
   .cs-groups {
     grid-template-columns: minmax(0, 1fr);

@@ -1,5 +1,6 @@
 # Refreshes site/codm-feed.json (official videos, app versions, World Championship)
-# and site/codm-weapons.json (weapon database) for the CODM lobby, once a day.
+# and site/codm-weapons.json (every gun + its wiki stats) + site/codm-weapons-log.json (their
+# day-to-day changes) for the CODM lobby and Gun Stats page, once a day.
 # No secrets needed: every source is public. See scripts/codm-feed.mjs.
 #
 # Run it by hand any time from the Actions tab ("Run workflow").
@@ -27,6 +28,7 @@ jobs:
             scripts
             site/codm-feed.json
             site/codm-weapons.json
+            site/codm-weapons-log.json
           sparse-checkout-cone-mode: false
 
       - uses: actions/setup-node@v4
@@ -38,13 +40,13 @@ jobs:
 
       - name: Commit if changed
         run: |
-          if [ -z "$(git status --porcelain -- site/codm-feed.json site/codm-weapons.json)" ]; then
+          if [ -z "$(git status --porcelain -- site/codm-feed.json site/codm-weapons.json site/codm-weapons-log.json)" ]; then
             echo "No change."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/codm-feed.json site/codm-weapons.json
+          git add site/codm-feed.json site/codm-weapons.json site/codm-weapons-log.json
           git commit -m "Update CODM feed"
           git pull --rebase
           git push
