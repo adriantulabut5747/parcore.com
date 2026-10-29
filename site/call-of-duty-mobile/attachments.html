@@ -19,6 +19,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/11layout.css?v=20261029a">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/codm-banner.css?v=20261029a">
 
 
 <style>
@@ -516,187 +518,26 @@ background-color: #101011;
 
   <div class="coc-main" >
 
-<div class="codm-hero">
-  <div class="codm-hero-bg" role="img" aria-label="Call of Duty Mobile — Ghost"></div>
-  <div class="codm-hero-overlay">
-    <div class="codm-hero-content">
-      <h1 class="codm-hero-title"><em>Attachments</em><br>CODM</h1>
+<!-- BANNER (Oct 29 2026, "Target lock"): look = /codm-banner.css, season fact = /codm-banner.js,
+     the count fact is filled by this page's script. Tray = the Loadouts tab's pages. -->
+<header class="cb" aria-labelledby="cbTitle">
+  <span class="cb-art" aria-hidden="true"></span>
+  <span class="cb-lock" aria-hidden="true"></span>
+  <span class="cb-ico" aria-hidden="true"><img src="/images/codm/guns/ak117.webp" alt="" decoding="async"></span>
+  <div class="cb-copy">
+    <p class="cb-kicker">Call of Duty: Mobile</p>
+    <h1 class="cb-title" id="cbTitle">Attachments</h1>
+    <p class="cb-text">Gunsmith builds for Multiplayer and Battle Royale. Verified builds are read off real Gunsmith screenshots.</p>
+    <div class="cb-strip">
+      <span class="cb-fact"><small>Gun builds</small><b id="cbCount">&nbsp;</b><em id="cbCountSub">&nbsp;</em></span>
+      <span class="cb-fact" id="cbSeason" hidden><small>Season</small><b></b><em></em></span>
     </div>
   </div>
-</div>
-
-
-
-<style>
-.codm-hero{
-  position:relative;
-  min-width:100%;
-  min-height:455px;
-  max-height:420px;
-  overflow:hidden;
-  flex:0 0 auto;
-  background:#0c0c0d;
-  margin-top: 45px;
-}
-.codm-hero-bg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  background-image:url('/callofdutymobile-icons/02.jpg');
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position:center 15%;
-  filter:saturate(1.1) contrast(1.05);
-  z-index:1;
-}
-/* On mobile this gets overridden with an explicit oversized background-size below,
-   which guarantees both left-right AND up-down panning always work — with plain
-   "cover", the crop math only leaves room to pan in ONE direction depending on
-   how the image's shape compares to the box's shape (that's why the vertical
-   number seemed to do nothing before: there was zero vertical room to pan through). */
-/* fallback look when no image is supplied yet */
-.codm-hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 80% 20%, rgba(194,45,45,0.16), transparent 55%),
-    linear-gradient(135deg, #150404 0%, #0c0c0d 55%, #050505 100%);
-  z-index:0;
-}
-.codm-hero-overlay{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  padding-left:6%;
-  background:
-    linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%),
-    linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 45%);
-}
-/* Fade the very bottom of the hero into the same dark tone the battle pass
-   widget uses, so the two sections blend into one continuous surface
-   instead of meeting at a hard edge. */
-.codm-hero::after{
-  content:"";
-  position:absolute;
-  left:0; right:0; bottom:0;
-  height:180px;
-  z-index:3;
-  pointer-events:none;
-  background:linear-gradient(to bottom, rgba(18,18,19,0) 0%, rgba(18,18,19,0.75) 60%, #121213 100%);
-}
-
-.codm-hero-content{
-  position:relative;
-  z-index:3;
-  max-width:640px;
-  color:#fff;
-  animation:codmFadeInUp .8s ease forwards;
-  margin-top: 50px;
-}
-.codm-hero-eyebrow{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:#ff5555;
-  margin-bottom:14px;
-}
-.codm-hero-eyebrow::before{
-  content:"";
-  width:22px;
-  height:2px;
-  background:#c22d2d;
-  display:inline-block;
-}
-.codm-hero-title{
-  font-size:clamp(40px,6vw,72px);
-  font-weight:900;
-  line-height:1.02;
-  text-transform:uppercase;
-  margin-bottom:18px;
-  background:linear-gradient(90deg,#ffffff,#e6dede,#c9c4c4);
-  background-clip:text;
-  -webkit-background-clip:text;
-  color:transparent;
-  text-shadow:2px 4px 10px rgba(0,0,0,0.5);
-  margin-left: 25%;
-}
-.codm-hero-title em{
-  font-style:normal;
-  background:linear-gradient(90deg,#be1b1b,#a70e0e);
-  background-clip:text;
-  -webkit-background-clip:text;
-}
-.codm-hero-tagline{
-  font-size:clamp(14px,1.2vw,17px);
-  line-height:1.6;
-  color:#c8c8c8;
-  max-width:520px;
-  text-shadow:0 1px 3px rgba(0,0,0,0.6);
-}
-
-@keyframes codmFadeInUp{
-  0%{opacity:0; transform:translateY(18px);}
-  100%{opacity:1; transform:translateY(0);}
-}
-
-@media (max-width:970px){
-  .codm-hero-title{margin-left: 0%;}
-  .codm-hero{min-height:350px; max-height:350px; margin-top: 44px;}
-  .codm-hero-overlay{
-    padding-left:6%;
-    padding-right:6%;
-    justify-content:center;
-    text-align:center;
-    background:
-      linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.35)),
-      linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.2) 45%, rgba(0,0,0,0.92) 100%);
-  }
-  .codm-hero-content{max-width:100%; margin:60px auto 0 auto;}
-  .codm-hero-eyebrow{justify-content:center;}
-  .codm-hero-tagline{max-width:100%; margin:0 auto;}
-.codm-hero-bg{
-  background-position:20% 0%;
-}
-}
-</style>
-<!-- FEATURED CODM CONTENTS -->
-<style>
-.layouts-title-box {
-  margin: 40px 15% 15px 15%;
-  border-radius: 0;
-  padding: 12px 20px;
-  text-align: center;
-  background: transparent;
-  border-bottom: 1px solid #2a2a2a;
-  position: relative;
-}
-.layouts-title-box::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 50%;
-  transform: translateX(-50%);
-  width: 100px; height: 2px;
-  background: linear-gradient(90deg, #d40000, #7b1515);
-}
-.layouts-title {
-  font-size: clamp(16px, 2vw, 22px);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(90deg, #c0c9d4, #ffffff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-</style>
+</header>
+<nav class="cb-tabs" aria-label="Loadouts pages">
+  <a href="/call-of-duty-mobile/loadouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Loadouts</a>
+  <a href="/call-of-duty-mobile/attachments" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>Attachments</a>
+</nav>
 <style>
 
 :root{
@@ -1159,7 +1000,13 @@ if (codmModePill) document.querySelectorAll('#codmModePills .codm-pill').forEach
 // ?q=ak117 (from the lobby's gun search) opens with the search box filled in
 const codmStartQ = new URLSearchParams(location.search).get('q');
 if (codmStartQ) document.getElementById('codmSearch').value = codmStartQ;
-fetch('/codm-guns.json').then(r => r.json()).then(g => { CODM_GUNS = g; codmFilter(); });
+fetch('/codm-guns.json').then(r => r.json()).then(g => {
+  CODM_GUNS = g; codmFilter();
+  // banner fact (codm-banner.css): guns with a build, how many read off a real Gunsmith screenshot
+  const verified = g.filter(x => x.attachments).length;
+  document.getElementById('cbCount').textContent = g.length + ' guns';
+  document.getElementById('cbCountSub').textContent = (verified ? verified + ' verified · ' : '') + 'MP + BR';
+});
 </script>
 
    <footer class="pf-footer">
@@ -1476,6 +1323,7 @@ body {
   </div>
 </div>
 
+<script src="/codm-banner.js?v=20261029a"></script>
 <script src="/11layout.js?v=20261029a"></script>
 </body>
 </html>
