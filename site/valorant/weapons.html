@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valorant Weapons | Parchrome</title>
+<meta name="description" content="Every Valorant gun: cost, fire rate, damage by range, shots to kill and time to kill, straight from the game files.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link rel="stylesheet" href="/11layout.css?v=20261029b">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Sora:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/codm-banner.css?v=20261029h">
+<link rel="stylesheet" href="/codm-tools.css?v=20261029d">
+<link rel="stylesheet" href="/valorant.css?v=20261029b">
+<link rel="stylesheet" href="/valorant-weapons.css?v=20261029b">
+</head>
+<body data-game-nav="valorant">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/valorant.png" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">Valorant</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Valorant pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main" >
+
+<header class="cb" aria-labelledby="cbTitle">
+  <span class="cb-art" aria-hidden="true"></span>
+  <span class="cb-ico" aria-hidden="true"><img id="cbIco" src="https://media.valorant-api.com/weapons/9c82e19d-4575-0200-1a81-3eacf00cf872/displayicon.png" alt="" decoding="async"></span>
+  <div class="cb-copy">
+    <p class="cb-kicker">Valorant</p>
+    <h1 class="cb-title" id="cbTitle">Weapons</h1>
+    <p class="cb-text">Every gun: cost, damage by range, shots to kill and time to kill.</p>
+    <div class="cb-strip">
+      <span class="cb-fact"><small>Guns</small><b id="cbCount">&nbsp;</b><em id="cbCountSub">&nbsp;</em></span>
+      <span class="cb-fact" id="cbPatch" hidden><small>Patch</small><b></b><em>From the game files</em></span>
+      <span class="cb-fact" id="cbAct" hidden><small>Act</small><b></b><em></em></span>
+    </div>
+  </div>
+</header>
+<!-- the type tray = this page's filter (?type=sidearm|smg|shotgun|rifle|sniper|heavy, All = none) -->
+<div class="cb-tabs cb-tabs--many" id="vwTabs" role="tablist" aria-label="Weapon types"></div>
+
+<!-- THE TOOL: valorant-weapons.js, data = /valorant-weapons.json (scripts/valorant-feed.mjs, daily).
+     The bar's distance, hit zone and shields drive every number on the page. -->
+<div class="gs-bar vw-bar">
+  <label class="lb-search gs-find" for="vwQ">
+    <input class="lb-search-input" id="vwQ" type="search" placeholder="Find a gun" autocomplete="off" spellcheck="false" maxlength="30">
+    <span class="lb-search-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+  </label>
+  <div class="gs-dist">
+    <label for="vwM">Distance</label>
+    <input type="range" id="vwM" min="0" max="50" step="1" value="15">
+    <output id="vwMOut" for="vwM">15 m</output>
+  </div>
+  <div class="gs-seg" id="vwHit" role="group" aria-label="Where the shots land">
+    <button type="button" data-hit="head" aria-pressed="false">Head</button>
+    <button type="button" data-hit="body" aria-pressed="true">Body</button>
+    <button type="button" data-hit="leg" aria-pressed="false">Legs</button>
+  </div>
+  <div class="gs-seg" id="vwArm" role="group" aria-label="Their shields">
+    <button type="button" data-arm="0" aria-pressed="false">No shields</button>
+    <button type="button" data-arm="25" aria-pressed="false">Light</button>
+    <button type="button" data-arm="50" aria-pressed="true">Heavy</button>
+  </div>
+</div>
+
+<section class="ct-sec" aria-labelledby="vwBuyTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vwBuyTitle">Buy menu</h2>
+    <p class="ct-sub" id="vwBuySub">Every gun the way the shop lays them out. Open one for its damage, skins and every stat.</p>
+  </header>
+  <div class="vw-shop" id="vwShop"></div>
+</section>
+
+<section class="ct-sec" aria-labelledby="vwCmpTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vwCmpTitle">Compare</h2>
+    <p class="ct-sub">Time to kill at every distance. Pick up to three guns: tick them in the list below or open one and press Compare.</p>
+  </header>
+  <div class="gs-cmp">
+    <div class="gs-chartbox">
+      <div class="gs-legend" id="vwLegend"></div>
+      <div class="gs-chart" id="vwChart"></div>
+    </div>
+    <div class="gs-sheet" id="vwSheet"></div>
+  </div>
+</section>
+
+<section class="ct-sec" aria-labelledby="vwOneTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vwOneTitle">One-shot ranges</h2>
+    <p class="ct-sub" id="vwOneSub">Where a single bullet kills.</p>
+  </header>
+  <div class="vw-one" id="vwOne"></div>
+</section>
+
+<section class="ct-sec" aria-labelledby="vwAllTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vwAllTitle">Every gun</h2>
+    <p class="ct-sub" id="vwAllSub">Tap a column to sort.</p>
+  </header>
+  <div class="gs-table-wrap">
+    <table class="gs-table vw-table">
+      <thead>
+        <tr>
+          <th scope="col" class="gs-c-pick"><span class="gs-sr">Compare</span></th>
+          <th scope="col"><button type="button" data-sort="name">Gun</button></th>
+          <th scope="col"><button type="button" data-sort="ttk">Time to kill</button></th>
+          <th scope="col"><button type="button" data-sort="dmg">Damage</button></th>
+          <th scope="col"><button type="button" data-sort="cost">Cost</button></th>
+          <th scope="col" class="gs-c-x"><button type="button" data-sort="fire">Fire rate</button></th>
+          <th scope="col" class="gs-c-x"><button type="button" data-sort="mag">Mag</button></th>
+          <th scope="col" class="gs-c-x"><button type="button" data-sort="reload">Reload</button></th>
+          <th scope="col" class="gs-c-x"><button type="button" data-sort="pen">Walls</button></th>
+        </tr>
+      </thead>
+      <tbody id="vwRows"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="ct-sec" aria-labelledby="vwLogTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vwLogTitle">Patch changes</h2>
+    <p class="ct-sub">Every buff and nerf to a gun's numbers, spotted the day the patch reaches the game files.</p>
+  </header>
+  <ol class="cs-rows gs-log" id="vwLog"></ol>
+</section>
+
+<section class="ct-sec ct-sec--last" aria-labelledby="vwHowTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vwHowTitle">How it's worked out</h2>
+    <p class="ct-sub">Numbers from the game files, read by <a href="https://valorant-api.com" target="_blank" rel="noopener">valorant-api.com</a> every patch and checked here once a day.</p>
+  </header>
+  <ol class="ct-steps">
+    <li>Health is 100. Light shields add 25 and heavy shields add 50, and shields take the damage first, so a kill through heavy shields needs 150.</li>
+    <li>Shots to kill = that total divided by the gun's damage at that distance and hit zone, rounded up.</li>
+    <li>Time to kill = the gaps between those shots at the gun's fire rate. The first shot lands at 0 ms. Aiming, recoil and the Odin's spin-up aren't counted, and shotguns get none because their pellets spread.</li>
+  </ol>
+</section>
+
+<!-- one gun: built by valorant-weapons.js on open (?w=<id>). Desktop = a centred panel, phones = a bottom sheet. -->
+<dialog class="vw-dlg" id="vwDlg" aria-labelledby="vwDName"></dialog>
+
+<script src="/valorant-weapons.js?v=20261029d"></script>
+  <footer class="pf-footer">
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+</footer>
+</div>
+
+<style>
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+
+</style>
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/valorant.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Valorant Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261029b"></script>
+</body>
+</html>

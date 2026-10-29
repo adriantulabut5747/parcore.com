@@ -1,0 +1,57 @@
+/* ============================================================
+   VALORANT -- shared by every /valorant/ page (Oct 29 2026).
+   Only the page base lives here: every bar, menu, sheet and search box is
+   11layout.css's (never re-add chrome here). The page's own sections still
+   carry their <style> blocks inside the body until the Lobby redesign.
+   ============================================================ */
+
+/* ---- BASE: reset + scroll layout (same as genshin.css / codm) ---- */
+body { visibility: hidden; }
+html.loaded body { visibility: visible; }
+html { visibility: hidden; }
+html.loaded { visibility: visible; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Oxanium', sans-serif; }
+body { height: 100vh; height: 100dvh; background: #181a1c; color: #eff2f5; display: flex; flex-direction: column; overflow: hidden; }
+* { scrollbar-width: thin; scrollbar-color: #2f3136 #121318; -webkit-tap-highlight-color: transparent; }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #121318; }
+::-webkit-scrollbar-thumb { background: #2f3136; border: 2px solid #121318; }
+::-webkit-scrollbar-thumb:hover { background: #3a3d43; }
+html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
+.coc-main { display: flex; flex-direction: column; flex: 1 1 auto; overflow-y: auto; background: #181a1c; padding-bottom: 60px; }
+/* The scroller starts at the top of the viewport and gives the bar's height
+   back as padding, so nothing but the page shows behind the bars. */
+.main { margin-top: 0; }
+.coc-main { padding-top: var(--topbar-height, 52px); }
+@media (max-width: 970px) {
+  body { overflow: auto; height: auto; }
+  /* clears the phone bar */
+  .coc-main { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---- TOKENS: the colours the page's sections read ---- */
+:root {
+  --accent: #c22d2d;
+  --text-secondary: #c8cbcd;
+  --text-muted: #949ba4;
+}
+
+/* ---- PAGE BANNER (Oct 29 2026): sub-pages wear CODM's .cb card (codm-banner.css, linked before
+   this file), Adrian: "as simple as possible, similar to the other pages". Only the art and the
+   gun well differ. Chamber's purple art is turned red here instead of baking a copy. ---- */
+.cb-art {
+  background: url('/images/valorant/bg-chamber.webp') 50% 30% / cover no-repeat;
+  filter: hue-rotate(95deg) saturate(0.75) brightness(0.7);
+}
+/* valorant-api's gun icons are transparent side views, not CODM's Gunsmith cut-outs */
+.cb-ico img {
+  width: 84%;
+  -webkit-mask-image: none;
+  mask-image: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+@media (max-width: 970px) {
+  /* phones: the act shows only its days left (CODM's #cbSeason rule) */
+  .cb-fact#cbAct em { display: inline; }
+  #cbAct b { display: none; }
+}

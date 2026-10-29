@@ -1,0 +1,1060 @@
+/* ============================================================
+   VALORANT WEAPONS (/valorant/weapons, Oct 29 2026). On top of codm-banner.css (banner, tray,
+   --codm-side) and codm-tools.css (section titles .ct-*, CODM Gun Stats' bar / chart / list .gs-*,
+   log rows .cs-rows): this file is only the Valorant pieces -- the buy menu, the one-shot tracks
+   and the gun panel. House recipe: raised boxes, sunken wells, picked = the grey key, the one
+   main action = the red key (11layout.css --lb-*).
+   ============================================================ */
+
+/* the bar: search | distance | hit zone | shields (Gun Stats has three parts, this has four) */
+.vw-bar {
+  grid-template-columns: minmax(200px, 1fr) minmax(200px, 300px) auto auto;
+}
+.vw-cr {
+  width: 0.95em;
+  height: 0.95em;
+  margin-right: 4px;
+  vertical-align: -0.12em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+.vw-cost {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.vw-fail {
+  margin: 0;
+  padding: 28px 20px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  text-align: center;
+  font-size: 13px;
+  color: #8a8a8f;
+}
+
+/* ---- BUY MENU: the shop's four columns, each a raised box; a gun = a well that rises on hover ---- */
+.vw-shop {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.vw-shop > .vw-fail {
+  grid-column: 1 / -1;
+}
+.vw-col {
+  position: relative;
+  padding: 14px 12px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(194, 59, 59, 0.07), transparent 70%),
+    var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+/* the banner's red tab, on every column */
+.vw-col::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 14px;
+  width: 40px;
+  height: 3px;
+  border-radius: 0 0 2px 2px;
+  background: var(--lb-red);
+}
+.vw-col-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 2px 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #c9cbd0;
+}
+.vw-col-head span {
+  font-size: 10px;
+  color: #6f7178;
+}
+.vw-col-list {
+  display: grid;
+  gap: 8px;
+}
+.vw-tile {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 64px auto;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px 10px;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 3px),
+    var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #e6e8ec;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.vw-tile-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.vw-tile-top b {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vw-tile .vw-cost {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #a3a5ab;
+}
+.vw-tile img {
+  justify-self: center;
+  align-self: center;
+  max-width: 88%;
+  max-height: 58px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.78) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  transition: filter 0.25s ease, transform 0.35s var(--lb-ease);
+}
+.vw-tile-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 20px;
+}
+.vw-ttk {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #f2f3f5;
+}
+.vw-ttk small {
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-weight: 400;
+  color: #8a8a8f;
+}
+.vw-tile-foot > small {
+  font-size: 11.5px;
+  color: #8a8a8f;
+}
+.vw-tag {
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8.5px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #fff;
+}
+@media (hover: hover) {
+  .vw-tile:hover {
+    border-color: var(--lb-edge);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-btn);
+  }
+  .vw-tile:hover img {
+    filter: grayscale(0) brightness(1.05) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+    transform: scale(1.06) translateX(2px);
+  }
+}
+.vw-tile:focus-visible,
+.vw-one-row:focus-visible,
+.vw-gun:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+/* a gun in Compare wears its chart colour down its left edge */
+.vw-tile.is-on::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: -2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--sw);
+}
+
+/* ---- ONE-SHOT RANGES: a row per gun, a 0-50 m groove, red where one bullet kills ---- */
+.vw-one {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vw-one > .vw-fail {
+  margin: 0;
+}
+.vw-one-axis,
+.vw-one-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+.vw-one-axis > span:last-child {
+  position: relative;
+  height: 16px;
+}
+.vw-one-axis i {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  font-style: normal;
+  color: #6f7178;
+  white-space: nowrap;
+}
+.vw-one-axis i:first-child {
+  transform: none;
+}
+.vw-one-axis i:last-child {
+  transform: translateX(-100%);
+}
+.vw-one-row {
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.vw-one-row:hover {
+  background: var(--lb-row);
+}
+.vw-one-gun {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+}
+.vw-one-gun img {
+  grid-row: 1 / 3;
+  width: 56px;
+  height: 22px;
+  object-fit: contain;
+  opacity: 0.75;
+}
+.vw-one-gun b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #e6e8ec;
+}
+.vw-one-gun small {
+  font-size: 11px;
+  color: #8a8a8f;
+}
+.vw-one-track {
+  position: relative;
+  height: 22px;
+  border-radius: 99px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(20% - 1px), rgba(255, 255, 255, 0.05) calc(20% - 1px) 20%),
+    var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vw-one-track i {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #d04545, var(--lb-red));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.vw-one-track i span {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #fff;
+}
+.vw-one-track em {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: #e6e8ec;
+  box-shadow: 0 0 0 2px var(--lb-edge);
+}
+
+/* ---- the list: the gun name opens its panel ---- */
+.vw-gun {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.vw-gun:hover b {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.vw-table .gs-gun img {
+  filter: brightness(0.9);
+}
+
+/* ---- THE GUN PANEL: <dialog>. Desktop = a centred box, art + skins left, numbers right;
+   phones = a bottom sheet (one column). ---- */
+.vw-dlg {
+  width: min(1040px, calc(100vw - 48px));
+  max-width: none;
+  max-height: min(760px, calc(100vh - 48px));
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow), 0 40px 80px -20px rgba(0, 0, 0, 0.9);
+  color: #e6e8ec;
+  font-family: 'Sora', 'Oxanium', sans-serif;
+}
+.vw-dlg::backdrop {
+  background: rgba(4, 5, 6, 0.72);
+}
+.vw-dlg[open] {
+  animation: vw-in 0.28s var(--lb-ease);
+}
+@keyframes vw-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+}
+/* a fixed height + a 0-min row, so each column scrolls inside the panel (with max-height alone the
+   row grew to its content and the dialog clipped it: no scrolling to the skins or the stats) */
+.vw-d {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: min(760px, calc(100vh - 48px));
+}
+.vw-grip {
+  display: none;
+}
+.vw-x {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+}
+.vw-x:hover {
+  background: var(--lb-raise-hover);
+}
+.vw-x svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+/* left: the stage (a sunken screen), chromas, the skins grid; scrolls on its own */
+.vw-d-art {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px;
+  border-right: 1px solid #1f2025;
+  background: #101114;
+}
+.vw-stage {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--lb-r);
+  background:
+    radial-gradient(ellipse 55% 55% at 50% 52%, rgba(194, 59, 59, 0.22), transparent 72%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 32px),
+    var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vw-stage img {
+  max-width: 84%;
+  max-height: 70%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.6));
+  animation: vw-pop 0.35s var(--lb-ease);
+}
+@keyframes vw-pop {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+.vw-stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vw-stage img[hidden],
+.vw-stage video[hidden],
+.vw-play[hidden],
+.vw-chromas[hidden] {
+  display: none;
+}
+.vw-stage-name {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  max-width: calc(100% - 140px);
+  overflow: hidden;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #c4c6cb;
+}
+.vw-play {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.vw-play:hover {
+  background: var(--lb-red-hover);
+}
+.vw-chromas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vw-chromas button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 3px;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #8d8f95;
+  cursor: pointer;
+  font-size: 12px;
+}
+.vw-chromas button[aria-pressed='true'] {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+}
+.vw-chromas img {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  object-fit: cover;
+}
+.vw-skins-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #c9cbd0;
+}
+.vw-skins-head span {
+  color: #6f7178;
+}
+.vw-skins {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+.vw-skins-wait {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 14px 0;
+  font-size: 12.5px;
+  color: #8a8a8f;
+}
+.vw-skin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 52px;
+  padding: 6px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  cursor: pointer;
+}
+.vw-skin[hidden] {
+  display: none;
+}
+/* a set box: % max sizes don't hold inside the grid tile, and big renders spilled out */
+.vw-skin > img:first-child {
+  width: 100%;
+  height: 36px;
+  object-fit: contain;
+}
+.vw-skin:hover,
+.vw-skin.is-on {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+}
+.vw-tier {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 14px;
+  height: 14px;
+}
+.vw-more {
+  grid-column: 1 / -1;
+}
+/* right: the numbers; scrolls on its own */
+.vw-d-info {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 24px 24px;
+}
+.vw-d-kick {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vw-d-kick .vw-cost {
+  color: #e6e8ec;
+}
+.vw-d-name {
+  margin: 4px 0 0;
+  font-family: 'Big Shoulders Stencil Display', 'Oxanium', sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: #f2f3f5;
+}
+.vw-d-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.vw-d-tags li {
+  padding: 5px 9px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 11.5px;
+  color: #c4c6cb;
+}
+.vw-d-h {
+  margin: 22px 0 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vw-d-note {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #9a9da1;
+}
+.vw-bands {
+  display: inline-flex;
+  margin-bottom: 12px;
+}
+.vw-bands button {
+  height: 34px;
+  min-width: 0;
+}
+/* damage: the body + one bar per zone */
+.vw-dmg {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+.vw-dmg:not(:first-child) {
+  margin-top: 0;
+}
+.vw-d-note + .vw-dmg {
+  margin-top: 12px;
+}
+.vw-body {
+  width: 72px;
+  height: auto;
+}
+.vw-body [data-z] {
+  fill: #23252b;
+  stroke: var(--lb-edge);
+  stroke-width: 2;
+  transition: fill 0.2s ease;
+}
+.vw-body [data-z].is-on {
+  fill: var(--lb-red);
+}
+.vw-zones {
+  display: grid;
+  gap: 6px;
+}
+.vw-zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #a3a5ab;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+}
+.vw-zone i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: var(--w);
+  background: #3a3d45;
+  transition: width 0.3s var(--lb-ease);
+}
+.vw-zone span,
+.vw-zone b {
+  position: relative;
+}
+.vw-zone b {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #f2f3f5;
+}
+.vw-zone b small {
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #8a8a8f;
+}
+.vw-zone.is-on {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.vw-zone.is-on i {
+  background: var(--lb-red);
+}
+/* shots to kill: zones x shields */
+.vw-stk-t {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  margin: -4px;
+  width: calc(100% + 8px);
+}
+.vw-stk-t th {
+  padding: 2px 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: left;
+  color: #8d8f95;
+}
+.vw-stk-t thead th {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+.vw-stk-t thead small {
+  display: block;
+  margin-top: 2px;
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6f7178;
+}
+.vw-stk-t td {
+  padding: 8px 10px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vw-stk-t td b {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #f2f3f5;
+}
+.vw-stk-t td small {
+  font-size: 11px;
+  color: #8a8a8f;
+}
+.vw-stk-t tr.is-on th {
+  color: #fff;
+}
+.vw-stk-t td.is-one {
+  background: linear-gradient(180deg, rgba(194, 59, 59, 0.28), rgba(194, 59, 59, 0.14)), var(--lb-well);
+}
+.vw-stk-t td.is-one small {
+  color: var(--lb-red-text);
+}
+/* stats: a 3-across grid of wells */
+.vw-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.vw-stat {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vw-stat small {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #7d7f86;
+}
+.vw-stat b {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #f2f3f5;
+}
+.vw-stat b small {
+  font-family: 'Sora', 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #8a8a8f;
+}
+.vw-stat em {
+  font-size: 10.5px;
+  font-style: normal;
+  color: #8a8a8f;
+}
+/* keys: Compare = the red main action (grey once picked), Copy link = grey */
+.vw-d-keys {
+  display: flex;
+  gap: 8px;
+  margin-top: 22px;
+}
+.vw-key {
+  flex: 1;
+  height: 44px;
+  padding: 0 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.vw-key:hover:not(:disabled) {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.vw-key:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.vw-key--red {
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+}
+.vw-key--red:hover:not(:disabled) {
+  background: var(--lb-red-hover);
+}
+.vw-key--q {
+  flex: 0 0 auto;
+}
+.vw-key:focus-visible,
+.vw-x:focus-visible,
+.vw-zone:focus-visible,
+.vw-skin:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+
+/* ---- in between: two buy-menu columns, the bar in two rows ---- */
+@media (max-width: 1300px) {
+  .vw-shop {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vw-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  }
+  .vw-bar .gs-seg {
+    justify-content: stretch;
+  }
+  .vw-bar .gs-seg button {
+    flex: 1;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 970px) {
+  .vw-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .vw-bar .gs-find,
+  .vw-bar .gs-dist {
+    grid-column: 1 / -1;
+  }
+  .vw-bar .gs-dist {
+    min-height: 48px;
+  }
+  .vw-bar .gs-seg {
+    min-height: 46px;
+  }
+  .vw-bar .gs-seg button {
+    min-width: 0;
+    padding: 0 6px;
+    font-size: 9.5px;
+  }
+  .vw-shop {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* a column's guns two across */
+  .vw-col-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vw-tile {
+    grid-template-rows: auto 48px auto;
+    padding: 8px 10px;
+  }
+  .vw-tile-top {
+    flex-direction: column;
+    gap: 1px;
+  }
+  .vw-tile-top b {
+    font-size: 13.5px;
+  }
+  .vw-tile img {
+    max-height: 44px;
+  }
+  .vw-tile-foot > small {
+    display: none;
+  }
+  .vw-one {
+    padding: 10px;
+  }
+  .vw-one-axis,
+  .vw-one-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .vw-one-axis > span:first-child {
+    display: none;
+  }
+  .vw-one-axis {
+    order: 99; /* the scale sits under the last track on phones */
+    padding: 0 8px;
+  }
+  .vw-one-gun {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+  }
+  .vw-one-gun img {
+    grid-row: auto;
+    width: 44px;
+  }
+  /* the panel = a bottom sheet, one column, one scroller */
+  .vw-dlg {
+    width: 100%;
+    max-height: 92dvh;
+    margin: auto 0 0;
+    border-width: 2px 0 0;
+    border-radius: 14px 14px 0 0;
+  }
+  .vw-dlg[open] {
+    animation: vw-up 0.32s var(--lb-ease);
+  }
+  @keyframes vw-up {
+    from {
+      transform: translateY(40%);
+      opacity: 0;
+    }
+  }
+  .vw-d {
+    height: auto;
+    max-height: 92dvh;
+    overflow-y: auto;
+  }
+  .vw-grip {
+    display: block;
+    width: 44px;
+    height: 5px;
+    margin: 8px auto 0;
+    border-radius: 99px;
+    background: #3a3d45;
+  }
+  .vw-x {
+    top: 14px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+  }
+  .vw-d-art {
+    overflow: visible;
+    padding: 12px 12px 4px;
+    border-right: 0;
+    background: none;
+  }
+  .vw-d-info {
+    overflow: visible;
+    padding: 8px 14px 28px;
+  }
+  /* on phones the skins come after the numbers */
+  .vw-d {
+    display: flex;
+    flex-direction: column;
+  }
+  .vw-d-art {
+    display: contents;
+  }
+  /* the sheet is the scroller: its parts keep their height (flex squeezed them into each other) */
+  .vw-d > *,
+  .vw-d-art > * {
+    flex-shrink: 0;
+  }
+  .vw-stage {
+    order: 1;
+    margin: 12px 12px 0;
+  }
+  .vw-chromas {
+    order: 2;
+    margin: 10px 12px 0;
+  }
+  .vw-d-info {
+    order: 3;
+  }
+  .vw-skins-head {
+    order: 4;
+    margin: 0 14px 10px;
+  }
+  .vw-skins {
+    order: 5;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    margin: 0 14px 28px;
+  }
+  .vw-d-name {
+    font-size: 40px;
+  }
+  .vw-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vw-stk-t td {
+    padding: 7px 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vw-tile,
+  .vw-tile img,
+  .vw-zone i,
+  .vw-body [data-z] {
+    transition: none;
+  }
+  .vw-dlg[open],
+  .vw-stage img {
+    animation: none;
+  }
+}

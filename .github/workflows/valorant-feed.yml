@@ -1,0 +1,49 @@
+# Refreshes site/valorant-weapons.json (every gun + its stats, the patch, the acts, the stat-change
+# log) for /valorant/weapons, once a day. No secrets needed: valorant-api.com is public.
+# See scripts/valorant-feed.mjs.
+#
+# Run it by hand any time from the Actions tab ("Run workflow").
+name: Update Valorant feed
+
+on:
+  schedule:
+    - cron: "17 22 * * *" # 22:17 UTC = 6:17 AM Philippines time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: valorant-feed
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+            site/valorant-weapons.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch Valorant feed
+        run: node scripts/valorant-feed.mjs
+
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain -- site/valorant-weapons.json)" ]; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/valorant-weapons.json
+          git commit -m "Update Valorant feed"
+          git pull --rebase
+          git push
