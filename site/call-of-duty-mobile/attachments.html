@@ -18,9 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261029a">
+<link rel="stylesheet" href="/11layout.css?v=20261029b">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/codm-banner.css?v=20261029c">
+<link rel="stylesheet" href="/codm-banner.css?v=20261029f">
 
 
 <style>
@@ -519,7 +519,7 @@ background-color: #101011;
   <div class="coc-main" >
 
 <!-- BANNER (Oct 29 2026, "Target lock"): look = /codm-banner.css, season fact = /codm-banner.js,
-     the count fact is filled by this page's script. Tray = the Loadouts tab's pages. -->
+     the count fact is filled by this page's script. Tray = this page's gun-type tabs. -->
 <header class="cb" aria-labelledby="cbTitle">
   <span class="cb-art" aria-hidden="true"></span>
   <span class="cb-ico" aria-hidden="true"><img src="/images/codm/guns/ak117.webp" alt="" decoding="async"></span>
@@ -533,10 +533,19 @@ background-color: #101011;
     </div>
   </div>
 </header>
-<nav class="cb-tabs" aria-label="Loadouts pages">
-  <a href="/call-of-duty-mobile/loadouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Loadouts</a>
-  <a href="/call-of-duty-mobile/attachments" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>Attachments</a>
-</nav>
+<!-- GUN TYPES (Oct 29 2026): views of this one page, kept in the address as ?type=smg (All = none).
+     The Attachments menu rows tick these in place (window.pcView below). Counts = this mode's guns. -->
+<div class="cb-tabs cb-tabs--many" id="codmPills" role="tablist" aria-label="Gun types">
+  <button type="button" role="tab" class="codm-pill active" data-type="all" aria-selected="true">All<span class="cb-n" data-count="all"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="ar" aria-selected="false" title="Assault rifles">AR<span class="cb-n" data-count="ar"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="smg" aria-selected="false">SMG<span class="cb-n" data-count="smg"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="sr" aria-selected="false">Sniper<span class="cb-n" data-count="sr"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="lmg" aria-selected="false">LMG<span class="cb-n" data-count="lmg"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="sg" aria-selected="false">Shotgun<span class="cb-n" data-count="sg"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="marksman" aria-selected="false">Marksman<span class="cb-n" data-count="marksman"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="pistol" aria-selected="false">Pistol<span class="cb-n" data-count="pistol"></span></button>
+  <button type="button" role="tab" class="codm-pill" data-type="favorites" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>Favorites<span class="cb-n" data-count="favorites"></span></button>
+</div>
 <style>
 
 :root{
@@ -556,34 +565,6 @@ background-color: #101011;
 
 /* search bar */
 .codm-search-wrap{position:relative;margin:30px var(--codm-side) 14px var(--codm-side);display:flex;align-items:center;}
-.layouts-title-box {
-  margin: 5px var(--codm-side) 0px var(--codm-side);
-  border-radius: 0;
-  padding: 12px 20px;
-  text-align: center;
-  background: transparent;
-  border-bottom: 1px solid #2a2a2a;
-  position: relative;
-}
-.layouts-title-box::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 50%;
-  transform: translateX(-50%);
-  width: 100px; height: 2px;
-  background: linear-gradient(90deg, #d40000, #7b1515);
-
-}
-.layouts-title {
-  font-size: clamp(16px, 2vw, 22px);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(90deg, #c0c9d4, #ffffff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
 .codm-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;flex-shrink:0;}
 .codm-search-box{position:relative;display:flex;align-items:stretch;flex:1;min-width:0;background:var(--codm-bg);border:1px solid var(--codm-border);border-radius:0;transition:border-color .15s,background .15s;}
 .codm-search-box:focus-within{border-color:var(--codm-border-hover);background:#202022;}
@@ -658,36 +639,6 @@ background-color: #101011;
   .codm-sort-menu{ left:auto; right:0; min-width:140px; }
 }
 
-/* mode filter pills (multiplayer / battle royale) */
-.codm-mode-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 var(--codm-side) 10px var(--codm-side);flex-shrink:0;}
-.codm-mode-wrap::-webkit-scrollbar{display:none;}
-.codm-mode-pill{font-size:12px;padding:10px 20px;}
-
-/* filter pills */
-.codm-pill-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 var(--codm-side) 20px var(--codm-side);flex-shrink:0;}
-.codm-pill-wrap::-webkit-scrollbar{display:none;}
-.codm-pill-row{display:flex;gap:8px;width:max-content;min-width:100%;}
-.codm-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;white-space:nowrap;font-family:'Oxanium',sans-serif;user-select:none; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-raise); box-shadow: var(--lb-btn); color: #e6e8ec; transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease; }
-.codm-pill:hover{ border-color: var(--lb-edge); background: var(--lb-raise-hover); color: #fff; }
-.codm-pill.active{
-font-weight: 600;
-
-
-  border-color: var(--lb-pick-edge);
-  background: var(--lb-pick);
-  box-shadow: var(--lb-pick-shadow);
-  color: var(--lb-pick-ink);}
-.codm-pill:focus-visible {
-  outline: 2px solid var(--lb-red-text);
-  outline-offset: 2px;
-}
-.codm-pill:active {
-  transform: translateY(1px);
-  box-shadow: var(--lb-btn-down);
-}
-.codm-pill-dot{width:6px;height:6px;border-radius:0;background:var(--codm-dot-inactive);flex-shrink:0;transition:background .15s;}
-.codm-pill.active .codm-pill-dot{background:#a20d1c;}
-
 /* card grid */
 .codm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:0 var(--codm-side) 40px var(--codm-side);}
 .gun-card{position:relative;background:#151516; transition: transform 0.25s var(--lb-ease), box-shadow 0.25s ease, background-color 0.25s ease;  overflow: hidden;  border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background-color: var(--lb-box); box-shadow: var(--lb-shadow); }
@@ -750,10 +701,6 @@ font-weight: 600;
 
 @media (max-width:970px){
   .codm-search-wrap{margin:20px var(--codm-side) 14px var(--codm-side);}
-  .codm-mode-wrap{margin:0 var(--codm-side) 10px var(--codm-side);}
-  .codm-mode-wrap .codm-pill-row{width:100%;}
-  .codm-mode-pill{flex:1 1 0;justify-content:center;width:auto;}
-  .codm-pill-wrap{margin:0 var(--codm-side) 16px var(--codm-side);}
   .codm-grid{grid-template-columns:1fr;gap:18px;margin:0 var(--codm-side) 40px var(--codm-side);}
   .codm-no-results{margin:0 var(--codm-side);}
 }
@@ -783,28 +730,9 @@ font-weight: 600;
       </div>
     </div>
   </div>
-</div>
-
-<!-- MODE PILLS -->
-<div class="codm-mode-wrap">
-  <div class="codm-pill-row" id="codmModePills">
-    <button class="codm-pill codm-mode-pill active" data-mode="multiplayer">Multiplayer</button>
-    <button class="codm-pill codm-mode-pill" data-mode="battleroyale">Battleroyale</button>
-  </div>
-</div>
-
-<!-- PILLS -->
-<div class="codm-pill-wrap">
-  <div class="codm-pill-row" id="codmPills">
-    <button class="codm-pill active" data-type="all"><span class="codm-pill-dot"></span>All</button>
-    <button class="codm-pill" data-type="favorites"><span class="codm-pill-dot"></span>Favorites</button>
-    <button class="codm-pill" data-type="ar"><span class="codm-pill-dot"></span>Assault</button>
-    <button class="codm-pill" data-type="sr"><span class="codm-pill-dot"></span>Sniper</button>
-    <button class="codm-pill" data-type="smg"><span class="codm-pill-dot"></span>SMG</button>
-    <button class="codm-pill" data-type="lmg"><span class="codm-pill-dot"></span>LMG</button>
-    <button class="codm-pill" data-type="sg"><span class="codm-pill-dot"></span>Shotgun</button>
-    <button class="codm-pill" data-type="marksman"><span class="codm-pill-dot"></span>Marksman</button>
-    <button class="codm-pill" data-type="pistol"><span class="codm-pill-dot"></span>Pistol</button>
+  <div class="codm-switch" id="codmModePills" role="tablist" aria-label="Game mode">
+    <button type="button" role="tab" class="codm-pill codm-mode-pill active" data-mode="multiplayer" aria-selected="true" title="Multiplayer">MP</button>
+    <button type="button" role="tab" class="codm-pill codm-mode-pill" data-mode="battleroyale" aria-selected="false" title="Battle Royale">BR</button>
   </div>
 </div>
 
@@ -895,6 +823,7 @@ function codmFilter(){
   const mode = activeModePill ? activeModePill.dataset.mode : 'multiplayer';
   const q = document.getElementById('codmSearch').value.toLowerCase().trim();
   const sortMode = codmSortMode;
+  codmCounts();
   document.getElementById('codmSearchClear').style.display = q ? 'flex' : 'none';
 
   // keep each gun's original array position so "Most Popular" can restore it after sorting
@@ -944,17 +873,15 @@ function codmShowMore(){
 
 document.querySelectorAll('#codmPills .codm-pill').forEach(pill => {
   pill.addEventListener('click', () => {
-    document.querySelectorAll('#codmPills .codm-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    codmFilter();
+    codmPick('#codmPills', pill);
+    codmSaveView('type', pill.dataset.type, 'all');
   });
 });
 
 document.querySelectorAll('#codmModePills .codm-pill').forEach(pill => {
   pill.addEventListener('click', () => {
-    document.querySelectorAll('#codmModePills .codm-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    codmFilter();
+    codmPick('#codmModePills', pill);
+    codmSaveView('mode', pill.dataset.mode, 'multiplayer');
   });
 });
 
@@ -986,15 +913,42 @@ function codmClearSearch(){
   document.getElementById('codmSearch').focus();
 }
 
-// ?type=smg (from the lobby's weapon class cards) opens with that class's pill on
-const codmStartType = new URLSearchParams(location.search).get('type');
-const codmStartPill = codmStartType && document.querySelector(`#codmPills .codm-pill[data-type="${CSS.escape(codmStartType)}"]`);
-if (codmStartPill) document.querySelectorAll('#codmPills .codm-pill').forEach(p => p.classList.toggle('active', p === codmStartPill));
-// ?mode=battleroyale (from the lobby's BR crate) opens the BR list
-const codmStartMode = new URLSearchParams(location.search).get('mode');
-const codmModePill = codmStartMode && document.querySelector(`#codmModePills .codm-pill[data-mode="${CSS.escape(codmStartMode)}"]`);
-if (codmModePill) document.querySelectorAll('#codmModePills .codm-pill').forEach(p => p.classList.toggle('active', p === codmModePill));
-// ?q=ak117 (from the lobby's gun search) opens with the search box filled in
+// VIEWS (Oct 29 2026): the gun type (?type=smg, All = none) and the mode (?mode=battleroyale,
+// Multiplayer = none) live in the address, so the lobby's links, shared links and the Attachments
+// menu rows open on them; the menu rows switch them in place through window.pcView (11layout.js).
+function codmPick(row, btn){
+  document.querySelectorAll(row + ' .codm-pill').forEach(p => {
+    p.classList.toggle('active', p === btn);
+    p.setAttribute('aria-selected', String(p === btn));
+  });
+}
+function codmSaveView(key, value, def){
+  const u = new URL(location.href);
+  if (value === def) u.searchParams.delete(key); else u.searchParams.set(key, value);
+  history.replaceState(null, '', u.pathname + u.search + u.hash);
+  if (window.pcMarkViews) window.pcMarkViews();
+  codmFilter();
+}
+// tab counts = guns of each type in the picked mode
+function codmCounts(){
+  const mode = (document.querySelector('#codmModePills .codm-pill.active') || {}).dataset?.mode || 'multiplayer';
+  const list = CODM_GUNS.filter(g => (g.modes || []).includes(mode));
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const k = el.dataset.count;
+    el.textContent = k === 'all' ? list.length : k === 'favorites' ? list.filter(g => g.favorite === true).length : list.filter(g => g.type === k).length;
+  });
+}
+window.pcView = () => {
+  const qs = new URLSearchParams(location.search);
+  const type = document.querySelector(`#codmPills .codm-pill[data-type="${CSS.escape(qs.get('type') || 'all')}"]`) || document.querySelector('#codmPills .codm-pill[data-type="all"]');
+  const mode = document.querySelector(`#codmModePills .codm-pill[data-mode="${CSS.escape(qs.get('mode') || 'multiplayer')}"]`) || document.querySelector('#codmModePills .codm-pill[data-mode="multiplayer"]');
+  codmPick('#codmPills', type);
+  codmPick('#codmModePills', mode);
+  if (CODM_GUNS.length) codmFilter();
+  // the picked tab scrolls into the tray (phones)
+  type.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+};
+window.pcView();
 const codmStartQ = new URLSearchParams(location.search).get('q');
 if (codmStartQ) document.getElementById('codmSearch').value = codmStartQ;
 fetch('/codm-guns.json').then(r => r.json()).then(g => {
@@ -1320,7 +1274,7 @@ body {
   </div>
 </div>
 
-<script src="/codm-banner.js?v=20261029c"></script>
-<script src="/11layout.js?v=20261029a"></script>
+<script src="/codm-banner.js?v=20261029f"></script>
+<script src="/11layout.js?v=20261029b"></script>
 </body>
 </html>

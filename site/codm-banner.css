@@ -190,43 +190,81 @@
   color: var(--lb-red-text);
 }
 
-/* the Loadouts tab's pages: a sunken tray, the current page raised as the grey key */
+/* the tray under the banner = this page's tabs (Loadouts: MP | BR, Attachments: the gun types):
+   a sunken tray, the picked tab raised out of it as the grey key (the TH pages' Layouts / Army / Tools).
+   Tabs share the width and never shrink below their label; a long tray scrolls inside itself. */
 .cb-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 6px;
   margin: 16px var(--codm-side) 0;
   padding: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
   border-radius: var(--lb-r);
   background: var(--lb-well);
   box-shadow: var(--lb-ring-well);
 }
-.cb-tabs a {
+.cb-tabs::-webkit-scrollbar {
+  display: none;
+}
+html body .cb-tabs > a,
+html body .cb-tabs > button {
+  flex: 1 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   height: 44px;
+  margin: 0;
+  padding: 0 12px;
   border: 2px solid transparent;
   border-radius: var(--lb-r);
+  background: transparent;
+  box-shadow: none;
   color: #8d8f95;
   text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
   font-family: 'Orbitron', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
   transition: color 0.15s ease, background-color 0.15s ease;
 }
-.cb-tabs a:hover {
+html body .cb-tabs > a:hover,
+html body .cb-tabs > button:hover {
   color: #e6e8ec;
   background: rgba(255, 255, 255, 0.03);
 }
-.cb-tabs a[aria-current='page'] {
+html body .cb-tabs > a[aria-current='page'],
+html body .cb-tabs > [aria-selected='true'],
+html body .cb-tabs > .active {
   border-color: var(--lb-edge);
   background: var(--lb-raise);
   box-shadow: var(--lb-btn);
   color: #fff;
+}
+/* a tab's count ("8"), a small well inside it */
+.cb-n {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 10px;
+  color: #8d8f95;
+  font-variant-numeric: tabular-nums;
+}
+[aria-selected='true'] > .cb-n,
+.active > .cb-n {
+  color: #e6e8ec;
+}
+/* a tray of many tabs (Attachments' 9 gun types) fits a desktop column only without its counts;
+   phones keep them (that tray scrolls there anyway) */
+@media (min-width: 971px) {
+  .cb-tabs--many .cb-n {
+    display: none;
+  }
 }
 .cb-tabs svg {
   width: 17px;
@@ -237,7 +275,7 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.cb-tabs a:focus-visible {
+.cb-tabs > :focus-visible {
   outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
 }
@@ -311,13 +349,212 @@
     margin: 10px var(--codm-side) 0;
     padding: 4px;
   }
-  .cb-tabs a {
+  html body .cb-tabs > a,
+  html body .cb-tabs > button {
     height: 38px;
-    font-size: 11px;
+    padding: 0 12px;
+    font-size: 10.5px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cb-tabs a {
+  html body .cb-tabs > * {
     transition: none;
+  }
+}
+
+/* ============================================================
+   FILTER BARS + CARDS on the CODM sub-pages (Oct 29 2026, Adrian: "the sunken and raised css
+   should be applied here"). CoC recipe: every chip / switch is a sunken well at rest and rises as
+   the grey key when picked (th-layouts.css "TABS + CARD ACTIONS"), never a white or red pill.
+   `html body` because each page's own <style> comes after this file.
+   ============================================================ */
+/* chips (Loadouts' game modes): one row, scrolls on phones */
+html body .codm-pill-wrap {
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 var(--codm-side) 20px;
+}
+html body .codm-pill-wrap::-webkit-scrollbar {
+  display: none;
+}
+html body .codm-pill-wrap[hidden] {
+  display: none;
+}
+html body .codm-pill-row {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  min-width: 100%;
+}
+html body .codm-pill-wrap .codm-pill,
+html body .codm-switch .codm-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #8d8f95;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+html body .codm-pill-wrap .codm-pill:hover,
+html body .codm-switch .codm-pill:hover {
+  color: #e6e8ec;
+}
+html body .codm-pill-wrap .codm-pill.active,
+html body .codm-switch .codm-pill.active {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+html body .codm-pill:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+html body .codm-pill-dot {
+  display: none;
+}
+/* Attachments' MP | BR: a small two-way switch in the search row (one well, the picked side raised) */
+html body .codm-switch {
+  flex: none;
+  display: flex;
+  gap: 4px;
+  margin-left: 10px;
+  padding: 4px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+html body .codm-switch .codm-pill {
+  height: 36px;
+  padding: 0 12px;
+  background: transparent;
+  box-shadow: none;
+}
+/* the sort key = the grey raised key (it was the browser's white button on Attachments) */
+html body .codm-sort-btn {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+}
+html body .codm-sort-btn:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+/* the sort menu = a raised box; View more = a grey key; loadout cards = raised boxes */
+html body .codm-sort-menu {
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+html body .codm-viewmore-btn {
+  height: 44px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+}
+html body .codm-viewmore-btn:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+html body .codm-grid .gun-card {
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  transition: transform 0.25s var(--lb-ease, ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+@media (hover: hover) {
+  html body .codm-grid .gun-card:hover {
+    background: var(--lb-box-hover);
+    box-shadow: var(--lb-shadow-hover);
+  }
+}
+/* a tab with nothing in it yet (Loadouts' BR): one raised box, said plainly */
+.codm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 4px var(--codm-side) 48px;
+  padding: 40px 20px;
+  text-align: center;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background:
+    radial-gradient(ellipse 50% 70% at 50% 40%, rgba(194, 59, 59, 0.08), transparent 70%),
+    var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.codm-empty[hidden] {
+  display: none;
+}
+.codm-empty svg {
+  width: 48px;
+  height: 48px;
+  fill: none;
+  stroke: #5d5f66;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.codm-empty b {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #f2f3f5;
+}
+.codm-empty span {
+  max-width: 44ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #9a9da1;
+}
+.codm-empty button {
+  margin-top: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.codm-empty button:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+@media (max-width: 600px) {
+  html body .codm-switch {
+    margin-left: 8px;
+  }
+  html body .codm-switch .codm-pill {
+    padding: 0 9px;
   }
 }

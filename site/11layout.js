@@ -503,14 +503,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const groups = game.groups;
     // A page with "activePrefix" is also "here" on every address under it
     // (Player lookup: /genshin-impact/player/<UID>).
-    const here = p => !p.soon && (normalizePage(p.link) === currentPage ||
+    // VIEWS (CODM, Oct 29 2026): a row whose link has a query ("/attachments?type=smg") is a view of
+    // that page, not a page: it's "here" only while the address carries the same values (a missing
+    // one counts as the page's window.pcViewDefaults, e.g. { mode: 'mp' }), and clicking it on that
+    // page switches in place (see "VIEW LINKS" below) instead of reloading.
+    const isView = p => !!p.link && p.link.indexOf('?') > -1;
+    const viewMatches = href => {
+      const u = new URL(href, location.href);
+      if (normalizePage(u.pathname) !== currentPage) return false;
+      const now = new URLSearchParams(location.search), def = window.pcViewDefaults || {};
+      for (const [k, v] of u.searchParams) if ((now.get(k) || def[k] || '').toLowerCase() !== v.toLowerCase()) return false;
+      return true;
+    };
+    const here = p => !p.soon && (isView(p) ? viewMatches(p.link) : normalizePage(p.link) === currentPage ||
       !!(p.activePrefix && currentPage.startsWith(normalizePage(p.activePrefix) + '/')));
     const menus = groups.filter(g => g.pages.length);
     const hrefOf = g => g.link || '#gn-sec-' + menus.indexOf(g);
     // A group's own page ("Events hub", "All tools") stays in game-nav.json (trail, search, the
     // group-page cards read it) but never as a menu row or sheet tile (Oct 28 2026, Adrian): the
     // group link itself goes there, and on that page the sheet lights the group's label instead.
-    const isHub = (g, p) => !!g.link && normalizePage(p.link) === normalizePage(g.link);
+    const isHub = (g, p) => !!g.link && !isView(p) && normalizePage(p.link) === normalizePage(g.link);
     const rows = g => g.pages.filter(p => !isHub(g, p));
     const keyStr = h => (h.charAt(0) === '#' ? h : normalizePage(h));
     const isSvg = ic => !!ic && ic.charAt(0) === '<';
@@ -559,6 +571,41 @@ document.addEventListener('DOMContentLoaded', () => {
       const all = [].concat(...menus.map(rows));
       if (count) count.textContent = all.filter(p => !p.soon).length + ' live · ' + all.length + ' pages';
     }
+
+    // VIEW LINKS: light the view rows / tiles that match the address (the menu engine lights rows by
+    // path alone, so every view of this page would be lit), and switch views in place: on a page that
+    // defines window.pcView (it re-reads the address and ticks its tab), a view link to this same page
+    // updates the address and calls it instead of reloading. Pages call window.pcMarkViews() after
+    // changing the address themselves (their own tabs).
+    const markViews = () => {
+      document.querySelectorAll('.stb-dd-row[href*="?"], #moreOverlay .mx-tool[href*="?"]').forEach(a => {
+        const on = viewMatches(a.getAttribute('href'));
+        a.classList.toggle(a.classList.contains('mx-tool') ? 'active' : 'is-on', on);
+        if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      });
+    };
+    window.pcMarkViews = markViews;
+    markViews();
+    document.addEventListener('click', e => {
+      if (typeof window.pcView !== 'function' || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest('.stb-dd a[href*="?"], #moreOverlay a[href*="?"]');
+      if (!a) return;
+      const u = new URL(a.getAttribute('href'), location.href);
+      if (u.origin !== location.origin || normalizePage(u.pathname) !== currentPage) return;
+      e.preventDefault();
+      history.pushState(null, '', u.pathname + u.search);
+      window.pcView();
+      markViews();
+      a.blur();
+      const dd = a.closest('.stb-dd');
+      if (dd) dd.hidden = true;
+      if (window.closeMoreMenu && document.getElementById('moreOverlay')?.classList.contains('open')) window.closeMoreMenu();
+    }, true); // capture: the More sheet stops clicks from bubbling (onclick="event.stopPropagation()")
+    window.addEventListener('popstate', () => {
+      if (typeof window.pcView !== 'function') return;
+      window.pcView();
+      markViews();
+    });
 
     // Trail: "Genshin Impact › Events › Banners"; a group page is "Genshin Impact › Events".
     const crumb = { short: game.short };

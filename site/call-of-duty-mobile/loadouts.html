@@ -18,9 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261029a">
+<link rel="stylesheet" href="/11layout.css?v=20261029b">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/codm-banner.css?v=20261029c">
+<link rel="stylesheet" href="/codm-banner.css?v=20261029f">
 
 
 <style>
@@ -511,7 +511,7 @@ background-color: #181A1C;
   <div class="coc-main" >
 
 <!-- BANNER (Oct 29 2026, "Target lock"): look = /codm-banner.css, season fact = /codm-banner.js,
-     the count fact is filled by this page's script. Tray = the Loadouts tab's pages. -->
+     the count fact is filled by this page's script. Tray = this page's MP | BR tabs. -->
 <header class="cb" aria-labelledby="cbTitle">
   <span class="cb-art" aria-hidden="true"></span>
   <span class="cb-ico" aria-hidden="true"><img src="/images/codm/guns/uss9.webp" alt="" decoding="async"></span>
@@ -525,10 +525,12 @@ background-color: #181A1C;
     </div>
   </div>
 </header>
-<nav class="cb-tabs" aria-label="Loadouts pages">
-  <a href="/call-of-duty-mobile/loadouts" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>Loadouts</a>
-  <a href="/call-of-duty-mobile/attachments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>Attachments</a>
-</nav>
+<!-- MP | BR (Oct 29 2026): views of this one page, kept in the address as ?mode=br (MP = no mode).
+     The Loadouts menu's Multiplayer / Battle Royale rows tick these in place (window.pcView below). -->
+<div class="cb-tabs" id="codmViews" role="tablist" aria-label="Loadout modes">
+  <button type="button" role="tab" data-view="mp" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20a6 6 0 0 1 12 0M15 20a4.5 4.5 0 0 1 6-4.2"/></svg>Multiplayer<span class="cb-n" data-n="mp"></span></button>
+  <button type="button" role="tab" data-view="br" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Battle Royale<span class="cb-n" data-n="br"></span></button>
+</div>
 <style>
 
 :root{
@@ -548,34 +550,6 @@ background-color: #181A1C;
 
 /* search bar */
 .codm-search-wrap{position:relative;margin:30px var(--codm-side) 14px var(--codm-side);display:flex;align-items:center;}
-.layouts-title-box {
-  margin: 5px var(--codm-side) 0px var(--codm-side);
-  border-radius: 0;
-  padding: 12px 20px;
-  text-align: center;
-  background: transparent;
-  border-bottom: 1px solid #2a2a2a;
-  position: relative;
-}
-.layouts-title-box::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 50%;
-  transform: translateX(-50%);
-  width: 100px; height: 2px;
-  background: linear-gradient(90deg, #d40000, #7b1515);
-
-}
-.layouts-title {
-  font-size: clamp(16px, 2vw, 22px);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(90deg, #c0c9d4, #ffffff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
 .codm-search-icon{position:absolute;left:14px;pointer-events:none;flex-shrink:0;}
 .codm-search-box{position:relative;display:flex;align-items:center;flex:1;min-width:0;}
 .codm-search-input{flex:1;min-width:0;width:100%;box-sizing:border-box;background:var(--codm-bg);padding:12px 38px 12px 38px;font-size:13px;color:#eee;font-family:'Oxanium',sans-serif;outline:none;transition:border-color .15s,background .15s; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background-color: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); }
@@ -755,8 +729,8 @@ font-weight: 600;
   </div>
 </div>
 
-<!-- PILLS -->
-<div class="codm-pill-wrap">
+<!-- PILLS: Multiplayer's game modes (hidden on the BR tab) -->
+<div class="codm-pill-wrap" id="codmPillWrap">
   <div class="codm-pill-row" id="codmPills">
     <button class="codm-pill active" data-type="all"><span class="codm-pill-dot"></span>All</button>
     <button class="codm-pill" data-type="snd"><span class="codm-pill-dot"></span>SnD</button>
@@ -769,6 +743,12 @@ font-weight: 600;
 <!-- GRID -->
 <div class="codm-grid" id="codmGrid"></div>
 <div class="codm-no-results" id="codmNoResults">No loadouts match your search.</div>
+<div class="codm-empty" id="codmEmpty" hidden>
+  <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="1.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16"/></svg>
+  <b>No BR loadouts yet</b>
+  <span>Battle Royale classes are on the way. Multiplayer has <span data-n="mp"></span> ready now.</span>
+  <button type="button" data-view="mp">See Multiplayer loadouts</button>
+</div>
 <button class="codm-viewmore-btn" id="codmViewMoreBtn" onclick="codmShowMore()">
   <span>View More</span>
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
@@ -987,9 +967,11 @@ function codmFilter(){
   let filtered = CODM_GUNS
     .map((gun, i) => ({ gun, i }))
     .filter(({ gun }) => {
-      const matchesType = (type === 'all' || gun.type === type);
+      const matchesView = (gun.mode || 'mp') === codmView;
+      // the game-mode chips are Multiplayer's; BR ignores them
+      const matchesType = (codmView !== 'mp' || type === 'all' || gun.type === type);
       const matchesQuery = gun.name.toLowerCase().includes(q);
-      return matchesType && matchesQuery;
+      return matchesView && matchesType && matchesQuery;
     });
 
   if (sortMode === 'alpha') {
@@ -1008,7 +990,10 @@ function codmFilter(){
   codmFullResult = result;
   codmVisibleCount = CODM_PAGE_SIZE;
   codmRenderPage();
-  document.getElementById('codmNoResults').style.display = result.length === 0 ? 'block' : 'none';
+  // a tab with no loadouts at all shows its "none yet" panel; otherwise "no match" is about the search
+  const none = !CODM_GUNS.some(l => (l.mode || 'mp') === codmView);
+  document.getElementById('codmEmpty').hidden = !none;
+  document.getElementById('codmNoResults').style.display = result.length === 0 && !none ? 'block' : 'none';
 }
 
 const CODM_PAGE_SIZE = 12;
@@ -1041,7 +1026,27 @@ function codmClearSearch(){
   document.getElementById('codmSearch').focus();
 }
 
-codmFilter();
+// MP | BR TABS: a loadout's "mode" is "mp" (the default) or "br". The tab lives in the address
+// (?mode=br; MP = none), so a shared link opens on it and the menu's view rows can tick it.
+let codmView = 'mp';
+window.pcViewDefaults = { mode: 'mp' };
+function codmSetView(view, save){
+  codmView = view;
+  document.querySelectorAll('#codmViews [data-view]').forEach(t => t.setAttribute('aria-selected', String(t.dataset.view === view)));
+  document.getElementById('codmPillWrap').hidden = view !== 'mp';
+  if (save) {
+    const u = new URL(location.href);
+    if (view === 'mp') u.searchParams.delete('mode'); else u.searchParams.set('mode', view);
+    history.replaceState(null, '', u.pathname + u.search + u.hash);
+    if (window.pcMarkViews) window.pcMarkViews();
+  }
+  codmFilter();
+}
+window.pcView = () => codmSetView(new URLSearchParams(location.search).get('mode') === 'br' ? 'br' : 'mp', false);
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => codmSetView(b.dataset.view, true)));
+document.querySelectorAll('[data-n]').forEach(el => { el.textContent = CODM_GUNS.filter(l => (l.mode || 'mp') === el.dataset.n).length; });
+
+window.pcView();
 </script>
 
    <footer class="pf-footer">
@@ -1359,7 +1364,7 @@ body {
   </div>
 </div>
 
-<script src="/codm-banner.js?v=20261029c"></script>
-<script src="/11layout.js?v=20261029a"></script>
+<script src="/codm-banner.js?v=20261029f"></script>
+<script src="/11layout.js?v=20261029b"></script>
 </body>
 </html>
