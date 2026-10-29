@@ -513,6 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isHub = (g, p) => !!g.link && normalizePage(p.link) === normalizePage(g.link);
     const rows = g => g.pages.filter(p => !isHub(g, p));
     const keyStr = h => (h.charAt(0) === '#' ? h : normalizePage(h));
+    const isSvg = ic => !!ic && ic.charAt(0) === '<';
     buildHubNav({ hubNav: groups.map(g => ({
       name: g.name, link: hrefOf(g), icon: g.icon, img: g.img,
       activeOn: g.pages.some(here) ? [currentPage] : []
@@ -524,7 +525,8 @@ document.addEventListener('DOMContentLoaded', () => {
         keyOf: link => keyOf[keyStr(link.getAttribute('href') || '')] || '',
         labels: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.name])),
         cols: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.cols])), // "cols": 2 in game-nav.json = a 2-across menu
-        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, rows(g).map(p => ({ href: p.soon ? '' : p.link, name: p.name, sub: p.sub, soon: p.soon, icon: p.icon }))]))
+        // an icon that is SVG markup (CODM) rather than a picture path goes in as `svg`
+        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, rows(g).map(p => ({ href: p.soon ? '' : p.link, name: p.name, sub: p.sub, soon: p.soon, [isSvg(p.icon) ? 'svg' : 'icon']: p.icon }))]))
       });
     }
     document.addEventListener('click', e => {
@@ -541,7 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.querySelector('#moreOverlay .more-list');
     if (list) {
       const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      const ico = p => (p.icon ? `<span class="mx-tool-ico"><img src="${p.icon}" alt="" loading="lazy" decoding="async"></span>` : '');
+      const ico = p => (!p.icon ? '' : isSvg(p.icon)
+        ? `<span class="mx-tool-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p.icon}</svg></span>`
+        : `<span class="mx-tool-ico"><img src="${p.icon}" alt="" loading="lazy" decoding="async"></span>`);
       const tile = p => p.soon
         ? `<a class="mx-tool is-soon" aria-disabled="true">${ico(p)}<span class="mx-tool-name">${esc(p.name)}</span></a>`
         : `<a class="mx-tool${here(p) ? ' active' : ''}" href="${p.link}">${ico(p)}<span class="mx-tool-name">${esc(p.name)}</span></a>`;
