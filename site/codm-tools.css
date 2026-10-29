@@ -583,8 +583,272 @@ a.ct-card:focus-visible {
   color: #f2f3f5;
 }
 
+/* ---- Season page (codm-season.js): the clock = the lobby's battle pass card grown up (box, one well
+   per unit, live seconds red), then rows (date well | name + line | state tag) and boxed groups ---- */
+.cs-clock {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.cs-clock[hidden],
+.cs-note[hidden],
+.ct-sec[hidden] {
+  display: none;
+}
+.cs-clock p {
+  margin: 0;
+}
+.cs-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cs-badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+}
+.cs-k {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.cs-name {
+  margin-top: 4px !important;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #f2f3f5;
+  text-wrap: balance;
+}
+.cs-digits {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.cs-digits span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 4px 14px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #7d7f86;
+}
+.cs-digits b {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(30px, 4.4vw, 56px);
+  font-weight: 900;
+  line-height: 1;
+  color: #f2f3f5;
+  font-variant-numeric: tabular-nums;
+}
+.cs-digits .cs-sec b {
+  color: var(--lb-red-text);
+}
+.cs-clock.is-over .cs-digits {
+  display: none;
+}
+/* season gone by: a red fill in a well (scaleX, so it never repaints the layout) */
+.cs-track {
+  height: 12px;
+  padding: 3px;
+  border-radius: 99px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.cs-track i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--lb-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.8s var(--lb-ease);
+}
+.cs-ends {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px !important;
+  font-size: 12px;
+  color: #8a8a8f;
+}
+.cs-ends b {
+  font-weight: 600;
+  color: #c4c6cb;
+}
+.cs-sub {
+  padding-top: 14px;
+  border-top: 1px solid #222226;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #8a8a8f;
+}
+.cs-sub a,
+.ct-sub a,
+.cs-note a {
+  color: #c4c6cb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cs-sub a:hover,
+.ct-sub a:hover,
+.cs-note a:hover {
+  color: #fff;
+}
+.cs-note {
+  margin: 0;
+}
+
+/* rows (dates, past seasons) */
+.cs-rows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cs-rows li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px 10px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.cs-when,
+.cs-num {
+  min-width: 112px;
+  padding: 10px 12px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+  color: #e6e8ec;
+  white-space: nowrap;
+}
+.cs-num {
+  min-width: 56px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.cs-row-main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.cs-row-main b {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f2f3f5;
+}
+.cs-row-main small {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #9a9da1;
+}
+.cs-len,
+.cs-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8d8f95;
+  white-space: nowrap;
+}
+.cs-tag {
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.cs-rows .is-live .cs-tag {
+  background: rgba(194, 59, 59, 0.16);
+  box-shadow: none;
+  color: var(--lb-red-text);
+}
+.cs-rows .is-done {
+  opacity: 0.55;
+}
+
+/* what's in: one box per group */
+.cs-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.cs-group {
+  padding: 16px 18px 18px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.cs-group h3 {
+  margin: 0 0 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--lb-red-text);
+}
+.cs-group ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cs-group li {
+  display: grid;
+  gap: 3px;
+}
+.cs-group b {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f2f3f5;
+}
+.cs-group span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #9a9da1;
+}
+
 /* phones */
 @media (max-width: 1150px) and (min-width: 971px) {
+  .cs-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .cc-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -616,6 +880,41 @@ a.ct-card:focus-visible {
   .bc-badge {
     width: 52px;
     height: 52px;
+  }
+  .cs-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cs-clock {
+    gap: 14px;
+    padding: 14px;
+  }
+  .cs-badge {
+    width: 52px;
+    height: 52px;
+    font-size: 15px;
+  }
+  .cs-digits {
+    gap: 6px;
+  }
+  .cs-digits span {
+    padding: 12px 2px 10px;
+    font-size: 9px;
+  }
+  /* rows: the date well + tag on one line, the name and its line under them */
+  .cs-rows li {
+    gap: 10px;
+    padding: 10px;
+  }
+  .cs-rows--dates li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .cs-rows--dates .cs-row-main {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .cs-when {
+    justify-self: start;
+    min-width: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
