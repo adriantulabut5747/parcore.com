@@ -1,0 +1,626 @@
+/* ============================================================
+   CODM TOOLS (Oct 29 2026): the Tools hub (/call-of-duty-mobile/tools), Color Codes and Bot Checker.
+   On top of codm-banner.css (banner, side inset --codm-side, filter recipe). Raised boxes, sunken
+   wells, the picked thing = the grey key, the one main action = the red key (11layout.css --lb-*).
+   ============================================================ */
+.cb-ico svg {
+  width: 50%;
+  height: 50%;
+  fill: none;
+  stroke: #c9cbd0;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* sections: title + quiet line, the CoC tools hub's rhythm */
+.ct-sec {
+  margin: 48px var(--codm-side) 0;
+}
+.ct-sec--last {
+  margin-bottom: 80px;
+}
+.ct-head {
+  margin-bottom: 16px;
+}
+.ct-title {
+  margin: 0;
+  font-family: 'Big Shoulders Stencil Display', 'Oxanium', sans-serif;
+  font-size: clamp(28px, 2.6vw, 38px);
+  font-weight: 800;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #f2f3f5;
+}
+.ct-sub {
+  margin: 6px 0 0;
+  max-width: 64ch;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #9a9da1;
+}
+
+/* ---- Tools hub: tool cards (text left, art in a well on the right) ---- */
+.ct-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.ct-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 14px;
+  min-height: 108px;
+  padding: 16px 16px 16px 18px;
+  color: #fff;
+  text-decoration: none;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  transition: transform 0.25s var(--lb-ease, ease), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+@media (hover: hover) {
+  a.ct-card:hover {
+    transform: translateY(-3px);
+    background: var(--lb-box-hover);
+    box-shadow: var(--lb-shadow-hover);
+  }
+  a.ct-card:hover .ct-art svg {
+    stroke: #f2f3f5;
+  }
+}
+a.ct-card:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.ct-card b {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+/* the blurb only (a bare `.ct-card span` also caught the art well and pushed its icon into a corner) */
+.ct-card b + span {
+  display: block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #a3a5ab;
+}
+.ct-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: var(--lb-r);
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 55%, rgba(194, 59, 59, 0.14), transparent 70%),
+    var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.ct-art svg {
+  width: 46%;
+  height: 46%;
+  fill: none;
+  stroke: #8d8f95;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s ease;
+}
+.ct-tag {
+  position: absolute;
+  top: -9px;
+  left: 14px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #2a2b31;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.ct-card--soon {
+  cursor: default;
+}
+.ct-card--soon b {
+  color: #c9cbd0;
+}
+
+/* ---- Tools hub: outside websites (favicon well, name + domain, one line, the out arrow) ---- */
+.ct-sites {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.ct-site {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  color: #fff;
+  text-decoration: none;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ct-site:hover {
+  background: var(--lb-box-hover);
+  box-shadow: var(--lb-shadow-hover);
+}
+.ct-site:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.ct-fav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.ct-fav img {
+  width: 22px;
+  height: 22px;
+}
+.ct-site b {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+}
+.ct-site small {
+  margin-left: 8px;
+  font-size: 11.5px;
+  color: #7d7f86;
+}
+.ct-site span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: #9a9da1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ct-out {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #7d7f86;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- the "not checked in game yet" note (Color Codes, Bot Checker's example list) ---- */
+.ct-note {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 16px var(--codm-side) 0;
+  padding: 14px 16px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b9bbc0;
+}
+.ct-note b {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(194, 59, 59, 0.16);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--lb-red-text);
+}
+
+/* ---- Color Codes: the generator (inputs left, preview + code right) ---- */
+.cc-gen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  margin: 16px var(--codm-side) 0;
+}
+.cc-box {
+  padding: 18px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.cc-label {
+  display: block;
+  margin: 0 0 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.cc-label + .cc-label,
+.cc-swatches + .cc-label,
+.cc-custom + .cc-label {
+  margin-top: 18px;
+}
+.cc-name {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #fff;
+  caret-color: var(--lb-red);
+  font: 600 15px 'Sora', 'Oxanium', sans-serif;
+  outline: none;
+}
+.cc-name:focus {
+  border-color: #000;
+}
+.cc-swatches {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 18px;
+}
+.cc-sw {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: var(--c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+.cc-sw[aria-pressed='true'] {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.cc-sw:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.cc-custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: #9a9da1;
+}
+.cc-custom[hidden] {
+  display: none;
+}
+.cc-custom input {
+  width: 44px;
+  height: 32px;
+  padding: 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: var(--lb-well);
+  cursor: pointer;
+}
+/* the preview = a dark name plate, the name in the picked colour */
+.cc-plate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border-radius: var(--lb-r);
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.2)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    #121317;
+  box-shadow: var(--lb-ring-well);
+}
+.cc-plate i {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: #2a2b31 url('/icons/codm.png') center / 70% no-repeat;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.06);
+}
+.cc-plate b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--c, #fff);
+}
+.cc-out {
+  display: flex;
+  gap: 8px;
+  margin-top: 0;
+}
+.cc-code {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 14px;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font: 600 14px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #e6e8ec;
+  user-select: all;
+}
+.ct-key {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 18px;
+  border: 2px solid var(--lb-red-edge, var(--lb-edge));
+  border-radius: var(--lb-r);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red, var(--lb-btn));
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.ct-key:hover {
+  background: var(--lb-red-hover, var(--lb-red));
+}
+.ct-key:active {
+  transform: translateY(1px);
+}
+.cc-fmt-note {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #9a9da1;
+}
+/* every colour in the picked format, a click copies */
+.cc-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.cc-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  text-align: left;
+  color: #fff;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.cc-item:hover {
+  background: var(--lb-box-hover);
+}
+.cc-item i {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: var(--c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+}
+.cc-item b {
+  display: block;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f2f3f5; /* white, not the colour: Dark Blue / Dark Red / Black vanished on the dark card */
+}
+.cc-item code {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 11.5px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #9a9da1;
+}
+.cc-item.is-copied code {
+  color: var(--lb-red-text);
+}
+.ct-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: s;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.ct-steps li {
+  counter-increment: s;
+  padding: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b9bbc0;
+}
+.ct-steps li::before {
+  content: counter(s, decimal-leading-zero);
+  display: block;
+  margin-bottom: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--lb-red-text);
+}
+
+/* ---- Bot Checker ---- */
+.bc-find {
+  margin: 16px var(--codm-side) 0;
+}
+.bc-find .lb-search-input {
+  font-family: 'Sora', 'Oxanium', sans-serif;
+}
+.bc-find button.lb-search-btn {
+  padding: 0;
+}
+.bc-result {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  margin: 12px var(--codm-side) 0;
+  padding: 18px 20px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.bc-result[hidden] {
+  display: none;
+}
+.bc-badge {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.bc-badge svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: #8d8f95;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bc-result.is-bot .bc-badge {
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(194, 59, 59, 0.3), transparent 75%), var(--lb-well);
+}
+.bc-result.is-bot .bc-badge svg {
+  stroke: var(--lb-red-text);
+}
+.bc-verdict {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f2f3f5;
+}
+.bc-result.is-bot .bc-verdict {
+  color: var(--lb-red-text);
+}
+.bc-why {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #9a9da1;
+}
+.bc-why q {
+  color: #e6e8ec;
+  quotes: '\201C' '\201D';
+}
+.bc-tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.bc-tips li {
+  padding: 14px 16px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b9bbc0;
+}
+.bc-tips b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f2f3f5;
+}
+
+/* phones */
+@media (max-width: 1150px) and (min-width: 971px) {
+  .cc-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 970px) {
+  .ct-sec {
+    margin-top: 36px;
+  }
+  .ct-sec--last {
+    margin-bottom: 56px;
+  }
+  .ct-grid,
+  .ct-sites,
+  .cc-gen,
+  .ct-steps,
+  .bc-tips {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cc-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cc-box {
+    padding: 14px;
+  }
+  .bc-result {
+    grid-template-columns: 52px minmax(0, 1fr);
+    padding: 14px;
+  }
+  .bc-badge {
+    width: 52px;
+    height: 52px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-card,
+  .ct-site {
+    transition: none;
+  }
+}
