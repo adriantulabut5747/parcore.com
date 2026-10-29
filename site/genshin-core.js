@@ -228,6 +228,43 @@
     );
   });
 
+  // ---- ABYSS FLOOR (Endgame + /genshin-impact/abyss; moved from genshin-endgame.js Oct 27 2026).
+  // One floor of the feed's endgame.abyss: ley line disorders, then its three chambers (star targets,
+  // each half's waves of enemies). Styles: genshin-endgame.css (both pages link it).
+  // "Remaining challenge time longer than (60/180/300) sec." / "Target defense progress greater
+  // than (20/40/60)%." -> one gold chip per star count, each with its own threshold. Any other
+  // wording falls back to the wiki's sentence.
+  function starTargets(t) {
+    const m = t.match(/\((\d+)\/(\d+)\/(\d+)\)\s*(sec|%)/);
+    if (!m) return `<p class="eg-target"><span aria-hidden="true">&#9733;</span>${esc(t)}</p>`;
+    const unit = m[4] === '%' ? '%' : 's';
+    const chip = (n, i) => `<li><span aria-hidden="true">${'&#9733;'.repeat(i + 1)}</span>${n}${unit}</li>`;
+    return `<div class="eg-stars"><span class="gi-label">${unit === '%' ? 'Monolith HP left' : 'Time left'}</span><ul aria-label="${esc(t)}">${[m[1], m[2], m[3]]
+      .map(chip)
+      .join('')}</ul></div>`;
+  }
+  function foe(e, icons) {
+    const pic = icons[e.name] ? `<img src="${esc(icons[e.name])}" alt="" loading="lazy" decoding="async">` : '';
+    return `<figure class="eg-foe" title="${esc(e.name)}"><span class="eg-foe-pic">${pic}${e.n > 1 ? `<b>&times;${e.n}</b>` : ''}</span><figcaption>${esc(e.name)}</figcaption></figure>`;
+  }
+  // A half: its waves left to right, a small arrow between them, then how they spawn (the wiki's note).
+  const half = (label, waves, icons, spawn) =>
+    `<div class="eg-half"><span class="gi-label">${label}</span><div class="eg-waves">${
+      waves.length
+        ? waves.map((w) => `<div class="eg-wave">${w.map((e) => foe(e, icons)).join('')}</div>`).join('<i class="eg-then" aria-hidden="true"></i>')
+        : '<p class="eg-none">Not listed yet.</p>'
+    }</div>${spawn ? `<p class="eg-spawn">${esc(spawn)}</p>` : ''}</div>`;
+  const abyssFloor = (f, icons) => `<div class="eg-floor" data-floor="${f.floor}" role="tabpanel" aria-label="Floor ${f.floor}">
+      <div class="gi-box eg-dis"><span class="gi-label">Ley line disorder</span><ul>${f.disorders.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></div>
+      <div class="eg-chambers">${f.chambers
+        .map(
+          // data-n = the faded numeral; the heat colour per chamber is in genshin-endgame.css.
+          (c, i) => `<article class="gi-box eg-ch" data-n="${['I', 'II', 'III'][i] || ''}"><header><b>Chamber ${i + 1}</b><span>Lv. ${c.level}</span></header>
+        ${starTargets(c.target)}
+        ${half('First half', c.halves[0], icons, (c.spawns || [])[0])}${half('Second half', c.halves[1], icons, (c.spawns || [])[1])}</article>`
+        )
+        .join('')}</div></div>`;
+
   // ---- PLAYER LOOKUP BOX (Lobby + /genshin-impact/player). A UID's first digit is its
   // server; 10-digit UIDs carry it in the second digit. Submit opens the player's page.
   const UID_SERVER = { 1: 'China', 2: 'China', 3: 'China', 5: 'China (B)', 6: 'America', 7: 'Europe', 8: 'Asia', 9: 'TW · HK · MO' };
@@ -501,6 +538,7 @@
     tile,
     elIcon,
     codeRow,
+    abyssFloor,
     TBF,
     SI,
     SUB_ICON,

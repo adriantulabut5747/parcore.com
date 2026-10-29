@@ -571,9 +571,9 @@
       warHead() +
       (note ? '<p class="wp-note">' + note + '</p>' : '') +
       '<section class="am wp-plan" aria-labelledby="wpPlanTitle">' +
-      '<header class="am-head"><div><h2 class="am-title" id="wpPlanTitle">The plan</h2><p class="am-intro">Tap one of your players, then the enemy base they should hit. Tap it again to take it back. ' +
+      '<header class="am-head"><div><h2 class="am-title" id="wpPlanTitle">The plan</h2><div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Tap one of your players, then the enemy base they should hit. Tap it again to take it back. ' +
       (war.apm > 1 ? 'Each player has ' + war.apm + ' attacks.' : 'One attack each in the Clan War League.') +
-      '</p></div><div class="wp-auto" role="group" aria-label="Fill the plan">' +
+      '</p></div></div><div class="wp-auto" role="group" aria-label="Fill the plan">' +
       '<button type="button" class="am-btn" data-auto="best" title="Smallest Town Hall that can take each base, top base first">Best fit</button>' +
       '<button type="button" class="am-btn" data-auto="mirror" title="#1 on #1, #2 on #2 ...">Mirror</button>' +
       '<button type="button" class="am-btn" data-auto="clear">Clear</button>' +
@@ -1087,11 +1087,11 @@
       ).toFixed(1);
     };
     return (
-      '<section class="am wp-lineup" aria-labelledby="wpLineTitle"><header class="am-head"><div><h2 class="am-title" id="wpLineTitle">Line-up</h2><p class="am-intro">Town Halls on each side. Average TH ' +
+      '<section class="am wp-lineup" aria-labelledby="wpLineTitle"><header class="am-head"><div><h2 class="am-title" id="wpLineTitle">Line-up</h2><div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Town Halls on each side. Average TH ' +
       avg(war.us) +
       ' against ' +
       avg(war.them) +
-      '.</p></div></header><div class="am-part"><div class="wp-mix">' +
+      '.</p></div></div></header><div class="am-part"><div class="wp-mix">' +
       ths
         .map(function (t) {
           var x = a[t] || 0;

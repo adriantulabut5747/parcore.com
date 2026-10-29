@@ -1,4 +1,4 @@
-// Genshin Impact -- Farm today (/genshin-impact/farm, Oct 24 2026). Styles: genshin-farm.css.
+// Genshin Impact -- Daily domains (/genshin-impact/farm, Oct 24 2026; "Farm today" until Oct 27). Styles: genshin-farm.css.
 // Data: the feed's `farm` (scripts/genshin-feed.py farm(): per day group, each nation's talent
 // book with its tiers, domain and users, and its weapon material) + /genshin-weapons.json (each
 // weapon's `forge` = [day group 0-2, city, domain], so weapons are matched to their material by
@@ -224,6 +224,13 @@
     }
     out.push(`Rotates in <b data-reset></b>`);
     $('fmFacts').innerHTML = out.map((x) => `<li>${x}</li>`).join('');
+    // Klee's line under the header (Oct 27 2026): today in her voice; with picks, how many of yours can farm.
+    const myToday = mine.size ? chars.filter((c) => mine.has(c.id) && groups.includes(bookOf[c.name].g)).length : 0;
+    $('fmKlee').textContent =
+      t === 'sunday'
+        ? "It's Sunday, so every domain is open! Klee says farm anything you like."
+        : `It's ${DAY[wd]} on ${SERVER[GI.server()]}: ${nb} talent books are open. ` +
+          (mine.size ? `${myToday} of your characters can farm their books today!` : 'Pick your characters and Klee shows who needs them!');
 
     const tw = (wd + 1) % 7;
     const tt = tabOf(tw);
@@ -457,5 +464,6 @@
     })
     .catch(() => {
       $('fmPanels').innerHTML = '<p class="gi-box gi-empty">Couldn’t load the domain schedule right now. Try again in a minute.</p>';
+      $('fmKlee').textContent = "Klee couldn't find the domain schedule. Try again in a minute!";
     });
 })();

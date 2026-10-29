@@ -15,9 +15,9 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css?v=20261026as">
+<link rel="stylesheet" href="/11layout.css?v=20261028my">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
-<link rel="stylesheet" href="/coc-clan-clock.css?v=20261027or">
+<link rel="stylesheet" href="/coc-clan-clock.css?v=20261027perf">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoC Base Layouts, Army Comps &amp; Tools | Clash of Clans | Parchrome</title>
@@ -312,10 +312,9 @@ margin: auto;
   });
 })();
 </script>
-  <link rel="stylesheet" href="/coc-help.css?v=20261027or" />
-  <link rel="stylesheet" href="/coc-more.css?v=20261026hot" />
-  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261027or" />
-  <link rel="stylesheet" href="/tool-cards.css?v=87999251" />
+  <link rel="stylesheet" href="/coc-help.css?v=20261028my" />
+  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261028mx" />
+  <link rel="stylesheet" href="/tool-cards.css?v=6564ab48" />
 </head>
 <body class="coc-home">
 
@@ -632,14 +631,11 @@ Please open this page in Chrome for the best experience.</li><br>
                of the tracker search script (it shares that one's tag rules + API). -->
           <div class="ch-find">
             <form class="ch-find-form" id="chFind" role="search" autocomplete="off" novalidate>
-              <label class="lb-search ch-find-field" for="chFindInput">
+              <div class="lb-search ch-find-field">
                 <span class="ch-find-hash" aria-hidden="true">#</span>
                 <input class="lb-search-input" id="chFindInput" type="text" placeholder="Player tag, e.g. LL9PUCG8V" aria-label="Player tag" maxlength="15" autocapitalize="characters" spellcheck="false" enterkeyhint="search">
-              </label>
-              <button type="submit" class="ch-btn ch-btn-primary ch-find-go">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
-                <span>Search</span>
-              </button>
+                <button type="submit" class="lb-search-btn ch-find-go" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg></button>
+              </div>
             </form>
             <p class="ch-find-status" id="chFindStatus" aria-live="polite"></p>
             <div class="ch-found" id="chFound" aria-live="polite" hidden></div>
@@ -741,7 +737,7 @@ Please open this page in Chrome for the best experience.</li><br>
           </section>
           <script>
           /* RAID CLOCK: one tick a second. A unit that changes replays its drop-in
-             (.is-flip), so the seconds visibly roll. coc-events.js is deferred and
+             (FLIP below), so the seconds visibly roll. coc-events.js is deferred and
              runs before DOMContentLoaded, so window.cocEvent exists by then. */
           (function () {
             var box = document.getElementById('chRaid');
@@ -751,8 +747,16 @@ Please open this page in Chrome for the best experience.</li><br>
             var when = document.getElementById('chRaidWhen');
             var bars = box.querySelectorAll('.ch-raid-days i');
             var DAY = 864e5;
+            // The drop-in runs through el.animate(): the old remove-class / offsetWidth /
+            // add-class restart forced a whole-page style recalc every second (~70 ms on
+            // a phone: the scroll hitched once a second).
+            var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var FLIP = [{ transform: 'translateY(-38%)', opacity: 0, filter: 'blur(2px)' }, { transform: 'none', opacity: 1, filter: 'none' }];
+            var seen = true, lastTarget = 0;
             function pad(n) { return (n < 10 ? '0' : '') + n; }
+            function set(el, t) { if (el.textContent !== t) el.textContent = t; }
             function tick() {
+              if (!seen || document.hidden) return;
               var now = new Date(), r = window.cocEvent('raid', now);
               var s = Math.max(0, Math.floor((r.target - now) / 1000));
               var v = { d: Math.floor(s / 86400), h: pad(Math.floor((s % 86400) / 3600)), m: pad(Math.floor((s % 3600) / 60)), s: pad(s % 60) };
@@ -760,23 +764,30 @@ Please open this page in Chrome for the best experience.</li><br>
                 var el = cells[k], t = String(v[k]);
                 if (el.textContent === t) return;
                 el.textContent = t;
-                el.classList.remove('is-flip');
-                void el.offsetWidth;
-                el.classList.add('is-flip');
+                if (!still) el.animate(FLIP, { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
               });
               box.classList.toggle('is-live', r.active);
-              state.textContent = r.active ? 'Raid ends in' : 'Next raid in';
-              when.textContent = (r.active ? 'Ends ' : 'Starts ') +
-                r.target.toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+              set(state, r.active ? 'Raid ends in' : 'Next raid in');
+              if (+r.target !== lastTarget) {
+                lastTarget = +r.target;
+                set(when, (r.active ? 'Ends ' : 'Starts ') +
+                  r.target.toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }));
+              }
               bars.forEach(function (b, i) {
                 var done = r.active ? (now - r.from - i * DAY) / DAY : 0;
-                b.style.width = (Math.max(0, Math.min(1, done)) * 100).toFixed(2) + '%';
+                var w = (Math.max(0, Math.min(1, done)) * 100).toFixed(2) + '%';
+                if (b.style.width !== w) b.style.width = w;
               });
             }
             document.addEventListener('DOMContentLoaded', function () {
               if (!window.cocEvent) return;
               tick();
               setInterval(tick, 1000);
+              // Off screen nobody sees it: no DOM writes, so scrolling the rest of the page stays still.
+              if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+                seen = es[0].isIntersecting;
+                tick();
+              }).observe(box);
             });
           })();
           </script>
@@ -972,8 +983,9 @@ Please open this page in Chrome for the best experience.</li><br>
 .ch-kicker span:nth-child(2)::before { animation-delay: 1.3s; }
 
 @keyframes ch-dot-pulse {
-  0%, 100% { opacity: 0.55; transform: scale(0.9);  box-shadow: 0 0 4px rgba(194, 59, 59, 0.5); }
-  50%      { opacity: 1;    transform: scale(1.15); box-shadow: 0 0 10px rgba(194, 59, 59, 0.95); }
+  /* no box-shadow here: it would repaint every frame (see cc-dot in coc-clan-clock.css) */
+  0%, 100% { opacity: 0.55; transform: scale(0.9); }
+  50%      { opacity: 1;    transform: scale(1.15); }
 }
 
 /* TITLE ------------------------------------------------------------- */
@@ -1058,26 +1070,15 @@ Please open this page in Chrome for the best experience.</li><br>
 }
 
 /* PLAYER SEARCH (Oct 24 2026) ------------------------------------------
-   The shared sunken well (11layout.css "SUNKEN SEARCH BAR") holding a "#" and
-   the tag, with the red ch-btn-primary key beside it, not inside it -- the
-   Genshin lobby's UID bar. The well matches the key's 48px. */
+   The shared hero search (11layout.css "SUNKEN SEARCH BAR": well + red key inside,
+   Oct 28 2026, same as the home and Genshin heroes) holding a "#" and the tag.
+   Only width and the tag's own type live here. */
 /* 420px (was 520): a tag is 9-10 characters, the field needn't run the column. */
 .ch-find { max-width: 420px; margin-bottom: 34px; }
-.ch-find-form { display: flex; gap: 10px; }
-.ch-find-field {
-  flex: 1;
-  min-width: 0;
-  box-sizing: border-box;
-  height: 48px;
-  padding: 0 16px;
-  gap: 4px;
-}
+.ch-find-field { gap: 4px; }
 .ch-find-hash { font: 800 16px/1 'Orbitron', sans-serif; color: var(--lb-red-text); }
-.ch-find-field .lb-search-input { font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-.ch-find-field .lb-search-input::placeholder { text-transform: none; letter-spacing: 0.2px; font-weight: 600; color: rgba(255, 255, 255, 0.42); }
-.ch-find-go { padding: 0 20px; }
-.ch-find-go svg { width: 15px; height: 15px; }
-.ch-find-go:hover svg { transform: none; }
+.ch-find-field .lb-search-input { text-transform: uppercase; }
+.ch-find-field .lb-search-input::placeholder { text-transform: none; }
 .ch-find-go[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
 .ch-find-status {
   margin: 10px 0 0;
@@ -1239,10 +1240,6 @@ Please open this page in Chrome for the best experience.</li><br>
   font-variant-numeric: tabular-nums;
   color: #d9dce1;
 }
-.ch-raid-u b.is-flip { animation: ch-raid-flip 0.42s var(--lb-ease); }
-@keyframes ch-raid-flip {
-  from { transform: translateY(-38%); opacity: 0; filter: blur(2px); }
-}
 .ch-raid-u small { font: 700 8.5px/1 'Oxanium', sans-serif; letter-spacing: 1.8px; text-transform: uppercase; color: #6f747c; }
 .ch-raid.is-live .ch-raid-u b { color: #fff; text-shadow: 0 0 18px rgba(232, 106, 106, 0.35); }
 .ch-raid-foot {
@@ -1363,7 +1360,6 @@ Please open this page in Chrome for the best experience.</li><br>
   .ch-btn-primary svg,
   .ch-raid-hall,
   .ch-raid-chip::before,
-  .ch-raid-u b.is-flip,
   .ch-card-hot::before,
   .ch-found-card {
     animation: none;
@@ -1773,6 +1769,10 @@ Please open this page in Chrome for the best experience.</li><br>
     gap: 12px;
     max-width: none;
     padding: 10px 10px 10px 12px;
+    /* It sits on the banner's solid dark foot here: the glass blurred nothing
+       and cost the phone a blur pass every scroll frame. */
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   .ch-raid-hall,
   .ch-raid-chip,
@@ -2175,9 +2175,10 @@ function warModalEscHandler(e) {
 <!-- Town Hall + Clash tools cards: shared with /coc/tools/. -->
 <link rel="stylesheet" href="/coc-cards.css?v=20261027or" />
 <!-- Popular Articles strip: shared with every game section. -->
-<link rel="stylesheet" href="/article-cards.css?v=20261026hot3" />
+<link rel="stylesheet" href="/article-cards.css?v=20261027perf" />
 <!-- Most picked equipment + Top players of the week + FAQ (coc-lobby.css). -->
 <link rel="stylesheet" href="/coc-lobby.css?v=20261027or" />
+<link rel="stylesheet" href="/coc-villager.css?v=20261027d" />
 
 <!-- The .ql-wrap "Quality Over Quantity" block that used to sit here (its
      own <style> block plus markup) was merged into the hero section at the
@@ -2312,8 +2313,8 @@ function warModalEscHandler(e) {
         the 80/56px gap under the ticker that .layouts-title-box used to. -->
    <div class="lob-head lob-head--first" id="featured-townhalls">
      <div class="lob-head-text">
-       <h2 class="lob-title">Meta <em>Layouts</em></h2>
-       <p class="lob-sub">Base layouts curated by <strong>Parcore</strong>, former #1 Legend League player in the PH rankings.</p>
+       <h2 class="lob-title">Featured Meta <em>Layouts</em></h2>
+       <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Welcome, Chief! Every base here is picked by Parcore, once the #1 Legend League player in the Philippines.</p></div>
      </div>
    </div>
 
@@ -2923,7 +2924,7 @@ function warModalEscHandler(e) {
     <div class="cl-feature-copy">
       <p class="lb-kicker">Clan tracker</p>
       <h2 class="cl-feature-title">Track any <em>clan</em></h2>
-      <p class="cl-feature-text">Keep your clan&rsquo;s war score on the phone, live from Supercell&rsquo;s API. Search any other in seconds.</p>
+      <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Scout any clan by name or #tag, Chief. Tap Show and its war score stays on the phone, live from Supercell.</p></div>
     </div>
 
     <!-- One raised box: Clan / Player switch, the field + Scout key, the hint,
@@ -3451,6 +3452,7 @@ function warModalEscHandler(e) {
     <div class="lob-head">
       <div class="lob-head-text">
         <h2 class="lob-title" id="ptTitle">Parchrome <em>tools.</em></h2>
+        <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Builder made all of these. Please sign your approval here&hellip; and here&hellip; and here&hellip;</p></div>
       </div>
       <a class="art-all" href="/coc/tools/">Browse all tools<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
@@ -4957,7 +4959,7 @@ function warModalEscHandler(e) {
       <div class="lb-head">
         <p class="lb-kicker" id="hmKicker">Global top 200</p>
         <h2 class="lb-title" id="hmTitle">Most picked equipment <span class="lb-nw">in <em>Legend League</em></span></h2>
-        <p class="lb-text">What the world&rsquo;s 200 highest-ranked players have on each hero this week. Tap an item for its stats.</p>
+        <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>This is what the world&rsquo;s top 200 players put on each hero this week. Tap an item for its stats.</p></div>
       </div>
       <!-- Link + one joined ‹ › control (desktop). Phones: the link sits on
            its own row under the text and the row is swiped. -->
@@ -4987,7 +4989,7 @@ function warModalEscHandler(e) {
       <div class="lb-head">
         <p class="lb-kicker" id="gtKicker">Global top 10</p>
         <h2 class="lb-title" id="gtTitle">Top players <em>of the week</em></h2>
-        <p class="lb-text">The world&rsquo;s ten best as the week&rsquo;s leaderboard closed. Tap a player for their profile.</p>
+        <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-shock.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Whoa&hellip; the world&rsquo;s 10 best when this week&rsquo;s leaderboard closed. Tap a player to see their profile.</p></div>
       </div>
       <a class="art-all" href="/coc/tools/leaderboards?region=global">Full leaderboard<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
@@ -5007,8 +5009,8 @@ function warModalEscHandler(e) {
   <div class="qa-inner">
     <div class="qa-side">
       <p class="lb-kicker lb-kicker--still"><span>Help desk &middot; 9 answers</span></p>
-      <h2 class="lb-title" id="qaTitle">Questions, <em>answered</em></h2>
-      <p class="lb-text">Copying bases, the live tracker, where our numbers come from, and joining Ascendere.</p>
+      <h2 class="lb-title" id="qaTitle">Ask the <em>Villager</em></h2>
+      <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>I can tell you a thing or two, Chief! Don&rsquo;t see your question? Send it with the form.</p></div>
       <div data-feedback></div>
     </div>
 
@@ -5182,11 +5184,11 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js?v=20261026as" defer></script>
+<script src="/11layout.js?v=20261028my" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
-<script src="/coc-events.js?v=20261024cc" defer></script>
+<script src="/coc-events.js?v=20261027perf" defer></script>
 <script>
 // Sidebar logic (normalizePage, buildSidebarFromJSON, toggleSidebar,
 // toggleTripleA, handleDesktopSidebar, etc.), top-bar scrollToTop,
@@ -5533,7 +5535,6 @@ window.addEventListener('popstate', () => {
   100% { background-position: -200% 0; }
 }
 
-
 #page-loader {
   display: flex; /* restored */
 }
@@ -5564,330 +5565,6 @@ window.addEventListener('popstate', () => {
   to { transform: rotate(360deg); }
 }
 
-/* UPDATE (Sep 2026): body scrolling on phones is BACK -- see "Phones scroll
-   the whole page" at the end of <head>. With .coc-main as the scroller the
-   fixed top bars covered its scrollbar; the page's own (window) scrollbar
-   can't be covered. The sidebar/More-sheet/search lock this note worried
-   about is now handled by the script there (pins body with position:fixed,
-   which does stop iOS). Original note, kept for history:
-   Removed: `@media (max-width:970px){ body{ overflow:auto; height:auto } }`.
-   That override let the whole document grow and scroll on mobile, which meant
-   .coc-main was never the scroll container here -- only on th18, where the
-   base `body{height:100vh;overflow:hidden}` in 1coclayouts.css loads after
-   11layout.css and wins the same way this page's own base rule now does.
-   It matters for the sidebar: the scroll lock in 11layout.css is
-   `body.sidebar-open .coc-main{ overflow:hidden }`, so it had nothing to lock
-   on this page, and the `body{overflow:hidden}` half of it does not reliably
-   stop the viewport scrolling on iOS. With this gone the page scrolls through
-   .coc-main exactly as th18 does and the same lock applies. */
-
-/* ============================================================
-   BOTTOM NAV (mobile) + MORE MODAL + DESKTOP SUB NAV
-   ============================================================ */
-
-/* ---- Mobile bottom nav ---- */
-.bn-bar{
-  position:fixed;
-  left:0; right:0; bottom:0;
-  height:60px;
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 6px;
-  z-index:9999;
-  transform:translateY(0);
-  transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change:transform;
-}
-.bn-bar.bn-hidden{
-  transform:translateY(115%);
-  transition:transform .32s cubic-bezier(0.4, 0, 1, 1);
-}
-.bn-item{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  text-decoration:none;
-  color:#7d7f85;
-  font-family:'Sora',sans-serif;        /* Sora, sentence case ("Home") -- matches /coc/town-hall-18/layouts */
-  font-size:10.5px;
-  font-weight:500;
-  letter-spacing:0;
-  transition:color .15s;
-  padding:6px 0;
-}
-.bn-item svg{ width:22px; height:22px; stroke:currentColor; transition:stroke .15s; }
-.bn-item.active,.bn-item:hover{ color:#ffffff; }
-
-.bn-more-wrap{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  position:relative;
-  padding:6px 0;
-}
-.bn-more-spacer{
-  width:22px;
-  height:22px;
-}
-.bn-more{
-  position:absolute;
-  top:-22px;
-  left:50%;
-  transform:translateX(-50%);
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-}
-.bn-more:active{ transform:translateX(-50%) scale(0.92); }
-.bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
-.bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
-.bn-more-label{
-  font-size:10.5px;
-  font-weight:500;
-  letter-spacing:0;
-  color:#7d7f85;
-  font-family:'Sora',sans-serif;
-  transition:color .15s;
-}
-.bn-more-wrap.open .bn-more-label{ color:#e9e9ec; }
-
-/* ---- More modal (bottom sheet) ---- */
-.more-overlay{
-  position:fixed;
-  inset:0;
-  bottom:60px;
-  background:rgba(0,0,0,0.55);
-  backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
-  z-index:9997;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  transition:opacity .28s ease, visibility 0s linear .28s;
-}
-.more-overlay.open{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-  transition:opacity .28s ease, visibility 0s linear 0s;
-}
-.more-sheet{
-  width:100%;
-  max-width:600px;
-  border-radius:20px 20px 0 0;
-  padding:8px 16px 20px;
-  transform:translateY(100%);
-  transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
-  max-height:80vh;
-  overflow-y:auto;
-}
-.more-overlay.open .more-sheet{ transform:translateY(0); }
-.more-sheet.dragging{ transition:none; }
-
-/* The pinned sheet header lives in 11layout.css now. */
-
-.more-sheet-handle{
-  width:36px; height:4px; border-radius:4px;
-  background:#3a3a3e;
-  margin:6px auto 10px;
-  position:relative;
-  touch-action:none;
-  cursor:grab;
-}
-.more-sheet-handle::before{
-  content:'';
-  position:absolute;
-  top:-14px; left:-30px; right:-30px; bottom:-14px;
-}
-.more-sheet-handle:active{ cursor:grabbing; }
-.more-sheet-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding-bottom:8px;
-  margin-bottom:4px;
-  border-bottom:1px solid #232326;
-}
-.more-sheet-title{
-  font-family:'Oxanium',sans-serif;
-  font-size:13px;
-  font-weight:800;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  color:#fff;
-  position:relative;
-  padding-left:12px;
-}
-.more-sheet-title::before{
-  content:"";
-  position:absolute;
-  left:0; top:50%;
-  transform:translateY(-50%);
-  width:4px; height:14px;
-  background:linear-gradient(180deg,#ff4655,#a3121f);
-  border-radius:2px;
-}
-.more-sheet-close{
-  width:30px; height:30px;
-  display:flex; align-items:center; justify-content:center;
-  color:#9a9ba1;
-  cursor:pointer;
-  transition:color .15s, border-color .15s, background .15s;
-}
-.more-sheet-close svg{ width:14px; height:14px; }
-.more-sheet-close:hover{ color:#fff;}
-.more-list{
-  display:flex;
-  flex-direction:column;
-}
-.more-row{
-  /* Sits inside the same rounded card as .th-mini rows now, so the old
-     negative margin / own radius / own border-top are gone -- the shared
-     :not(:first-child) hairline above draws the dividers instead. */
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:11px 12px;
-  text-decoration:none;
-  transition:background .15s;
-}
-
-.more-row:hover{ background:rgba(255,255,255,0.035); }
-
-/* Match .th-mini's icon treatment so guide rows and town-hall rows read as
-   one list. */
-.more-row img{
-  width:34px;
-  height:34px;
-  padding:7px;
-  box-sizing:border-box;
-  object-fit:contain;
-  border-radius:9px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);
-  flex-shrink:0;
-}
-.more-row:first-child{ border-top:none; }
-.more-row:hover, .more-row:active{ background:rgba(255,255,255,0.035); }
-.more-row.active{ background:rgba(255,255,255,0.035); }
-.more-row.active::before{
-  content:"";
-  position:absolute;
-  left:-6px; top:8px; bottom:8px;
-  width:3px;
-  border-radius:2px;
-  background:linear-gradient(180deg,#ff4655,#a3121f);
-}
-.more-row.active .more-row-icon::before{ background:#3a3a3e; }
-.more-row.active .more-row-icon::after{ background:#232326; }
-.more-row.active .more-row-icon svg{ stroke:#fff; color:#fff; }
-.more-row.active .more-row-title{ color:#fff; }
-.more-row-icon{
-  position:relative;
-  isolation:isolate;
-  flex-shrink:0;
-  width:42px; height:42px;
-  display:flex; align-items:center; justify-content:center;
-  clip-path:polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
-  transition:transform .15s;
-}
-.more-row-icon::before{
-  content:"";
-  position:absolute; inset:0; z-index:-2;
-  clip-path:polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
-  background:#2a2a2e;
-}
-.more-row-icon::after{
-  content:"";
-  position:absolute; inset:1.3px; z-index:-1;
-  clip-path:polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
-  background:#1c1c1f;
-  transition:background .15s;
-}
-.more-row-icon svg{ width:18px; height:18px; stroke:#c8cbcd; color:#c8cbcd; transition:stroke .15s, color .15s; }
-.more-row:hover .more-row-icon::before{ background:#3a3a3e; }
-.more-row:hover .more-row-icon::after{ background:#232326; }
-.more-row:hover .more-row-icon svg{ stroke:#fff; color:#fff; }
-.more-row-text{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  flex:1 1 auto;
-  min-width:0;
-}
-.more-row-title{
-  font-family:'Oxanium',sans-serif;
-  font-size:13.5px;
-  font-weight:700;
-  letter-spacing:0.3px;
-  color:#eff2f5;
-}
-
-
-/* 11layout.css gives .secondary-left `flex: 1 1 auto` so a long page title can
-   grow and then truncate. hwr gets away with it because its chip strip also
-   carries `flex: 1 1 0` and competes for the space. Here the nav group is a
-   fixed-width set of chips, so an unopposed growing title shoved it to the far
-   right. Dropping grow (keeping shrink, so the ellipsis still works) lets the
-   title stay its natural width with the divider and chips right beside it. */
-.secondary-top-bar .secondary-left{ flex:0 1 auto; }
-
-/* Copied verbatim from hwr-css.css's .stb-divider -- these pages do not load
-   hwr-css.css, so the rule has to exist here for the same look. Separates the
-   page title from the nav chips inside .secondary-top-bar. */
-.stb-divider{
-  width:1px;
-  height:24px;
-  margin:0 16px;
-  flex-shrink:0;
-  background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.2) 20%, rgba(255,255,255,0.2) 80%, transparent 100%);
-}
-
-/* Same hairline, used a second time -- sits between .stb-dsn-wrap and
-   .stb-hub-nav, dividing the dsn-chip row (Town Halls, far left) from the
-   stb-hub-link row (Home/Layouts/Armies/Guides, far right), same as hwr's
-   .stb-divider-end. Identical look to .stb-divider, just a different hook
-   so each can be targeted/hidden independently if needed later. */
-.stb-divider-end{
-  width:1px;
-  height:24px;
-  margin:0 16px;
-  flex-shrink:0;
-  background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.2) 20%, rgba(255,255,255,0.2) 80%, transparent 100%);
-}
-
-/* th-icon (the small game icon next to the "Clash of Clans" title) ships
-   at 32px/20px in 11layout.css -- overlapping it here rather than editing
-   that shared file. Same specificity, later in the cascade, so this wins. */
-.th-icon{ width:22px; height:22px; }
-@media (max-width:970px){
-  .th-icon{ width:16px; height:16px; }
-}
-
-/* Page label ("Clash of Clans") in Sora 500, matching
-   /web-resources/ -- its label renders in Sora because the inner
-   .secondary-content-desktop span sets it, even though hwr-css.css puts
-   Oxanium on the wrapper. Two classes to outrank 11layout.css's mobile
-   ".secondary-content { font-family:'Oxanium' }". Same rule as
-   /coc/town-hall-18/layouts. */
-.secondary-top-bar .secondary-content{ font-family:'Sora', sans-serif; font-weight:500; }
-
 /* ---- Desktop secondary nav (below secondary-top-bar) ----
    Redesigned: the old .desktop-sub-nav (Home/Layouts/Armies/Guides links,
    each with a hover dropdown of dsn-mini/dsn-guide-box tiles) is gone.
@@ -5895,363 +5572,14 @@ window.addEventListener('popstate', () => {
    .stb-dsn-wrap (dsn-chip Town Hall row) + .stb-hub-nav (stb-hub-link
    Home/Layouts/Armies/Guides row) -- styled entirely by 11layout.css.
    No dropdown-specific CSS needed here any more. */
-/* Town Hall chip icons: 18px, up from 11layout.css's 14px (same rule as
-   th-layouts.css; not in 11layout.css because hwr shares that file). */
-.stb-dsn-wrap .dsn-chip-icon{ width:18px; height:18px; }
+
 @media (max-width:970px){
-  .bn-bar{ display:flex; }
-  .stb-divider-end{ display:none !important; }
+
   .coc-main{ padding-bottom:76px; }
-}
-@media (min-width:971px){
-  .bn-bar{ display:none !important; }
-  .more-overlay{ bottom:0; }
 }
 
 /* Lock body scroll when More menu sheet is open */
 html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%; }
-
-/* ---- More modal: section titles / townhall grid / guide rows ---- */
-/* MORE-SHEET ACCORDION ------------------------------------------------
-   Same behaviour as hwr's .th-mini-wrap / .th-mini-dropdown (hwr-css.css):
-   the section matching the current page starts open, the rest collapsed.
-   The collapse is hwr's exact mechanism -- grid-template-rows 0fr -> 1fr
-   with an overflow:hidden inner -- which animates to the content's real
-   height without hardcoding one. Rules are duplicated here because these
-   pages do not load hwr-css.css. */
-.more-acc-toggle{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  width:100%;
-  background:transparent;
-  border:none;
-  border-top:1px solid #202023;
-  margin-top:3px;
-  padding:9px 6px 5px;
-  cursor:pointer;
-  text-align:left;
-  -webkit-tap-highlight-color:transparent;
-}
-.more-acc:first-child .more-acc-toggle{ border-top:none; margin-top:0; }
-
-/* Guides no longer collapses -- there's nothing to click, so no pointer
-   cursor and no hover feedback that would promise an interaction it doesn't
-   have. */
-.more-acc-toggle.more-acc-static{ cursor:default; }
-.more-acc-static:hover .more-acc-title{ color:#9a9ba1; }
-
-/* Matches .more-section-title, which these rows replace. */
-.more-acc-title{
-  font-family:'Oxanium',sans-serif;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  color:#9a9ba1;
-}
-
-.more-acc-chevron{
-  width:14px;
-  height:14px;
-  flex-shrink:0;
-  color:#54565b;
-  transition:transform .15s, color .15s;
-}
-.more-acc.open .more-acc-chevron{ transform:rotate(90deg); color:#9a9ba1; }
-.more-acc-toggle:hover .more-acc-title{ color:#d7d8db; }
-
-.more-acc-panel{
-  display:grid;
-  grid-template-rows:0fr;
-  transition:grid-template-rows .25s ease;
-}
-.more-acc.open .more-acc-panel{ grid-template-rows:1fr; }
-.more-acc-inner{ overflow:hidden; }
-
-@media (prefers-reduced-motion: reduce){
-  .more-acc-panel{ transition:none; }
-}
-
-.more-section-title{
-  font-family:'Oxanium',sans-serif;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  color:#9a9ba1;
-  padding:9px 6px 5px;
-  border-top:1px solid #202023;
-  margin-top:3px;
-}
-.more-list > .more-section-title:first-child{
-  border-top:none;
-  margin-top:0;
-  padding-top:0;
-}
-/* TOWN HALLS ------------------------------------------------------------
-   Two aligned lists -- Layouts left, Armies right, row for row.
-
-   Rebuilt for calm and density. The previous version stacked three frames
-   on top of each other: a bordered card per column, a bordered tile behind
-   every icon, and a hairline per row -- around 46 competing edges on one
-   screen for 22 links. This version draws almost nothing: no cards, no icon
-   chrome, one rule between the columns, and inset separators between rows
-   (the pattern dense system lists use). The only colour on screen is the
-   town-hall art itself; every surface and every state here is neutral. */
-.th-cols{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0;
-  align-items:start;
-}
-
-.th-col{ min-width:0; padding-right:11px; }
-.th-col + .th-col{
-  padding-right:0;
-  padding-left:11px;
-  border-left:1px solid rgba(255,255,255,0.07);
-}
-
-/* The heading still names the column for screen readers, and it is what the
-   row-suffix labeller in 11layout.js reads to build "TH18 Layouts". It is
-   hidden visually because every row now states its own kind -- showing it
-   too printed the same word twice, eleven times per column. */
-.th-col-head{
-  position:absolute;
-  width:1px;
-  height:1px;
-  padding:0;
-  margin:-1px;
-  overflow:hidden;
-  clip:rect(0 0 0 0);
-  white-space:nowrap;
-  border:0;
-}
-
-/* No card -- rows sit directly on the sheet. */
-.th-cols .th-mini-grid{
-  display:flex;
-  flex-direction:column;
-  background:none;
-  border:none;
-  border-radius:0;
-  margin-bottom:0;
-  overflow:visible;
-}
-
-.th-cols .th-mini{
-  position:relative;
-  gap:10px;
-  padding:0 8px;
-  min-height:44px;            /* WCAG 2.5.5 target size */
-  border-radius:8px;
-  border-top:none;
-}
-
-/* Separator inset to where the label starts, so the icons read as one clean
-   column instead of being sliced across by every rule. */
-.th-cols .th-mini + .th-mini::before{
-  content:"";
-  position:absolute;
-  left:36px;
-  right:0;
-  top:0;
-  height:1px;
-  background:rgba(255,255,255,0.055);
-}
-
-/* Icon: the artwork on its own. The tile it used to sit in added a second
-   frame around something that is already a self-contained image. */
-.th-cols .th-mini img{
-  width:26px;
-  height:26px;
-  padding:0;
-  background:none;
-  border:none;
-  border-radius:0;
-}
-
-/* Two-part label. The town-hall number is the thing you scan for, so it
-   carries the weight; the kind is context and steps back. Same information,
-   a lot less shouting. */
-.th-cols .th-mini span{
-  font-family:'Sora',sans-serif;
-  font-size:13px;
-  font-weight:600;
-  letter-spacing:0.1px;
-  color:#e6e8ea;
-}
-/* Needs to outrank `.th-cols .th-mini span` above (0,2,1) -- matching on
-   the element as well as the class gets this to (0,3,1). */
-.th-cols .th-mini span.th-kind{
-  font-size:12px;
-  font-weight:500;
-  color:#9a9ea4;
-}
-
-.th-cols .th-mini:hover{ background:rgba(255,255,255,0.045); }
-
-/* Current page: a quiet neutral fill. No accent colour -- the sheet has one
-   job here and it is not decoration. */
-.th-cols .th-mini.active{ background:rgba(255,255,255,0.07); }
-.th-cols .th-mini.active span{ color:#fff; }
-.th-cols .th-mini.active span.th-kind{ color:#c8cbcd; font-weight:500; }
-.th-cols .th-mini.active img{ background:none; border:none; }
-
-/* Keyboard focus has to be visible on its own, not only through :hover. */
-.th-cols .th-mini:focus-visible{
-  outline:2px solid rgba(255,255,255,0.55);
-  outline-offset:-2px;
-}
-
-.th-cols .th-mini::after{ display:none; }
-
-/* The base rule below (`.th-mini-grid > .th-mini:not(:first-child)`, three
-   classes) outranks `.th-cols .th-mini{ border-top:none }` (two classes), so
-   its full-width border-top was still drawing underneath the inset ::before
-   separator above -- two rules stacked from x:36 to the right edge and none
-   from 0 to 36, which is what read as "thicker on the right, thin on the
-   left". Matching one class deeper here (four classes) wins outright and
-   leaves only the single inset hairline. */
-.th-cols .th-mini-grid > .th-mini:not(:first-child){ border-top:none; }
-
-@media (max-width:360px){
-  /* Two icon+label columns stop fitting; stack them with the rule turned
-     horizontal so the grouping still reads. */
-  .th-cols{ grid-template-columns:1fr; }
-  .th-col{ padding-right:0; }
-  .th-col + .th-col{
-    padding-left:0;
-    border-left:none;
-    border-top:1px solid rgba(255,255,255,0.07);
-    margin-top:16px;
-    padding-top:16px;
-  }
-}
-
-.th-mini-grid{
-  /* One card per row, exactly as hwr's More sheet renders its categories
-     (.th-mini-grid in hwr-css.css). Was a 4-column tile grid. The whole list
-     is one rounded, bordered card and each row is a divider apart. */
-  display:flex;
-  flex-direction:column;
-  margin-bottom:6px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.06);
-  background:rgba(255,255,255,0.015);
-  overflow:hidden;
-}
-.th-mini{
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:11px 12px;
-  background:transparent;
-  text-decoration:none;
-  transition:background .15s;
-}
-
-/* Rows after the first get a hairline, same as hwr's
-   .th-mini-wrap:not(:first-child). */
-.th-mini-grid > .th-mini:not(:first-child),
-.more-guides-list > .more-row:not(:first-child){
-  border-top:1px solid rgba(255,255,255,0.055);
-}
-
-.th-mini:hover{ background:rgba(255,255,255,0.035); }
-
-/* hwr puts a chevron on every row. Drawn here instead of added to the markup
-   so it applies to both the runtime-generated rows (th18) and the hardcoded
-   ones (coc-home) without touching either. Guides rows used to get this
-   pseudo-chevron on top of their own inline <svg class="more-row-chevron">,
-   drawing two right-pointing arrows per row -- removed there, kept here. */
-.th-mini::after{
-  content:"";
-  width:7px;
-  height:7px;
-  flex-shrink:0;
-  margin-left:auto;
-  border-right:2px solid #54565b;
-  border-top:2px solid #54565b;
-  transform:rotate(45deg);
-}
-.th-mini:hover{ background:#212124; border-color:#323238; }
-.th-mini img{
-  width:34px;
-  height:34px;
-  padding:7px;
-  box-sizing:border-box;
-  object-fit:contain;
-  border-radius:9px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);
-  flex-shrink:0;
-}
-.th-mini span{
-  font-family:'Sora',sans-serif;
-  font-size:13.5px;
-  font-weight:600;
-  letter-spacing:0.1px;
-  line-height:1.2;
-  color:#c8cbcd;
-  flex:1;
-  min-width:0;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-/* Remaining active-row treatment from hwr: the icon tile brightens and the
-   chevron lightens, so the whole row reads as one selected bar. */
-.th-mini.active img{
-  background:rgba(255,255,255,0.07);
-  border-color:rgba(255,255,255,0.18);
-}
-.th-mini.active::after{ border-color:#c8cbcd; }
-
-/* Two per row. One full-width row per guide left a lot of dead space
-   beside four short labels, and pushed the list well below the fold. */
-.more-guides-list{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  padding:8px;
-  margin-bottom:6px;
-}
-.more-guides-list .more-row{
-  padding:10px 10px;
-  gap:10px;
-  min-height:56px;
-  margin:0;
-  border-top:none;
-  border-radius:8px;
-  background:#1b1b1e;
-  border:1px solid #26262a;
-}
-.more-guides-list .more-row:hover{
-  background:#212124;
-}
-.more-guides-list .more-row-icon{
-  width:40px;
-  height:40px;
-}
-
-/* The artwork was rendering at 6px. `.more-row img` sets padding:7px, a 1px
-   border and box-sizing:border-box to give TOWN-HALL rows their tile look --
-   but guide icons already sit inside .more-row-icon, which draws that tile
-   itself. So the padding+border ate the box from both sides: a 22px img was
-   22 - 14 - 2 = 6px of visible icon (and 2px back when it was 18px). The
-   tile belongs to the wrapper, so the image inside it gets none of that. */
-.more-guides-list .more-row-icon img{
-  width:26px;
-  height:26px;
-  padding:0;
-  border:none;
-  background:none;
-  border-radius:0;
-}
 
 /* ============================================================
    NOTHING BEHIND THE BARS BUT THE PAGE ITSELF
@@ -6265,15 +5593,10 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
    and gives that 52px back as padding, so the area behind both bars is the
    page itself and there is no seam. Resting positions are unchanged.
 
-   The sidebar took its offset from .main's margin, so it carries it itself
-   at desktop widths; on mobile it is a fixed drawer with its own top:52px. */
+   The sidebar's look and offset are 11layout.css's alone. */
 .main{ margin-top: 0; }
 
 .coc-main{ padding-top: var(--topbar-height, 52px); }
-
-@media (min-width: 971px){
-  .sidebar{ margin-top: var(--topbar-height, 40px); }
-}
 
 /* Desktop bar: the shared ONE DESKTOP BAR block in 11layout.css. */
 </style>
@@ -6295,7 +5618,7 @@ html.no-scroll, html.no-scroll body { overflow: hidden !important; height: 100%;
         <!-- More sheet body (redesigned Oct 2026). Each Town Hall once, as a
              tile; the Layouts / Armies switch decides where the tiles go
              (coc-more.js; starts on whichever section this page is in). The
-             old two-column list repeated every TH twice. Styles: coc-more.css. -->
+             old two-column list repeated every TH twice. Styles: 11layout.css "MORE SHEET". -->
         <section class="mx-sec" aria-labelledby="mxThLabel">
           <div class="mx-head">
             <h3 class="mx-label" id="mxThLabel">Town Halls</h3>
@@ -6566,9 +5889,9 @@ function cocPagePath(u) {
     if (svg) svg.outerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5.5\"/><path d=\"M12 7.7v.1\"/></svg>';
   });
   </script>
-  <script src="/coc-more.js?v=20261026hot" defer></script>
+  <script src="/coc-more.js?v=20261028my" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
-  <script src="/tool-cards.js?v=87999251" defer></script>
+  <script src="/tool-cards.js?v=6564ab48" defer></script>
 <style>
 /* ONE SPACING RHYTHM (Oct 2026, Adrian's pick). Every lobby section, from
    the Town Halls down to the clan card, gets the same --sy top and bottom.
@@ -6631,6 +5954,35 @@ html body.coc-home .gt-top { align-items: center; }
   html body.coc-home .clan-title,
   html body.coc-home .cc-label { letter-spacing: 0; }
   html body.coc-home .pt-band .lob-head { flex-direction: row; justify-content: space-between; gap: 12px; }
+}
+
+/* HEADING RHYTHM, phones (Oct 27 2026, Adrian): every section head below the
+   hero uses the same four gaps, whichever heading recipe it wears (.lob-*,
+   .lb-*, .cl-feature-*, the Live band). Desktop is untouched. */
+@media (max-width: 970px) {
+  .coc-main { --h-kick: 12px; --h-sub: 10px; --h-link: 16px; --h-box: 24px; }
+  /* kicker -> title */
+  html body.coc-home .lb-kicker { margin-bottom: var(--h-kick); }
+  html body.coc-home .t18-band-head { gap: var(--h-kick); }
+  /* title -> subtitle (Equipment has none: its title margin collapses into the link's) */
+  html body.coc-home .lob-head-text { gap: var(--h-sub); }
+  html body.coc-home .lb-title,
+  html body.coc-home .cl-feature-title { margin-bottom: var(--h-sub); }
+  /* text -> the link / chip under it */
+  html body.coc-home .hm-actions,
+  html body.coc-home .gt-top .art-all { margin-top: var(--h-link); }
+  html body.coc-home .t18-band .cc-label-row { gap: var(--h-link); margin-bottom: var(--h-box); }
+  /* heading -> first box (.lob-head is already 24px in coc-hub-menus.css) */
+  html body.coc-home .gt-top { margin-bottom: var(--h-box); }
+  html body.coc-home .qa-list { margin-top: var(--h-box); }
+  html body.coc-home .cl-feature-device { margin-top: var(--h-box); }
+  /* The heroes' head room: 100px still fits the tallest action pose (97px
+     above its card) and puts the standing heroes ~24px under the link. */
+  html body.coc-home .hm-grid { padding-top: 100px; }
+  /* Subtitles break into even lines at any phone width (no lone last word). */
+  html body.coc-home .lob-sub,
+  html body.coc-home .cl-feature-text,
+  html body.coc-home .lb-text { text-wrap: balance; }
 }
 </style>
 </body>

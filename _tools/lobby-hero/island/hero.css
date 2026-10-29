@@ -1,0 +1,150 @@
+/* ============================================================
+   MINECRAFT LOBBY (/minecraft/, Oct 28 2026 rebuild). Linked after mc-hero.css, lobby only.
+   Guide = Wandy T., a wandering trader (Adrian: never "Villager" / "Wandering Trader").
+   ============================================================ */
+
+/* ---------- HERO: sunset photo backdrop, the live 3D island (mc-lobby-hero.js), copy on the left ---------- */
+.ml-hero {
+  --ml-h: clamp(620px, calc(100vh - 64px), 880px);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: var(--ml-h);
+  display: flex;
+  align-items: center;
+  background: #08080b;
+}
+/* the backdrop: Adrian's Hardcore Parcore at sunset, pre-blurred (_tools/lobby-hero/bg.py) so the island floats in
+   front of it; a warm glow where the sun sits behind the island */
+.ml-sky {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background:
+    radial-gradient(50% 50% at 70% 45%, rgba(255, 170, 90, 0.18), transparent 70%),
+    url('/images/minecraft/lobby/hero-bg.webp') 70% 40% / cover no-repeat,
+    #2a1e12;
+}
+.ml-poster,
+.ml-scene {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+}
+.ml-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 50%;
+}
+.ml-scene {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.ml-hero.is-3d .ml-scene { opacity: 1; }
+.ml-hero.is-3d .ml-poster { opacity: 0; transition: opacity 0.9s ease; }
+/* legibility: the copy side darkens, the foot fades into the page */
+.ml-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(8, 8, 11, 0.5) 0%, rgba(8, 8, 11, 0.22) 34%, transparent 58%),
+    linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0) 22%);
+}
+.ml-hero-inner {
+  position: relative;
+  width: 100%;
+  padding-top: 72px;
+  padding-bottom: 72px;
+  box-sizing: border-box;
+}
+.ml-copy { max-width: 520px; }
+.ml-title {
+  margin: 16px 0 0;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: clamp(34px, 3.7vw, 60px); /* = .mch-hero-title */
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+  text-wrap: balance;
+}
+
+/* the title screen: splash text, Wandy in chat, the menu buttons, the versions in the corners */
+.ml-logo { position: relative; display: inline-block; max-width: 100%; }
+.ml-title { margin: 0; }
+/* the game's splash: yellow, tilted -20deg, pulsing twice a second (TitleScreen: 1.8 - |sin| * 0.1) */
+.ml-splash { position: absolute; right: -44px; bottom: 26px; overflow: visible; transform: rotate(-20deg); animation: ml-splash 0.5s ease-in-out infinite; pointer-events: none; }
+@keyframes ml-splash { 50% { transform: rotate(-20deg) scale(0.945); } }
+/* chat: the game's half-black strip, a fixed width like the chat box */
+.ml-chat { width: 400px; max-width: 100%; box-sizing: border-box; margin: 30px 0 0; padding: 4px 6px; background: rgba(0, 0, 0, 0.5); }
+#mlLine { transition: opacity 0.22s ease; }
+#mlLine.is-out { opacity: 0; }
+.ml-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 400px; max-width: 100%; margin-top: 22px; }
+.ml-menu .mcb { display: grid; }
+.ml-menu-wide { grid-column: 1 / -1; }
+.ml-corner { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; pointer-events: none; }
+.ml-corner > * { pointer-events: auto; }
+/* the button shrinks to its text, which the game-font drawer measures: so it gets a width, text right-aligned */
+.ml-corner-r { width: 480px; max-width: 100%; padding: 0; border: 0; background: none; cursor: pointer; opacity: 0.8; }
+.ml-corner-r canvas { margin-left: auto; }
+.ml-corner-r:hover { opacity: 1; }
+.ml-corner-r:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* phones: the island on top as a scene, the copy under it on the dark ground */
+@media (max-width: 970px) {
+  .ml-hero {
+    --ml-scene-h: min(112vw, 460px);
+    display: block;
+    min-height: 0;
+    margin-top: 32px; /* the secondary bar overlaps the top of .coc-main (= .mch-hero) */
+  }
+  .ml-poster,
+  .ml-scene { bottom: auto; height: var(--ml-scene-h); }
+  .ml-sky { bottom: auto; height: calc(var(--ml-scene-h) + 40px); }
+  .ml-hero::after { background: linear-gradient(0deg, #0a0a0b calc(100% - var(--ml-scene-h)), rgba(10, 10, 11, 0) calc(100% - var(--ml-scene-h) + 90px)); }
+  .ml-hero-inner { padding-top: calc(var(--ml-scene-h) - 70px); padding-bottom: 0; }
+  .ml-copy { max-width: none; }
+  .ml-title { font-size: clamp(26px, 7.4vw, 38px); }
+  .ml-splash { right: 0; bottom: auto; top: -34px; }
+  .ml-chat { width: 100%; margin-top: 34px; }
+  .ml-menu { width: 100%; }
+  .ml-corner { position: static; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 22px; }
+  .ml-corner-r { width: 100%; text-align: left; }
+  .ml-corner-r canvas { margin-left: 0; }
+  .ml-hero { padding-bottom: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-scene, .ml-hero.is-3d .ml-poster, #mlLine { transition: none; }
+  .ml-splash { animation: none; }
+}
+
+
+/* ============================================================
+   SECTIONS UNDER THE HERO (Oct 28 2026, round 2). Adrian: every section a real Minecraft screen, not
+   cards. Sprites = the 26.3 jar's own (minecrafticons/gui/lobby/), drawn at GUI scale 2 (one texture
+   pixel = 2 CSS px), always pixelated. Text in .mcf is redrawn in the game font by mc-lobby.js.
+   ============================================================ */
+:root { --G: url('/minecrafticons/gui/lobby/'); }
+.ml-hero ~ .mch-ch img[src*='/gui/lobby/'], .mcb, .mct, .ml-tip, .ml-mapitem, .rs, .bk-page, .bk-turn, .ln-side img { image-rendering: pixelated; }
+
+/* ---------- TITLES: Handjet (Adrian's pick, Oct 28 2026), lobby only ---------- */
+html body .ml-hero .ml-title { font-family: 'Handjet', sans-serif !important; font-size: clamp(46px, 5vw, 84px); font-weight: 800; line-height: 0.92; letter-spacing: 0.005em; }
+html body .mch .mch-sec-title, html body .mch .lob-title { font-family: 'Handjet', sans-serif !important; font-size: calc(var(--fs-title) * 1.4); font-weight: 800; line-height: 1; letter-spacing: 0.01em; }
+html body .mch .mch-sec-title em, html body .mch .lob-title em { font-family: inherit !important; }
+
+.mch-ch.ml-band { padding: 8px 0 40px; border: 0; }
+.mch-ch.ml-band .mch-frame > .mch-sec:first-of-type { margin-top: 56px; }
+#ch-map .mch-frame > .mch-sec:first-of-type { margin-top: 72px; }
+.mch-ch.ml-strip { padding: 4px 0 56px; }
+.mch-ch.ml-strip .mch-frame > .mch-sec:first-of-type { margin-top: 48px; }
+.ml-band .mch-sec-head, .ml-strip .mch-sec-head { align-items: flex-end; }
+
+/* Wandy's line under a title (the hero's dialogue box, small) */

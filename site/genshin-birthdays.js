@@ -93,6 +93,10 @@
       `Busiest <b>${MONTH[busiest.i]}</b>(${busiest.list.length})`,
     ];
     $('bdFacts').innerHTML = out.map((x) => `<li>${x}</li>`).join('');
+    // Klee's line under the header (Oct 27 2026): today's birthday, or who's next.
+    $('bdKlee').textContent = todays.length
+      ? `Happy birthday, ${todays.map((x) => x.c.name).join(' and ')}! Klee is throwing a party!`
+      : `${next.c.name}'s birthday is ${next.n === 1 ? 'tomorrow' : 'in ' + next.n + ' days'}! Klee is already making a card.`;
   }
   let monthCache = null;
   function months() {
@@ -437,7 +441,7 @@
     const ga = at(gap.a);
     const gb = at(gap.b);
     const lonely = YEAR - days.length;
-    // Yours (Farm today's picks).
+    // Yours (Daily domains' picks).
     const my = upcoming().filter((x) => mine.has(x.c.id));
     const yours = my.length
       ? `<ul class="bd-f-mine">${my
@@ -447,7 +451,7 @@
               `<li>${face(c)}<span><b>${esc(c.name)}</b><small>${dateText(c)}</small></span><em>${n === 0 ? 'Today' : n + 'd'}</em></li>`,
           )
           .join('')}</ul>${my.length > 6 ? `<p class="bd-f-more">+${my.length - 6} more on the calendar (Yours filter).</p>` : ''}`
-      : `<p class="bd-f-none">Pick the characters you play on <a href="/genshin-impact/farm">Farm today</a> and their birthdays show up here, in the calendar and in your calendar file.</p>`;
+      : `<p class="bd-f-none">Pick the characters you play on <a href="/genshin-impact/farm">Daily domains</a> and their birthdays show up here, in the calendar and in your calendar file.</p>`;
     $('bdFactGrid').innerHTML = `
       <div class="gi-box bd-f bd-f--months"><span class="gi-label">Birthdays per month</span><ol class="bd-bars">${bars}</ol><p>${MONTH[mm.find((x) => x.list.length === max).i]} is the busiest with ${max}; ${mm
         .filter((x) => x.list.length === min)
@@ -685,5 +689,6 @@
     })
     .catch(() => {
       $('bdSpot').innerHTML = '<p class="gi-empty">Couldn’t load the birthdays right now. Try again in a minute.</p>';
+      $('bdKlee').textContent = "Klee couldn't find the birthdays. Try again in a minute!";
     });
 })();

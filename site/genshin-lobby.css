@@ -4,21 +4,6 @@
    Data: /genshin-feed.json. Behaviour: genshin-lobby.js.
    ============================================================ */
 
-/* Elemental reactions sits under the tall wish card: more room above it (Adrian). */
-#reactions { padding-top: 112px; }
-@media (max-width: 970px) {
-  #reactions { padding-top: 80px; }
-}
-
-/* Phones (Adrian): Current banners first, then the Endgame box, then reactions. The three
-   share one .gi-frame, so it becomes a flex column and `order` swaps them; markup stays
-   desktop order. The Endgame box takes a normal section gap once it's under the card. */
-@media (max-width: 970px) {
-  .gi-frame:has(> #endgame) { display: flex; flex-direction: column; }
-  #endgame { order: 1; padding-top: 48px; }
-  #reactions { order: 2; }
-}
-
 /* PHONE SIDES (Oct 23 2026, Adrian): the lobby uses /coc/'s phone inset (5% of the
    screen), not the 10px genshin.css gives the other Genshin pages. vw, not %: the
    hero's --ir calc and nested paddings would read a % against other boxes. */
@@ -29,15 +14,26 @@
 /* ---- HERO v5 (Oct 22 2026): Klee's campfire, one fixed picture -----------
    images/genshin/art/klee-campfire.webp (1298x736 = 1.7636:1), drawn at the
    hero's height (--hh; never zoomed past it), --iw wide. Desktop: anchored by
-   its right side (--ir) so Klee's back (88% across the picture) ends 64px left
-   of the Today panel. Its edges fade out with a CSS mask on the picture itself
+   its right side (--ir) so Klee's back (88% across the picture) ends 4px left
+   of the Today panel (64px until Oct 27 2026: Adrian moved her right, out from behind the copy). Its edges fade out with a CSS mask on the picture itself
    (a gradient layer on top left a 1px seam: the "white line"). The copy is
    centred top to bottom on the left over a soft dark halo. Embers are placed
    in picture fractions (--x), so they follow the fire at every width. */
 .gi-hero {
   --hh: clamp(600px, calc(100vh - 150px), 800px);
   --iw: calc(var(--hh) * 1.7636);
-  --ir: calc(var(--coc-side) + 360px + 64px - var(--iw) * 0.12);
+  --ir: calc(var(--coc-side) + 360px + 4px - var(--iw) * 0.12);
+  /* Hero accent = Klee's hat red (Oct 27 2026): the low-saturation site red read as brown
+     next to the firelight. Only inside the hero (the Search key, the kicker diamond). */
+  --gi-acc: #c4362f;
+  --gi-acc-hover: #d4443c;
+  --gi-acc-text: #ff8d82;
+  --gi-acc-rgb: 196, 54, 47;
+  /* Fire = picture fractions (--fx, --fy); the glow and the embers start there. */
+  --fx: 0.44;
+  --fy: 0.62;
+  --fire-x: calc(100% - var(--ir) - var(--iw) * (1 - var(--fx)));
+  --fire-y: calc(var(--hh) * var(--fy));
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -53,13 +49,14 @@
   background: url('/images/genshin/art/klee-campfire.webp') 0 0 / 100% 100% no-repeat;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 85%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 85%, transparent 100%);
+  filter: saturate(1.12) contrast(1.04);
 }
 @media (prefers-reduced-motion: no-preference) {
   .gi-hero-bg { animation: gi-settle 18s var(--gi-ease) both; }
 }
 @keyframes gi-settle { from { transform: scale(1.04); } to { transform: scale(1); } }
-/* The grade: a soft dark halo behind the copy, the right side shaded under the
-   Today panel, a fade into the page at the foot, a little shade under the bar. */
+/* The grade (Oct 27 2026: six layers cut to three, they turned the art to mud): a soft halo
+   behind the copy, a shade at the left edge, the fade into the page at the foot. */
 .gi-hero::before {
   content: '';
   position: absolute;
@@ -67,41 +64,56 @@
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(38% 46% at 16% 52%, rgba(9, 9, 11, 0.82) 0%, rgba(9, 9, 11, 0.55) 55%, rgba(9, 9, 11, 0) 100%),
-    linear-gradient(90deg, rgba(9, 9, 11, 0.6) 0%, rgba(9, 9, 11, 0) 22%),
-    linear-gradient(270deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 34%),
-    linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0.6) 12%, rgba(10, 10, 11, 0) 30%),
-    linear-gradient(180deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 14%);
+    radial-gradient(36% 44% at 16% 52%, rgba(9, 9, 11, 0.74) 0%, rgba(9, 9, 11, 0.45) 55%, rgba(9, 9, 11, 0) 100%),
+    linear-gradient(90deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 20%),
+    linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0.6) 12%, rgba(10, 10, 11, 0) 30%);
 }
-.gi-hero::after {
+/* Firelight: a warm pool on the fire that breathes (screen blend, so it lights the art and
+   the halo instead of painting over them), then embers rising off it. */
+.gi-hero-fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.gi-hero-fx::before {
   content: '';
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(120% 100% at 45% 45%, transparent 60%, rgba(0, 0, 0, 0.45) 100%);
+  left: var(--fire-x);
+  top: var(--fire-y);
+  width: calc(var(--hh) * 1.1);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 138, 64, 0.34), rgba(255, 92, 40, 0.14) 45%, transparent);
+  mix-blend-mode: screen;
 }
-/* Embers rising off the fire. */
-.gi-hero-fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
 .gi-hero-fx i {
   position: absolute;
-  top: calc(var(--hh) * 0.56);
+  top: calc(var(--fire-y) - 6%);
   left: calc(100% - var(--ir) - var(--iw) * (1 - var(--x)));
   width: var(--s, 3px);
   height: var(--s, 3px);
   border-radius: 50%;
-  background: #ffc27a;
+  background: #ffd29a;
+  box-shadow: 0 0 6px 1px rgba(255, 140, 60, 0.85);
   opacity: 0;
   animation: gi-ember var(--d, 10s) ease-out var(--t, 0s) infinite;
 }
 @keyframes gi-ember {
   0% { transform: translate(0, 0); opacity: 0; }
-  12% { opacity: 0.9; }
-  70% { opacity: 0.35; }
-  100% { transform: translate(var(--dx, 20px), -380px); opacity: 0; }
+  12% { opacity: 1; }
+  45% { transform: translate(calc(var(--dx, 20px) * -0.4), -200px); }
+  70% { opacity: 0.4; }
+  100% { transform: translate(var(--dx, 20px), -440px); opacity: 0; }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .gi-hero-fx::before { animation: gi-flicker 3.2s ease-in-out infinite; }
+}
+/* Uneven steps read as fire. */
+@keyframes gi-flicker {
+  0% { opacity: 1; } 14% { opacity: 0.82; } 22% { opacity: 0.95; } 41% { opacity: 0.76; }
+  52% { opacity: 1; } 67% { opacity: 0.86; } 80% { opacity: 0.97; } 91% { opacity: 0.8; }
+}
+/* Out of view (genshin-lobby.js "HERO OFF SCREEN"): the hero's loops stop painting. */
+.gi-hero.is-off .gi-hero-fx i, .gi-hero.is-off .gi-hero-fx::before, .gi-hero.is-off .gi-say-next { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
-  .gi-hero-fx { display: none; }
+  .gi-hero-fx i { display: none; }
 }
 
 .gi-hero-grid {
@@ -125,33 +137,101 @@
   color: #b4b8bf;
 }
 .gi-kicker::before { content: ''; width: 7px; height: 7px; background: var(--gi-acc); transform: rotate(45deg); }
+/* Title lockup (Oct 27 2026): a small line ("Klee's guide to") over one big word, solid white,
+   lit warm from the fire side. The full stop wears the hat red. */
 .gi-hero-title {
   font-family: 'Cinzel', serif !important;
-  font-size: clamp(48px, 4.2vw, 80px);
+  font-size: clamp(56px, 4.4vw, 86px);
   font-weight: 800;
-  line-height: 0.98;
-  letter-spacing: 0.01em;
+  line-height: 0.92;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #fff;
-  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55), 4px 2px 34px rgba(255, 128, 56, 0.3);
 }
-.gi-hero-title em {
+.gi-hero-title small {
   display: block;
-  font-style: normal;
-  font-family: inherit !important;
-  color: inherit;
+  margin-bottom: 0.16em;
+  font-size: 0.3em;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: #e8dcd6;
 }
-/* One live line (genshin.js lede()): who's on the wishes and for how long, what
-   the codes are worth, when the Abyss resets. Three lines tall from the start,
-   so filling it never moves anything. */
-.gi-lede { min-height: 4.8em; max-width: 25em; margin-top: 22px; font-size: 16px; line-height: 1.6; color: #c3c6cc; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8); }
+.gi-hero-title em { font-style: normal; font-family: inherit !important; color: var(--gi-acc); }
+/* KLEE SAYS (Oct 27 2026): the live line (genshin-lobby.js lede(): who's on the wishes and
+   for how long, the codes, the Abyss reset) as Klee's in-game dialogue box: her name in the
+   hat red, the line typing itself out once, the bouncing "next" mark. Its tail points right,
+   at her. The line is three lines tall from the start, so filling it never moves anything. */
+.gi-say {
+  position: relative;
+  max-width: 420px;
+  margin-top: 26px;
+  padding: 14px 20px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(16, 13, 14, 0.78), rgba(10, 9, 11, 0.84));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.gi-say::after {
+  content: '';
+  position: absolute;
+  top: 34px;
+  right: -8px;
+  width: 14px;
+  height: 14px;
+  border: solid rgba(255, 255, 255, 0.1);
+  border-width: 1px 1px 0 0;
+  background: rgba(14, 12, 13, 0.8);
+  transform: rotate(45deg);
+  clip-path: polygon(0 0, 100% 0, 100% 100%); /* only the half outside the box */
+}
+/* DID YOU KNOW (Oct 27 2026): the facts stack in one grid cell, exactly three lines tall at every
+   width (Adrian: three lines, never more, never fewer), and cross-fade 6 s apart. */
+.gi-say { cursor: pointer; }
+.gi-say:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.gi-lede { display: grid; height: 4.8em; overflow: hidden; font-size: 15px; line-height: 1.6; color: #d4d6da; }
 .gi-lede b { font-weight: 600; color: #fff; white-space: nowrap; }
+.gi-dyk {
+  grid-area: 1 / 1;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s var(--gi-ease), visibility 0s linear 0.35s;
+}
+.gi-dyk.is-on { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.gi-say-next {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top: 6px solid var(--gi-acc-text);
+  border-bottom: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gi-say-next { animation: gi-next 1.1s ease-in-out infinite; }
+}
+@keyframes gi-next { 50% { transform: translateY(3px); } }
 .gi-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
 .gi-hero-cta .gi-key { height: 48px; padding: 0 22px 2px; font-size: 14px; }
 /* Player search (Oct 23 2026): the shared UID field (genshin.css "PLAYER LOOKUP BOX") as the
    hero's first key. The warning line and the player card float under it, so the hero never
    changes height (genshin-lobby.js "PLAYER SEARCH"). */
 .gi-find { position: relative; z-index: 3; flex: 1 1 0; min-width: 0; max-width: 380px; }
+/* The hero search = 11layout.css "SUNKEN SEARCH BAR" (Oct 28 2026, same as the home and CoC heroes). */
+.gi-find-field { position: relative; flex: 1; min-width: 0; }
+.gi-find-ph { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 3px; pointer-events: none; font-family: 'Sora', sans-serif; line-height: 1; }
+.gi-find-ph b { font-size: 15.5px; font-weight: 700; color: rgba(255, 255, 255, 0.72); }
+.gi-find-ph small { font-size: 11px; font-weight: 500; color: rgba(255, 255, 255, 0.4); }
+.gi-find-field .lb-search-input:not(:placeholder-shown) ~ .gi-find-ph { display: none; }
+.gi-find-field .gi-uid-server { margin-right: 0; }
 .gi-find .gi-look-status { position: absolute; top: 100%; left: 2px; margin-top: 8px; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }
 .gi-find .gi-look-status:empty, .gi-find .gi-look-status:has(~ .gi-hit:not([hidden])) { display: none; }
 .gi-hit {
@@ -219,47 +299,65 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
    three-cell strip over the art's faded foot. */
 @media (max-width: 1440px) {
   .gi-hero { --hh: clamp(640px, calc(100vh - 100px), 820px); --ir: calc(100% - var(--iw) * 0.94); background: transparent; }
-  .gi-hero::before, .gi-hero::after { bottom: auto; height: var(--hh); }
+  .gi-hero::before { bottom: auto; height: var(--hh); }
   .gi-hero-grid { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-top: 72px; padding-bottom: 120px; }
   .gi-hero-main { display: flex; flex-direction: column; justify-content: center; min-height: calc(var(--hh) - 72px - 110px); }
   .gi-today { flex-direction: row; }
   .gi-today-cell { flex: 1; border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.06); }
   .gi-today-cell:first-child { flex: 1.25; border-left: 0; }
 }
-/* Tablets and phones: Klee and the fire as a band on top (centred on them),
-   fading into the page at its foot; the copy and the Today panel under it. The
-   embers keep rising and a low warm glow sits where the band fades, so the
-   picture runs into the page instead of stopping. */
+/* Tablets and phones (Oct 27 2026 rebuild, Adrian: "do whatever you want"): the portrait cut
+   of the same picture (klee-campfire-tall.webp, 736x1308) as a full scene, --ah tall, drawn
+   width-first and bottom-aligned, so every point on it is (100vw, --ah) maths:
+   title centred in the dark forest at the top, Klee + the fire clear in the middle, her
+   dialogue box under her boots (tail pointing up at her), then search, then the Today panel.
+   Klee's top = --ah - 92vw, her boots = --ah - 42vw, the fire = 39% / --ah - 51.5vw. */
 @media (max-width: 970px) {
-  /* Phones (Oct 23 2026, Adrian): the copy centred on the picture instead of under it.
-     Klee (~68% across the art) sits at 78% of the screen, so she peeks out on the right
-     past the copy; the fire is behind the text, dimmed by the left shade. 82px = the bars. */
-  .gi-hero { --hh: 560px; --ir: calc(22% - var(--iw) * 0.32); }
+  .gi-hero {
+    --ah: min(177.7vw, 1040px);
+    --lift: 14px; /* Adrian: Klee and her box sit a little higher */
+    --fire-x: 39%;
+    --fire-y: calc(var(--ah) - 51.5vw - var(--lift));
+  }
   .gi-hero-bg {
-    -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+    top: calc(-1 * var(--lift));
+    left: 0;
+    right: 0;
+    width: auto;
+    height: var(--ah);
+    background: url('/images/genshin/art/klee-campfire-tall.webp') 50% 100% / cover no-repeat;
+    -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 80%, transparent 100%);
   }
   .gi-hero::before {
+    height: var(--ah);
     background:
-      linear-gradient(90deg, rgba(9, 9, 11, 0.84) 0%, rgba(9, 9, 11, 0.6) 48%, rgba(9, 9, 11, 0.06) 88%),
-      linear-gradient(180deg, rgba(9, 9, 11, 0.55) 0%, rgba(9, 9, 11, 0) 100px),
-      linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0) 24%);
+      linear-gradient(180deg, rgba(9, 9, 11, 0.6) 0%, rgba(9, 9, 11, 0) 34%),
+      linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0.6) 10%, rgba(10, 10, 11, 0) 26%);
   }
-  .gi-hero::after { display: none; }
-  .gi-hero-grid { display: block; padding-top: 82px; padding-bottom: 40px; }
-  .gi-hero-main { display: flex; flex-direction: column; justify-content: center; min-height: calc(var(--hh) - 82px); max-width: none; padding-bottom: 12px; }
-  .gi-today { flex-direction: column; margin-top: 0; background: rgba(14, 14, 17, 0.7); }
+  .gi-hero-fx::before { width: 110vw; }
+  .gi-hero-fx i { top: calc(var(--fire-y) - 8vw); left: calc((var(--x) - 0.05) * 100%); }
+  .gi-hero-grid { display: block; padding-top: 0; padding-bottom: 40px; }
+  /* --say-up (Adrian, Oct 28 2026): the Did you know box, and the title above it, sit this much
+     higher; the box's equal margin-bottom keeps the search where it was (below the fold at landing). */
+  .gi-hero-main { --say-up: 16px; position: relative; display: block; min-height: 0; max-width: none; padding: calc(var(--ah) - 36vw - var(--lift) - var(--say-up)) 0 0; }
+  .gi-hero-head { position: absolute; top: calc(108px - var(--say-up)); left: 0; right: 0; text-align: center; }
+  .gi-kicker { justify-content: center; gap: 9px; margin-bottom: 14px; font-size: 10px; letter-spacing: 0.22em; }
+  .gi-hero-title { font-size: clamp(52px, 15vw, 88px); }
+  .gi-say { max-width: none; margin: 0 0 var(--say-up); padding: 10px 14px 11px; }
+  .gi-find-ph { left: 18px; }
+  .gi-find-ph b { font-size: 14.5px; }
+  /* The tail points up at Klee (she's ~66% across the screen). */
+  .gi-say::after { top: -8px; right: auto; left: 68%; border-width: 1px 0 0 1px; clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .gi-say-who { margin-bottom: 4px; font-size: 13px; }
+  .gi-lede { height: 4.65em; font-size: 13px; line-height: 1.55; }
+  .gi-say-next { right: 12px; bottom: 9px; }
+  .gi-hero-cta { margin-top: 14px; }
+  .gi-find { flex-basis: 100%; max-width: none; }
+  .gi-hit-go { font-size: 0; gap: 0; } /* arrow only */
+  .gi-today { flex-direction: column; margin-top: 20px; background: rgba(14, 14, 17, 0.7); }
   .gi-today-cell { border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
   .gi-today-cell:first-child { border-top: 0; }
-  .gi-kicker { gap: 9px; margin-bottom: 12px; font-size: 10px; letter-spacing: 0.22em; }
-  .gi-hero-title { font-size: clamp(36px, 10.5vw, 50px); }
-  .gi-lede { min-height: 0; max-width: 72%; margin-top: 14px; font-size: 13.5px; line-height: 1.55; }
-  .gi-hero-cta { margin-top: 20px; }
-  .gi-find { flex-basis: 100%; max-width: none; }
-  /* genshin.css shrinks the lookup key to its icon on phones; the hero keeps "Search". */
-  .gi-find .gi-look-form .gi-key { width: auto; padding: 0 18px 2px; gap: 8px; }
-  .gi-find .gi-key-t { display: inline; }
-  .gi-hit-go { font-size: 0; gap: 0; } /* arrow only */
   .gi-today-big { font-size: 28px; }
 }
 
@@ -290,7 +388,7 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 .gi-eg-list { display: flex; flex-direction: column; gap: 8px; }
 .gi-eg-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px 80px;
+  grid-template-columns: 40px minmax(0, 1fr) 96px 80px;
   align-items: center;
   gap: 16px;
   padding: 14px 18px;
@@ -299,6 +397,7 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
   background: rgba(10, 11, 14, 0.72);
   box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35);
 }
+.gi-eg-ico { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); }
 .gi-eg-name { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .gi-eg-name h3 { font: 800 15px/1.2 'Sora', sans-serif; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gi-eg-stat { display: flex; flex-direction: column; gap: 6px; }
@@ -335,8 +434,7 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 .gi-book-more { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; background: var(--lb-well); font: 700 11px/1 'Sora', sans-serif; color: var(--gi-muted); }
 .gi-fc-weps { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--gi-line); }
 
-/* ---- WHAT'S NEXT (page groups) ----------------------------------------- */
-.gi-next { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+/* ---- PAGE GROUP CARDS (namecard on top; the Farm today cards use them) ---- */
 .gi-grp { overflow: hidden; }
 .gi-grp-art { position: relative; display: block; aspect-ratio: 840 / 330; background: center / cover; }
 .gi-grp-art:hover h3 { color: #e8dcc0; }
@@ -348,19 +446,8 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 .gi-grp li a { color: #fff; text-decoration: none; font-weight: 600; }
 .gi-grp li a:hover { color: #c9ccd2; }
 
-/* ---- CURATED TOOLS ------------------------------------------------------ */
-.gi-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.gi-tool { display: flex; gap: 14px; padding: 16px; }
-.gi-tool-ico { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); }
-.gi-tool-ico img { width: 22px; height: 22px; }
-.gi-tool b { display: flex; align-items: center; gap: 8px; font: 800 14px/1.2 'Sora', sans-serif; color: #fff; }
-.gi-tool b span { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gi-dim); }
-.gi-tool p { margin-top: 6px; font-size: 12px; line-height: 1.55; color: var(--gi-muted); }
-
 /* ---- DESKTOP NARROW ----------------------------------------------------- */
 @media (max-width: 1280px) and (min-width: 971px) {
-  .gi-next { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .gi-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gi-ev { flex-basis: calc((100% - 16px) / 2); }
   .gi-fc { flex-basis: calc((100% - 32px) / 3); }
 }
@@ -369,7 +456,6 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 @media (max-width: 970px) {
   .gi-sec--first { margin-top: 0; padding-top: 8px; }
   .gi-ev, .gi-fc { flex-basis: 84%; }
-  .gi-next, .gi-tools { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ============================================================
@@ -413,35 +499,6 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 
 /* ---- REACTIONS: the wheel's look moved to genshin-reactions.css (Oct 26 2026, shared with the
    Reactions chart); the phone tweaks below ("COMPACT") stay here. */
-
-/* ---- PITY: the 90 pulls, drawn ------------------------------------------ */
-.gi-pity { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
-.gi-pity-chart { display: flex; align-items: center; padding: 24px 24px 16px; }
-.gi-pity-svg { width: 100%; height: auto; display: block; overflow: visible; }
-.gi-pity-svg .pb { fill: #2a2c35; }
-.gi-pity-svg .pb.is-soft { fill: #4a4d58; }
-.gi-pity-svg .pb.is-spent { fill: rgba(var(--gi-acc-rgb), 0.4); }
-.gi-pity-svg .pb.is-next { fill: var(--gi-acc); }
-.gi-pity-svg .pz { fill: rgba(var(--gi-acc-rgb), 0.08); }
-.gi-pity-svg .pl { stroke: rgba(255, 255, 255, 0.16); stroke-dasharray: 3 4; }
-.gi-pity-svg text { font: 700 9px 'Sora', sans-serif; letter-spacing: 1px; text-transform: uppercase; fill: #6f737b; }
-.gi-pity-svg text.is-red { fill: var(--gi-acc-text); }
-.gi-pity-ctl { display: flex; flex-direction: column; gap: 18px; padding: 24px; }
-.gi-pity-ctl label { display: flex; justify-content: space-between; align-items: baseline; }
-.gi-pity-ctl output { font: 800 32px/1 'Sora', sans-serif; color: #fff; }
-.gi-pity-stats { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; border-top: 1px solid var(--gi-line); }
-.gi-stat small .gi-primo { flex-basis: 100%; font-size: 11px; }
-.gi-stat small img { width: 14px; height: 14px; }
-.gi-pity-note { font-size: 11px; line-height: 1.6; color: var(--gi-dim); }
-
-@media (max-width: 970px) {
-  .gi-nat-body, .gi-pity { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .gi-nat { margin-top: 64px; padding: 48px 0 56px; }
-  .gi-nat .gi-tray { margin-bottom: 24px; }
-  .gi-nat::before { background: radial-gradient(80% 50% at 0% 100%, rgba(var(--gi-acc-rgb), 0.14), transparent 70%), linear-gradient(180deg, #0a0a0b 0%, rgba(10, 10, 11, 0.7) 25%, rgba(10, 10, 11, 0.88) 60%, #0a0a0b 100%); }
-  .gi-nat-chars { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
-  .gi-pity-chart, .gi-pity-ctl { padding: 18px; }
-}
 
 /* ---- COMING TO PARCHROME: full-bleed band on the floating city ------------
    The city sits in the top half of the picture; the band shows it above the
@@ -494,8 +551,12 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 
   /* Nations: a smaller name, the facts on one line, the characters a three-row
      carousel you swipe (the band no longer grows with the roster). */
-  .gi-nat { padding: 36px 0 40px; }
-  .gi-nat .gi-tray { margin-bottom: 18px; }
+  /* Oct 27 2026 (Adrian: "so big"): a slim nation tray and no Archon/Ideal line on phones;
+     the point here is "a build for every character", so the faces get the room. */
+  .gi-nat { padding: 28px 0 32px; }
+  .gi-nat .gi-tray { margin-bottom: 14px; padding: 3px; }
+  .gi-nat .gi-tab { gap: 6px; min-height: 30px; padding: 0 10px; font-size: 10px; letter-spacing: 0.08em; }
+  .gi-nat .gi-tab img { width: 14px; height: 14px; }
   .gi-nat-body { gap: 16px; }
   .gi-nat-name { font-size: 30px; }
   .gi-nat-ideal { flex-direction: row; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 13px; }
@@ -520,11 +581,11 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
      "View all characters" link (.gi-all, quiet on phones) goes under the faces. */
   .gi-nat-body { grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: 0 12px; }
   .gi-nat-info { display: contents; }
-  .gi-nat-name { grid-area: 1 / 1; font-size: 28px; }
+  .gi-nat-name { grid-area: 1 / 1; margin-bottom: 12px; font-size: 20px; }
   .gi-nat-count { grid-area: 1 / 2; gap: 5px; margin: 0; }
   .gi-nat-count b { font: 700 13px/1 'Sora', sans-serif; }
   .gi-nat-count span { font-size: 12px; }
-  .gi-nat-ideal { grid-area: 2 / 1 / 3 / -1; margin: 10px 0 16px; }
+  .gi-nat-ideal { display: none; }
   .gi-nat-chars { grid-area: 3 / 1 / 4 / -1; }
   .gi-nat-all { grid-area: 4 / 1 / 5 / -1; justify-self: start; margin-top: 12px; }
 
@@ -536,7 +597,8 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
   .gi-eg-head .gi-eyebrow, .gi-eg-head .mch-sec-sub { display: none; }
   .gi-eg-more { margin: 0; }
   .gi-eg-list { gap: 6px; }
-  .gi-eg-row { grid-template-columns: minmax(0, 1fr) 66px 58px; gap: 10px; padding: 9px 12px; }
+  .gi-eg-row { grid-template-columns: 30px minmax(0, 1fr) 66px 58px; gap: 10px; padding: 9px 12px; }
+  .gi-eg-ico { width: 30px; height: 30px; }
   .gi-eg-name { gap: 4px; }
   .gi-eg-name h3 { font-size: 13px; }
   .gi-eg-name .gi-label { font-size: 9px; }
@@ -545,3 +607,272 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
 }
 
 
+
+/* ---- KLEE'S MAP: Klee's card | the big four, then every page by group ---- */
+.gm { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: auto auto; gap: 16px; }
+/* Klee's card runs down the whole left side, so her full picture fits (arms up) and her line
+   sits over her outfit, not her face. */
+.gm-guide {
+  position: relative;
+  grid-row: 1 / 3;
+  min-height: 560px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 12px;
+  background: #1c1415;
+  box-shadow: var(--lb-shadow);
+}
+.gm-guide-art {
+  position: absolute;
+  inset: 0;
+  background: url('/images/genshin/strip/Klee.webp') center top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 98%);
+  mask-image: linear-gradient(180deg, #000 70%, transparent 98%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gm-guide-art { animation: gm-bob 5s ease-in-out infinite; }
+}
+@keyframes gm-bob { 50% { transform: translateY(-4px); } }
+.gm-guide-say {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  padding: 12px 14px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(14, 11, 12, 0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #d4d6da;
+}
+.gm-guide-say::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border: solid rgba(255, 255, 255, 0.1);
+  border-width: 1px 0 0 1px;
+  background: rgba(14, 11, 12, 0.86);
+  transform: rotate(45deg);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.gm-guide-say .gi-say-who { margin-bottom: 4px; color: var(--klee-text); }
+
+.gm-feat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.gm-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 16px;
+  min-height: 150px;
+  padding: 18px 18px 18px 20px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  color: inherit;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 0.25s var(--gi-ease), box-shadow 0.25s ease;
+}
+/* The group's namecard on the right half, fading into the box. */
+.gm-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 30%;
+  z-index: -1;
+  background: var(--nc) center / cover no-repeat;
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 60%);
+  mask-image: linear-gradient(90deg, transparent, #000 60%);
+  transition: opacity 0.3s ease, transform 0.5s var(--gi-ease);
+}
+.gm-ic { display: grid; place-items: center; width: 52px; height: 52px; border: 2px solid var(--lb-edge); border-radius: 50%; background: var(--lb-well); }
+.gm-ic img { width: 34px; height: 34px; }
+.gm-txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gm-txt b { font: 900 20px/1.1 'Cinzel', serif; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7); }
+.gm-txt span { font-size: 12.5px; line-height: 1.5; color: #c3c6cc; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8); }
+.gm-go { display: grid; place-items: center; width: 36px; height: 36px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; transition: transform 0.25s var(--gi-ease); }
+.gm-go svg, .gm-grp-head svg:last-child { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.gm-card:hover::before { opacity: 0.8; transform: scale(1.04); }
+.gm-card:hover .gm-go { transform: translateX(3px); }
+.gm-card:focus-visible, .gm-row:focus-visible, .gm-grp-head:focus-visible, .gwl-card:focus-visible, .gi-nat-c:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (hover: hover) {
+  .gm-card:hover { transform: translateY(-3px); box-shadow: var(--lb-shadow-hover); }
+}
+
+.gm-groups { grid-column: 2; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; }
+.gm-grp { min-width: 0; border-left: 1px solid var(--gi-line); }
+.gm-grp:first-child { border-left: 0; }
+.gm-grp--wide { grid-column: span 2; }
+.gm-grp-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--gi-line); color: #fff; text-decoration: none; transition: background-color 0.2s ease; }
+.gm-grp-head:hover { background: rgba(255, 255, 255, 0.03); }
+.gm-grp-head svg:first-child { width: 22px; height: 22px; color: #c9ccd2; }
+.gm-grp-head b { font: 900 16px/1 'Cinzel', serif; text-transform: uppercase; }
+.gm-grp-head svg:last-child { margin-left: auto; }
+.gm-rows { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 8px; }
+.gm-grp--wide .gm-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gm-row { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 7px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #e6e8ec; text-decoration: none; white-space: nowrap; transition: background-color 0.15s ease; }
+.gm-row img { flex: none; width: 26px; height: 26px; object-fit: contain; }
+a.gm-row:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
+.gm-row.is-soon { color: var(--gi-dim); cursor: default; }
+.gm-row.is-soon img { filter: grayscale(1); opacity: 0.45; }
+.gm-row span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.gm-row small { flex: none; margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* Wide desktops (Oct 27 2026, Adrian: the map was too tall): the big four sit in one row as
+   upright cards and the page lists are tighter, so Klee's card (which stretches to fit) gets
+   shorter too. */
+@media (min-width: 1281px) {
+  .gm-guide { min-height: 0; }
+  .gm-feat { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .gm-card { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 12px; min-height: 0; padding: 16px; }
+  .gm-card::before { inset: 0; opacity: 0.4; -webkit-mask-image: linear-gradient(180deg, transparent 15%, #000); mask-image: linear-gradient(180deg, transparent 15%, #000); }
+  .gm-ic { width: 44px; height: 44px; }
+  .gm-ic img { width: 30px; height: 30px; }
+  .gm-txt b { font-size: 17px; }
+  .gm-go { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; }
+  .gm-grp-head { padding: 12px 16px; }
+  .gm-rows { padding: 6px 8px; }
+  .gm-row { padding: 5px 8px; }
+}
+
+/* ---- CURRENT WISHES: one light card per live wish ---- */
+.gwl-card { flex: 0 0 calc((100% - 32px) / 3); scroll-snap-align: start; display: flex; flex-direction: column; overflow: hidden; color: inherit; text-decoration: none; transition: transform 0.25s var(--gi-ease), box-shadow 0.25s ease; }
+/* Element dress (Oct 27 2026, Adrian: the grey cards were plain): the whole card takes the featured
+   5-star's element, like the Player lookup's build card (.gp-build): tinted ground, star dust and
+   four-point sparkles in that colour. The weapon wish has no element: it wears the 5-star gold. */
+.gwl-card {
+  --gwl-spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.9 6.6 13.4 9.1 20 10 13.4 10.9 10.9 13.4 10 20 9.1 13.4 6.6 10.9 0 10 6.6 9.1 9.1 6.6 10 0Z'/%3E%3C/svg%3E");
+  position: relative;
+  isolation: isolate;
+  border-color: color-mix(in srgb, var(--gi-el) 35%, var(--lb-edge));
+  background:
+    radial-gradient(90% 55% at 50% 22%, color-mix(in srgb, var(--gi-el) 34%, transparent), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 26%, #0a0c11) 0%, color-mix(in srgb, var(--gi-el) 12%, #0c0e13) 55%, #0d0f14 100%);
+}
+.gwl-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(color-mix(in srgb, var(--gi-el) 55%, #fff) 0.8px, transparent 1.4px),
+    radial-gradient(color-mix(in srgb, var(--gi-el) 80%, #fff) 0.6px, transparent 1.1px);
+  background-size: 97px 89px, 53px 61px;
+  background-position: 11px 7px, 38px 29px;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 30%, transparent 85%);
+}
+.gwl-art {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-bottom: 2px solid color-mix(in srgb, var(--gi-el) 55%, transparent);
+  background: radial-gradient(60% 80% at 50% 62%, color-mix(in srgb, var(--gi-el) 45%, transparent), transparent 72%);
+}
+/* Three sparkles over the art, top left and right. */
+.gwl-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--gi-el) 60%, #fff);
+  -webkit-mask: var(--gwl-spark) 14px 14px / 18px no-repeat, var(--gwl-spark) 38px 38px / 9px no-repeat, var(--gwl-spark) right 18px top 24px / 13px no-repeat;
+  mask: var(--gwl-spark) 14px 14px / 18px no-repeat, var(--gwl-spark) 38px 38px / 9px no-repeat, var(--gwl-spark) right 18px top 24px / 13px no-repeat;
+  opacity: 0.85;
+}
+.gwl-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 0.6s var(--gi-ease); }
+.gwl-card--wep .gwl-art { gap: 10%; }
+.gwl-card--wep .gwl-art img { position: relative; inset: auto; width: auto; height: 118%; margin-top: -2%; object-fit: contain; transform: rotate(-16deg); }
+.gwl-card--wep .gwl-art img + img { transform: rotate(16deg); }
+.gwl-body { display: flex; flex: 1; flex-direction: column; gap: 6px; padding: 14px 16px 16px; }
+.gwl-tag { color: var(--gi-dim); }
+.gwl-name { overflow: hidden; font: 900 26px/1.1 'Cinzel', serif; text-transform: uppercase; color: #fff; white-space: nowrap; text-overflow: ellipsis; }
+.gwl-card--wep .gwl-name { font-size: 17px; line-height: 1.3; white-space: normal; }
+.gwl-name small { font-size: 0.8em; color: var(--gi-dim); }
+.gwl-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gi-muted); }
+.gwl-meta img { width: 18px; height: 18px; }
+.gwl-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--gi-line); }
+.gwl-four { display: flex; gap: 5px; }
+.gwl-four .gi-tile { width: 34px; height: 34px; }
+.gwl-end { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.gwl-end b { font: 700 15px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gwl-end b.is-ending { color: var(--gi-acc-text); }
+@media (hover: hover) {
+  .gwl-card:hover { transform: translateY(-3px); box-shadow: var(--lb-shadow-hover), 0 10px 30px -12px color-mix(in srgb, var(--gi-el) 60%, transparent); }
+  .gwl-card:hover .gwl-art img { transform: scale(1.04); }
+  .gwl-card--wep:hover .gwl-art img { transform: rotate(-16deg) scale(1.04); }
+  .gwl-card--wep:hover .gwl-art img + img { transform: rotate(16deg) scale(1.04); }
+}
+
+/* ---- CHARACTER BUILD GUIDES: every face opens that character's page ---- */
+.gi-nat-c { display: block; min-width: 0; color: inherit; text-decoration: none; }
+.gi-nat-c .gi-tile { transition: transform 0.2s var(--gi-ease); }
+.gi-nat-c:hover .gi-tile { transform: translateY(-3px); }
+
+/* ---- KLEE PIECES: laptops + phones ---- */
+@media (max-width: 970px) {
+  /* Klee's card turns sideways: her picture left, her line right (tail pointing at her). */
+  .gm { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .gm-guide { display: grid; grid-template-columns: 200px minmax(0, 1fr); align-items: center; grid-row: auto; min-height: 0; }
+  .gm-guide-art { position: relative; inset: auto; aspect-ratio: 4 / 5; background-position: center 18%; -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent); mask-image: linear-gradient(90deg, #000 70%, transparent); }
+  .gm-guide-say { position: relative; inset: auto; max-width: 460px; margin: 12px 12px 12px 4px; }
+  .gm-guide-say::after { top: 50%; left: -7px; margin-top: -6px; border-width: 0 0 1px 1px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+  .gm-groups { grid-column: auto; }
+}
+@media (max-width: 1280px) and (min-width: 971px) {
+  /* Laptops: Klee is a narrow column beside the big four only; the page lists go full width under. */
+  .gm { grid-template-columns: 220px minmax(0, 1fr); }
+  .gm-guide { grid-row: 1; min-height: 0; }
+  .gm-guide-say { padding: 10px 12px 11px; font-size: 12.5px; }
+  .gm-groups { grid-column: 1 / -1; }
+  .gm-card { grid-template-columns: 44px minmax(0, 1fr) 32px; gap: 12px; padding: 16px; }
+  .gm-ic { width: 44px; height: 44px; }
+  .gm-ic img { width: 28px; height: 28px; }
+  .gwl-card { flex-basis: calc((100% - 16px) / 2); }
+}
+@media (max-width: 970px) {
+  .gm { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .gm-guide { grid-template-columns: 38% minmax(0, 1fr); }
+  .gm-guide-art { aspect-ratio: 3 / 4; }
+  .gm-feat { gap: 10px; }
+  .gm-card { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 10px; min-height: 0; padding: 14px; }
+  .gm-card::before { inset: 0; opacity: 0.35; -webkit-mask-image: linear-gradient(180deg, transparent 20%, #000); mask-image: linear-gradient(180deg, transparent 20%, #000); }
+  .gm-ic { width: 42px; height: 42px; }
+  .gm-ic img { width: 28px; height: 28px; }
+  .gm-txt b { font-size: 15px; }
+  .gm-txt span, .gm-go { display: none; }
+  .gm-groups { grid-template-columns: minmax(0, 1fr); }
+  .gm-grp, .gm-grp--wide { grid-column: auto; border-left: 0; border-top: 1px solid var(--gi-line); }
+  .gm-grp:first-child { border-top: 0; }
+  .gm-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gwl-card { flex-basis: 84%; }
+  .gwl-name { font-size: 22px; }
+}
+
+/* ---- PHONE SCROLL LAG (Oct 27 2026): see-through boxes with a blur behind them, a blend-mode glow
+   and idle loops kept phones repainting while scrolling. Phones get solid boxes instead, a plain
+   glow, half the embers, a still Klee card, and the long lower sections skip rendering until they
+   come near the screen (content-visibility). ---- */
+@media (max-width: 970px) {
+  .gi-say, .gi-today, .gm-guide-say, .gi-city .gi-grp { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .gi-say { background: rgb(16, 13, 14); }
+  .gi-today { background: rgb(16, 16, 19); }
+  .gm-guide-say { background: rgb(17, 13, 14); }
+  .gi-hero-fx::before { mix-blend-mode: normal; opacity: 0.75; }
+  .gi-hero-fx i:nth-child(n + 9) { display: none; }
+  .gm-guide-art { animation: none; }
+  #reactions, #endgame, #faq { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+}

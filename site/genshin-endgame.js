@@ -1,4 +1,5 @@
-// Genshin Impact endgame (/genshin-impact/endgame, Oct 23 2026). This period's Spiral
+// Genshin Impact endgame (Oct 23 2026; since Oct 27 2026 the lower half of /genshin-impact/all-events, the old
+// /endgame address 301s there with ?go=abyss). This period's Spiral
 // Abyss floors 9-12, the Imaginarium Theater season and Stygian Onslaught. Periods,
 // rewards and Stygian come from the feed's ennead data (challenges / events); what's
 // inside the Abyss and the Theater comes from feed.endgame (scripts/genshin-feed.py
@@ -19,41 +20,7 @@
       c.primos ? `<div><span class="gi-label">Reward</span>${primo(c.primos)}</div>` : ''
     }`);
 
-  // ---- SPIRAL ABYSS ----
-  // "Remaining challenge time longer than (60/180/300) sec." / "Target defense progress greater
-  // than (20/40/60)%." -> one gold chip per star count, each with its own threshold. Any other
-  // wording falls back to the wiki's sentence.
-  function stars(t) {
-    const m = t.match(/\((\d+)\/(\d+)\/(\d+)\)\s*(sec|%)/);
-    if (!m) return `<p class="eg-target"><span aria-hidden="true">&#9733;</span>${esc(t)}</p>`;
-    const unit = m[4] === '%' ? '%' : 's';
-    const chip = (n, i) => `<li><span aria-hidden="true">${'&#9733;'.repeat(i + 1)}</span>${n}${unit}</li>`;
-    return `<div class="eg-stars"><span class="gi-label">${unit === '%' ? 'Monolith HP left' : 'Time left'}</span><ul aria-label="${esc(t)}">${[m[1], m[2], m[3]]
-      .map(chip)
-      .join('')}</ul></div>`;
-  }
-  function foe(e, icons) {
-    const pic = icons[e.name] ? `<img src="${esc(icons[e.name])}" alt="" loading="lazy" decoding="async">` : '';
-    return `<figure class="eg-foe" title="${esc(e.name)}"><span class="eg-foe-pic">${pic}${e.n > 1 ? `<b>&times;${e.n}</b>` : ''}</span><figcaption>${esc(e.name)}</figcaption></figure>`;
-  }
-  // A half: its waves left to right, a small arrow between them, then how they spawn (the wiki's note).
-  const half = (label, waves, icons, spawn) =>
-    `<div class="eg-half"><span class="gi-label">${label}</span><div class="eg-waves">${
-      waves.length
-        ? waves.map((w) => `<div class="eg-wave">${w.map((e) => foe(e, icons)).join('')}</div>`).join('<i class="eg-then" aria-hidden="true"></i>')
-        : '<p class="eg-none">Not listed yet.</p>'
-    }</div>${spawn ? `<p class="eg-spawn">${esc(spawn)}</p>` : ''}</div>`;
-  const floor = (f, icons) => `<div class="eg-floor" data-floor="${f.floor}" role="tabpanel" aria-label="Floor ${f.floor}">
-      <div class="gi-box eg-dis"><span class="gi-label">Ley line disorder</span><ul>${f.disorders.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></div>
-      <div class="eg-chambers">${f.chambers
-        .map(
-          // data-n = the faded numeral; the heat colour per chamber is in genshin-endgame.css.
-          (c, i) => `<article class="gi-box eg-ch" data-n="${['I', 'II', 'III'][i] || ''}"><header><b>Chamber ${i + 1}</b><span>Lv. ${c.level}</span></header>
-        ${stars(c.target)}
-        ${half('First half', c.halves[0], icons, (c.spawns || [])[0])}${half('Second half', c.halves[1], icons, (c.spawns || [])[1])}</article>`
-        )
-        .join('')}</div></div>`;
-
+  // ---- SPIRAL ABYSS ---- (one floor's markup = GI.abyssFloor in genshin-core.js, shared with /genshin-impact/abyss)
   function abyss(a, icons, ch) {
     const box = $('egAbyss');
     if (!a || !a.floors || !a.floors.length) {
@@ -61,7 +28,7 @@
       return;
     }
     if (ch) $('egAbyssSub').textContent = `The Abyssal Moon Spire, floors 9 to 12, ${day(ch.start)} to ${lastDay(ch.end)}${a.version ? ' (version ' + a.version + ')' : ''}.`;
-    box.innerHTML = a.floors.map((f) => floor(f, icons)).join('');
+    box.innerHTML = a.floors.map((f) => GI.abyssFloor(f, icons)).join('');
     const tabs = $('egFloors');
     tabs.innerHTML = a.floors.map((f) => `<button type="button" class="gi-tab" role="tab" data-floor="${f.floor}">Floor ${f.floor}</button>`).join('');
     const pick = (n) => {
@@ -145,7 +112,6 @@
     requestAnimationFrame(step);
   });
 
-  GI.serverTray($('egServer'));
   GI.feed
     .then((feed) => {
       const t = now();
@@ -161,14 +127,13 @@
       abyss(eg.abyss, icons, tower);
       theater(eg.theater, icons, roster, role);
       stygian(sty);
-      const facts = [];
-      if (tower) facts.push(`<li>Abyss resets in <b data-end-srv="${+tower.end}"></b></li>`);
-      if (role) facts.push(`<li>Theater in <b data-end-srv="${+role.end}"></b></li>`);
-      const sum = [tower, role].reduce((a, c) => a + ((c && c.primos) || 0), 0);
-      if (sum) facts.push(`<li><b>${sum.toLocaleString()}</b>Primogems a month</li>`);
-      $('egFacts').innerHTML = facts.join('');
       countdowns();
       setInterval(countdowns, 1000);
+      // A #section or ?go=section in the address (old /endgame links arrive as ?go=abyss): the browser's own
+      // jump came before the timeline and these sections were filled, so jump again now that they are.
+      const go = new URLSearchParams(location.search).get('go') || location.hash.slice(1);
+      if (go && document.getElementById(go)) document.getElementById(go).scrollIntoView();
+      if (location.search) history.replaceState(null, '', location.pathname + (go ? '#' + go : ''));
     })
     .catch((err) => {
       console.error('Endgame failed to load:', err);

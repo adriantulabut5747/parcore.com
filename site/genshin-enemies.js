@@ -3,7 +3,7 @@
 // energy drops + yatta's drops / icons), genshin-enemies-more.json (lore, tips, attacks; fetched the first
 // time a dossier opens) and the feed (characters for faces, endgame for "Fighting now").
 // Sections: Fighting now -> the archive (grid + dossier ?e=<slug>) -> the hunt list -> the resistance board.
-// "Yours" = Farm today's gi-farm-mine (character ids). Styles: genshin-enemies.css.
+// "Yours" = Daily domains' gi-farm-mine (character ids). Styles: genshin-enemies.css.
 // Everything from the data is third-party text, so it goes through esc().
 (function () {
   const { $, esc, EL, SI, elIcon } = window.GI;
@@ -406,7 +406,7 @@
         ${e.abilities.length ? `<ul class="en-abil">${e.abilities.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
       </div></div>
       <div class="en-info">
-        ${now ? `<a class="en-now-box" href="/genshin-impact/endgame"><b>Fighting now</b><span>${now.map((x) => esc(x.mode + (x.where ? ' ' + x.where : '') + (x.level ? ', Lv. ' + x.level : ''))).join(' · ')}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>` : ''}
+        ${now ? `<a class="en-now-box" href="/genshin-impact/all-events#abyss"><b>Fighting now</b><span>${now.map((x) => esc(x.mode + (x.where ? ' ' + x.where : '') + (x.level ? ', Lv. ' + x.level : ''))).join(' · ')}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>` : ''}
         ${forms}
         <section class="en-sec en-sec--first"><h3 class="en-h">Resistances</h3>${states}${chart(vals)}${verdict(vals)}</section>
         ${f ? statsHtml(f) : ''}
@@ -857,6 +857,8 @@
         .map((x) => `<li>${x}</li>`)
         .join('');
 
+      // Klee's line under the header (Oct 27 2026): the count + the immunities, in her voice.
+      $('enKlee').textContent = `Klee found ${list.length} enemies! ${imm} of them are immune to an element, so check before you fight.`;
       buildNow(feed);
       render();
       $('enBoardTabs').innerHTML = ELS.map(
@@ -871,5 +873,6 @@
     })
     .catch(() => {
       grid.innerHTML = '<p class="gi-box gi-empty">The enemy list didn’t load. Refresh to try again.</p>';
+      $('enKlee').textContent = "Klee couldn't find the enemies. Refresh to try again!";
     });
 })();

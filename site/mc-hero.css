@@ -705,14 +705,22 @@ a.mch-nav-tab.active:hover {
    so the banner hangs them below its bottom hairline as ::before, sent behind
    the page content (z-index -1). For that the banner must not be a stacking
    context (no isolation / z-index on .mch-hero--page; its photo, scrim, text and
-   tray stack inside .coc-content instead) and .coc-content must be one. The tool
-   pages (.mt-page) keep minecraft.net's #171615: their #0e0d0d boxes would sink
-   into this black. */
-body.mc-home:not(.mt-page) .coc-main,
-body.mc-home:not(.mt-page) .coc-content {
+   tray stack inside .coc-content instead) and .coc-content must be one.
+   Oct 28 2026 (Adrian): every sub-page, tools included (.mt-page too: their
+   #1b1c22 boxes stand clear of it), now wears the blackstone ground below; only
+   the lobby (body.mc-lobby) keeps this film grain. */
+body.mc-lobby .coc-main,
+body.mc-lobby .coc-content {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='-0.215'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='-0.215'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E") 0 0 / 220px 220px,
     #0a0a0b;
+}
+/* The blackstone ground: polished blackstone a hair off #0a0a0b, one 64px tile
+   (baked by _tools/ground/blackstone.py; stone up close, a calm dark field from
+   reading distance). Scrolls with the page: no fixed background (phones). */
+body.mc-home:not(.mc-lobby) .coc-main,
+body.mc-home:not(.mc-lobby) .coc-content {
+  background: url('/images/minecraft/ground-blackstone.png') 0 0 / 64px 64px, #0a0a0b;
 }
 /* Discover's chapter bands (mc-home.css CHAPTERS) each painted #0d0e10 over it:
    they go see-through so the one ground + glow shows. Their edges stay. The
@@ -891,7 +899,7 @@ body.mc-home:not(.mt-page) .mch-hero--page::before {
 }
 
 /* ---- TOOL BANNER (Oct 22 2026) ----------------------------------------------
-   Tool pages only (.mch-hero--tool; not the tools lobby, not the Java pages): the
+   Tool pages + every Java page (.mch-hero--tool, Java since Oct 28 2026; not the tools lobby): the
    banner is /coc/'s compressed .tb card (th-layouts.css "Banner (.tb)") instead of
    the full-bleed photo. A box in the page column, 196px tall, 20px under the bar
    like the TH pages: the Creaking art on the right two-thirds fading into the card,
@@ -1045,5 +1053,68 @@ body.mc-home.mt-page .mch-hero--tool + .mch-hero-tabs {
   .mch-hero--tool + .mch-hero-tabs .mch-nav-arrow--r {
     right: calc(var(--coc-side) + 2px);
     border-radius: 0 var(--lb-r, 6px) var(--lb-r, 6px) 0;
+  }
+}
+
+/* ---- NAV SPRITES (Oct 27 2026) ----------------------------------------------
+   The group icons in the top bar, phone bar and More sheet (game-nav.json
+   "minecraft" "img") are 16px item sprites: drawn pixelated so they stay sharp,
+   and a lighter grey at rest than 11layout's .gn-pic (its grey at 60% turned the
+   old 3D renders into dark blobs). Colour when active or hovered. */
+[data-game-nav="minecraft"] .gn-pic,
+.mx-label-pic {
+  image-rendering: pixelated;
+}
+[data-game-nav="minecraft"] .gn-pic {
+  filter: grayscale(1) brightness(1.25);
+  opacity: 0.75;
+}
+[data-game-nav="minecraft"] .active > .gn-pic,
+[data-game-nav="minecraft"] a:hover > .gn-pic {
+  filter: none;
+  opacity: 1;
+}
+[data-game-nav="minecraft"] .bn-item img.gn-pic {
+  width: 24px;
+  height: 24px;
+}
+.mx-label-pic {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+/* Phone trail: 11layout.css BREADCRUMB (Oct 28 2026, shared with Genshin). */
+
+/* ---- HANDJET TITLES (Oct 28 2026, Adrian: "switch all to Handjet on all pages") ----
+   Every Minecraft page's banner + section titles in Handjet, the lobby's title font (moved here from
+   mc-lobby.css). Handjet runs narrow, so the sizes are ~1.4x the Orbitron ones they replace. Each page
+   links the font (Google Fonts "Handjet:wght@400..900"). hcpc.html's old hero is left alone. */
+html body .mch .mch-sec-title,
+html body .mch .lob-title,
+html body .mch-hero-title {
+  font-family: 'Handjet', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+html body .mch .mch-sec-title,
+html body .mch .lob-title {
+  font-size: calc(var(--fs-title) * 1.4);
+  line-height: 1;
+}
+html body .mch .mch-sec-title em,
+html body .mch .lob-title em {
+  font-family: inherit !important;
+}
+body.mc-home .mch-hero--tool .mch-hero-title {
+  font-size: clamp(38px, 3.6vw, 54px);
+  line-height: 0.95;
+}
+@media (max-width: 970px) {
+  html body .mch .mch-sec-title,
+  html body .mch .lob-title {
+    font-size: 34px;
+  }
+  body.mc-home .mch-hero--tool .mch-hero-title {
+    font-size: 30px;
   }
 }

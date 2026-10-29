@@ -130,6 +130,10 @@
         (sum ? `<li><b>${sum.toLocaleString()}</b>Primogems</li>` : '') +
         (expired.length ? `<li><b>${expired.length}</b>expired</li>` : '');
       $('cdList').innerHTML = active.length ? active.map(codeRow).join('') : "<p class=\"gi-box gi-empty\">No active codes right now. New ones usually come with the next version's livestream.</p>";
+      // Klee's line: the same live count, in her voice.
+      $('cdKlee').textContent = active.length
+        ? `Klee found ${active.length} code${active.length === 1 ? '' : 's'}${sum ? ` worth ${sum.toLocaleString()} Primogems` : ''}! Redeem them before they run out.`
+        : 'No codes right now. Klee is watching for the next livestream!';
       if (sum) $('cdActiveSub').textContent = `${active.length} codes worth ${sum.toLocaleString()} Primogems, checked every three hours. Redeem opens the official gift page with the code filled in.`;
       $('cdMore').textContent = `Show all ${expired.length}`;
       if (!expired.length) $('cdOldSub').textContent = "The expired list isn't available right now.";
@@ -139,6 +143,7 @@
     .catch((err) => {
       console.error('Codes failed to load:', err);
       $('cdList').innerHTML = "<p class=\"gi-box gi-empty\">Couldn't load the codes right now. Try again in a bit.</p>";
+      $('cdKlee').textContent = "Klee couldn't find the codes. Try again in a bit!";
       redeemDemo(null);
     });
 })();

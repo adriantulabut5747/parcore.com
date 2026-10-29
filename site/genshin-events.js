@@ -1,4 +1,5 @@
-// Genshin Impact events timeline (/genshin-impact/timeline, Oct 23 2026; moved from /events Oct 24 2026). Everything
+// Genshin Impact events timeline (Oct 23 2026; /timeline Oct 24; since Oct 27 2026 the top of /genshin-impact/all-events,
+// with the endgame sections under it: genshin-endgame.js). Everything
 // running this version on one chart: wishes (this version's phases from
 // /genshin-history.json + the live weapon wish), events and endgame (the feed), in
 // three lanes on a shared date axis with a red "today" line. Hover / tap a bar for
@@ -192,6 +193,9 @@
     $('evFacts').innerHTML =
       `<li><b>${running.length}</b>running now</li><li><b>${week.length}</b>end this week</li>` +
       (phases.length ? `<li>version <b>${esc(phases[phases.length - 1].version)}</b></li>` : '');
+    // Klee's line under "This version." (Oct 27 2026): the same two counts, in her voice.
+    $('evKlee').textContent =
+      `Klee counted ${running.length} things running right now! ` + (week.length ? `${week.length} of them end this week, so hurry.` : 'None of them end this week.');
 
     // The details panel starts on what ends soonest.
     const first = running.sort((a, b) => a.e - b.e)[0];

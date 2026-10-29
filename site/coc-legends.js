@@ -298,11 +298,11 @@
     var watch = read(WATCH_KEY);
     app.innerHTML =
       (watch.length
-        ? '<section class="am lg-board" aria-labelledby="lgWatchTitle"><header class="am-head"><div><h2 class="am-title" id="lgWatchTitle">Your watch list</h2><p class="am-intro">Today&rsquo;s Legend day for the players you watch. Saved on this device.</p></div></header><div class="am-part"><ol class="lg-rows" id="lgWatchRows">' +
+        ? '<section class="am lg-board" aria-labelledby="lgWatchTitle"><header class="am-head"><div><h2 class="am-title" id="lgWatchTitle">Your watch list</h2><div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Today&rsquo;s Legend day for the players you watch. Saved on this device.</p></div></div></header><div class="am-part"><ol class="lg-rows" id="lgWatchRows">' +
           skeletonRows(Math.min(watch.length, 5)) +
           '</ol></div></section>'
         : '') +
-      '<section class="am lg-board" aria-labelledby="lgTopTitle"><header class="am-head"><div><h2 class="am-title" id="lgTopTitle">The world&rsquo;s top 10, today</h2><p class="am-intro">Ranked by this week&rsquo;s world leaderboard. Bars show today&rsquo;s attacks (top) and defenses (bottom); the number is today&rsquo;s net.</p></div></header><div class="am-part"><ol class="lg-rows" id="lgTopRows">' +
+      '<section class="am lg-board" aria-labelledby="lgTopTitle"><header class="am-head"><div><h2 class="am-title" id="lgTopTitle">The world&rsquo;s top 10, today</h2><div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Ranked by this week&rsquo;s world leaderboard. Bars show today&rsquo;s attacks (top) and defenses (bottom); the number is today&rsquo;s net.</p></div></div></header><div class="am-part"><ol class="lg-rows" id="lgTopRows">' +
       skeletonRows(10) +
       '</ol></div></section>';
 
@@ -849,7 +849,7 @@
     box.innerHTML =
       '<header class="am-head"><div><h2 class="am-title" id="lgSeasonTitle">Last ' +
       list.length +
-      ' days</h2><p class="am-intro">Each bar is one Legend day&rsquo;s net; the line adds them up. Tap a bar to open that day.</p></div><div class="lg-total ' +
+      ' days</h2><div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Each bar is one Legend day&rsquo;s net; the line adds them up. Tap a bar to open that day.</p></div></div><div class="lg-total ' +
       tone(total) +
       '"><span>Total</span><b>' +
       signed(total) +

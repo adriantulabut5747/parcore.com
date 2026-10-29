@@ -2571,7 +2571,7 @@ try {
         var page = hwrPageKey(window.location.pathname);
         // NOTE: .bn-item / .dsn-link are intentionally left out of this auto-highlight —
         // Home is hardcoded active on this page since it's the web resources hub.
-        document.querySelectorAll('.dsn-chip, a.th-mini').forEach(function(el) {
+        document.querySelectorAll('.dsn-chip, #mxResGrid .mx-tool').forEach(function(el) {
           var href = hwrPageKey(el.getAttribute('href'));
           el.classList.toggle('active', href === page);
         });
@@ -2586,24 +2586,11 @@ try {
       //  - Desktop: chips overflow into the horizontally-scrollable strip
       //    (left/right arrows already show/hide themselves via
       //    initDsnCategoriesScroll's updateArrows()).
-      //  - Mobile: the th-mini-grid is a single-column list, so extra items
-      //    simply stack as additional rows automatically.
-      //
-      // Every row's chevron is a dropdown toggle holding that category's
-      // own on-page sections (hwr-categories.json → sections[<that page>]):
-      //  - The CURRENT page's row starts open, and its items are in-page
-      //    scroll links (href="#toc-<id>", closes the sheet + smooth
-      //    scrolls via hwrScrollToToc) since you're already there.
-      //  - Every OTHER row starts closed, and its items are plain links to
-      //    that category's own page + anchor (href="/web-resources/movies#toc-
-      //    <id>") — a normal navigation that lands on/scrolls to that
-      //    section once you arrive, same as any anchor link would.
-      // A category with no sections entry yet falls back to a plain link
-      // row (no dropdown) so nothing breaks before its placeholder/real
-      // sections are added to hwr-categories.json.
-      // ===================================================
-      // toggleThMiniDropdown() lives in 11layout.js now — shared with the
-      // other sections that use the same More sheet.
+      //  - Mobile: the More sheet's "Resources" section, one .mx-tool tile
+      //    per category (the shared sheet: 11layout.css "MORE SHEET"). Oct 28
+      //    2026: it was an accordion of rows, each opening that page's
+      //    sections; those now live only in the desktop hover panels below.
+      //    On the lobby itself the "Resources" label lights up (no tile).
 
       function renderCategoryNav(data) {
         var categories = data.categories || [];
@@ -2611,7 +2598,7 @@ try {
         var currentFile = hwrPageKey(location.pathname);
 
         var dsnScroll = document.getElementById('dsnCategoriesScroll');
-        var thGrid = document.getElementById('thMiniGrid');
+        var thGrid = document.getElementById('mxResGrid');
         if (!dsnScroll || !thGrid) return;
 
         var dsnHtml = '';
@@ -2621,60 +2608,23 @@ try {
           var name = cat.name || '';
           var link = cat.link || '#';
           var isCurrent = hwrPageKey(link) === currentFile;
-          var pageSections = allSections[link];
-          // This category's own cat slug (not the current page's) — lets
-          // the count badges below be counted from window.HwrWebsitesData
-          // even for a category whose card-list containers don't exist
-          // anywhere in this page's DOM.
-          var catSlug = (window.HWR_PAGE_CAT_MAP && window.HWR_PAGE_CAT_MAP[link]) || '';
 
           dsnHtml += '<a href="' + link + '" class="dsn-chip">' +
             '<img class="dsn-chip-icon" src="' + iconSrc + '" alt="">' + name +
             '</a>';
-
-          // No sections defined for this category yet — plain link row,
-          // same as before, no dropdown to expand into.
-          if (!Array.isArray(pageSections) || !pageSections.length) {
-            thHtml += '<a href="' + link + '" class="th-mini' + (isCurrent ? ' active' : '') + '">' +
-              '<img src="' + iconSrc + '" alt="">' +
-              '<span>' + name + '</span>' +
-              '<svg class="th-mini-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-              '</a>';
-            return;
-          }
-
-          var tocHtml = pageSections.map(function(sec) {
-            var anchorId = 'toc-' + sec.id;
-            var itemHref = isCurrent ? ('#' + anchorId) : (link + '#' + anchorId);
-            var itemClick = isCurrent ? (' onclick="hwrScrollToToc(event,\'' + anchorId + '\',true)"') : '';
-            // noCardList sections (e.g. a page's own Glossary) have no
-            // group/containerId to count against — same as the sidebar
-            // and box-three TOC rows above, drop the badge instead of
-            // showing a permanently-wrong "0".
-            var countBadge = sec.noCardList ? '' :
-              '<span class="stb-toc-count" data-count-for="' + sec.containerId + '" data-cat="' + catSlug + '" data-group="' + (sec.group || '') + '">0</span>';
-            return '<a href="' + itemHref + '" class="stb-toc-card"' + itemClick + '>' +
-              hwrSectionIconSvg(sec, 'stb-toc-icon') +
-              '<span class="stb-toc-name">' + sec.title + '</span>' +
-              countBadge +
-              '</a>';
-          }).join('');
-
-          thHtml += '<div class="th-mini-wrap' + (isCurrent ? ' open' : '') + '">' +
-            '<div class="th-mini-toggle' + (isCurrent ? ' active' : '') + '">' +
-            '<a href="' + link + '" class="th-mini th-mini-link' + (isCurrent ? ' active' : '') + '">' +
-            '<img src="' + iconSrc + '" alt="">' +
-            '<span>' + name + '</span>' +
-            '</a>' +
-            '<button type="button" class="th-mini-chevron-btn" onclick="toggleThMiniDropdown(this)" aria-label="Toggle ' + name + ' sections">' +
-            '<svg class="th-mini-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-            '</button>' +
-            '</div>' +
-            '<div class="th-mini-dropdown"><div class="th-mini-dropdown-inner"><div class="stb-toc-grid">' + tocHtml + '</div></div></div>' +
-            '</div>';
+          thHtml += '<a href="' + link + '" class="mx-tool' + (isCurrent ? ' active' : '') + '">' +
+            '<span class="mx-tool-ico"><img src="' + iconSrc + '" alt="" loading="lazy" decoding="async"></span>' +
+            '<span class="mx-tool-name">' + name + '</span></a>';
         });
         dsnScroll.innerHTML = dsnHtml;
         thGrid.innerHTML = thHtml;
+        var resLabel = document.getElementById('mxResLabel');
+        if (resLabel && hwrPageKey('/web-resources/') === currentFile) {
+          resLabel.classList.add('active');
+          resLabel.setAttribute('aria-current', 'page');
+        }
+        var resCount = document.querySelector('#moreOverlay [data-role="more-count"]');
+        if (resCount) resCount.textContent = categories.length + ' pages';
 
         // Desktop hover panels — same on-page sections as each category's
         // mobile dropdown, shown on mouseenter instead of tap. Paired up by
@@ -2728,8 +2678,8 @@ try {
         highlightActiveNavItems();
 
         // Only now do BOTH the desktop .nav-chip rows (built earlier, in the
-        // other HwrCategoriesPromise.then handler above) and these mobile
-        // .stb-toc-card rows actually exist in the DOM — this .then() always
+        // other HwrCategoriesPromise.then handler above) and the category
+        // chips actually exist in the DOM — this .then() always
         // runs after that one (same promise, registered later = fires
         // later), so this is the first safe point to wire up the "you are
         // here" scroll-spy highlighter and have it see both sets of rows.

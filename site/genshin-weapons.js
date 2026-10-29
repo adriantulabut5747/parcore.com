@@ -525,6 +525,9 @@
       $('wpSub').innerHTML = btn('', 'Any substat') + subs.map((x) => btn(subKey(x), esc(x === 'None' ? 'No substat' : x.replace('Physical DMG Bonus', 'Physical DMG')))).join('');
       const n = (r) => all.filter((w) => w.rarity === r).length;
       $('wpFacts').innerHTML = `<li><b>${all.length}</b>weapons</li><li><b>${n(5)}</b>5&#9733;</li><li><b>${n(4)}</b>4&#9733;</li><li><b>${all.length - n(5) - n(4)}</b>3&#9733; and under</li>`;
+      // Klee's line under the header (Oct 27 2026): the count + the 5-stars on the weapon wish, in her voice.
+      const onWish = wish ? wish.weapons.map((x) => all.find((w) => w.name === x.name)).filter((w) => w && w.rarity === 5).map((w) => w.name) : [];
+      $('wpKlee').textContent = `Klee counted ${all.length} weapons! ` + (onWish.length ? `${onWish.join(' and ')} ${onWish.length > 1 ? 'are' : 'is'} on the weapon wish right now.` : 'Tap one to see its stats at every level.');
       liveWish();
       render();
       const pick = url.get('w') && all.find((w) => slug(w) === url.get('w'));
@@ -532,6 +535,7 @@
     })
     .catch((err) => {
       console.error('Weapons failed to load:', err);
+      $('wpKlee').textContent = "Klee couldn't open the weapon chest. Try again in a bit!";
       $('wpList').innerHTML = "<p class=\"gi-box gi-empty ch-empty\">Couldn't load the weapons right now. Try again in a bit.</p>";
     });
 })();

@@ -3,7 +3,7 @@
 How `/genshin-impact/characters/<slug>` pages are made, and the exact steps to add the next character.
 Read this before touching `scripts/genshin-characters.py`, `scripts/genshin-builds.json`,
 `site/genshin-character.css/.js` or anything in `site/genshin-impact/characters/`.
-The design history (why the page looks the way it does) is in `docs/genshin-handoff.md`, section 7 page 9.
+The design history (why the page looks the way it does) is in git: `docs/genshin-handoff.md` before Oct 28 2026, section 7 page 9.
 
 **Status (Oct 25 2026):** one page exists, the pilot, **Kamisato Ayaka**
 (`/genshin-impact/characters/kamisato-ayaka`). Adrian is still working on the front end. **Don't generate

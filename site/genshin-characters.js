@@ -181,10 +181,14 @@
       $('chFacts').innerHTML =
         `<li><b>${roster.length}</b>characters</li><li><b>${fives}</b>5&#9733;</li><li><b>${roster.length - fives}</b>4&#9733;</li>` +
         `<li>newest <b>${latest.join(' &amp; ')}</b></li>`;
+      // Klee's line under the header (Oct 27 2026): the roster count + the newest, in her voice.
+      const names = roster.filter((c) => c.release === newest.release).map((c) => c.name);
+      $('chKlee').textContent = `Klee knows all ${roster.length} of them! Say hi to ${names.join(' and ')}, the newest ${names.length > 1 ? 'friends' : 'friend'}.`;
       render();
     })
     .catch((err) => {
       console.error('Roster failed to load:', err);
+      $('chKlee').textContent = "Klee couldn't find anyone. Try again in a bit!";
       $('chList').innerHTML = "<p class=\"gi-box gi-empty ch-empty\">Couldn't load the roster right now. Try again in a bit.</p>";
     });
 })();

@@ -112,10 +112,7 @@
   var dateFmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
   // Mojang's version manifest feeds the release timeline.
-  var manifest = fetch('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json').then(function (r) {
-    if (!r.ok) throw new Error(r.status);
-    return r.json();
-  });
+  var manifest = (window.pcJSON || function (u) { return fetch(u).then(function (r) { return r.json(); }); })('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json'); // shared with mc-java.js (one download)
   // ---- Commands: in-game colours + the chat input line ----
   // Colours follow the game's own command highlighting: selectors aqua,
   // ids green, strings gold, numbers light purple.

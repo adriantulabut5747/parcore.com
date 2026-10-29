@@ -19,11 +19,15 @@
   function favicon(site) {
     return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(site) + '&sz=64';
   }
-  function card(p) {
+  // Same card as Worlds / shaders / modpacks / data packs ("PACK CARDS" in mc-home.css).
+  function card(p, i, label) {
     return '<a class="mch-mod" href="' + esc(p.href) + '" target="_blank" rel="noopener">' +
-      '<div class="mch-mod-media"><img src="' + esc(p.img) + '" alt="" loading="lazy" decoding="async"></div>' +
-      '<h3 class="mch-mod-name">' + esc(p.name) + '</h3><p class="mch-mod-desc">' + esc(p.desc) + '</p>' +
-      '<span class="mch-src"><img src="' + favicon(p.site) + '" alt="" loading="lazy">' + esc(p.source) + '</span></a>';
+      '<div class="mch-mod-media"><img src="' + esc(p.img) + '" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">' + String(i + 1).padStart(2, '0') + '</span></div>' +
+      '<h3 class="mch-mod-name">' + esc(p.name) + '</h3>' +
+      (p.by ? '<span class="mch-mod-author">by ' + esc(p.by) + '</span>' : '') +
+      '<p class="mch-mod-desc">' + esc(p.desc) + '</p>' +
+      '<p class="mch-scard-tags">' + esc(label) + '</p>' +
+      '<span class="mch-src"><img src="' + favicon(p.site) + '" alt="" loading="lazy"><b>' + esc(p.source) + '</b></span></a>';
   }
 
   fetch('/mc-packs.json')
@@ -43,7 +47,7 @@
         var mine = packs.filter(function (p) { return p.cat === c.key; });
         return '<section class="mch-pgroup" id="cat-' + c.key + '" aria-labelledby="cat-' + c.key + '-t">' +
           '<header class="mch-pgroup-head"><h4 id="cat-' + c.key + '-t">' + esc(c.label) + '<span data-n>' + mine.length + '</span></h4><p>' + esc(c.sub) + '</p></header>' +
-          '<div class="mch-mods mch-mods--grid" style="--cols:5">' + mine.map(card).join('') + '</div></section>';
+          '<div class="mch-mods mch-mods--grid mch-mods--cards" style="--cols:5">' + mine.map(function (p, i) { return card(p, i, c.label); }).join('') + '</div></section>';
       }).join('');
       chips.innerHTML = '<button type="button" class="mch-chip" data-cat="all" aria-pressed="true">All<span data-n>' + packs.length + '</span></button>' +
         cats.map(function (c) {

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft | Parchrome</title>
+<meta name="description" content="Browse the best Minecraft Vanilla worlds, shaders, resource packs, commands and more — curated by the Parchrome community.">
+<meta name="theme-color" content="#0e0e0e">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parchrome1.netlify.app/minecraft/">
+<meta property="og:title" content="Minecraft | Parchrome">
+<meta property="og:description" content="Browse top-rated worlds, shaders, resource packs, commands and more. Curated Minecraft content in one place.">
+<meta property="og:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Parchrome">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minecraft Vanilla — Parchrome">
+<meta name="twitter:description" content="Browse top-rated worlds, shaders, resource packs, commands and more.">
+<meta name="twitter:image" content="https://parchrome1.netlify.app/icons/minecrafthero.jfif">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Handjet:wght@400..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261028my">
+<link rel="stylesheet" href="/mc-java.css?v=20261020bn">
+<link rel="stylesheet" href="/article-cards.css?v=20261027perf">
+<link rel="stylesheet" href="/mc-home.css?v=20261022qref">
+<link rel="stylesheet" href="/mc-hero.css?v=20261028bs">
+<link rel="stylesheet" href="/mc-nether.css?v=20261028qa">
+<link rel="stylesheet" href="/mc-lobby.css?v=20261028qa">
+
+
+</head>
+<body class="mc-home mc-lobby" data-game-nav="minecraft">  
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" loading="lazy" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" onclick="event.stopPropagation()" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/minecraft.png" alt="TH10 Icon" class="th-icon" loading="lazy" decoding="async">
+    <div class="secondary-content">
+          <!-- Desktop shows just the section name; mobile adds the hardcoded
+               "you are here" crumb. Structure mirrors the HWR bar so the two
+               read identically, but the group is static here rather than
+               driven by a scroll-spy. -->
+          <span class="secondary-content-desktop">Minecraft</span>
+          <span class="secondary-content-mobile">
+            <span class="sc-mobile-text">Minecraft</span>
+            <span class="sc-mobile-group">Lobby</span>
+          </span>
+        </div>
+  </div>
+    <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Minecraft pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" loading="lazy" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+    <!-- HERO v2 — see the "HERO v2" block in mc-java.css. The edition wordmark
+         swaps per edition (Bedrock / Story / Dungeons logos are already in
+         minecrafticons/); the live version pills keep the original hvs-* ids so
+         the Mojang piston-meta fetch in mc-java.js drives them unchanged. -->
+    <div class="coc-content">
+      <!-- MINECRAFT JAVA HOME v2 (Oct 12 2026): centered frame, bone bands,
+           podium, command terminal, server standings. Styles: mc-home.css,
+           behaviour (copy, tabs, block reveals): mc-home.js. mc-java.js still
+           fills the nav strip (.mc-mobile-nav), the hvs-* versions,
+           #vt-sb-latest and #server-row: keep those ids. -->
+      <div class="mch">
+      <!-- HERO (Oct 28 2026, v3): the Nether. Official Nether Update art, baked + graded by _tools/lobby-hero/nether.py;
+           mc-lobby-hero.js draws the live particles over it (portal, lava embers, soul fire, crimson spores) and runs the
+           Piglin's lines + the Barter box. Copy left, Barter right, the piglin in the picture's middle kept clear.
+           Styles: mc-lobby.css "HERO". The hvs-* ids are filled by mc-java.js. Old 3D island: _tools/lobby-hero/island/. -->
+      <header class="ml-hero" id="mlHero">
+        <div class="ml-art" aria-hidden="true">
+          <picture>
+            <source media="(max-width: 970px)" srcset="/images/minecraft/lobby/nether-phone.webp">
+            <img class="ml-art-img" src="/images/minecraft/lobby/nether.webp" alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
+          </picture>
+          <canvas class="ml-fx" id="mlFx"></canvas>
+        </div>
+        <div class="mch-frame ml-hero-grid">
+          <div class="ml-copy">
+            <p class="ml-kicker"><span>Minecraft</span><span>Java Edition</span></p>
+            <h1 class="ml-title"><span class="sr-only">Minecraft: </span><span class="ml-title-line">Play more.</span><br><em>Search less.</em></h1>
+            <p class="ml-desc">Only the best of the best for Minecraft Java Edition: worlds, packs, seeds and tools, picked by hand. The junk gets skipped, so you don't have to. Quality over quantity.</p>
+            <div class="ml-say">
+              <button type="button" class="ml-say-face" id="mlFace" aria-label="Next line from the Piglin"><img src="/images/minecraft/piglin/face.webp" alt="" width="56" height="56"></button>
+              <div class="ml-say-box"><b>Piglin</b><p id="mlLine" aria-live="polite">Gold first. Then we talk. That's how it works down here.</p></div>
+            </div>
+          </div>
+          <aside class="ml-side">
+            <section class="ml-barter" aria-labelledby="mlBarterT">
+              <header class="ml-barter-head"><img src="/minecrafticons/items/gold_ingot.png" alt=""><h2 id="mlBarterT">Barter</h2><span>Gold in, a page out</span></header>
+              <div class="ml-slot" id="mlSlot" aria-live="polite">
+                <p class="ml-slot-idle"><img src="/minecrafticons/items/gold_ingot.png" alt="">Throw the Piglin a gold ingot. It keeps the gold and tosses back a random page.</p>
+              </div>
+              <button type="button" class="ml-btn ml-btn--red ml-barter-go" id="mlThrow"><img src="/minecrafticons/items/gold_ingot.png" alt="">Throw gold</button>
+            </section>
+            <div class="ml-ver">
+              <span><small>Release</small><b id="mlRel">&hellip;</b></span>
+              <span><small>Snapshot</small><b id="mlSnap">&hellip;</b></span>
+              <button type="button" class="ml-btn ml-ver-notes" onclick="openVtFeed()" aria-label="Patch notes" title="Patch notes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg></button>
+              <span hidden><span id="hvs-release-version"></span><span id="hvs-release-updated"></span><span id="hvs-snapshot-version"></span><span id="hvs-snapshot-updated"></span></span>
+            </div>
+          </aside>
+        </div>
+      </header>
+
+
+      <!-- Java chapters share a subtle background treatment; section titles carry the headings. -->
+      <!-- LOBBY SECTIONS (Oct 28 2026, round 2: Adrian wanted every section to be a Minecraft screen, not cards):
+           a real seed's Nether map (banners = pages), a 3D item-frame wall, the Select World screen, articles (untouched),
+           pack rows, the commands copy list, release history (untouched), the FAQ (/coc/'s .qa look). Game sprites: minecrafticons/gui/lobby/ (26.3 jar). Styles: mc-lobby.css;
+           behaviour: mc-lobby.js (+ mc-lobby-frames.js for the wall). Text in .mcf spans is redrawn in the game font. -->
+      <div class="mch-ch ml-band" id="ch-map"><div class="ml-cave" aria-hidden="true"><div class="ml-cave-glint"></div><div class="ml-cave-front"></div><i class="ml-ember" style="--x:8%;--d:7s;--t:-1s;--dx:-20px"></i><i class="ml-ember" style="--x:17%;--d:9s;--t:-4s;--dx:30px"></i><i class="ml-ember" style="--x:26%;--d:6s;--t:-2s;--dx:-10px"></i><i class="ml-ember" style="--x:34%;--d:8s;--t:-6s;--dx:24px"></i><i class="ml-ember" style="--x:43%;--d:10s;--t:-3s;--dx:-34px"></i><i class="ml-ember" style="--x:51%;--d:7s;--t:-5s;--dx:16px"></i><i class="ml-ember" style="--x:60%;--d:9s;--t:-1s;--dx:-22px"></i><i class="ml-ember" style="--x:68%;--d:6s;--t:-7s;--dx:30px"></i><i class="ml-ember" style="--x:76%;--d:8s;--t:-2s;--dx:-14px"></i><i class="ml-ember" style="--x:85%;--d:10s;--t:-5s;--dx:20px"></i><i class="ml-ember" style="--x:92%;--d:7s;--t:-3s;--dx:-26px"></i><i class="ml-ember" style="--x:97%;--d:9s;--t:-6s;--dx:12px"></i></div><div class="mch-frame"><section class="mch-sec ml-map" id="map" aria-labelledby="mapT"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="mapT">Piglin's <em>map.</em></h2><div class="ml-guide"><img class="ml-guide-face" src="/images/minecraft/piglin/face.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><p><b>Piglin</b>The real Nether under a real seed. Every banner is a page. Maps spin like crazy down here, so I drew this one myself.</p></div></div></header><div class="ml-atlas"><figure class="ml-mapitem"><div class="ml-mapface" id="mlMapFace"><img loading="lazy" class="ml-mappx" src="/images/minecraft/lobby/map.png" alt="" width="128" height="128" decoding="async"><div class="ml-marks" id="mlMarks"></div><div class="ml-tip" id="mlTip" hidden></div></div></figure><div class="ml-key"><div class="ml-key-groups" id="mlMap"></div><p class="ml-seed"><img loading="lazy" src="/minecrafticons/items/filled_map.png" alt="">Seed <code>8608349220991265627</code> &middot; Java 1.21 &middot; its real Nether biomes and structures<a href="/minecraft/tools/seed-map#seed=8608349220991265627&amp;v=1.21&amp;dim=-1&amp;x=0&amp;z=0&amp;zoom=-3">Open in Seed Map<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p></div></div></section></div></div>
+      <div class="mch-ch ml-band" id="ch-tools"><div class="mch-frame"><section class="mch-sec ml-tools" id="tools" aria-labelledby="toolsT"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="toolsT">Popular <em>tools.</em></h2><div class="ml-guide"><img class="ml-guide-face" src="/images/minecraft/piglin/face.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><p><b>Piglin</b>The best loot, hung on the board. Point at one and it turns, like in an item frame. None of it is gold. Tragic.</p></div></div><div class="mch-sec-act"><a class="art-all" href="/minecraft/tools/">All tools<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header><div class="ml-stage"><div class="ml-board"><div class="ml-wall" id="mlWall"><canvas class="ml-wall-3d" aria-hidden="true"></canvas><div class="ml-wall-grid"><a class="ml-fr" href="/minecraft/tools/mob" data-item="/minecrafticons/eggs/zombie.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Mob Summon</b><span>Any mob, your rules</span></span></a><a class="ml-fr" href="/minecraft/tools/seed-map" data-item="/minecrafticons/items/filled_map.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Seed Map</b><span>Read any seed</span></span></a><a class="ml-fr" href="/minecraft/tools/enchanted-item" data-item="/minecrafticons/items/enchanted_book.png" data-glint><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Enchanted Item</b><span>Any enchantment, one /give</span></span></a><a class="ml-fr" href="/minecraft/tools/skin-lookup" data-item="/minecrafticons/items/armor_stand.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Skin Lookup</b><span>Any player's skin in 3D</span></span></a><a class="ml-fr" href="/minecraft/tools/firework" data-item="/minecrafticons/items/firework_rocket.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Fireworks</b><span>Rockets, launched live</span></span></a><a class="ml-fr" href="/minecraft/tools/banner" data-item="/minecrafticons/items/banner_icon.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Banner Maker</b><span>Banners up to 16 patterns</span></span></a><a class="ml-fr" href="/minecraft/tools/potion" data-item="/minecrafticons/items/potion.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Potion Maker</b><span>Any effect, any level</span></span></a><a class="ml-fr" href="/minecraft/tools/anvil" data-item="/minecrafticons/items/anvil.png"><span class="ml-fr-hole" aria-hidden="true"></span><span class="ml-fr-plate"><b>Anvil Optimizer</b><span>The cheapest book order</span></span></a></div></div><i class="ml-cap" aria-hidden="true"></i><i class="ml-cap ml-cap--tr" aria-hidden="true"></i><i class="ml-cap ml-cap--bl" aria-hidden="true"></i><i class="ml-cap ml-cap--br" aria-hidden="true"></i></div><figure class="ml-stage-piglin" aria-hidden="true"><img src="/images/minecraft/piglin/piglin-axe.webp" alt="" width="347" height="380" loading="lazy" decoding="async"></figure></div></section></div></div>
+      <div class="mch-ch ml-band" id="ch-worlds"><div class="mch-frame"><section class="mch-sec ml-worlds" id="worlds" aria-labelledby="worldsT"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="worldsT">Top 10 <em>worlds.</em></h2><div class="ml-guide"><img class="ml-guide-face" src="/images/minecraft/piglin/face.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><p><b>Piglin</b>Ten worlds, one portal. Pick a world and it shows up in the frame. Step through, then bring back gold.</p></div></div><div class="mch-sec-act"><a class="art-all" href="/minecraft/java/worlds">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header><div class="wp" id="mlWorlds"><div class="wp-stage"><div class="wp-gate"><a class="wp-portal" href="#" tabindex="-1" aria-hidden="true"><canvas class="wp-swirl"></canvas><span class="wp-world"><img class="wp-bg" alt="" loading="lazy" decoding="async"><img class="wp-img" alt="" loading="lazy" decoding="async"></span><span class="mcf wp-rank" data-mc="#1" data-c="ffaa00" data-s="4">#1</span></a><i class="wp-cry" style="left:calc(3*var(--B));top:0"></i><i class="wp-cry" style="right:calc(5*var(--B));top:0"></i><i class="wp-cry" style="left:0;top:calc(4*var(--B))"></i><i class="wp-cry" style="right:0;top:calc(2*var(--B))"></i><i class="wp-cry" style="left:calc(2*var(--B));bottom:0"></i><i class="wp-cry" style="right:calc(3*var(--B));bottom:0"></i><i class="wp-cry" style="right:0;bottom:0"></i><span class="wp-px" aria-hidden="true"><i class="wp-p" style="--x:6%;--y:18%;--dx:14px;--dy:-46px;--d:3.2s;--t:0s"></i><i class="wp-p" style="--x:12%;--y:72%;--dx:22px;--dy:-60px;--d:4.1s;--t:-1.3s"></i><i class="wp-p" style="--x:20%;--y:40%;--dx:-18px;--dy:-52px;--d:3.6s;--t:-2.2s"></i><i class="wp-p" style="--x:30%;--y:84%;--dx:10px;--dy:-70px;--d:4.6s;--t:-0.4s"></i><i class="wp-p" style="--x:44%;--y:22%;--dx:-12px;--dy:-40px;--d:3.0s;--t:-1.8s"></i><i class="wp-p" style="--x:55%;--y:66%;--dx:16px;--dy:-58px;--d:4.3s;--t:-3.1s"></i><i class="wp-p" style="--x:66%;--y:30%;--dx:-20px;--dy:-64px;--d:3.8s;--t:-0.9s"></i><i class="wp-p" style="--x:76%;--y:78%;--dx:12px;--dy:-48px;--d:3.4s;--t:-2.6s"></i><i class="wp-p" style="--x:86%;--y:46%;--dx:-14px;--dy:-56px;--d:4.0s;--t:-1.5s"></i><i class="wp-p" style="--x:94%;--y:14%;--dx:8px;--dy:-44px;--d:3.3s;--t:-3.4s"></i><i class="wp-p" style="--x:38%;--y:56%;--dx:-8px;--dy:-62px;--d:4.4s;--t:-2.9s"></i><i class="wp-p" style="--x:82%;--y:92%;--dx:18px;--dy:-50px;--d:3.7s;--t:-0.2s"></i></span></div><div class="wp-plate" aria-live="polite"><span class="mcf wp-name" data-mc="" data-s="3"></span><p class="wp-desc"></p><div class="wp-plate-foot"><ul class="wp-facts"></ul><a class="ml-btn ml-btn--red wp-play" href="#">Play world<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div></div><div class="mcs mcs--worlds"><div class="mcs-head"><span class="mcf mcs-title" data-mc="Select World">Select World</span><label class="mcs-search"><span class="sr-only">Search worlds</span><input type="search" placeholder="search for worlds" autocomplete="off" spellcheck="false"></label></div><ul class="sw-list" role="listbox" aria-label="Top 10 worlds"><li class="sw-row is-on" role="option" aria-selected="true" tabindex="0" data-href="https://hielkemaps.com/maps/parkour-spiral" data-ext="1" data-img="/minecrafticons/worlds/parkour-spiral.webp" data-desc="The ultimate spiral parkour challenge" data-by="Hielke" data-ver="26.2" data-players="1+" data-tag="Parkour" data-tagi="/minecrafticons/items/feather.png"><span class="sw-ico"><img src="/minecrafticons/worlds/parkour-spiral.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="1. Parkour Spiral">1. Parkour Spiral</span><span class="mcf sw-meta" data-mc="Hielke, Version: 26.2" data-c="7e7e7e">Hielke, Version: 26.2</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="/minecraft/java/worlds" data-ext="0" data-img="/minecrafticons/hardcoreparcore-compresso.jpg" data-desc="3000 Days Hardcore World by ACP" data-by="Parcore" data-ver="" data-players="" data-tag="" data-tagi=""><span class="sw-ico"><img src="/minecrafticons/hardcoreparcore-compresso.jpg" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="2. Parcorp Village">2. Parcorp Village</span><span class="mcf sw-meta" data-mc="by Parcore" data-c="7e7e7e">by Parcore</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://hermitcraft.com/" data-ext="1" data-img="/minecrafticons/worlds/hermitcraft.webp" data-desc="A server full of massive creations" data-by="the Hermits" data-ver="" data-players="" data-tag="City" data-tagi="/minecrafticons/items/bricks.png"><span class="sw-ico"><img src="/minecrafticons/worlds/hermitcraft.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="3. Hermitcraft">3. Hermitcraft</span><span class="mcf sw-meta" data-mc="by the Hermits" data-c="7e7e7e">by the Hermits</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.curseforge.com/minecraft/worlds/oneblock" data-ext="1" data-img="/minecrafticons/worlds/oneblock-skyblock.webp" data-desc="Start with one block (Tiny Takeover)" data-by="Crepi" data-ver="26.3" data-players="1+" data-tag="" data-tagi=""><span class="sw-ico"><img src="/minecrafticons/worlds/oneblock-skyblock.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="4. One Block Skyblock">4. One Block Skyblock</span><span class="mcf sw-meta" data-mc="Crepi, Version: 26.3" data-c="7e7e7e">Crepi, Version: 26.3</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.planetminecraft.com/project/mosslorn-1000x1000-custom-abandoned-city-map-with-loot-lore-and-hundreds-of-secrets-to-find/" data-ext="1" data-img="/minecrafticons/mosslorn-compresso.webp" data-desc="Explore a ruined city full of secrets" data-by="Milkshake___" data-ver="1.20.1+" data-players="" data-tag="City" data-tagi="/minecrafticons/items/bricks.png"><span class="sw-ico"><img src="/minecrafticons/mosslorn-compresso.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="5. [Mosslorn] Overgrown City">5. [Mosslorn] Overgrown City</span><span class="mcf sw-meta" data-mc="Milkshake___, Version: 1.20.1+" data-c="7e7e7e">Milkshake___, Version: 1.20.1+</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.planetminecraft.com/project/gotham-city-by-flowzzy/" data-ext="1" data-img="/minecrafticons/gothamcity.webp" data-desc="Gotham City inspired by Arkham games" data-by="Flowzzy" data-ver="" data-players="" data-tag="City" data-tagi="/minecrafticons/items/bricks.png"><span class="sw-ico"><img src="/minecrafticons/gothamcity.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="6. Gotham City">6. Gotham City</span><span class="mcf sw-meta" data-mc="by Flowzzy" data-c="7e7e7e">by Flowzzy</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.mediafire.com/file/5uik0uao8c69t8a/Korea+University+Campus+in+Seoul,+South+Korea.rar/file" data-ext="1" data-img="/minecrafticons/koreaimage.webp" data-desc="Explore a detailed campus built among rolling hills" data-by="KURAFT" data-ver="" data-players="" data-tag="Recreation" data-tagi="/minecrafticons/items/painting.png"><span class="sw-ico"><img src="/minecrafticons/koreaimage.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="7. Korea University Campus">7. Korea University Campus</span><span class="mcf sw-meta" data-mc="by KURAFT" data-c="7e7e7e">by KURAFT</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.planetminecraft.com/project/atheria-v2-0/" data-ext="1" data-img="/minecrafticons/atheria.jpg" data-desc="Explore a growing city full of landmarks" data-by="Tazluh" data-ver="" data-players="" data-tag="City" data-tagi="/minecrafticons/items/bricks.png"><span class="sw-ico"><img src="/minecrafticons/atheria.jpg" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="8. Atheria (v2.06)">8. Atheria (v2.06)</span><span class="mcf sw-meta" data-mc="by Tazluh" data-c="7e7e7e">by Tazluh</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.planetminecraft.com/project/stonehill-castle-4407920/" data-ext="1" data-img="/minecrafticons/stonehill.jpg" data-desc="A royal fortress full of secrets" data-by="FALL Studios" data-ver="1.15" data-players="" data-tag="Castle" data-tagi="/minecrafticons/items/shield.png"><span class="sw-ico"><img src="/minecrafticons/stonehill.jpg" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="9. Stonehill Castle">9. Stonehill Castle</span><span class="mcf sw-meta" data-mc="FALL Studios, Version: 1.15" data-c="7e7e7e">FALL Studios, Version: 1.15</span></span></li><li class="sw-row" role="option" aria-selected="false" tabindex="-1" data-href="https://www.planetminecraft.com/project/nova-celes-city-the-futuristic-town-cit-du-swagg-download/" data-ext="1" data-img="/minecrafticons/worlds/nova-celes.webp" data-desc="A futuristic city in eight themed districts" data-by="QuanticsBuild" data-ver="" data-players="" data-tag="City" data-tagi="/minecrafticons/items/bricks.png"><span class="sw-ico"><img src="/minecrafticons/worlds/nova-celes.webp" alt="" loading="lazy" decoding="async"><i aria-hidden="true"></i></span><span class="sw-txt"><span class="mcf sw-name" data-mc="10. Nova Celes City">10. Nova Celes City</span><span class="mcf sw-meta" data-mc="by QuanticsBuild" data-c="7e7e7e">by QuanticsBuild</span></span></li></ul><p class="sw-none" hidden><span class="mcf" data-mc="No worlds match. Try another word." data-c="a0a0a0">No worlds match. Try another word.</span></p><div class="mcs-foot"><button type="button" class="mcb sw-random"><span class="mcf" data-mc="Random World">Random World</span></button><a class="mcb" href="/minecraft/java/seeds"><span class="mcf" data-mc="Create New World">Create New World</span></a></div></div></div></section></div></div>
+
+      <!-- The deepslate pit with a rule on top: Java guides (swapped with Popular worlds, Oct 21 2026). -->
+      <div class="mch-ch mch-ch--play" id="ch-play" role="region" aria-label="Guides">
+        <!-- JAVA GUIDES: Minecraft articles from /articles.json. -->
+        <section class="as-band mch-art" id="mc-articles" aria-labelledby="asTitle">
+          <div class="lob-head lob-head--row">
+            <h3 class="lob-title" id="asTitle">Popular <em>articles.</em></h3>
+            <a class="art-all" href="/articles/">View more<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+          <div class="art-track" id="mcArticles" data-game="minecraft" data-variant="slide" data-order="random"></div>
+          <div class="art-pager">
+            <div class="art-progress" data-for="mcArticles" aria-hidden="true"><span></span></div>
+            <div class="art-nav" data-for="mcArticles">
+              <button type="button" aria-label="Previous article">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+              </button>
+              <button type="button" aria-label="Next article">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="mch-ch ml-band" id="ch-packs"><div class="mch-frame"><section class="mch-sec ml-row" id="packs" aria-labelledby="mc-mods-t"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="mc-mods-t">Popular <em>R-Packs.</em></h2><div class="ml-guide"><img class="ml-guide-face" src="/images/minecraft/piglin/face.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><p><b>Piglin</b>Same world, new light. Packs, shaders, whole modpacks. None of them make gold, I checked.</p></div></div><div class="mch-sec-act"><div class="art-nav mch-row-nav" data-for="mcPacksRow"><button type="button" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button type="button" aria-label="Scroll on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><a class="art-all" href="/minecraft/java/resource-packs">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header><div class="mch-mods mch-mods--row" id="mcPacksRow"><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/fresh-animations" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1402/911/256/256/638909354589974674.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">01</span></div><h3 class="mch-mod-name">Fresh Animations</h3><p class="mch-mod-desc">Make your game like the trailers!</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://vanillatweaks.net/picker/resource-packs/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/vanillatweaks.jpg" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">02</span></div><h3 class="mch-mod-name">Vanilla Tweaks</h3><p class="mch-mod-desc">Pick-and-mix resource and data packs</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=vanillatweaks.net&sz=64" alt="" loading="lazy"><b>Vanilla Tweaks</b></span></a><a class="mch-mod" href="https://modrinth.com/resourcepack/better-leaves" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/uvpymuxq/fe1a61998ae57dc6ad1a4bb028334c3c3925d22f_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">03</span></div><h3 class="mch-mod-name">Motschen's Better Leaves</h3><p class="mch-mod-desc">Better Leaves adds additional layers</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/resourcepack/x-ray" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/u6RWzf7M/4ae5ff97cec3ed2c62f07ce0a4984b7fbc78c2d9_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">04</span></div><h3 class="mch-mod-name">X Ray | Spectator</h3><p class="mch-mod-desc">Best X ray texture Pack For Minecraft</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/fresh-moves" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/985/357/256/256/638494820573552980.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">05</span></div><h3 class="mch-mod-name">Fresh Moves</h3><p class="mch-mod-desc">Gives fancy animations to the player entity.</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.planetminecraft.com/texture-pack/modernarch-realism-1-13-1-14-512x512/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/compressed-modernarch.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">06</span></div><h3 class="mch-mod-name">ModernArch</h3><p class="mch-mod-desc">Contains 3D models, 1024x resolution</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="" loading="lazy"><b>PMC</b></span></a><a class="mch-mod" href="https://www.planetminecraft.com/texture-pack/rename-items/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/renameitems.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">07</span></div><h3 class="mch-mod-name">Rename Items</h3><p class="mch-mod-desc">Unlock custom textures by renaming items</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="" loading="lazy"><b>PMC</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/stay-true" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/274/491/256/256/637258639542653246.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">08</span></div><h3 class="mch-mod-name">Stay True</h3><p class="mch-mod-desc">Upgraded foliage, leaves and plants.</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.planetminecraft.com/texture-pack/redstone-tweaks/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="/minecrafticons/redstonetweaks.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">09</span></div><h3 class="mch-mod-name">Redstone Tweaks</h3><p class="mch-mod-desc">Visual upgrades for redstone builds</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=planetminecraft.com&sz=64" alt="" loading="lazy"><b>PMC</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/texture-packs/low-on-fire" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/494/548/64/64/637806308919001110.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">10</span></div><h3 class="mch-mod-name">Low on Fire</h3><p class="mch-mod-desc">Low fire on your screen! Vanilla Friendly</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=CurseForge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a></div></section><section class="mch-sec ml-row" id="mc-shaders" aria-labelledby="mc-shaders-t"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="mc-shaders-t">Popular <em>shaders.</em></h2></div><div class="mch-sec-act"><div class="art-nav mch-row-nav" data-for="mcShadersRow"><button type="button" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button type="button" aria-label="Scroll on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><a class="art-all" href="/minecraft/java/shaders">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header><div class="mch-mods mch-mods--row" id="mcShadersRow"><a class="mch-mod" href="https://modrinth.com/shader/bsl-shaders" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/Q1vvjJYV/2a611a3cb434fb52fb81fa5dace13c5d8b67e55d_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">01</span></div><h3 class="mch-mod-name">BSL Shaders</h3><p class="mch-mod-desc">Real-time lighting and stunning sky effects</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://minecraftshader.com/sildurs-vibrant-shaders/" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://minecraftshader.com/wp-content/uploads/2021/11/sildurs-vibrant-shaders.jpg.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">02</span></div><h3 class="mch-mod-name">Sildurs Vibrant Shaders</h3><p class="mch-mod-desc">Improved visuals with dynamic shadows</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=minecraftshader.com&sz=64" alt="" loading="lazy"><b>MC Shaders</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/complementary-reimagined" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/HVnmMxH1/79cb7c8123bbc54945305b2ebad6b8881efdf5f8_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">03</span></div><h3 class="mch-mod-name">Complementary Shaders</h3><p class="mch-mod-desc">Preserving the elements of Minecraft</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/nostalgia-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/xEItlMn3/49ba53348dd4902ad2a3ae49cc643550ead201bc.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">04</span></div><h3 class="mch-mod-name">Nostalgia Shaders</h3><p class="mch-mod-desc">Classic shaders with a modern visual style</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/mellow" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/BUxf36AP/b2cc2e9b97e5e0c4c7fcd89b7e295f29a29b9c6d_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">05</span></div><h3 class="mch-mod-name">Mellow Shaders</h3><p class="mch-mod-desc">Shaderpack with a painterly aesthetic</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/super-duper-vanilla" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/LMIZZNxZ/5d09a380b6da014dcbca683879cdfb4a94603cf8_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">06</span></div><h3 class="mch-mod-name">Super Duper Vanilla</h3><p class="mch-mod-desc">Inspired by Super Duper Graphics style</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=Modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/bliss-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/ZvMtQlho/90145c971ea24387775108fc86c89bed9bd2c8f1_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">07</span></div><h3 class="mch-mod-name">Bliss Shaders</h3><p class="mch-mod-desc">Fantasy-styled with heavy scene variation and customization</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/solas-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/EpQFjzrQ/e3efc6ba7a63f9e1cf473a794d0224a6daf243c7_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">08</span></div><h3 class="mch-mod-name">Solas Shader</h3><p class="mch-mod-desc">Colored lighting and vibrant fancy visuals</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/photon-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/lLqFfGNs/39cb5f12e7dcc68d6cb666f225fcb2b801dd70fb_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">09</span></div><h3 class="mch-mod-name">Photon Shaders</h3><p class="mch-mod-desc">Gameplay-focused, semi-realistic sky and lighting</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a><a class="mch-mod" href="https://modrinth.com/shader/vanilla-plus-shader" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://cdn.modrinth.com/data/EPsIYDj1/ebc9166345b79c602c18df0dc9f7c4c68d28e998_96.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">10</span></div><h3 class="mch-mod-name">Vanilla Plus Shader</h3><p class="mch-mod-desc">Modern visual overhaul that stays faithful to vanilla</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=modrinth.com&sz=64" alt="" loading="lazy"><b>Modrinth</b></span></a></div></section><section class="mch-sec ml-row" id="mc-modpacks" aria-labelledby="mc-modpacks-t"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="mc-modpacks-t">Popular <em>modpacks.</em></h2></div><div class="mch-sec-act"><div class="art-nav mch-row-nav" data-for="mcModpacksRow"><button type="button" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button type="button" aria-label="Scroll on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><a class="art-all" href="/minecraft/java/mods">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header><!-- First 10 of mc-modpacks.json "modpacks", in that file's order. --><div class="mch-mods mch-mods--row" id="mcModpacksRow"><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/better-mc-forge-bmc4" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1095/963/256/256/638641361377079410.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">01</span></div><h3 class="mch-mod-name">Better MC [FORGE] BMC4</h3><p class="mch-mod-desc">A kitchen-sink pack packed with quality-of-life mods and new biomes to explore</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/homestead-cozy" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1336/95/256/256/638868484880282584.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">02</span></div><h3 class="mch-mod-name">Homestead: Cozy</h3><p class="mch-mod-desc">A relaxing cottage-core survival pack focused on farming, décor, and peaceful progression</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/create-ultimate-selection-2" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1394/588/256/256/638904163435529465.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">03</span></div><h3 class="mch-mod-name">Create: Ultimate Selection 2</h3><p class="mch-mod-desc">Build sprawling factories and automate everything with the Create mod at its center</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/otherworld-dnd" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1604/132/256/256/639036063530941198.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">04</span></div><h3 class="mch-mod-name">Otherworld: DnD</h3><p class="mch-mod-desc">A D&amp;D-inspired RPG modpack with spells, classes, dungeons, and legendary loot</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/beyond-depth" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/1750/700/639114276202065882.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">05</span></div><h3 class="mch-mod-name">Beyond Depth</h3><p class="mch-mod-desc">Dive into revamped cave systems with new ores, mobs, and underground biomes</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/better-oneblock" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1551/613/256/256/639007047544599113_animated.gif" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">06</span></div><h3 class="mch-mod-name">Better OneBlock</h3><p class="mch-mod-desc">The classic OneBlock skyblock experience reimagined with mod progression and custom phases</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/dungeon-heroes" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/939/312/256/256/638419035171069148.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">07</span></div><h3 class="mch-mod-name">Dungeon Heroes</h3><p class="mch-mod-desc">Hero classes, skill trees, and boss dungeons in a full RPG overhaul of vanilla</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/zombiemania" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1854/104/256/256/639165491163621475_animated.gif" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">08</span></div><h3 class="mch-mod-name">ZombieMania</h3><p class="mch-mod-desc">Survive waves of undead hordes in a hardcore zombie apocalypse overhaul</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/restlesshorizons" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/1794/859/639136983596579775.webp" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">09</span></div><h3 class="mch-mod-name">Restless Horizons</h3><p class="mch-mod-desc">Open-world exploration pack with new dimensions, structures, and epic bosses</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a><a class="mch-mod" href="https://www.curseforge.com/minecraft/modpacks/better-adventures-plus" target="_blank" rel="noopener"><div class="mch-mod-media mch-reveal"><img src="https://media.forgecdn.net/avatars/thumbnails/1606/687/256/256/639037309955176837.png" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">10</span></div><h3 class="mch-mod-name">Better Adventures+</h3><p class="mch-mod-desc">Enhances vanilla exploration with richer biomes, villages, and world structures</p><span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=curseforge.com&sz=64" alt="" loading="lazy"><b>CurseForge</b></span></a></div></section></div></div>
+      <div class="mch-ch mch-ch--play ml-strip" id="ch-build" role="region" aria-label="Commands"><div class="mch-frame"><section class="mch-sec ml-cmds" id="mc-commands" aria-labelledby="mc-commands-t"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="mc-commands-t">Popular <em>commands.</em></h2><div class="ml-guide"><img class="ml-guide-face" src="/images/minecraft/piglin/face.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><p><b>Piglin</b>Words the world obeys. Copy one, paste it in chat, watch it happen.</p></div></div><div class="mch-sec-act"><a class="art-all" href="/minecraft/java/commands">View all<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></header><div class="mch-term"><div class="mch-term-bar"><span class="mch-term-hint">Tap Copy, paste into chat or a command block</span></div><ul class="mch-term-list" id="homeCmdList"></ul><div class="mch-chatline" aria-hidden="true"><span class="mch-chatline-text">/</span><i class="mch-caret"></i></div></div>
+        </section></div></div>
+
+      <div class="mch-ch mch-ch--bedrock" id="ch-learn" role="region" aria-label="Learn">
+        <div class="mch-frame">
+        <!-- RELEASE TIMELINE (Oct 12): every "release" in Mojang's version list
+             (piston-meta, the feed the hero reads), one block per release, stacked
+             by year. Red = a new major version. Behaviour: mc-home.js. -->
+        <section class="mch-sec" id="mc-releases" aria-labelledby="mc-releases-t">
+          <header class="mch-sec-head"><div class="mch-sec-text"><h3 class="mch-sec-title" id="mc-releases-t">Java release <em>history.</em></h3><p class="mch-sec-sub" id="tlSub">Every release since 1.0, from Mojang's own version list.</p></div></header>
+          <div class="mch-tl">
+            <div class="mch-tl-scroll"><div class="mch-tl-chart" id="tlChart" role="list" aria-label="Java releases by year"></div></div>
+            <p class="mch-tl-read" id="tlRead" aria-live="polite">&nbsp;</p>
+            <ul class="mch-tl-key" aria-hidden="true"><li><i class="is-major"></i>Major version</li><li><i></i>Update or fix</li></ul>
+          </div>
+        </section>
+        </div>
+      </div>
+      <div class="mch-ch ml-band" id="ch-faq"><div class="mch-frame"><section class="mch-sec ml-qa" id="faq" aria-labelledby="faqT"><div class="ml-qa-side"><header class="mch-sec-head"><div class="mch-sec-text"><h2 class="mch-sec-title" id="faqT">Ask the <em>Piglin.</em></h2><div class="ml-guide"><img class="ml-guide-face" src="/images/minecraft/piglin/face.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><p><b>Piglin</b>The questions worth asking. Yours isn't here? Drop it in the box. Gold optional.</p></div></div></header><div data-feedback></div></div><div class="qa-list"><details class="qa-item" name="qa"><summary><span class="qa-ico"><img src="/minecrafticons/minecraft-block-logo.png" alt="" loading="lazy" decoding="async"></span><span class="qa-q">Which edition is this for?</span><i class="qa-tog" aria-hidden="true"></i></summary><div class="qa-a"><p>Java Edition. Every <b>/give</b>, <b>/summon</b> or <b>/tellraw</b> a tool makes uses Java syntax, and the seeds are Java seeds. Bedrock places structures differently, so a seed won&rsquo;t match there.</p></div></details><details class="qa-item" name="qa"><summary><span class="qa-ico"><img src="/minecrafticons/nav/worlds.webp" alt="" loading="lazy" decoding="async"></span><span class="qa-q">How do I install a world?</span><i class="qa-tog" aria-hidden="true"></i></summary><div class="qa-a"><p>Open <b>Worlds</b> and scroll to <b>Install a world</b>. It walks you through it step by step, from the download to the world list, on Windows, Mac and Linux.</p></div></details><details class="qa-item" name="qa"><summary><span class="qa-ico"><img src="/minecrafticons/blocks/command_block_side.png" alt="" loading="lazy" decoding="async"></span><span class="qa-q">How do I use a command?</span><i class="qa-tog" aria-hidden="true"></i></summary><div class="qa-a"><p>Press <b>Copy</b>, open chat in game with <b>T</b>, paste and press Enter. Cheats must be on, or you need operator on a server. Chat takes 256 characters, so longer ones go in a command block.</p></div></details><details class="qa-item" name="qa"><summary><span class="qa-ico"><img src="/minecrafticons/items/filled_map.png" alt="" loading="lazy" decoding="async"></span><span class="qa-q">Which version does the Seed Map follow?</span><i class="qa-tog" aria-hidden="true"></i></summary><div class="qa-a"><p>World generation up to <b>Java 1.21.4</b>. Newer versions are only listed once their seeds have been checked in game.</p></div></details></div></section></div></div>
+
+      </div>
+
+      <footer class="pf-footer">
+
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+
+  <div class="pf-footer-divider"></div>
+
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+
+</footer>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY LIGHTBOX (banners) -->
+<div id="gal-lightbox" onclick="closeLightbox()">
+  <button id="gal-lb-fixed-close" onclick="closeLightbox()">✕</button>
+  <div id="gal-lb-inner" onclick="event.stopPropagation()">
+    <img id="gal-lb-img" alt="" loading="lazy" decoding="async">
+    <div id="gal-lb-copybox">
+      <div id="gal-lb-name"></div>
+      <div id="gal-lb-code"></div>
+      <button id="gal-lb-copy-btn" onclick="galCopyCmd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+        Copy Command
+      </button>
+      <div id="gal-lb-feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PALETTE LIGHTBOX -->
+<div id="pal-lightbox" onclick="closePalette()">
+  <button id="pal-lb-fixed-close" onclick="closePalette()">✕</button>
+  <!-- Prev/next were only ever built on the worlds and seeds pages. The grids
+       here are galleries too, so they get the same controls; palLightboxNav()
+       is shared and needs these ids to exist before it can be called. -->
+  <button id="pal-lb-prev" onclick="event.stopPropagation();palLightboxNav(-1)" aria-label="Previous image">&#8249;</button>
+  <button id="pal-lb-next" onclick="event.stopPropagation();palLightboxNav(1)" aria-label="Next image">&#8250;</button>
+  <div id="pal-lb-inner" onclick="event.stopPropagation()">
+    <img id="pal-lb-img" alt="" loading="lazy" decoding="async">
+  </div>
+  <div id="pal-lb-bar">
+    <div id="pal-lb-title"></div>
+    <div id="pal-lb-count"></div>
+  </div>
+</div>
+
+<!-- COMMAND MODAL -->
+<div class="cmd-modal-backdrop" id="cmdModal" onclick="closeCmdOutside(event)">
+  <div class="cmd-modal">
+    <button class="cmd-modal-close" onclick="closeCmd()">✕</button>
+    <div class="cmd-modal-title" id="cmdModalTitle"></div>
+    <div class="cmd-modal-sub" id="cmdModalSub">Command</div>
+    <div class="cmd-code-box" id="cmdModalCode"></div>
+    <button class="cmd-copy-btn" onclick="copyCmd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#aaa"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+      Copy Command
+    </button>
+    <div class="cmd-copy-feedback" id="cmdFeedback"></div>
+  </div>
+</div>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- More Menu Modal (bottom sheet) -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu(event)">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+        <span class="mx-hdr-ico"><img loading="lazy" src="/minecrafticons/minecraft-block-logo.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Minecraft Pages</span><span class="mx-hdr-count" data-role="more-count"></span></span>
+        <div class="more-sheet-close" onclick="closeMoreMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) — edition switcher, mirrors the hero section's tabs -->
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#7d7f85 !important;"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" fill="none" stroke="#7d7f85" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+</div>
+
+<script src="/11layout.js?v=20261028my"></script>
+
+<script src="/mc-java.js?v=20261029res"></script>
+<script src="/mc-commands.js?v=20261013c1" defer></script>
+<script src="/mc-home.js?v=20261014nd" defer></script>
+<script src="/article-cards.js?v=20261026hot3" defer></script>
+<script src="/mc-font.js" defer></script>
+<script src="/mc-lobby-hero.js?v=20261028fast" defer></script>
+<script src="/mc-lobby.js?v=20261029res" defer></script>
+<script src="/mc-lobby-frames.js?v=20261028fast" defer></script>
+<!-- VERSION FEED MODAL -- opened by .vt-sb-more in the right sidebar -->
+<div class="vt-modal" id="vtModal" onclick="closeVtFeedOutside(event)" role="dialog" aria-modal="true" aria-label="Recent Minecraft updates">
+  <div class="vt-modal-panel" onclick="event.stopPropagation()">
+    <div class="vt-modal-head">
+      <div>
+        <div class="vt-modal-title">Recent Updates</div>
+        <div class="vt-modal-sub">Official Java patch notes from Mojang</div>
+      </div>
+      <button type="button" class="vt-modal-close" onclick="closeVtFeed()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="vt-modal-body">
+      <div class="vt-feed-list" id="vt-modal-list">
+        <div class="vt-feed-skel"></div><div class="vt-feed-skel"></div><div class="vt-feed-skel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

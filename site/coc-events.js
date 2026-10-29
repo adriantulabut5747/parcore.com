@@ -279,4 +279,13 @@
       toggleBtn.textContent = expanded ? 'View Less' : 'View More';
     });
   }
+
+  // The band's loops (stars, embers, live dots) pause while it's off screen
+  // (.is-off, coc-clan-clock.css): running, they keep phones busy every frame
+  // of a scroll even from the page's foot.
+  if (eventsCard && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      eventsCard.classList.toggle('is-off', !es[0].isIntersecting);
+    }, { rootMargin: '200px 0px' }).observe(eventsCard);
+  }
 })();

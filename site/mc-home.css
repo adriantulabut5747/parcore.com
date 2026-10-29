@@ -3280,7 +3280,7 @@ a.mch-feat:hover {
   white-space: nowrap;
 }
 /* Filter chips (Oct 21 2026): ONE row that scrolls sideways, never wraps.
-   Same recipe as the More sheet tiles (coc-more.css): a sunken well at rest,
+   Same recipe as the More sheet tiles (11layout.css "MORE SHEET"): a sunken well at rest,
    a step lighter on hover, the picked one the raised grey key. The bottom
    padding leaves room for the key's ledge inside the scroll box. */
 .mch-chips {
@@ -4070,38 +4070,6 @@ a.mch-chip {
    the seeds search/chips, the pack cards (.mch-mod), the Modrinth leaderboard
    (.mch-standings--mr) and the steps. New here: author line + tag footer on the
    cards, launcher panels, essential-mod rows and the link row. */
-.mch-mod-by {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin: -2px 0 0;
-  overflow: hidden;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: #b4b8be;
-}
-.mch-mod-by img {
-  width: 16px;
-  height: 16px;
-  flex: none;
-  object-fit: cover;
-}
-.mch-mod-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  margin-top: 2px;
-}
-.mch-mod-foot .mch-src {
-  align-self: auto;
-}
-.mch-mod-tags {
-  font-size: 12px;
-  color: var(--mch-dim);
-}
 
 /* Launchers: four panels, the most-used one marked in red. */
 .mch-launchers {
@@ -4278,10 +4246,6 @@ a.mch-launcher:hover {
   .mch-ess {
     grid-template-columns: minmax(0, 1fr);
   }
-  .mch-mod-by,
-  .mch-mod-tags {
-    display: none;
-  }
 }
 @media (max-width: 560px) {
   .mch-launchers {
@@ -4348,15 +4312,6 @@ a.mch-launcher:hover {
   background: none;
   font-size: 13px;
   font-weight: 600;
-}
-.mch-mod-dl {
-  flex-basis: 100%;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--mch-muted);
-}
-.mch-mod-dl:empty {
-  display: none;
 }
 
 /* Iris or OptiFine: two panels side by side, Iris marked as the pick. */
@@ -4440,9 +4395,6 @@ a.mch-launcher:hover {
   }
   .mch-vs-col {
     padding: 20px 16px;
-  }
-  .mch-mod-dl {
-    display: none;
   }
   .mch-tier {
     top: 6px;
@@ -10107,5 +10059,74 @@ html body .mch-sec-title {
   }
   .mch-qref-col {
     padding: 18px 16px 20px;
+  }
+}
+
+/* ---- PACK CARDS (Oct 29 2026, Adrian) ----------------------------------------
+   One card for Worlds, resource packs, shaders, modpacks (+ single mods) and data
+   packs (.mch-mods--cards, built by mc-worlds/-packs/-shaders/-modpacks.js), in the
+   lobby's Popular R-Packs dress (mc-lobby.css "POPULAR R-PACKS"): plain raised box,
+   rank = raised dark key top-left (#1 red), Handjet name, red "by" line, tags on ONE
+   line with ..., source = favicon + a sunken well. The body.mc-home .mch prefix
+   outranks the site-wide tag plates (.mch-src / .mch-mod-rank, "Tags:" above). */
+body.mc-home .mch .mch-mods--cards .mch-mod-rank {
+  padding: 5px 7px 4px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 5px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+}
+body.mc-home .mch .mch-mods--cards .mch-mod:first-child .mch-mod-rank {
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+}
+body.mc-home .mch .mch-mods--cards .mch-mod-name {
+  font: 700 21px/1 'Handjet', sans-serif;
+  letter-spacing: 0.02em;
+}
+body.mc-home .mch .mch-mods--cards .mch-scard-tags {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0; /* sides = the grid's 12px inset */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+body.mc-home .mch .mch-mods--cards .mch-scard-tags i {
+  display: inline-block;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+body.mc-home .mch .mch-mods--cards .mch-src {
+  gap: 7px;
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+body.mc-home .mch .mch-mods--cards .mch-src img {
+  display: block; /* hidden site-wide inside the plate; here it sits beside the well */
+  width: 14px;
+  height: 14px;
+}
+body.mc-home .mch .mch-mods--cards .mch-src b {
+  padding: 5px 8px 4px;
+  border-radius: 5px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #c9ccd2;
+}
+/* the shaders' live PC tier moves to the picture's foot: the rank owns the top corner */
+body.mc-home .mch .mch-mods--cards .mch-tier {
+  top: auto;
+  bottom: 8px;
+}
+@media (max-width: 970px) {
+  body.mc-home .mch .mch-mods--cards .mch-mod-name {
+    font-size: 19px;
   }
 }

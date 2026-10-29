@@ -933,5 +933,22 @@ window.MobView = (function () {
     pivot.add(view);
     built();
   }
-  return { mount: mount, show: show };
+  // The Minecraft lobby hero (mc-lobby-hero.js) draws its own scene: it only borrows three.js and the mob builder.
+  // mob(o) = makeMob's group (find bones by userData.bone.n); loading() = textures still on their way.
+  var libWait = [];
+  function lib(cb) {
+    var api = { THREE: null, mob: function (o) { return makeMob(o, false, false); }, loading: function () { return pend > 0; } };
+    if (THREE && data) { api.THREE = THREE; return cb(api); }
+    libWait.push(cb);
+    if (libWait.length > 1) return;
+    var got = 0;
+    function ready() {
+      if (++got < 2) return;
+      THREE = api.THREE = window.THREE;
+      libWait.forEach(function (f) { f(api); });
+    }
+    if (window.THREE) ready(); else load('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js', ready);
+    fetch('/mc-mob3d.json').then(function (r) { return r.json(); }).then(function (d) { data = d; ready(); });
+  }
+  return { mount: mount, show: show, lib: lib };
 })();

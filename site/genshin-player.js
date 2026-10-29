@@ -43,10 +43,9 @@
     '<svg class="gp-crest" viewBox="0 0 160 20"><path d="M0 10h58M102 10h58M62 10h6M92 10h6"/><path d="M80 1l9 9-9 9-9-9z"/><path d="M80 5.5l4.5 4.5-4.5 4.5-4.5-4.5z" class="f"/></svg>';
 
   // Milestones: the card's right column. Plain facts about the profile's numbers, each with the
-  // game's matching achievement category medal (yatta), gold when reached. The search card draws
-  // the same medals, grey, each with its requirement (blank = true). Floor / stars = this period's.
+  // game's matching achievement category medal (yatta), gold when reached. Floor / stars = this period's.
   const ACH = (n) => `/images/genshin/achievement/${n}.webp`;
-  function medals(p, blank) {
+  function medals(p) {
     const floor = +p.towerFloorIndex || 0;
     const room = +p.towerLevelIndex || 1;
     const stars = p.towerStarIndex;
@@ -59,7 +58,7 @@
     ];
     return B.map(
       ([i, t, d, ok, prog]) =>
-        `<li class="gp-badge${ok ? ' is-on' : ''}" title="${d}"><span class="gp-medal"><img src="${ACH(i)}" alt="" loading="lazy" decoding="async"></span><span><b>${t}</b><small>${ok ? 'Earned' : (!blank && prog) || d}</small></span></li>`,
+        `<li class="gp-badge${ok ? ' is-on' : ''}" title="${d}"><span class="gp-medal"><img src="${ACH(i)}" alt="" loading="lazy" decoding="async"></span><span><b>${t}</b><small>${ok ? 'Earned' : prog || d}</small></span></li>`,
     ).join('');
   }
 
@@ -85,11 +84,9 @@
     } catch (e) {}
   }
 
-  // ---- no UID: the search = the profile card with nobody in it yet ----
+  // ---- no UID: the search ----
   if (!raw) {
     $('gpHome').hidden = false;
-    $('gpBlankStats').innerHTML = STATS.map(([i, k]) => `<li>${ico(i)}<b>&ndash;</b><span>${k}</span></li>`).join('');
-    $('gpBlankBadges').innerHTML = medals({}, true);
     const form = $('gpLook');
     lookup(form);
     // The server box lights the row the typed UID belongs to.
@@ -103,11 +100,10 @@
     if (r.length) {
       $('gpRecent').hidden = false;
       $('gpRecentList').innerHTML = r
-        .map(({ u, n, p }) => {
-          const server = uidServer(u);
-          return `<a class="gi-tab gp-ch" href="${playerHref(u)}"><span class="gi-tile${p ? ' r5' : ''}">${p ? `<img src="${esc(p)}" alt="" loading="lazy" decoding="async">` : '<i class="gp-q">?</i>'}</span>
-            <span class="gp-ch-t"><b>${esc(n || 'UID ' + u)}</b><small>${n ? u : ''}${n && server ? ' &middot; ' : ''}${esc(server)}</small></span></a>`;
-        })
+        .map(
+          ({ u, n, p }) =>
+            `<a class="gp-rc" href="${playerHref(u)}" title="${esc(uidServer(u))}"><span class="gp-rc-face">${p ? `<img src="${esc(p)}" alt="" loading="lazy" decoding="async">` : '<i class="gp-q">?</i>'}</span><b>${esc(n || u)}</b>${n ? `<small>${u}</small>` : ''}</a>`,
+        )
         .join('');
       $('gpRecentClear').onclick = () => {
         try {
@@ -257,8 +253,8 @@
         <div class="gp-who">
           <h1 class="gp-name">${esc(nick)}</h1>
           <div class="gp-uid">${finder(uid, server)}
-            <button type="button" class="gp-uid-copy" data-copy="${uid}" aria-label="Copy UID ${uid}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
-            <button type="button" class="gp-uid-copy" id="gpShare" data-copy="" aria-label="Copy the link to this profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span>Link</span></button>
+            <button type="button" class="gp-uid-copy" data-copy="${uid}" title="Copy UID" aria-label="Copy UID ${uid}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
+            <button type="button" class="gp-uid-copy" id="gpShare" data-copy="" title="Copy the link to this profile" aria-label="Copy the link to this profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span>Link</span></button>
             <button type="button" class="gp-uid-copy" id="gpRefresh" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg><span id="gpRefreshT">Refresh</span></button>
             <p class="gi-look-status gp-find-st" aria-live="polite"></p></div>
           ${p.signature ? `<p class="gp-sig">${esc(p.signature)}</p>` : ''}
@@ -655,12 +651,26 @@
   } catch (e) {}
   const optCls = () => ['uid', 'name', 'rolls', 'brk'].map((k) => (opts[k] ? '' : ' no-' + k)).join('') + (opts.port ? ' is-portrait' : '');
   const bar = $('gpCardBar');
+  // Desktop always shows the options (its summary is hidden); phones start them folded.
+  $('gpStMore').open = !matchMedia('(max-width: 970px)').matches;
+  // Landscape on a narrow page (Oct 28 2026, Adrian): the stacked layout looked like Portrait, so the
+  // real 1280px card is drawn and shrunk to the page's width (CSS zoom, #gpBuild.is-fit) = the picture.
+  const fitBox = $('gpBuild');
+  const fit = () => {
+    const w = fitBox.parentElement.clientWidth;
+    if (!w) return; // the section is still hidden
+    const on = !opts.port && w < 680;
+    fitBox.classList.toggle('is-fit', on);
+    fitBox.style.zoom = on ? w / 1280 : '';
+  };
+  new ResizeObserver(fit).observe(fitBox.parentElement);
   const saveOpts = () => {
     try {
       localStorage.setItem(OPTS_KEY, JSON.stringify(opts));
     } catch (e) {}
     const el = $('gpBuild').querySelector('.gp-build');
     if (el) el.className = 'gp-build' + optCls() + (mover ? ' is-moving' : '');
+    fit();
     paint();
     syncStudio();
   };

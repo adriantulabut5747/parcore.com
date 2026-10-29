@@ -16,12 +16,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261026as">
-<link rel="stylesheet" href="/coc-more.css?v=20261026hot">
-<link rel="stylesheet" href="/coc-help.css?v=20261027or">
-<link rel="stylesheet" href="/genshin.css?v=20261025a">
-<link rel="stylesheet" href="/genshin-wish.css?v=20261023a">
-<link rel="stylesheet" href="/genshin-banners.css?v=20261023a">
+<link rel="stylesheet" href="/11layout.css?v=20261028my">
+<link rel="stylesheet" href="/coc-help.css?v=20261028my">
+<link rel="stylesheet" href="/genshin.css?v=20261028my">
+<link rel="stylesheet" href="/genshin-banners.css?v=20261027m">
 </head>
 <body class="gi-page" data-game-nav="genshin-impact">
 
@@ -92,70 +90,117 @@
 
   <div class="coc-main">
     <div class="coc-content">
+      <main class="gi gi--klee">
       <div class="gi-frame">
 
         <!-- HEADER (Oct 22 2026): /coc/'s .tb banner in Genshin type (genshin.css .gi-tb).
-             One fixed picture (the Fatui Harbingers, same art as the Lobby's How to redeem),
-             the Intertwined Fate icon, title, one sentence, fact chips (#gbFacts, filled from
-             the feed). The wishes' tabs are in the card, never in the header. -->
+             One fixed picture (the Fatui Harbingers), the Intertwined Fate icon, title, one
+             sentence, fact chips (#gbFacts, filled from the feed). -->
         <header class="gi-tb">
           <img class="gi-tb-art" src="/images/genshin/art/fatui-harbingers.webp" alt="" fetchpriority="high">
           <div class="gi-tb-body">
             <img class="gi-tb-icon" src="/images/genshin/nav/banners.webp" alt="" width="76" height="76">
             <div class="gi-tb-copy">
               <h1 class="gi-title"><span class="gi-vh">Genshin Impact </span>Current <em>banners</em></h1>
-              <p class="gi-tb-desc">Every wish live right now: who's featured, the real rates, and when it ends on your server.</p>
+              <p class="gi-tb-desc">Every wish live right now: who's featured, if they're new or back, the real rates, and when it ends on your server.</p>
               <ul class="gi-tb-facts" id="gbFacts"></ul>
             </div>
           </div>
         </header>
 
-        <!-- The server switch: the card's countdown follows it. -->
-        <div class="gi-bar">
-          <div class="gi-tray gi-tray--sm" id="gbServer" role="tablist" aria-label="Server">
-            <button type="button" class="gi-tab" data-server="asia" role="tab">Asia</button>
-            <button type="button" class="gi-tab" data-server="america" role="tab">NA</button>
-            <button type="button" class="gi-tab" data-server="europe" role="tab">EU</button>
-          </div>
-          <p class="gb-server-note">Wishes end at the same server time everywhere, so America's end 13 hours after Asia's and Europe's 7.</p>
-        </div>
-
-        <!-- THE WISH CARD (v2, Oct 23 2026): the Lobby's card, same markup + genshin-wish.css/.js
-             (shared, GI.wishCard), so a change there shows on both pages. Under it: how the picked
-             wish works (rates + its path, drawn; genshin-banners.js rules()). -->
-        <section class="gw-host gb-stage" aria-label="Current wishes">
-          <article class="gw" id="giWish" aria-labelledby="giName">
-            <div class="gw-art" id="gwArt" aria-hidden="true"></div>
-            <div class="gw-chart" id="gwChart" hidden></div>
-            <div class="gw-info">
-              <div class="gi-tray gw-tray" id="giSwitch" role="tablist" aria-label="Current wishes"></div>
-              <div class="gw-body">
-                <p class="gw-tag" id="giEyebrow">Event Wish</p>
-                <h3 class="gw-name" id="giName">Current wish</h3>
-                <p class="gw-title"><span id="giTitle"></span><span class="gi-rarity" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></p>
-                <p class="gw-meta" id="giMeta">Loading the current wishes&hellip;</p>
-                <dl class="gw-plates" id="gwPlates" hidden></dl>
-                <div class="gw-kit" id="gwKitBox" hidden>
-                  <p class="gi-label" id="gwKitLabel">Talents</p>
-                  <div class="gw-kit-row" id="gwKit"></div>
-                </div>
-                <div class="gw-four" id="giFour" hidden>
-                  <p class="gi-label" id="giFourLabel">Featured 4&#9733;</p>
-                  <div class="gw-four-row" id="giFourRow"></div>
-                </div>
-              </div>
-              <div class="gw-ends" id="giClock" hidden>
-                <span class="gi-label">Ends in</span>
-                <div class="gi-clock-units" role="timer" aria-live="off"><span><b data-u="d">--</b><small>d</small></span><span><b data-u="h">--</b><small>h</small></span><span><b data-u="m">--</b><small>m</small></span><span><b data-u="s">--</b><small>s</small></span></div>
+        <!-- ON THE WISHES NOW (v3, Oct 27 2026, Adrian: "a fresh restart", only what a player wants): one
+             card per live wish, all on the page at once (no tabs): the 5-star's wish art on its element,
+             name + title + element / weapon / nation, how many banners they've had and how long since the
+             last one (genshin-history.json), the featured 4-stars, the countdown on the picked server, then
+             Build guide (only when that page exists) + Wish simulator. Built by genshin-banners.js cards(). -->
+        <section class="gi-sec gb-first" id="wishes" aria-labelledby="gbWishesT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="gbWishesT">On the wishes <em>now.</em></h2></div>
+            <div class="gi-acts">
+              <div class="gi-tray gi-tray--sm" id="gbServer" role="tablist" aria-label="Server">
+                <button type="button" class="gi-tab" data-server="asia" role="tab">Asia</button>
+                <button type="button" class="gi-tab" data-server="america" role="tab">NA</button>
+                <button type="button" class="gi-tab" data-server="europe" role="tab">EU</button>
               </div>
             </div>
-            <aside class="gw-insp" id="gwInsp" aria-live="polite" hidden>
-              <div class="gw-insp-head"><span class="gw-insp-ic" id="gwInspIc"></span><div><p class="gw-insp-k" id="gwInspK"></p><p class="gw-insp-n" id="gwInspN"></p></div></div>
-              <p class="gw-insp-t" id="gwInspT"></p>
+          </header>
+          <div class="gi-klee"><img class="gi-klee-face" src="/images/genshin/klee/face.webp" alt="" width="44" height="44" decoding="async"><p><b>Klee</b><span id="gbKlee">Klee is counting the wishes&hellip;</span></p></div>
+          <div class="gb-list" id="gbList"><p class="gi-empty">Loading the wishes&hellip;</p></div>
+        </section>
+
+        <!-- HOW WISHES WORK: the official rates (handoff section 10, confirmed Oct 22 2026), each wish's
+             path to the featured 5-star drawn as three diamonds, and the most it can cost. Static: these
+             only change if HoYoverse changes the rules. Klee's card first (her happy wish art). -->
+        <section class="gi-sec" id="rules" aria-labelledby="gbRulesT">
+          <header class="gi-sec-head">
+            <div><h2 class="gi-title" id="gbRulesT">How wishes <em>work.</em></h2><p class="mch-sec-sub">The official rates, and the most a featured 5&#9733; can ever cost you.</p></div>
+          </header>
+          <div class="gb-rules">
+            <aside class="gb-guide">
+              <div class="gb-guide-art" aria-hidden="true"></div>
+              <div class="gb-guide-say"><p class="gi-say-who">Klee <small>Klee's math</small></p><p>Every wish costs 160 Primogems, so the featured 5&#9733; costs 28,800 at most. Start saving early!</p></div>
             </aside>
-          </article>
-          <div class="gi-box gb-rules" id="gbRules"></div>
-          <p class="gi-empty" id="gbEmpty" hidden>No wish is live right now. New ones show up here within three hours of going live.</p>
+            <article class="gi-box gb-rule">
+              <header class="gb-rule-head"><img src="/images/genshin/fate.webp" alt="" width="44" height="44" loading="lazy"><div><p class="gi-label">Character Event Wish</p><h3>The 50/50</h3></div></header>
+              <ul class="gb-nums">
+                <li><b>0.6%</b><span>base 5&#9733; rate</span></li>
+                <li><b>90</b><span>wishes to a sure 5&#9733;</span></li>
+                <li><b>55%</b><span>it's the featured one</span></li>
+                <li><b>180</b><span>wishes to a sure featured 5&#9733;</span></li>
+              </ul>
+              <ol class="gb-path">
+                <li><span class="gb-pip" aria-hidden="true"></span><b>Pull a 5&#9733;</b><small>At most 90 wishes after your last one.</small></li>
+                <li><span class="gb-pip is-point" aria-hidden="true"></span><b>55%: it's the featured one</b><small>The 50/50, with Capturing Radiance counted in.</small></li>
+                <li><span class="gb-pip is-yours" aria-hidden="true"></span><b>Miss it: the next 5&#9733; is</b><small>Both character wishes share this pity, and it carries over to the next ones.</small></li>
+              </ol>
+              <p class="gb-cost"><img src="/images/genshin/primogem.webp" alt="" width="22" height="22" loading="lazy"><span><b>28,800</b> Primogems at most</span><small>180 &times; 160</small></p>
+            </article>
+            <article class="gi-box gb-rule">
+              <header class="gb-rule-head"><img src="/images/genshin/fate.webp" alt="" width="44" height="44" loading="lazy"><div><p class="gi-label">Weapon Event Wish</p><h3>Epitomized Path</h3></div></header>
+              <ul class="gb-nums">
+                <li><b>0.7%</b><span>base 5&#9733; rate</span></li>
+                <li><b>80</b><span>wishes to a sure 5&#9733;</span></li>
+                <li><b>75%</b><span>it's a featured one</span></li>
+                <li><b>160</b><span>wishes to a sure pick</span></li>
+              </ul>
+              <ol class="gb-path">
+                <li><span class="gb-pip" aria-hidden="true"></span><b>Chart a course</b><small>Pick one of the two featured 5&#9733; weapons.</small></li>
+                <li><span class="gb-pip is-point" aria-hidden="true"></span><b>Miss it: 1 Fate Point</b><small>Any other 5&#9733; weapon fills it.</small></li>
+                <li><span class="gb-pip is-yours" aria-hidden="true"></span><b>The next 5&#9733; is yours</b><small>Fate Points reset when this wish ends. Your pity doesn't.</small></li>
+              </ol>
+              <p class="gb-cost"><img src="/images/genshin/primogem.webp" alt="" width="22" height="22" loading="lazy"><span><b>25,600</b> Primogems at most</span><small>160 &times; 160</small></p>
+            </article>
+          </div>
+        </section>
+
+        <!-- ASK KLEE (Oct 27 2026): the Lobby's FAQ (genshin.css "KLEE PIECES", <details name="qa">: one
+             open at a time, no script) with banner questions, + the shared feedback box (11layout.js). -->
+        <section class="gi-sec gi-qa gi-qa--short" id="faq" aria-labelledby="gbQaT">
+          <div class="gi-qa-side">
+            <header class="gi-sec-head">
+              <div><h2 class="gi-title" id="gbQaT">Ask <em>Klee.</em></h2></div>
+            </header>
+            <div class="gi-klee"><img class="gi-klee-face" src="/images/genshin/klee/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Klee</b><span>Klee asked around for all of these! Tell Klee what else you want to know.</span></p></div>
+            <div data-feedback></div>
+          </div>
+          <div class="gi-qa-list">
+            <details class="gi-qa-item" name="qa">
+              <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/pity.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">Do the two character wishes share pity?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+              <div class="gi-qa-a"><p>Yes. Both character wishes count toward the same pity and the same guarantee, and both carry over to the next character wishes. The weapon wish has its own pity, which carries over too.</p></div>
+            </details>
+            <details class="gi-qa-item" name="qa">
+              <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/banners.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">What happens if I lose the 50/50?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+              <div class="gi-qa-a"><p>Your next 5&#9733; on a character wish is the featured one, so 180 wishes is the most it can take. Since version 5.0, <b>Capturing Radiance</b> can also turn a lost 50/50 into the featured 5&#9733;, which lifts the odds to 55%.</p></div>
+            </details>
+            <details class="gi-qa-item" name="qa">
+              <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/weapons.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">How does Epitomized Path work?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+              <div class="gi-qa-a"><p>Chart a course to one of the two featured 5&#9733; weapons. Any other 5&#9733; weapon gives you 1 Fate Point, and with 1 point the next 5&#9733; is your pick. Fate Points reset when the wish ends, so only chart a course you'll finish.</p></div>
+            </details>
+            <details class="gi-qa-item" name="qa">
+              <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/reruns.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">When is my favourite coming back?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+              <div class="gi-qa-a"><p>HoYoverse only says who's next when the next version is announced. Until then, the <a href="/genshin-impact/reruns">Rerun tracker</a> shows how long every character has waited since their last banner.</p></div>
+            </details>
+          </div>
         </section>
 
         <div class="gi-more">
@@ -163,15 +208,14 @@
             <div><b>Rerun tracker</b><p>How long since every 5&#9733; was last on a banner, and who's due.</p></div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
-          <a class="gi-box gi-card" href="/genshin-impact/#pity">
-            <div><b>Your pity</b><p>Drag to your pull count and see your odds of a 5&#9733; from there.</p></div>
+          <a class="gi-box gi-card" href="/genshin-impact/wish-simulator">
+            <div><b>Wish simulator</b><p>Spend pretend Primogems on these banners, with the real rates and pity.</p></div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
         </div>
-        <p class="gi-note">Rates are from the in-game wish details. 55% is the 50/50 with Capturing Radiance counted in. HoYoverse doesn't publish soft pity, so it isn't shown here.</p>
-        <p class="gi-credit">Game assets &copy; HoYoverse. Parchrome is a fan site and isn't affiliated with HoYoverse. Live data: ennead.cc and Project Amber (yatta.moe), refreshed every three hours.</p>
+        <p class="gi-note">Rates are from the in-game wish details. 55% is the 50/50 with Capturing Radiance counted in. HoYoverse doesn't publish soft pity, so it isn't shown here. A Chronicled Wish has its own rules, not covered here.</p>
+        <p class="gi-credit">Game assets &copy; HoYoverse. Parchrome is a fan site and isn't affiliated with HoYoverse. Live data: ennead.cc and Project Amber (yatta.moe), refreshed every three hours. Banner history: paimon.moe (MIT License, &copy; 2021 Made Baruna).</p>
 
-      </div>
       </div>
       </main>
  <footer class="pf-footer">
@@ -232,9 +276,8 @@
   </div>
 </div>
 
-<script src="/11layout.js?v=20261026as"></script>
+<script src="/11layout.js?v=20261028my"></script>
 <script src="/genshin-core.js?v=20261025a"></script>
-<script src="/genshin-wish.js?v=20261023a"></script>
-<script src="/genshin-banners.js?v=20261023a"></script>
+<script src="/genshin-banners.js?v=20261027k"></script>
 </body>
 </html>

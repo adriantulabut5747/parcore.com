@@ -395,8 +395,7 @@ if (mcOn('home')) {
              '<span class="hlu-short">' + timeAgoShort(iso) + '</span>';
     }
 
-    fetch('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json')
-      .then(r => r.json())
+    (window.pcJSON || function (u) { return fetch(u).then(function (r) { return r.json(); }); })('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json')
       .then(data => {
         const releaseId = data.latest.release;
         const snapshotId = data.latest.snapshot;
@@ -2020,7 +2019,9 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 // ============================================================
-// BOTTOM NAV + MORE MODAL + DESKTOP SUB NAV
+// SCROLL LOCK (the modals on these pages). The top bar, phone bar and More
+// sheet are 11layout.js's game-nav engine since Oct 27 2026 (game-nav.json
+// "minecraft"); only the bar's auto-hide below is still Minecraft's own.
 // ============================================================
 function bnLockScroll(){
   document.documentElement.classList.add('no-scroll');
@@ -2033,132 +2034,6 @@ function bnUnlockScroll(){
   if(cocMain) cocMain.style.overflow = '';
   if(window.bnResyncAfterModal) window.bnResyncAfterModal();
 }
-// Tracks whether we've pushed a throwaway history entry for the open sheet,
-// same pattern as the search modal — lets the phone's back button/gesture
-// close the sheet instead of navigating off the page.
-let moreMenuHistoryState = false;
-
-function openMoreMenu(){
-  var overlay = document.getElementById('moreOverlay');
-  var wrap = document.getElementById('bnMoreWrap');
-  overlay.classList.add('open');
-  if(wrap) wrap.classList.add('open');
-  bnLockScroll();
-
-  if(!moreMenuHistoryState){
-    history.pushState({ moreMenuModal: true }, '');
-    moreMenuHistoryState = true;
-  }
-}
-
-function toggleMoreMenu(){
-  var overlay = document.getElementById('moreOverlay');
-  var isOpen = overlay.classList.contains('open');
-  if(isOpen){
-    closeMoreMenu();
-  } else {
-    openMoreMenu();
-  }
-}
-
-// `fromPopstate` is true when triggered by the back button/gesture itself —
-// in that case the browser is already consuming the history entry, so we
-// must NOT call history.back() again (that would navigate off the page).
-function closeMoreMenu(e, fromPopstate){
-  document.getElementById('moreOverlay').classList.remove('open');
-  var wrap = document.getElementById('bnMoreWrap');
-  if(wrap) wrap.classList.remove('open');
-  bnUnlockScroll();
-
-  if(moreMenuHistoryState){
-    moreMenuHistoryState = false;
-    if(!fromPopstate){
-      history.back(); // cleans up the throwaway history entry pushed by openMoreMenu()
-    }
-  }
-}
-document.addEventListener('DOMContentLoaded', function(){
-  var moreOverlay = document.getElementById('moreOverlay');
-  if(moreOverlay){
-    moreOverlay.addEventListener('touchmove', function(e){
-      if(!e.target.closest('.more-sheet')) e.preventDefault();
-    }, {passive:false});
-  }
-});
-
-// Mobile back button / gesture support: closes the sheet instead of
-// leaving the page, if it happens to be open when back fires.
-window.addEventListener('popstate', () => {
-  var overlay = document.getElementById('moreOverlay');
-  if(overlay && overlay.classList.contains('open')){
-    closeMoreMenu(null, true);
-  }
-});
-
-// DRAG-TO-CLOSE: dragging the handle down past ~28% of the sheet's
-// height (or a fast flick) closes the sheet; otherwise it snaps back.
-(function initMoreSheetDrag(){
-  const sheet = document.querySelector('.more-sheet');
-  const handle = document.querySelector('.more-sheet-handle');
-  const overlay = document.getElementById('moreOverlay');
-  if(!sheet || !handle || !overlay) return;
-
-  let dragging = false;
-  let startY = 0;
-  let dragY = 0;
-  let sheetHeight = 0;
-  let lastY = 0;
-  let lastT = 0;
-  let velocity = 0;
-
-  function onPointerDown(e){
-    dragging = true;
-    startY = e.clientY;
-    lastY = startY;
-    lastT = Date.now();
-    velocity = 0;
-    sheetHeight = sheet.getBoundingClientRect().height || 1;
-    sheet.classList.add('dragging');
-    if(handle.setPointerCapture) handle.setPointerCapture(e.pointerId);
-  }
-
-  function onPointerMove(e){
-    if(!dragging) return;
-    const now = Date.now();
-    const dt = now - lastT;
-    if(dt > 0) velocity = (e.clientY - lastY) / dt; // px per ms
-    lastY = e.clientY;
-    lastT = now;
-
-    dragY = Math.max(0, e.clientY - startY);
-    sheet.style.transform = `translateY(${dragY}px)`;
-    overlay.style.opacity = String(1 - Math.min(dragY / sheetHeight, 1) * 0.9);
-  }
-
-  function onPointerUp(){
-    if(!dragging) return;
-    dragging = false;
-    sheet.classList.remove('dragging');
-
-    const pastThreshold = dragY > sheetHeight * 0.28;
-    const fastFlick = velocity > 0.6; // flicked down quickly
-    overlay.style.opacity = '';
-
-    if(pastThreshold || fastFlick){
-      closeMoreMenu();
-      requestAnimationFrame(() => { sheet.style.transform = ''; });
-    } else {
-      sheet.style.transform = '';
-    }
-    dragY = 0;
-  }
-
-  handle.addEventListener('pointerdown', onPointerDown);
-  handle.addEventListener('pointermove', onPointerMove);
-  handle.addEventListener('pointerup', onPointerUp);
-  handle.addEventListener('pointercancel', onPointerUp);
-})();
-
 // ===================================================
 // BOTTOM NAV AUTO-HIDE ON SCROLL (mobile, app-style)
 // Visible by default. Hides as soon as you scroll down.
@@ -2288,71 +2163,13 @@ window.addEventListener('popstate', () => {
   window.bnHideNav = function(){ hideNav(); };
 })();
 
-document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape') closeMoreMenu();
-});
-
-// Highlight the active bottom-nav / desktop sub-nav / mobile "More" sheet item based on current page
-(function highlightActiveNavItems(){
-  // Full path, not just the last part ("/minecraft/java/mods"), so pages in
-  // different folders with the same file name can't be confused.
-  function pagePath(u){
-    var p = new URL(String(u || ''), location.origin + '/').pathname.toLowerCase();
-    return p.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1');
-  }
-  var page = pagePath(window.location.pathname);
-  document.querySelectorAll('.dsn-link').forEach(function(el){
-    var href = pagePath(el.getAttribute('href'));
-    el.classList.toggle('active', href === page);
-  });
-  document.querySelectorAll('.dsn-mini, .dsn-guide-box, .dsn-guide-row').forEach(function(el){
-    var href = pagePath(el.getAttribute('href'));
-    el.classList.toggle('active', href === page);
-  });
-  document.querySelectorAll('.th-mini, .more-row').forEach(function(el){
-    var href = pagePath(el.getAttribute('href'));
-    el.classList.toggle('active', href === page);
-  });
-})();
-
-// Desktop sub-nav horizontal scroll arrows (shown only when content overflows)
-(function dsnScrollArrows(){
-  var track = document.getElementById('dsnScrollTrack');
-  var left = document.getElementById('dsnArrowLeft');
-  var right = document.getElementById('dsnArrowRight');
-  if(!track || !left || !right) return;
-
-  function update(){
-    var overflow = track.scrollWidth > track.clientWidth + 1;
-    var atStart = track.scrollLeft <= 1;
-    var atEnd = track.scrollLeft >= (track.scrollWidth - track.clientWidth - 1);
-    left.classList.toggle('show', overflow && !atStart);
-    right.classList.toggle('show', overflow && !atEnd);
-  }
-
-  left.addEventListener('click', function(){
-    track.scrollBy({ left: -200, behavior: 'smooth' });
-  });
-  right.addEventListener('click', function(){
-    track.scrollBy({ left: 200, behavior: 'smooth' });
-  });
-
-  track.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-  update();
-  // Re-check shortly after load in case fonts/images shift layout width
-  setTimeout(update, 300);
-  // Re-check once the nav has been populated from mc-contents.json
-  document.addEventListener('nav-data-ready', function(){ setTimeout(update, 0); });
-})();
-
 /* ============================================================
-   NAV RENDER — renders hero tabs, mobile "Discover Categories"
-   grid, the "More" sheet, and the desktop sub-nav — all from
-   mc-contents.json.
-
-   To add/remove/edit a nav item on EVERY page, just edit
-   mc-contents.json. Nothing here needs to change.
+   BANNER TABS -- the tabs tray at the foot of every Minecraft banner
+   (.mch-nav, mc-hero.css "TABS"). Since Oct 27 2026 it reads the Java /
+   Tools pages of game-nav.json "minecraft", the same list the top bar,
+   phone bar and More sheet are built from (11layout.js buildGroups), so a
+   page is added in one place. Tool pages list the tools (no "All tools").
+   hcpc.html still reads mc-contents.json for its old hero + sidebar cards.
    ============================================================ */
 (function () {
   // Full path ("/minecraft/java/mods"), same rule as 11layout.js's normalizePage.
@@ -2362,18 +2179,8 @@ document.addEventListener('keydown', function(e){
     return p.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1');
   }
   const currentPage = normalizePage(window.location.pathname);
-  const isCurrent = (item) => {
-    const link = typeof item === 'string' ? item : item.link;
-    // A jump to a section of a page ("/minecraft/java/#mc-skins") isn't that page.
-    if (String(link || '').includes('#')) return false;
-    if (normalizePage(link) === currentPage) return true;
-    // activePrefix: lit on every page under that folder (Tools on every
-    // /minecraft/tools/<tool>), same as sidebar.json's.
-    const prefix = typeof item === 'object' && item.activePrefix && normalizePage(item.activePrefix);
-    if (prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/'))) return true;
-    const activeOn = typeof item === 'object' && item.activeOn;
-    return Array.isArray(activeOn) && activeOn.some((p) => normalizePage(p) === currentPage);
-  };
+  // A jump to a section of a page ("/minecraft/java/#mc-skins") isn't that page.
+  const isCurrent = (item) => !String(item.link || '').includes('#') && normalizePage(item.link) === currentPage;
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, (c) => ({
@@ -2381,19 +2188,11 @@ document.addEventListener('keydown', function(e){
     }[c]));
   }
 
-  // ---- item renderers ----
-  // Pages not built yet ("soon": true in mc-contents.json, Oct 2026) render
-  // as a greyed <span>, not a link: their old links pointed at icon PNGs,
-  // '#' or pages that 404. Same idea as game-nav.json's "soon".
   const isSoon = (item) => item.soon || !item.link || item.link === '#';
   function navItem(item, cls, inner) {
     if (isSoon(item)) return `<span class="${cls} is-soon" aria-disabled="true" title="Coming soon">${inner}</span>`;
     const active = isCurrent(item) ? ' active' : '';
     return `<a href="${escapeHtml(item.link)}" class="${cls}${active}">${inner}</a>`;
-  }
-
-  function heroTabHtml(item) {
-    return navItem(item, 'hero-tab', `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}"><span>${escapeHtml(item.name)}</span>`);
   }
 
   function mobileNavItemHtml(item) {
@@ -2403,51 +2202,8 @@ document.addEventListener('keydown', function(e){
     return navItem(item, 'mc-mobile-nav-item', `<span class="mc-slot-ico" style="--icon:url('${src}')"><img src="${src}" alt=""></span><span class="mc-slot-name">${escapeHtml(item.name)}</span>`);
   }
 
-  function moreAppGridItemHtml(item) {
-    return navItem(item, 'more-app-grid-item', `<img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
-  }
+  const onToolsPage = () => currentPage === '/minecraft/tools' || currentPage.startsWith('/minecraft/tools/');
 
-  function dsnLinkHtml(item) {
-    // hwr's chip classes, styled once in 11layout.css, so the bar matches
-    return navItem(item, 'dsn-chip', `<img class="dsn-chip-icon" src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
-  }
-
-  // Sections use hwr's .dsn-chip; the destinations on the right use its
-  // .stb-hub-link -- the same split hwr makes between its own two strips.
-  function stbHubLinkHtml(item) {
-    return navItem(item, 'stb-hub-link', `<img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
-  }
-
-  function bnItemHtml(item) {
-    return navItem(item, 'bn-item', `<img src="${escapeHtml(item.image)}" alt="">${escapeHtml(item.name)}`);
-  }
-
-  // Tools is its own tab (Oct 13 2026), so its pages list the tools in the
-  // section strips instead of the Java sections. data.tools mirrors the
-  // static cards on /minecraft/tools/: add a tool in both places.
-  const onToolsPage = (data) => Array.isArray(data.tools) && data.heroTabs.some((t) => t.name === 'Tools' && isCurrent(t));
-  const toMenu = (list) => list.filter((c) => !isSoon(c)).map((c) => ({ href: c.link, icon: c.image, name: c.name, sub: c.subtitle }));
-
-  // ---- section renderers ----
-  function renderHeroTabs(data) {
-    const wrap = document.querySelector('.hero-game-tabs');
-    if (!wrap || !data.heroTabs) return;
-    wrap.innerHTML = data.heroTabs.map(heroTabHtml).join('');
-  }
-
-  function renderBottomNav(data) {
-    const bar = document.getElementById('bottomNav');
-    if (!bar || !data.heroTabs) return;
-    const moreWrap = document.getElementById('bnMoreWrap');
-    // Two tabs, More, two tabs (Minecraft, Tools | Story, Dungeons).
-    bar.innerHTML = data.heroTabs.slice(0, 2).map(bnItemHtml).join('');
-    if (moreWrap) bar.appendChild(moreWrap);
-    bar.insertAdjacentHTML('beforeend', data.heroTabs.slice(2, 4).map(bnItemHtml).join(''));
-  }
-
-  // Banner tabs (Oct 21 2026, games.gg-style): text only, at the foot of every
-  // Minecraft banner (.mch-nav, styled in mc-hero.css "TABS"). Tool pages list
-  // the tools, led by the hub the way games.gg leads with "Overview".
   function heroNavTabHtml(item) {
     // Same picture as the More sheet; "All tools" borrows the Tools anvil.
     const img = item.image || '/minecrafticons/anvil.png';
@@ -2458,7 +2214,7 @@ document.addEventListener('keydown', function(e){
   function renderMobileNav(data) {
     const tabs = document.querySelector('.mch-nav');
     if (tabs && data.mobileNav) {
-      const onTool = onToolsPage(data);
+      const onTool = onToolsPage();
       const list = onTool ? data.tools : data.mobileNav;
       // Tool pages: the lobby is their parent, not a tab -- a key in the banner's
       // top-right corner leads there instead (mc-hero.css BACK TO ALL TOOLS).
@@ -2492,119 +2248,27 @@ document.addEventListener('keydown', function(e){
     const header = nav.querySelector('.mc-mobile-nav-header');
     nav.innerHTML = '';
     if (header) nav.appendChild(header);
-    nav.insertAdjacentHTML('beforeend', (onToolsPage(data) ? data.tools : data.mobileNav).map(mobileNavItemHtml).join(''));
+    nav.insertAdjacentHTML('beforeend', (onToolsPage() ? data.tools : data.mobileNav).map(mobileNavItemHtml).join(''));
     // Phones scroll this strip: bring the current page's slot to the middle.
     const on = nav.querySelector('.mc-mobile-nav-item.active');
     if (on) nav.scrollLeft += on.getBoundingClientRect().left - nav.getBoundingClientRect().left - (nav.clientWidth - on.offsetWidth) / 2;
   }
 
-  // Breadcrumb (Oct 13): Clash's trail (thz-script.js buildCrumbs; CSS is
-  // 11layout.css BREADCRUMB) on phones and desktop, every step a link:
-  //   Minecraft > Worlds   Minecraft > Tools > Banner Maker
-  // "Minecraft" is the Discover page, which itself reads "Minecraft Java
-  // Edition". A page missing from mc-contents.json (hcpc) names itself from
-  // its static .sc-mobile-group text.
-  function renderCrumbs(data) {
-    const box = document.querySelector('.secondary-left .secondary-content');
-    const home = data.heroTabs && data.heroTabs[0];
-    if (!box || !home || box.querySelector('.stb-crumbs')) return;
-    const tools = data.heroTabs.find((t) => t.name === 'Tools');
-    const tool = (data.tools || []).find((t) => !isSoon(t) && isCurrent(t.link));
-    const section = (data.mobileNav || []).find((t) => !isSoon(t) && isCurrent(t.link));
-    let trail = [{ text: home.name, href: home.link }];
-    if (isCurrent(home.link)) trail = [{ text: 'Minecraft Java Edition', href: home.link }];
-    else if (tools && (tool || isCurrent(tools.link))) {
-      trail.push({ text: tools.name, href: tools.link });
-      if (tool) trail.push({ text: tool.crumbText || tool.name, href: tool.link });
-    } else if (section) trail.push({ text: section.crumbText || section.name, href: section.link });
-    else {
-      const own = document.querySelector('.sc-mobile-group');
-      if (own) trail.push({ text: own.textContent.trim(), href: location.pathname });
-    }
-    const nav = document.createElement('nav');
-    nav.className = 'stb-crumbs';
-    nav.setAttribute('aria-label', 'Breadcrumb');
-    nav.innerHTML = trail
-      .map((c, i) => `<a href="${escapeHtml(c.href)}"${i === trail.length - 1 ? ' aria-current="page"' : ''}>${escapeHtml(c.text)}</a>`)
-      .join('<span class="stb-crumb-sep" aria-hidden="true">›</span>');
-    box.appendChild(nav);
-    box.classList.add('has-crumbs');
-  }
-
-  // More sheet (Oct 21 2026): the Clash sheet's body -- labelled sections of
-  // two-across tiles, wells at rest, the page you're on the raised grey key.
-  // Same .mx classes and markup as coc-more.js, styled once in coc-more.css.
-  // Java = the built sections, Tools = the tools A-Z, then the editions not
-  // built yet as greyed tiles.
-  function renderMoreSheet(data) {
-    const list = document.querySelector('.more-list');
-    if (!list) return;
-    const tile = (it) => navItem(it, 'mx-tool',
-      `<span class="mx-tool-ico"><img src="${escapeHtml(it.image)}" alt=""></span>` +
-      `<span class="mx-tool-name">${escapeHtml(it.sheetName || it.name)}</span>`);
-    const sec = (label, items) => items.length
-      ? `<section class="mx-sec"><div class="mx-head"><h3 class="mx-label">${label}</h3></div>` +
-        `<div class="mx-tools">${items.map(tile).join('')}</div></section>`
-      : '';
-    list.classList.add('mx');
-    list.innerHTML =
-      sec('Java', (data.mobileNav || []).filter((it) => !isSoon(it))) +
-      sec('Tools', data.tools || []) +
-      sec('Coming soon', (data.heroTabs || []).filter(isSoon));
-    const count = document.querySelector('[data-role="more-count"]');
-    if (count) count.textContent = list.querySelectorAll('a.mx-tool').length + ' pages';
-  }
-
-  function renderDesktopSubNav(data) {
-    if (!data.desktopSubNav) return;
-    const { editions = [], categories = [] } = data.desktopSubNav;
-    // Two strips in the secondary top bar now, not one track in a bar of its
-    // own: sections on the left, editions on the right -- the same split hwr
-    // uses for its categories and its hub destinations.
-    const sections = document.getElementById('dsnCategoriesScroll');
-    const dests = document.getElementById('stbHubNavScroll');
-    if (sections) sections.innerHTML = (onToolsPage(data) ? data.tools : categories).map(dsnLinkHtml).join('');
-    if (dests) dests.innerHTML = editions.map(stbHubLinkHtml).join('');
-    // scrollWidth is only meaningful once the chips exist -- the same
-    // re-measure hwr's renderCategoryNav() does after it injects.
-    // Desktop: the sections strip is hidden (one-bar layout, 11layout.css),
-    // so hovering "Java" lists them instead -- the shared menu engine
-    // (window.stbHubMenus in 11layout.js), same as the Clash menus.
-    // This file isn't deferred, so the engine (11layout.js, deferred) may not
-    // exist yet when the nav data arrives: wait for it in that case.
-    const attachMenu = () =>
-      dests && window.stbHubMenus &&
-      window.stbHubMenus(dests, {
-        keyOf: (link) => {
-          const href = link.getAttribute('href') || '';
-          return /^\/minecraft\/java\/?$/.test(href) ? 'java' : /^\/minecraft\/tools\/?$/.test(href) ? 'tools' : '';
-        },
-        labels: { java: 'Java sections', tools: 'Tools' },
-        lists: { java: toMenu(categories), tools: toMenu(data.tools || []) },
-      });
-    if (window.stbHubMenus) attachMenu();
-    else document.addEventListener('DOMContentLoaded', attachMenu);
-  }
-
-  // ---- init ----
-  function renderAll(data) {
-    renderHeroTabs(data);
-    renderBottomNav(data);
-    renderMobileNav(data);
-    renderCrumbs(data);
-    renderMoreSheet(data);
-    renderDesktopSubNav(data);
-    document.dispatchEvent(new CustomEvent('nav-data-ready', { detail: data }));
-  }
-
   function init() {
-    fetch('/mc-contents.json')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load mc-contents.json: ' + res.status);
-        return res.json();
+    (window.pcJSON || function (u) { return fetch(u).then(function (r) { return r.json(); }); })('/game-nav.json')
+      .then((all) => {
+        const groups = (all.minecraft && all.minecraft.groups) || [];
+        // Tray label = "tab" (shorter) or the name; picture = the page's icon.
+        const pagesOf = (name) => ((groups.find((g) => g.name === name) || {}).pages || [])
+          .map((p) => Object.assign({}, p, { name: p.tab || p.name, image: p.icon }));
+        renderMobileNav({ mobileNav: pagesOf('Resources'), tools: pagesOf('Tools').slice(1) });
       })
-      .then(renderAll)
-      .catch((err) => console.error('[nav-render]', err));
+      .catch((err) => console.error('[banner-tabs]', err));
+    if (!document.querySelector('.hero-video, #mcsbCatList')) return;
+    fetch('/mc-contents.json')
+      .then((res) => res.json())
+      .then((data) => document.dispatchEvent(new CustomEvent('nav-data-ready', { detail: data })))
+      .catch((err) => console.error('[hcpc-nav]', err));
   }
 
   if (document.readyState === 'loading') {
@@ -2857,8 +2521,7 @@ function mcUpdateRowFade(row) {
     return days + 'd';
   }
 
-  fetch('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json')
-    .then(function (r) { return r.json(); })
+  (window.pcJSON || function (u) { return fetch(u).then(function (r) { return r.json(); }); })('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json')
     .then(function (data) {
       var releaseId = data.latest.release;
       var snapshotId = data.latest.snapshot;

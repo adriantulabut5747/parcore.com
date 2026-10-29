@@ -1,0 +1,552 @@
+/* ============================================================
+   MINECRAFT LOBBY (/minecraft/, Oct 28 2026 rebuild). Linked after mc-hero.css, lobby only.
+   Guide = the Piglin (Oct 28 2026, replaced Wandy T.): no name, just "Piglin". Gold-obsessed Nether humour.
+   ============================================================ */
+
+/* ---------- HERO (Oct 28 2026, v3): the Nether ----------
+   Official Nether Update art (baked + graded by _tools/lobby-hero/nether.py), live particles over it in
+   #mlFx (mc-lobby-hero.js), copy on the left, the Barter box on the right, the piglin's middle kept clear.
+   Fonts: title = the section titles' Handjet, Sora text, Oxanium labels and keys (Adrian). Raised UI tokens from 11layout.css.
+   The old 3D floating island is saved in _tools/lobby-hero/island/. */
+.ml-hero {
+  --ml-h: clamp(640px, calc(100vh - 64px), 900px);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: var(--ml-h);
+  display: flex;
+  align-items: center;
+  background: #0b0707;
+}
+/* the art + its particles move together (mouse parallax sets the transform); inset leaves room for the shift */
+.ml-art {
+  position: absolute;
+  inset: -16px;
+  z-index: -3;
+  will-change: transform;
+}
+.ml-art picture,
+.ml-art-img { display: block; width: 100%; height: 100%; }
+.ml-art-img {
+  object-fit: cover;
+  object-position: 34% 38%; /* shows the lava column; the piglin stays mid-frame */
+  animation: ml-art-in 1.8s var(--lb-ease) both;
+}
+@keyframes ml-art-in { from { opacity: 0; transform: scale(1.07); filter: brightness(0.35); } }
+.ml-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* grade: the top sinks under the bar, a vignette, /coc/'s red light from the lower left, a fine grain */
+.ml-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(55% 65% at 0% 100%, rgba(194, 59, 59, 0.24), transparent 70%),
+    linear-gradient(180deg, rgba(8, 6, 7, 0.8) 0%, rgba(8, 6, 7, 0) 20%),
+    radial-gradient(130% 95% at 56% 42%, transparent 52%, rgba(6, 4, 5, 0.7) 100%);
+}
+/* legibility: the copy side and the barter side darken, the foot fades into the page ground */
+.ml-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(10, 8, 9, 0.95) 0%, rgba(10, 8, 9, 0.86) 26%, rgba(10, 8, 9, 0.5) 42%, rgba(10, 8, 9, 0) 56%),
+    linear-gradient(270deg, rgba(10, 8, 9, 0.62) 0%, rgba(10, 8, 9, 0.2) 20%, rgba(10, 8, 9, 0) 32%),
+    linear-gradient(0deg, #0a0a0b 0%, rgba(10, 10, 11, 0.55) 12%, rgba(10, 10, 11, 0) 30%);
+}
+.ml-hero-grid {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr) minmax(0, 340px);
+  gap: 32px;
+  padding-top: 76px;
+  padding-bottom: 76px;
+}
+.ml-copy { grid-column: 1; align-self: center; }
+.ml-side { grid-column: 3; align-self: end; }
+/* the copy rises in, one piece after another */
+.ml-copy > *, .ml-side { animation: ml-rise 0.9s var(--lb-ease) both; }
+.ml-copy > :nth-child(2) { animation-delay: 0.08s; }
+.ml-copy > :nth-child(3) { animation-delay: 0.16s; }
+.ml-copy > :nth-child(4) { animation-delay: 0.24s; }
+.ml-copy > :nth-child(5) { animation-delay: 0.32s; }
+.ml-side { animation-delay: 0.4s; }
+@keyframes ml-rise { from { opacity: 0; transform: translateY(14px); } }
+
+/* kicker: /coc/'s Oxanium line with pulsing square dots */
+.ml-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0 0 20px;
+  font: 700 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #8b9099;
+}
+.ml-kicker span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.ml-kicker span::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: var(--lb-red);
+  box-shadow: 0 0 6px rgba(194, 59, 59, 0.8);
+  animation: ml-dot 2.6s ease-in-out infinite;
+}
+.ml-kicker span:nth-child(2)::before { animation-delay: 1.3s; }
+@keyframes ml-dot { 0%, 100% { opacity: 0.55; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.15); } }
+
+/* title: Orbitron 900, white lines with a slow sheen, the red line glowing like hot netherrack */
+.ml-title {
+  margin: 0 0 18px;
+  font-family: 'Handjet', sans-serif !important; /* = the lobby's .mch-sec-title (Adrian, Oct 28 2026) */
+  font-size: clamp(56px, 5.6vw, 96px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.ml-title-line {
+  display: inline-block;
+  font-family: inherit;
+  color: transparent;
+  background: linear-gradient(100deg, #c7ccd4 0%, #eef0f3 30%, #fff 42%, #eef0f3 54%, #c7ccd4 100%) 100% 0 / 250% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.6));
+  animation: ml-shine 10s cubic-bezier(0.3, 0.7, 0.3, 1) 0.6s infinite both;
+}
+.ml-title em {
+  font-family: inherit;
+  font-style: normal;
+  color: var(--lb-red);
+  text-shadow: 0 0 18px rgba(194, 59, 59, 0.4), 2px 4px 8px rgba(0, 0, 0, 0.5);
+  animation: ml-ember 4.5s ease-in-out infinite alternate;
+}
+@keyframes ml-shine { 0% { background-position: 100% 0; } 17%, 50% { background-position: 0 0; } 67%, 100% { background-position: 100% 0; } }
+@keyframes ml-ember {
+  from { text-shadow: 0 0 18px rgba(194, 59, 59, 0.4), 2px 4px 8px rgba(0, 0, 0, 0.5); }
+  to { text-shadow: 0 0 32px rgba(214, 72, 52, 0.75), 2px 4px 8px rgba(0, 0, 0, 0.5); }
+}
+.ml-desc { max-width: 420px; margin: 0 0 26px; font: 400 15px/1.65 'Sora', sans-serif; color: #b1adab; }
+
+/* the Piglin says: face key + raised bubble (the lobby guide; mc-lobby-hero.js rotates the lines) */
+.ml-say { display: flex; align-items: flex-start; gap: 14px; max-width: 460px; }
+.ml-say-face {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 35%, #5a2320, #1a0e0e 78%);
+  box-shadow: var(--lb-btn);
+  cursor: pointer;
+  transition: transform 0.2s var(--lb-ease);
+}
+.ml-say-face img { display: block; width: 100%; height: 100%; }
+.ml-say-face:hover { transform: translateY(-2px) rotate(-3deg); }
+.ml-say-face:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 3px; }
+.ml-say-face.is-hop { animation: ml-hop 0.45s var(--lb-ease); }
+@keyframes ml-hop { 30% { transform: translateY(-7px) rotate(-6deg); } 60% { transform: translateY(1px) rotate(2deg); } }
+.ml-say-box {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 14px 11px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(30, 31, 36, 0.94), rgba(20, 21, 24, 0.94));
+  box-shadow: var(--lb-shadow);
+}
+.ml-say-box::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: -8px;
+  width: 11px;
+  height: 11px;
+  border: solid var(--lb-edge);
+  border-width: 0 0 2px 2px;
+  background: #1e1f24;
+  transform: rotate(45deg);
+}
+.ml-say-box b {
+  display: block;
+  margin-bottom: 4px;
+  font: 800 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lb-red-text);
+}
+.ml-say-box p { min-height: 3em; margin: 0; font: 400 14px/1.5 'Sora', sans-serif; color: #dedbd8; transition: opacity 0.25s ease, transform 0.25s ease; }
+.ml-say-box p.is-out { opacity: 0; transform: translateY(4px); }
+
+
+/* ---- the Barter box: throw gold at the piglin, get a random page (mc-lobby-hero.js "BARTER") ---- */
+.ml-barter {
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(30, 31, 36, 0.9), rgba(18, 19, 22, 0.94));
+  box-shadow: var(--lb-shadow), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+}
+.ml-barter-head { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.ml-barter-head img { width: 20px; height: 20px; image-rendering: pixelated; }
+.ml-barter-head h2 { margin: 0; font: 800 12px/1 'Oxanium', sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: #fff; }
+.ml-barter-head span { margin-left: auto; font: 500 11px/1 'Sora', sans-serif; color: #8b9099; }
+.ml-slot {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: 116px;
+  padding: 14px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  overflow: hidden;
+}
+.ml-slot-idle { display: flex; align-items: center; gap: 14px; margin: 0; font: 400 13px/1.55 'Sora', sans-serif; color: #a9a6a4; }
+.ml-slot-idle img { flex: none; width: 40px; height: 40px; image-rendering: pixelated; animation: ml-bob 2.8s ease-in-out infinite; }
+@keyframes ml-bob { 50% { transform: translateY(-4px) rotate(-6deg); } }
+/* admiring: the piglin holds the ingot up, the timer bar fills (the game's 6 s, rushed) */
+.ml-slot-admire { display: flex; align-items: center; gap: 14px; font: 600 13px/1.4 'Sora', sans-serif; color: #dedbd8; }
+.ml-slot-admire img { width: 56px; height: 56px; animation: ml-admire 0.5s ease-in-out infinite alternate; }
+.ml-slot-admire small { display: block; font-weight: 400; color: #8b9099; }
+@keyframes ml-admire { from { transform: rotate(-5deg); } to { transform: rotate(5deg) translateY(-2px); } }
+.ml-timer { height: 6px; margin-top: 10px; border-radius: 3px; background: var(--lb-well); box-shadow: inset 0 0 0 1px var(--lb-edge); overflow: hidden; }
+.ml-timer i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #8e2a2a, var(--lb-red-hover)); }
+/* the loot: the page the piglin threw back, as a link */
+.ml-loot {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  color: inherit;
+  text-decoration: none;
+  animation: ml-pop 0.5s var(--lb-ease) both;
+}
+.ml-loot-ico { display: grid; place-items: center; width: 56px; height: 56px; border: 2px solid var(--lb-edge); border-radius: 8px; background: var(--lb-raise); box-shadow: var(--lb-btn); }
+.ml-loot-ico img { width: 32px; height: 32px; image-rendering: pixelated; }
+.ml-loot b { display: block; font: 800 15px/1.2 'Oxanium', sans-serif; letter-spacing: 0.02em; color: #fff; }
+.ml-loot small { display: block; margin-top: 3px; font: 400 12.5px/1.45 'Sora', sans-serif; color: #a9a6a4; }
+.ml-loot em { display: block; margin-bottom: 4px; font: 700 9.5px/1 'Oxanium', sans-serif; font-style: normal; letter-spacing: 0.16em; text-transform: uppercase; color: var(--lb-red-text); }
+.ml-loot svg { width: 18px; height: 18px; fill: none; stroke: #8b9099; stroke-width: 2.4; transition: transform 0.2s var(--lb-ease), stroke 0.2s; }
+.ml-loot:hover svg { stroke: #fff; transform: translateX(3px); }
+.ml-loot:hover b { color: var(--lb-red-text); }
+.ml-loot:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 4px; border-radius: 6px; }
+@keyframes ml-pop { from { opacity: 0; transform: scale(0.92); filter: brightness(2); } }
+.ml-barter-go { width: 100%; margin-top: 12px; }
+/* the ingot / loot in flight between the box and the piglin in the picture */
+.ml-fly { position: fixed; left: 0; top: 0; z-index: 50; width: 30px; height: 30px; margin: -15px 0 0 -15px; image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); }
+
+/* the live versions under the box: a sunken strip (mc-java.js fills the hidden hvs-* spans, the hero copies them) */
+.ml-ver {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-top: 12px;
+  padding: 10px 10px 10px 14px;
+  border-radius: 10px;
+  background: rgba(14, 15, 18, 0.88);
+  box-shadow: var(--lb-ring-well);
+}
+.ml-ver > span { min-width: 0; }
+.ml-ver small { display: block; margin-bottom: 4px; font: 700 9.5px/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: #74787f; }
+.ml-ver b { display: block; overflow: hidden; font: 700 14px/1.1 'Oxanium', sans-serif; color: #fff; white-space: nowrap; text-overflow: ellipsis; }
+.ml-ver b i { font: 400 11px 'Sora', sans-serif; font-style: normal; color: #8b9099; }
+.ml-ver-notes { width: 38px; height: 38px; padding: 0; }
+.ml-ver-notes svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+
+/* phones: the art on top as a scene, the copy and the box under it on the dark ground */
+@media (max-width: 970px) {
+  .ml-hero {
+    --ml-art-h: min(82vw, 560px);
+    display: block;
+    min-height: 0;
+    margin-top: 32px; /* the secondary bar overlaps the top of .coc-main */
+    padding-bottom: 32px;
+  }
+  .ml-art { inset: 0 0 auto 0; height: var(--ml-art-h); }
+  .ml-art-img { object-position: 50% 50%; }
+  .ml-hero::before { bottom: auto; height: var(--ml-art-h); }
+  .ml-hero::after { background: linear-gradient(0deg, #0a0a0b calc(100% - var(--ml-art-h)), rgba(10, 10, 11, 0) calc(100% - var(--ml-art-h) + 120px)); }
+  .ml-hero-grid { display: block; padding-top: calc(var(--ml-art-h) - 64px); padding-bottom: 0; }
+  .ml-kicker { display: none; }
+  .ml-title { font-size: clamp(44px, 12.5vw, 64px); }
+  .ml-desc { font-size: 14px; margin-bottom: 20px; }
+  .ml-say { max-width: none; gap: 12px; }
+  .ml-say-face { width: 48px; height: 48px; }
+  .ml-say-box::before { top: 16px; }
+  .ml-say-box p { font-size: 13.5px; }
+  .ml-side { margin-top: 24px; }
+  .ml-barter { display: none; } /* phones: no Barter box (Adrian, Oct 28 2026); the versions strip stays */
+  .ml-ver { margin-top: 0; }
+}
+/* phones: the title's sheen (background-position) and red glow (text-shadow) repaint every frame: off */
+@media (max-width: 970px) {
+  .ml-title-line, .ml-title em { animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-art-img, .ml-copy > *, .ml-side, .ml-title-line, .ml-title em, .ml-kicker span::before, .ml-slot-idle img, .ml-slot-admire img, .ml-loot { animation: none; }
+  .ml-say-box p { transition: none; }
+}
+
+
+/* ============================================================
+   SECTIONS UNDER THE HERO (Oct 28 2026, round 2). Adrian: every section a real Minecraft screen, not
+   cards. Sprites = the 26.3 jar's own (minecrafticons/gui/lobby/), drawn at GUI scale 2 (one texture
+   pixel = 2 CSS px), always pixelated. Text in .mcf is redrawn in the game font by mc-lobby.js.
+   ============================================================ */
+:root { --G: url('/minecrafticons/gui/lobby/'); }
+.ml-hero ~ .mch-ch img[src*='/gui/lobby/'], .mcb, .ml-tip { image-rendering: pixelated; }
+
+
+.mch-ch.ml-band { padding: 8px 0 40px; border: 0; }
+.mch-ch.ml-band .mch-frame > .mch-sec:first-of-type { margin-top: 56px; }
+#ch-map .mch-frame > .mch-sec:first-of-type { margin-top: 72px; }
+.mch-ch.ml-strip { padding: 4px 0 56px; }
+.mch-ch.ml-strip .mch-frame > .mch-sec:first-of-type { margin-top: 48px; }
+.ml-band .mch-sec-head, .ml-strip .mch-sec-head { align-items: flex-end; }
+
+
+/* ---------- MAP: a real seed's Nether, banners = pages (mc-lobby.js "MAP") ----------
+   Simplified Oct 28 2026 (Adrian: "messy"): the map sits in a sunken well inside a raised box (no paper, no tilt),
+   dimmed so the banners carry it; only page banners on it. White = Java, gold = Tools. */
+.ml-atlas { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); align-items: start; gap: 40px; }
+.ml-mapitem { margin: 0; padding: 14px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.ml-mapface { position: relative; aspect-ratio: 1; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.ml-mappx { display: block; width: 100%; height: 100%; image-rendering: pixelated; filter: saturate(0.55) brightness(0.62); }
+.ml-marks { position: absolute; inset: 0; }
+.mk { position: absolute; z-index: 1; display: block; width: 6.25%; aspect-ratio: 1; border-radius: 2px; text-decoration: none; transform: translate(-50%, -50%); transition: transform 0.2s var(--lb-ease); }
+.mk img { display: block; width: 100%; height: 100%; image-rendering: pixelated; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6)); }
+.mk:hover, .mk:focus-visible, .mk.is-hot { z-index: 3; transform: translate(-50%, -50%) scale(1.45); outline: none; }
+.mk.is-hot img { animation: mk-pulse 0.9s steps(2) infinite; }
+@keyframes mk-pulse { 50% { filter: drop-shadow(0 0 0 #fff) brightness(1.6); } }
+/* banner names under a marker, as the map draws them (game font, on a dark strip) */
+.mk-lab { position: absolute; top: 105%; left: 50%; transform: translateX(-50%) scale(0.69); transform-origin: 50% 0; padding: 2px 3px 1px; background: rgba(0, 0, 0, 0.55); opacity: 0; transition: opacity 0.15s; pointer-events: none; }
+.mk:hover .mk-lab, .mk:focus-visible .mk-lab, .mk.is-hot .mk-lab { opacity: 1; }
+/* the game's item tooltip (tooltip/background + tooltip/frame, nine-slice), the page's icon on its left */
+.ml-tip { position: absolute; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 8px 10px; pointer-events: none; border: 18px solid transparent; border-image: url('/minecrafticons/gui/lobby/background.png') 9 fill / 18px stretch; margin: -14px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5)); }
+.ml-tip[hidden] { display: none; }
+.ml-tip::after { content: ''; position: absolute; inset: -18px; border: 20px solid transparent; border-image: url('/minecrafticons/gui/lobby/frame.png') 10 / 20px stretch; image-rendering: pixelated; pointer-events: none; }
+.ml-tip-ico { flex: none; width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; }
+.ml-tip-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* touch screens: a tapped banner pins the tooltip, with a small red key to open the page */
+.ml-tip.is-pinned { pointer-events: auto; }
+.ml-tip-go { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 4px; align-self: flex-end; height: 28px; padding: 0 9px 0 11px; border-radius: 5px; background: var(--lb-red); box-shadow: var(--lb-ring-red); font: 700 11px/1 'Oxanium', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; text-decoration: none; }
+.ml-tip-go svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+/* the key beside the map: a raised box, each group's pages in a sunken well, the hovered one raised out of it */
+.ml-key { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 18px 18px 20px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.ml-key-groups { display: flex; flex-direction: column; gap: 16px; }
+.mkg-h { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; padding: 0 2px; color: #e6e8ec; font: 700 22px/1 'Handjet', sans-serif; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; }
+.mkg-h img { width: 16px; height: 16px; image-rendering: pixelated; }
+.mkg-h small { font: 600 16px/1 'Handjet', sans-serif; color: #7c8088; }
+.mkg-h svg { width: 15px; height: 15px; margin-left: auto; fill: none; stroke: #7c8088; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.15s; }
+a.mkg-h:hover svg, a.mkg-h:focus-visible svg { stroke: #fff; }
+.mkg-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px; padding: 8px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.mkg-row { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 5px 8px; border-radius: 5px; color: #b9bdc4; font: 500 19px/1.1 'Handjet', sans-serif; text-decoration: none; transition: background-color 0.15s, color 0.15s; }
+.mkg-row img { flex: none; width: 14px; height: 14px; image-rendering: pixelated; }
+.mkg-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mkg-row:hover, .mkg-row:focus-visible, .mkg-row.is-hot { background: var(--lb-raise); box-shadow: var(--lb-btn); color: #fff; outline: none; }
+.mkg-row.is-soon { color: #6f737b; }
+.ml-seed { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: 0; padding: 12px 14px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); font: 400 12.5px/1.5 'Sora', sans-serif; color: #8d9199; }
+.ml-seed img { width: 18px; height: 18px; image-rendering: pixelated; }
+.ml-seed code { font: 600 12.5px ui-monospace, Consolas, monospace; color: #e6e8ec; }
+.ml-seed a { display: inline-flex; align-items: center; gap: 6px; flex-basis: 100%; color: #e6e8ec; font-weight: 600; text-decoration: none; }
+.ml-seed a svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the cave itself (.ml-cave) lives in mc-nether.css */
+#ch-map { --cp: 4px; isolation: isolate; overflow: hidden; padding: 150px 0 150px; background: #0b0607; }
+
+/* ---------- TOOLS: a wall of item frames, 3D behind real links (mc-lobby-frames.js) ---------- */
+/* ---------- POPULAR TOOLS (Oct 28 2026, v2): the frames on a hanging Nether board, the piglin beside it ----------
+   Quiet ground on purpose (Adrian: calmer than the cave above). Board = polished blackstone bricks round a gold trim,
+   gilded blackstone corners, crimson planks behind the frames. The piglin = Adrian's golden-axe
+   render, cut out by _tools/lobby-hero/nether.py. The 3D frames (mc-lobby-frames.js) size themselves to the holes. */
+#ch-tools { background: radial-gradient(34% 60% at 86% 62%, rgba(194, 59, 59, 0.09), transparent 70%), linear-gradient(180deg, #0e0708 0, #0c0a0b 260px); }
+.ml-stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: center; gap: 48px; }
+@media (max-width: 1600px) { .ml-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 240px); gap: 32px; } .ml-fr-plate { padding-left: 9px; padding-right: 9px; } }
+.ml-board {
+  position: relative;
+  margin-top: 28px;
+  padding: 22px;
+  border: 2px solid #050304;
+  background: url('/minecrafticons/blocks/polished_blackstone_bricks.png') 0 0 / 44px 44px;
+  image-rendering: pixelated;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.08), inset 0 -4px 0 rgba(0, 0, 0, 0.4), 0 26px 40px -24px rgba(0, 0, 0, 0.9);
+}
+.ml-cap { position: absolute; top: -6px; left: -6px; width: 36px; height: 36px; border: 2px solid #050304; background: url('/minecrafticons/blocks/gilded_blackstone.png') 0 0 / 100% 100%; }
+.ml-cap--tr { left: auto; right: -6px; }
+.ml-cap--bl { top: auto; bottom: -6px; }
+.ml-cap--br { top: auto; left: auto; right: -6px; bottom: -6px; }
+.ml-wall { position: relative; overflow: hidden; border: 2px solid #050304; background: linear-gradient(180deg, rgba(14, 4, 7, 0.5), rgba(14, 4, 7, 0.72)), url('/minecrafticons/blocks/crimson_planks.png') 0 0 / 48px 48px; image-rendering: pixelated; box-shadow: 0 0 0 2px #b8862a, 0 0 0 4px #050304; }
+/* the piglin, a little bob as if breathing; its glow and shadow sit on the quiet ground */
+.ml-stage-piglin { position: relative; margin: 0; }
+.ml-stage-piglin::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: -4px; height: 22px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, 0.7), transparent); }
+.ml-stage-piglin img { position: relative; display: block; width: 100%; height: auto; filter: drop-shadow(0 0 28px rgba(194, 59, 59, 0.18)); animation: ml-breathe 4.5s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes ml-breathe { 50% { transform: translateY(-3px) scaleY(1.008); } }
+.ml-wall::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 90% at 50% 0%, rgba(255, 190, 110, 0.12), transparent 60%), linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.22) 60%, rgba(0, 0, 0, 0.55)); }
+.ml-wall-3d { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s ease; }
+.ml-wall.is-3d .ml-wall-3d { opacity: 1; }
+.ml-wall-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 18px; padding: 28px 26px 26px; }
+.ml-fr { display: flex; flex-direction: column; align-items: center; gap: 14px; color: inherit; text-decoration: none; }
+.ml-fr-hole { position: relative; display: block; width: min(108px, 100%); aspect-ratio: 1; }
+/* no 3D (or still loading): the frame drawn flat from the same textures */
+.ml-wall:not(.is-3d) .ml-fr-hole { background: url('/minecrafticons/gui/lobby/item_frame.png') center / 76% 76% no-repeat, url('/minecrafticons/blocks/birch_planks.png') 0 0 / 50% 50%; box-shadow: 0 10px 18px -6px rgba(0, 0, 0, 0.7); }
+.ml-wall:not(.is-3d) .ml-fr-hole::after { content: ''; position: absolute; inset: 24%; background: var(--item) center / contain no-repeat; image-rendering: pixelated; }
+.ml-fr-plate { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 14px 8px; border-radius: 4px; background: rgba(10, 8, 6, 0.72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); text-align: center; transition: background-color 0.2s, transform 0.25s var(--lb-ease); }
+.ml-fr-plate b { font: 700 19px/1 'Handjet', sans-serif; letter-spacing: 0.02em; color: #fff; }
+.ml-fr-plate { box-sizing: border-box; max-width: 100%; }
+.ml-fr-plate span { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } /* names never cut */
+.ml-fr-plate span { font: 400 11.5px/1.35 'Sora', sans-serif; color: #a69f96; }
+.ml-fr:hover .ml-fr-plate, .ml-fr:focus-visible .ml-fr-plate { background: rgba(194, 59, 59, 0.85); transform: translateY(-2px); }
+.ml-fr:hover .ml-fr-plate span, .ml-fr:focus-visible .ml-fr-plate span { color: #fde3e3; }
+.ml-fr:focus-visible { outline: none; }
+
+/* ---------- SCREENS: Select World + Resource Packs share the game's menu dress ---------- */
+.mcs { position: relative; isolation: isolate; overflow: hidden; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: #101012; box-shadow: var(--lb-shadow); }
+.mcs-head { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 16px 16px; }
+.mcs-head::after, .mcs-foot::before { content: ''; position: absolute; left: 0; right: 0; height: 4px; background: url('/minecrafticons/gui/lobby/header_separator.png') 0 0 / 64px 4px repeat-x; image-rendering: pixelated; }
+.mcs-head::after { bottom: 0; }
+.mcs-foot::before { top: 0; background-image: url('/minecrafticons/gui/lobby/footer_separator.png'); }
+.mcs-title { display: inline-block; }
+.mcs-foot { position: relative; display: flex; justify-content: center; gap: 8px; padding: 16px; }
+.mcs-foot .mcb { width: 300px; max-width: 48%; }
+
+/* ---------- TOP 10 WORLDS (Oct 28 2026, v2): a ruined Nether portal + the Select World screen in Nether dress ----------
+   The picked world shows through the portal: mc-lobby.js "WORLDS" draws the game's own nether_portal frames on
+   .wp-swirl BEHIND the picture, the picture's edges are masked off so the swirl shows round it, and while a new
+   world "warps" in the picture fades out and the swirl fills the frame. Frame = obsidian on a block grid (--B = one
+   block; the gate is rounded to whole blocks so the tiles meet at every edge), crying obsidian dripping tears.
+   The list = the game's Select World on blackstone instead of dirt, gold trim like the tools board above. */
+#ch-worlds { background: radial-gradient(36% 46% at 30% 44%, rgba(168, 54, 160, 0.13), transparent 70%), radial-gradient(50% 30% at 30% 96%, rgba(194, 59, 59, 0.1), transparent 70%), #0c0a0b; }
+/* the left column stretches to the list's height: the gate grows, its bottom row is its own strip (::before) so the
+   blocks stay whole at any height (the side columns tile from the top, their cut last block hides under it) */
+.wp { --B: 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 390px); gap: 40px; margin-top: 28px; }
+.wp-stage { display: flex; flex-direction: column; min-width: 0; container-type: inline-size; }
+
+/* Select World: the game's screen on blackstone, black edge (the gold ring went, Adrian Oct 28 2026) */
+.mcs--worlds { border-color: #050304; border-radius: 0; background: linear-gradient(180deg, rgba(12, 7, 9, 0.82), rgba(12, 7, 9, 0.9)), url('/minecrafticons/blocks/blackstone.png') 0 0 / 32px 32px; image-rendering: pixelated; box-shadow: 0 26px 40px -24px rgba(0, 0, 0, 0.9); }
+.mcs-search { display: block; width: min(400px, 100%); }
+.mcs-search input { width: 100%; height: 40px; box-sizing: border-box; padding: 0 12px; border: 2px solid #a0a0a0; border-radius: 0; background: #000; font: 500 19px/1 'Handjet', monospace; letter-spacing: 0.04em; color: #e0e0e0; outline: none; }
+.mcs-search input::placeholder { color: #707070; }
+.mcs-search input:focus { border-color: #fff; }
+.mcs--worlds .sw-list { padding: 10px 10px 12px; }
+.sw-list { display: flex; flex-direction: column; gap: 2px; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.sw-row { display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: center; gap: 10px; padding: 3px; border: 2px solid transparent; cursor: pointer; outline: none; }
+.sw-row:hover { background: rgba(255, 255, 255, 0.05); }
+.sw-row.is-on { border-color: #fff; background: rgba(0, 0, 0, 0.55); box-shadow: inset 0 0 0 2px #000; }
+.sw-row:focus-visible { border-color: #fff; }
+.sw-row[hidden] { display: none; }
+.sw-ico { position: relative; width: 38px; height: 38px; overflow: hidden; background: #000; }
+.sw-ico img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.sw-ico i { position: absolute; inset: 0; background: rgba(160, 160, 160, 0.4) url('/minecrafticons/gui/lobby/join.png') center / 38px 38px no-repeat; image-rendering: pixelated; opacity: 0; transition: opacity 0.1s; }
+.sw-row:hover .sw-ico i, .sw-row.is-on .sw-ico i { opacity: 1; }
+.sw-ico:hover i { background-image: url('/minecrafticons/gui/lobby/join_highlighted.png'); }
+.sw-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sw-none { display: flex; justify-content: center; margin: 0; padding: 26px 12px 30px; }
+.sw-none[hidden] { display: none; }
+/* two full-width rows, like the game's own two button rows: the game font is too wide for both on one line here */
+.mcs--worlds .mcs-foot { flex-direction: column; gap: 6px; padding: 14px 12px; }
+.mcs--worlds .mcs-foot .mcb { width: 100%; max-width: none; padding: 0 8px; font: inherit; background: none; }
+
+/* ---------- POPULAR R-PACKS / SHADERS / MODPACKS (Oct 28 2026, Adrian): the old Discover page's card rows ----------
+   Markup + scrolling + arrows are the shared .mch-mods--row cards (mc-home.css, article-cards.js "art-nav"); here only
+   the tags change: Adrian wanted the light plates gone. Rank = a raised dark key (#1 stays our red key), source = a
+   sunken well. The id selector outranks mc-home.css's "body.mc-home .mch ..." tag rules. */
+#ch-packs .ml-row + .ml-row { margin-top: 64px; }
+#ch-packs .mch-mod-rank { padding: 5px 7px 4px; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-raise); box-shadow: var(--lb-btn); color: #e6e8ec; }
+#ch-packs .mch-mod:first-child .mch-mod-rank { border-color: var(--lb-red-edge); background: var(--lb-red); box-shadow: var(--lb-btn-red); color: #fff; }
+#ch-packs .mch-src b { padding: 5px 8px 4px; border-radius: 5px; background: var(--lb-well); box-shadow: var(--lb-ring-well); color: #c9ccd2; }
+
+/* ASK THE PIGLIN (.ml-qa / .qa-*) lives in mc-nether.css: the Worlds page's FAQ wears it too */
+
+/* ---------- narrower screens ---------- */
+@media (max-width: 1200px) {
+  .ml-atlas { grid-template-columns: minmax(0, 1fr); }
+  .ml-mapitem { width: min(600px, 100%); margin: 0 auto; }
+  .ml-wall-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 12px; padding: 24px 16px; }
+  .ml-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 220px); gap: 28px; }
+  .wp { --B: 32px; grid-template-columns: minmax(0, 1fr); gap: 32px; } /* side by side the portal shrank to a sliver: the list goes under it */
+}
+@media (max-width: 970px) {
+  .mch-ch.ml-band { padding: 4px 0 24px; }
+  .mch-ch.ml-band .mch-frame > .mch-sec:first-of-type, #ch-map .mch-frame > .mch-sec:first-of-type { margin-top: 40px; }
+  .mch-ch.ml-strip { padding-bottom: 40px; }
+  .ml-band .mch-sec-head, .ml-strip .mch-sec-head { flex-wrap: wrap; align-items: flex-start; }
+  .ml-band .mch-sec-text, .ml-strip .mch-sec-text { flex: 1 0 100%; }
+  .ml-band .mch-sec-act, .ml-strip .mch-sec-act { order: 3; }
+
+  .ml-atlas { gap: 24px; }
+  .ml-mapitem { padding: 10px; }
+  .mk { width: 8.5%; }
+  .mkg-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 6px; }
+  .mkg-row { font-size: 18px; padding: 5px 6px; }
+  .ml-seed { display: none; }
+  #ch-map { --cp: 3px; padding: 110px 0 110px; }
+  .ml-key { padding: 14px 12px 14px; }
+
+  /* phones: 3 frames a row (Adrian, Oct 28 2026); the last row's 2 sit centred (6-col grid, each frame spans 2) */
+  .ml-wall-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px 8px; padding: 18px 8px; }
+  .ml-fr { grid-column: span 2; gap: 10px; }
+  .ml-fr:nth-child(3n + 1):nth-last-child(2) { grid-column: 2 / span 2; }
+  .ml-fr-hole { width: min(96px, 100%); }
+  .ml-stage { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .ml-board { padding: 12px; margin-top: 20px; }
+  .ml-cap { width: 24px; height: 24px; }
+  .ml-stage-piglin { display: none; }
+  /* a third of a phone is too narrow for the blurb: the name alone, allowed to wrap (names are never cut) */
+  .ml-fr-plate { padding: 5px 6px 6px; }
+  .ml-fr-plate b { font-size: 17px; line-height: 0.95; }
+  .ml-fr-plate span { display: none; }
+
+  .mcs-head { padding: 14px 10px 12px; }
+  /* phones (Adrian, Oct 28 2026: "too tall"): portal, then the list as the game's HOTBAR (one row of 10 slots, the
+     world's picture as the item, its rank as the item count, the game's selection box on the picked one), then the
+     plate without the fact tags. No search / Random / Create here. .wp-stage dissolves so the hotbar sits between. */
+  .wp { --B: 24px; display: flex; flex-direction: column; gap: 0; margin-top: 20px; container-type: inline-size; }
+  .wp-stage { display: contents; }
+  .wp-gate { order: 1; flex: none; min-height: calc(100cqw * 0.62); }
+  .wp-rank { left: 10px; top: 8px; }
+  .wp-p:nth-child(n + 7) { display: none; }
+  .mcs--worlds { order: 2; overflow: visible; margin-top: 14px; border: 0; background: none; box-shadow: none; }
+  .mcs--worlds .mcs-head, .mcs--worlds .mcs-foot, .sw-none { display: none; }
+  .wp-plate { order: 3; margin-top: 14px; padding: 12px 14px 14px; }
+  .wp-plate::before, .wp-facts { display: none; }
+  .wp-name { margin-bottom: 6px; }
+  .wp-desc { min-height: 0; margin-bottom: 12px; overflow: hidden; font-size: 13.5px; white-space: nowrap; text-overflow: ellipsis; }
+  .wp-play { width: 100%; }
+  /* the hotbar: each slot = hotbar.png's first slot (x 1-20, all 22 px tall) at 3x; slots in a row read as the bar */
+  .mcs--worlds .sw-list { flex-direction: row; gap: 0; width: max-content; max-width: 100%; margin: 0 auto; padding: 3px 6px; box-sizing: border-box; counter-reset: sw; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .mcs--worlds .sw-list::-webkit-scrollbar { display: none; }
+  .mcs--worlds .sw-row { position: relative; display: block; flex: none; width: 60px; height: 66px; padding: 0; border: 0; background: url('/minecrafticons/gui/hotbar.png') -3px 0 / 546px 66px; image-rendering: pixelated; box-shadow: none; scroll-snap-align: center; }
+  .mcs--worlds .sw-row:first-child { border-left: 3px solid #000; }
+  .mcs--worlds .sw-row:last-child { border-right: 3px solid #000; }
+  .mcs--worlds .sw-ico { position: absolute; left: 6px; top: 9px; width: 48px; height: 48px; }
+  .mcs--worlds .sw-ico i { display: none; }
+  .mcs--worlds .sw-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .mcs--worlds .sw-row::before { counter-increment: sw; content: counter(sw); position: absolute; right: 4px; bottom: 5px; z-index: 1; font: 700 22px/1 'Handjet', sans-serif; color: #fff; text-shadow: 3px 3px 0 #3f3f3f; pointer-events: none; }
+  /* hotbar_selection.png (24 x 23) sits 1 px up and 2 px left of its slot, at 3x */
+  .mcs--worlds .sw-row.is-on::after { content: ''; position: absolute; left: -6px; top: -3px; z-index: 2; width: 72px; height: 69px; background: url('/minecrafticons/gui/hotbar_selection.png') 0 0 / 100% 100%; pointer-events: none; }
+  .mcs--worlds .sw-row:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+  .mcs-foot { padding: 12px 8px; }
+  .mcs-foot .mcb { padding: 0 6px; }
+  #ch-packs .ml-row + .ml-row { margin-top: 44px; }
+
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-stage-piglin img { animation: none; }
+  .mk, .ml-fr-plate { transition: none; }
+  .mk.is-hot img { animation: none; }
+}

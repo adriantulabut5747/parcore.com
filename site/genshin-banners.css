@@ -1,64 +1,315 @@
 /* ============================================================
-   GENSHIN IMPACT BANNERS (Oct 22 2026; v2 Oct 23 2026) -- /genshin-impact/banners only.
-   Linked after genshin.css + genshin-wish.css. Data: /genshin-feed.json "banners".
-   Behaviour: genshin-banners.js.
+   GENSHIN IMPACT BANNERS (v3, Oct 27 2026: the banner box restarted, the page kleefied)
+   -- /genshin-impact/banners only. Linked after genshin.css. Data: /genshin-feed.json
+   "banners" + /genshin-history.json. Behaviour: genshin-banners.js.
 
-   Header = the shared .gi-tb (genshin.css). Under it: the server switch, then the
-   Lobby's wish card (.gw, genshin-wish.css: tabs, art, talents, Inspect), then how
-   the picked wish works (.gb-rules): the official rates and its path, drawn.
+   Header = the shared .gi-tb. Then: one card per live wish (.gbw), every one on the
+   page; How wishes work (.gb-rules: Klee's card + the two rate boxes); Ask Klee
+   (.gi-qa, genshin.css "KLEE PIECES"). The cards wear the Lobby's Current wishes dress
+   (.gwl-card): the 5-star's element tints the ground, star dust + sparkles in it.
    ============================================================ */
 
+.gb-first { padding-top: 64px; }
 
-/* ---- SERVER ------------------------------------------------------------- */
-.gi-bar { justify-content: flex-start; }
-.gi-bar #gbServer { flex: none; }
-.gb-server-note { font-size: 11.5px; line-height: 1.5; color: var(--gi-dim); }
-
-/* ---- HOW THIS WISH WORKS ------------------------------------------------
-   One .gb-rule per wish, all in the same grid cell: the box is as tall as the
-   tallest and switching wishes never moves the page (genshin.css 5.6 rule). */
-.gb-rules { display: grid; margin-top: 16px; padding: 24px 28px; }
-.gb-rule { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); align-items: center; gap: 20px 48px; }
-.gb-rule:not(.is-on) { visibility: hidden; }
-.gb-rule-head h3 { margin-top: 8px; font: 800 22px/1.1 'Cinzel', serif; text-transform: uppercase; color: #fff; }
-
-/* The real rates, as chips (official wish details; no soft pity). */
-.gb-rates { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; list-style: none; }
-.gb-rates li {
-  padding: 6px 9px 5px;
-  border: 2px solid var(--lb-edge);
-  border-radius: 5px;
-  background: var(--lb-well);
-  font: 600 11px/1 'Sora', sans-serif;
-  white-space: nowrap;
-  color: var(--gi-muted);
+/* ---- ONE WISH CARD: info left, the wish art bleeding off the right ---- */
+.gb-list { display: grid; gap: 20px; }
+.gbw {
+  --spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.9 6.6 13.4 9.1 20 10 13.4 10.9 10.9 13.4 10 20 9.1 13.4 6.6 10.9 0 10 6.6 9.1 9.1 6.6 10 0Z'/%3E%3C/svg%3E");
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  min-height: 460px;
+  overflow: hidden;
+  scroll-margin-top: 96px;
+  border-color: color-mix(in srgb, var(--gi-el) 35%, var(--lb-edge));
+  border-radius: 12px;
+  background:
+    radial-gradient(60% 85% at 74% 46%, color-mix(in srgb, var(--gi-el) 34%, transparent), transparent 72%),
+    linear-gradient(100deg, #0d0f14 0%, color-mix(in srgb, var(--gi-el) 9%, #0c0e13) 38%, color-mix(in srgb, var(--gi-el) 24%, #0a0c11) 100%);
 }
-.gb-rates b { margin-right: 3px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+/* Star dust over the art side. */
+.gbw::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(color-mix(in srgb, var(--gi-el) 55%, #fff) 0.8px, transparent 1.4px),
+    radial-gradient(color-mix(in srgb, var(--gi-el) 80%, #fff) 0.6px, transparent 1.1px);
+  background-size: 97px 89px, 53px 61px;
+  background-position: 11px 7px, 38px 29px;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(90deg, transparent 30%, #000 70%);
+  mask-image: linear-gradient(90deg, transparent 30%, #000 70%);
+}
+.gbw-art { position: absolute; z-index: -1; top: 0; right: 0; bottom: 0; width: 64%; pointer-events: none; }
+.gbw-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 26%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 26%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 26%);
+  transition: transform 0.6s var(--gi-ease);
+}
+/* Three sparkles on the art, like the Lobby's cards. */
+.gbw-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--gi-el) 60%, #fff);
+  -webkit-mask: var(--spark) right 28px top 26px / 20px no-repeat, var(--spark) right 58px top 58px / 10px no-repeat, var(--spark) 22% 84% / 14px no-repeat;
+  mask: var(--spark) right 28px top 26px / 20px no-repeat, var(--spark) right 58px top 58px / 10px no-repeat, var(--spark) 22% 84% / 14px no-repeat;
+  opacity: 0.85;
+}
+@media (min-width: 971px) and (prefers-reduced-motion: no-preference) {
+  .gbw-art img { animation: gbw-float 7s ease-in-out infinite; }
+  .gbw--wep .gbw-art img { animation: none; }
+}
+@keyframes gbw-float { 50% { translate: 0 -6px; } }
+@media (hover: hover) {
+  .gbw:hover .gbw-art img { transform: scale(1.03); }
+}
 
-/* The path, drawn: three diamonds on a line -- the course (outline), the step that
-   decides it (red), the featured 5-star (white). */
-.gb-path { position: relative; display: flex; gap: 24px; list-style: none; }
-.gb-path::before { content: ''; position: absolute; top: 9px; left: 8px; right: 8px; height: 2px; background: rgba(255, 255, 255, 0.1); }
-.gb-path li { position: relative; flex: 1; display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 12px; }
+.gbw-info { grid-column: 1; display: flex; flex-direction: column; padding: 32px 36px 28px; }
+.gbw-tag { display: flex; align-items: center; gap: 10px; }
+.gbw-phase {
+  padding: 4px 8px 3px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  font: 700 9.5px/1 'Sora', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #c9ccd2;
+}
+.gbw-name {
+  margin-top: 12px;
+  font: 900 clamp(40px, 3.4vw, 60px)/1 'Cinzel', serif;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+}
+.gbw--wep .gbw-name { font-size: clamp(28px, 2.4vw, 40px); }
+.gbw-title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 10px; font: 600 15px/1.4 'Sora', sans-serif; color: #d4d6da; }
+.gbw-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--gi-muted); }
+.gbw-meta img { width: 18px; height: 18px; margin-right: -2px; }
+.gbw-meta i { font-style: normal; color: var(--gi-dim); }
+
+/* "2nd banner · Back after 189 days", or a red "New" (the one red on the card). */
+.gbw-run {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 6px 12px 6px 6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  font-size: 12.5px;
+  color: #c3c6cc;
+}
+.gbw-run b {
+  padding: 5px 8px 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  font: 800 10.5px/1 'Sora', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.gbw-run b.gbw-new { background: var(--gi-acc); }
+
+/* Featured 4-stars (and the weapon wish's two 5-stars): tile, name, one small line. */
+.gbw-four { margin-top: 22px; }
+.gbw-four ul, .gbw-weps { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 10px; list-style: none; }
+.gbw-four li, .gbw-weps li { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.gbw-four .gi-tile { width: 42px; height: 42px; }
+.gbw-four b, .gbw-weps b { display: block; font: 700 13px/1.25 'Sora', sans-serif; color: #fff; }
+.gbw-four small, .gbw-weps small { display: flex; align-items: center; gap: 5px; margin-top: 3px; font-size: 11.5px; color: var(--gi-muted); }
+.gbw-four small img { width: 14px; height: 14px; }
+.gbw-weps { flex-direction: column; gap: 10px; margin-top: 20px; }
+.gbw-weps .gi-tile { width: 54px; height: 54px; }
+.gbw-weps b { font-size: 16px; }
+.gbw-weps small { font-size: 12px; }
+
+/* Foot: the countdown (d / h / m / s on the picked server) | the keys. */
+.gbw-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--gi-line);
+}
+.gbw-info > :nth-last-child(2) { margin-bottom: 26px; }
+.gbw-ends { display: grid; gap: 7px; }
+.gbw-ends small { font-size: 11px; color: var(--gi-dim); }
+.gbw .gi-clock-units span { padding: 8px 9px 7px; }
+.gbw .gi-clock-units b { font-size: 20px; }
+.gbw .gi-clock-units.is-ending b { color: #ffa395; }
+.gbw-keys { display: flex; gap: 8px; }
+.gbw-keys .gi-key { height: 40px; padding: 0 16px 2px; }
+.gbw-keys .gi-key svg { width: 14px; height: 14px; transition: transform 0.2s var(--gi-ease); }
+.gbw-keys .gi-key:hover svg { transform: translateX(3px); }
+
+/* The weapon wish: both 5-star weapons standing in the art, tilted apart. */
+.gbw--wep .gbw-art { display: flex; align-items: center; justify-content: center; gap: 6%; }
+.gbw--wep .gbw-art img {
+  width: auto;
+  height: 112%;
+  object-fit: contain;
+  -webkit-mask-image: none;
+  mask-image: none;
+  transform: rotate(-14deg);
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
+}
+.gbw--wep .gbw-art img + img { transform: rotate(14deg); }
+@media (hover: hover) {
+  .gbw--wep:hover .gbw-art img { transform: rotate(-14deg) scale(1.03); }
+  .gbw--wep:hover .gbw-art img + img { transform: rotate(14deg) scale(1.03); }
+}
+
+
+/* ---- HOW WISHES WORK: Klee's card | character wish | weapon wish ---- */
+.gb-rules { display: grid; grid-template-columns: 250px minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.gb-guide {
+  position: relative;
+  min-height: 440px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 12px;
+  background: #1c1415;
+  box-shadow: var(--lb-shadow);
+}
+.gb-guide-art {
+  position: absolute;
+  inset: 0;
+  background: url('/images/genshin/strip/Klee.webp') center top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 96%);
+  mask-image: linear-gradient(180deg, #000 62%, transparent 96%);
+}
+.gb-guide-say {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  padding: 12px 14px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(14, 11, 12, 0.9);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d4d6da;
+}
+.gb-guide-say .gi-say-who { margin-bottom: 4px; color: var(--klee-text); }
+
+.gb-rule { display: flex; flex-direction: column; gap: 22px; padding: 24px; }
+.gb-rule-head { display: flex; align-items: center; gap: 14px; }
+.gb-rule-head img { flex: none; width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); }
+.gb-rule-head h3 { margin-top: 6px; font: 800 22px/1.1 'Cinzel', serif; text-transform: uppercase; color: #fff; }
+
+/* The four numbers, each in a well. */
+.gb-nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; list-style: none; }
+.gb-nums li { padding: 12px 10px 11px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); }
+.gb-nums b { display: block; font: 800 22px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #fff; }
+.gb-nums span { display: block; margin-top: 6px; font-size: 11px; line-height: 1.35; color: var(--gi-muted); }
+
+/* The path, drawn: three diamonds down a line -- the start (outline), the step that decides
+   it (red), the featured 5-star (white). */
+.gb-path { position: relative; display: grid; gap: 16px; list-style: none; }
+.gb-path::before { content: ''; position: absolute; top: 10px; bottom: 10px; left: 8px; width: 2px; background: rgba(255, 255, 255, 0.1); }
+.gb-path li { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 12px; }
 .gb-path li b { font: 700 13.5px/1.3 'Sora', sans-serif; color: #fff; }
-.gb-path li small { grid-column: 2; margin-top: 3px; font-size: 11.5px; line-height: 1.5; color: var(--gi-muted); }
+.gb-path li small { grid-column: 2; margin-top: 3px; font-size: 12px; line-height: 1.5; color: var(--gi-muted); }
 .gb-pip { grid-row: 1 / span 2; width: 12px; height: 12px; margin: 3px 0 0 3px; border: 2px solid #8b9099; background: #101117; transform: rotate(45deg); }
 .gb-pip.is-point { border-color: var(--gi-acc); background: var(--gi-acc); }
 .gb-pip.is-yours { border-color: #fff; background: #fff; }
 
+/* The most it can cost. */
+.gb-cost { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--gi-line); font-size: 13px; color: var(--gi-muted); }
+.gb-cost img { width: 22px; height: 22px; }
+.gb-cost b { margin-right: 4px; font: 800 18px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #fff; }
+.gb-cost small { margin-left: auto; font-size: 11.5px; color: var(--gi-dim); font-variant-numeric: tabular-nums; }
 
-/* ---- NARROW: the rates above the path ------------------------------------ */
-@media (max-width: 1280px) {
-  .gb-rule { grid-template-columns: minmax(0, 1fr); }
+
+/* ---- NARROW COLUMNS (laptops): by the column's width, not the screen's, since the sidebar
+   eats into it (1366 wide = a ~930px column). #wishes / #rules / each rate box are containers. ---- */
+#wishes { container: gbw / inline-size; }
+#rules { container: gbr / inline-size; }
+.gb-rule { container-type: inline-size; }
+@container gbw (max-width: 1100px) {
+  .gbw { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); }
+  .gbw-art { width: 58%; }
+  .gbw-name { font-size: 44px; }
+  .gbw--wep .gbw-name { font-size: 32px; }
+  .gbw--wep .gbw-art { gap: 0; }
+  .gbw--wep .gbw-art img { height: 96%; }
+}
+@container gbr (max-width: 1180px) {
+  /* Klee's card turns sideways over the two boxes: picture left, her line right. */
+  .gb-rules { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .gb-guide { grid-column: 1 / -1; display: grid; grid-template-columns: 200px minmax(0, 1fr); align-items: center; min-height: 0; }
+  .gb-guide-art { position: relative; inset: auto; aspect-ratio: 4 / 3; background-position: center 14%; -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent); mask-image: linear-gradient(90deg, #000 70%, transparent); }
+  .gb-guide-say { position: relative; inset: auto; max-width: 520px; margin: 12px 12px 12px 4px; }
+}
+@container (max-width: 520px) {
+  .gb-nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* ---- PHONES ------------------------------------------------------------- */
+/* ---- PHONES: the art as a band on top (2:1, the whole wish art), info under it ---- */
 @media (max-width: 970px) {
-  .gb-rules { padding: 16px; }
+  .gb-first { padding-top: 40px; }
+  #wishes .gi-sec-head { flex-wrap: wrap; align-items: flex-start; gap: 14px; }
+  .gb-list { gap: 14px; }
+  .gbw { display: flex; flex-direction: column; min-height: 0; border-radius: 10px; }
+  .gbw::before { -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 55%); mask-image: linear-gradient(180deg, #000 20%, transparent 55%); }
+  .gbw { background:
+      radial-gradient(90% 40% at 50% 18%, color-mix(in srgb, var(--gi-el) 34%, transparent), transparent 72%),
+      linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 22%, #0a0c11) 0%, color-mix(in srgb, var(--gi-el) 8%, #0c0e13) 45%, #0d0f14 100%); }
+  /* min-height 0: an aspect-ratio box otherwise grows to fit the tall weapon art. */
+  .gbw-art { position: relative; z-index: 0; inset: auto; width: auto; min-height: 0; aspect-ratio: 2 / 1; overflow: hidden; }
+  .gbw-art img { object-position: 50% 30%; -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent); mask-image: linear-gradient(180deg, #000 72%, transparent); }
+  .gbw-art::after { -webkit-mask: var(--spark) right 16px top 14px / 16px no-repeat, var(--spark) 18px 18px / 10px no-repeat; mask: var(--spark) right 16px top 14px / 16px no-repeat, var(--spark) 18px 18px / 10px no-repeat; }
+  .gbw--wep .gbw-art img { height: 118%; }
+  .gbw-info { position: relative; z-index: 1; margin-top: -14px; padding: 0 14px 14px; }
+  .gbw-name { margin-top: 8px; font-size: 30px; }
+  .gbw--wep .gbw-name { font-size: 24px; }
+  .gbw-title { margin-top: 6px; font-size: 13.5px; }
+  .gbw-meta { margin-top: 6px; font-size: 12.5px; }
+  .gbw-run { margin-top: 14px; font-size: 12px; }
+  /* The three 4-stars as three columns: tile over name over line. */
+  .gbw-four { margin-top: 18px; }
+  .gbw-four ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
+  .gbw--wep .gbw-four ul { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .gbw-four li { flex-direction: column; gap: 6px; text-align: center; }
+  .gbw-four small { justify-content: center; font-size: 10.5px; }
+  .gbw--wep .gbw-four small { display: none; }
+  .gbw--wep .gbw-four b { font-size: 10.5px; font-weight: 600; color: #c9ccd2; }
+  .gbw-weps { margin-top: 14px; }
+  .gbw-weps .gi-tile { width: 46px; height: 46px; }
+  .gbw-weps b { font-size: 14px; }
+  .gbw-weps small { font-size: 11px; }
+  .gbw-info > :nth-last-child(2) { margin-bottom: 18px; }
+  .gbw-foot { flex-direction: column; align-items: stretch; gap: 12px; padding-top: 14px; }
+  .gbw-ends { grid-template-columns: auto 1fr; align-items: center; column-gap: 12px; }
+  .gbw-ends small { grid-column: 1 / -1; }
+  .gbw-ends .gi-clock-units { justify-self: end; }
+  .gbw .gi-clock-units b { font-size: 16px; }
+  .gbw .gi-clock-units span { padding: 6px 7px 5px; }
+  .gbw-keys .gi-key { flex: 1; justify-content: center; }
+
+  .gb-rules { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .gb-guide { grid-template-columns: 38% minmax(0, 1fr); }
+  .gb-guide-art { aspect-ratio: 3 / 4; }
+  .gb-guide-say { margin: 10px 10px 10px 0; padding: 10px 12px 11px; font-size: 12.5px; }
+  .gb-rule { gap: 18px; padding: 16px; }
   .gb-rule-head h3 { font-size: 18px; }
-  .gb-rates { flex-wrap: nowrap; overflow-x: auto; margin-top: 12px; scrollbar-width: none; }
-  .gb-rates::-webkit-scrollbar { display: none; }
-  .gb-rates li { flex: none; }
-  .gb-path { flex-direction: column; gap: 14px; }
-  .gb-path::before { top: 10px; bottom: 10px; left: 8px; right: auto; width: 2px; height: auto; }
+  .gb-nums b { font-size: 19px; }
+  #faq { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 }

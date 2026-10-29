@@ -16,6 +16,7 @@
     .catch((err) => {
       console.error('genshin-glossary.json failed to load:', err);
       $('glList').innerHTML = '<p class="gi-box gi-empty">Couldn’t load the glossary right now. Try again in a bit.</p>';
+      $('glKlee').textContent = "Klee couldn't find the words. Try again in a bit!";
     });
 
   function run(D) {
@@ -25,6 +26,7 @@
     all.forEach((t) => (t.hay = norm([t.term, ...(t.also || []), t.def].join(' '))));
 
     $('glFacts').innerHTML = `<li><b>${all.length}</b>terms</li><li><b>${D.sections.length}</b>topics</li><li>Checked for <b>${esc(D.version)}</b></li>`;
+    $('glKlee').textContent = `Klee learned all ${all.length} words! Search for one, or jump to a topic.`; // Klee's line under the header (Oct 27 2026)
 
     // One dictionary row: the word (+ other spellings) left, meaning / example / see also right.
     // Most asked reuses it without the id (the full list owns #t-<id>).
@@ -164,9 +166,8 @@
 
   // "See also" page links: the page's name from its address.
   function pageName(link) {
-    if (link.includes('#pity')) return 'Pity chart';
     const p = link.split(/[?#]/)[0].replace(/\/$/, '').split('/').pop();
-    const NAMES = { '': 'Lobby', 'genshin-impact': 'Lobby', reactions: 'Reactions chart', reruns: 'Rerun tracker', codes: 'Redeem codes', endgame: 'Endgame', farm: 'Farm today', artifacts: 'Artifacts', banners: 'Banners', nations: 'Nations' };
+    const NAMES = { '': 'Lobby', 'genshin-impact': 'Lobby', reactions: 'Reactions chart', reruns: 'Rerun tracker', codes: 'Redeem codes', endgame: 'Endgame', farm: 'Daily domains', artifacts: 'Artifacts', banners: 'Banners', nations: 'Nations', 'wish-simulator': 'Wish simulator' };
     return NAMES[p] || p;
   }
 

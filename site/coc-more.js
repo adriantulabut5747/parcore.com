@@ -10,7 +10,7 @@ function cocPagePath(u) {
    (every CoC page). One grid of Town Hall tiles per side; the switch shows
    one at a time. It starts on whichever section the page belongs to
    (army pages and the army maker open on Armies). Arrow keys move between
-   the two tabs, as a tablist should. Styles: coc-more.css. */
+   the two tabs, as a tablist should. Styles: 11layout.css "MORE SHEET". */
 (function () {
   var tabs = [document.getElementById('mxTabLayouts'), document.getElementById('mxTabArmies')];
   if (!tabs[0] || !tabs[1]) return;
@@ -86,6 +86,19 @@ function cocPagePath(u) {
           })
           .join(''),
       );
+      // Section labels wear their top-bar picture, like the Genshin / Minecraft sheets (11layout.js
+      // buildGroups). The Tools hub has no tile (see above): on it, its label lights up instead
+      // (Town Halls never does: every TH page has its own tile).
+      [['mxThLabel', data.primaryNav.layouts], ['mxToolsLabel', data.primaryNav.guides, true]].forEach(function (l) {
+        var h = document.getElementById(l[0]);
+        if (!h || h.querySelector('.mx-label-pic')) return;
+        h.classList.add('mx-label--ico');
+        h.insertAdjacentHTML('afterbegin', '<img class="mx-label-pic" src="' + l[1].icon + '" alt="">');
+        if (l[2] && cocPagePath(l[1].href) === page) {
+          h.classList.add('active');
+          h.setAttribute('aria-current', 'page');
+        }
+      });
       // Header count: every page the sheet links to (both TH panels + tools).
       var count = document.querySelector('[data-role="more-count"]');
       if (count) count.textContent = document.querySelectorAll('.more-list.mx a').length + ' pages';

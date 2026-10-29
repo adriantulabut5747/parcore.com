@@ -31,15 +31,16 @@
     var el = document.getElementById(id);
     if (el) el.innerHTML = html;
   }
-  function card(p, tags) {
+  // Same card as Worlds / packs / shaders ("PACK CARDS" in mc-home.css).
+  function card(p, tags, i) {
     var site = /modrinth\.com/.test(p.href) ? 'modrinth.com' : 'curseforge.com';
     return '<a class="mch-mod" href="' + esc(p.href) + '" target="_blank" rel="noopener">' +
-      '<div class="mch-mod-media"><img src="' + esc(p.img) + '" alt="" loading="lazy" decoding="async"></div>' +
+      '<div class="mch-mod-media"><img src="' + esc(p.img) + '" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">' + String(i + 1).padStart(2, '0') + '</span></div>' +
       '<h3 class="mch-mod-name">' + esc(p.name) + '</h3>' +
-      '<p class="mch-mod-by"><img src="' + esc(p.icon) + '" alt="" loading="lazy">' + esc(p.by) + '</p>' +
+      (p.by ? '<span class="mch-mod-author">by ' + esc(p.by) + '</span>' : '') +
       '<p class="mch-mod-desc">' + esc(p.desc) + '</p>' +
-      '<span class="mch-mod-foot"><span class="mch-src"><img src="' + favicon(site) + '" alt="" loading="lazy">' + (site === 'modrinth.com' ? 'Modrinth' : 'CurseForge') + '</span>' +
-      (tags ? '<span class="mch-mod-tags">' + p.tags.map(function (t) { return esc(tags[t] || t); }).join(' · ') + '</span>' : '') + '</span></a>';
+      '<p class="mch-scard-tags">' + p.tags.map(function (t) { return esc(tags[t] || t); }).join('<i aria-hidden="true"></i>') + '</p>' +
+      '<span class="mch-src"><img src="' + favicon(site) + '" alt="" loading="lazy"><b>' + (site === 'modrinth.com' ? 'Modrinth' : 'CurseForge') + '</b></span></a>';
   }
 
   fetch(grid.getAttribute('data-src') || '/mc-modpacks.json')
@@ -54,8 +55,8 @@
       var hero = document.getElementById('mpHeroCount');
       if (hero) hero.textContent = packs.length;
 
-      grid.innerHTML = packs.map(function (p) { return card(p, tags); }).join('');
-      if (data.mods) fill('singleGrid', data.mods.map(function (p) { return card(p, tags); }).join(''));
+      grid.innerHTML = packs.map(function (p, i) { return card(p, tags, i); }).join('');
+      if (data.mods) fill('singleGrid', data.mods.map(function (p, i) { return card(p, tags, i); }).join(''));
       if (data.picks) fill('pickGrid', data.picks.map(essItem).join(''));
 
       // Chips: All + every tag. A pack with two tags shows under both.

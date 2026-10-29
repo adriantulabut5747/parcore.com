@@ -19,14 +19,11 @@
   }
 
 
-  // ---- CURRENT BANNERS v3: the wish card is shared with the Banners page (genshin-wish.js,
-  // GI.wishCard), so it's drawn there. ----
-  let wish = { tick() {} };
-
-  // ---- hero lede (Oct 22 2026): one live sentence under the title -- who's on the
-  // wishes and for how long, what the codes are worth, when the Abyss resets.
-  // Days (or hours on the last day), set once per load; the line has a fixed
-  // height in CSS so filling it never moves the hero.
+  // ---- DID YOU KNOW? (Oct 27 2026): the hero's dialogue box rotates facts like the TH pages' box
+  // (th-layouts.js). Card 1 = the live line (lede(): who's on the wishes and for how long, the codes);
+  // then genshin-dyk.json, shuffled, 6 s each. Every card sits in one grid cell three lines tall, so the
+  // hero never moves. Hover holds it (not on touch), click / tap / Enter skips on; it only runs while
+  // the box is on screen and the tab is visible.
   function lede(feed) {
     const t = now();
     const span = (sec) => {
@@ -34,18 +31,116 @@
       const h = Math.max(1, Math.floor(sec / 3600));
       return d >= 1 ? d + (d === 1 ? ' day' : ' days') : h + (h === 1 ? ' hour' : ' hours');
     };
-    const out = [];
     const wishes = (feed.banners || []).filter((b) => srvEnd(b.end) > t);
     const fives = [].concat(...wishes.map((b) => (b.characters || []).filter((c) => c.rarity === 5)));
     const end = srvEnd(Math.min(...wishes.map((b) => b.end)));
-    if (fives.length) out.push(`<b>${fives.map((c) => esc(c.name)).join(' and ')}</b>${fives.length > 1 ? "'s wishes end" : "'s wish ends"} in ${span(end - t)}.`);
     const codes = feed.codes || [];
     const sum = codes.reduce((a, c) => a + (c.primos || 0), 0);
-    if (codes.length) out.push(`<b>${codes.length} code${codes.length === 1 ? '' : 's'}</b> ${codes.length === 1 ? 'is' : 'are'} live${sum ? `, worth ${sum.toLocaleString()} Primogems` : ''}.`);
-    const abyss = (feed.challenges || []).find((c) => c.type === 'ActTypeTower' && c.end > t);
-    if (abyss) out.push(`The Spiral Abyss resets in ${span(abyss.end - t)}.`);
-    if (out.length) $('giLede').innerHTML = out.join(' ');
+    const out = [];
+    if (fives.length) out.push(`<b>${fives.map((c) => esc(c.name)).join(' and ')}</b>${fives.length > 1 ? "'s wishes end" : "'s wish ends"} in ${span(end - t)}`);
+    if (codes.length) out.push(`<b>${codes.length} code${codes.length === 1 ? '' : 's'}</b>${sum ? ` worth ${sum.toLocaleString()} Primogems` : ''} ${codes.length === 1 ? 'is' : 'are'} live`);
+    if (out.length) document.querySelector('#giLede .gi-dyk').innerHTML = out.join(', and ') + '!';
   }
+
+  (function dyk() {
+    const box = $('giDyk');
+    const stage = $('giLede');
+    fetch('/genshin-dyk.json')
+      .then((r) => r.json())
+      .then((data) => {
+        const facts = (data.facts || []).filter((f) => f.text);
+        for (let i = facts.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [facts[i], facts[j]] = [facts[j], facts[i]];
+        }
+        facts.forEach((f) => {
+          const p = document.createElement('p');
+          p.className = 'gi-dyk';
+          p.textContent = f.text;
+          p.setAttribute('aria-hidden', 'true');
+          stage.appendChild(p);
+        });
+        const els = [...stage.children];
+        let at = 0;
+        let timer = 0;
+        let held = false;
+        let seen = true;
+        const show = (n) => {
+          els[at].classList.remove('is-on');
+          els[at].setAttribute('aria-hidden', 'true');
+          at = n;
+          els[at].classList.add('is-on');
+          els[at].removeAttribute('aria-hidden');
+        };
+        const run = () => {
+          clearTimeout(timer);
+          if (held || !seen || document.hidden) return;
+          timer = setTimeout(() => {
+            show((at + 1) % els.length);
+            run();
+          }, 6000);
+        };
+        const next = () => {
+          stage.setAttribute('aria-live', 'polite'); // a fact the visitor asked for is read out
+          show((at + 1) % els.length);
+          run();
+        };
+        if (matchMedia('(hover: hover)').matches) {
+          box.addEventListener('mouseenter', () => {
+            held = true;
+            run();
+          });
+          box.addEventListener('mouseleave', () => {
+            held = false;
+            run();
+          });
+        }
+        box.addEventListener('click', next);
+        box.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            next();
+          }
+        });
+        document.addEventListener('visibilitychange', run);
+        new IntersectionObserver(([en]) => {
+          seen = en.isIntersecting;
+          run();
+        }).observe(box);
+      })
+      .catch(() => {});
+  })();
+
+  // ---- PHONES: THE SEARCH STARTS TUCKED UNDER THE BOTTOM BAR (Oct 27 2026, Adrian). The Did you
+  // know box gets just enough margin that the UID bar sits centred behind the fixed bottom nav on the
+  // first screen (measured, so it's exact on every phone). Re-run on a real width change only: phones
+  // fire resize while the address bar slides.
+  (function tuck() {
+    const box = $('giDyk');
+    const cta = document.querySelector('.gi-hero-cta');
+    const bn = $('bottomNav');
+    const fit = () => {
+      box.style.marginBottom = '';
+      if (innerWidth > 970 || !bn || !cta) return;
+      const r = bn.getBoundingClientRect();
+      const want = r.top + (r.height - cta.offsetHeight) / 2; // the bar's middle, in screen terms at scroll 0
+      const now = cta.getBoundingClientRect().top + scrollY;
+      if (want > now) box.style.marginBottom = want - now + 'px';
+    };
+    fit();
+    if (document.fonts) document.fonts.ready.then(fit);
+    let w = innerWidth;
+    addEventListener('resize', () => {
+      if (innerWidth === w) return;
+      w = innerWidth;
+      fit();
+    });
+  })();
+
+  // ---- HERO OFF SCREEN (Oct 27 2026, phone scroll lag): the embers, the fire flicker and the
+  // bouncing "next" mark pause while the hero is out of view (.is-off), so they don't keep the
+  // page painting under everything else.
+  new IntersectionObserver(([en]) => $('giHero').classList.toggle('is-off', !en.isIntersecting)).observe($('giHero'));
 
   // ---- today panel (depends on the picked server) ----
   function today(feed) {
@@ -111,6 +206,13 @@
       .join('');
   }
 
+  // Each mode's emblem: the Abyss one is ours; Theater + Stygian load from the Fandom wiki (it blocks
+  // downloads, so they're shown the way the nav's Nations emblem is).
+  const EG_ICON = {
+    ActTypeTower: '/images/genshin/endgame/abyss-emblem.webp',
+    ActTypeRoleCombat: 'https://static.wikia.nocookie.net/gensin-impact/images/9/95/Imaginarium_Theater_Emblem.png/revision/latest/scale-to-width-down/80',
+    ActTypeHardChallenge: 'https://static.wikia.nocookie.net/gensin-impact/images/c/cb/Stygian_Onslaught_Emblem.png/revision/latest/scale-to-width-down/80',
+  };
   function endgame(ch, evs) {
     const t = now();
     const stygian = (evs || []).find((e) => e.type === 'ActTypeHardChallenge' && (!e.end || e.end > t));
@@ -126,7 +228,7 @@
     };
     list.innerHTML = rows
       .map(
-        (c) => `<div class="gi-eg-row"><div class="gi-eg-name"><h3>${esc(c.name)}</h3>${c.start ? `<span class="gi-label">${day(c.start)} – ${day(c.end)}</span>` : ''}</div>
+        (c) => `<div class="gi-eg-row"><img class="gi-eg-ico" src="${EG_ICON[c.type] || EG_ICON.ActTypeTower}" alt="" width="40" height="40" loading="lazy" decoding="async"><div class="gi-eg-name"><h3>${esc(c.name)}</h3>${c.start ? `<span class="gi-label">${day(c.start)} – ${day(c.end)}</span>` : ''}</div>
       <div class="gi-eg-stat"><span class="gi-label">Resets in</span>${c.end ? `<span class="gi-today-v" data-end="${+c.end}"></span>` : '<span class="gi-today-v">Ongoing</span>'}</div>
       ${c.primos ? `<div class="gi-eg-stat"><span class="gi-label">Reward</span><span class="gi-primo">${PRIMO}${c.primos.toLocaleString()}</span></div>` : ''}</div>`
       )
@@ -148,6 +250,68 @@
     box.innerHTML = (primo.length ? primo : list.slice(0, 3)).map(GI.codeRow).join('');
   }
 
+  // ---- CURRENT WISHES (Oct 27 2026): one light card per live wish, all opening the Banners page.
+  // Character wish = the 5-star's wish art on its element colour; weapon wish = the two 5-star
+  // weapons side by side. The clock is [data-end-srv], so tick() keeps it running.
+  function wishes(list) {
+    const t = now();
+    const live = list.filter((b) => srvEnd(b.end) > t);
+    const box = $('giWishes');
+    if (!live.length) {
+      box.innerHTML = '<p class="gi-empty">No wishes are running right now.</p>';
+      return;
+    }
+    const fours = (arr) => `<span class="gwl-four">${(arr || []).filter((x) => x.rarity === 4).map((x) => tile(x.icon, 4, x.name)).join('')}</span>`;
+    const end = (b) => `<span class="gwl-end"><span class="gi-label">Ends in</span><b data-end-srv="${+b.end}"></b></span>`;
+    const tag = (b) => `<span class="gi-label gwl-tag">${esc(b.name.replace(/\s*\d+$/, ''))}${b.version ? ' · ' + esc(b.version) : ''}</span>`;
+    box.innerHTML = live
+      .map((b) => {
+        const five = (b.characters || []).find((c) => c.rarity === 5);
+        if (five) {
+          return `<a class="gi-box gwl-card" href="/genshin-impact/banners#${slug(five.name)}" style="--gi-el:${GI.EL[five.element] || GI.NEUTRAL}">
+          <span class="gwl-art">${five.splash ? `<img src="${esc(five.splash)}" alt="" loading="lazy" decoding="async">` : ''}</span>
+          <span class="gwl-body">${tag(b)}<b class="gwl-name">${esc(five.name)}</b>
+          <span class="gwl-meta">${five.element ? `<img src="${elIcon(five.element.toLowerCase())}" alt="${esc(five.element)}">` : ''}${esc([five.title, five.weapon].filter(Boolean).join(' · '))}</span>
+          <span class="gwl-foot">${fours(b.characters)}${end(b)}</span></span></a>`;
+        }
+        const ws = (b.weapons || []).filter((w) => w.rarity === 5);
+        if (!ws.length) return '';
+        return `<a class="gi-box gwl-card gwl-card--wep" href="/genshin-impact/banners#weapons" style="--gi-el:var(--gi-r5)">
+          <span class="gwl-art">${ws.map((w) => (w.art ? `<img src="${esc(w.art)}" alt="" loading="lazy" decoding="async">` : '')).join('')}</span>
+          <span class="gwl-body">${tag(b)}<b class="gwl-name">${ws.map((w) => esc(w.name)).join(' <small>&amp;</small> ')}</b>
+          <span class="gwl-meta">${esc(ws.map((w) => w.type).join(' · '))}</span>
+          <span class="gwl-foot">${fours(b.weapons)}${end(b)}</span></span></a>`;
+      })
+      .join('');
+  }
+
+  // ---- KLEE'S MAP (Oct 27 2026): every page of the section by group, from game-nav.json (the
+  // same list the bar's menus use), so adding a page there adds it here. "soon" = greyed, no link.
+  function map() {
+    const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    fetch('/game-nav.json')
+      .then((r) => r.json())
+      .then((nav) => {
+        const groups = nav['genshin-impact'].groups.filter((g) => g.pages && g.pages.length);
+        $('giMap').innerHTML = groups
+          .map((g) => {
+            // Built pages first, "soon" ones at the foot of the list.
+            const pages = g.pages.filter((p) => p.link !== g.link).sort((a, b) => !!a.soon - !!b.soon);
+            const row = (p) =>
+              p.soon
+                ? `<span class="gm-row is-soon" title="${esc(p.desc || '')}"><img src="${esc(p.icon)}" alt="" loading="lazy" decoding="async"><span>${esc(p.name)}</span><small>Soon</small></span>`
+                : `<a class="gm-row" href="${esc(p.link)}" title="${esc(p.desc || '')}"><img src="${esc(p.icon)}" alt="" loading="lazy" decoding="async"><span>${esc(p.name)}</span></a>`;
+            return `<div class="gm-grp${pages.length > 9 ? ' gm-grp--wide' : ''}"><a class="gm-grp-head" href="${esc(g.link)}"><svg viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg><b>${esc(g.name)}</b>${ARROW}</a>
+            <div class="gm-rows">${pages.map(row).join('')}</div></div>`;
+          })
+          .join('');
+      })
+      .catch(() => {
+        $('giMap').innerHTML = '';
+      });
+  }
+  map();
+
   function farm(f, day, books) {
     const box = $('giFarm');
     if (!books.length) {
@@ -159,6 +323,7 @@
     $('giFarmSub').textContent = sunday
       ? 'Sunday: every Domain is open, so every book and weapon material, by nation.'
       : `${nice}'s talent books and weapon materials by nation, back again in three days.`;
+    if (sunday) $('giFarmKlee').textContent = "It's Sunday, so every domain is open! Klee wants to farm them all.";
     const weps = sunday ? [].concat(...Object.values(f).map((x) => x.weapons)) : (f[FARM_DAY[day]] || {}).weapons || [];
     // One card per nation, in NATIONS order; the art is that nation's namecard.
     // Sunday has three books per nation, so it lists them without the faces.
@@ -262,6 +427,9 @@
 
   // ---- NATIONS ---- (the list itself: GI.NATIONS in genshin-core.js, shared with the Characters page)
   const cap = (s) => s[0].toUpperCase() + s.slice(1);
+  // Every character's page (Adrian is building them all): /genshin-impact/characters/<slug>, slug() =
+  // scripts/genshin-characters.py's slug().
+  const slug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   function nations(chars) {
     const tabs = $('giNatTabs');
     tabs.innerHTML = NATIONS.map((n, i) => `<button type="button" class="gi-tab" role="tab" data-i="${i}">${n.el || n.icon ? `<img src="${n.icon || elIcon(n.el)}" alt="">` : ''}${esc(n.name)}</button>`).join('');
@@ -281,7 +449,9 @@
       $('giNatCount').textContent = list.length;
       $('giNatAll').href = '/genshin-impact/characters?nation=' + n.key;
       fit($('giNatName'));
-      $('giNatChars').innerHTML = list.map((c) => `<figure>${tile(c.icon, c.rarity, c.name)}<figcaption>${esc(c.name)}</figcaption></figure>`).join('');
+      $('giNatChars').innerHTML = list
+        .map((c) => `<a class="gi-nat-c" href="/genshin-impact/characters/${slug(c.name)}"><figure>${tile(c.icon, c.rarity, c.name)}<figcaption>${esc(c.name)}</figcaption></figure></a>`)
+        .join('');
     };
     tabs.addEventListener('click', (e) => {
       const t = e.target.closest('.gi-tab');
@@ -307,8 +477,13 @@
       const t = e.target.closest('.gi-tab');
       if (t) cur = +t.dataset.i;
     });
+    // Phones fire resize whenever the address bar slides during a scroll; re-rendering eight nations
+    // then made scrolling stutter. Only a real width change re-measures.
     let rt = 0;
+    let w = innerWidth;
     window.addEventListener('resize', () => {
+      if (innerWidth === w) return;
+      w = innerWidth;
       clearTimeout(rt);
       rt = setTimeout(size, 150);
     });
@@ -318,65 +493,12 @@
 
   // ---- REACTIONS: the wheel moved to genshin-reactions.js (Oct 26 2026), shared with the Reactions chart. ----
 
-  // ---- PITY: chance of a 5-star on pull n since the last one (community model) ----
-  const P5 = (n) => (n >= 90 ? 1 : n <= 73 ? 0.006 : Math.min(1, 0.006 + 0.06 * (n - 73)));
-  function pity() {
-    const svg = $('giPitySvg');
-    const input = $('giPityIn');
-    let lost = false;
-    const X0 = 28;
-    const W = 600 / 90;
-    const H = 250;
-    const BASE = 286;
-    const x = (n) => X0 + (n - 1) * W;
-    let bars = '';
-    for (let n = 1; n <= 90; n++) bars += `<rect class="pb" data-n="${n}" x="${x(n) + 0.8}" width="${W - 1.6}" y="${BASE - Math.max(3, P5(n) * H)}" height="${Math.max(3, P5(n) * H)}" rx="1"/>`;
-    svg.innerHTML =
-      `<rect class="pz" x="${x(74)}" y="16" width="${x(91) - x(74)}" height="${BASE - 16}"/>` +
-      `<line class="pl" x1="${x(74)}" x2="${x(74)}" y1="10" y2="${BASE}"/><text class="is-red" x="${x(74) + 6}" y="26">Soft pity 74</text>` +
-      `<text x="${x(91) - 4}" y="12" text-anchor="end">90 · sure 5&#9733;</text>` +
-      bars +
-      `<text x="${X0}" y="${BASE + 20}">Pull 1</text><text x="${x(45)}" y="${BASE + 20}">45</text><text x="${x(91)}" y="${BASE + 20}" text-anchor="end">90</text>` +
-      `<text x="${X0}" y="26">Chance per pull</text>`;
-    const rects = [...svg.querySelectorAll('.pb')];
-    const pct = (p) => (p >= 0.995 ? '100%' : p < 0.1 ? (p * 100).toFixed(1) + '%' : Math.round(p * 100) + '%');
-    function update() {
-      const c = +input.value;
-      input.style.setProperty('--p', (c / 89) * 100 + '%');
-      $('giPityOut').textContent = c;
-      rects.forEach((r) => {
-        const n = +r.dataset.n;
-        r.setAttribute('class', 'pb' + (n <= c ? ' is-spent' : n === c + 1 ? ' is-next' : n >= 74 ? ' is-soft' : ''));
-      });
-      let miss = 1;
-      for (let i = 1; i <= 10; i++) miss *= 1 - P5(c + i);
-      $('psNext').textContent = pct(P5(c + 1));
-      $('ps10').textContent = pct(1 - miss);
-      $('psHard').textContent = 90 - c;
-      $('psHardP').innerHTML = `pulls to the sure 5&#9733;<span class="gi-primo"><img src="/images/genshin/primogem.webp" alt="">${((90 - c) * 160).toLocaleString()} Primogems</span>`;
-      $('psFeat').textContent = lost ? '100%' : '50/50';
-      $('psFeatS').innerHTML = lost ? 'it&#39;s the featured 5&#9733; (guaranteed)' : 'that it&#39;s the featured 5&#9733;';
-    }
-    input.addEventListener('input', update);
-    $('giPityG').addEventListener('click', (e) => {
-      const t = e.target.closest('.gi-tab');
-      if (!t) return;
-      lost = t.dataset.g === '1';
-      $('giPityG').querySelectorAll('.gi-tab').forEach((b) => {
-        b.classList.toggle('active', b === t);
-        b.setAttribute('aria-selected', b === t);
-      });
-      update();
-    });
-    update();
-  }
-  pity();
 
   // ---- go ----
   GI.feed
     .then((feed) => {
-      wish = GI.wishCard(feed.banners || []);
       lede(feed);
+      wishes(feed.banners || []);
       const v = (feed.banners || []).find((b) => b.version);
       if (v) $('giVer').textContent = v.version;
       today(feed);
@@ -388,7 +510,6 @@
         today(feed);
         lede(feed);
         tick();
-        wish.tick();
       });
       tick();
       syncArrows();
@@ -396,7 +517,6 @@
     })
     .catch((err) => {
       console.error('genshin-feed.json failed to load:', err);
-      $('giMeta').textContent = "Couldn't load the live data right now. Try again in a bit.";
-      ['giEvents', 'giEnd', 'giCodes', 'giFarm'].forEach((id) => ($(id).innerHTML = "<p class=\"gi-empty\">Couldn't load this right now.</p>"));
+      ['giWishes', 'giEvents', 'giEnd', 'giCodes', 'giFarm'].forEach((id) => ($(id).innerHTML = "<p class=\"gi-empty\">Couldn't load this right now.</p>"));
     });
 })();

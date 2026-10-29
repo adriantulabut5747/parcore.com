@@ -463,8 +463,7 @@
     return;
   }
 
-  fetch('/articles.json')
-    .then((r) => r.json())
+  (window.pcJSON || function (u) { return fetch(u).then(function (r) { return r.json(); }); })('/articles.json')
     .then((data) => {
       const games = data.games || {};
       const all = (data.articles || []).map((a) => Object.assign({ link: '/articles/' + a.game + '/' + a.id }, a));

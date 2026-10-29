@@ -16,11 +16,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/11layout.css?v=20261026as">
-<link rel="stylesheet" href="/coc-more.css?v=20261026hot">
-<link rel="stylesheet" href="/coc-help.css?v=20261027or">
-<link rel="stylesheet" href="/genshin.css?v=20261025a">
-<link rel="stylesheet" href="/genshin-player.css?v=20261023uc">
+<link rel="stylesheet" href="/11layout.css?v=20261028my">
+<link rel="stylesheet" href="/coc-help.css?v=20261028my">
+<link rel="stylesheet" href="/genshin.css?v=20261028my">
+<link rel="stylesheet" href="/genshin-player.css?v=20261028q">
 </head>
 <body class="gi-page" data-game-nav="genshin-impact">
 
@@ -91,7 +90,7 @@
 
   <div class="coc-main">
     <div class="coc-content">
-      <main class="gi gp">
+      <main class="gi gi--klee gp">
       <div class="gi-frame">
 
         <!-- PLAYER LOOKUP (Oct 23 2026). One page for every player: /genshin-impact/player/<UID>
@@ -111,46 +110,49 @@
               </div>
             </div>
           </header>
-          <!-- The search = the player page's profile card with nobody in it yet (same .gp-card
-               classes): the map, a "?" profile picture, the UID field where the name goes, grey
-               milestones and the number tray waiting for a UID. No gold trim: it's on the banner
-               above instead. Milestones + tray filled by genshin-player.js (medals / STATS), so
-               both pages draw them from one place. -->
+          <div class="gi-klee"><img class="gi-klee-face" src="/images/genshin/klee/face.webp" alt="" width="44" height="44" decoding="async"><p><b>Klee</b><span>Try your own UID first, then a friend&rsquo;s. They&rsquo;ll never know Klee peeked!</span></p></div>
+          <!-- The search (Oct 28 2026, Adrian: "simplify it, make it look more professional"): one
+               focused panel on the Mondstadt map. The UID field is the only thing to do; recent
+               lookups sit right under it as chips (genshin-player.js); the foot says what a lookup
+               gives you. Replaced the empty profile card (grey medals + a tray of dashes). -->
           <section class="gp-first" aria-labelledby="gpLookT">
-            <div class="gi-box gp-card gp-blank">
+            <div class="gi-box gp-search">
               <div class="gp-card-art" aria-hidden="true"><img src="/images/genshin/art/teyvat-map.webp" alt="" decoding="async"></div>
-              <div class="gp-card-main">
-                <span class="gp-face" aria-hidden="true"><i class="gp-q">?</i></span>
-                <div class="gp-who">
-                  <h2 class="gp-name" id="gpLookT">Any Traveler</h2>
-                  <form class="gi-look-form" id="gpLook" autocomplete="off" novalidate>
-                    <label class="gi-uid">
-                      <span class="gi-vh">Player UID</span>
-                      <input type="text" inputmode="numeric" maxlength="10" placeholder="UID, numbers only: 800123456" spellcheck="false">
-                      <span class="gi-uid-server"></span>
-                    </label>
-                    <button type="submit" class="gi-key gi-key--red" aria-label="Search">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span class="gi-key-t">Search</span>
-                    </button>
-                  </form>
-                  <p class="gi-look-status" aria-live="polite">Your UID is on the bottom right of the Paimon menu.</p>
+              <div class="gp-search-main">
+                <p class="gi-label gp-search-k">Search by UID &middot; every server</p>
+                <h2 class="gp-search-t" id="gpLookT">Find any Traveler</h2>
+                <form class="gi-look-form" id="gpLook" autocomplete="off" novalidate>
+                  <label class="gi-uid">
+                    <span class="gi-vh">Player UID</span>
+                    <input type="text" inputmode="numeric" maxlength="10" placeholder="UID, like 800123456" spellcheck="false">
+                    <span class="gi-uid-server"></span>
+                  </label>
+                  <button type="submit" class="gi-key gi-key--red" aria-label="Search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span class="gi-key-t">Track</span>
+                  </button>
+                </form>
+                <p class="gi-look-status" aria-live="polite">Your UID is in the bottom right of the Paimon Menu.</p>
+                <!-- Recent lookups (this browser): face, nickname, UID. -->
+                <div class="gp-recent" id="gpRecent" hidden>
+                  <span class="gi-label">Recent</span>
+                  <div class="gp-recent-list" id="gpRecentList"></div>
+                  <button type="button" class="gp-recent-x" id="gpRecentClear">Clear</button>
                 </div>
-                <ul class="gp-badges" id="gpBlankBadges" aria-label="Milestones a lookup checks"></ul>
               </div>
-              <ul class="gp-stats gp-stats--blank" id="gpBlankStats" aria-label="What a lookup shows"></ul>
-            </div>
-
-            <!-- Recent lookups, as the player page's showcase tray: face, nickname, UID + server. -->
-            <div class="gp-recent" id="gpRecent" hidden>
-              <div class="gp-recent-head"><span class="gi-label">Recent lookups</span><button type="button" class="gp-uid-copy" id="gpRecentClear"><span>Clear</span></button></div>
-              <div class="gi-tray gp-chars" id="gpRecentList"></div>
+              <ul class="gp-gets" aria-label="What a lookup shows">
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.4l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/></svg><span><b>Profile</b><small>AR, World Level, achievements</small></span></li>
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20a8 8 0 1 1 8-8 6 6 0 0 1-6 6 4.5 4.5 0 0 1-4.5-4.5A3 3 0 0 1 12.5 10a1.6 1.6 0 0 1 1.5 1.6"/></svg><span><b>Endgame</b><small>Abyss and Theater progress</small></span></li>
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h5.5v5.5L10 19.5 4.5 14zM7 16.5 4 19.5M11 7l6 6"/></svg><span><b>Builds</b><small>Weapon, artifacts, final stats</small></span></li>
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg><span><b>Build card</b><small>Save a build as a picture</small></span></li>
+              </ul>
             </div>
           </section>
 
           <!-- Three drawn tips. The server rows
                light up as a UID is typed (genshin-player.js); data-s = GI.uidServer's names. -->
           <section class="gi-sec gp-tips-sec" aria-labelledby="gpHowT">
-            <header class="gi-sec-head"><div><h2 class="gi-title" id="gpHowT">Before you <em>search.</em></h2><p class="mch-sec-sub">What shows up depends on what the player shares in game.</p></div></header>
+            <header class="gi-sec-head"><div><h2 class="gi-title" id="gpHowT">Before you <em>search.</em></h2></div></header>
+            <div class="gi-klee"><img class="gi-klee-face" src="/images/genshin/klee/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Klee</b><span>No builds? The player has to turn on &ldquo;Show Character Details&rdquo;. Kaeya keeps his off.</span></p></div>
             <div class="gp-tips">
               <article class="gi-box gp-tip">
                 <div class="gp-tip-art gp-pm" aria-hidden="true">
@@ -182,6 +184,36 @@
               </article>
             </div>
           </section>
+
+          <!-- ASK KLEE (Oct 27 2026): the short FAQ (.gi-qa--short, genshin.css "KLEE PIECES") + the shared
+               feedback box (11layout.js). Answers follow the page's own boxes and notes. -->
+          <section class="gi-sec gi-qa gi-qa--short" id="faq" aria-labelledby="gpQaT">
+            <div class="gi-qa-side">
+              <header class="gi-sec-head">
+                <div><h2 class="gi-title" id="gpQaT">Ask <em>Klee.</em></h2></div>
+              </header>
+              <div class="gi-klee"><img class="gi-klee-face" src="/images/genshin/klee/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Klee</b><span>Don&rsquo;t see your question? Send it to Klee with the form.</span></p></div>
+              <div data-feedback></div>
+            </div>
+            <div class="gi-qa-list">
+              <details class="gi-qa-item" name="qa">
+                <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/player.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">Where do I find a UID?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+                <div class="gi-qa-a"><p>Open the Paimon Menu: it&rsquo;s the number in the bottom right corner, 9 or 10 digits long.</p></div>
+              </details>
+              <details class="gi-qa-item" name="qa">
+                <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/characters.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">Why can&rsquo;t I see someone&rsquo;s builds?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+                <div class="gi-qa-a"><p>Builds only appear for characters in the player&rsquo;s Character Showcase, with &ldquo;Show Character Details&rdquo; turned on in game.</p></div>
+              </details>
+              <details class="gi-qa-item" name="qa">
+                <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/discover.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">What does the first digit mean?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+                <div class="gi-qa-a"><p>The server: 6 America, 7 Europe, 8 Asia, 9 TW &middot; HK &middot; MO, 1 to 3 and 5 China. A 10-digit UID carries it in the second digit.</p></div>
+              </details>
+              <details class="gi-qa-item" name="qa">
+                <summary><span class="gi-qa-ico"><img src="/images/genshin/nav/glossary.webp" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="gi-qa-q">Does the player know I looked them up?</span><i class="gi-qa-tog" aria-hidden="true"></i></summary>
+                <div class="gi-qa-a"><p>No. The lookup only reads what their profile already shows everyone, through Enka.Network. Your recent lookups stay in this browser.</p></div>
+              </details>
+            </div>
+          </section>
         </div>
 
         <!-- A UID: the player. The card (its UID line is the search + Copy / Link / Refresh), then the showcase. Every state (loading, not found,
@@ -199,6 +231,10 @@
                  page and the downloaded picture always match; remembered in this browser
                  (genshin-player.js "CARD STUDIO"). -->
             <div class="gi-box gp-studio" id="gpCardBar" hidden>
+              <!-- Phones (Oct 28 2026): the save keys come first and the options fold away in here;
+                   desktop opens it and hides the summary (genshin-player.js "CARD STUDIO"). -->
+              <details class="gp-st-more" id="gpStMore">
+              <summary class="gp-st-sum"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Customize the card</span><small>Picture, text, shape, colour</small></summary>
               <div class="gp-st-grid">
                 <section class="gp-st-grp" aria-labelledby="gpStPic">
                   <h3 class="gi-label" id="gpStPic">Picture</h3>
@@ -238,6 +274,7 @@
                   </div>
                 </section>
               </div>
+              </details>
               <div class="gp-st-foot">
                 <span class="gi-label">Save as a picture</span>
                 <p class="gi-look-status gp-card-st" id="gpCardSt" aria-live="polite"></p>
@@ -269,6 +306,7 @@
             <header class="gi-sec-head">
               <div><h2 class="gi-title" id="gpNcT">Namecard <em>collection.</em></h2><p class="mch-sec-sub" id="gpNcSub"></p></div>
             </header>
+            <div class="gi-klee"><img class="gi-klee-face" src="/images/genshin/klee/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Klee</b><span>Tap any namecard to see it full size and where it comes from.</span></p></div>
             <ul class="gp-nc-list" id="gpNcList"></ul>
           </section>
 
@@ -343,8 +381,8 @@
   </div>
 </div>
 
-<script src="/11layout.js?v=20261026as"></script>
+<script src="/11layout.js?v=20261028my"></script>
 <script src="/genshin-core.js?v=20261025a"></script>
-<script src="/genshin-player.js?v=20261023ua"></script>
+<script src="/genshin-player.js?v=20261028q"></script>
 </body>
 </html>

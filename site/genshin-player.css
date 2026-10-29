@@ -19,24 +19,74 @@
 
 .gp-first { padding-top: 40px; }
 
-/* ---- SEARCH (no UID): the profile card with nobody in it yet ----
-   Same .gp-card / .gp-badges / .gp-stats as a loaded player (below), so the search and the
-   result are one card before and after. Only what differs is here. */
-.gp-card.gp-blank { margin-top: 0; padding-top: 40px; } /* the .gi-tb banner sits above it, not the bars; no crest to clear */
+/* ---- SEARCH (no UID, Oct 28 2026): one focused panel ----
+   The Mondstadt map (.gp-card-art, shared with the profile card) faded dark on the left, where
+   the copy and the UID field sit; recent lookups as chips under the field; a foot strip saying
+   what a lookup gives you. Nothing in it is a placeholder. */
+.gp-search { position: relative; isolation: isolate; overflow: hidden; container: gp-search / inline-size; }
+.gp-search .gp-card-art::after {
+  background:
+    linear-gradient(90deg, rgba(16, 17, 21, 0.97) 0%, rgba(16, 17, 21, 0.86) 42%, rgba(16, 17, 21, 0.25) 78%, rgba(16, 17, 21, 0.1) 100%),
+    linear-gradient(180deg, rgba(16, 17, 21, 0) 55%, rgba(16, 17, 21, 0.75) 100%);
+}
+.gp-search-main { position: relative; padding: 44px 48px 36px; max-width: 720px; }
+.gp-search-k { color: #d3bc8e; }
+.gp-search-t { margin: 12px 0 22px; font: 800 clamp(30px, 2.6vw, 42px)/1.1 'Cinzel', serif; color: #fff; text-shadow: 0 4px 22px rgba(0, 0, 0, 0.6); }
+.gp-search .gi-uid { height: 56px; background: rgba(9, 10, 12, 0.92); }
+.gp-search .gi-uid input { padding: 0 18px; font-size: 18px; }
+.gp-search .gi-look-form .gi-key { height: 56px; padding: 0 28px 2px; font-size: 15px; }
+.gp-search .gi-look-status { color: #9aa0a8; }
+
+/* Recent lookups: one row of chips (face, nickname, UID); the row scrolls on its own if it's long. */
+.gp-recent { display: flex; align-items: center; gap: 12px; margin-top: 20px; min-width: 0; }
+.gp-recent > .gi-label { flex: none; }
+.gp-recent-list { display: flex; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.gp-recent-list::-webkit-scrollbar { display: none; }
+.gp-rc {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 4px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 999px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font: 700 12px/1 'Sora', sans-serif;
+  color: #e6e8ec;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.gp-rc:hover { background: var(--lb-raise-hover); color: #fff; }
+.gp-rc:focus-visible { outline: 2px solid #d3bc8e; outline-offset: 2px; }
+.gp-rc-face { display: grid; flex: none; place-items: center; width: 26px; height: 26px; overflow: hidden; border-radius: 50%; background: #2a2c33; }
+.gp-rc-face img { width: 100%; height: 100%; object-fit: cover; }
+.gp-rc b { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+.gp-rc small { font-size: 11px; font-weight: 600; color: #8e939b; font-variant-numeric: tabular-nums; }
+.gp-recent-x { flex: none; margin-left: auto; padding: 6px 2px; border: 0; background: none; font: 600 12px/1 'Sora', sans-serif; color: #8e939b; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.gp-recent-x:hover { color: #fff; }
+
+/* What a lookup gives you: four quiet cells in a sunken strip along the foot. */
+.gp-gets { position: relative; display: grid; padding: 0 24px; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; border-top: 1px solid rgba(255, 255, 255, 0.07); background: rgba(9, 10, 12, 0.72); }
+.gp-gets li { display: flex; align-items: flex-start; gap: 12px; padding: 18px 24px; border-left: 1px solid rgba(255, 255, 255, 0.06); }
+.gp-gets li:first-child { border-left: 0; }
+.gp-gets svg { flex: none; width: 20px; height: 20px; margin-top: 1px; fill: none; stroke: #d3bc8e; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.gp-gets span { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gp-gets b { font: 700 13px/1.2 'Sora', sans-serif; color: #fff; }
+.gp-gets small { font-size: 12px; line-height: 1.45; color: #8e939b; }
+/* Sized by the panel's own width (the sidebar eats ~300px on laptops): 2 x 2 under 900px. */
+@container gp-search (max-width: 899px) {
+  .gp-gets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gp-gets li:nth-child(odd) { border-left: 0; }
+  .gp-gets li:nth-child(n + 3) { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+}
+
 /* Its starfield namecard is sky blue, which fought the red / gold / dark (Adrian): drained and
    re-lit as the Genshin ground's red night sky. The art's own stars keep their sparkle. */
 .gp-tb .gi-tb-art { filter: grayscale(1) sepia(1) hue-rotate(-40deg) saturate(1.7) brightness(0.55) contrast(1.15); }
-/* "?" = nobody yet: the profile picture slot and a recent lookup without a picture. */
-.gp-q { display: grid; place-items: center; width: 100%; height: 100%; font: 800 56px/1 'Cinzel', serif; font-style: normal; color: rgba(211, 188, 142, 0.85); }
-.gi-tile .gp-q { font-size: 22px; }
-.gp-blank .gi-look-form { max-width: 560px; margin-top: 16px; }
-.gp-stats--blank b { color: #4f535c; }
-.gp-stats--blank svg { stroke: #5d616b; }
-
-/* Recent lookups: the showcase tray's tabs (face, nickname, UID + server). */
-.gp-recent { margin-top: 18px; }
-.gp-recent-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.gp-recent .gp-ch { text-decoration: none; }
+/* "?" = no picture: a recent lookup saved before pictures were kept. */
+.gp-q { font: 800 14px/1 'Cinzel', serif; font-style: normal; color: rgba(211, 188, 142, 0.85); }
 
 /* Before you search: three drawn tips (.gp-rec-k = their label row). */
 .gp-tips-sec { padding-top: 56px; }
@@ -172,6 +222,11 @@
   cursor: pointer;
 }
 .gp-uid-copy:hover { background: var(--lb-raise-hover); color: #fff; }
+/* Copy / Link are icon-only (title + aria-label say what they do), so the UID line stays one row. */
+.gp-uid .gp-uid-copy:not(#gpRefresh) { width: 30px; justify-content: center; padding: 0 0 1px; }
+.gp-uid .gp-uid-copy:not(#gpRefresh) span { display: none; }
+.gp-uid .gp-uid-copy.is-done { width: auto; padding: 0 8px 1px; }
+.gp-uid .gp-uid-copy.is-done span { display: inline; } /* "Copied" shows for a moment */
 .gp-uid-copy svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .gp-uid-copy.is-done { background: var(--lb-well); box-shadow: var(--card-well); color: #fff; }
 .gp-sig { position: relative; margin-top: 14px; max-width: 52ch; padding-left: 14px; font-size: 13.5px; font-style: italic; line-height: 1.55; color: #c3c7cd; overflow-wrap: anywhere; }
@@ -208,14 +263,6 @@
   .gp-card-main { flex-wrap: wrap; }
   .gp-badges { width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gp-badge:last-child:nth-child(odd) { grid-column: auto; }
-}
-/* The search card's UID field needs the room: its medals drop under it sooner (desktop; phones below). */
-@media (min-width: 971px) {
-  @container gp-card (max-width: 1099px) {
-    .gp-blank .gp-card-main { flex-wrap: wrap; }
-    .gp-blank .gp-badges { width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .gp-blank .gp-badge:last-child:nth-child(odd) { grid-column: auto; }
-  }
 }
 
 /* The numbers: one sunken tray, a cell each (over the trim's corner flourishes). */
@@ -349,6 +396,25 @@
 .gp-card-st { margin: 0; }
 .gp-card-st:empty { display: none; }
 #gpBuild.is-drop .gp-build { box-shadow: 0 0 0 2px var(--lb-edge), 0 0 0 5px rgba(255, 255, 255, 0.45); }
+/* The options fold (phones only; desktop opens it and hides the summary). */
+.gp-st-sum { display: none; }
+@media (max-width: 970px) {
+  .gp-studio { display: flex; flex-direction: column; }
+  .gp-st-foot { order: -1; margin-top: 0; padding-top: 0; border-top: 0; }
+  .gp-st-foot .gi-acts { width: 100%; }
+  .gp-st-foot #gpDl { flex: 1; justify-content: center; }
+  .gp-st-more { margin-top: 14px; border-top: 1px solid var(--gi-line); }
+  .gp-st-sum { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; padding: 14px 0 0; list-style: none; cursor: pointer; }
+  .gp-st-sum::-webkit-details-marker { display: none; }
+  .gp-st-sum svg { grid-row: span 2; width: 20px; height: 20px; fill: none; stroke: #c9ccd2; stroke-width: 1.8; stroke-linecap: round; }
+  .gp-st-sum span { font: 700 13px/1.2 'Sora', sans-serif; color: #fff; }
+  .gp-st-sum small { grid-column: 2; font-size: 11.5px; color: var(--gi-muted); }
+  .gp-st-sum::after { content: ''; grid-column: 3; grid-row: 1 / span 2; width: 8px; height: 8px; margin-right: 4px; border-right: 2px solid #8e939b; border-bottom: 2px solid #8e939b; transform: rotate(45deg); transition: transform 0.2s; }
+  .gp-st-more[open] .gp-st-sum::after { transform: rotate(-135deg); }
+  .gp-st-more[open] .gp-st-grid { margin-top: 18px; }
+  /* Long chip trays scroll inside themselves instead of running off the box. */
+  .gp-st-grp .gi-tray { overflow-x: auto; scrollbar-width: none; }
+}
 @container gp-show (max-width: 979px) {
   .gp-st-grid { grid-template-columns: minmax(0, 1fr); }
   .gp-st-grp { padding: 18px 0 0; }
@@ -602,6 +668,8 @@
 /* The download stage: a fixed 1280px copy off screen, still and fully drawn. */
 .gp-stage { position: fixed; top: 0; left: -20000px; width: 1280px; container: gp-show / inline-size; pointer-events: none; }
 .gp-stage--port { width: 720px; }
+/* Landscape on a narrow page: the same 1280px card as the picture, shrunk by genshin-player.js fit() (zoom). */
+#gpBuild.is-fit { width: 1280px; container: gp-show / inline-size; }
 .gp-stage *,
 .gp-stage *::before { animation: none !important; transition: none !important; }
 
@@ -628,8 +696,8 @@
   .gp-art { inset: 0; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }
   .gp-art img.is-own { --own-x: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); --own-y: linear-gradient(180deg, transparent, #000 7%, #000 60%, transparent 98%); }
   .gp-b-head { padding: 28px 20px 0 26px; }
-  .gp-b-name { font-size: 25px; }
-  .gp-cons { top: 150px; left: 22px; gap: 8px; }
+  .gp-b-name { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 25px; }
+  .gp-cons { top: 168px; left: 22px; gap: 8px; }
   .gp-cons li { width: 34px; height: 34px; }
   .gp-talents { right: 18px; bottom: 30px; }
   .gp-tal i { width: 44px; height: 44px; }
@@ -693,7 +761,7 @@
   .gp-build.is-portrait .gp-hero { min-height: 500px; }
   .gp-build.is-portrait .gp-b-head { padding: 28px 22px 0 26px; }
   .gp-build.is-portrait .gp-b-name { font-size: 25px; }
-  .gp-build.is-portrait .gp-cons { top: 150px; left: 22px; }
+  .gp-build.is-portrait .gp-cons { top: 168px; left: 22px; }
   .gp-build.is-portrait .gp-b-mid { padding: 6px 22px 0; }
   .gp-build.is-portrait .gp-final { grid-template-columns: minmax(0, 1fr); }
   .gp-build.is-portrait .gp-b-arts { display: flex; flex-direction: column; padding: 16px 22px 30px; }
@@ -831,16 +899,21 @@
 /* ---- PHONES ---- */
 @media (max-width: 970px) {
   .gp-first { padding-top: 28px; }
-  .gp-card.gp-blank { margin-top: 0; }
-  .gp-blank .gp-q { font-size: 38px; }
-  /* Phones: the name beside the face, the UID field full width under both (it was cut off beside the face). */
-  .gp-blank .gp-card-main { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 0 14px; }
-  .gp-blank .gp-who { display: contents; }
-  .gp-blank .gp-name { grid-column: 2; grid-row: 1; padding-bottom: 6px; }
-  .gp-blank .gi-look-form,
-  .gp-blank .gi-look-status,
-  .gp-blank .gp-badges { grid-column: 1 / -1; }
-  .gp-blank .gi-look-form { max-width: none; margin-top: 14px; }
+  /* Search on phones: the map shows as a band behind the title, then the field full width;
+     Track keeps its word (the shared rule shrinks it to an icon); the foot = 2 x 2. */
+  .gp-search .gp-card-art::after { background: linear-gradient(180deg, rgba(16, 17, 21, 0.45) 0%, rgba(16, 17, 21, 0.92) 46%, rgba(16, 17, 21, 0.97) 100%); }
+  .gp-search .gp-card-art img { object-position: 88% 30%; }
+  .gp-search-main { padding: 26px 18px 20px; }
+  .gp-search-t { margin: 10px 0 18px; font-size: 28px; }
+  .gp-search .gi-uid,
+  .gp-search .gi-look-form .gi-key { height: 52px; }
+  .gp-search .gi-uid input { padding: 0 14px; font-size: 16px; } /* 16px: iOS zooms into smaller fields */
+  .gp-search .gi-look-form .gi-key { width: auto; padding: 0 16px 2px; gap: 6px; }
+  .gp-search .gi-look-form .gi-key-t { display: inline; }
+  .gp-recent { flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .gp-recent-list { order: 3; flex: 1 0 100%; margin: 0 -18px; padding: 0 18px; }
+  .gp-gets { padding: 0; }
+  .gp-gets li { gap: 10px; padding: 14px 16px 14px 18px; }
   .gp-tips-sec { padding-top: 40px; }
   .gp-tips { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   /* A lighter trim; the medals wrap under the name, two a row. */
@@ -850,14 +923,39 @@
   .gp-frame { inset: 8px; border-radius: 10px; }
   .gp-orn { width: 40px; height: 40px; }
   .gp-crest { top: -7px; width: 110px !important; height: 14px !important; }
-  .gp-card-main { flex-wrap: wrap; gap: 14px; padding: 0 22px; }
-  .gp-face { width: 88px; height: 88px; }
-  .gp-who { padding-top: 10px; }
+  /* Phones (Oct 28 2026): face + name on one row, then the UID line, signature and medals full width
+     (.gp-who melts into the grid). Copy / Link go icon-only so the UID line stays one row. */
+  .gp-card-main { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0 14px; padding: 0 22px; }
+  .gp-who { display: contents; }
+  .gp-face { width: 72px; height: 72px; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 0 5px #121317, 0 0 0 6px rgba(var(--gp-gold), 0.7); }
   .gp-name { font-size: 26px; }
-  .gp-uid { font-size: 12px; }
-  .gp-sig { margin-top: 10px; font-size: 12.5px; }
-  .gp-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 18px 22px 0; }
-  .gp-stats li { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 11px 10px; border-top: 1px solid var(--gi-line); }
+  .gp-card-main > .gp-uid,
+  .gp-who > .gp-uid,
+  .gp-sig,
+  .gp-card-main > .gp-badges { grid-column: 1 / -1; }
+  .gp-uid { flex-wrap: nowrap; gap: 6px; margin-top: 16px; font-size: 12px; }
+  .gp-uid .gp-find-st { display: none; }
+  .gp-uid .gp-find { flex: 1; min-width: 0; }
+  .gp-uid .gp-find-box { flex: 1; min-width: 0; height: 34px; }
+  .gp-uid .gp-find-box input { flex: 1; width: auto; }
+  .gp-uid-copy { flex: none; height: 34px; padding: 0 10px 1px; }
+  .gp-uid-copy svg { width: 14px; height: 14px; }
+  .gp-sig { margin-top: 12px; font-size: 12.5px; }
+  /* Medals = one row of five: the medal and its name, no box (the numbers under it carry the detail). */
+  .gp-card-main > .gp-badges { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; width: 100%; margin-top: 16px; padding-top: 0; }
+  .gp-badge,
+  .gp-badge.is-on { flex-direction: column; gap: 6px; padding: 4px 0 0; border: 0; background: none; box-shadow: none; text-align: center; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .gp-badge:last-child:nth-child(odd) { grid-column: auto; }
+  .gp-badge > span:last-child { align-items: center; }
+  .gp-badge b { font-size: 9.5px; line-height: 1.25; }
+  .gp-badge small { display: none; }
+  .gp-medal { width: 40px; height: 40px; }
+  /* Numbers: 3 a row; a short last row shares the width (5 = 3 + 2, never a lone empty cell). */
+  .gp-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); margin: 16px 22px 0; }
+  .gp-stats li { grid-column: span 2; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 11px 12px; border-top: 1px solid var(--gi-line); }
+  .gp-stats li:nth-child(3n + 1):nth-last-child(2),
+  .gp-stats li:nth-child(3n + 1):nth-last-child(2) + li { grid-column: span 3; }
+  .gp-stats li:nth-child(3n + 1):last-child { grid-column: 1 / -1; }
   .gp-stats li:nth-child(3n + 1) { border-left: 0; }
   .gp-stats li:nth-child(-n + 3) { border-top: 0; }
   .gp-stats svg { display: none; }
@@ -873,10 +971,18 @@
   .gp-ch-t b { max-width: 110px; font-size: 12px; }
   .gp-roster,
   .gp-ncs { padding-top: 40px; }
+  /* The table fits the phone: Character, Cons, Talents, CV (Lv / weapon / sets / CRIT are in each build). */
+  .gp-table { min-width: 0; }
+  .gp-table tr > :nth-child(2),
+  .gp-table tr > :nth-child(5),
+  .gp-table tr > :nth-child(6),
+  .gp-table tr > :nth-child(7) { display: none; }
+  .gp-table thead th,
+  .gp-table td,
+  .gp-table tbody th { padding-left: 10px; padding-right: 10px; }
+  .gp-table tr > :first-child { padding-left: 14px; }
+  .gp-r-name small { font-size: 11px; }
   .gp-nc-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 8px; }
-  .gp-badge:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .gp-noshow-paimon { top: -30px; right: -8px; width: 80px; height: 80px; }
-  .gp-badges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .gp-badge { padding: 10px; gap: 10px; }
   .gp-noshow { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 18px; }
 }

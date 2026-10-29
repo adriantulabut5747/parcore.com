@@ -80,9 +80,9 @@
     const q = (s) => root.querySelector(s);
     const svg = q('.gi-wheel');
     const MODE_NOTE = {
-      classic: 'A party with no Moon Wheel or Stellar Linchpin user.',
-      lunar: 'A Moon Wheel user or Columbina in the party: Hydro reactions turn Lunar.',
-      stellar: 'A Stellar Linchpin user or the Cryo Traveler in the party: Cryo reactions turn Stellar.',
+      classic: 'Classic = no Lunar or Stellar character in your team: every reaction works the normal way.',
+      lunar: 'Lunar = a Lunar character like Ineffa or Columbina in your team: Hydro\'s reactions change.',
+      stellar: 'Stellar = a Stellar character like Sandrone or the Cryo Traveler in your team: Cryo\'s reactions change.',
     };
     let mode = 'classic';
     let picked = ['pyro', 'hydro'];
@@ -96,9 +96,9 @@
     // The line under the description: who swaps it in, what it becomes with them, or why nothing changed.
     function extra(r, base, variant) {
       if (!r) return '';
-      if (variant) return `<p class="rx-swap-t">${MODE_ICON[r.fam]}<span>Replaces <b>${esc(byId[r.swap].name)}</b> when ${esc(orList(r.by))} is in your party. Since ${esc(r.since)}.</span></p>${faces(r.by, map)}`;
+      if (variant) return `<p class="rx-swap-t">${MODE_ICON[r.fam]}<span>Replaces <b>${esc(byId[r.swap].name)}</b> when ${esc(orList(r.by))} is in your team. Since ${esc(r.since)}.</span></p>${faces(r.by, map)}`;
       const up = RX.find((x) => x.swap === r.id && (mode === 'classic' || x.fam === mode) && hits(x, ...picked));
-      if (up) return `<p class="rx-swap-t">${MODE_ICON[up.fam]}<span>With ${esc(orList(up.by))} in your party this becomes <button type="button" class="rx-go" data-go="${up.id}">${esc(up.name)}</button>.</span></p>`;
+      if (up) return `<p class="rx-swap-t">${MODE_ICON[up.fam]}<span>With ${esc(orList(up.by))} in your team this becomes <button type="button" class="rx-go" data-go="${up.id}">${esc(up.name)}</button>.</span></p>`;
       if (mode !== 'classic' && base && !base.on)
         return `<p class="rx-swap-t is-none">${MODE_ICON[mode]}<span>${mode === 'lunar' ? 'No Lunar version: every Lunar reaction needs Hydro, with Electro, Dendro or Geo.' : 'No Stellar version: Stellar Glimmer needs Cryo, with Electro or Anemo.'}</span></p>`;
       return '';
@@ -195,7 +195,7 @@
       .map(
         (r) => `<button type="button" class="gi-box gi-card rx-sw is-${r.fam}" data-go="${r.id}">
           <span class="rx-sw-els">${elRow(els(r))}</span>
-          <span class="rx-sw-from"><small>Classic</small><b>${esc(byId[r.swap].name)}</b></span>
+          <span class="rx-sw-from"><small>Normally</small><b>${esc(byId[r.swap].name)}</b></span>
           <span class="rx-sw-arrow" aria-hidden="true"><i></i>${MODE_ICON[r.fam]}<i></i></span>
           <span class="rx-sw-to"><small>${r.fam === 'lunar' ? 'Lunar' : 'Stellar'} · since ${esc(r.since)}</small><b>${esc(r.name)}</b></span>
           ${faces(r.by, map)}
@@ -221,8 +221,8 @@
           <p class="rx-fc-desc">${esc(r.desc)}</p>
           ${nums(r)}
           <p class="rx-fc-tip"><b>Good to know</b>${esc(r.tip)}</p>
-          <footer><span class="gi-label">Swapped in by</span>${faces(r.by, map)}</footer>
-          <button type="button" class="gi-key rx-fc-go" data-go="${r.id}">On the wheel<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+          <footer><span class="gi-label">Changed by</span>${faces(r.by, map)}</footer>
+          <button type="button" class="gi-key rx-fc-go" data-go="${r.id}">Show on the wheel<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
         </article>`
       )
       .join('');

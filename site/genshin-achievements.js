@@ -85,6 +85,10 @@
       t.d ? `<b>${fmt(t.d)}</b>ticked by you` : `<b>${CARDS()}</b>namecards`,
     ];
     $('acFacts').innerHTML = out.map((x) => `<li>${x}</li>`).join('');
+    // Klee's line under the header (Oct 27 2026): your progress once you tick, the totals before. facts() reruns on every tick.
+    $('acKlee').textContent = t.d
+      ? `You've ticked ${fmt(t.d)} of ${fmt(ALL())}. Klee is proud of you!`
+      : `Klee counted ${fmt(ALL())} achievements worth ${fmt(PRIMOS())} Primogems! Tick the ones you've done.`;
   }
 
   // ---- PROGRESS: the wheel. One segment per category, clockwise from the top in the game's order. Its length
@@ -860,5 +864,6 @@
     })
     .catch(() => {
       $('acProg').innerHTML = '<p class="gi-empty">Couldn’t load the achievements right now. Try again in a minute.</p>';
+      $('acKlee').textContent = "Klee couldn't find the achievements. Try again in a minute!";
     });
 })();

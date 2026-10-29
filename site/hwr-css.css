@@ -45,13 +45,6 @@
       font-family: 'sora', sans-serif;
     }
 
-    /* Sidebar uses Oxanium for all its text, including JS-injected
-   games list / triple-a list content. (Matches /.) */
-    .sidebar,
-    .sidebar * {
-      font-family: 'Oxanium', sans-serif;
-    }
-
     body {
       height: 100vh;
       background: var(--bg-main);
@@ -73,13 +66,10 @@
     /* Full-height scrollbar (desktop): .coc-main starts at the very top and
        clears the top bar with padding instead of .main's margin, so its
        scrollbar runs from y=0 instead of starting below the top bar
-       (11layout.css insets the bars by its width). The sidebar carries the
-       offset itself at desktop widths; on phones it's a fixed drawer. */
+       (11layout.css insets the bars by its width). The sidebar's look and
+       offset are 11layout.css's alone (SIDEBAR, ONE DESKTOP BAR). */
     .main { margin-top: 0; }
     .coc-main { padding-top: var(--topbar-height, 52px); }
-    @media (min-width: 971px) {
-      .sidebar { margin-top: var(--topbar-height, 40px); }
-    }
 
     /* Bases grid */
     .grid-container {
@@ -3660,337 +3650,6 @@
    fall back to 0. */
 :root { --bn-bar-h: 60px; }
 
-.bn-bar {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 60px;
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 6px;
-            /* Higher than .more-overlay (99970). The overlay's rect stops right
-     at this bar's top edge (bottom:60px) so it doesn't dim the bar —
-     but the floating "More" button (.bn-more) pokes up ~22px above
-     the bar's own top edge, into the area the overlay covers. With a
-     lower z-index than the overlay, that sliver of the button got
-     painted over by the dimmed/blurred backdrop whenever the sheet
-     was open, cropping it. Being higher than the overlay keeps the
-     whole bar — including the part of the button that overhangs it —
-     on top, regardless of the overlay's open/closed state. */
-            z-index: 99980;
-            transform: translateY(0);
-            transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
-            will-change: transform;
-          }
-
-          .bn-bar.bn-hidden {
-            transform: translateY(115%);
-            transition: transform .32s cubic-bezier(0.4, 0, 1, 1);
-          }
-
-          .bn-item {
-            flex: 1 1 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            height: 100%;
-            text-decoration: none;
-            color: #9a9ca2;
-            font-family: 'Sora', sans-serif;
-            font-size: 10.5px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            transition: color .15s;
-          }
-
-          .bn-item svg {
-            width: 22px;
-            height: 22px;
-            stroke: currentColor;
-            fill: none;
-            transition: transform .15s, fill .15s;
-          }
-
-          /* Active bn-item: icon goes from plain outline to a solid,
-     filled glyph (fill inherits the item's own active color — see
-     ".bn-item.active { color: #fff }" above — so this stays in sync
-     with that color instead of hardcoding a second white value). */
-          .bn-item.active svg {
-            fill: currentColor;
-          }
-
-          /* Contribute icon's "+" is drawn as two straight strokes with
-     no enclosed area — a plain fill:currentColor would make them
-     vanish invisibly into the filled document body. Keep them
-     unfilled so the plus stays visible on the solid file glyph. */
-          .bn-item.active svg .fp-plus {
-            fill: none;
-          }
-
-          .bn-item img {
-            width: 22px;
-            height: 22px;
-            object-fit: contain;
-            border-radius: 5px;
-            transition: transform .15s;
-          }
-
-          .bn-item:active svg,
-          .bn-item:active img {
-            transform: scale(0.88);
-          }
-
-
-          .bn-more-wrap {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            position: relative;
-            padding: 6px 0;
-          }
-
-          .bn-more-spacer {
-            width: 22px;
-            height: 22px;
-          }
-
-          .bn-more {
-            position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-          }
-
-
-          .bn-more:active {
-            transform: translateX(-50%) scale(0.92);
-          }
-
-          .bn-more svg {
-            width: 20px;
-            height: 20px;
-            stroke: #7d7f85;
-            transition: transform .25s ease, stroke .2s ease;
-          }
-
-
-          .bn-more-wrap.open .bn-more svg {
-            transform: rotate(90deg);
-            stroke: #c8cbcd;
-          }
-
-          .bn-more-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            color: #7d7f85;
-            font-family: 'Sora', sans-serif;
-            transition: color .15s;
-          }
-
-          .bn-more-wrap.open .bn-more-label {
-            color: #e9e9ec;
-          }
-
-          .more-overlay {
-            position: fixed;
-            inset: 0;
-            bottom: 60px;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            z-index: 99970;
-            /* pushed well above every other fixed/sticky layer on the page (top-bar 20, secondary-top-bar 15, ptr-indicator 100000 excepted — that one only shows mid pull-gesture) so scrolled content can never paint through it */
-            isolation: isolate;
-            /* forces this into its own stacking context so nothing inside .box-one/.box-container can leak above it regardless of their own transforms/z-index */
-            transform: translateZ(0);
-            /* promotes the overlay to its own compositor layer — fixes the mobile Safari/Chrome bug where backdrop-filter lets a sliver of freshly-scrolled content flash through unblurred at the overlay's edges */
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity .28s ease, visibility 0s linear .28s;
-          }
-
-          .more-overlay.open {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-            transition: opacity .28s ease, visibility 0s linear 0s;
-          }
-
-          .more-sheet {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 18px 18px 0 0;
-            transform: translateY(100%);
-            transition: transform .32s cubic-bezier(0.32, 0.72, 0, 1);
-            max-height: 80vh;
-            /* This element only clips + animates now — it does NOT scroll (see
-     .more-sheet-scroll below). Mobile Safari doesn't reliably clip
-     border-radius on an element that's also its own overflow-y:auto
-     scroll container: during momentum/rubber-band scrolling a sliver of
-     the scrolled-past content can paint outside the rounded corner, on
-     top of the dimmed overlay behind it, unblurred (this is what shows
-     up as a stray row "poking out" above the sheet while scrolling its
-     list). Keeping the scrollable content in its own inner element and
-     leaving only clipping (overflow:hidden, no scroll) on this outer,
-     rounded element is what actually stops the bleed. */
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            /* keeps it correctly stacked above the overlay's own background within their shared stacking context */
-          }
-
-          .more-overlay.open .more-sheet {
-            transform: translateY(0);
-          }
-
-          .more-sheet.dragging {
-            transition: none;
-          }
-
-          /* The actual scroll container — everything that used to scroll directly
-   inside .more-sheet (handle/header + .more-list) now lives in here, so
-   overflow-y:auto and the rounded-corner clipping above are never on the
-   same element. */
-          .more-sheet-scroll {
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            flex: 1 1 auto;
-            min-height: 0;
-            padding: 8px 16px 24px;
-          }
-
-          /* Handle + header stay pinned to the top of the sheet while its
-   content (.more-list) scrolls underneath, instead of scrolling
-   away with everything else — negative margins cancel
-   .more-sheet-scroll's own padding so this reaches the true edges
-   (needed for the rounded top corners + full-bleed background to
-   line up), then re-applies that same padding on itself. */
-          .more-sheet-top {
-            position: sticky;
-            top: -20px;
-            z-index: 5;
-            margin: -8px -16px 0;
-            padding: 28px 16px 0px;
-            /* Flat color instead of its own gradient: .more-sheet-scroll is
-     transparent, so the body area behind it is really .more-sheet's
-     gradient — and right under the header that gradient is still
-     essentially #18181b (it's a subtle 18181b -> 131315 fade over the
-     whole ~80vh sheet). A gradient scaled to this small header's own
-     height ran through much more of that fade in a much shorter span,
-     so it came out visibly darker than the body directly below it —
-     hence the seam. A flat #18181b matches what's actually behind it. */
-            border-radius: 18px 18px 0 0;
-          }
-
-          .more-sheet-handle {
-            width: 34px;
-            height: 4px;
-            border-radius: 4px;
-            background: #333338;
-            margin: 6px auto 12px;
-            position: relative;
-            touch-action: none;
-            cursor: grab;
-          }
-
-          .more-sheet-handle::before {
-            content: '';
-            position: absolute;
-            top: -14px;
-            left: -30px;
-            right: -30px;
-            bottom: -14px;
-          }
-
-          .more-sheet-handle:active {
-            cursor: grabbing;
-          }
-
-          .more-sheet-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2px 14px;
-            margin-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          }
-
-          .more-sheet-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 13.5px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 9px;
-          }
-
-          .more-sheet-title::before {
-            content: '';
-            display: block;
-            width: 3px;
-            height: 14px;
-            border-radius: 2px;
-            background: var(--accent);
-            flex-shrink: 0;
-          }
-
-          .more-sheet-close {
-            width: 26px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background .15s, border-color .15s;
-          }
-
-
-          .more-sheet-close svg {
-            width: 13px;
-            height: 13px;
-            color: #c8cbcd;
-            stroke: #c8cbcd;
-          }
-
-          .more-sheet-close svg path {
-            stroke: #c8cbcd;
-          }
-
-          .more-section-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 1.4px;
-            text-transform: uppercase;
-            color: #8d9096;
-            padding: 20px 2px 10px;
-          }
-
           /* Categories — clean single-column list (icon badge · label · chevron)
    instead of a cramped 5-across icon grid. Reads like a proper settings
    list: one clear row per category, subtle hairline dividers, no color
@@ -4081,7 +3740,6 @@
 
           /* .dsn-chip* moved to 11layout.css so the Minecraft/Clash bars can
              use the same chips. The .stb-dsn-wrap sizing overrides stay here. */
-
 
           /* Desktop category hover panel — hovering a dsn-chip surfaces that
    category's on-page sections (same content as its mobile dropdown).
@@ -4198,9 +3856,6 @@
           }
 
           @media (max-width:970px) {
-            .bn-bar {
-              display: flex;
-            }
 
             .desktop-sub-nav {
               display: none !important;
@@ -4210,14 +3865,7 @@
             .desktop-sub-nav {
               display: flex;
             }
-
-            .bn-bar {
-              display: none !important;
-            }
-
-            .more-overlay {
-              bottom: 0;
-            }}
+}
         
 /* ---- next block ---- */
 
@@ -4842,205 +4490,15 @@
         display: none !important;
       }
 
-      /* Mobile-only: the leave-site icon button on the right side of the
-   secondary top bar. .secondary-top-bar (in 11layout.css) already
-   uses justify-content:space-between, so this just needs to sit as
-   the last flex child to land on the right. Desktop keeps the
-   inline chip bar instead, so this stays hidden at >=971px. */
-      .stb-mobile-actions {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-shrink: 0;
-      }
-
-      .stb-icon-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        /* Square with a small radius instead of a full circle — quieter
-     shape that doesn't stand out as its own "pill" among the rest of
-     the mobile top bar. */
-        border-radius: 5px;
-        /* Flat, muted fill + hairline border instead of the old
-     two-corner radial-glow border used elsewhere (.web-item, etc.) —
-     that glow effect is what made this small button pull the eye on
-     mobile. Kept simple and low-contrast so it recedes until pressed. */
-        background: #161616;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-sizing: border-box;
-        color: #9a9a9a;
-        cursor: pointer;
-        text-decoration: none;
-        flex-shrink: 0;
-        padding: 0;
-        transition: background 0.2s ease, border-color 0.2s ease;
-      }
-
-      .stb-icon-btn svg {
-        width: 16px;
-        height: 16px;
-        stroke: #9a9a9a;
-        flex-shrink: 0;
-      }
-
-      .stb-icon-btn.is-active {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.14);
-      }
-
-      .stb-icon-btn.is-active svg {
-        stroke: #fff;
-      }
-
-      .stb-icon-btn:active {
-        background: #2c2c2c;
-        border-color: rgba(255, 255, 255, 0.14);
-      }
-
-      /* Shared dark/blurred backdrop for the info + settings dropdowns
-   (the two .stb-mobile-actions popovers). Dims and softly blurs
-   everything behind the open popover — page content, the top bar,
-   the hero — while staying translucent enough that it's all still
-   visible through it, rather than fully hidden like the "More"
-   sheet's backdrop. Sits below both dropdown-wraps (z-index:61 on
-   those) so the trigger button and open panel always stay sharp and
-   clickable on top of it. */
-      .stb-dd-overlay {
-        position: fixed;
-        inset: 0;
-        /* Higher than .bn-bar (99980) and .more-overlay (99970) so this
-     dims/blurs literally everything else on the page — including the
-     bottom nav bar — while it's open. The two dropdown panels
-     (#stbInfoDropdown / #stbSettingsDropdown) are detached to
-     position:fixed direct children of <body> with an even higher
-     z-index (see initStbInfoDropdown/initStbSettingsDropdown JS) so
-     they — and only they — stay sharp above this. */
-        z-index: 99985;
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.22s ease, visibility 0s linear 0.22s;
-      }
-
-      .stb-dd-overlay.open {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-        transition: opacity 0.22s ease, visibility 0s linear 0s;
-      }
-
-      /* Keep the primary + secondary top bars sharp while the overlay is
-   open — they should stay exactly as readable/interactive as normal,
-   not dimmed or blurred like the page content behind them. Both bars
-   live inside the same <header> as .stb-dd-overlay (see markup
-   above), so :has() can reach "up" from the overlay to lift them
-   above its z-index:99985 the moment .open is added. Everything else
-   (page content, bottom nav) is still meant to dim/blur underneath,
-   per the overlay's own comment above.
-
-   .secondary-top-bar is excluded from this boost while the mobile
-   sidebar drawer is open (body.sidebar-open): the sidebar (z-index 15,
-   11layout.css) is meant to always sit above the full-width mobile
-   secondary top bar (also z-index 15 normally — the sidebar simply
-   wins that tie by coming later in the DOM). Boosting the bar to
-   99990 in that state would flip that and let it cover the sidebar,
-   which should never happen. .top-bar isn't affected either way since
-   the sidebar starts at top:52px, right where .top-bar ends — they
-   never overlap. */
-      header:has(.stb-dd-overlay.open) .top-bar {
-        z-index: 99990;
-      }
-
-      body:not(.sidebar-open) header:has(.stb-dd-overlay.open) .secondary-top-bar {
-        z-index: 99990;
-      }
-
-      /* Info dropdown stays visible at every width — it's the only place
-   "Saving your Favorite Sites" is explained on the page now (the
-   duplicate bottom-of-page promo card was removed), so unlike the
-   old compact-toggle/leave-site buttons this row is never hidden on
-   desktop. */
-      @media (min-width:971px) {
-        .stb-mobile-actions {
-          display: flex;
-        }
-
-        /* Desktop keeps the original smaller size — the bigger sizing
-     above is mobile-only, where it needed to hold its own next to
-     the rest of the touch UI. Same flat square shape, just smaller. */
-        .stb-icon-btn {
-          width: 24px;
-          height: 24px;
-        }
-
-        .stb-icon-btn svg {
-          width: 13px;
-          height: 13px;
-          stroke-width: 2.2;
-        }}
-
-      /* Info dropdown — quick bookmarking explainer, triggered from the
-   "i" icon button in the secondary top bar. Plain text only: no
-   imagery, no accent color, just a clean, professional card that
-   mirrors the site's existing dark surfaces. */
-      .stb-info-dropdown-wrap {
-        position: relative;
-        flex-shrink: 0;
-        /* Sits above .stb-dd-overlay so the trigger button (and its own
-     dropdown panel) stay crisp and clickable while the backdrop
-     behind everything else dims/blurs. */
-        z-index: 61;
-      }
-
-      .stb-info-dropdown-wrap .stb-icon-btn[aria-expanded="true"] {
-        color: #d4d4d4;
-        background: #2c2c2c;
-        border-color: rgba(255, 255, 255, 0.14);
-      }
-
-      .stb-info-dropdown-wrap .stb-icon-btn[aria-expanded="true"] svg {
-        stroke: #d4d4d4;
-      }
-
+      /* The "i" key, its backdrop and the panel shell: 11layout.css "TOP-BAR HELP BUTTON"
+         (Oct 28 2026, shared with CoC + Genshin). Only this page's panel size stays here. */
       .stb-info-dropdown {
-        /* Detached to a direct child of <body> at open-time (see
-     stbDetachDropdownPanel in the script above) so it can sit above
-     .stb-dd-overlay regardless of .secondary-top-bar's own low
-     z-index. Fixed + a high z-index here is what makes that actually
-     work; top/right are then set inline by JS to match the trigger
-     button's on-screen position. */
-        position: fixed;
-        top: calc(100% + 10px);
-        right: -4px;
-        z-index: 99990;
         width: 268px;
-        max-width: calc(100vw - 24px);
-        background: #181818;
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 14px;
         padding: 18px 18px 17px;
-        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
-        box-sizing: border-box;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-6px);
-        transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+        overflow: visible;
       }
 
-      .stb-info-dropdown.is-open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      /* Badge sits on its own line above the heading — keeps the icon from
+      /* Badge sits on its own line above the heading -- keeps the icon from
    vertically "floating" between two lines of wrapped heading text,
    which is what happened when it lived inline next to the title. */
       .stb-info-dd-badge {

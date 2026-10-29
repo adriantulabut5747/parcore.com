@@ -34,9 +34,6 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
    back as padding, so nothing but the page shows behind the bars. */
 .main { margin-top: 0; }
 .coc-main { padding-top: var(--topbar-height, 52px); }
-@media (min-width: 971px) {
-  .sidebar { margin-top: var(--topbar-height, 40px); }
-}
 @media (max-width: 970px) {
   body { overflow: auto; height: auto; }
 }
@@ -87,29 +84,7 @@ body.gi-page {
    on phones while the address bar / bottom nav slide and the fixed gradient
    catches up. */
 
-/* Bar labels = Minecraft's (mc-java.css "BOTTOM NAV = CLASH'S"): sentence case,
-   Oxanium 10.5px / 500, no tracking. Bar title = Sora, white, like Minecraft's
-   crumb (desktop is already Sora via 11layout's ONE DESKTOP BAR). */
-.gi-page .bn-bar .bn-item,
-.gi-page .bn-bar .bn-more-label {
-  font-family: 'Oxanium', sans-serif;
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-}
-.gi-page .secondary-top-bar .secondary-content { font-family: 'Sora', sans-serif; color: #eff2f5; }
-/* PHONE BREADCRUMB (Oct 24 2026, Adrian: CoC has one on phones, Genshin didn't): 11layout.js
-   buildGroups' trail ("Genshin › Events › Banners") replaces the title on phones too. 11layout.css
-   hides it there for Web Resources, so it's switched back on here, Genshin only. Every step the
-   same flat grey, the page you're on included (no white last step, Adrian). The middle steps give
-   way first ("Gen... › Database › Achievements"). */
-@media (max-width: 970px) {
-  .gi-page .secondary-left.has-crumbs > .secondary-content { display: none; }
-  .gi-page .secondary-left > .stb-crumbs { display: flex; font-size: 13px; font-weight: 500; line-height: 1; color: var(--text-muted, #949ba4); } /* font: 11layout.css BREADCRUMB FONT */
-  .gi-page .secondary-left > .stb-crumbs a { color: inherit; }
-  .gi-page .secondary-left > .stb-crumbs a:not([aria-current]) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-}
+/* PHONE BREADCRUMB: 11layout.css BREADCRUMB (Oct 28 2026, shared with Minecraft). */
 body.gi-page::before {
   content: '';
   position: fixed;
@@ -122,6 +97,25 @@ body.gi-page::before {
     radial-gradient(circle, rgba(var(--gi-acc-rgb), 0.12) 1px, transparent 1px),
     radial-gradient(circle, rgba(226, 232, 240, 0.05) 1px, transparent 1px);
   background-size: 190px 190px, 96px 96px;
+}
+/* PHONES (Oct 27 2026, scroll lag): a fixed body background plus a screen-blended layer over it made
+   phones repaint the whole screen on every scroll frame. Same sky, moved onto the fixed ::before
+   (a layer the phone just slides, no repaint): glows + dots there, no blend, dots at half strength
+   in place of the old 50% opacity. */
+@media (max-width: 970px) {
+  body.gi-page { background: #09090a; }
+  body.gi-page::before {
+    opacity: 1;
+    mix-blend-mode: normal;
+    background-image:
+      radial-gradient(circle, rgba(var(--gi-acc-rgb), 0.06) 1px, transparent 1px),
+      radial-gradient(circle, rgba(226, 232, 240, 0.025) 1px, transparent 1px),
+      radial-gradient(1100px 620px at 16% -8%, rgba(var(--gi-acc-rgb), 0.1), transparent 60%),
+      radial-gradient(950px 560px at 88% 2%, rgba(160, 170, 190, 0.045), transparent 58%),
+      radial-gradient(1200px 820px at 50% 118%, rgba(var(--gi-acc-rgb), 0.06), transparent 60%),
+      linear-gradient(#0e0d0f 0%, #0b0b0c 42%, #09090a 100%);
+    background-size: 190px 190px, 96px 96px, auto, auto, auto, auto;
+  }
 }
 /* Rising stars (GI.stars): a canvas filling its host box, e.g. the Lobby's wish card. */
 .gi-stars { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
@@ -379,7 +373,6 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 .gi-stat b { font: 800 24px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
 .gi-stat b.is-red { color: var(--gi-acc-text); }
 .gi-stat small { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 5px; font-size: 11px; color: var(--gi-muted); }
-
 
 /* Pieces the wish card (.gw, genshin-wish.css) uses: the 5 stars and the countdown boxes. */
 .gi-rarity { font-size: 13px; letter-spacing: 2px; color: #f2c45a; }
@@ -726,4 +719,147 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 @media (max-width: 970px) {
   .stb-info-dropdown.gh { width: 360px; }
   .gh-head { padding: 22px 20px 16px; }
+}
+
+/* LOBBY WINDMILL (Oct 27 2026, Adrian: the house was "ugly"): the Lobby group icon in game-nav.json is a
+   drawn Mondstadt windmill; its sails (.gi-mill) turn while the bar link is hovered. */
+.gi-mill { transform-box: view-box; transform-origin: 12px 9.5px; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .stb-hub-link:hover .gi-mill { animation: gi-mill 2.4s linear infinite; }
+}
+@keyframes gi-mill { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   KLEE PIECES (Oct 27 2026, Adrian: "kleefify the whole page"; moved here from
+   genshin-lobby.css when the Banners page was kleefied, so both share them). Klee is
+   the tour guide: her dialogue lines under the section titles (.gi-klee), her clover
+   as the section-title mark (main.gi--klee), the foot key and Ask Klee (.gi-qa). Her
+   map (.gm) stays in genshin-lobby.css. Her red (the hat) is only on
+   her own pieces; keys and tabs keep the site's red.
+   ============================================================ */
+.gi {
+  --klee: #c4362f;
+  --klee-text: #ff8d82;
+  /* Klee's hat clover: four heart leaves lit from the top left, a cream heart at the centre. */
+  --klee-clover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg id='l'%3E%3Cpath fill='%23e2564c' d='M12 11C9 9 7.2 6.6 7.8 4.6 8.4 2.7 10.9 2.5 12 4.3 13.1 2.5 15.6 2.7 16.2 4.6 16.8 6.6 15 9 12 11Z'/%3E%3C/g%3E%3Cpath fill='%23b0302a' d='M12 11C9 9 7.2 6.6 7.8 4.6 8.4 2.7 10.9 2.5 12 4.3 13.1 2.5 15.6 2.7 16.2 4.6 16.8 6.6 15 9 12 11Z' transform='rotate(90 12 11.5)'/%3E%3Cpath fill='%238e231e' d='M12 11C9 9 7.2 6.6 7.8 4.6 8.4 2.7 10.9 2.5 12 4.3 13.1 2.5 15.6 2.7 16.2 4.6 16.8 6.6 15 9 12 11Z' transform='rotate(180 12 11.5)'/%3E%3Cpath fill='%23cf453c' d='M12 11C9 9 7.2 6.6 7.8 4.6 8.4 2.7 10.9 2.5 12 4.3 13.1 2.5 15.6 2.7 16.2 4.6 16.8 6.6 15 9 12 11Z' transform='rotate(270 12 11.5)'/%3E%3Ccircle cx='12' cy='11.5' r='1.6' fill='%23f6dccd'/%3E%3C/svg%3E");
+}
+/* Klee pages' section-title mark = the clover (main.gi--klee: Lobby + Banners; every other Genshin page keeps the gem). */
+.gi--klee .gi-sec-head .gi-title::before {
+  width: 0.78em;
+  height: 0.78em;
+  margin-right: 0.36em;
+  vertical-align: -0.08em;
+  background-image: var(--klee-clover);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55));
+}
+
+/* ---- KLEE SAYS: one line under a section title, her face + a dialogue bubble ---- */
+.gi-klee { display: flex; align-items: center; gap: 12px; max-width: 680px; margin: -8px 0 26px; }
+/* Right under a page header (no section title above it): the bar's gap, not the pull-up. */
+.gi-tb + .gi-klee { margin-top: 28px; }
+.gi-klee-face {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--klee);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #4a2a27, #1c1213 75%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+.gi-klee p {
+  position: relative;
+  padding: 9px 14px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  background: rgba(16, 13, 14, 0.82);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #d4d6da;
+}
+.gi-klee p::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border: solid rgba(255, 255, 255, 0.09);
+  border-width: 0 0 1px 1px;
+  background: rgb(16, 13, 14);
+  transform: rotate(45deg);
+  clip-path: polygon(0 0, 0 100%, 100% 100%); /* only the half outside the bubble */
+}
+/* p > b: one step past a page's own `.xx b` colour (the Glossary's made Klee's name white). */
+.gi-klee p > b { margin-right: 8px; font: 800 13px/1 'Cinzel', serif; letter-spacing: 0.05em; color: var(--klee-text); }
+/* Klee's name over a dialogue box (the hero's Did you know box, the Banners page's Klee card). */
+.gi-say-who {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  font: 800 15px/1.2 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  color: var(--gi-acc-text);
+}
+.gi-say-who small { font: 600 10px/1 'Sora', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gi-dim); }
+
+/* ---- SECTION FOOT KEY (Oct 27 2026, Adrian: the "All banners" key in the title row looked
+   misplaced): the section's "see everything" key sits under its content instead, centred;
+   full width on phones. ---- */
+.gi-foot { display: flex; justify-content: center; margin-top: 22px; }
+.gi-foot-key { height: 44px; padding: 0 24px 2px; font-size: 14px; }
+.gi-foot-key svg { width: 15px; height: 15px; transition: transform 0.2s var(--gi-ease); }
+.gi-foot-key:hover svg { transform: translateX(3px); }
+
+/* ---- ASK KLEE: questions + the shared feedback box (like /coc/'s .qa) ---- */
+.gi-qa { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 56px; align-items: start; overflow: clip; interpolate-size: allow-keywords; }
+.gi-qa-side [data-feedback] { margin-top: 4px; }
+@media (min-width: 1201px) {
+  .gi-qa-side { position: sticky; top: 96px; }
+}
+.gi-qa-list { display: grid; gap: 8px; }
+.gi-qa-item { border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow); }
+.gi-qa-item[open] { background: var(--lb-box2, var(--lb-box)); }
+.gi-qa-item::details-content { block-size: 0; overflow: hidden; transition: block-size 0.3s var(--gi-ease), content-visibility 0.3s allow-discrete; }
+.gi-qa-item[open]::details-content { block-size: auto; }
+.gi-qa-item summary { display: grid; grid-template-columns: 40px minmax(0, 1fr) 24px; align-items: center; gap: 14px; padding: 10px 12px; list-style: none; cursor: pointer; }
+.gi-qa-item summary::-webkit-details-marker { display: none; }
+.gi-qa-item summary:hover { background: rgba(255, 255, 255, 0.03); }
+.gi-qa-item summary:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.gi-qa-ico { display: grid; place-items: center; width: 40px; height: 40px; border: 2px solid var(--lb-edge); border-radius: 50%; background: var(--lb-well); }
+.gi-qa-ico img { width: 26px; height: 26px; }
+.gi-qa-q { font: 700 14px/1.4 'Sora', sans-serif; color: #fff; }
+.gi-qa-tog { position: relative; width: 14px; height: 14px; justify-self: center; transition: transform 0.25s var(--gi-ease); }
+.gi-qa-tog::before, .gi-qa-tog::after { content: ''; position: absolute; top: 6px; left: 0; width: 14px; height: 2px; border-radius: 1px; background: #c9ccd2; }
+.gi-qa-tog::after { transform: rotate(90deg); }
+.gi-qa-item[open] .gi-qa-tog { transform: rotate(45deg); }
+.gi-qa-a { padding: 0 18px 16px 66px; }
+.gi-qa-a p { font-size: 13.5px; line-height: 1.65; color: #c3c6cc; }
+.gi-qa-a b { color: #fff; }
+.gi-qa-a a { color: var(--gi-acc-text); }
+/* SHORT ASK KLEE (.gi-qa--short, Oct 27 2026, Adrian: "3-4 only" + "align it"): four questions are
+   shorter than the Lobby's left column, so the title + Klee's line run full width, then the feedback box
+   left and the questions right (Adrian: always that way round, like the Lobby). They're about the same
+   height; closed questions spread to fill it. Banners, Rerun tracker, All events, Codes, Abyss. Phones keep
+   the stack below. */
+@media (min-width: 971px) {
+  .gi-qa--short { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 32px; }
+  .gi-qa--short .gi-qa-side { display: contents; }
+  .gi-qa--short .gi-sec-head, .gi-qa--short .gi-klee { grid-column: 1 / -1; }
+  .gi-qa--short .gi-qa-list { grid-column: 2; grid-row: 3; align-self: stretch; align-content: space-between; }
+  .gi-qa--short [data-feedback] { grid-column: 1; grid-row: 3; margin-top: 0; }
+}
+@media (max-width: 970px) {
+  .gi-klee { gap: 10px; margin: -10px 0 20px; }
+  .gi-tb + .gi-klee { margin-top: 20px; }
+  .gi-klee-face { width: 38px; height: 38px; }
+  .gi-klee p { padding: 8px 12px 9px; font-size: 13px; }
+  .gi-qa { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .gi-qa-side { display: contents; }
+  .gi-qa-list { order: 2; }
+  .gi-qa-side [data-feedback] { order: 3; margin-top: 24px; }
+  .gi-qa-a { padding: 0 14px 14px; }
+  .gi-foot { margin-top: 16px; }
+  .gi-foot-key { width: 100%; justify-content: center; }
 }

@@ -1,0 +1,79 @@
+/* ============================================================
+   THE VILLAGER (Oct 27 2026, Adrian: "do Klee on the Clash of Clans pages too").
+   CoC's guide, like Klee on the Genshin pages: one line in a title block, her
+   face + a dialogue bubble. It takes the subtitle's place, so a section keeps
+   its spacing. Face = images/coc/villager/face.webp (her WWE announcer look).
+   Faces: -flat (the intimidating look) almost everywhere, Adrian's pick; -shock for a "Whoa" line.
+   Never -cheer or the plain smile (Adrian: "looks like a clown"). Text = Sora (Adrian).
+   Voice: the in-game tutorial's -- calls you "Chief", polite, a little
+   dramatic. Mostly plain help; a joke only where a short one fits.
+
+   <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face.webp" alt="" width="44" height="44"
+     loading="lazy" decoding="async"><p><b>Villager</b>Her line.</p></div>
+   ============================================================ */
+
+.cv-say[hidden] { display: none; } /* Tier list hides the other list's line */
+.cv-say { display: flex; align-items: center; gap: 12px; max-width: 600px; margin-top: 16px; text-align: left; }
+.cv-face {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #3a2420, #121317 75%);
+  box-shadow: 0 0 0 2px var(--lb-edge), 0 0 0 3px rgba(255, 255, 255, 0.08), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+/* The bubble = the raised "box" recipe, with a tail pointing at her. */
+.cv-say p {
+  position: relative;
+  margin: 0;
+  padding: 9px 14px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 8px;
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #d4d6da;
+}
+.cv-say p::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border: solid var(--lb-edge);
+  border-width: 0 0 2px 2px;
+  background: var(--lb-box);
+  transform: rotate(45deg);
+  clip-path: polygon(0 0, 0 100%, 100% 100%); /* only the half outside the bubble */
+}
+/* p > b: one step past a section's own `b` colour. */
+.cv-say p > b { margin-right: 8px; font: 800 11px/1 'Sora', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lb-red-text); }
+
+/* Damage Calculator's "Your attack" is a narrow box on desktop too: title + TH chip keep their row, the bubble
+   drops under them (squeezed beside the chip, it pushed the chip out of the box). */
+.dc-attack .dc-head:has(> div > .cv-say) { flex-wrap: wrap; align-items: center; }
+.dc-attack .dc-head > div:has(> .cv-say) { display: contents; }
+.dc-attack .dc-head > div > .cv-say { order: 2; flex: 1 0 100%; max-width: none; margin-top: 0; }
+.dc-attack .dc-head .cv-say p { flex: 1 1 auto; }
+
+@media (max-width: 970px) {
+  .cv-say { gap: 10px; margin-top: 12px; }
+  /* /coc/ Parchrome tools (Adrian: the bubble was squeezed beside "Browse all tools"): title + link keep their
+     row, the bubble drops under them, full width. */
+  html body.coc-home .pt-band .lob-head { flex-wrap: wrap; }
+  html body.coc-home .pt-band .lob-head-text { display: contents; }
+  html body.coc-home .pt-band .lob-head .cv-say { order: 2; flex: 1 0 100%; margin-top: 0; }
+  .cv-face { width: 38px; height: 38px; }
+  /* Full width (Adrian: the Walls bubble stopped short beside Share). The title + any side key keep their row,
+     the bubble drops under them. Army Maker's head (.am-head-tools) already stacks, so it only fills. */
+  .cv-say { max-width: none; }
+  .cv-say p { flex: 1 1 auto; }
+  :is(.am-head, .dc-head):not(:has(.am-head-tools)):has(> div > .cv-say) { flex-wrap: wrap; align-items: center; }
+  :is(.am-head, .dc-head):not(:has(.am-head-tools)) > div:has(> .cv-say) { display: contents; }
+  :is(.am-head, .dc-head):not(:has(.am-head-tools)) > div > .cv-say { order: 2; flex: 1 0 100%; margin-top: 0; }
+  .cv-say p { padding: 8px 12px 9px; font-size: 13px; }
+}

@@ -366,11 +366,14 @@
         .map((x) => `<li>${x}</li>`)
         .join('');
 
+      // Klee's line under the header (Oct 27 2026): the count + the newest version's sets, in her voice.
+      $('afKlee').textContent = `Klee found ${sets.length} artifact sets! ` + (newest ? `The newest came in ${/^\d/.test(newest) ? 'Version ' : ''}${newest}. ` : '') + 'Open one to see who it suits.';
       render();
       const s = url.get('s');
       if (s) open(s);
     })
     .catch(() => {
       grid.innerHTML = '<p class="gi-box gi-empty">The artifact list didn’t load. Refresh to try again.</p>';
+      $('afKlee').textContent = "Klee couldn't find the artifacts. Try again in a bit!";
     });
 })();

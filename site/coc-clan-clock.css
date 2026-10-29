@@ -65,9 +65,11 @@
   background:var(--cc-red); box-shadow:0 0 6px rgba(194,59,59,0.8);
   animation:cc-dot 2.6s ease-in-out infinite;
 }
+/* opacity + transform only (the glow rides the opacity): a box-shadow keyframe
+   repaints the page every frame, which made phones stutter while scrolling. */
 @keyframes cc-dot{
-  0%,100%{ opacity:.55; transform:scale(.9); box-shadow:0 0 4px rgba(194,59,59,.5); }
-  50%{ opacity:1; transform:scale(1.15); box-shadow:0 0 10px rgba(194,59,59,.95); }
+  0%,100%{ opacity:.55; transform:scale(.9); }
+  50%{ opacity:1; transform:scale(1.15); }
 }
 .cc-label-note{
   font-family:'Oxanium', sans-serif; font-size:10px;
@@ -918,10 +920,24 @@ html body .t18-band .cc-label::before { display: none; }
   }
 }
 
+/* Off screen (coc-events.js adds .is-off): every loop in the band holds still. */
+.t18-band.is-off,
+.t18-band.is-off::before,
+.t18-band.is-off *,
+.t18-band.is-off *::before,
+.t18-band.is-off *::after {
+  animation-play-state: paused !important;
+}
+
 /* Phones: 16px sides. */
 @media (max-width: 970px) {
   .cc-section.t18-band {
     padding: 40px 16px 28px;
+  }
+  /* Phones: twinkle only. The drift animates background-position, which
+     repaints on every frame even with the band off screen (scroll stutter). */
+  .t18-band::before {
+    animation: cc-twinkle 6s ease-in-out infinite alternate;
   }
   .coc-content:has(+ .t18-band) .t18-lower {
     padding-bottom: 110px;

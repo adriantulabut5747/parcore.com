@@ -29,16 +29,16 @@
   function favicon(site) {
     return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(site) + '&sz=64';
   }
-  function card(p, tags) {
+  // Same card as Worlds / packs / modpacks / data packs ("PACK CARDS" in mc-home.css).
+  function card(p, tags, i) {
     var site = p.modrinth ? 'modrinth.com' : p.site;
     return '<a class="mch-mod" href="' + esc(p.href) + '" target="_blank" rel="noopener"' + (p.modrinth ? ' data-mr="' + esc(p.modrinth) + '"' : '') + '>' +
-      '<div class="mch-mod-media"><img src="' + esc(p.img) + '" alt="" loading="lazy" decoding="async"><span class="mch-tier" hidden></span></div>' +
+      '<div class="mch-mod-media"><img src="' + esc(p.img) + '" alt="" loading="lazy" decoding="async"><span class="mch-mod-rank">' + String(i + 1).padStart(2, '0') + '</span><span class="mch-tier" hidden></span></div>' +
       '<h3 class="mch-mod-name">' + esc(p.name) + '</h3>' +
-      (p.by ? '<p class="mch-mod-by">' + (p.icon ? '<img src="' + esc(p.icon) + '" alt="" loading="lazy">' : '') + esc(p.by) + '</p>' : '') +
+      (p.by ? '<span class="mch-mod-author">by ' + esc(p.by) + '</span>' : '') +
       '<p class="mch-mod-desc">' + esc(p.desc) + '</p>' +
-      '<span class="mch-mod-foot"><span class="mch-src"><img src="' + favicon(site) + '" alt="" loading="lazy">' + esc(p.modrinth ? 'Modrinth' : p.source) + '</span>' +
-      '<span class="mch-mod-tags">' + p.tags.map(function (t) { return esc(tags[t] || t); }).join(' · ') + '</span>' +
-      '<span class="mch-mod-dl"></span></span></a>';
+      '<p class="mch-scard-tags">' + p.tags.map(function (t) { return esc(tags[t] || t); }).join('<i aria-hidden="true"></i>') + '</p>' +
+      '<span class="mch-src"><img src="' + favicon(site) + '" alt="" loading="lazy"><b>' + esc(p.modrinth ? 'Modrinth' : p.source) + '</b></span></a>';
   }
 
   fetch('/mc-shaders.json')
@@ -51,7 +51,7 @@
       var tags = data.tags;
       var hero = document.getElementById('shHeroCount');
       if (hero) hero.textContent = list.length;
-      grid.innerHTML = list.map(function (p) { return card(p, tags); }).join('');
+      grid.innerHTML = list.map(function (p, i) { return card(p, tags, i); }).join('');
       var cards = Array.prototype.slice.call(grid.children);
 
       var chips = document.getElementById('shChips');
@@ -109,7 +109,7 @@
           projects.forEach(function (pr) {
             var el = grid.querySelector('[data-mr="' + pr.slug + '"]');
             if (!el) return;
-            el.querySelector('.mch-mod-dl').textContent = compact.format(pr.downloads) + ' downloads';
+            el.querySelector('.mch-scard-tags').insertAdjacentHTML('afterbegin', compact.format(pr.downloads) + ' downloads<i aria-hidden="true"></i>');
             var t = tier(pr.categories, pr.additional_categories);
             if (t) {
               var badge = el.querySelector('.mch-tier');

@@ -152,6 +152,8 @@
   function top() {
     const list = rows[topRarity].filter((r) => !r.live).sort(SORTS.wait).slice(0, 5);
     $('rtTopSub').textContent = `The ${topRarity}★ characters with the longest time since their last ${topRarity === 5 ? 'banner (Event or Chronicled)' : 'Event Wish'}.`;
+    // Klee's line follows the picked rarity, so it always names this row's #1.
+    if (list[0]) $('rtKlee').textContent = `${list[0].c.name} has waited longest: ${plural(list[0].wait, 'day')}. Come back soon!`;
     $('rtTop').innerHTML = list
       .map((r, i) => {
         const p = r.ratio ? Math.min(r.ratio / 2, 1) * 100 : 0;

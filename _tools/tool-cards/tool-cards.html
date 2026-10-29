@@ -70,8 +70,9 @@ h2 { font: 900 37px/1.1 'Orbitron', sans-serif; letter-spacing: -.5px; text-tran
 /* the art column: a 160px stage centred on the card, scaled by --s from its
    right edge; three depths inside lean toward the pointer */
 .ptc-art { position: absolute; top: 50%; right: calc((var(--well-w) - var(--art-w) * var(--s)) / 2); width: var(--art-w); height: 160px; margin-top: -80px; pointer-events: none; --mx: 0; --my: 0; }
-.ptc-art:not(.is-on), .ptc-art * { animation-play-state: paused; }
-.ptc-art.is-on * { animation-play-state: running; }
+/* pseudo-elements too (the rays' spin is on ::before): animation-* isn't inherited */
+.ptc-art:not(.is-on), .ptc-art *, .ptc-art *::before, .ptc-art *::after { animation-play-state: paused; }
+.ptc-art.is-on *, .ptc-art.is-on *::before, .ptc-art.is-on *::after { animation-play-state: running; }
 .ptc-layer { position: absolute; inset: 0; transform-origin: 100% 50%; scale: var(--s); transition: transform .6s cubic-bezier(.22,1,.36,1); }
 .ptc-far  { transform: translate(calc(var(--mx) * -3px), calc(var(--my) * -2px)); }
 .ptc-mid  { transform: translate(calc(var(--mx) * 4px),  calc(var(--my) * 3px)); }
@@ -663,7 +664,7 @@ img.fx-em { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius:
 
 @media (prefers-reduced-motion: reduce) {
   .pl-art { --lx: 40px; --ly: 52px; }
-  .ptc-art, .ptc-art * { animation: none !important; }
+  .ptc-art, .ptc-art *, .ptc-art *::before, .ptc-art *::after { animation: none !important; }
   /* still frames: Army Maker = the camp with its three troop cards round it,
      Damage Calculator = the Monolith destroyed (stamp on, no bar) */
   .am-t { width: 40px; height: 40px; margin: -6px 0 0 -6px; opacity: 1; border-radius: 8px; outline-width: 2px; }
@@ -685,7 +686,7 @@ img.fx-em { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius:
   /* /coc/ phones: the reduced-motion still frames (Oct 25 2026, Adrian: the
      animations lagged there). /coc/tools/ (no .coc-home) keeps them. */
   .coc-home .pl-art { --lx: 40px; --ly: 52px; }
-  .coc-home .ptc-art, .coc-home .ptc-art * { animation: none !important; }
+  .coc-home .ptc-art, .coc-home .ptc-art *, .coc-home .ptc-art *::before, .coc-home .ptc-art *::after { animation: none !important; }
   .coc-home .am-t { width: 40px; height: 40px; margin: -6px 0 0 -6px; opacity: 1; border-radius: 8px; outline-width: 2px; }
   .coc-home .am-t0 { transform: translate(-50px, 50px) rotate(-10deg); }
   .coc-home .am-t1 { transform: translate(44px, 46px) rotate(9deg); }

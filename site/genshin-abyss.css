@@ -1,0 +1,112 @@
+/* ============================================================
+   GENSHIN IMPACT SPIRAL ABYSS (Oct 27 2026) -- /genshin-impact/abyss only.
+   Linked after genshin.css and genshin-endgame.css (the floor's disorders and
+   chambers come from there, built by GI.abyssFloor). Behaviour: genshin-abyss.js.
+
+   Adrian's brief: spiralabyss.org's "Select a floor" stage (four arched
+   gates on a navy Abyss ground), in our dress: navy art, but titles stay the
+   section's white-to-steel and the picked gate wears our red, not gold.
+   The art is the portal (endgame/abyss.webp) turned navy by --ab-night; the
+   wiki's Abyss interior shots (Spiral_Abyss_Abyssal_Moon_Spire_UI.png) would
+   suit better but its image server blocks scripts: swap the file in here and
+   in genshin-abyss.js (the gates' <img>) if Adrian saves one.
+   ============================================================ */
+.ab {
+  --ab-night: grayscale(1) sepia(1) hue-rotate(185deg) saturate(1.7) brightness(0.62);
+  --ab-arch: polygon(50% 0, 72% 4.5%, 89% 10.5%, 100% 17%, 100% 83%, 89% 89.5%, 72% 95.5%, 50% 100%, 28% 95.5%, 11% 89.5%, 0 83%, 0 17%, 11% 10.5%, 28% 4.5%);
+}
+.ab .gi-tb-art { filter: var(--ab-night); object-position: 50% 42%; }
+
+/* ---- THE STAGE: a navy box, the portal faint behind it, the head centred ---- */
+.ab-stage {
+  position: relative;
+  isolation: isolate;
+  margin-top: 28px;
+  padding: 44px 24px 56px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: radial-gradient(70% 80% at 50% 0%, #1a2547, #0c1226 70%);
+  box-shadow: var(--lb-shadow);
+}
+.ab-stage::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.4;
+  background: url('/images/genshin/endgame/abyss.webp') center 40% / cover;
+  filter: var(--ab-night);
+  -webkit-mask-image: linear-gradient(180deg, #000 10%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 10%, transparent 85%);
+  pointer-events: none;
+}
+.ab-stage .gi-sec-head { justify-content: center; margin-bottom: 36px; text-align: center; }
+.ab-stage .gi-sec-head::after { left: calc(50% - 32px); }
+/* Klee's line (Oct 27 2026) sits centred under the centred title, like the head itself. */
+.ab-stage .gi-klee { width: fit-content; margin-inline: auto; margin-bottom: 30px; }
+.ab-stage .mch-sec-sub { color: #aeb8cc; }
+
+/* ---- THE GATES: four arches (--ab-arch), a 2px edge = the outer shape showing round the inner one ---- */
+.ab-gates { display: flex; justify-content: center; gap: clamp(12px, 4.2vw, 72px); }
+.ab-gate {
+  --ab-edge: rgba(196, 208, 232, 0.42);
+  flex: 0 1 168px;
+  aspect-ratio: 168 / 420;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
+  transition: transform 0.3s var(--gi-ease), filter 0.3s ease;
+}
+.ab-gate-in,
+.ab-gate-art { display: block; height: 100%; -webkit-clip-path: var(--ab-arch); clip-path: var(--ab-arch); }
+.ab-gate-in { padding: 2px; background: var(--ab-edge); transition: background-color 0.3s ease; }
+.ab-gate-art { position: relative; background: #0f1730; }
+.ab-gate-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; filter: var(--ab-night); opacity: 0.75; transition: opacity 0.3s ease; }
+/* Dark at the foot so the level reads, a little at the head under the medallion. */
+.ab-gate-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12, 18, 38, 0.55) 0%, rgba(12, 18, 38, 0) 34%, rgba(12, 18, 38, 0) 52%, rgba(8, 12, 26, 0.92) 82%); }
+/* The floor number on a silver medallion (the screenshot's). */
+.ab-gate-n {
+  position: absolute;
+  z-index: 1;
+  top: 20%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #f6f7f9, #bcc2cc 62%, #868d99);
+  box-shadow: 0 0 0 3px rgba(16, 22, 42, 0.85), 0 0 0 5px rgba(196, 208, 232, 0.35), 0 6px 14px rgba(0, 0, 0, 0.5);
+  transform: translateX(-50%);
+  font: 800 clamp(20px, 2.2vw, 34px)/1 'Cinzel', serif;
+  color: #171a22;
+}
+.ab-gate-lv { position: absolute; z-index: 1; left: 0; right: 0; bottom: 21%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.ab-gate-lv b { font: 800 15px/1 'Sora', sans-serif; font-variant-numeric: tabular-nums; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); }
+.ab-gate-lv span { font: 700 9.5px/1 'Sora', sans-serif; letter-spacing: 1.3px; text-transform: uppercase; color: #c3ccdc; }
+.ab-gate:hover { --ab-edge: rgba(226, 233, 246, 0.75); }
+.ab-gate:hover .ab-gate-art img,
+.ab-gate.active .ab-gate-art img { opacity: 1; }
+.ab-gate.active { --ab-edge: rgb(var(--gi-acc-rgb)); filter: drop-shadow(0 0 16px rgba(var(--gi-acc-rgb), 0.55)) drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55)); }
+.ab-gate:focus-visible { outline: 2px solid #fff; outline-offset: 6px; }
+@media (prefers-reduced-motion: no-preference) {
+  .ab-gate:hover,
+  .ab-gate.active { transform: translateY(-6px); }
+}
+
+/* ---- THE FLOOR (disorders + chambers: genshin-endgame.css) ---- */
+.ab-floor { padding-top: 56px; }
+
+@media (max-width: 970px) {
+  .ab-stage { margin-top: 20px; padding: 28px 12px 32px; }
+  .ab-stage .gi-sec-head { margin-bottom: 24px; }
+  .ab-gates { gap: 8px; }
+  .ab-gate { flex: 1 1 0; max-width: 120px; }
+  .ab-gate-lv { gap: 5px; }
+  .ab-gate-lv b { font-size: 12px; }
+  .ab-gate-lv span { font-size: 8px; letter-spacing: 0.8px; }
+  .ab-floor { padding-top: 40px; }
+}

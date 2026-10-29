@@ -23,7 +23,7 @@
     var count = document.getElementById('worldCount');
     var empty = document.getElementById('worldEmpty');
 
-    var card = function (w, tags) {
+    var card = function (w, tags, i) {
       var host = '';
       try { host = new URL(w.url).hostname.replace(/^www\./, ''); } catch (e) {}
       var meta = [];
@@ -32,12 +32,13 @@
       w.tags.forEach(function (t) { meta.push(tags[t]); });
       return '<a class="mch-mod mwl-card" id="world-' + w.id + '" href="' + esc(w.url) + '" target="_blank" rel="noopener">' +
         '<div class="mch-mod-media"><img src="' + esc(w.img) + '" alt="" loading="lazy" decoding="async">' +
+        '<span class="mch-mod-rank">' + (i < 9 ? '0' : '') + (i + 1) + '</span>' +
         (w.version ? '<span class="mwl-ver"><small>Java</small>' + esc(w.version) + '</span>' : '') + '</div>' +
         '<h3 class="mch-mod-name">' + esc(w.name) + '</h3>' +
         (w.by ? '<span class="mch-mod-author">by ' + esc(w.by) + '</span>' : '') +
         '<p class="mch-mod-desc">' + esc(w.desc) + '</p>' +
         '<p class="mch-scard-tags">' + meta.map(esc).join('<i aria-hidden="true"></i>') + '</p>' +
-        '<span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=' + esc(host) + '&amp;sz=64" alt="" loading="lazy">' + esc(w.src) + '</span></a>';
+        '<span class="mch-src"><img src="https://www.google.com/s2/favicons?domain=' + esc(host) + '&amp;sz=64" alt="" loading="lazy"><b>' + esc(w.src) + '</b></span></a>';
     };
 
     fetch('/mc-worlds.json')
@@ -46,35 +47,40 @@
         return r.json();
       })
       .then(function (data) {
-        var worlds = data.worlds, tags = data.tags, icons = data.tagIcons || {};
-        grid.innerHTML = worlds.map(function (w) { return card(w, tags); }).join('');
-        var ico = function (t) {
-          return icons[t] ? '<img src="' + esc(icons[t]) + '" alt="" width="16" height="16">' : '';
-        };
-        chipsBox.innerHTML = '<button type="button" class="mch-chip" data-tag="all" aria-pressed="true">' + ico('all') + 'All<span>' + worlds.length + '</span></button>' +
+        var worlds = data.worlds, tags = data.tags;
+        grid.innerHTML = worlds.map(function (w, i) { return card(w, tags, i); }).join('');
+        // Chips as on the data packs / shaders / mods pages: counts follow the search, an empty chip greys out.
+        chipsBox.innerHTML = '<button type="button" class="mch-chip" data-tag="all" aria-pressed="true">All<span data-n></span></button>' +
           Object.keys(tags).map(function (t) {
-            var n = worlds.filter(function (w) { return w.tags.indexOf(t) > -1; }).length;
-            return '<button type="button" class="mch-chip" data-tag="' + t + '" aria-pressed="false">' + ico(t) + esc(tags[t]) + '<span>' + n + '</span></button>';
+            return '<button type="button" class="mch-chip" data-tag="' + t + '" aria-pressed="false">' + esc(tags[t]) + '<span data-n></span></button>';
           }).join('');
 
         var cards = Array.prototype.slice.call(grid.children);
         var active = 'all';
         var apply = function () {
           var q = find.value.trim().toLowerCase();
+          var hitQ = worlds.map(function (w) {
+            return !q || [w.name, w.by, w.desc, w.src, w.version, w.schematic ? 'schematic' : ''].concat(w.tags.map(function (t) { return tags[t]; })).join(' ').toLowerCase().indexOf(q) > -1;
+          });
           var shown = 0;
           worlds.forEach(function (w, i) {
-            var hay = [w.name, w.by, w.desc, w.src, w.version, w.schematic ? 'schematic' : ''].concat(w.tags.map(function (t) { return tags[t]; })).join(' ').toLowerCase();
-            var ok = (active === 'all' || w.tags.indexOf(active) > -1) && (!q || hay.indexOf(q) > -1);
+            var ok = hitQ[i] && (active === 'all' || w.tags.indexOf(active) > -1);
             cards[i].hidden = !ok;
             if (ok) shown++;
           });
-          count.textContent = shown === worlds.length ? worlds.length + ' worlds' : shown + ' of ' + worlds.length;
+          chipsBox.querySelectorAll('.mch-chip').forEach(function (c) {
+            var t = c.getAttribute('data-tag');
+            var n = worlds.filter(function (w, i) { return hitQ[i] && (t === 'all' || w.tags.indexOf(t) > -1); }).length;
+            c.querySelector('[data-n]').textContent = n;
+            c.disabled = !n && t !== active;
+          });
+          count.textContent = shown === worlds.length ? worlds.length + ' worlds' : shown + ' of ' + worlds.length + ' worlds';
           empty.hidden = shown > 0;
           document.getElementById('worldEmptyQ').textContent = q ? '“' + find.value.trim() + '”' : 'this filter';
         };
         chipsBox.addEventListener('click', function (e) {
           var chip = e.target.closest('.mch-chip');
-          if (!chip) return;
+          if (!chip || chip.disabled) return;
           active = chip.getAttribute('data-tag');
           chipsBox.querySelectorAll('.mch-chip').forEach(function (c) {
             c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');

@@ -489,33 +489,54 @@ document.addEventListener('DOMContentLoaded', () => {
   // groups instead (Live / Database / Tools / Guides). Each group is one
   // top-bar link with a hover menu of its pages, one phone-bar item that
   // opens the More sheet at that group, and one labelled section of the
-  // sheet (coc-more.css's .mx tiles, like Minecraft and CoC). A group link
+  // sheet (11layout.css "MORE SHEET" .mx tiles, like Minecraft and CoC). A group link
   // isn't a page itself (href "#gn-<i>"); it's lit when you're on one of
   // its built pages.
   // Oct 24 2026 (Adrian, "like the clash of clans"): every group has a "link". A group with no
   // pages (Lobby) is a plain link; the others link to their group page ("All tools" etc., CoC's Tools button):
   // a click / phone tap goes there, desktop hover opens the menu of its pages. Page icons are
   // pictures (in-game art), shown in the menu rows and the sheet's tiles; group icons stay SVG.
+  // Minecraft (Oct 27 2026): a group's "img" = a picture icon instead of the SVG "icon"; a group
+  // with no "link" (Spin-offs, nothing built yet) points at its More-sheet section, "#gn-sec-<i>":
+  // desktop hover still opens its menu, a tap on phones opens the sheet there (listener below).
   function buildGroups(game) {
     const groups = game.groups;
     // A page with "activePrefix" is also "here" on every address under it
     // (Player lookup: /genshin-impact/player/<UID>).
     const here = p => !p.soon && (normalizePage(p.link) === currentPage ||
       !!(p.activePrefix && currentPage.startsWith(normalizePage(p.activePrefix) + '/')));
+    const menus = groups.filter(g => g.pages.length);
+    const hrefOf = g => g.link || '#gn-sec-' + menus.indexOf(g);
+    // A group's own page ("Events hub", "All tools") stays in game-nav.json (trail, search, the
+    // group-page cards read it) but never as a menu row or sheet tile (Oct 28 2026, Adrian): the
+    // group link itself goes there, and on that page the sheet lights the group's label instead.
+    const isHub = (g, p) => !!g.link && normalizePage(p.link) === normalizePage(g.link);
+    const rows = g => g.pages.filter(p => !isHub(g, p));
+    const keyStr = h => (h.charAt(0) === '#' ? h : normalizePage(h));
     buildHubNav({ hubNav: groups.map(g => ({
-      name: g.name, link: g.link, icon: g.icon,
+      name: g.name, link: hrefOf(g), icon: g.icon, img: g.img,
       activeOn: g.pages.some(here) ? [currentPage] : []
     })) });
-    const menus = groups.filter(g => g.pages.length);
     const keyOf = {};
-    menus.forEach((g, i) => (keyOf[normalizePage(g.link)] = 'gn-' + i));
+    menus.forEach((g, i) => (keyOf[keyStr(hrefOf(g))] = 'gn-' + i));
     if (buildHubStrip) {
       window.stbHubMenus(stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav, {
-        keyOf: link => keyOf[normalizePage(link.getAttribute('href') || '')] || '',
+        keyOf: link => keyOf[keyStr(link.getAttribute('href') || '')] || '',
         labels: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.name])),
-        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.pages.map(p => ({ href: p.soon ? '' : p.link, name: p.name, soon: p.soon, icon: p.icon }))]))
+        cols: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.cols])), // "cols": 2 in game-nav.json = a 2-across menu
+        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, rows(g).map(p => ({ href: p.soon ? '' : p.link, name: p.name, sub: p.sub, soon: p.soon, icon: p.icon }))]))
       });
     }
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href^="#gn-sec-"]');
+      if (!a) return;
+      e.preventDefault(); // not a page: never touch the address (Mob Summon keeps its build in the hash)
+      const overlay = document.getElementById('moreOverlay');
+      if (window.matchMedia('(min-width: 971px)').matches || !overlay) return;
+      if (!overlay.classList.contains('open')) window.toggleMoreMenu();
+      const sec = document.getElementById(a.getAttribute('href').slice(1));
+      if (sec) sec.scrollIntoView({ block: 'start' });
+    });
 
     const list = document.querySelector('#moreOverlay .more-list');
     if (list) {
@@ -525,11 +546,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<a class="mx-tool is-soon" aria-disabled="true">${ico(p)}<span class="mx-tool-name">${esc(p.name)}</span></a>`
         : `<a class="mx-tool${here(p) ? ' active' : ''}" href="${p.link}">${ico(p)}<span class="mx-tool-name">${esc(p.name)}</span></a>`;
       list.classList.add('mx');
-      list.innerHTML = menus.map((g, i) =>
-        `<section class="mx-sec" id="gn-sec-${i}"><div class="mx-head"><h3 class="mx-label mx-label--ico"><svg viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>${esc(g.name)}</h3></div>` +
-        `<div class="mx-tools">${g.pages.map(tile).join('')}</div></section>`).join('');
+      list.innerHTML = menus.map((g, i) => {
+        const on = g.pages.some(p => isHub(g, p) && here(p));
+        return `<section class="mx-sec" id="gn-sec-${i}"><div class="mx-head"><h3 class="mx-label mx-label--ico${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''}>${g.img ? `<img class="mx-label-pic" src="${g.img}" alt="">` : `<svg viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>`}${esc(g.name)}</h3></div>` +
+          `<div class="mx-tools">${rows(g).map(tile).join('')}</div></section>`;
+      }).join('');
       const count = document.querySelector('#moreOverlay .mx-hdr-count');
-      const all = [].concat(...menus.map(g => g.pages));
+      const all = [].concat(...menus.map(rows));
       if (count) count.textContent = all.filter(p => !p.soon).length + ' live · ' + all.length + ' pages';
     }
 
@@ -545,8 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (gameKey) {
-    fetch('/game-nav.json')
-      .then(res => res.json())
+    getFeaturedJSON('/game-nav.json')
       .then(all => {
         const game = all[gameKey];
         if (!game) return console.error('game-nav.json has no "' + gameKey + '" entry');
@@ -575,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ============================================================
    MORE SHEET OPEN / CLOSE (game sections)
    Copied from thz-script.js (the CoC pages). Only runs on pages with
-   <body data-game-nav>: CoC, Minecraft and Web Resources still ship their
+   <body data-game-nav>: CoC and Web Resources still ship their
    own copy of these functions, and two definitions would fight. Once one
    of them adds data-game-nav and deletes its copy, it uses this one.
    Styles: "BOTTOM NAV + MORE SHEET (game sections)" in 11layout.css.
@@ -655,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* MORE SHEET PULL-TO-CLOSE (every page, Oct 24 2026): pulling the sheet's list down once it is
    at the top drags the whole sheet, like app sheets (also mid-swipe: scroll up to the top and keep
    going); same rule as the handle drag: past ~28% of its height or a fast flick closes it. NOT gated
-   on data-game-nav: CoC, Minecraft and Web Resources keep their own open/close copies, but all of
+   on data-game-nav: CoC and Web Resources keep their own open/close copies, but all of
    them have #moreOverlay > .more-sheet and a global closeMoreMenu() (the overlay's onclick), so this
    one listener serves every page. Touch events, not pointer ones: a scroller cancels pointers. */
 (function initMorePull() {
@@ -790,11 +812,15 @@ let searchoverlay, searchinput, searchIcon, resultsContainer, searchInputClearBt
 // them from hwr-categories.json ("from": "hwr") or game-nav.json
 // ("gameNav": key). Edit those files, not this code.
 // (404.html has a short copy of this for its "Find a page" box.)
-const featuredJSON = {};
+// the cache lives on the function: initHubNav (above) calls this while the script is still loading
 function getFeaturedJSON(url) {
-  if (!featuredJSON[url]) featuredJSON[url] = fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
-  return featuredJSON[url];
+  const c = getFeaturedJSON.c || (getFeaturedJSON.c = {});
+  if (!c[url]) c[url] = fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
+  return c[url];
 }
+// One download per JSON per page (Oct 28 2026): game-nav.json was fetched 4 times on /minecraft/, Mojang's version
+// list twice. Page scripts call window.pcJSON(url); callers share the parsed object, so never mutate it.
+window.pcJSON = getFeaturedJSON;
 function featuredTilesOf(g) {
   if (g.from === 'hwr') {
     return getFeaturedJSON('/hwr-categories.json').then(c => (c.categories || []).map(x => ({
@@ -1241,11 +1267,16 @@ document.addEventListener('DOMContentLoaded', function () {
   // from "scrolling inside a modal on top of the page" — without this guard,
   // scrolling up inside e.g. the More sheet's own list, or swiping down
   // inside/over an open dropdown, gets misread as a pull-to-refresh gesture
-  // and reloads the page.
+  // and reloads the page. Also: every bottom-sheet drawer (a modal <dialog>:
+  // CoC Equipment, Genshin Weapons/Artifacts/Enemies…), the Damage
+  // Calculator's sheet (html.dc-lock) and the phone sidebar (.sidebar.active;
+  // some pages toggle only that, never body.sidebar-open). Oct 27 2026.
   function modalScrollLocked(){
     return document.documentElement.classList.contains('no-scroll') ||
+           document.documentElement.classList.contains('dc-lock') ||
            document.body.classList.contains('search-modal-open') ||
-           document.body.classList.contains('stb-dd-scroll-locked');
+           document.body.classList.contains('stb-dd-scroll-locked') ||
+           !!document.querySelector('dialog[open], .sidebar.active');
   }
 
   document.addEventListener('touchstart', function(e){
@@ -1851,7 +1882,7 @@ window.stbHubMenus = function (hubScroll, opts) {
     const old = document.getElementById('stbMenu-' + key);
     if (old) old.remove();
     const panel = document.createElement('div');
-    panel.className = 'stb-dd stb-dd--' + key;
+    panel.className = 'stb-dd stb-dd--' + key + (opts.cols && opts.cols[key] === 2 ? ' stb-dd--2col' : '');
     panel.id = 'stbMenu-' + key;
     panel.setAttribute('role', 'navigation');
     panel.setAttribute('aria-label', (opts.labels && opts.labels[key]) || link.textContent.trim());

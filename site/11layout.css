@@ -294,7 +294,7 @@ body { visibility: hidden; }
   --lb-edge: #060708;
   --lb-r: 6px;
   /* Well depth: the sunken look of CoC's resting surfaces and the More sheet
-     tiles (coc-more.css, CoC + Minecraft). Pair with a 2px --lb-edge border
+     tiles (11layout.css "MORE SHEET"). Pair with a 2px --lb-edge border
      and --lb-well. Was in coc-hub-menus.css, which Minecraft doesn't load. */
   --card-well: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
   --lb-red: #c23b3b;
@@ -854,6 +854,156 @@ body { visibility: hidden; }
   .th-icon { width: 20px; height: 20px; margin-left: 0px;}
   .secondary-content { font-size: 13px; font-family: 'Oxanium';}
   .help-button { width: 28px; height: 28px;}
+}
+
+/* ============================================================
+   TOP-BAR HELP BUTTON + PANEL SHELL -- SHARED (Oct 28 2026)
+   ============================================================
+   The bar's "i" key (.stb-icon-btn in .stb-mobile-actions), the dimmed
+   backdrop behind its panel (.stb-dd-overlay) and the panel's frame
+   (.stb-info-dropdown, detached to <body> and placed under the key by
+   script). One copy for CoC + Genshin (coc-help.js) and Web Resources
+   (hwr-js.js); it was in coc-help.css and hwr-css.css. The panels'
+   CONTENT stays with each section: coc-help.css (.cch-*), genshin.css
+   (.gh), hwr-css.css (.stb-info-dd-*, width + padding, and its own
+   settings menu). The key's raised look is in ONE DESKTOP BAR below. */
+.stb-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stb-help-divider {
+  display: none; /* coc-help.js still builds it; hidden at every width since the one desktop bar */
+}
+
+.stb-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+  color: #9a9a9a;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 0;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.stb-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: #9a9a9a;
+  flex-shrink: 0;
+}
+.stb-icon-btn.is-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.stb-icon-btn.is-active svg {
+  stroke: #fff;
+}
+.stb-icon-btn:active {
+  background: #2c2c2c;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.stb-icon-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+@media (min-width: 971px) {
+  .stb-icon-btn {
+    width: 24px;
+    height: 24px;
+  }
+  .stb-icon-btn svg {
+    width: 13px;
+    height: 13px;
+    stroke-width: 2.2;
+  }
+}
+
+/* Backdrop: dims and softly blurs the page (and the bottom nav) while the
+   panel is open; the two top bars are lifted above it so they stay sharp,
+   except while the phone sidebar drawer is open (it must stay on top). */
+.stb-dd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99985;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+.stb-dd-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0s;
+}
+body:has(.stb-dd-overlay.open) .top-bar {
+  z-index: 99990;
+}
+body:not(.sidebar-open):has(.stb-dd-overlay.open) .secondary-top-bar {
+  z-index: 99990;
+}
+
+.stb-info-dropdown-wrap {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 61;
+}
+.stb-info-dropdown-wrap .stb-icon-btn[aria-expanded='true'] {
+  color: #d4d4d4;
+  background: #2c2c2c;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.stb-info-dropdown-wrap .stb-icon-btn[aria-expanded='true'] svg {
+  stroke: #d4d4d4;
+}
+
+/* Panel shell: hwr's .stb-info-dropdown (detached to <body> and placed
+   under the button by the script), on the CoC card surface. */
+.stb-info-dropdown {
+  position: fixed;
+  top: calc(100% + 10px);
+  right: -4px;
+  z-index: 99990;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: #121316;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0.18s;
+}
+.stb-info-dropdown.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 /* ============================================================
@@ -2648,6 +2798,15 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
     font-family: 'Oxanium', sans-serif;
   }
 }
+/* PLAIN PAGE TITLE (phones; desktop's is in ONE DESKTOP BAR): a bar title with no trail is
+   Sora 500 in the title white. One rule since Oct 28 2026 (was th-layouts.css, /coc/'s inline
+   copy and genshin.css). Not Web Resources' phone title (page + scroll-spy section = a trail,
+   above) nor the sections still waiting for their redesign (Valorant, CODM, Tekken). */
+:is(body:not([data-game-nav]), [data-game-nav="genshin-impact"]) .secondary-top-bar .secondary-content:not(.has-crumbs):not(:has(.secondary-content-mobile)) {
+  font-family: 'Sora', sans-serif;
+  font-weight: 500;
+  color: #eef0f3;
+}
 /* Every step keeps its width except a page's own name (a player or clan,
    set by window.setCrumbName in thz-script.js), which gives way first and
    ends in "..." -- long names never push the bar's info button off. */
@@ -2709,17 +2868,29 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
     display: none;
   }
 }
+/* Genshin + Minecraft phones show the trail too ("Genshin › Events › Banners"), like CoC's
+   in-title one: it replaces the title, every step the same flat grey (current page included,
+   Adrian), and the middle steps give way first. One rule since Oct 28 2026 (was genshin.css +
+   mc-hero.css). Web Resources keeps its title + scroll-spy section on phones. */
+@media (max-width: 970px) {
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left.has-crumbs > .secondary-content { display: none; }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left > .stb-crumbs { display: flex; font-size: 13px; font-weight: 500; line-height: 1; color: var(--text-muted, #949ba4); }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left > .stb-crumbs a { color: inherit; }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left > .stb-crumbs a:not([aria-current]) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+}
 
 /* ============================================================
-   BOTTOM NAV + MORE SHEET (game sections)
+   BOTTOM NAV + MORE SHEET (every page with a phone bar)
    ============================================================
-   CoC's bottom nav (1coclayouts.css "BOTTOM NAV + DESKTOP SUB NAV + MORE
-   MENU"), copied here so Valorant / CODM / Genshin / Tekken share one copy.
-   Scoped to <body data-game-nav> because CoC, Minecraft and Web Resources
-   still load their own copy after this file -- unscoped, any property theirs
-   doesn't set would leak in from here. Items come from game-nav.json
-   (initHubNav in 11layout.js); open/close is initGameMoreSheet. */
-[data-game-nav] .bn-bar{
+   The ONE copy (Oct 28 2026, Adrian: "all located in 11layout.css"). CoC
+   (1coclayouts.css + /coc/'s inline copy) and Web Resources (hwr-css.css)
+   had their own; those are gone. Minecraft's mc-java.css still overrides
+   bits until its layout is redone. ":root " keeps the old
+   "[data-game-nav] " weight (0,2,0), so page files that out-ranked it still
+   do. Items: game-nav.json / hwr-categories.json (initHubNav), CoC's own
+   markup; open/close: initGameMoreSheet, thz-script.js, hwr-js.js. */
+:root:has(.bn-bar) { --bn-bar-h: 60px; } /* the sidebar drawer pads clear of the bar */
+:root .bn-bar{
   position:fixed;
   left:0; right:0; bottom:0;
   height:60px;
@@ -2732,11 +2903,11 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   transition:transform .45s cubic-bezier(0.22, 1, 0.36, 1);
   will-change:transform;
 }
-[data-game-nav] .bn-bar.bn-hidden{
+:root .bn-bar.bn-hidden{
   transform:translateY(115%);
   transition:transform .32s cubic-bezier(0.4, 0, 1, 1);
 }
-[data-game-nav] .bn-item{
+:root .bn-item{
   flex:1;
   display:flex;
   flex-direction:column;
@@ -2746,19 +2917,19 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   text-decoration:none;
   color:#7d7f85;
   font-family:'Oxanium',sans-serif;
-  font-size:10px;
-  font-weight:600;
-  letter-spacing:0.3px;
-  text-transform:uppercase;
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
   transition:color .15s;
   padding:6px 0;
 }
-[data-game-nav] .bn-item svg{ width:22px; height:22px; stroke:currentColor; transition:stroke .15s; }
+:root .bn-item svg{ width:22px; height:22px; stroke:currentColor; transition:stroke .15s; }
 /* Labels: always one line, "…" when too long ("CLASH OF CLANS"). */
-[data-game-nav] .bn-item{ min-width:0; }
-[data-game-nav] .bn-item span{ max-width:100%; padding:0 3px; box-sizing:border-box; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-[data-game-nav] .bn-item.active,
-[data-game-nav] .bn-item:hover{ color:#ffffff; }
+:root .bn-item{ min-width:0; }
+:root .bn-item span{ max-width:100%; padding:0 3px; box-sizing:border-box; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+:root .bn-item.active,
+:root .bn-item:hover{ color:#ffffff; }
 .bn-item.active {
   background: var(--lb-raise);
   box-shadow: var(--lb-ring-btn);
@@ -2769,7 +2940,7 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   border-radius: 8px;
 }
 
-[data-game-nav] .bn-more-wrap{
+:root .bn-more-wrap{
   flex:1;
   display:flex;
   flex-direction:column;
@@ -2779,8 +2950,8 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   position:relative;
   padding:6px 0;
 }
-[data-game-nav] .bn-more-spacer{ width:22px; height:22px; }
-[data-game-nav] .bn-more{
+:root .bn-more-spacer{ width:22px; height:22px; }
+:root .bn-more{
   position:absolute;
   top:-22px;
   left:50%;
@@ -2794,9 +2965,9 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   justify-content:center;
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
 }
-[data-game-nav] .bn-more:active{ transform:translateX(-50%) scale(0.92); }
-[data-game-nav] .bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
-[data-game-nav] .bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
+:root .bn-more:active{ transform:translateX(-50%) scale(0.92); }
+:root .bn-more svg{ width:20px; height:20px; stroke:#7d7f85; transition:transform .25s ease, stroke .2s ease; }
+:root .bn-more-wrap.open .bn-more svg{ transform:rotate(90deg); stroke:#c8cbcd; }
 .bn-more:hover,
 .bn-more-wrap.open .bn-more {
   border: 0;
@@ -2807,18 +2978,18 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   background: var(--lb-raise);
   box-shadow: inset 0 0 0 2px var(--lb-edge), inset 0 3px 0 rgba(255, 255, 255, 0.12), inset 0 -5px 0 rgba(0, 0, 0, 0.32), 0 0 0 4px var(--lb-box), 0 4px 12px rgba(0, 0, 0, 0.5);
 }
-[data-game-nav] .bn-more-label{
-  font-size:10px;
-  font-weight:600;
-  letter-spacing:0.3px;
-  text-transform:uppercase;
+:root .bn-more-label{
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
   color:#7d7f85;
   font-family:'Oxanium',sans-serif;
   transition:color .15s;
 }
-[data-game-nav] .bn-more-wrap.open .bn-more-label{ color:#e9e9ec; }
+:root .bn-more-wrap.open .bn-more-label{ color:#e9e9ec; }
 
-[data-game-nav] .more-overlay{
+:root .more-overlay{
   position:fixed;
   inset:0;
   bottom:60px;
@@ -2834,13 +3005,13 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   pointer-events:none;
   transition:opacity .28s ease, visibility 0s linear .28s;
 }
-[data-game-nav] .more-overlay.open{
+:root .more-overlay.open{
   opacity:1;
   visibility:visible;
   pointer-events:auto;
   transition:opacity .28s ease, visibility 0s linear 0s;
 }
-[data-game-nav] .more-sheet{
+:root .more-sheet{
   width:100%;
   max-width:600px;
   border-radius:20px 20px 0 0;
@@ -2848,15 +3019,15 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   transition:transform .32s cubic-bezier(0.32, 0.72, 0, 1);
   max-height:80vh;
 }
-[data-game-nav] .more-overlay.open .more-sheet{ transform:translateY(0); }
-[data-game-nav] .more-sheet.dragging{ transition:none; }
+:root .more-overlay.open .more-sheet{ transform:translateY(0); }
+:root .more-sheet.dragging{ transition:none; }
 .more-sheet {
   border: 2px solid var(--lb-edge);
   border-bottom: 0;
   background: var(--lb-box);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 -16px 40px -12px rgba(0, 0, 0, 0.9);
 }
-[data-game-nav] .more-sheet-handle{
+:root .more-sheet-handle{
   width:36px; height:4px; border-radius:4px;
   background:#3a3a3e;
   margin:6px auto 10px;
@@ -2864,20 +3035,20 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   touch-action:none;
   cursor:grab;
 }
-[data-game-nav] .more-sheet-handle::before{
+:root .more-sheet-handle::before{
   content:'';
   position:absolute;
   top:-14px; left:-30px; right:-30px; bottom:-14px;
 }
-[data-game-nav] .more-sheet-handle:active{ cursor:grabbing; }
-[data-game-nav] .more-sheet-header{
+:root .more-sheet-handle:active{ cursor:grabbing; }
+:root .more-sheet-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding-bottom:8px;
   border-bottom:1px solid #232326;
 }
-[data-game-nav] .more-sheet-title{
+:root .more-sheet-title{
   font-family:'Oxanium',sans-serif;
   font-size:13px;
   font-weight:800;
@@ -2887,7 +3058,7 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   position:relative;
   padding-left:12px;
 }
-[data-game-nav] .more-sheet-title::before{
+:root .more-sheet-title::before{
   content:"";
   position:absolute;
   left:0; top:50%;
@@ -2896,22 +3067,22 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   background:linear-gradient(180deg,#ff4655,#a3121f);
   border-radius:2px;
 }
-[data-game-nav] .more-sheet-close{
+:root .more-sheet-close{
   width:30px; height:30px;
   display:flex; align-items:center; justify-content:center;
   color:#9a9ba1;
   cursor:pointer;
   transition:color .15s, border-color .15s, background .15s;
 }
-[data-game-nav] .more-sheet-close svg{ width:14px; height:14px; }
-[data-game-nav] .more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
+:root .more-sheet-close svg{ width:14px; height:14px; }
+:root .more-sheet-close:hover{ color:#fff; border-color:#4a4a4e; background:#232326; }
 .more-sheet-close {
   border: 0;
   border-radius: var(--lb-r);
   background: var(--lb-raise);
   box-shadow: var(--lb-ring-btn);
 }
-[data-game-nav] .more-list{ display:flex; flex-direction:column; padding-top:12px; }
+:root .more-list{ display:flex; flex-direction:column; padding-top:12px; }
 
 /* Sheet rows carry the page's line icon (an SVG, not an image), in the same
    34px tile .th-mini gives an <img>. */
@@ -2937,6 +3108,36 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
 .active > .gn-pic { filter: none; opacity: 1; }
 .bn-item img.gn-pic { width: 22px; height: 22px; }
 .th-mini img.gn-pic { width: 34px; height: 34px; padding: 0; object-fit: cover; border-radius: 9px; } /* game icons fill the tile (.th-mini img pads line icons) */
+/* NAV PICTURES (CoC, was coc-hub-menus.css) ----------------------------------
+   Lobby tower, this TH's Town Hall / barracks, Tools anvil -- in the top
+   bar (.hub-pic, th-layouts.js), and the bottom nav (each page's #bottomNav). Paths: coc-nav-data.json. A picture can't
+   swap outline->filled like the old SVGs, so the page you're on is told
+   by colour: the rest greyed and dimmed. */
+.coc-nav-pic {
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: grayscale(1) brightness(0.8);
+  opacity: 0.6;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.active > .coc-nav-pic {
+  filter: none;
+  opacity: 1;
+}
+html body .secondary-top-bar .stb-hub-nav .stb-hub-link img.hub-pic,
+.bn-item img.coc-nav-pic {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---- Title icon (Oct 2026) ---------------------------------------------
+   Desktop shows the Clash of Clans logo at the left of the bar on every
+   CoC page; phones keep the page's own icon (TH, barracks, tool). Each
+   page wraps .th-icon in <picture> with a min-width:971px source. The
+   wrapper must not become its own flex box in .secondary-left. */
+.secondary-left > picture {
+  display: contents;
+}
 [data-game-nav] .gn-soon{
   font-style:normal;
   font-family:'Oxanium',sans-serif;
@@ -2949,21 +3150,352 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
 }
 
 html.no-scroll, html.no-scroll body{ overflow:hidden !important; height:100%; }
-[data-game-nav].search-modal-open .bn-bar{ display:none !important; }
+body.search-modal-open .bn-bar{ display:none !important; }
 
 @media (max-width:970px){
-  [data-game-nav] .bn-bar{ display:flex; }
+  :root .bn-bar{ display:flex; }
   /* Room for the bar under the footer's last line. */
   [data-game-nav] .pf-footer{ padding-bottom:90px; }
   /* Bottom bar steps aside while the sidebar drawer is open (it is z-index
      9999 against the drawer's 15). Two rules, not one list: an unsupported
      :has() would invalidate the whole list. */
-  [data-game-nav].sidebar-open .bn-bar{ transform:translateY(115%); pointer-events:none; }
-  [data-game-nav]:has(.sidebar.active) .bn-bar{ transform:translateY(115%); pointer-events:none; }
+  body.sidebar-open .bn-bar{ transform:translateY(115%); pointer-events:none; }
+  body:has(.sidebar.active) .bn-bar{ transform:translateY(115%); pointer-events:none; }
 }
 @media (min-width:971px){
-  [data-game-nav] .bn-bar,
-  [data-game-nav] .more-overlay{ display:none !important; }
+  :root .bn-bar,
+  :root .more-overlay{ display:none !important; }
+}
+
+/* =======================================================================
+   MORE SHEET -- SECTIONS + TILES (.mx), every section's phone sheet
+   (was coc-more.css until Oct 28 2026; one copy here now). Header row
+   (.mx-hdr: picture well, title, page count, close key), then labelled
+   sections (.mx-sec / .mx-head / .mx-label) of tiles (.mx-tool; CoC's
+   Town Halls = .mx-th + the Layouts / Armies switch .mx-seg). Built by
+   11layout.js buildGroups (Genshin, Minecraft), coc-more.js (CoC) and
+   hwr-js.js renderCategoryNav (Web Resources). Tiles = wells at rest, the
+   page you're on = the raised grey key (th-layouts.css's TH chips recipe).
+   ======================================================================= */
+
+/* SHEET HEADER (Oct 21 2026, CoC + Minecraft): the game's nav picture in a
+   sunken well, the title with the real page count under it, the close as a
+   grey key, and a sunken line (edge + light) under the row instead of the
+   old red bar + hairline. Markup: .more-sheet-header.mx-hdr in every page;
+   the count is filled by coc-more.js / mc-java.js renderMoreSheet. The
+   .more-sheet .mx-hdr prefix outranks 1coclayouts.css, mc-java.css and
+   /coc/'s inline copy of the old header. */
+.more-sheet .mx-hdr {
+  justify-content: flex-start;
+  gap: 12px;
+  margin: 0 0 6px;
+  padding: 2px 0 14px;
+  border-bottom: 0;
+  box-shadow:
+    0 1px 0 var(--lb-edge),
+    0 2px 0 rgba(255, 255, 255, 0.04);
+}
+.mx-hdr-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+}
+.mx-hdr-ico img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+.mx-hdr-text {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.more-sheet .mx-hdr .more-sheet-title {
+  padding-left: 0;
+  overflow: hidden;
+  font: 800 14px/1 'Oxanium', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+.more-sheet .mx-hdr .more-sheet-title::before {
+  display: none;
+}
+.mx-hdr-count {
+  font: 600 11px/1 'Sora', sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #8b9099;
+}
+.mx-hdr-count:empty {
+  display: none;
+}
+.more-sheet .mx-hdr .more-sheet-close {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #c9ccd2;
+}
+.more-sheet .mx-hdr .more-sheet-close:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+
+.more-list.mx {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 6px 2px 4px;
+}
+
+.mx-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.mx-label {
+  margin: 0;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #8b9099;
+}
+/* A group's icon before its label (game-nav.json "groups", 11layout.js). */
+.mx-label--ico {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mx-label--ico svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+/* Segmented switch: a recessed track; the selected side is a raised key
+   (the Copy Layout key face), the other is plain text. */
+.mx-seg {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #0e0e10;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.mx-tab {
+  min-width: 78px;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #8b9099;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.mx-tab[aria-selected='true'] {
+  background: linear-gradient(180deg, #2a2c32, #1d1e23);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+.mx-tab:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 1px;
+}
+
+/* Tiles = the Town Hall chips under the hero (.second-layer buttons,
+   th-layouts.css "TABS + CARD ACTIONS"), same recipe (Oct 2026): at rest a
+   well sunk into the sheet (black edge, --card-well from coc-hub-menus.css),
+   a step lighter on hover; the page you're on is the raised grey key
+   (--lb-raise + --lb-btn), a step lighter again on hover. Change one,
+   change both. The row gap leaves room for the active key's ledge. */
+.mx-grid,
+.mx-tools {
+  display: grid;
+  gap: 10px 8px;
+}
+.mx-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.mx-tools {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.mx-grid[hidden] {
+  display: none;
+}
+.mx-th,
+.mx-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 42px;
+  padding: 0 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--card-well);
+  color: #8b9099;
+  text-decoration: none;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.1s ease;
+}
+.mx-th {
+  justify-content: center;
+}
+.mx-th:hover,
+.mx-tool:hover {
+  background: #17181d;
+  color: #c9ccd2;
+}
+.mx-th.active,
+.mx-tool.active {
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.mx-th.active:hover,
+.mx-tool.active:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+/* Not built yet (Minecraft's Story Mode / Dungeons): a dead, dimmed well. */
+.mx-tool.is-soon {
+  opacity: 0.4;
+  cursor: default;
+}
+.mx-tool.is-soon:hover {
+  background: var(--lb-well);
+  color: #8b9099;
+}
+.mx-th:focus-visible,
+.mx-tool:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+.mx-th img,
+.mx-tool-ico img {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.mx-th span {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.mx-th.active span {
+  font-weight: 800;
+}
+/* Tools: icon + name, left-aligned (names are longer than "TH18"). */
+.mx-tool-ico {
+  display: contents;
+}
+.mx-tool-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.mx-tool.active .mx-tool-name {
+  font-weight: 800;
+}
+/* HOT (coc-nav-data.json "hot", Oct 26 2026): a tiny red tag straddling the
+   tile's top edge, so it costs the name no width on 2-a-row phones. */
+.mx-tool {
+  position: relative;
+}
+.mx-hot {
+  position: absolute;
+  top: -7px;
+  right: 6px;
+  padding: 2px 4px 1px;
+  border: 1px solid var(--lb-red-edge, #5c1515);
+  border-radius: 3px;
+  background: var(--lb-red, #c73a3a);
+  font: 800 8px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #fff;
+  pointer-events: none;
+}
+
+/* Very narrow phones: 3 TH tiles across. */
+@media (max-width: 340px) {
+  .mx-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ACTIVE SECTION LABEL (Oct 28 2026, Adrian). A group's own page (Genshin's Events hub,
+   CoC's Tools, Web Resources' lobby...) has no tile: on that page its label lights up
+   instead. It's a title, not a card, so no box: the text goes white, its picture comes
+   out of grey, and a red hairline runs from it to the sheet's edge, fading out. Built
+   with aria-current="page" by the same three scripts. Pictures (.mx-label-pic) rest
+   greyed like the bar's nav pictures; the SVG icons (Genshin) follow the text colour. */
+.mx-label-pic {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.9);
+  opacity: 0.7;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.mx-label.active {
+  flex: 1;
+  min-width: 0;
+  color: #fff;
+}
+.mx-label.active .mx-label-pic {
+  filter: none;
+  opacity: 1;
+}
+.mx-label.active::after {
+  content: '';
+  flex: 1;
+  min-width: 24px;
+  height: 1px;
+  margin-left: 4px;
+  background: linear-gradient(90deg, var(--lb-red, #c73a3a), rgba(194, 59, 59, 0.25) 45%, transparent);
 }
 
 /* =====================================================================
@@ -3303,6 +3835,13 @@ cursor: pointer; transition: background .2s ease, border-color .2s ease, color .
 }
 .stb-dd--tools .stb-dd-list {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+/* A game-nav.json group with "cols": 2 (Genshin's Database, 12 pages): two across, half as tall. */
+.stb-dd--2col {
+  width: min(544px, calc(100vw - 24px));
+}
+.stb-dd--2col .stb-dd-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .stb-dd-list {
   display: grid;
