@@ -264,55 +264,82 @@
   outline-offset: 2px;
 }
 
-/* phones: the page's 5% column; Ghost sits behind the copy, darker; the gun well shrinks */
+/* phones (Oct 29 2026, Adrian: "too tall"): one compact card, ~150px instead of ~275. No gun well
+   (Ghost is behind the copy anyway), the line clamped to one, both facts on one row: the season
+   shows only its number + days left (its name and end date are desktop-only). */
 @media (max-width: 970px) {
   .cb {
-    margin: 54px 5% 0;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
     min-height: 0;
-    padding: 20px 18px;
+    margin: 54px 5% 0;
+    padding: 16px 16px 14px;
   }
   .cb::before {
-    left: 18px;
+    left: 16px;
+  }
+  .cb-lock {
+    inset: 6px;
+    --l: 14px;
   }
   .cb-art {
-    width: 75%;
-    opacity: 0.55;
+    width: 70%;
+    opacity: 0.5;
     background-position: 78% 30%;
   }
   .cb-ico {
-    width: 64px;
-    align-self: start;
+    display: none;
+  }
+  .cb-kicker {
+    font-size: 9px;
   }
   .cb-title {
-    font-size: 40px;
+    margin-top: 4px;
+    font-size: 34px;
   }
   .cb-text {
-    font-size: 13px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    margin-top: 6px !important;
+    font-size: 12.5px;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
-  /* facts wrap here, so no hairlines: a wrapped fact kept its divider and sat indented */
   .cb-strip {
-    gap: 10px 24px;
-    margin-top: 12px;
+    flex-wrap: nowrap;
+    margin-top: 10px;
   }
   .cb-fact {
-    padding: 0;
-    border-left: 0;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0 14px;
+  }
+  .cb-fact b {
+    font-size: 13px;
+  }
+  .cb-fact small,
+  .cb-fact b,
+  .cb-fact em {
+    white-space: nowrap;
+  }
+  .cb-fact em {
+    font-size: 11px;
+  }
+  /* the count's note ("4 modes", "4 verified · MP + BR") is desktop-only: it wrapped the row */
+  .cb-fact:not(#cbSeason) em {
+    display: none;
+  }
+  #cbSeason b,
+  .cb-end {
+    display: none;
   }
   .cb-tabs {
-    margin: 12px 5% 0;
+    margin: 10px 5% 0;
+    padding: 4px;
   }
-}
-@media (max-width: 420px) {
-  .cb {
-    grid-template-columns: 1fr;
-  }
-  .cb-ico {
-    display: none;
+  .cb-tabs a {
+    height: 38px;
+    font-size: 11px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

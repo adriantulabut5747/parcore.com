@@ -24,7 +24,8 @@
   const title = name.replace(/^Season \d+\s*[:\-–—]?\s*/, '').trim();
   fact.querySelector('small').textContent = num ? 'Season ' + num : 'Season';
   fact.querySelector('b').textContent = title || name;
-  fact.querySelector('em').innerHTML = `<i>${days}d left</i> · ends ${est && !ev.endDate ? 'around ' : ''}` +
-    end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  // .cb-end = the end date, hidden on phones (one compact row there)
+  fact.querySelector('em').innerHTML = `<i>${days}d left</i><span class="cb-end"> · ends ${est && !ev.endDate ? 'around ' : ''}` +
+    end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + '</span>';
   fact.hidden = false;
 })();
