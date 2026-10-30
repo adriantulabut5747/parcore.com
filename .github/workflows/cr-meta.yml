@@ -1,0 +1,56 @@
+# Clash Royale meta crawl (Oct 30 2026): reads the Path of Legends top 1,000's
+# battle logs (~1,002 API calls) and rewrites site/cr-decks.json, cr-cards.json,
+# cr-top.json from the last 7 days in data/cr/. Every commit is a deploy, so once
+# a day is the ceiling. See scripts/cr-meta.mjs + docs/clash-royale-plan.md.
+#
+# Needs the CR_API_KEY secret (Clash Royale key, IP 45.79.218.79); without it the
+# run logs a warning and changes nothing. Run it by hand from the Actions tab.
+name: Update Clash Royale meta
+
+on:
+  schedule:
+    - cron: "0 23 * * *" # 23:00 UTC = 7:00 AM Philippines time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cr-meta
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+            data/cr
+            site/cr-decks.json
+            site/cr-cards.json
+            site/cr-top.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Crawl
+        env:
+          CR_API_KEY: ${{ secrets.CR_API_KEY }}
+        run: node scripts/cr-meta.mjs
+
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain -- data/cr site/cr-decks.json site/cr-cards.json site/cr-top.json)" ]; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data/cr site/cr-decks.json site/cr-cards.json site/cr-top.json
+          git commit -m "Update Clash Royale meta"
+          git pull --rebase
+          git push
