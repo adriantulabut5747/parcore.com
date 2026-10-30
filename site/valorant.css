@@ -55,3 +55,39 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
   .cb-fact#cbAct em { display: inline; }
   #cbAct b { display: none; }
 }
+
+/* ---- TITLES (Oct 29 2026, Adrian): Tourney italic, a free Google font (Riot's Tungsten is licensed,
+   not ours to host; Anton, League Gothic and the Valorant look were turned down), so Valorant titles
+   don't read like CODM's stencil. `html body` beats the pages' own <style> blocks, which come after
+   this file. ---- */
+html body .cb-title, html body .ct-title,
+html body .hero-title, html body .tracker-subheader, html body .featured-title {
+  font-family: 'Tourney', 'Oxanium', sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+/* the lobby's small headers sit beside badges: Tourney's narrower cut keeps "Rank distribution" on one line */
+html body .tracker-subheader { font-stretch: 85%; }
+/* no red tab on the banner's top edge here (Adrian): that's CODM's mark */
+.cb::before { content: none; }
+/* Jett's bubbles (coc-villager.css .cv-say): the `*` reset above would put Oxanium on the script-written
+   <span> and the link inside her Sora line; the key hint stays whole */
+.cv-say p > span:not([class]), .cv-say p > a { font-family: inherit; }
+.cv-say .xh-kbd { white-space: nowrap; }
+.cv-say p > a { color: #e6e8ec; text-decoration: underline; text-underline-offset: 2px; }
+.cv-say p > a:hover { color: #fff; }
+
+/* ---- GROUND (Oct 29 2026, Adrian; here since Oct 30 for Weapons + Maps, opt in with <body class="vl-ground">): the TH Layouts / Armies pages' ground (th-layouts.css "Background grain"
+   + .coc-content's red light): film grain over a near-black fade, a whisper of red at the top. The red light
+   scrolls with the page (`local`, like it does inside .coc-content there); grain + fade stay put. ---- */
+body.vl-ground .coc-main {
+  background-color: #040404;
+  background-image:
+    radial-gradient(1100px 460px at 22% 0%, rgba(194, 59, 59, 0.07), rgba(194, 59, 59, 0) 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(16, 16, 16), rgb(4, 4, 4));
+  background-size: auto, 220px 220px, auto;
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-attachment: local, scroll, scroll;
+}

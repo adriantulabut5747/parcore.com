@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valorant Sensitivity Converter | Parchrome</title>
+<meta name="description" content="Convert your CS2, Apex, Overwatch 2, Call of Duty, Fortnite, Marvel Rivals, Rainbow Six Siege or TF2 sensitivity to Valorant, with your cm/360 and a turn dial.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tourney:ital,wdth,wght@1,75..125,100..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link rel="stylesheet" href="/11layout.css?v=20261029b">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/codm-banner.css?v=20261029h">
+<link rel="stylesheet" href="/codm-tools.css?v=20261029d">
+<link rel="stylesheet" href="/valorant.css?v=20261030b">
+<link rel="stylesheet" href="/valorant-sensitivity.css?v=20261030a">
+<link rel="stylesheet" href="/coc-villager.css?v=20261027d">
+</head>
+<body class="vl-ground" data-game-nav="valorant">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/valorant.png" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">Valorant</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Valorant pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main" >
+
+<header class="cb" aria-labelledby="cbTitle">
+  <span class="cb-art" aria-hidden="true"></span>
+  <span class="cb-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></span>
+  <div class="cb-copy">
+    <p class="cb-kicker">Valorant</p>
+    <h1 class="cb-title" id="cbTitle">Sensitivity Converter</h1>
+    <p class="cb-text">Bring your aim from another game: same mouse swipe, same turn, now in Valorant.</p>
+    <div class="cb-strip">
+      <span class="cb-fact"><small>Games</small><b id="cbGames">&nbsp;</b><em>Convert from</em></span>
+      <span class="cb-fact"><small>Valorant</small><b>0.07&deg;</b><em>Turn per mouse count</em></span>
+      <span class="cb-fact"><small>Your 360</small><b id="cbCm">&nbsp;</b><em>Mouse distance</em></span>
+    </div>
+  </div>
+</header>
+
+<!-- THE CONVERTER: valorant-sensitivity.js. Left = game, sens, DPI and the result; right = the 360 dial. -->
+<section class="ct-sec" aria-labelledby="snTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="snTitle">Convert to Valorant</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Pick your old game, type its sens and DPI, and get the Valorant sens that turns you just as far. Same flicks, better game.</p></div>
+  </header>
+
+  <div class="sn-grid">
+    <form class="sn-panel" id="snForm" autocomplete="off" novalidate>
+      <p class="sn-head" id="snFromLab">From</p>
+      <div class="gs-seg sn-games" id="snGames" role="group" aria-labelledby="snFromLab"></div>
+      <div class="sn-fields">
+        <label class="sn-field"><span id="snSensLab">Sensitivity</span><input class="sn-input" id="snSens" type="text" inputmode="decimal" maxlength="10" spellcheck="false"></label>
+        <label class="sn-field"><span>Mouse DPI</span><input class="sn-input" id="snDpi" type="text" inputmode="numeric" maxlength="6" spellcheck="false"></label>
+      </div>
+      <p class="sn-note" id="snNote"></p>
+      <div class="sn-out">
+        <div class="sn-res">
+          <small>Valorant sensitivity</small>
+          <output class="sn-val" id="snVal" for="snSens snDpi">&ndash;</output>
+        </div>
+        <button type="button" class="ct-key" id="snCopy">Copy</button>
+      </div>
+      <div class="sn-facts">
+        <span><small>cm / 360&deg;</small><b id="snCm">&ndash;</b></span>
+        <span><small>in / 360&deg;</small><b id="snIn">&ndash;</b></span>
+        <span><small>Valorant eDPI</small><b id="snEdpi">&ndash;</b></span>
+      </div>
+      <p class="xh-msg" id="snMsg" role="status"></p>
+    </form>
+
+    <div class="sn-dialbox">
+      <svg class="sn-dial" id="snDial" viewBox="0 0 240 240" role="img" aria-labelledby="snDialSay">
+        <circle class="sn-ring" cx="120" cy="120" r="100"/>
+        <g id="snTicks"></g>
+        <path class="sn-cone" id="snCone" d=""/>
+        <path class="sn-arc" id="snArc" d=""/>
+        <circle class="sn-me" cx="120" cy="120" r="7"/>
+        <text class="sn-deg" id="snDeg" x="120" y="166" text-anchor="middle">0&deg;</text>
+      </svg>
+      <p class="sn-say" id="snDialSay">&nbsp;</p>
+      <div class="gs-dist sn-dist">
+        <label for="snMove">Mouse</label>
+        <input type="range" id="snMove" min="0" max="60" step="0.5" value="10">
+        <output id="snMoveOut" for="snMove">10 cm</output>
+      </div>
+      <div class="gs-seg sn-quick" id="snQuick" role="group" aria-label="Jump to a turn">
+        <button type="button" data-turn="90" aria-pressed="false">90&deg;</button>
+        <button type="button" data-turn="180" aria-pressed="false">180&deg;</button>
+        <button type="button" data-turn="360" aria-pressed="false">360&deg;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ct-sec" aria-labelledby="snAllTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="snAllTitle">Every game</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The same aim in every game we support, ready to copy. Same feel everywhere, so no excuses when you miss.</p></div>
+  </header>
+  <div class="sn-list" id="snList"></div>
+</section>
+
+<section class="ct-sec ct-sec--last" aria-labelledby="snHowTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="snHowTitle">Put it in your game</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Set it in a few steps, then warm up in the Range before you queue. I'll wait. Not for long.</p></div>
+  </header>
+  <ol class="ct-steps">
+    <li>Press <b>Copy</b> next to your Valorant sensitivity.</li>
+    <li>In Valorant, open <b>Settings</b>, go to <b>General</b> and paste it into <b>Sensitivity: Aim</b> under Mouse. Keep the DPI you typed here: another DPI changes your turn.</li>
+    <li>Scoped aim isn't converted here: start <b>Scoped Sensitivity Multiplier</b> at 1 and adjust it in the Range.</li>
+  </ol>
+</section>
+
+<script src="/valorant-sensitivity.js?v=20261030a"></script>
+  <footer class="pf-footer">
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+</footer>
+</div>
+
+<style>
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;
+}}
+
+</style>
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/valorant.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Valorant Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261029b"></script>
+</body>
+</html>

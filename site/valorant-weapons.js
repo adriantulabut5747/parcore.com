@@ -77,7 +77,6 @@
     set('w', st.w);
     history.replaceState(null, '', u.pathname + u.search + u.hash);
   }
-  const setting = () => `${HITS[st.hit].toLowerCase()} shots at ${st.m} m, ${ARMS[st.arm]}`;
   const shown = (g) =>
     (!st.type || g.type === st.type) && (!st.find || g.name.toLowerCase().includes(st.find) || typeOf[g.type].name.toLowerCase().includes(st.find));
 
@@ -157,7 +156,6 @@
     const best = Math.min(...ts.map(([, t]) => t.ms));
     const fastest = ts.filter(([, t]) => t.ms === best);
     const top = fastest.length === 1 ? fastest[0][0].id : null;
-    $('vwBuySub').textContent = `Every gun the way the shop lays them out, with its time to kill for ${setting()}. Open one for its damage, skins and every stat.`;
     $('vwShop').innerHTML =
       COLS.map(([title, types]) => {
         const col = vis.filter((g) => types.includes(g.type));
@@ -196,7 +194,7 @@
       .filter((g) => g.pellets === 1)
       .map((g) => ({ g, hits: g.ranges.filter((r) => r[st.hit] >= need) }))
       .filter((x) => x.hits.length);
-    $('vwOneSub').textContent = `Where a single ${HITS[st.hit].toLowerCase()} shot kills through ${ARMS[st.arm]} (${need} damage). The line is your distance.`;
+    $('vwOneSub').textContent = `The red bar is where one ${HITS[st.hit].toLowerCase()} shot kills through ${ARMS[st.arm]}, and the white line is your distance. One tap, night night!`;
     const pct = (m) => (m / MAXM) * 100;
     $('vwOne').innerHTML = rows.length
       ? '<div class="vw-one-axis" aria-hidden="true"><span></span><span>' +
@@ -250,7 +248,6 @@
       if (b.dataset.sort === st.sort) th.setAttribute('aria-sort', st.dir > 0 ? 'ascending' : 'descending');
       else th.removeAttribute('aria-sort');
     });
-    $('vwAllSub').textContent = `${HITS[st.hit]} shots at ${st.m} m, ${ARMS[st.arm]}. Tap a column to sort.`;
     $('vwRows').innerHTML =
       list
         .map((g) => {

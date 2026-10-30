@@ -1,0 +1,524 @@
+/* ============================================================
+   VALORANT MAPS (Oct 30 2026): /valorant/maps/ + every map page, all written by
+   scripts/valorant-maps.py. On top of codm-banner.css (the .cb banner + tray), codm-tools.css
+   (.ct-sec sections) and valorant.css (base, titles, the ground). Raised boxes, sunken wells,
+   the picked thing = the grey key (11layout.css --lb-*).
+   ============================================================ */
+
+/* the banner wears the map's own splash (set inline by the script), not Weapons' red Chamber */
+.vm-page .cb-art {
+  background-position: 50% 40%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: brightness(0.62) saturate(0.85);
+}
+/* the minimap sits in the banner's well */
+.vm-page .cb-ico img {
+  width: 88%;
+}
+.cb-fact[data-state='in'] b {
+  color: #e6e8ec;
+}
+.cb-fact[data-state='out'] b {
+  color: #8d8f95;
+}
+
+/* ---- INDEX: map cards ---- */
+.vm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.vm-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+.vm-card:hover {
+  background: var(--lb-box-hover);
+}
+.vm-card:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.vm-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vm-pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.vm-card:hover .vm-pic img {
+  transform: scale(1.04);
+}
+/* out of the ranked pool: the picture goes quiet, the badge says so */
+.vm-card[data-state='out'] .vm-pic img {
+  filter: grayscale(0.85) brightness(0.7);
+}
+.vm-pool {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 9px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 4px;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.vm-pool[data-state='out'] {
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #8d8f95;
+}
+.vm-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px 16px;
+}
+.vm-txt b {
+  font-family: 'Tourney', 'Oxanium', sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  color: #f2f3f5;
+}
+.vm-txt small {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vm-txt > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 4px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #a9acb2;
+}
+
+/* ---- MAP PAGE: callouts (the minimap in a well, the list beside it) ---- */
+.vm-co {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+  align-items: start;
+}
+.vm-mapbox {
+  padding: 14px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vm-mapbox--solo {
+  max-width: 640px;
+}
+.vm-map {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.vm-map > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+}
+.vm-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.vm-pin i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e6e8ec;
+  box-shadow: 0 0 0 2px var(--lb-edge);
+}
+.vm-pin span {
+  margin-top: 2px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(6, 7, 8, 0.78);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: #d4d6da;
+}
+.vm-pin.is-on {
+  z-index: 2;
+}
+.vm-pin.is-on i {
+  background: var(--lb-red);
+  box-shadow: 0 0 0 2px var(--lb-edge), 0 0 0 6px rgba(194, 59, 59, 0.35);
+}
+.vm-pin.is-on span {
+  background: var(--lb-red);
+  color: #fff;
+}
+.vm-colist {
+  max-height: 760px;
+  overflow-y: auto;
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vm-count {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #8d8f95;
+}
+.vm-count b {
+  color: #e6e8ec;
+}
+.vm-cg + .vm-cg {
+  margin-top: 14px;
+}
+.vm-cg h3 {
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vm-cg ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* the CoC chip recipe: a well at rest, the raised grey key when picked (a <span> = a name the
+   game gives no spot for: the TDM maps) */
+.vm-cg span,
+.vm-cg button {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b9bbc0;
+  cursor: pointer;
+}
+.vm-cg button:hover,
+.vm-cg button.is-on {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.vm-cg button:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+
+/* ---- MAP PAGE: guide ---- */
+.vm-intro,
+.vm-note {
+  max-width: 72ch;
+  margin: 0 0 14px;
+  font-family: 'Sora', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #c3c6cb;
+}
+.vm-note {
+  padding: 16px 18px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vm-guide {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.vm-tricks,
+.vm-site {
+  padding: 16px 18px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vm-tricks h3,
+.vm-site h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-family: 'Tourney', 'Oxanium', sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1;
+  color: #f2f3f5;
+}
+.vm-site h3 b {
+  font: inherit;
+  font-size: 34px;
+  color: var(--lb-red-text);
+}
+.vm-tricks ul,
+.vm-side ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vm-tricks li,
+.vm-side li {
+  position: relative;
+  padding-left: 14px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #b9bbc0;
+}
+.vm-tricks li + li,
+.vm-side li + li {
+  margin-top: 8px;
+}
+.vm-tricks li::before,
+.vm-side li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  background: #6b6e75;
+}
+.vm-sites {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.vm-site {
+  display: grid;
+  align-content: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 18px;
+}
+.vm-site h3 {
+  grid-column: 1 / -1;
+}
+.vm-side {
+  min-width: 0;
+}
+.vm-side h4 {
+  margin: 0 0 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vm-side--attack li::before {
+  background: var(--lb-red);
+}
+
+/* ---- MAP PAGE: Skirmish layouts + the map file ---- */
+.vm-vars {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.vm-var {
+  margin: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vm-var img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.vm-var figcaption {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b9bbc0;
+}
+.vm-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 6px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vm-facts > div {
+  padding: 12px 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+}
+.vm-facts dt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vm-facts dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e6e8ec;
+}
+
+@media (max-width: 1200px) {
+  .vm-guide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .vm-vars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 970px) {
+  .vm-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vm-co {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .vm-colist {
+    max-height: none;
+  }
+  .vm-sites,
+  .vm-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .vm-grid,
+  .vm-sites {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .vm-site {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .vm-vars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vm-mapbox {
+    padding: 8px;
+  }
+  /* a phone-wide minimap can't fit every name: dots only, the picked one keeps its label */
+  .vm-pin span {
+    display: none;
+  }
+  .vm-pin.is-on span {
+    display: block;
+  }
+}
+
+/* ---- SITES + SPAWNS on the minimap (Oct 30 2026, Adrian picked "in-game style"): the map stays clean,
+   like Valorant's own minimap. Sites = a plain letter on the plant area, spawns = two faint words; no
+   boxes, no fills. Every other callout shows only while its name is hovered / tapped in the list.
+   Anchored by where they sit (--u/--v = 0..1, set by the script): centred mid-map, left-aligned at the
+   left edge, right-aligned at the right one, so nothing pokes out of the box (Summit's attackers sit at 4%). ---- */
+.vm-pin--site,
+.vm-pin--atk,
+.vm-pin--def {
+  z-index: 1;
+  transform: translate(calc(var(--u, 0.5) * -100%), calc(var(--v, 0.5) * -100%));
+}
+.vm-pin--site b {
+  font-family: 'Tourney', 'Oxanium', sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 2px #060708, 0 1px 3px #060708, 0 0 8px rgba(6, 7, 8, 0.6);
+}
+html body .vm-pin--atk > span,
+html body .vm-pin--def > span {
+  display: block;
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #a9acb2;
+  text-shadow: 0 0 2px #060708, 0 1px 3px #060708;
+}
+/* picked in the list: the letter / word turns red-white, no box */
+.vm-pin--site.is-on b {
+  color: #e86a6a;
+}
+html body .vm-pin--atk.is-on > span,
+html body .vm-pin--def.is-on > span {
+  color: #fff;
+}
+/* plain callouts: hidden until picked */
+.vm-pin:not(.vm-pin--site):not(.vm-pin--atk):not(.vm-pin--def):not(.is-on) {
+  display: none;
+}
+@media (max-width: 640px) {
+  .vm-pin--site b {
+    font-size: 17px;
+  }
+  html body .vm-pin--atk > span,
+  html body .vm-pin--def > span {
+    font-size: 8.5px;
+    letter-spacing: 1px;
+  }
+}
+/* phones: the banner's one-line strip can't fit Sites + Released + Ranked pool; the date is in "Map file" */
+@media (max-width: 970px) {
+  .vm-page .cb-fact:has(+ #vmPool) {
+    display: none;
+  }
+}

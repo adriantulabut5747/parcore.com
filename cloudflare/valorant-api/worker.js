@@ -93,6 +93,29 @@ async function ogImage(url, cacheSeconds) {
   return answer(200, { img }, cacheSeconds);
 }
 
+// The Ranks page's "Top of the ladder" (Oct 30 2026): one region's leaderboard cut down to what the
+// page draws (~2 KB): Immortal 1+ cutoffs, how many players are on the board, and the top 10.
+// thresholds[].start_index = the board place where that tier starts, so the gaps are tier sizes.
+async function board(region, key) {
+  const res = await henrik('v3/leaderboard/' + region + '/pc?size=10', 1800, key);
+  if (!res.ok) return res;
+  try {
+    const { data, results } = await res.json();
+    const players = (data.players || []).slice(0, 10).map((p) => ({
+      rank: p.leaderboard_rank,
+      name: p.is_anonymized ? '' : p.name,
+      tag: p.is_anonymized ? '' : p.tag,
+      tier: p.tier,
+      rr: p.rr,
+      wins: p.wins,
+      card: p.card,
+    }));
+    return answer(200, { updated_at: data.updated_at, total: results.total, thresholds: data.thresholds, players }, 1800);
+  } catch {
+    return oops(502, 'The leaderboard came back in a shape we do not know.');
+  }
+}
+
 // One answer through the edge cache: the stored copy, or make() and store it.
 async function cached(keyUrl, make, ctx) {
   const cacheKey = new Request(keyUrl);
@@ -120,6 +143,7 @@ async function route(url, key, ctx) {
   if (!REGIONS.includes(region)) return [oops(400, 'badRegion')];
   if (!key) return [oops(500, 'noKey')];
   if (type === 'queue') return via('queue/' + region, () => henrik('v1/queue-status/' + region, 600, key));
+  if (type === 'leaderboard') return via('leaderboard/' + region, () => board(region, key));
 
   const name = cleanName(q.get('name'));
   const tag = cleanTag(q.get('tag'));
@@ -132,7 +156,9 @@ async function route(url, key, ctx) {
   if (type === 'matches') {
     const start = q.get('start') || '0';
     if (start !== '0' && start !== '10') return [oops(400, 'badStart')];
-    return via('matches/' + region + '/' + id + '/' + start, () => henrik('v4/matches/' + region + '/pc/' + who + '?size=10&start=' + start, 120, key));
+    return via('matches/' + region + '/' + id + '/' + start, () =>
+      henrik('v4/matches/' + region + '/pc/' + who + '?size=10&start=' + start, 120, key),
+    );
   }
   return [oops(400, 'badType')];
 }

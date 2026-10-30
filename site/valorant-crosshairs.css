@@ -1,0 +1,810 @@
+/* ============================================================
+   VALORANT CROSSHAIRS (Oct 30 2026): /valorant/crosshairs, the maker. On top of codm-banner.css
+   (banner, --codm-side) + codm-tools.css (.ct-sec, .ct-key, .gs-seg, .ct-steps) + valorant.css.
+   Raised boxes, sunken wells, the picked thing = the grey key, the one main action = the red key.
+   ============================================================ */
+.xh-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.cb-ico canvas {
+  width: 104px;
+  height: 104px;
+}
+
+/* ---- MAKER: stage left (sticky), panel right ---- */
+.xh-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.xh-left {
+  position: sticky;
+  top: 80px;
+}
+.xh-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  overflow: hidden;
+  background: #0b0c0e;
+  box-shadow: var(--lb-shadow);
+}
+.xh-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* HUD tags on the stage's corners */
+.xh-hud {
+  position: absolute;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgba(6, 7, 8, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #e6e8ec;
+  pointer-events: none;
+}
+.xh-hud[hidden] {
+  display: none;
+}
+.xh-hud--tl { top: 12px; left: 12px; }
+.xh-hud--tr { top: 12px; right: 12px; color: #9a9da1; }
+.xh-hud--bl { bottom: 12px; left: 12px; color: #fff; background: rgba(194, 59, 59, 0.85); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4); }
+.xh-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.xh-seg button {
+  min-width: 56px;
+  height: 38px;
+}
+
+/* the panel: a box; tabs well on top, rows in a well, code dock under them */
+.xh-panel {
+  padding: 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.xh-tabs button {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.xh-rows {
+  margin-top: 10px;
+  padding: 4px 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.xh-head {
+  margin: 0;
+  padding: 14px 14px 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #6f7277;
+}
+.xh-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 4px 14px;
+  transition: opacity 0.2s ease;
+}
+.xh-row + .xh-row {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.xh-row.is-off {
+  opacity: 0.38;
+}
+.xh-lab {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c9cbd0;
+}
+.xh-row--num .xh-lab {
+  width: 104px;
+}
+
+/* slider: the Weapons distance groove (red up to the thumb, grey key thumb) */
+.xh-range {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.xh-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--lb-red) var(--fill, 0%), #0b0c0e var(--fill, 0%));
+  box-shadow: inset 0 0 0 1px var(--lb-edge);
+}
+.xh-range::-moz-range-track {
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--lb-red) var(--fill, 0%), #0b0c0e var(--fill, 0%));
+  box-shadow: inset 0 0 0 1px var(--lb-edge);
+}
+.xh-range::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  margin-top: -6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--lb-pick);
+  box-shadow: var(--lb-btn);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.xh-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--lb-pick);
+}
+.xh-range:disabled {
+  cursor: default;
+}
+.xh-range:focus-visible,
+.xh-num:focus-visible,
+.xh-tog:focus-visible,
+.xh-sw:focus-visible,
+.xh-sw--custom:focus-within,
+.xh-bg:focus-visible,
+.xh-card-pic:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+/* the exact number: a small well */
+.xh-num,
+.xh-hex,
+.xh-paste {
+  border: 0;
+  border-radius: var(--lb-r);
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  color: #f2f3f5;
+  font: 600 13px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+.xh-num {
+  flex: none;
+  width: 62px;
+  height: 34px;
+  padding: 0 6px;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.xh-num::-webkit-inner-spin-button,
+.xh-num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* switch: a sunken track, a raised knob; on = red track */
+.xh-tog {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.xh-tog i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  transition: transform 0.2s var(--lb-ease), background-color 0.2s ease;
+}
+.xh-tog[aria-checked='true'] {
+  background: var(--lb-red);
+  box-shadow: inset 0 0 0 2px var(--lb-red-edge), inset 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+.xh-tog[aria-checked='true'] i {
+  transform: translateX(22px);
+  background: var(--lb-pick);
+}
+.xh-tog:disabled {
+  cursor: default;
+}
+
+/* colours: the game's eight + custom */
+.xh-row--color {
+  flex-wrap: wrap;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.xh-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.xh-sw {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: 6px;
+  background: var(--c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -3px 0 rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  transition: transform 0.15s var(--lb-ease);
+}
+.xh-sw:hover {
+  transform: translateY(-1px);
+}
+.xh-sw[aria-pressed='true'] {
+  outline: 2px solid #f2f3f5;
+  outline-offset: 2px;
+}
+/* custom: the colour inside a rainbow ring, the native picker hidden on top of it */
+.xh-sw--custom {
+  background: conic-gradient(from 0deg, #ff4655, #ffd84d, #6cff7a, #4dd8ff, #8f6bff, #ff4dd2, #ff4655);
+  box-shadow: none;
+}
+.xh-sw--custom::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 3px;
+  background: var(--c);
+  box-shadow: 0 0 0 1px var(--lb-edge);
+}
+.xh-sw--custom input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.xh-hex {
+  width: 84px;
+  height: 32px;
+  margin-left: 4px;
+  padding: 0 8px;
+  text-transform: uppercase;
+}
+
+/* ---- the code dock ---- */
+.xh-dock {
+  margin-top: 12px;
+}
+.xh-dock-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.xh-dock-head span {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.xh-dock-head small {
+  font-size: 11.5px;
+  color: var(--lb-red-text);
+}
+.xh-code {
+  display: block;
+  min-height: 48px;
+  max-height: 120px;
+  overflow: auto;
+  padding: 13px 14px;
+  border-radius: var(--lb-r);
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  font: 600 13.5px/1.55 ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #f2f3f5;
+  word-break: break-all;
+  user-select: all;
+}
+.xh-copy {
+  width: 100%;
+  margin-top: 10px;
+}
+.xh-keys {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.xh-keys .xh-key {
+  flex: 1;
+  padding: 0 8px;
+}
+/* grey key: the site's raised key */
+.xh-key {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease;
+}
+.xh-key:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.xh-key:active,
+.ct-key:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.xh-key.is-done,
+.ct-key.is-done {
+  color: #fff;
+  background: #2f6b46;
+  border-color: #0d2416;
+}
+.xh-import,
+.xh-saveform {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.xh-paste {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+}
+.xh-paste::placeholder {
+  color: #6f7277;
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 500;
+}
+.xh-msg {
+  min-height: 18px;
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: #9a9da1;
+}
+.xh-msg.is-bad {
+  color: var(--lb-red-text);
+}
+
+/* ---- BACKGROUNDS (under the stage): map shots as raised tiles, the picked one ringed red ---- */
+.xh-bgbox {
+  margin-top: 12px;
+  padding: 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.xh-bghead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 2px 10px;
+}
+.xh-bghead span {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.xh-bghead {
+  align-items: center;
+}
+.xh-bgtabs {
+  padding: 4px;
+}
+.xh-bgtabs button {
+  height: 30px;
+  min-width: 0;
+  padding: 0 14px;
+}
+.xh-bgs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px 10px;
+  padding: 4px;
+}
+.xh-bg {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: #9a9da1;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease, transform 0.2s var(--lb-ease);
+}
+.xh-bg:hover {
+  color: #e6e8ec;
+}
+.xh-bg-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--flat, #0b0c0e);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.xh-bg-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s var(--lb-ease);
+}
+.xh-bg:hover .xh-bg-pic img {
+  transform: scale(1.06);
+}
+/* a small cross in the middle of every tile */
+.xh-bg-pic::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  background:
+    linear-gradient(#fff, #fff) center / 2px 100% no-repeat,
+    linear-gradient(#fff, #fff) center / 100% 2px no-repeat;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 1px #000);
+}
+.xh-bg b {
+  padding: 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xh-bg[aria-checked='true'] {
+  color: #fff;
+}
+/* flat tiles inside the box (no card in a card): the picked one = a red ring on its picture */
+.xh-bg[aria-checked='true'] .xh-bg-pic {
+  box-shadow: 0 0 0 2px var(--lb-red), 0 0 0 4px var(--lb-red-edge);
+}
+
+/* ---- STARTERS + SAVED cards ---- */
+.xh-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+.xh-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 8px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  transition: background-color 0.2s ease;
+}
+.xh-card:hover {
+  background: var(--lb-box-hover);
+}
+.xh-card-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  cursor: pointer;
+}
+.xh-card-pic canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.xh-card-txt {
+  min-width: 0;
+  padding: 0 4px;
+}
+.xh-card-txt b {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f2f3f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xh-card-txt code {
+  display: block;
+  margin-top: 3px;
+  font: 600 11.5px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #8d8f95;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xh-card-keys {
+  display: flex;
+  gap: 6px;
+}
+.xh-card-keys .xh-key {
+  flex: 1;
+  height: 38px;
+  padding: 0 10px;
+}
+.xh-card-keys .xh-key--x {
+  flex: none;
+  width: 38px;
+  font-size: 18px;
+}
+.xh-key--x:hover {
+  background: var(--lb-red);
+  border-color: var(--lb-red-edge);
+}
+.xh-saveform {
+  max-width: 560px;
+  margin: 0 0 14px;
+}
+.xh-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 22px 18px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8d8f95;
+}
+.xh-empty code {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #e6e8ec;
+}
+
+/* ---- INSIDE THE CODE: one box per part, a row per key ---- */
+.xh-read {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.xh-read-box {
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.xh-read-box h3 {
+  margin: 0 0 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.xh-read-box ul {
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.xh-read-box li {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #c9cbd0;
+}
+.xh-read-box li + li {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.xh-read-box li code {
+  font: 700 12px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: var(--lb-red-text);
+}
+.xh-read-box li b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #f2f3f5;
+  font-variant-numeric: tabular-nums;
+}
+.xh-read-box li.is-unk span {
+  color: #6f7277;
+}
+.xh-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--c);
+  box-shadow: 0 0 0 1px var(--lb-edge);
+}
+.ct-steps b {
+  color: #f2f3f5;
+}
+
+/* ---- tablets: the panel goes under the stage ---- */
+@media (max-width: 1100px) {
+  .xh-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* the stage sticks under the top bar while the controls scroll past (it's a grid item now) */
+  .xh-left {
+    display: contents;
+  }
+  .xh-stage {
+    position: sticky;
+    top: calc(var(--topbar-height, 52px) + 8px);
+    z-index: 3;
+  }
+  .xh-tools {
+    margin-top: -4px;
+  }
+  /* the controls come before the backgrounds here */
+  .xh-panel {
+    order: 1;
+  }
+  .xh-bgbox {
+    order: 2;
+    margin-top: 0;
+  }
+  .xh-bgs {
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  }
+}
+@media (max-width: 970px) {
+  /* phones scroll the page, not .coc-main: .main (hidden) and .coc-main (overflow-y: auto) were
+     scroll boxes that held the sticky stage in place; clip cuts the same but doesn't make one */
+  html body .main {
+    overflow: clip;
+  }
+  .coc-main {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+  .xh-stage {
+    top: 88px; /* under the phone top bar (52) + the Valorant crumb bar (32) */
+  }
+  .xh-bgs {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: 112px;
+    grid-template-rows: repeat(2, auto);
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scroll-snap-type: x proximity;
+  }
+  .xh-bg {
+    scroll-snap-align: start;
+  }
+  .xh-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .xh-read {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .xh-tools {
+    flex-wrap: nowrap;
+  }
+  .xh-seg {
+    flex: 1;
+  }
+  .xh-seg button {
+    flex: 1;
+    min-width: 0;
+    padding: 0 4px;
+  }
+  .xh-bgtabs {
+    flex: none;
+  }
+  .xh-bgtabs button {
+    padding: 0 10px;
+  }
+  .xh-panel {
+    padding: 10px;
+  }
+  .xh-row {
+    padding: 4px 12px;
+  }
+  .xh-row--num .xh-lab {
+    width: 82px;
+    font-size: 12.5px;
+  }
+  .xh-hud {
+    padding: 5px 8px;
+    font-size: 9px;
+  }
+  .xh-cards {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .xh-card-keys .xh-key {
+    padding: 0 6px;
+    font-size: 9.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xh-bg,
+  .xh-bg-pic img,
+  .xh-tog i,
+  .xh-sw {
+    transition: none;
+  }
+}

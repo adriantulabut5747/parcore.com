@@ -1,0 +1,574 @@
+/* ============================================================
+   VALORANT CHAT ART (Oct 30 2026): /valorant/chat-art (maker) + /valorant/chat-art-gallery.
+   On top of codm-banner.css (banner, --codm-side) + codm-tools.css (.ct-sec, .ct-key, .gs-seg,
+   .ct-steps, .ct-note) + valorant.css. The Crosshairs recipe: raised boxes, sunken wells,
+   picked = the grey key, ONE red key (Copy art).
+   ============================================================ */
+.ca-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.cb-ico canvas {
+  display: block;
+}
+
+/* ---- MAKER: grid left (sticky), panel right ---- */
+.ca-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(340px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.ca-left {
+  position: sticky;
+  top: 80px;
+}
+.ca-stage {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.ca-stage canvas {
+  display: block;
+  cursor: crosshair;
+  touch-action: none; /* a finger draws, it doesn't scroll the page */
+}
+.ca-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.ca-tools .gs-seg button {
+  min-width: 64px;
+  height: 38px;
+}
+.ca-tools-keys {
+  display: flex;
+  gap: 8px;
+}
+
+/* the chat preview: the drawing small, on a darkened map shot, the way chat sits over the game */
+.ca-chat {
+  margin-top: 12px;
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: linear-gradient(rgba(6, 7, 8, 0.6), rgba(6, 7, 8, 0.8)), url('/images/valorant/maps/ascent.webp') 50% 50% / cover;
+  box-shadow: var(--lb-shadow);
+}
+.ca-chat-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #b9bbc0;
+}
+.ca-chat-head small {
+  font: inherit;
+  color: #8d8f95;
+}
+.ca-chat-box {
+  display: inline-block;
+  max-width: 100%;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+}
+.ca-chat-box canvas {
+  display: block;
+}
+
+/* the panel: a box; tabs well on top, each tab's rows in a well, the line dock under them */
+.ca-panel {
+  padding: 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.ca-tabs button {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 6px;
+}
+.ca-pane {
+  margin-top: 10px;
+  padding: 4px 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.ca-pane[hidden] {
+  display: none;
+}
+.ca-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  min-height: 50px;
+  padding: 8px 14px;
+}
+.ca-row + .ca-row {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.ca-lab {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c9cbd0;
+}
+.ca-lab em {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(194, 59, 59, 0.16);
+  font: 700 8.5px 'Orbitron', sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--lb-red-text);
+}
+.ca-row .gs-seg button {
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+}
+.ca-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #8d8f95;
+}
+
+/* glyph swatches: raised tiles, the picked one ringed red */
+.ca-sws {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ca-sw {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 46px;
+  padding: 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: #0b0c0e;
+  box-shadow: var(--lb-btn);
+  cursor: pointer;
+}
+.ca-sw:hover {
+  background: #15171a;
+}
+.ca-sw[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px var(--lb-red), var(--lb-btn);
+}
+.ca-sw canvas {
+  display: block;
+}
+
+/* the small number well + steppers */
+.ca-num {
+  width: 64px;
+  height: 36px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  color: #f2f3f5;
+  font: 600 13px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  text-align: center;
+}
+.ca-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ca-step output {
+  min-width: 28px;
+  font: 600 13px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  text-align: center;
+  color: #f2f3f5;
+}
+.ca-step .ca-key {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 16px;
+}
+
+/* text field (banner, save name) */
+.ca-form {
+  display: flex;
+  gap: 8px;
+  flex-basis: 100%;
+}
+.ca-in {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  color: #f2f3f5;
+  font: 600 13px ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+.ca-in::placeholder {
+  color: #6f7277;
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 500;
+}
+/* the picture picker: a grey key over a hidden file input */
+.ca-file {
+  position: relative;
+  overflow: hidden;
+}
+.ca-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ca-file:focus-within {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+/* switch: Crosshairs' .xh-tog */
+.ca-tog {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.ca-tog i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  transition: transform 0.2s var(--lb-ease), background-color 0.2s ease;
+}
+.ca-tog[aria-checked='true'] {
+  background: var(--lb-red);
+  box-shadow: inset 0 0 0 2px var(--lb-red-edge), inset 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+.ca-tog[aria-checked='true'] i {
+  transform: translateX(22px);
+  background: var(--lb-pick);
+}
+
+/* ---- the line dock ---- */
+.ca-dock {
+  margin-top: 12px;
+}
+.ca-dock-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ca-dock-head span {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.ca-dock-head small {
+  font-size: 11.5px;
+  color: #9a9da1;
+}
+.ca-line {
+  display: block;
+  max-height: 92px;
+  overflow: auto;
+  padding: 12px 14px;
+  border-radius: var(--lb-r);
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+  font: 13px/1.3 ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #c9cbd0;
+  word-break: break-all;
+  user-select: all;
+}
+.ca-copy {
+  width: 100%;
+  margin-top: 10px;
+}
+.ca-dock .ca-key {
+  width: 100%;
+  margin-top: 8px;
+}
+.ca-msg {
+  min-height: 18px;
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: #9a9da1;
+}
+.ca-msg.is-bad {
+  color: var(--lb-red-text);
+}
+
+/* grey key: the site's raised key (Crosshairs' .xh-key) */
+.ca-key {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+.ca-key:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.ca-key:active,
+.ct-key:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.ca-key:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.ca-key.is-done,
+.ct-key.is-done {
+  color: #fff;
+  background: #2f6b46;
+  border-color: #0d2416;
+}
+.ca-sw:focus-visible,
+.ca-tog:focus-visible,
+.ca-key:focus-visible,
+.ca-num:focus-visible,
+.ca-in:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+
+/* ---- CARDS (gallery, saved, teaser) ---- */
+.ca-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.ca-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 8px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  transition: background-color 0.2s ease;
+}
+.ca-card:hover {
+  background: var(--lb-box-hover);
+}
+.ca-card-pic {
+  display: grid;
+  place-items: center;
+  height: 170px;
+  border-radius: 4px;
+  background: #0b0c0e;
+  box-shadow: var(--lb-ring-well);
+}
+/* sized when drawn; if the box narrows later (sidebar loading, phone rotation) it scales down instead of spilling */
+.ca-card-pic canvas,
+.ca-chat-box canvas,
+.ca-stage canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+.ca-card-txt {
+  min-width: 0;
+  padding: 0 4px;
+}
+.ca-card-txt b {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f2f3f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ca-card-txt small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: #8d8f95;
+}
+.ca-card-keys {
+  display: flex;
+  gap: 6px;
+}
+.ca-card-keys .ca-key {
+  flex: 1;
+  height: 38px;
+  padding: 0 10px;
+}
+.ca-card-keys .ca-key--x {
+  flex: none;
+  width: 38px;
+  font-size: 18px;
+}
+.ca-key--x:hover {
+  background: var(--lb-red);
+  border-color: var(--lb-red-edge);
+}
+.ca-saveform {
+  display: flex;
+  gap: 8px;
+  max-width: 560px;
+  margin: 0 0 14px;
+}
+.ca-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 22px 18px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8d8f95;
+}
+.ca-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+/* ---- GALLERY: categories + search on one row ---- */
+.cg-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.cg-cats button {
+  height: 40px;
+  min-width: 0;
+}
+.cg-cats small {
+  margin-left: 4px;
+  font: inherit;
+  color: #6f7277;
+}
+.cg-find {
+  width: min(320px, 100%);
+}
+.ct-note {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ---- tablets: the panel goes under the grid ---- */
+@media (max-width: 1100px) {
+  .ca-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ca-left {
+    position: static;
+  }
+}
+@media (max-width: 970px) {
+  .ca-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ca-card-pic {
+    height: 130px;
+  }
+  .cg-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cg-cats {
+    overflow-x: auto;
+  }
+  .cg-cats button {
+    flex: none;
+  }
+  .cg-find {
+    width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .ca-panel {
+    padding: 10px;
+  }
+  .ca-row {
+    padding: 8px 12px;
+  }
+  .ca-tools .gs-seg {
+    flex: 1;
+  }
+  .ca-tools .gs-seg button {
+    flex: 1;
+    min-width: 0;
+    padding: 0 4px;
+  }
+  .ca-card-keys .ca-key {
+    padding: 0 6px;
+    font-size: 9.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ca-tog,
+  .ca-tog i {
+    transition: none;
+  }
+}

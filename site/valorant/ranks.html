@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valorant Ranks: Every Rank, RR and Party Rules | Parchrome</title>
+<meta name="description" content="Every Valorant rank from Iron to Radiant: how RR is gained and lost, who can queue together, 5-stack penalties, and the live Immortal and Radiant cutoffs for every region.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tourney:ital,wdth,wght@1,75..125,100..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/home.jpg">
+<link rel="shortcut icon" href="/icons/home.jpg">
+<link rel="apple-touch-icon" href="/icons/home.jpg">
+<link rel="stylesheet" href="/11layout.css?v=20261029b">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/codm-banner.css?v=20261029h">
+<link rel="stylesheet" href="/codm-tools.css?v=20261029d">
+<link rel="stylesheet" href="/valorant.css?v=20261030a">
+<link rel="stylesheet" href="/valorant-ranks.css?v=20261030a">
+<link rel="stylesheet" href="/coc-villager.css?v=20261027d">
+</head>
+<body class="vl-ground" data-game-nav="valorant">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/valorant.png" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">Valorant</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Valorant pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main" >
+
+<header class="cb" aria-labelledby="cbTitle">
+  <span class="cb-art" aria-hidden="true"></span>
+  <span class="cb-ico" aria-hidden="true"><img id="cbIco" src="/images/valorant/ranks/27.webp" alt="" width="128" height="128" decoding="async"></span>
+  <div class="cb-copy">
+    <p class="cb-kicker">Valorant</p>
+    <h1 class="cb-title" id="cbTitle">Ranks</h1>
+    <p class="cb-text">Every rank from Iron to Radiant: how RR works, who can queue together and the live top of the ladder.</p>
+    <div class="cb-strip">
+      <span class="cb-fact"><small>Ranks</small><b>9</b><em>25 divisions</em></span>
+      <span class="cb-fact"><small>Move up</small><b>100 RR</b><em>Per division</em></span>
+      <span class="cb-fact" id="vrRadFact" hidden><small>Radiant</small><b>&nbsp;</b><em>&nbsp;</em></span>
+    </div>
+  </div>
+</header>
+<!-- the ladder: one tab per rank (?r=iron … radiant), filled by valorant-ranks.js -->
+<div class="cb-tabs cb-tabs--many vr-tray" id="vrTabs" role="tablist" aria-label="Ranks"></div>
+
+<!-- THE TOOL: valorant-ranks.js. Tiers + icons = valorant-api /competitivetiers (icons baked to
+     /images/valorant/ranks/<tier>.webp), rules = Riot's support pages (Oct 2026), live numbers =
+     the Worker's type=leaderboard (HenrikDev). -->
+<section class="ct-sec" aria-labelledby="vrRankTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vrRankTitle">Iron</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Pick a rank in the tray to see its divisions and who you can queue with. Radiant's at the top. Try to keep up!</p></div>
+  </header>
+  <div class="vr-panel" id="vrPanel"></div>
+</section>
+
+<section class="ct-sec" aria-labelledby="vrRRTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vrRRTitle">How RR works</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Wins give you RR, losses take it away, and 100 RR moves you up a division. Win big for a bigger jump. Me? I just win.</p></div>
+  </header>
+  <div class="vr-factors">
+    <div class="vr-box"><b>Win or lose</b><p>The result sets the base amount. A loss never gives you RR, however well you played.</p></div>
+    <div class="vr-box"><b>Round difference</b><p>A 13-2 win gives more RR than a 13-9 win.</p></div>
+    <div class="vr-box"><b>Your play</b><p>Counts for less than the result, and only from Iron to Ascendant. From Immortal up, only wins and losses count.</p></div>
+    <div class="vr-box"><b>Hidden MMR</b><p>If your hidden skill rating is above your rank, you gain more and lose less until your rank catches up. Below it, the opposite.</p></div>
+  </div>
+  <dl class="vr-rules">
+    <div><dt>Moving up</dt><dd>Reach 100 RR to go up a division. You start the next one with at least 10 RR, and a big win can skip a division (Gold 1 to Gold 3).</dd></div>
+    <div><dt>Dropping down</dt><dd>Hit 0 RR, then lose again. You land on at least 70 RR in the division below.</dd></div>
+    <div><dt>Rank shields</dt><dd>Reaching division 1 of a rank gives you 2 shields. Each one blocks a drop into the rank below. They don't stop drops between divisions of the same rank, and dodges or remakes don't use one.</dd></div>
+    <div><dt>Immortal and up</dt><dd>Immortal 1 starts at 10 RR. Immortal 2, Immortal 3 and Radiant go by RR cutoffs set for each region (below), and Radiant also needs a top 500 spot.</dd></div>
+  </dl>
+</section>
+
+<section class="ct-sec" aria-labelledby="vrPartyTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vrPartyTitle">Who can queue together</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Pick your rank and your friend's to see if you can duo or trio. Five-stacks can always go, but they lose some RR. Worth it for the memes.</p></div>
+  </header>
+  <div class="vr-party">
+    <div class="vr-box vr-check">
+      <div class="vr-picks">
+        <label class="vr-pick"><span>You</span><select id="vrA"></select></label>
+        <label class="vr-pick"><span>Your friend</span><select id="vrB"></select></label>
+      </div>
+      <p class="vr-verdict" id="vrVerdict" aria-live="polite"></p>
+    </div>
+    <div class="gs-table-wrap">
+      <table class="gs-table vr-table">
+        <caption class="gs-sr">Duo and trio rank limits</caption>
+        <thead><tr><th scope="col">Lowest rank in the party</th><th scope="col">Highest rank allowed</th></tr></thead>
+        <tbody>
+          <tr><td>Iron or Bronze</td><td>Silver 3</td></tr>
+          <tr><td>Silver</td><td>Gold 3</td></tr>
+          <tr><td>Gold</td><td>Platinum 3</td></tr>
+          <tr><td>Platinum and up</td><td>One rank higher, same division (Platinum 2 up to Diamond 2)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <dl class="vr-rules">
+    <div><dt>Party sizes</dt><dd>Solo, duo, trio or a 5-stack. Four-player parties can't queue. Immortal 1 and up can only go solo, duo or in a 5-stack.</dd></div>
+    <div><dt>5-stacks</dt><dd>Any ranks can play together, but for less RR. Everyone Ascendant 3 or below: 25% less, and only if someone is outside the limits above. Anyone Immortal: 25% less. Anyone Radiant: 75% less, or 90% if someone in the party is below Radiant.</dd></div>
+  </dl>
+</section>
+
+<section class="ct-sec" aria-labelledby="vrTopTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vrTopTitle">Top of the ladder</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Live from each region's leaderboard: the RR you need for each Immortal division and Radiant, plus the top 10. Catch me there!</p></div>
+  </header>
+  <div class="gs-seg vr-regions" id="vrRegions" role="group" aria-label="Region">
+    <button type="button" data-region="na" aria-pressed="true">NA</button>
+    <button type="button" data-region="eu" aria-pressed="false">EU</button>
+    <button type="button" data-region="ap" aria-pressed="false">AP</button>
+    <button type="button" data-region="kr" aria-pressed="false">KR</button>
+    <button type="button" data-region="latam" aria-pressed="false">LATAM</button>
+    <button type="button" data-region="br" aria-pressed="false">BR</button>
+  </div>
+  <div class="vr-top">
+    <div class="gs-table-wrap">
+      <table class="gs-table vr-cuts">
+        <caption class="gs-sr">RR cutoffs and player counts</caption>
+        <thead><tr><th scope="col">Rank</th><th scope="col">Cutoff now</th><th scope="col">Players</th><th scope="col">Riot's floor</th></tr></thead>
+        <tbody id="vrCuts"></tbody>
+      </table>
+    </div>
+    <div class="gs-table-wrap">
+      <table class="gs-table vr-board">
+        <caption class="gs-sr">Top 10 players</caption>
+        <thead><tr><th scope="col">#</th><th scope="col">Player</th><th scope="col">RR</th><th scope="col">Wins</th></tr></thead>
+        <tbody id="vrBoard"></tbody>
+      </table>
+    </div>
+  </div>
+  <p class="vr-note" id="vrTopNote"></p>
+</section>
+
+<section class="ct-sec ct-sec--last" aria-labelledby="vrPlaceTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="vrPlaceTitle">Placements and resets</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>You need account level 20 to play ranked, then a few placement matches set your rank. Don't dodge them, I'm watching.</p></div>
+  </header>
+  <ol class="ct-steps">
+    <li>Competitive unlocks at account level 20.</li>
+    <li>At the start of a season and at mid-season, everyone plays 5 placement matches. You start on 50 RR in the rank you land.</li>
+    <li>Nobody places straight into Immortal: the highest first rank is Ascendant.</li>
+    <li>At every other act, 1 placement match updates your rank, and a bad one can drop it. Immortal and Radiant players lose 90% of their RR there, and Radiants go back to Immortal.</li>
+    <li>Ranks never decay, but Immortal and Radiant players must play at least once every 7 days to stay on the leaderboard.</li>
+    <li>Lost RR to a cheater? Riot refunds some of it, up to a limit each act.</li>
+  </ol>
+</section>
+
+<script src="/valorant-ranks.js?v=20261030a"></script>
+  <footer class="pf-footer">
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+</footer>
+</div>
+
+<style>
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;   
+}}
+
+</style>
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/valorant.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Valorant Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261029b"></script>
+</body>
+</html>

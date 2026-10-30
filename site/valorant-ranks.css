@@ -1,0 +1,294 @@
+/* ============================================================
+   VALORANT RANKS (Oct 30 2026): /valorant/ranks, built by valorant-ranks.js.
+   On top of codm-banner.css (banner, tray, --codm-side), codm-tools.css (.ct-*, .gs-seg, .gs-table)
+   and valorant.css. Raised boxes, sunken wells, picked = the grey key (11layout.css --lb-*).
+   ============================================================ */
+
+/* the ladder: each rank's top-division icon over its name, so all 9 fit a 1280px desktop (phones scroll) */
+html body .vr-tray > button {
+  flex-direction: column;
+  gap: 4px;
+  height: 64px;
+  padding: 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+.vr-tray > button img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+/* ---- one rank: its divisions ---- */
+.vr-divs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+/* Radiant has one division: one card, not a third of the row */
+.vr-divs:has(> :only-child) {
+  grid-template-columns: minmax(0, 340px);
+}
+.vr-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 14px 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+  text-align: center;
+}
+.vr-div-ico {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  height: 132px;
+  margin-bottom: 8px;
+  border-radius: var(--lb-r);
+  /* a faint light in the rank's own colour (--vr-c, set by the script) */
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--vr-c, #fff) 16%, transparent), transparent), var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.vr-div-ico img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+.vr-div b {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f2f3f5;
+}
+.vr-div small {
+  font-size: 12.5px;
+  color: #9a9da1;
+}
+.vr-div-q {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #e6e8ec;
+}
+.vr-div-q em {
+  display: block;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vr-div .vr-div-n {
+  color: #c4c6cb;
+}
+.vr-sizes,
+.vr-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #9a9da1;
+}
+
+/* ---- How RR works ---- */
+.vr-factors {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.vr-box {
+  padding: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vr-box > b {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #f2f3f5;
+}
+.vr-box > p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b9bbc0;
+}
+.vr-rules {
+  margin: 12px 0 0;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.vr-rules > div {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 16px;
+  padding: 12px 16px;
+}
+.vr-rules > div + div {
+  border-top: 1px solid #1f2025;
+}
+.vr-rules dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #8d8f95;
+  padding-top: 2px;
+}
+.vr-rules dd {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #e6e8ec;
+}
+
+/* ---- Who can queue together ---- */
+.vr-party {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 12px;
+  align-items: start;
+}
+.vr-picks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.vr-pick > span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #8d8f95;
+}
+.vr-pick select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #f2f3f5;
+  font-size: 14px;
+  cursor: pointer;
+}
+.vr-pick select:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 2px;
+}
+.vr-pick option {
+  background: #141518;
+}
+.vr-verdict {
+  margin: 14px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #e6e8ec;
+}
+.vr-verdict b {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 3px 10px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  font-size: 11px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.vr-verdict[data-ok='no'] b {
+  border-color: var(--lb-red-edge);
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+}
+
+/* ---- Top of the ladder ---- */
+.vr-regions {
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.vr-regions button {
+  flex: 0 0 auto;
+  min-width: 60px;
+  height: 38px;
+}
+.vr-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.vr-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.vr-cell img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.vr-cell .vr-card {
+  object-fit: cover;
+  border-radius: 4px;
+}
+.vr-cell small {
+  margin-left: 2px;
+}
+
+@media (max-width: 1100px) {
+  .vr-factors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vr-party,
+  .vr-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .vr-divs {
+    gap: 8px;
+  }
+  .vr-div {
+    padding: 8px 6px 12px;
+  }
+  .vr-div-ico {
+    height: 84px;
+  }
+  .vr-div-ico img {
+    width: 64px;
+    height: 64px;
+  }
+  .vr-div b {
+    font-size: 14px;
+  }
+  .vr-div small,
+  .vr-div-q {
+    font-size: 11.5px;
+  }
+  .vr-factors,
+  .vr-picks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .vr-rules > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
