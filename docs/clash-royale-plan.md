@@ -127,22 +127,32 @@ https://link.clashroyale.com/en/?clashroyale://copyDeck?deck=<8 ids>&slots=<8 fl
 Most useful single feature: put it on every deck everywhere (Decks, Lobby,
 player battles, Deck builder, Decks for you).
 
-## 5. Look + structure
+## 5. Look + structure (decided Oct 30 2026, Adrian: "CoC look but far more different")
 
-- **Nav = Genshin's plumbing:** `<body data-game-nav="clash-royale">` + one
-  `game-nav.json` entry with 4 `groups`. 11layout.js builds the top bar,
-  hover menus, phone bottom nav and More sheet: **no nav code**. Do NOT copy
-  CoC's own nav (coc-hub-menus.js); CoC hasn't migrated yet.
-- **OPEN: guide.** Every section has one (Villager, Klee, Piglin, Jett; `.cv-say`
-  bubble + line rules in coc-villager.css). Suggested: the King (his emotes = a voice).
-- **OPEN: dress.** Recommended = CoC's (Orbitron titles, `.tb` banner, wells at
-  rest / grey key when picked, th-layouts.css "TABS + CARD ACTIONS" recipe):
-  same publisher, same art style. Alternative = Genshin's (Cinzel/Sora,
-  `.gi-tb` gold frame). Red stays the accent either way; Clash Royale's
-  blue/gold only in game art.
-- Files: `site/cr.css` + `site/cr-core.js` on every page, then
-  `cr-<page>.css/.js` per page (Genshin's split). (raised.css is gone since
-  Oct 29 2026: the raised look is 11layout.css.) Root-absolute paths only.
+- **Nav = the groups engine:** `<body data-game-nav="clash-royale">` + `game-nav.json` `clash-royale`
+  (Lobby / Meta / Players / Tools, SVG icons; a page's row gets its `link` and loses `soon` when it ships).
+  11layout.js builds the top bar, menus, phone bar and More sheet: **no nav code**.
+- **Shell = CODM / Valorant's:** a page links codm-banner.css + codm-tools.css (`.cb` banner, `.cb-tabs`
+  tray, `.ct-sec` sections, `--codm-side` inset), coc-villager.css (the guide bubble), then `site/cr.css`
+  (base, ground, titles, banner art, `.cr-key`) + `site/cr-core.js` (`window.CR`: card data + pictures, deck
+  order, avg elixir, 4-card cycle, copy link), then the page's `cr-<page>.css/.js`. Copy
+  `site/clash-royale/decks.html` for a new page.
+- **What makes it Clash Royale:** titles in **Lilita One** (free; the game's own font is licensed) white with
+  the in-game dark outline; the banner art = fan kit key art filling the whole card (`banner-battle.webp`);
+  the King in the banner's well; the cards' own art everywhere (evo = purple crest, hero = gold, cost on a pink
+  elixir drop = game art). The CoC recipe stays: raised boxes, sunken wells, grey key when picked, ONE red key
+  (Copy deck). Red is the accent; Clash Royale's blue/gold only inside game art.
+- **Art:** Supercell's fan kit (fankit.supercell.com, Frontify; its search API is public:
+  `/api/assets/search/345?q=<words>`), allowed for fan sites by Supercell's fan content policy. Baked by
+  `python scripts/cr-assets.py` (cards from the API's icons, King faces + banners from the kit, file names pinned
+  in the script). Other good banners for later pages (kit titles): `Forbidden City` (dark red sunset),
+  `group_6` (used), `Birthday 4`, `MergeTactics_KeyART`; 36 King renders `King_01`..`King_47`.
+- **Guide = the Red King** (label "King", `.cv-face.cr-king`). Faces: `king/face` (grin, default),
+  `face-laugh` (a line ending in a joke), `face-shock` ("Whoa" lines). Voice (Fandom wiki blocks scripts, so
+  this is from his in-game sounds + the fan kit's King emote names: Laughing, Crying, Angry, Thumbs up/down,
+  Begging, Sweating, Hide, Absolute Cinema, Emperor, No. 1, Belt): a smug, theatrical showman who loves
+  crowns, cackles "He he he he" at you, sulks when a tower falls. He's the player's own King, so he wants
+  crowns brought to him. Lines follow the `.cv-say` rules (coc-villager.css). Adrian is the judge of the voice.
 - Phones first: most visitors are on phones.
 
 ## 6. Build order (one page at a time, Adrian QCs each)
@@ -154,7 +164,7 @@ player battles, Deck builder, Decks for you).
 3. Player page + extras, Leaderboard.
 4. Upgrade calculator (reuses the player call).
 5. Clan page + River Race.
-6. Decks (once a week of data exists).
+6. Decks. **Built Oct 30 2026** (`/clash-royale/decks`, unlisted until Adrian QCs: no sidebar / search entry).
 7. Lobby.
 8. Decks for you (needs Decks + the player call).
 9. Cards.
@@ -199,7 +209,7 @@ player battles, Deck builder, Decks for you).
 2. Save it as the Worker secret `CR_API_KEY` (dashboard -> parchrome-coc ->
    Settings -> Variables and Secrets) and as a GitHub Actions secret
    `CR_API_KEY`.
-3. Answer the **OPEN** items: dress, guide, Worker (4th tab = Tools, settled Oct 30 2026).
+3. Answer the last **OPEN** item: own Worker or not (tabs, look and guide settled Oct 30 2026).
 
 ## 9. Weak spots (said plainly)
 

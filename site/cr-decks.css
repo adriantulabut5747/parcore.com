@@ -1,0 +1,375 @@
+/* ============================================================
+   /clash-royale/decks (Oct 30 2026). On top of codm-banner.css + codm-tools.css (banner, tray,
+   .ct-sec rhythm, --codm-side inset) and cr.css (titles, the King, keys).
+   A deck = one raised box: rank, the 8 cards in a sunken well (the game's own card art, cost on
+   each), then win rate + facts + the red Copy key. Phones: rank + cards on top (4 a row), stats under.
+   ============================================================ */
+
+/* ---- filter row: the card picker key + the picked cards as chips ---- */
+.crd-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px var(--codm-side) 0;
+}
+.crd-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: #8d8f95;
+  font-variant-numeric: tabular-nums;
+}
+#crdPickN:not(:empty) {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--lb-red);
+  color: #fff;
+  font-size: 10px;
+}
+.crd-chips {
+  display: contents;
+}
+.crd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px 0 5px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  font: 600 12px/1 'Oxanium', sans-serif;
+  cursor: pointer;
+}
+.crd-chip img {
+  width: 20px;
+  height: auto;
+}
+.crd-chip span {
+  margin-left: 2px;
+  color: #8d8f95;
+  font-size: 15px;
+}
+.crd-chip--without {
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #a3a5ab;
+}
+.crd-chip--without img {
+  filter: grayscale(1) brightness(0.6);
+}
+.crd-chip--clear {
+  padding: 0 12px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: #8d8f95;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* the picker: every card that was played, most used first; picked = red ring, excluded = grey + slash */
+.crd-pick {
+  margin: 12px var(--codm-side) 0;
+  padding: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crd-pick[hidden] {
+  display: none;
+}
+.crd-pick .cv-say {
+  margin: 0 0 14px;
+}
+.crd-pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 6px;
+  max-height: 340px;
+  padding: 8px;
+  overflow-y: auto;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crd-pc {
+  position: relative;
+  padding: 2px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+.crd-pc img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.crd-pc:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.crd-pc[data-s='with'] {
+  border-color: var(--lb-red);
+  background: rgba(194, 59, 59, 0.18);
+}
+.crd-pc[data-s='without'] img {
+  filter: grayscale(1) brightness(0.45);
+}
+.crd-pc[data-s='without']::after {
+  content: '';
+  position: absolute;
+  inset: 45% 8% auto;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--lb-red);
+  transform: rotate(-35deg);
+}
+.crd-pc:focus-visible {
+  outline: 2px solid var(--lb-red-text);
+  outline-offset: 1px;
+}
+
+/* ---- the list ---- */
+.crd-list {
+  display: grid;
+  gap: 12px;
+}
+.crd-deck {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 520px) minmax(280px, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 14px 18px 14px 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crd-rank {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  font: 400 18px/1 'Lilita One', sans-serif;
+  color: #c4c6cc;
+}
+.crd-deck:first-child .crd-rank {
+  background: var(--lb-red);
+  box-shadow: var(--lb-btn-red);
+  color: #fff;
+}
+.crd-cards {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crd-card {
+  position: relative;
+}
+.crd-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* the cost, on an elixir drop at the card's foot (the game's own pink: game art, not our accent) */
+.crd-cost {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #1a0820;
+  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+  background: radial-gradient(circle at 40% 35%, #f59bf5, #c23ad2 60%, #7d1c8f);
+  color: #fff;
+  font: 400 11px/1 'Lilita One', sans-serif;
+  text-shadow: 0 1px 0 #000;
+  transform: translateX(-50%);
+}
+
+.crd-stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'wr act' 'facts facts';
+  align-items: center;
+  gap: 12px 16px;
+  min-width: 0;
+}
+.crd-wr {
+  grid-area: wr;
+}
+.crd-act {
+  grid-area: act;
+}
+.crd-facts {
+  grid-area: facts;
+}
+.crd-wr small,
+.crd-facts dt {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7d7f86;
+}
+.crd-wr b {
+  display: block;
+  margin: 4px 0 6px;
+  font: 400 26px/1 'Lilita One', sans-serif;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+/* the bar: a well with a 50% tick, filled red to the win rate */
+.crd-wrbar {
+  position: relative;
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--lb-well);
+  box-shadow: inset 0 0 0 1px var(--lb-edge);
+  overflow: hidden;
+}
+.crd-wrbar i {
+  display: block;
+  height: 100%;
+  background: var(--lb-red);
+}
+.crd-wrbar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.45);
+}
+.crd-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, auto));
+  justify-content: space-between;
+  gap: 8px 14px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.crd-facts dd {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 3px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e6e8ec;
+  font-variant-numeric: tabular-nums;
+}
+.crd-drop {
+  width: 9px;
+  height: 12px;
+  fill: #d055dd;
+}
+.crd-act {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.crd-tower {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #a3a5ab;
+  white-space: nowrap;
+}
+.crd-tower img {
+  width: 18px;
+  height: auto;
+}
+
+.crd-more {
+  display: flex;
+  margin: 16px auto 0;
+}
+.crd-more[hidden] {
+  display: none;
+}
+.crd-empty[hidden] {
+  display: none;
+}
+.crd-empty {
+  padding: 18px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crd-empty .cv-say {
+  margin: 0;
+}
+
+/* the steps under "How it's counted" use codm-tools.css .ct-steps */
+
+/* ---- medium: stats drop under the cards ---- */
+@media (max-width: 1180px) {
+  .crd-deck {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+  .crd-stats {
+    grid-column: 2;
+  }
+}
+/* ---- phones ---- */
+@media (max-width: 700px) {
+  /* rank in its own slim column at the top, cards 4 a row beside it, stats full width under both */
+  .crd-deck {
+    grid-template-columns: 30px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px 10px;
+    padding: 12px;
+  }
+  .crd-rank {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+  .crd-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 6px;
+    padding: 8px 8px 12px;
+  }
+  .crd-stats {
+    grid-column: 1 / -1;
+  }
+  .crd-wr b {
+    font-size: 22px;
+  }
+  .crd-act {
+    align-items: flex-end;
+  }
+  .crd-count {
+    width: 100%;
+    margin-left: 0;
+    order: 9;
+  }
+}
+@media (max-width: 420px) {
+  .crd-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
