@@ -6,6 +6,7 @@
 # scripts/valorant-agents.json (release date + patch, real name, origin, Protocol number, voice: from the wiki).
 # The page shell (head, bars, sidebar, footer, More sheet) is the Weapons page's, swapped in at build time.
 # Pictures are baked once into site/images/valorant/agents/ (WebP; valorant-api's portraits are 2048px PNGs).
+# Also writes site/valorant-roster.json (id, slug, role, colours) for the player page.
 #
 # Run:  python scripts/valorant-agents.py            (--images re-bakes the pictures, --cards only the card crops)
 # Needs Pillow.
@@ -389,6 +390,9 @@ def main():
     for a in agents:
         (OUT / f"{a['slug']}.html").write_text(agent_page(a, agents, roles), encoding='utf-8', newline='\n')
     (OUT / 'index.html').write_text(index_page(agents, roles, data), encoding='utf-8', newline='\n')
+    # the player page (valorant-player.js) draws agents with these pages' art + colours: match ids -> slug
+    roster = [dict(id=a['api']['uuid'], name=a['name'], slug=a['slug'], role=a['role'], ac=a['c1'], ac2=a['c2']) for a in agents]
+    (ROOT / 'valorant-roster.json').write_text(json.dumps(roster, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8', newline='\n')
     print(f'wrote {len(agents)} agent pages + the index ({datetime.date.today()})')
 
 

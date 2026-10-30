@@ -1,16 +1,13 @@
 // Valorant Lobby (Oct 30 2026, Adrian: full rebuild on the Weapons shell, player search in the hero).
 // Everything on /valorant/ that isn't 11layout's chrome:
 // 1. Hero facts: act + patch from /valorant-weapons.json (scripts/valorant-feed.mjs, daily), pool count from 4.
-// 2. Player search: HenrikDev through our Worker (cloudflare/valorant-api: the key never reaches the page).
-//    Results draw under the hero until /valorant/player/<name>-<tag> exists. Searches are logged to the
-//    old tracker's Firestore (trackervalorant-42e14 "searches"), Firebase loaded only on the first search.
+// 2. Player search: opens the player page /valorant/player/<name>-<tag> (valorant-player.js).
 // 3. Every page: one card per game-nav.json Valorant page, by tab ("soon" = grey, not a link).
 // 4. Map pool, 5. Top of the ladder, 6. Events (vlr.orlandomm.net), 7. News (VLR's RSS via the Worker).
 // Real numbers only (Adrian): a source that fails says so, never a hand-typed stand-in.
 (function () {
   const API = 'https://parchrome-valorant.adriantulabut5747.workers.dev/api/valorant';
   const api = (type, q) => API + '?type=' + type + (q ? '&' + new URLSearchParams(q) : '');
-  const REGIONS = ['na', 'eu', 'ap', 'kr', 'latam', 'br']; // = the Worker's list
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const getJSON = (url, ms = 6000) =>
@@ -39,177 +36,21 @@
     })
     .catch((err) => console.warn('Act / patch unavailable:', err));
 
-  /* ---- 2. player search ---- */
-  const form = $('vlFind');
-  const status = $('vlStatus');
-  const out = $('vlPlayer');
-  let logSearch = null;
-  const log = (name, tag, region) => {
-    logSearch = logSearch || Promise.all([
-      import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js'),
-    ]).then(([app, fs]) => {
-      const db = fs.getFirestore(app.initializeApp({
-        apiKey: 'AIzaSyCo88EeZQQW17cXSB97UXz0tuZbB_CgWMo',
-        authDomain: 'trackervalorant-42e14.firebaseapp.com',
-        projectId: 'trackervalorant-42e14',
-        storageBucket: 'trackervalorant-42e14.firebasestorage.app',
-        messagingSenderId: '1058942511167',
-        appId: '1:1058942511167:web:0c921d734162d881df708a',
-      }));
-      return (doc) => fs.addDoc(fs.collection(db, 'searches'), { ...doc, timestamp: fs.serverTimestamp() });
-    });
-    logSearch
-      .then((add) => add({ name, tag, region, page: 'valorant-home', userAgent: navigator.userAgent }))
-      .catch((err) => console.warn('Search log failed:', err)); // logging never blocks the search
-  };
-
-  const henrik = async (url) => {
-    const res = await fetch(url);
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      const e = body?.errors?.[0] || {};
-      // Henrik 24 = the account exists but has no recent match to read it from
-      throw new Error(e.code === 24 ? "That account has no recent matches, so it can't be looked up yet."
-        : res.status === 404 ? 'No player with that Riot ID.' : e.message || `The tracker isn't answering (${res.status}).`);
-    }
-    return res.json();
-  };
-
-  // HenrikDev's match shape has moved between versions ("red"/"blue" keys vs an array of {team_id}):
-  // these try the known variants instead of trusting one, so win / loss can't silently break.
-  const findPlayer = (m, puuid, name, tag) => {
-    const ps = m.players || [];
-    return ps.find((p) => p.puuid && puuid && p.puuid.toLowerCase() === puuid.toLowerCase())
-      || ps.find((p) => p.name?.toLowerCase() === name.toLowerCase() && p.tag?.toLowerCase() === tag.toLowerCase());
-  };
-  const teamOf = (m, id) => {
-    if (!m?.teams || !id) return null;
-    id = String(id).toLowerCase();
-    if (Array.isArray(m.teams)) return m.teams.find((t) => String(t.team_id || t.id || t.team || '').toLowerCase() === id) || null;
-    const k = Object.keys(m.teams).find((x) => x.toLowerCase() === id);
-    return k ? m.teams[k] : null;
-  };
-  const won = (t) => !!(t && (t.has_won ?? t.won ?? t.winner));
-  const roundsWon = (t) => (t ? [t.rounds_won, t.rounds?.won, t.rounds, t.score].find((v) => typeof v === 'number') ?? '' : '');
-
-  function summary(matches, puuid, name, tag) {
-    const sum = { w: 0, l: 0, k: 0, d: 0, a: 0, score: 0, rounds: 0, hs: 0, shots: 0 };
-    const agents = {};
-    matches.forEach((m) => {
-      const p = findPlayer(m, puuid, name, tag);
-      if (!p) return;
-      const win = won(teamOf(m, p.team_id || p.team));
-      const s = p.stats || {};
-      win ? sum.w++ : sum.l++;
-      sum.k += s.kills || 0;
-      sum.d += s.deaths || 0;
-      sum.a += s.assists || 0;
-      sum.score += s.score || 0;
-      sum.hs += s.headshots || 0;
-      sum.shots += (s.headshots || 0) + (s.bodyshots || 0) + (s.legshots || 0);
-      sum.rounds += (Number(roundsWon(teamOf(m, 'red'))) || 0) + (Number(roundsWon(teamOf(m, 'blue'))) || 0) || m.metadata?.rounds_played || 0;
-      const a = (agents[p.agent?.name || 'Unknown'] ||= { id: p.agent?.id, n: 0, w: 0, k: 0, d: 0 });
-      a.n++;
-      if (win) a.w++;
-      a.k += s.kills || 0;
-      a.d += s.deaths || 0;
-    });
-    sum.top = Object.entries(agents).sort((x, y) => y[1].n - x[1].n).slice(0, 5);
-    return sum;
-  }
-
-  const agentPic = (id) => (id ? `https://media.valorant-api.com/agents/${encodeURIComponent(id)}/displayicon.png` : '');
-  const kd = (k, d) => (d ? k / d : k).toFixed(2);
-
-  function draw(acc, mmr, matches, name, tag, notes) {
-    const cur = mmr?.current_data || {};
-    const peak = mmr?.highest_rank || {};
-    const rank = (label, tier, title, sub) => `
-      <div class="vt-rank"><span class="vt-rank-pic">${rankIcon(tier) ? `<img src="${rankIcon(tier)}" alt="" width="48" height="48">` : ''}</span>
-        <span><small>${label}</small><b>${esc(title || 'Unranked')}</b><em>${esc(sub)}</em></span></div>`;
-    let html = `
-      <div class="vt-head">
-        <span class="vt-card">${acc?.card?.small ? `<img src="${esc(acc.card.small)}" alt="" width="64" height="64">` : ''}</span>
-        <div class="vt-who"><b>${esc(name)}<i>#${esc(tag)}</i></b><span>Level ${esc(acc?.account_level ?? '?')} · ${esc((acc?.region || '').toUpperCase())}</span></div>
-        <div class="vt-ranks">
-          ${rank('Rank', cur.currenttier, cur.currenttierpatched, cur.ranking_in_tier != null ? cur.ranking_in_tier + ' RR' : '')}
-          ${rank('Peak', peak.tier, peak.patched_tier || peak.tier_patched, peak.season ? 'Season ' + peak.season : '')}
-        </div>
-      </div>`;
-    if (notes.length) html += `<p class="vt-note">${esc(notes.join(' · '))}</p>`;
-    if (!matches.length) {
-      out.innerHTML = html + '<p class="vl-empty">No recent matches found.</p>';
-      return;
-    }
-    const puuid = acc?.puuid;
-    const s = summary(matches, puuid, name, tag);
-    const played = s.w + s.l;
-    const stat = (label, v) => `<div class="vt-stat"><small>${label}</small><b>${v}</b></div>`;
-    html += `
-      <p class="vt-sub">The last ${matches.length} matches, any mode.</p>
-      <div class="vt-stats">
-        ${stat('Record', `${s.w}W ${s.l}L`)}${stat('Win %', (played ? (s.w / played) * 100 : 0).toFixed(1) + '%')}
-        ${stat('K/D', kd(s.k, s.d))}${stat('ACS', Math.round(s.rounds ? s.score / s.rounds : 0))}
-        ${stat('Headshot %', (s.shots ? (s.hs / s.shots) * 100 : 0).toFixed(1) + '%')}
-        ${stat('Kills', s.k)}${stat('Deaths', s.d)}${stat('Assists', s.a)}
-      </div>
-      <div class="vt-cols">
-        <div><h3 class="vt-h">Top agents</h3><ol class="vt-list">${s.top.map(([n, a]) => `
-          <li class="vt-row"><img src="${agentPic(a.id)}" alt="" width="36" height="36" loading="lazy"><b>${esc(n)}</b>
-            <span>${a.n} played</span><span>${Math.round((a.w / a.n) * 100)}% won</span><span>${kd(a.k, a.d)} K/D</span></li>`).join('')}</ol></div>
-        <div><h3 class="vt-h">Matches</h3><ol class="vt-list vt-matches">${matches.map((m) => {
-          const p = findPlayer(m, puuid, name, tag);
-          const st = p?.stats || {};
-          const win = won(teamOf(m, p?.team_id || p?.team));
-          return `<li class="vt-row vt-match" data-r="${win ? 'w' : 'l'}"><img src="${agentPic(p?.agent?.id)}" alt="" width="36" height="36" loading="lazy">
-            <b>${esc(m.metadata?.map?.name || m.metadata?.map || 'Unknown map')}<small>${esc(m.metadata?.queue?.name || m.metadata?.mode || '')}</small></b>
-            <span>${esc(roundsWon(teamOf(m, 'blue')))}-${esc(roundsWon(teamOf(m, 'red')))}</span><span>${st.kills ?? '-'}/${st.deaths ?? '-'}/${st.assists ?? '-'}</span></li>`;
-        }).join('')}</ol></div>
-      </div>`;
-    out.innerHTML = html;
-  }
-
-  form.addEventListener('submit', async (e) => {
+  /* ---- 2. player search: opens /valorant/player/<name>-<tag> (valorant-player.js draws it, and logs the search) ---- */
+  // Riot ID rules = the Worker's cleanName / cleanTag; Pages can't rewrite addresses, so there it's ?id=
+  const ON_PAGES = location.hostname.endsWith('github.io');
+  $('vlFind').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = $('vlName').value.trim();
     const tag = $('vlTag').value.trim().replace(/^#/, '');
-    if (!name || !tag) {
-      status.textContent = 'Type both the name and the tag.';
+    const status = $('vlStatus');
+    if (!/^[\p{L}\p{N} _.-]{3,16}$/u.test(name) || !/^[\p{L}\p{N}]{3,5}$/u.test(tag)) {
+      status.textContent = 'A Riot ID is a name of 3-16 characters and a tag of 3-5 letters or numbers.';
       status.dataset.err = '';
       return;
     }
-    const key = form.querySelector('button');
-    key.disabled = true;
-    delete status.dataset.err;
-    status.textContent = 'Searching...';
-    try {
-      const acc = (await henrik(api('account', { name, tag }))).data;
-      // the account says where it plays: mmr + matches are per region (the old lobby forced Asia)
-      const region = REGIONS.includes(acc?.region) ? acc.region : 'ap';
-      log(name, tag, region);
-      const q = { region, name, tag };
-      // the matches endpoint stops at 10 a call: two pages = 20
-      const [mmr, p1, p2] = await Promise.allSettled([
-        henrik(api('mmr', q)),
-        henrik(api('matches', { ...q, start: 0 })),
-        henrik(api('matches', { ...q, start: 10 })),
-      ]);
-      const page = (r) => (r.status === 'fulfilled' ? r.value.data || [] : []);
-      const matches = [...page(p1), ...page(p2)];
-      const notes = [];
-      if (mmr.status === 'rejected') notes.push('Rank unavailable');
-      if (p1.status === 'rejected' && p2.status === 'rejected') notes.push('Match history unavailable');
-      draw(acc, mmr.status === 'fulfilled' ? mmr.value.data : null, matches, acc?.name || name, acc?.tag || tag, notes);
-      status.textContent = '';
-      out.hidden = false;
-      out.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (err) {
-      status.textContent = err.message || 'No player with that Riot ID.';
-      status.dataset.err = '';
-    } finally {
-      key.disabled = false;
-    }
+    const id = encodeURIComponent(name) + '-' + encodeURIComponent(tag);
+    location.href = ON_PAGES ? '/valorant/player/?id=' + id : '/valorant/player/' + id;
   });
 
   /* ---- 3. every page ---- */

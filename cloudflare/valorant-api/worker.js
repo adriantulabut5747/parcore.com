@@ -1,5 +1,5 @@
 // Cloudflare Worker: GET https://parchrome-valorant.<account>.workers.dev/api/valorant?type=account&name=Foo&tag=1234
-// The site's one door to HenrikDev's Valorant API (the player search, the map
+// The site's one door to HenrikDev's Valorant API (the player search + player page, the map
 // pool's live rotation) and to VLR.gg's news feed (Latest Updates).
 //
 // Same setup as cloudflare/coc-api (Oct 29 2026): the key used to be written
@@ -116,6 +116,51 @@ async function board(region, key) {
   }
 }
 
+// The player page's match list (Oct 30 2026): Henrik's 10 matches are ~4 MB, mostly every player's position at
+// every kill. Same field names (the page reads Henrik's full shape too), minus positions, names inside kills /
+// rounds (the page finds them in players[]), damage_events, coaches and observers. Each kill keeps its distance
+// (killer to victim, metres on the map plane: 100 units = 1 m), the one thing the positions were for.
+const ref = (p) => (p ? { puuid: p.puuid, team: p.team } : null);
+export function slimMatch(m) {
+  return {
+    metadata: m.metadata,
+    players: (m.players || []).map((p) => ({
+      puuid: p.puuid, name: p.name, tag: p.tag, team_id: p.team_id, party_id: p.party_id, agent: p.agent, stats: p.stats,
+      ability_casts: p.ability_casts, tier: p.tier, account_level: p.account_level, economy: p.economy,
+      behavior: p.behavior && { afk_rounds: p.behavior.afk_rounds }, card: p.customization && p.customization.card,
+    })),
+    teams: (m.teams || []).map((t) => ({ team_id: t.team_id, rounds: t.rounds, won: t.won, placement: t.placement })),
+    rounds: (m.rounds || []).map((r) => ({
+      id: r.id, result: r.result, winning_team: r.winning_team, winning_team_role: r.winning_team_role,
+      plant: r.plant && { round_time_in_ms: r.plant.round_time_in_ms, site: r.plant.site, player: ref(r.plant.player) },
+      defuse: r.defuse && { round_time_in_ms: r.defuse.round_time_in_ms, player: ref(r.defuse.player) },
+      stats: (r.stats || []).map((s) => ({
+        player: ref(s.player),
+        economy: s.economy && { loadout_value: s.economy.loadout_value, remaining: s.economy.remaining, weapon: s.economy.weapon, armor: s.economy.armor },
+        stats: s.stats, was_afk: s.was_afk,
+      })),
+    })),
+    kills: (m.kills || []).map((k) => {
+      const at = (k.player_locations || []).find((l) => l.player && k.killer && l.player.puuid === k.killer.puuid);
+      const d = at && k.location ? Math.hypot(at.location.x - k.location.x, at.location.y - k.location.y) / 100 : null;
+      return {
+        round: k.round, time_in_round_in_ms: k.time_in_round_in_ms, killer: ref(k.killer), victim: ref(k.victim),
+        assistants: (k.assistants || []).map(ref), weapon: k.weapon, distance: d == null ? null : Math.round(d * 10) / 10,
+      };
+    }),
+  };
+}
+async function matchList(path, key) {
+  const res = await henrik(path, 120, key);
+  if (!res.ok) return res;
+  try {
+    const j = await res.json();
+    return answer(200, { status: j.status, data: (j.data || []).map(slimMatch) }, 120);
+  } catch {
+    return oops(502, 'The match list came back in a shape we do not know.');
+  }
+}
+
 // One answer through the edge cache: the stored copy, or make() and store it.
 async function cached(keyUrl, make, ctx) {
   const cacheKey = new Request(keyUrl);
@@ -153,12 +198,23 @@ async function route(url, key, ctx) {
 
   if (type === 'account') return via('account/' + id, () => henrik('v1/account/' + who, 600, key));
   if (type === 'mmr') return via('mmr/' + region + '/' + id, () => henrik('v2/mmr/' + region + '/' + who, 300, key));
+  // The player page (/valorant/player/<name>-<tag>, Oct 30 2026): every act's wins / games / end rank (v3),
+  // the RR each ranked game moved (live + Henrik's stored copy, the page merges them by match_id) and the
+  // stored match list (one line per game: the player's own stats only, so 100 of them stay small).
+  if (type === 'mmr3') return via('mmr3/' + region + '/' + id, () => henrik('v3/mmr/' + region + '/pc/' + who, 300, key));
+  if (type === 'rr') return via('rr/' + region + '/' + id, () => henrik('v2/mmr-history/' + region + '/pc/' + who, 300, key));
+  if (type === 'rrstored') return via('rrstored/' + region + '/' + id, () => henrik('v2/stored-mmr-history/' + region + '/pc/' + who + '?size=100', 900, key));
+  if (type === 'stored') {
+    const mode = q.get('mode') || '';
+    if (!['', 'competitive'].includes(mode)) return [oops(400, 'badMode')];
+    return via('stored/' + region + '/' + id + '/' + mode, () =>
+      henrik('v1/stored-matches/' + region + '/' + who + '?size=100' + (mode ? '&mode=' + mode : ''), 900, key),
+    );
+  }
   if (type === 'matches') {
     const start = q.get('start') || '0';
     if (start !== '0' && start !== '10') return [oops(400, 'badStart')];
-    return via('matches/' + region + '/' + id + '/' + start, () =>
-      henrik('v4/matches/' + region + '/pc/' + who + '?size=10&start=' + start, 120, key),
-    );
+    return via('matches/' + region + '/' + id + '/' + start, () => matchList('v4/matches/' + region + '/pc/' + who + '?size=10&start=' + start, key));
   }
   return [oops(400, 'badType')];
 }
