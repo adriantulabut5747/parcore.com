@@ -18,9 +18,11 @@
 <link rel="stylesheet" href="/codm-tools.css?v=20261029d">
 <link rel="stylesheet" href="/coc-villager.css?v=20261027d">
 <link rel="stylesheet" href="/cr.css?v=20261030a">
-<link rel="stylesheet" href="/cr-decks.css?v=20261030a">
+<link rel="stylesheet" href="/cr-decks.css?v=20261031b">
 </head>
 <body data-game-nav="clash-royale">
+<!-- the liked flame's ember fill (the CoC cards' gradient) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="crdFlameFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd36b"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#e2531f"/></linearGradient></defs></svg>
 
   <div id="page-loader">
   <div class="parchrome-fade">
@@ -105,16 +107,17 @@
     </div>
   </div>
 </header>
-<!-- the tray = this page's sort (?sort=wr; Most played = none). Filled by cr-decks.js. -->
+<!-- the tray = this page's sort (?sort=wr|elixir; Most played = none). Filled by cr-decks.js. -->
 <div class="cb-tabs" id="crdSort" role="tablist" aria-label="Sort decks"></div>
 
 <!-- THE LIST: cr-decks.js, data = /cr-decks.json + /cr-cards.json (scripts/cr-meta.mjs, daily).
-     Card filter in the address: ?with=<card ids>&without=<card ids>. -->
-<div class="crd-bar">
+     Card filter in the address: ?with=<card ids>&without=<card ids>; playstyle = ?style=. -->
+<div class="crd-tools" id="crdBar">
   <button type="button" class="cr-key" id="crdPickBtn" aria-expanded="false" aria-controls="crdPick"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="11" height="15" rx="1.5"/><path d="M19 7v12.5a1 1 0 0 1-1 1H9"/></svg>Filter by card<span id="crdPickN"></span></button>
   <div class="crd-chips" id="crdChips"></div>
   <span class="crd-count" id="crdCount"></span>
 </div>
+<div class="crd-styles" id="crdStyles" role="group" aria-label="Playstyle"></div>
 <div class="crd-pick" id="crdPick" hidden>
   <div class="cv-say"><img class="cv-face cr-king" src="/images/clash-royale/king/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>King</b>Tap a card once to keep only the decks that have it, and twice to hide every deck with it. No Mega Knight? Fine by me.</p></div>
   <div class="crd-pick-grid" id="crdPickGrid"></div>
@@ -123,11 +126,26 @@
 <section class="ct-sec" aria-labelledby="crdTitle">
   <header class="ct-head">
     <h2 class="ct-title" id="crdTitle">This week's decks</h2>
-    <div class="cv-say"><img class="cv-face cr-king" src="/images/clash-royale/king/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>King</b>Tap Copy deck on your phone and it opens right inside Clash Royale, ready to battle. Now go bring me three crowns!</p></div>
+    <div class="cv-say"><img class="cv-face cr-king" src="/images/clash-royale/king/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>King</b>Tap a card to see every deck that runs it, or the pen to make the deck your own. Now go bring me three crowns!</p></div>
   </header>
   <div class="crd-empty" id="crdEmpty" hidden><div class="cv-say"><img class="cv-face cr-king" src="/images/clash-royale/king/face-shock.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>King</b>Whoa! No deck here has all of that. Take a card off the filter and try again.</p></div></div>
   <div class="crd-list" id="crdList"></div>
   <button type="button" class="cr-key crd-more" id="crdMore" hidden>Show more decks</button>
+</section>
+
+<!-- META MAP: every deck by games (x, log) and win rate (y); the dot = its win condition. cr-decks.js metaMap(). -->
+<section class="ct-sec" aria-labelledby="crmTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="crmTitle">The meta map</h2>
+    <div class="cv-say"><img class="cv-face cr-king" src="/images/clash-royale/king/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>King</b>Every deck sits where it really lands: further right is played more, higher up wins more. Top left? Hidden gems, my favourite kind of treasure.</p></div>
+  </header>
+  <div class="crm">
+    <div class="crm-plot" id="crmPlot"></div>
+    <div class="crm-tip" id="crmTip" hidden></div>
+    <p class="crm-axis crm-axis--x">Games played &rarr;</p>
+    <p class="crm-axis crm-axis--y">Win rate &rarr;</p>
+  </div>
+  <p class="crm-key"><span class="crm-key-dot crm-dot--win"></span>Winning for sure <span class="crm-key-dot crm-dot--flip"></span>Too close to call <span class="crm-key-dot crm-dot--loss"></span>Losing for sure</p>
 </section>
 
 <section class="ct-sec ct-sec--last" aria-labelledby="crdHowTitle">
@@ -141,11 +159,13 @@
     <li>A deck is its 8 cards, and an evolution or hero counts as part of it: a deck with Evo Knight and the same deck with plain Knight are two decks.</li>
     <li>Numbers cover the last 7 days. A deck needs 50 games in that time to be listed, so a lucky 5-0 can't top the board.</li>
     <li>Win rate = wins out of games. Usage = the share of all decks played in those battles.</li>
+    <li>The &plusmn; next to a win rate is its 95% margin: the fewer games, the wider it is. "Winning" means even the low end of that range is above 50%, "Losing" means even the high end is below it, and anything in between is a coin flip.</li>
+    <li>Deck names follow the win condition, the way players say them: "2.6 Hog", "3.0 X-Bow", "Giant Graveyard". The number is the deck's average elixir.</li>
   </ol>
 </section>
 
-<script src="/cr-core.js?v=20261030a"></script>
-<script src="/cr-decks.js?v=20261030a"></script>
+<script src="/cr-core.js?v=20261031a"></script>
+<script src="/cr-decks.js?v=20261031b"></script>
   <footer class="pf-footer">
   <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
   disclaimer come from 11footer.json; the link row mirrors the sidebar

@@ -213,7 +213,8 @@ async function route(url, key, ctx) {
   }
   if (type === 'matches') {
     const start = q.get('start') || '0';
-    if (start !== '0' && start !== '10') return [oops(400, 'badStart')];
+    // pages of 10: the player page loads the last 20 by default, 50 on ?n=50
+    if (!['0', '10', '20', '30', '40'].includes(start)) return [oops(400, 'badStart')];
     return via('matches/' + region + '/' + id + '/' + start, () => matchList('v4/matches/' + region + '/pc/' + who + '?size=10&start=' + start, key));
   }
   return [oops(400, 'badType')];

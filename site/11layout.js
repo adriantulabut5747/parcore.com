@@ -140,7 +140,7 @@ function buildSidebarFromJSON(data) {
       <span>${item.name}</span>`;
     topBox.appendChild(a);});
 
-  // TOP GAMES (the upcoming mobile games from sidebar.json go last; no link yet)
+  // TOP GAMES (the upcoming mobile games from sidebar.json go last; linked once they have a "link")
   data.games.concat(data.upcoming || []).forEach(game => {
     const a = document.createElement('a');
     a.href = game.link || "#";

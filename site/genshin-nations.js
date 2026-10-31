@@ -456,8 +456,6 @@
       li(N.reduce((a, n) => a + n.bosses.length, 0), 'world bosses') +
       li(N.reduce((a, n) => a + n.weekly.length, 0), 'weekly bosses') +
       li(N.reduce((a, n) => a + n.specialties.length, 0), 'local specialties');
-    // Klee's line under the header (Oct 27 2026).
-    $('naKlee').textContent = `Klee is from Mondstadt, but she knows all ${N.length} regions! Which one is your favourite?`;
   }
 
   Promise.all([

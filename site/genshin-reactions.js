@@ -423,5 +423,4 @@
     });
   share();
   prism();
-  GI.jumpNav($('rxJump'));
 })();

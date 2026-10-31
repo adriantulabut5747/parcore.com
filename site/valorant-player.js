@@ -2,7 +2,7 @@
 // One page serves every player: site/_redirects sends /valorant/player/* here (GitHub Pages can't rewrite, so
 // there it's /valorant/player/?id=<name>-<tag>). Data = HenrikDev through our Worker (cloudflare/valorant-api):
 //   account (card, level, region) -> then in parallel: mmr3 (rank, peak, every act; v2 mmr if it fails),
-//   rr + rrstored (RR per ranked game, merged by match_id), matches x2 (the last 20 with rounds + kills: the
+//   rr + rrstored (RR per ranked game, merged by match_id), matches x5 (the last 50 with rounds + kills: the
 //   Worker slims them) and stored (100 older one-line games).
 // Every source can fail alone: its sections say so, the rest still draw. Real numbers only (Adrian's rule).
 // Agents use the agent pages' baked art + colours (/valorant-roster.json, written by scripts/valorant-agents.py).
@@ -11,7 +11,7 @@
   const API = 'https://parchrome-valorant.adriantulabut5747.workers.dev/api/valorant';
   const ON_PAGES = location.hostname.endsWith('github.io');
   const REGIONS = ['na', 'eu', 'ap', 'kr', 'latam', 'br']; // = the Worker's list
-  const TABS = ['overview', 'matches', 'agents', 'maps', 'weapons', 'acts'];
+  const TABS = ['overview', 'matches', 'acts', 'agents', 'maps', 'weapons'];
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const api = (type, q) => API + '?type=' + type + '&' + new URLSearchParams(q);
@@ -194,7 +194,11 @@
   }
 
   /* ---- shared bits ---- */
-  const say = (el, msg) => el && (el.innerHTML = `<p class="vp-empty">${msg}</p>`);
+  // a section with nothing to show goes away whole, title included (Adrian: no "isn't available" boxes)
+  const drop = (el) => {
+    const sec = el?.closest('.ct-sec');
+    if (sec) sec.hidden = true;
+  };
   const tile = (label, value, sub = '') => `<div class="vp-tile"><small>${label}</small><b>${value}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
   const resWord = (r) => ({ w: 'Win', l: 'Loss', d: 'Draw' })[r];
 
@@ -210,11 +214,21 @@
   }
   document.title = `${who.name}#${who.tag} | Valorant Player | Parchrome`;
   $('cbTitle').innerHTML = `${esc(who.name)}<i>#${esc(who.tag)}</i>`;
-  $('vpSub').textContent = 'Loading player...';
-  wireTabs();
+  $('vpLoadName').innerHTML = `${esc(who.name)}<i>#${esc(who.tag)}</i>`;
+  const showTab = wireTabs();
+  const COUNT = 50; // recent games with full data, always (Adrian): 5 Worker pages of 10
+
+  // the loader's steps: each source ticks one off, failed or not; the page shows once all five have
+  const step = (k, ok) => {
+    const li = $('vpLoadSteps').querySelector(`[data-step="${k}"]`);
+    if (!li || li.dataset.s) return;
+    li.dataset.s = ok ? 'done' : 'fail';
+    $('vpLoadBar').style.transform = `scaleX(${$('vpLoadSteps').querySelectorAll('[data-s]').length / 5})`;
+  };
+  const track = (k, p) => p.then((v) => (step(k, true), v), (e) => (step(k, false), Promise.reject(e)));
 
   const S = { acc: null, region: 'ap', mmr: null, mmr3: null, rr: [], recent: [], stored: [], games: [] };
-  getJSON(api('account', who))
+  track('account', getJSON(api('account', who)))
     .then(async (j) => {
       const acc = (S.acc = j.data || {});
       S.region = REGIONS.includes(acc.region) ? acc.region : 'ap';
@@ -230,47 +244,50 @@
       log(name, tag, S.region);
       const q = { region: S.region, name, tag };
       await rosterP;
-      const rank = getJSON(api('mmr3', q)).then((r) => (S.mmr3 = r.data)).catch(() => getJSON(api('mmr', q)).then((r) => (S.mmr = r.data)));
-      const rr = Promise.allSettled([getJSON(api('rr', q)), getJSON(api('rrstored', q))]).then(([a, b]) => {
+      const rank = track('rank', getJSON(api('mmr3', q)).then((r) => (S.mmr3 = r.data)).catch(() => getJSON(api('mmr', q)).then((r) => (S.mmr = r.data))));
+      const rr = track('rr', Promise.allSettled([getJSON(api('rr', q)), getJSON(api('rrstored', q))]).then(([a, b]) => {
         const seen = new Map();
         const add = (h) => h && !seen.has(h.match_id || h.date) && seen.set(h.match_id || h.date, h);
         (a.status === 'fulfilled' ? a.value.data?.history || [] : []).forEach(add);
         (b.status === 'fulfilled' ? b.value.data || [] : []).forEach(add);
         S.rr = [...seen.values()].filter((h) => Number.isFinite(h.elo)).sort((x, y) => Date.parse(x.date) - Date.parse(y.date));
         if (a.status === 'rejected' && b.status === 'rejected') throw a.reason;
-      });
-      const recent = Promise.allSettled([getJSON(api('matches', { ...q, start: 0 })), getJSON(api('matches', { ...q, start: 10 }))]).then(([a, b]) => {
-        const ms = [...(a.status === 'fulfilled' ? a.value.data || [] : []), ...(b.status === 'fulfilled' ? b.value.data || [] : [])];
+      }));
+      const pages = Array.from({ length: COUNT / 10 }, (_, i) => getJSON(api('matches', { ...q, start: i * 10 })));
+      const recent = track('matches', Promise.allSettled(pages).then((res) => {
+        const ms = res.flatMap((r) => (r.status === 'fulfilled' ? r.value.data || [] : []));
         const ids = new Set();
         S.recent = ms.filter((m) => m?.metadata && !ids.has(m.metadata.match_id) && ids.add(m.metadata.match_id))
           .map((m) => fromMatch(m, acc.puuid)).filter(Boolean).sort((x, y) => y.t - x.t);
         S.recent.forEach((g) => g.m.rounds?.length && (g.x = deep(g)));
-        if (a.status === 'rejected' && b.status === 'rejected') throw a.reason;
-      });
-      const stored = getJSON(api('stored', q)).then((r) => (S.stored = (r.data || []).map(fromStored).filter((g) => g.id)));
+        if (res.every((r) => r.status === 'rejected')) throw res[0].reason;
+      }));
+      const stored = track('stored', getJSON(api('stored', q)).then((r) => (S.stored = (r.data || []).map(fromStored).filter((g) => g.id))));
 
-      rank.then(drawRank, (e) => (say($('vpRank'), 'Rank data isn\'t available right now.'), say($('vpActs'), 'Act history isn\'t available right now.'), console.warn(e)))
-        .then(() => S.mmr3 || S.mmr ? drawActs() : null);
-      rr.then(drawRR, (e) => (say($('vpRR'), 'RR history isn\'t available right now.'), console.warn(e)));
-      recent.then(
-        () => (drawRecentBits(), drawMatches(), openFromAddress()),
-        (e) => {
-          ['vpForm', 'vpNums', 'vpHits', 'vpMates', 'vpMatchList', 'vpGuns', 'vpBuys', 'vpDist'].forEach((id) => say($(id), 'Match history isn\'t available right now.'));
-          console.warn(e);
-        },
-      );
-      // agents + maps use every game we have: the last 20 + Henrik's stored copies (recent wins a tie)
-      Promise.allSettled([recent, stored]).then(([, st]) => {
-        const ids = new Set(S.recent.map((g) => g.id));
-        S.games = [...S.recent, ...S.stored.filter((g) => !ids.has(g.id))].sort((x, y) => y.t - x.t);
-        if (st.status === 'rejected') console.warn(st.reason);
-        drawOld(st.status === 'fulfilled');
-        drawAgents();
-        drawMaps();
-        drawMain();
-        drawRoles();
-        if (!S.games.length) $('vpSub').textContent += ' · no games found';
-      });
+      // every section draws (or drops itself) while the loader is still up; reveal() then shows them all at once
+      const drawn = [
+        rank.then(drawRank, (e) => (drop($('vpRank')), drop($('vpActs')), console.warn(e))).then(() => (S.mmr3 || S.mmr ? drawActs() : null)),
+        rr.then(drawRR, (e) => (drop($('vpRR')), console.warn(e))),
+        recent.then(
+          () => (drawRecentBits(), drawMatches()),
+          (e) => (['vpForm', 'vpHits', 'vpMates', 'vpMatchList', 'vpGuns', 'vpBuys', 'vpDist'].forEach((id) => drop($(id))), console.warn(e)),
+        ),
+        // agents + maps use every game we have: the recent ones + Henrik's stored copies (recent wins a tie)
+        Promise.allSettled([recent, stored]).then(([, st]) => {
+          const ids = new Set(S.recent.map((g) => g.id));
+          S.games = [...S.recent, ...S.stored.filter((g) => !ids.has(g.id))].sort((x, y) => y.t - x.t);
+          if (st.status === 'rejected') console.warn(st.reason);
+          drawOld(st.status === 'fulfilled');
+          drawAgents();
+          drawMaps();
+          drawMain();
+          drawRoles();
+          if (!S.games.length) $('vpSub').textContent += ' · no games found';
+        }),
+      ];
+      // a draw that throws must not keep the loader up forever
+      await Promise.allSettled(drawn.map((p) => p.catch(console.warn)));
+      reveal();
     })
     .catch((err) => {
       root.dataset.state = 'error';
@@ -287,7 +304,26 @@
     if (/^https:\/\//.test(acc.card?.small || '')) $('vpIco').innerHTML = `<img src="${esc(acc.card.small)}" alt="" width="128" height="128" decoding="async">`;
     const last = acc.last_update_raw ? acc.last_update_raw * 1000 : Date.parse(acc.updated_at || '');
     $('vpSub').textContent = [`Level ${acc.account_level ?? '?'}`, S.region.toUpperCase(), Number.isFinite(last) ? 'Updated ' + ago(last) : ''].filter(Boolean).join(' · ');
+  }
+
+  /* ---- reveal: tabs left with no section go too, then everything shows at once ---- */
+  function reveal() {
+    const tray = $('vpTabs');
+    let open = 0;
+    document.querySelectorAll('.vp-panel').forEach((p) => {
+      const has = !!p.querySelector('.ct-sec:not([hidden])');
+      tray.querySelector(`[data-tab="${p.dataset.tab}"]`).hidden = !has;
+      open += has;
+    });
+    if (!open) {
+      root.dataset.state = 'error';
+      $('vpErr').textContent = "We found the account, but none of its rank or match data is available right now. Try again in a few minutes.";
+      return;
+    }
+    const cur = tray.querySelector('[aria-selected="true"]');
+    if (cur.hidden) showTab(tray.querySelector('[data-tab]:not([hidden])').dataset.tab, false);
     root.dataset.state = 'ok';
+    openFromAddress();
   }
 
   /* ---- rank: current / peak / this act (mmr v3, or v2's fields) ---- */
@@ -341,7 +377,7 @@
   function drawRR() {
     const box = $('vpRR');
     const H = S.rr;
-    if (H.length < 2) return say(box, H.length ? 'Only one ranked game so far: the chart starts at two.' : 'No ranked games in the RR history yet.');
+    if (H.length < 2) return drop(box); // one game is no chart
     box.innerHTML = `<div class="vp-chart" tabindex="0" aria-label="RR over the last ${H.length} ranked games. Use the arrow keys to read each game."><div class="vp-chart-svg"></div><div class="vp-tip" hidden></div></div>
       <details class="vp-table-toggle"><summary>Show as a table</summary><div class="gs-table-wrap"><table class="gs-table vp-rr-table"><thead><tr><th>Date</th><th>Map</th><th>Rank</th><th>Change</th><th>Elo</th></tr></thead><tbody>${H.slice().reverse().map((h) =>
         `<tr><td>${day(Date.parse(h.date))}</td><td>${esc(h.map?.name || '')}</td><td>${esc(h.tier?.name || tierName(h.tier?.id))} · ${num(h.rr)} RR</td><td data-sign="${h.last_change > 0 ? 'up' : h.last_change < 0 ? 'down' : ''}">${h.last_change > 0 ? '+' : ''}${num(h.last_change)}</td><td>${num(h.elo)}</td></tr>`).join('')}</tbody></table></div></details>`;
@@ -396,13 +432,11 @@
     new ResizeObserver(draw).observe(svgBox);
   }
 
-  /* ---- the last 20: form strip + the numbers, hit zones, party mates ---- */
+  /* ---- the recent games: form strip + the numbers, hit zones, party mates ---- */
   function drawRecentBits() {
     const G = S.recent;
-    if (!G.length) {
-      ['vpForm', 'vpNums', 'vpHits', 'vpMates'].forEach((id) => say($(id), 'No recent games found.'));
-      return;
-    }
+    if (!G.length) return ['vpForm', 'vpHits', 'vpMates', 'vpGuns', 'vpBuys', 'vpDist'].forEach((id) => drop($(id)));
+    $('vpFormTitle').textContent = `Last ${G.length} game${G.length > 1 ? 's' : ''}`;
     $('vpForm').innerHTML = `<div class="vp-strip">${G.slice().reverse().map((g) => `<button type="button" class="vp-sq" data-r="${g.res}" data-m="${esc(g.id)}" title="${esc(resWord(g.res) + ' · ' + g.map + ' · ' + g.mode + ' · ' + ago(g.t))}">${agentIcon(g.ag, 30)}<span class="vl-sr">${resWord(g.res)} on ${esc(g.map)}</span></button>`).join('')}</div>`;
     const R = G.filter((g) => g.rounds && !NO_ROUNDS.includes(g.mk));
     const sum = (arr, f) => arr.reduce((a, g) => a + (f(g) || 0), 0);
@@ -428,14 +462,15 @@
     // hit zones: the Weapons page's body, each zone lit by its share
     const z = { head: sum(G, (g) => g.hs), body: sum(G, (g) => g.bs), leg: sum(G, (g) => g.ls) };
     const share = (k) => (shots ? z[k] / shots : 0);
-    $('vpHits').innerHTML = shots ? `<div class="vp-hits">
+    if (!shots) drop($('vpHits'));
+    else $('vpHits').innerHTML = `<div class="vp-hits">
       <svg class="vp-body" viewBox="0 0 120 236" aria-hidden="true" style="--h:${share('head')};--b:${share('body')};--l:${share('leg')}">
         <circle data-z="head" cx="60" cy="24" r="17"/>
         <path data-z="body" d="M36 48h48a8 8 0 0 1 8 8v74a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V56a8 8 0 0 1 8-8zM14 54a6 6 0 0 1 11 0v62a5.5 5.5 0 0 1-11 0zM95 54a6 6 0 0 1 11 0v62a5.5 5.5 0 0 1-11 0z"/>
         <path data-z="leg" d="M34 140h24v86a7 7 0 0 1-7 7h-10a7 7 0 0 1-7-7zM62 140h24v86a7 7 0 0 1-7 7H69a7 7 0 0 1-7-7z"/>
       </svg>
       <ol class="vp-zones">${[['head', 'Head'], ['body', 'Body'], ['leg', 'Legs']].map(([k, n]) => `<li><span>${n}</span><span class="vp-zbar"><i style="width:${share(k) * 100}%"></i></span><b>${pct(z[k], shots, 1)}</b><small>${num(z[k])} hits</small></li>`).join('')}</ol>
-    </div>` : '<p class="vp-empty">No hits recorded in these games.</p>';
+    </div>`;
 
     // party mates: same party_id as the player in a game
     const mates = {};
@@ -448,11 +483,12 @@
       e.ag[a.slug || a.name] = a;
     }));
     const list = Object.values(mates).sort((a, b) => b.n - a.n).slice(0, 8);
-    $('vpMates').innerHTML = list.length ? `<div class="vp-mates">${list.map((e) => {
+    if (!list.length) drop($('vpMates'));
+    else $('vpMates').innerHTML = `<div class="vp-mates">${list.map((e) => {
       const link = okName(e.name) && okTag(e.tag);
       const inner = `<span class="vp-mate-ags">${Object.values(e.ag).slice(0, 3).map((a) => agentIcon(a, 28)).join('')}</span><span class="vp-mate-txt"><b>${esc(e.name)}<i>#${esc(e.tag)}</i></b><small>${e.n} game${e.n > 1 ? 's' : ''} together · ${pct(e.w, e.n)} won</small></span>`;
       return link ? `<a class="vp-mate" href="${href(e.name, e.tag)}">${inner}</a>` : `<div class="vp-mate">${inner}</div>`;
-    }).join('')}</div>` : '<p class="vp-empty">Solo queue: no party mates in the last 20 games.</p>';
+    }).join('')}</div>`;
 
     $('vpForm').addEventListener('click', (e) => {
       const b = e.target.closest('[data-m]');
@@ -480,7 +516,7 @@
   function drawMain() {
     const box = $('vpMain');
     const list = agentStats(playable());
-    if (!list.length) return say(box, 'No games to pick a main agent from yet.');
+    if (!list.length) return drop(box);
     const e = list[0], a = e.ag;
     const top = Object.entries(e.maps).sort((x, y) => y[1] - x[1])[0];
     const keys = ['c', 'q', 'e', 'x'];
@@ -492,16 +528,16 @@
       <div class="va-file">
         <div class="va-roleline">${agentIcon(a, 40)}<p><b>${esc(a.name)}</b>Picked in ${e.n} of their last ${playable().length} games (${pct(e.n, playable().length)})${a.slug ? `. <a href="/valorant/agents/${a.slug}">${esc(a.name)}'s abilities and history</a>` : ''}.</p></div>
         <dl class="va-facts">
-          <div><dt>Games</dt><dd>${e.n} · ${e.w}W ${e.n - e.w}L</dd></div>
+          <div><dt>Record</dt><dd>${e.w}W ${e.n - e.w}L</dd></div>
           <div><dt>Win %</dt><dd>${pct(e.w, e.n)}</dd></div>
           <div><dt>K/D</dt><dd>${ratio(e.k, e.d)}</dd></div>
           <div><dt>KDA</dt><dd>${ratio(e.k + e.a, e.d)}</dd></div>
           <div><dt>ACS</dt><dd>${num(e.r ? e.acs / e.r : NaN)}</dd></div>
           <div><dt>ADR</dt><dd>${num(e.r ? e.dmg / e.r : NaN)}</dd></div>
           <div><dt>Headshot %</dt><dd>${pct(e.hs, e.sh, 1)}</dd></div>
-          <div><dt>Best-known map</dt><dd>${top ? `${esc(top[0])} · ${top[1]} game${top[1] > 1 ? 's' : ''}` : '-'}</dd></div>
+          <div><dt>Top map</dt><dd title="${top ? `${top[1]} game${top[1] > 1 ? 's' : ''} there` : ''}">${top ? esc(top[0]) : '-'}</dd></div>
         </dl>
-        ${e.ct && a.slug ? `<div class="vp-casts"><small>Abilities a round (last 20 games)</small><div>${keys.map((k, i) => `<span><img src="/images/valorant/agents/${a.slug}-${k}.webp" alt="" width="36" height="36" loading="lazy" decoding="async"><kbd>${k.toUpperCase()}</kbd><b>${num(e.casts[i] / e.ct, 2)}</b></span>`).join('')}</div></div>` : ''}
+        ${e.ct && a.slug ? `<div class="vp-casts"><small>Abilities a round (last ${S.recent.length} games)</small><div>${keys.map((k, i) => `<span><img src="/images/valorant/agents/${a.slug}-${k}.webp" alt="" width="36" height="36" loading="lazy" decoding="async"><kbd>${k.toUpperCase()}</kbd><b>${num(e.casts[i] / e.ct, 2)}</b></span>`).join('')}</div></div>` : ''}
       </div>
     </div>`;
   }
@@ -512,7 +548,7 @@
     const n = { Duelist: 0, Initiator: 0, Controller: 0, Sentinel: 0 };
     G.forEach((g) => g.ag.role in n && n[g.ag.role]++);
     const all = Object.values(n).reduce((a, b) => a + b, 0);
-    if (!all) return say(box, 'No games to read roles from yet.');
+    if (!all) return drop(box);
     const most = Math.max(...Object.values(n));
     box.innerHTML = `<ol class="vp-roles">${Object.entries(n).sort((a, b) => b[1] - a[1]).map(([r, v]) =>
       `<li><img src="/images/valorant/agents/role-${r.toLowerCase()}.webp" alt="" width="26" height="26" loading="lazy" decoding="async"><span>${r}</span><span class="vp-zbar"><i style="width:${(v / most) * 100}%"></i></span><b>${pct(v, all)}</b><small>${v} game${v === 1 ? '' : 's'}</small></li>`).join('')}</ol>`;
@@ -536,7 +572,7 @@
   function drawMatches() {
     const G = S.recent;
     const list = $('vpMatchList'), chips = $('vpModes');
-    if (!G.length) return say(list, 'No recent games found.');
+    if (!G.length) return drop(list);
     const modes = [...new Map(G.map((g) => [g.mk, g.mode])).entries()];
     let pick = params().get('mode') || '';
     if (!modes.some(([k]) => k === pick)) pick = '';
@@ -560,10 +596,10 @@
   }
   function drawOld(ok) {
     const box = $('vpOld');
-    if (!ok) return say(box, 'Older games aren\'t available right now.');
+    if (!ok) return drop(box);
     const ids = new Set(S.recent.map((g) => g.id));
     const G = S.stored.filter((g) => !ids.has(g.id));
-    if (!G.length) return say(box, 'No older games stored for this player yet.');
+    if (!G.length) return drop(box);
     $('vpOldN').textContent = `${G.length} games`;
     box.innerHTML = G.map((g) => `<li class="vp-row vp-row--old" data-r="${g.res}">${row(g, false)}</li>`).join('');
   }
@@ -659,7 +695,7 @@
   function drawAgents() {
     const box = $('vpAgents'), tbl = $('vpAgentRows');
     const list = agentStats(playable());
-    if (!list.length) return say(box, 'No games to read agents from yet.');
+    if (!list.length) return drop(box), drop(tbl);
     $('vpAgentsN').textContent = `${playable().length} games`;
     box.innerHTML = list.map((e) => {
       const a = e.ag, tag = a.slug ? 'a' : 'div';
@@ -674,7 +710,7 @@
     tbl.innerHTML = list.map((e) => `<tr><th scope="row"><span class="vp-pl">${agentIcon(e.ag, 28)}<span class="vp-pl-txt"><span>${esc(e.ag.name)}</span><small>${esc(e.ag.role)}</small></span></span></th><td>${e.n}</td><td>${e.w}-${e.n - e.w}</td><td>${pct(e.w, e.n)}</td><td>${ratio(e.k, e.d)}</td><td>${ratio(e.k + e.a, e.d)}</td><td>${num(e.r ? e.acs / e.r : NaN)}</td><td>${num(e.r ? e.dmg / e.r : NaN)}</td><td>${pct(e.hs, e.sh, 1)}</td></tr>`).join('');
   }
 
-  /* ---- maps tab: every map they've played, with sides from the last 20 ---- */
+  /* ---- maps tab: every map they've played, with sides from the recent games ---- */
   function drawMaps() {
     const box = $('vpMaps');
     const by = {};
@@ -688,7 +724,7 @@
       if (g.x) (e.atk[0] += g.x.atk[0]), (e.atk[1] += g.x.atk[1]), (e.def[0] += g.x.def[0]), (e.def[1] += g.x.def[1]);
     });
     const list = Object.values(by).sort((a, b) => b.n - a.n);
-    if (!list.length) return say(box, 'No games to read maps from yet.');
+    if (!list.length) return drop(box);
     box.innerHTML = list.map((e) => {
       const best = Object.values(e.ags).sort((a, b) => b.n - a.n).slice(0, 3);
       const side = (lbl, s) => `<span class="vp-side"><small>${lbl}</small><span class="vp-zbar"><i style="width:${s[1] ? (s[0] / s[1]) * 100 : 0}%"></i></span><b>${s[1] ? pct(s[0], s[1]) : '-'}</b></span>`;
@@ -696,13 +732,13 @@
         <span class="vp-map-pic"><img src="${mapCard(e.map)}" alt="" width="720" height="405" loading="lazy" decoding="async" onerror="this.remove()"><b>${esc(e.map)}</b><span class="vp-map-wr" data-good="${e.w / e.n >= 0.5}">${pct(e.w, e.n)}</span></span>
         <span class="vp-map-body">
           <span class="vp-map-line"><span>${e.n} game${e.n > 1 ? 's' : ''} · ${e.w}W ${e.n - e.w}L</span><span>${ratio(e.k, e.d)} K/D · ${num(e.r ? e.acs / e.r : NaN)} ACS</span></span>
-          ${e.atk[1] || e.def[1] ? side('Attack rounds', e.atk) + side('Defense rounds', e.def) : '<span class="vp-map-note">Sides come from the last 20 games</span>'}
+          ${e.atk[1] || e.def[1] ? side('Attack rounds', e.atk) + side('Defense rounds', e.def) : '<span class="vp-map-note">Sides come from the last ${S.recent.length} games</span>'}
           <span class="vp-map-ags">${best.map((b) => agentIcon(b.ag, 28)).join('')}<small>most played here</small></span>
         </span></a>`;
     }).join('');
   }
 
-  /* ---- weapons tab: kills per gun, kill distances, buys (all from the last 20's kills + rounds) ---- */
+  /* ---- weapons tab: kills per gun, kill distances, buys (all from the recent games' kills + rounds) ---- */
   function drawWeapons() {
     const D = S.recent.filter((g) => g.x);
     const guns = {}, dist = [], buys = {}, armor = { Heavy: 0, Light: 0, None: 0 };
@@ -724,7 +760,7 @@
       });
     });
     const kills = Object.values(guns).reduce((a, e) => a + e.n, 0);
-    if (!kills) ['vpGuns', 'vpDist'].forEach((id) => say($(id), 'No kills recorded in the last 20 games.'));
+    if (!kills) ['vpGuns', 'vpDist'].forEach((id) => drop($(id)));
     else {
       let list = Object.values(guns).sort((a, b) => b.n - a.n);
       if (list.length > 13) {
@@ -741,9 +777,9 @@
         const top = Math.max(...cnt);
         $('vpDist').innerHTML = `<div class="vp-hist" role="img" aria-label="Kills by distance">${cnt.map((c, i) => `<span class="vp-hist-col" title="${c} kills at ${B[i]}${i === B.length - 1 ? '+' : '-' + B[i + 1]} m"><b>${c}</b><i style="height:${top ? (c / top) * 100 : 0}%"></i><small>${B[i]}${i === B.length - 1 ? '+' : ''}</small></span>`).join('')}</div>
           <p class="vp-hist-foot">Metres from the killer to the victim, flat on the map. Average <b>${num(avg(dist), 1)} m</b>, longest <b>${num(Math.max(...dist), 0)} m</b>.</p>`;
-      } else say($('vpDist'), 'No kill distances in these games.');
+      } else drop($('vpDist'));
     }
-    if (!rounds) return say($('vpBuys'), 'No buy data in the last 20 games.');
+    if (!rounds) return drop($('vpBuys'));
     const bl = Object.entries(buys).sort((a, b) => b[1].n - a[1].n).slice(0, 8);
     $('vpBuys').innerHTML = `<div class="vp-tiles vp-tiles--3">${tile('Average loadout', num(value / rounds), 'Credits on them a round')}${tile('Heavy shields', pct(armor.Heavy, rounds), `${armor.Heavy} of ${rounds} rounds`)}${tile('No shields', pct(armor.None, rounds), 'Saves and pistol rounds')}</div>
       <ol class="vp-guns vp-guns--buys">${bl.map(([n, e]) => `<li><span class="vp-gun-pic">${e.w?.id ? `<img src="https://media.valorant-api.com/weapons/${encodeURIComponent(e.w.id)}/killstreamicon.png" alt="" loading="lazy" decoding="async">` : ''}</span><span class="vp-gun-name"><b>${esc(n)}</b></span><span class="vp-zbar"><i style="width:${(e.n / bl[0][1].n) * 100}%"></i></span><b class="vp-gun-n">${pct(e.n, rounds)}</b><small class="vp-gun-s">${e.n} rounds</small></li>`).join('')}</ol>`;
@@ -753,7 +789,7 @@
   function drawActs() {
     const box = $('vpActs');
     const list = acts().filter((a) => a.games).reverse();
-    if (!list.length) return say(box, 'No ranked acts on record.');
+    if (!list.length) return drop(box);
     const most = Math.max(...list.map((a) => a.games));
     box.innerHTML = `<ol class="vp-acts">${list.map((a, i) => `<li${i === 0 ? ' class="is-now"' : ''}>
       <span class="vp-act-ico">${rankImg(a.end, 52) || '<i>?</i>'}</span>
@@ -784,6 +820,7 @@
         setTimeout(() => delete $('vpCopy').dataset.done, 1600);
       } catch {}
     });
+    return show;
   }
 
   /* ---- find another player + the last ones you opened (localStorage vl-recent) ---- */

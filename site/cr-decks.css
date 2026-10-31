@@ -1,12 +1,17 @@
 /* ============================================================
-   /clash-royale/decks (Oct 30 2026). On top of codm-banner.css + codm-tools.css (banner, tray,
-   .ct-sec rhythm, --codm-side inset) and cr.css (titles, the King, keys).
-   A deck = one raised box: rank, the 8 cards in a sunken well (the game's own card art, cost on
-   each), then win rate + facts + the red Copy key. Phones: rank + cards on top (4 a row), stats under.
+   /clash-royale/decks (Oct 30 2026; v2 Oct 31 2026, Adrian: "it should look like a real deck").
+   On top of codm-banner.css + codm-tools.css (banner, tray, .ct-sec rhythm, --codm-side inset)
+   and cr.css (titles, the King, keys).
+   A deck = one raised box: rank + name (CR.name) + the evo/hero line + the edit pen; the 8 cards
+   4 x 2 in a sunken well (the game's own art, cost on an elixir drop), tower + avg + cycle under them;
+   win rate with its 95% margin strip, numbers, elixir curve; then the CoC card bar (flame like,
+   grey Copy deck, share). 2 decks a row on desktop, 1 on phones; each deck lays itself out by its own
+   width (container query), so the stats sit beside the cards only when there's room.
+   Under the list: the meta map (cr-decks.js metaMap).
    ============================================================ */
 
 /* ---- filter row: the card picker key + the picked cards as chips ---- */
-.crd-bar {
+.crd-tools {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -69,6 +74,52 @@
   color: #8d8f95;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* ---- playstyle chips: the CoC recipe (a well at rest, the grey raised key when picked) ---- */
+.crd-styles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px var(--codm-side) 0;
+}
+.crd-st {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #a3a5ab;
+  font: 700 11px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.crd-st span {
+  color: #6b6e76;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.crd-st:hover {
+  color: #e6e8ec;
+}
+.crd-st[aria-pressed='true'] {
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.crd-st[aria-pressed='true'] span {
+  color: #a3a5ab;
+}
+.crd-st:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
 }
 
 /* the picker: every card that was played, most used first; picked = red ring, excluded = grey + slash */
@@ -134,182 +185,658 @@
   outline-offset: 1px;
 }
 
-/* ---- the list ---- */
+/* ============================================================
+   THE LIST: 2 a row on desktop, 1 on phones
+   ============================================================ */
 .crd-list {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
+@media (max-width: 970px) {
+  .crd-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
 .crd-deck {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 520px) minmax(280px, 1fr);
-  align-items: center;
-  gap: 18px;
-  padding: 14px 18px 14px 14px;
+  --win: #3a9d6a;
+  --win-text: #66cf98;
+  --loss: var(--lb-red);
+  --loss-text: var(--lb-red-text);
+  container: deck / inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
   background: var(--lb-box);
   box-shadow: var(--lb-shadow);
+  transition: box-shadow 0.2s ease;
+}
+.crd-deck:hover {
+  box-shadow: var(--lb-shadow-hover);
+}
+
+/* ---- head: rank, name + variant line, pen ---- */
+.crd-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 .crd-rank {
+  flex: none;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 6px;
   border-radius: var(--lb-r);
   background: var(--lb-well);
   box-shadow: var(--lb-ring-well);
-  font: 400 18px/1 'Lilita One', sans-serif;
-  color: #c4c6cc;
+  color: #a3a5ab;
+  font: 400 16px/1 'Lilita One', 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
 }
-.crd-deck:first-child .crd-rank {
+.crd-rank--top {
+  border: 2px solid var(--lb-red-edge);
   background: var(--lb-red);
   box-shadow: var(--lb-btn-red);
   color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+.crd-id {
+  flex: 1;
+  min-width: 0;
+}
+.crd-name {
+  margin: 0;
+  overflow: hidden;
+  font: 400 21px/1.15 'Lilita One', 'Oxanium', sans-serif;
+  letter-spacing: 0.01em;
+  color: #fff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 1px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 2px 0 #000;
+}
+.crd-var {
+  margin: 3px 0 0;
+  overflow: hidden;
+  font-size: 11.5px;
+  color: #8d8f95;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crd-edit {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #c9ccd2;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+.crd-edit:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.crd-edit:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.crd-edit:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+}
+
+/* ---- body: the hand + the numbers (side by side once the deck is wide enough) ---- */
+.crd-body {
+  display: grid;
+  gap: 12px;
+}
+@container deck (min-width: 540px) {
+  .crd-body {
+    grid-template-columns: minmax(0, 1fr) 190px;
+  }
+}
+
+/* the hand: a sunken mat with a faint red light, the 8 cards 4 x 2 like the game's deck screen */
+.crd-hand {
+  container: hand / inline-size;
+  padding: 8px 10px 0;
+  border-radius: var(--lb-r);
+  background: radial-gradient(120% 70% at 50% 0%, rgba(194, 59, 59, 0.12), rgba(194, 59, 59, 0) 65%), var(--lb-well);
+  box-shadow: var(--lb-ring-well);
 }
 .crd-cards {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px 6px;
   margin: 0;
-  padding: 8px;
+  padding: 0;
   list-style: none;
-  border-radius: var(--lb-r);
-  background: var(--lb-well);
-  box-shadow: var(--lb-ring-well);
 }
 .crd-card {
   position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.18s var(--lb-ease), filter 0.18s ease;
 }
 .crd-card img {
   display: block;
   width: 100%;
   height: auto;
+  -webkit-user-drag: none;
 }
-/* the cost, on an elixir drop at the card's foot (the game's own pink: game art, not our accent) */
+.crd-card:hover {
+  z-index: 1;
+  transform: translateY(-4px) scale(1.04);
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.55));
+}
+.crd-card:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+/* the elixir drop, top-left like the game's (drawn as SVG, no image file) */
 .crd-cost {
   position: absolute;
-  left: 50%;
-  bottom: -4px;
+  top: 9%;
+  left: -5%;
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #1a0820;
-  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
-  background: radial-gradient(circle at 40% 35%, #f59bf5, #c23ad2 60%, #7d1c8f);
+  width: 31%;
+  aspect-ratio: 24 / 30;
+  padding-top: 9%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 30'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.4' cy='.62' r='.6'%3E%3Cstop offset='0' stop-color='%23ffb6f8'/%3E%3Cstop offset='.5' stop-color='%23d34ed8'/%3E%3Cstop offset='1' stop-color='%237a1c84'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M12 1.5S2.2 13.2 2.2 19.6a9.8 9.8 0 0 0 19.6 0C21.8 13.2 12 1.5 12 1.5z' fill='url(%23g)' stroke='%23240629' stroke-width='2'/%3E%3Cellipse cx='8.6' cy='16' rx='2' ry='3.2' fill='%23fff' opacity='.45'/%3E%3C/svg%3E") center / contain no-repeat;
   color: #fff;
-  font: 400 11px/1 'Lilita One', sans-serif;
-  text-shadow: 0 1px 0 #000;
-  transform: translateX(-50%);
+  font: 400 clamp(11px, 4.6cqi, 19px)/1 'Lilita One', 'Oxanium', sans-serif;
+  text-shadow: 0 0 1px #240629, 1px 1px 0 #240629, -1px 1px 0 #240629, 1px -1px 0 #240629, -1px -1px 0 #240629;
+  pointer-events: none;
 }
-
-.crd-stats {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'wr act' 'facts facts';
-  align-items: center;
-  gap: 12px 16px;
-  min-width: 0;
-}
-.crd-wr {
-  grid-area: wr;
-}
-.crd-act {
-  grid-area: act;
-}
-.crd-facts {
-  grid-area: facts;
-}
-.crd-wr small,
-.crd-facts dt {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #7d7f86;
-}
-.crd-wr b {
-  display: block;
-  margin: 4px 0 6px;
-  font: 400 26px/1 'Lilita One', sans-serif;
-  color: #fff;
-  font-variant-numeric: tabular-nums;
-}
-/* the bar: a well with a 50% tick, filled red to the win rate */
-.crd-wrbar {
-  position: relative;
-  display: block;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--lb-well);
-  box-shadow: inset 0 0 0 1px var(--lb-edge);
-  overflow: hidden;
-}
-.crd-wrbar i {
-  display: block;
-  height: 100%;
-  background: var(--lb-red);
-}
-.crd-wrbar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.45);
-}
-.crd-facts {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, auto));
-  justify-content: space-between;
-  gap: 8px 14px;
-  margin: 0;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
-.crd-facts dd {
+/* tower troop + average elixir + 4-card cycle, a strip along the mat's foot */
+.crd-foot {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin: 3px 0 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #e6e8ec;
-  font-variant-numeric: tabular-nums;
-}
-.crd-drop {
-  width: 9px;
-  height: 12px;
-  fill: #d055dd;
-}
-.crd-act {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  gap: 14px;
+  margin: 4px -10px 0;
+  padding: 7px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 0 0 var(--lb-r) var(--lb-r);
 }
 .crd-tower {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: #a3a5ab;
+  gap: 7px;
+  min-width: 0;
+  margin-right: auto;
+  overflow: hidden;
+  color: #c4c6cc;
+  font-size: 12px;
+  font-weight: 600;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .crd-tower img {
-  width: 18px;
+  flex: none;
+  width: 22px;
   height: auto;
+}
+.crd-fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+.crd-fact b {
+  color: #fff;
+  font: 400 16px/1 'Lilita One', 'Oxanium', sans-serif;
+}
+.crd-fact small {
+  color: #8d8f95;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.crd-drop {
+  align-self: center;
+  width: 10px;
+  height: 13px;
+  fill: #d34ed8;
+}
+.crd-cyc {
+  align-self: center;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: #a3a5ab;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- the numbers ---- */
+.crd-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.crd-wr {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 2px 10px;
+}
+.crd-wr small,
+.crd-curve-wrap > small {
+  grid-column: 1 / -1;
+  color: #8d8f95;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.crd-wr b {
+  color: #fff;
+  font: 400 34px/0.95 'Lilita One', 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 0 #000;
+}
+.crd-wr b i {
+  margin-left: 1px;
+  font-size: 0.55em;
+  font-style: normal;
+  color: #c4c6cc;
+}
+.crd-verdict {
+  justify-self: end;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: help;
+}
+.crd-verdict em {
+  margin-left: 3px;
+  color: #8d8f95;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.crd-verdict--win {
+  color: var(--win-text);
+}
+.crd-verdict--loss {
+  color: var(--loss-text);
+}
+.crd-verdict--flip {
+  color: #c4c6cc;
+}
+/* win rate strip (35-65%): the band = the 95% margin, the dot = the deck, the bright line = 50% */
+.crd-strip {
+  position: relative;
+  height: 10px;
+  margin: 2px 0 14px;
+  border-radius: 5px;
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  --c: #8d8f95;
+}
+.crd-strip--win {
+  --c: var(--win);
+}
+.crd-strip--loss {
+  --c: var(--loss);
+}
+.crd-strip::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: rgba(255, 255, 255, 0.4);
+}
+.crd-band {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 3px;
+  background: var(--c);
+  opacity: 0.35;
+}
+.crd-dot {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transform: translate(-50%, -50%);
+}
+.crd-strip small {
+  position: absolute;
+  top: 13px;
+  color: #6b6e76;
+  font-size: 9.5px;
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+}
+.crd-strip small:first-of-type {
+  transform: none;
+}
+.crd-strip small:last-of-type {
+  transform: translateX(-100%);
+}
+/* compact rows: label left, number right, raised rows in one well */
+.crd-rows {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 4px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crd-rows div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: var(--lb-row);
+  box-shadow: var(--lb-row-ring);
+}
+.crd-rows dt {
+  color: #8d8f95;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.crd-rows dd {
+  margin: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* elixir curve: how many cards at each cost */
+.crd-curve-wrap {
+  display: grid;
+  gap: 6px;
+}
+.crd-curve {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: 3px;
+  height: 52px;
+  padding-top: 12px; /* room for the tallest bar's count */
+  margin-bottom: 14px;
+}
+.crd-curve i {
+  position: relative;
+  height: max(3px, calc(var(--h) * 100%));
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(#e2e4e9, #8d8f95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.crd-curve i[data-n=''] {
+  background: #2a2c35;
+  box-shadow: none;
+}
+.crd-curve i::before {
+  content: attr(data-n);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 2px;
+  color: #c4c6cc;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: center;
+}
+.crd-curve b {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 3px;
+  color: #6b6e76;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* narrow deck (phones, small desktops): the numbers sit under the hand, two columns */
+@container deck (max-width: 539px) {
+  .crd-stats {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'wr rows' 'strip rows' 'curve rows';
+    gap: 8px 14px;
+    align-items: start;
+  }
+  .crd-wr {
+    grid-area: wr;
+  }
+  .crd-strip {
+    grid-area: strip;
+  }
+  .crd-rows {
+    grid-area: rows;
+    align-self: start;
+  }
+  .crd-curve-wrap {
+    grid-area: curve;
+  }
+  .crd-curve {
+    height: 42px;
+  }
+}
+@container deck (max-width: 380px) {
+  .crd-wr {
+    grid-template-columns: auto;
+  }
+  .crd-verdict {
+    justify-self: start;
+  }
+  .crd-tower {
+    font-size: 0;
+  }
+}
+
+/* ---- the card bar: the CoC army cards' keys (flame like, grey Copy deck, share) ---- */
+.crd-bar {
+  display: grid;
+  grid-template-columns: 68px auto 68px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.crd-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 40px;
+  padding: 0 8px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  font: 700 13px/1 'Oxanium', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+.crd-key:hover,
+.crd-share[aria-expanded='true'] {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.crd-key:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.crd-key:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+}
+.crd-copy {
+  min-width: 170px;
+  padding: 0 24px;
+  font-size: 12.5px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.crd-like:disabled {
+  cursor: progress;
+}
+.crd-like span {
+  font-variant-numeric: tabular-nums;
+}
+.crd-like span:empty {
+  display: none;
+}
+.crd-flame,
+.crd-ico {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.crd-flame {
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+.crd-like.is-liked .crd-flame {
+  fill: url(#crdFlameFill);
+  stroke: #ffb26b;
+  filter: drop-shadow(0 0 5px rgba(255, 138, 61, 0.45));
+}
+.crd-like.just-liked .crd-flame {
+  animation: crd-pop 0.32s var(--lb-ease);
+}
+@keyframes crd-pop {
+  40% {
+    transform: scale(1.25);
+  }
+}
+
+/* share panel (desktop): one panel, moved into whichever deck opened it (the CoC cards' panel) */
+.crd-sp {
+  position: absolute;
+  right: 14px;
+  bottom: 62px;
+  z-index: 20;
+  width: 220px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(20, 21, 26, 0.97);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+}
+.crd-sp[hidden] {
+  display: none;
+}
+.crd-sp a,
+.crd-sp button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  background: none;
+  color: #d5d8de;
+  font: 600 13px/1.2 'Oxanium', sans-serif;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+.crd-sp a:hover,
+.crd-sp button:hover,
+.crd-sp a:focus-visible,
+.crd-sp button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  outline: none;
+}
+.crd-sp .crd-ico {
+  width: 16px;
+  height: 16px;
+}
+.crd-sp hr {
+  height: 1px;
+  margin: 4px 6px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+.crd-brand {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+.crd-brand--facebook {
+  color: #0866ff;
+}
+.crd-brand--x {
+  color: #fff;
+}
+.crd-brand--reddit {
+  color: #ff4500;
+}
+.crd-brand--whatsapp {
+  color: #25d366;
+}
+
+/* a deck opened from the meta map glows twice */
+.crd-deck.is-target {
+  animation: crd-glow 1.6s ease-in-out 2;
+}
+@keyframes crd-glow {
+  50% {
+    box-shadow: var(--lb-shadow), 0 0 0 2px rgba(255, 255, 255, 0.5);
+  }
 }
 
 .crd-more {
   display: flex;
   margin: 16px auto 0;
 }
-.crd-more[hidden] {
-  display: none;
-}
+.crd-more[hidden],
 .crd-empty[hidden] {
   display: none;
 }
@@ -322,54 +849,327 @@
 .crd-empty .cv-say {
   margin: 0;
 }
+.crd-fail {
+  grid-column: 1 / -1;
+  color: #a3a5ab;
+}
 
-/* the steps under "How it's counted" use codm-tools.css .ct-steps */
+/* ============================================================
+   THE META MAP: x = games (log), y = win rate; one dot per deck = its win condition's art,
+   ringed by the verdict (green = winning for sure, grey = too close to call, red = losing for sure).
+   One series, so no legend box: the key under it names the three rings.
+   ============================================================ */
+.crm {
+  position: relative;
+  padding: 22px 22px 40px 54px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crm-plot {
+  position: relative;
+  height: 440px;
+  border-radius: var(--lb-r);
+  background: radial-gradient(90% 60% at 100% 0%, rgba(58, 157, 106, 0.07), transparent 70%), var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crm-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.crm-gy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.06);
+}
+.crm-gy b,
+.crm-gx b {
+  position: absolute;
+  color: #6b6e76;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.crm-gy b {
+  right: 100%;
+  margin-right: 8px;
+  transform: translateY(-50%);
+}
+.crm-gy--50 {
+  border-top: 2px solid rgba(255, 255, 255, 0.22);
+}
+.crm-gy--50 b {
+  color: #e6e8ec;
+}
+.crm-gx {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed rgba(255, 255, 255, 0.05);
+}
+.crm-gx b {
+  top: 100%;
+  margin-top: 7px;
+  transform: translateX(-50%);
+}
+.crm-q {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.2);
+  font: 700 10.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.crm-q--tl {
+  top: 12px;
+  left: 14px;
+}
+.crm-q--tr {
+  top: 12px;
+  right: 14px;
+}
+.crm-q--br {
+  bottom: 12px;
+  right: 14px;
+}
+.crm-q--bl {
+  bottom: 12px;
+  left: 14px;
+}
+.crm-dot {
+  --ring: #8d8f95;
+  position: absolute;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 2px solid var(--ring);
+  border-radius: 50%;
+  background: var(--art) 50% 40% / 165% auto no-repeat, #1b1c21;
+  box-shadow: 0 0 0 2px var(--lb-well), 0 4px 10px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.15s var(--lb-ease), opacity 0.2s ease, filter 0.2s ease;
+}
+.crm-dot--win {
+  --ring: #3a9d6a;
+}
+.crm-dot--loss {
+  --ring: var(--lb-red);
+}
+.crm-dot:hover,
+.crm-dot:focus-visible {
+  z-index: 3;
+  transform: translate(-50%, -50%) scale(1.3);
+  outline: none;
+}
+.crm-dot.is-out {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+.crm-tip {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  gap: 3px;
+  max-width: 240px;
+  padding: 10px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: #1a1b20;
+  box-shadow: var(--lb-shadow), 0 14px 30px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, calc(-100% - 26px));
+  pointer-events: none;
+}
+.crm-tip.is-below {
+  transform: translate(-50%, 30px);
+}
+.crm-tip[hidden] {
+  display: none;
+}
+.crm-tip b {
+  color: #fff;
+  font: 400 16px/1.1 'Lilita One', 'Oxanium', sans-serif;
+}
+.crm-tip span {
+  color: #a3a5ab;
+  font-size: 12px;
+}
+.crm-tip-cards {
+  display: flex;
+  gap: 2px;
+  margin-top: 5px;
+}
+.crm-tip-cards img {
+  width: 25px;
+  height: auto;
+}
+.crm-axis {
+  position: absolute;
+  margin: 0;
+  color: #8d8f95;
+  font: 700 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.crm-axis--x {
+  right: 22px;
+  bottom: 12px;
+}
+.crm-axis--y {
+  top: 22px;
+  left: 10px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+.crm-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 12px 0 0;
+  color: #a3a5ab;
+  font-size: 12px;
+}
+.crm-key-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  border: 2px solid var(--ring, #8d8f95);
+  border-radius: 50%;
+}
+.crm-key-dot:first-child {
+  margin-left: 0;
+}
 
-/* ---- medium: stats drop under the cards ---- */
-@media (max-width: 1180px) {
-  .crd-deck {
-    grid-template-columns: 40px minmax(0, 1fr);
+/* phones (Oct 31 2026, Adrian: "so tall"): the numbers hide behind the win-rate key in the mat's foot strip */
+.crd-stats-key {
+  display: none;
+}
+@media (max-width: 970px) {
+  .crd-deck:not(.is-open) .crd-stats {
+    display: none;
   }
-  .crd-stats {
-    grid-column: 2;
+  .crd-stats-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 30px;
+    padding: 0 6px 0 10px;
+    border: 2px solid var(--lb-edge);
+    border-radius: var(--lb-r);
+    background: var(--lb-raise);
+    box-shadow: var(--lb-btn);
+    color: #fff;
+    cursor: pointer;
+  }
+  .crd-stats-key b {
+    font: 400 15px/1 'Lilita One', 'Oxanium', sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .crd-stats-key--win b {
+    color: var(--win-text);
+  }
+  .crd-stats-key--loss b {
+    color: var(--loss-text);
+  }
+  .crd-stats-key svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #a3a5ab;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.2s ease;
+  }
+  .crd-stats-key[aria-expanded='true'] {
+    background: var(--lb-well);
+    box-shadow: var(--lb-ring-well);
+  }
+  .crd-stats-key[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+  /* the strip on phones: tower portrait only (its name is in the title), tighter spacing */
+  .crd-foot {
+    gap: 10px;
+    padding: 5px 8px 5px 10px;
+  }
+  .crd-tower {
+    font-size: 0;
+  }
+  .crd-deck {
+    gap: 10px;
+  }
+  .crd-body {
+    gap: 10px;
+  }
+  .crd-var {
+    margin-top: 1px;
+  }
+  .crd-rank,
+  .crd-edit {
+    min-width: 34px;
+    width: auto;
+    height: 34px;
+  }
+  .crd-edit {
+    width: 34px;
+  }
+  .crd-key {
+    height: 38px;
   }
 }
+
 /* ---- phones ---- */
-@media (max-width: 700px) {
-  /* rank in its own slim column at the top, cards 4 a row beside it, stats full width under both */
-  .crd-deck {
-    grid-template-columns: 30px minmax(0, 1fr);
-    align-items: start;
-    gap: 12px 10px;
-    padding: 12px;
-  }
-  .crd-rank {
-    width: 30px;
-    height: 30px;
-    font-size: 15px;
-  }
-  .crd-cards {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px 6px;
-    padding: 8px 8px 12px;
-  }
-  .crd-stats {
-    grid-column: 1 / -1;
-  }
-  .crd-wr b {
-    font-size: 22px;
-  }
-  .crd-act {
-    align-items: flex-end;
-  }
+@media (max-width: 970px) {
   .crd-count {
     width: 100%;
     margin-left: 0;
     order: 9;
   }
+  /* playstyles scroll sideways in one row */
+  .crd-styles {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .crd-styles::-webkit-scrollbar {
+    display: none;
+  }
+  .crd-deck {
+    padding: 12px;
+  }
+  .crd-name {
+    font-size: 19px;
+  }
+  .crm {
+    padding: 14px 12px 36px 40px;
+  }
+  .crm-plot {
+    height: 340px;
+  }
+  .crm-dot {
+    width: 28px;
+    height: 28px;
+  }
+  .crm-q {
+    font-size: 9px;
+  }
 }
-@media (max-width: 420px) {
-  .crd-facts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (prefers-reduced-motion: reduce) {
+  .crd-card,
+  .crm-dot,
+  .crd-key {
+    transition: none;
+  }
+  .crd-like.just-liked .crd-flame,
+  .crd-deck.is-target {
+    animation: none;
   }
 }

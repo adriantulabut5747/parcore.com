@@ -113,7 +113,8 @@
 
   // ---- PHONES: THE SEARCH STARTS TUCKED UNDER THE BOTTOM BAR (Oct 27 2026, Adrian). The Did you
   // know box gets just enough margin that the UID bar sits centred behind the fixed bottom nav on the
-  // first screen (measured, so it's exact on every phone). Re-run on a real width change only: phones
+  // first screen (measured, so it's exact on every phone). Off while the bar is hidden on phones (Oct 29
+  // 2026: the Today panel then follows the box with no gap). Re-run on a real width change only: phones
   // fire resize while the address bar slides.
   (function tuck() {
     const box = $('giDyk');
@@ -121,7 +122,7 @@
     const bn = $('bottomNav');
     const fit = () => {
       box.style.marginBottom = '';
-      if (innerWidth > 970 || !bn || !cta) return;
+      if (innerWidth > 970 || !bn || !cta || !cta.offsetHeight) return;
       const r = bn.getBoundingClientRect();
       const want = r.top + (r.height - cta.offsetHeight) / 2; // the bar's middle, in screen terms at scroll 0
       const now = cta.getBoundingClientRect().top + scrollY;

@@ -782,9 +782,6 @@
   $('acChart').addEventListener('mouseover', chartPick);
   $('acChart').addEventListener('focusin', chartPick);
 
-  // The jump tray: glides to its section, and its raised pill slides to the section you're in (genshin-core.js).
-  GI.jumpNav(document.querySelector('.ac-jump'));
-
   // ---- LOAD ----
   fetch('/genshin-achievements.json')
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))

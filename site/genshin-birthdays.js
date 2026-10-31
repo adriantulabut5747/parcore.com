@@ -632,30 +632,18 @@
     youOut();
   });
   $('bdQ').addEventListener('input', lines);
-  // Jump links (the tray + "Add to calendar"): GI.glide (genshin-core.js), an eased scroll, then the
-  // section's title rises in. Reduced motion = a plain jump.
-  document.querySelectorAll('.bd-jump a, .bd-bar-r a[href^="#"]').forEach((a) =>
+  // "Add to calendar": GI.glide (genshin-core.js), an eased scroll, then the section's title rises in.
+  // Reduced motion = a plain jump. (The jump tray went Oct 29 2026, Adrian.)
+  document.querySelectorAll('.bd-bar-r a[href^="#"]').forEach((a) =>
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href');
       const target = $(href.slice(1));
       if (!target) return;
       e.preventDefault();
-      history.replaceState(null, '', location.pathname + location.search + (href === '#spotlight' ? '' : href));
+      history.replaceState(null, '', location.pathname + location.search + href);
       GI.glide(target);
     }),
   );
-
-  // The jump tray lights the section you're in.
-  const jumps = [...document.querySelectorAll('.bd-jump a')];
-  const spy = new IntersectionObserver(
-    (es) =>
-      es.forEach((x) => {
-        if (!x.isIntersecting) return;
-        jumps.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + x.target.id));
-      }),
-    { rootMargin: '-40% 0px -55% 0px' },
-  );
-  ['spotlight', 'year', 'you', 'facts'].forEach((id) => spy.observe($(id)));
 
   serverTray($('bdServer'), () => chars.length && draw());
 

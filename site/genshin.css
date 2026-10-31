@@ -65,62 +65,25 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
   /* 10px = the CoC layouts / army pages' phone sides (1coclayouts.css .coc-content) */
   .gi-page { --coc-side: 10px; }
 }
-/* GROUND (Oct 22 2026): genshintools.com's night sky, in our red. Three soft
-   glows on a near-black gradient (body) and two faint dot grids over it
-   (body::before). Still on purpose (Adrian, Oct 23 2026): no moving stars and no
-   diagonal tiles (their hard edges read as lines). All fixed to the screen.
-   The scroller and content are see-through so the sky shows; the hero and the
-   nation / city bands keep their own pictures on top. */
-body.gi-page {
-  background:
-    radial-gradient(1100px 620px at 16% -8%, rgba(var(--gi-acc-rgb), 0.1), transparent 60%),
-    radial-gradient(950px 560px at 88% 2%, rgba(160, 170, 190, 0.045), transparent 58%),
-    radial-gradient(1200px 820px at 50% 118%, rgba(var(--gi-acc-rgb), 0.06), transparent 60%),
-    linear-gradient(#0e0d0f 0%, #0b0b0c 42%, #09090a 100%) #09090a;
-  background-attachment: fixed;
-}
-/* The #09090a above is the canvas colour (body's background spreads to the
-   whole window). Without it the canvas is the browser's white, which flashes
-   on phones while the address bar / bottom nav slide and the fixed gradient
-   catches up. */
-
-/* PHONE BREADCRUMB: 11layout.css BREADCRUMB (Oct 28 2026, shared with Minecraft). */
-body.gi-page::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: screen;
+/* GROUND (Oct 29 2026, Adrian): the TH Layouts / Armies pages' ground (th-layouts.css "Background grain"
+   + .coc-content's red light), same as valorant-weapons.css "GROUND": film grain over a near-black fade, a
+   whisper of red at the top. Replaced the night sky (fixed glows + dot grids). Nothing is fixed, so phones
+   have no full-screen repaint on scroll (handoff 5.4e). The hero and the nation / city bands keep their own
+   pictures on top. body's #040404 = the canvas colour (no white flash while phone bars slide). */
+body.gi-page { background: #040404; }
+.gi-page .coc-main {
+  background-color: #040404;
   background-image:
-    radial-gradient(circle, rgba(var(--gi-acc-rgb), 0.12) 1px, transparent 1px),
-    radial-gradient(circle, rgba(226, 232, 240, 0.05) 1px, transparent 1px);
-  background-size: 190px 190px, 96px 96px;
-}
-/* PHONES (Oct 27 2026, scroll lag): a fixed body background plus a screen-blended layer over it made
-   phones repaint the whole screen on every scroll frame. Same sky, moved onto the fixed ::before
-   (a layer the phone just slides, no repaint): glows + dots there, no blend, dots at half strength
-   in place of the old 50% opacity. */
-@media (max-width: 970px) {
-  body.gi-page { background: #09090a; }
-  body.gi-page::before {
-    opacity: 1;
-    mix-blend-mode: normal;
-    background-image:
-      radial-gradient(circle, rgba(var(--gi-acc-rgb), 0.06) 1px, transparent 1px),
-      radial-gradient(circle, rgba(226, 232, 240, 0.025) 1px, transparent 1px),
-      radial-gradient(1100px 620px at 16% -8%, rgba(var(--gi-acc-rgb), 0.1), transparent 60%),
-      radial-gradient(950px 560px at 88% 2%, rgba(160, 170, 190, 0.045), transparent 58%),
-      radial-gradient(1200px 820px at 50% 118%, rgba(var(--gi-acc-rgb), 0.06), transparent 60%),
-      linear-gradient(#0e0d0f 0%, #0b0b0c 42%, #09090a 100%);
-    background-size: 190px 190px, 96px 96px, auto, auto, auto, auto;
-  }
+    radial-gradient(1100px 460px at 22% 0%, rgba(194, 59, 59, 0.07), rgba(194, 59, 59, 0) 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(16, 16, 16), rgb(4, 4, 4));
+  background-size: auto, 220px 220px, auto;
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-attachment: local, scroll, scroll;
 }
 /* Rising stars (GI.stars): a canvas filling its host box, e.g. the Lobby's wish card. */
 .gi-stars { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
 .gi-page .main,
-.gi-page .coc-main,
 .gi-page .coc-content { background: transparent; }
 .gi { font-family: 'Sora', sans-serif; color: var(--gi-text); padding-bottom: 72px; }
 .gi * { font-family: inherit; }
@@ -253,32 +216,6 @@ body.gi-page::before {
 .gi-arrow { width: 36px; padding: 0 0 2px; }
 .gi-arrow:disabled { color: rgba(255, 255, 255, 0.25); cursor: default; }
 .gi-arrow:disabled:hover { background: var(--lb-raise); }
-
-/* JUMP NAV PILL (GI.jumpNav, Oct 24 2026): in a tray of #section links the picked key is one raised
-   pill sliding and stretching from tab to tab (the tab itself stays see-through). No slide on load
-   (.is-ready comes a frame later); reduced motion = it just moves. */
-.gi-tray.has-pill { position: relative; }
-.gi-pill {
-  position: absolute;
-  top: 5px;
-  bottom: 5px;
-  left: 0;
-  width: 0;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: var(--lb-raise);
-  box-shadow: var(--lb-btn);
-  opacity: 0;
-  pointer-events: none;
-}
-.gi-pill.is-on { opacity: 1; }
-.gi-tray.has-pill > .gi-tab { position: relative; z-index: 1; }
-.gi-tray.has-pill > .gi-tab.active { border-color: transparent; background: none; box-shadow: none; }
-@media (prefers-reduced-motion: no-preference) {
-  .gi-tray.has-pill.is-ready .gi-pill { transition: transform 0.45s var(--gi-ease), width 0.45s var(--gi-ease), opacity 0.2s ease; }
-  /* The tab's ink catches up a beat after the pill arrives under it. */
-  .gi-tray.has-pill > .gi-tab { transition: color 0.25s ease 0.12s; }
-}
 
 /* ARRIVAL (GI.glide, moved from genshin-birthdays.css Oct 24 2026): after a glide lands, the section's
    title and subtitle rise in and a short red line sweeps under the head, then fades. */
@@ -451,6 +388,7 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 .gi-code-text { flex: 1; min-width: 0; }
 .gi-code-name { font: 800 15px/1 'Sora', sans-serif; letter-spacing: 1px; color: #fff; overflow-wrap: anywhere; }
 .gi-code-rw { margin-top: 6px; font-size: 11.5px; color: var(--gi-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gi-code-when { margin-top: 5px; font-size: 11px; color: var(--gi-dim); font-variant-numeric: tabular-nums; }
 .gi-code .gi-primo { flex: none; }
 .gi-code-acts { display: flex; gap: 6px; flex: none; }
 @media (max-width: 970px) {
@@ -490,9 +428,9 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
   align-items: center;
   min-height: 196px;
   /* 48px = 11layout's gap under the bars (every page but the Lobby, whose hero
-     runs under them), + 44px of air (Adrian, Oct 23 2026: was 20; phones keep theirs). */
-  margin-top: 92px;
-  padding: 34px 44px; /* clear of the frame's corners (HEADER FRAME) */
+     runs under them), + 20px of air = Minecraft's tool banner (Adrian, Oct 29 2026: was 92px; phones keep theirs). */
+  margin-top: 68px;
+  padding: 34px 44px;
   overflow: hidden;
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
@@ -537,39 +475,30 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
    both, so it gets the icon's width too. Phones move the icon to the title's row. */
 .gi-tb-body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0 22px; min-width: 0; max-width: min(640px, 58%); }
 .gi-tb-copy { display: contents; }
-/* HEADER FRAME (Oct 23 2026, Adrian: "less contrast"): every .gi-tb wears a quiet gold frame.
-   Cut corners like the game's panels with a fainter echo line inside, hairline edges that fade
-   toward the middle (the gradients below), a four-point star on the top edge (the night sky's
-   sparkle). Markup added to each .gi-tb by genshin-core.js (TBF), so no page carries a copy. */
-.gi-tbf {
-  --c: 12px; /* the corner cut: the edges start this far in, the corner SVG draws the diagonal */
-  --e: rgba(211, 188, 142, 0.3);
-  --m: rgba(211, 188, 142, 0.06);
-  position: absolute;
-  z-index: 2;
-  inset: 10px;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, var(--e), var(--m) 28%, var(--m) 72%, var(--e)) 50% 0 / calc(100% - 2 * var(--c)) 1px no-repeat,
-    linear-gradient(90deg, var(--e), var(--m) 28%, var(--m) 72%, var(--e)) 50% 100% / calc(100% - 2 * var(--c)) 1px no-repeat,
-    linear-gradient(180deg, var(--e), var(--m) 50%, var(--e)) 0 50% / 1px calc(100% - 2 * var(--c)) no-repeat,
-    linear-gradient(180deg, var(--e), var(--m) 50%, var(--e)) 100% 50% / 1px calc(100% - 2 * var(--c)) no-repeat;
+/* FRAME (Oct 29 2026): the help panel + weapon panel hero only. One faint hairline inset from the box's edge,
+   and a short tick of our red in each corner. Markup = genshin-core.js TBF. */
+.gi-tbf { position: absolute; z-index: 2; inset: 10px; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 4px; pointer-events: none; }
+.gi-tbf-c { position: absolute; width: 16px; height: 16px; border: 0 solid rgba(var(--gi-acc-rgb), 0.6); }
+.gi-tbf-c--tl { top: -1px; left: -1px; border-width: 1px 0 0 1px; border-top-left-radius: 4px; }
+.gi-tbf-c--tr { top: -1px; right: -1px; border-width: 1px 1px 0 0; border-top-right-radius: 4px; }
+.gi-tbf-c--bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; border-bottom-left-radius: 4px; }
+.gi-tbf-c--br { right: -1px; bottom: -1px; border-width: 0 1px 1px 0; border-bottom-right-radius: 4px; }
+/* MEDALLION (Oct 29 2026, Adrian picked it from ten options): the page icon on a round raised key with a thin red
+   ring, like the Paimon Menu's buttons. All on the <img> itself (padding = the disc around the picture), so no page
+   carries extra markup. */
+.gi-tb-icon {
+  grid-row: 1 / 3;
+  box-sizing: border-box;
+  width: 104px;
+  height: 104px;
+  padding: 20px;
+  object-fit: contain;
+  border: 2px solid var(--lb-edge);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #34363f, #1d1e24 70%);
+  box-shadow: var(--lb-btn), 0 0 0 5px rgba(214, 100, 106, 0.55);
+  margin: 5px; /* room for the ring */
 }
-.gi-tbf-c { position: absolute; width: 32px; height: 32px; }
-.gi-tbf-c--tl { top: 0; left: 0; }
-.gi-tbf-c--tr { top: 0; right: 0; transform: scaleX(-1); }
-.gi-tbf-c--bl { bottom: 0; left: 0; transform: scaleY(-1); }
-.gi-tbf-c--br { right: 0; bottom: 0; transform: scale(-1); }
-.gi-tbf-c svg { display: block; width: 100%; height: 100%; fill: none; stroke: rgba(211, 188, 142, 0.38); stroke-width: 1; }
-.gi-tbf-c svg .i { stroke: rgba(211, 188, 142, 0.16); }
-/* The star sits on the top edge; short lines taper out of it both ways. */
-.gi-tbf-star { position: absolute; top: -5px; left: 50%; width: 11px; height: 11px; transform: translateX(-50%); }
-.gi-tbf-star svg { display: block; width: 100%; height: 100%; fill: rgba(211, 188, 142, 0.55); }
-.gi-tbf-star::before,
-.gi-tbf-star::after { content: ''; position: absolute; top: 5px; width: 72px; height: 1px; }
-.gi-tbf-star::before { right: calc(100% + 5px); background: linear-gradient(270deg, rgba(211, 188, 142, 0.4), rgba(211, 188, 142, 0)); }
-.gi-tbf-star::after { left: calc(100% + 5px); background: linear-gradient(90deg, rgba(211, 188, 142, 0.4), rgba(211, 188, 142, 0)); }
-.gi-tb-icon { grid-row: 1 / 3; width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)); }
 .gi-tb .gi-title { grid-column: 2; font-size: clamp(26px, 2.5vw, 38px); line-height: 1.04; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55)); }
 .gi-tb-desc { grid-column: 2; margin-top: 10px; max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #b9bdc4; text-wrap: pretty; }
 /* Facts (Oct 23 2026): no chip boxes -- one flat line of numbers under a gold
@@ -616,16 +545,14 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 .gi-note { margin-top: 18px; font-size: 11.5px; line-height: 1.6; color: var(--gi-dim); }
 @media (min-width: 971px) and (max-width: 1350px) {
   .gi-tb-body { gap: 0 18px; max-width: 74%; }
-  .gi-tb-icon { width: 60px; height: 60px; }
+  .gi-tb-icon { width: 88px; height: 88px; padding: 17px; }
   .gi-tb-art { width: 50%; }
 }
 @media (max-width: 970px) {
   /* 52px = 20px under the secondary bar, the CoC layouts / army .tb gap */
   .gi-tb { min-height: 0; margin-top: 52px; padding: 22px 20px 18px; }
   .gi-tbf { inset: 6px; }
-  .gi-tbf-c { width: 24px; height: 24px; }
-  .gi-tbf-star::before,
-  .gi-tbf-star::after { width: 44px; }
+  .gi-tbf-c { width: 12px; height: 12px; }
   .gi-tb-art {
     width: 100%;
     -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.5) 50%, #000 100%);
@@ -640,7 +567,7 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
      squeezed the title onto two lines and the sentence onto four. Now a small icon
      shares the title's row and everything below runs the banner's full width. */
   .gi-tb-body { gap: 0 10px; max-width: none; }
-  .gi-tb-icon { grid-row: auto; width: 30px; height: 30px; }
+  .gi-tb-icon { grid-row: auto; width: 46px; height: 46px; padding: 8px; margin: 3px; box-shadow: var(--lb-btn), 0 0 0 3px rgba(214, 100, 106, 0.55); }
   .gi-tb .gi-title { font-size: 21px; line-height: 1.15; white-space: nowrap; }
   /* Oct 24 2026 (Adrian: a shorter banner): two lines of sentence at most, no facts line. */
   .gi-tb-desc {

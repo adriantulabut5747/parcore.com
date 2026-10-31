@@ -318,6 +318,9 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
     --lift: 14px; /* Adrian: Klee and her box sit a little higher */
     --fire-x: 39%;
     --fire-y: calc(var(--ah) - 51.5vw - var(--lift));
+    /* The hero's dark ground fades into the page's grain from the picture's foot down (Adrian, Oct 29 2026: the
+       hard line between the two read as a seam). Solid until the art ends, so there's no step under it. */
+    background: linear-gradient(180deg, #0b0a0c calc(var(--ah) - var(--lift) - 1px), rgba(11, 10, 12, 0) 100%);
   }
   .gi-hero-bg {
     top: calc(-1 * var(--lift));
@@ -337,7 +340,7 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
   }
   .gi-hero-fx::before { width: 110vw; }
   .gi-hero-fx i { top: calc(var(--fire-y) - 8vw); left: calc((var(--x) - 0.05) * 100%); }
-  .gi-hero-grid { display: block; padding-top: 0; padding-bottom: 40px; }
+  .gi-hero-grid { display: block; padding-top: 0; padding-bottom: 0; } /* the map's own 48px is the gap (Adrian: 88px was too much) */
   /* --say-up (Adrian, Oct 28 2026): the Did you know box, and the title above it, sit this much
      higher; the box's equal margin-bottom keeps the search where it was (below the fold at landing). */
   .gi-hero-main { --say-up: 16px; position: relative; display: block; min-height: 0; max-width: none; padding: calc(var(--ah) - 36vw - var(--lift) - var(--say-up)) 0 0; }
@@ -352,13 +355,20 @@ a.gi-today-cell:hover { background: rgba(255, 255, 255, 0.04); }
   .gi-say-who { margin-bottom: 4px; font-size: 13px; }
   .gi-lede { height: 4.65em; font-size: 13px; line-height: 1.55; }
   .gi-say-next { right: 12px; bottom: 9px; }
-  .gi-hero-cta { margin-top: 14px; }
+  .gi-hero-cta { display: none; } /* no player search on phones (Adrian, Oct 29 2026): Player lookup is in the Tools tab */
   .gi-find { flex-basis: 100%; max-width: none; }
   .gi-hit-go { font-size: 0; gap: 0; } /* arrow only */
-  .gi-today { flex-direction: column; margin-top: 20px; background: rgba(14, 14, 17, 0.7); }
-  .gi-today-cell { border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
-  .gi-today-cell:first-child { border-top: 0; }
-  .gi-today-big { font-size: 28px; }
+  /* Compact Today panel (Oct 29 2026, Adrian: "compress it"): ~320px -> ~210px. The clock shares a row with its
+     label, the books stay one row of 8, the birthday is one line. */
+  .gi-today { flex-direction: column; margin-top: 0; background: rgba(14, 14, 17, 0.7); }
+  .gi-today-cell { gap: 8px; padding: 12px 14px; border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+  .gi-today-cell:first-child { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 10px 12px; border-top: 0; }
+  .gi-today-cell:first-child .gi-today-top { grid-column: 1 / -1; margin-bottom: 0; }
+  .gi-today-big { justify-self: end; font-size: 22px; }
+  .gi-today-books { gap: 4px; }
+  .gi-today-bday { gap: 10px; }
+  .gi-today-bday .gi-tile { width: 30px; height: 30px; }
+  .gi-today-bday p { font-size: 12.5px; line-height: 1.35; }
 }
 
 /* ---- PLAYER LOOKUP: the box is shared (genshin.css "PLAYER LOOKUP BOX") ---- */
@@ -746,17 +756,19 @@ a.gm-row:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
 
 /* ---- CURRENT WISHES: one light card per live wish ---- */
 .gwl-card { flex: 0 0 calc((100% - 32px) / 3); scroll-snap-align: start; display: flex; flex-direction: column; overflow: hidden; color: inherit; text-decoration: none; transition: transform 0.25s var(--gi-ease), box-shadow 0.25s ease; }
-/* Element dress (Oct 27 2026, Adrian: the grey cards were plain): the whole card takes the featured
-   5-star's element, like the Player lookup's build card (.gp-build): tinted ground, star dust and
-   four-point sparkles in that colour. The weapon wish has no element: it wears the 5-star gold. */
+/* Element dress (Oct 27 2026, Adrian: the grey cards were plain): the featured 5-star's element, like the
+   Player lookup's build card (.gp-build). Toned down Oct 29 2026 (Adrian: "still want the dark grey"): the
+   element lives in the art (glow behind the character, star dust, sparkles, a thin line under it); the body
+   is our box grey with only a breath of the colour at its top, and the edge is the site's dark edge.
+   The weapon wish has no element: it wears the 5-star gold. */
 .gwl-card {
   --gwl-spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.9 6.6 13.4 9.1 20 10 13.4 10.9 10.9 13.4 10 20 9.1 13.4 6.6 10.9 0 10 6.6 9.1 9.1 6.6 10 0Z'/%3E%3C/svg%3E");
   position: relative;
   isolation: isolate;
-  border-color: color-mix(in srgb, var(--gi-el) 35%, var(--lb-edge));
+  border-color: var(--lb-edge);
   background:
-    radial-gradient(90% 55% at 50% 22%, color-mix(in srgb, var(--gi-el) 34%, transparent), transparent 72%),
-    linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 26%, #0a0c11) 0%, color-mix(in srgb, var(--gi-el) 12%, #0c0e13) 55%, #0d0f14 100%);
+    radial-gradient(90% 45% at 50% 18%, color-mix(in srgb, var(--gi-el) 16%, transparent), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 9%, var(--lb-box)) 0%, var(--lb-box) 50%);
 }
 .gwl-card::before {
   content: '';
@@ -769,9 +781,9 @@ a.gm-row:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
     radial-gradient(color-mix(in srgb, var(--gi-el) 80%, #fff) 0.6px, transparent 1.1px);
   background-size: 97px 89px, 53px 61px;
   background-position: 11px 7px, 38px 29px;
-  opacity: 0.5;
-  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 85%);
-  mask-image: linear-gradient(180deg, #000 30%, transparent 85%);
+  opacity: 0.35;
+  -webkit-mask-image: linear-gradient(180deg, #000 25%, transparent 55%);
+  mask-image: linear-gradient(180deg, #000 25%, transparent 55%);
 }
 .gwl-art {
   position: relative;
@@ -779,8 +791,8 @@ a.gm-row:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
   justify-content: center;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-bottom: 2px solid color-mix(in srgb, var(--gi-el) 55%, transparent);
-  background: radial-gradient(60% 80% at 50% 62%, color-mix(in srgb, var(--gi-el) 45%, transparent), transparent 72%);
+  border-bottom: 1px solid color-mix(in srgb, var(--gi-el) 40%, transparent);
+  background: radial-gradient(60% 80% at 50% 62%, color-mix(in srgb, var(--gi-el) 32%, transparent), transparent 72%);
 }
 /* Three sparkles over the art, top left and right. */
 .gwl-art::after {
@@ -791,7 +803,7 @@ a.gm-row:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
   background: color-mix(in srgb, var(--gi-el) 60%, #fff);
   -webkit-mask: var(--gwl-spark) 14px 14px / 18px no-repeat, var(--gwl-spark) 38px 38px / 9px no-repeat, var(--gwl-spark) right 18px top 24px / 13px no-repeat;
   mask: var(--gwl-spark) 14px 14px / 18px no-repeat, var(--gwl-spark) 38px 38px / 9px no-repeat, var(--gwl-spark) right 18px top 24px / 13px no-repeat;
-  opacity: 0.85;
+  opacity: 0.7;
 }
 .gwl-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 0.6s var(--gi-ease); }
 .gwl-card--wep .gwl-art { gap: 10%; }
@@ -811,7 +823,7 @@ a.gm-row:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
 .gwl-end b { font: 700 15px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .gwl-end b.is-ending { color: var(--gi-acc-text); }
 @media (hover: hover) {
-  .gwl-card:hover { transform: translateY(-3px); box-shadow: var(--lb-shadow-hover), 0 10px 30px -12px color-mix(in srgb, var(--gi-el) 60%, transparent); }
+  .gwl-card:hover { transform: translateY(-3px); box-shadow: var(--lb-shadow-hover), 0 10px 30px -12px color-mix(in srgb, var(--gi-el) 35%, transparent); }
   .gwl-card:hover .gwl-art img { transform: scale(1.04); }
   .gwl-card--wep:hover .gwl-art img { transform: rotate(-16deg) scale(1.04); }
   .gwl-card--wep:hover .gwl-art img + img { transform: rotate(16deg) scale(1.04); }

@@ -232,8 +232,39 @@ def challenges(calendar):
     return out
 
 
+def code_dates():
+    """Code (upper case) -> (start, end) from the wiki's Promotional Code table ({{Code Row|CODES|server|rewards|start|end}},
+    dates YYYY-MM-DD, end 'unknown' = no end announced). Global rows win over China-only ones. Empty if the wiki fails."""
+    try:
+        t = re.sub(r'<!--.*?-->', '', wikitext('Promotional_Code'), flags=re.S)
+    except Exception as e:
+        print('code dates: wiki failed:', e)
+        return {}
+    out = {}
+    for row in re.findall(r'\{\{Code Row(.*?)\}\}', t, flags=re.S):
+        f = [x.strip() for x in row.split('|')]
+        if len(f) < 6 or not re.fullmatch(r'\d{4}-\d{2}-\d{2}', f[4]):
+            continue
+        end = f[5] if re.fullmatch(r'\d{4}-\d{2}-\d{2}', f[5]) else ''
+        for code in f[1].split(';'):
+            k = code.strip().upper()
+            if k and (k not in out or f[2] == 'G'):
+                out[k] = (f[4], end)
+    return out
+
+
 def codes():
-    return [{'code': c['code'], 'rewards': c.get('rewards', []), 'primos': primos(c.get('rewards', []))} for c in get(ENNEAD + 'codes').get('active', [])]
+    dates = code_dates()
+    out = []
+    for c in get(ENNEAD + 'codes').get('active', []):
+        row = {'code': c['code'], 'rewards': c.get('rewards', []), 'primos': primos(c.get('rewards', []))}
+        start, end = dates.get(c['code'].upper(), ('', ''))
+        if start:
+            row['start'] = start  # the day it went out (the wiki's date)
+        if end:
+            row['end'] = end  # its announced last day; most codes never get one
+        out.append(row)
+    return out
 
 
 def expired():

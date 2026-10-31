@@ -84,34 +84,6 @@
       <div class="eg-sty-body">${e.description ? `<p>${esc(e.description)}</p>` : ''}</div></article>`;
   }
 
-  // ---- JUMP LINKS ----
-  // A quick eased scroll (~350 ms) instead of the browser's instant jump; the browser's own
-  // smooth scroll can't be sped up. The page scrolls inside .coc-main, not the window, and the
-  // fixed top bars cover its top, so the target lands just under them.
-  document.querySelector('.eg-jump').addEventListener('click', (e) => {
-    const a = e.target.closest('a[href^="#"]');
-    const to = a && document.querySelector(a.getAttribute('href'));
-    if (!to) return;
-    e.preventDefault();
-    history.replaceState(null, '', a.getAttribute('href'));
-    let sc = to.parentElement;
-    while (sc && !(sc.scrollHeight > sc.clientHeight && /auto|scroll/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
-    sc = sc || document.scrollingElement;
-    const scTop = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
-    const bars = Math.max(0, ...[...document.querySelectorAll('.top-bar, .secondary-top-bar')].map((b) => b.getBoundingClientRect().bottom));
-    const from = sc.scrollTop;
-    const dist = to.getBoundingClientRect().top - Math.max(scTop, bars) - 16;
-    sc.style.scrollBehavior = 'auto'; // a smooth scroll-behavior would lag behind every step
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return (sc.scrollTop = from + dist);
-    const t0 = performance.now();
-    const step = (t) => {
-      const p = Math.min(1, (t - t0) / 350);
-      sc.scrollTop = from + dist * (1 - Math.pow(1 - p, 3)); // ease-out cubic
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  });
-
   GI.feed
     .then((feed) => {
       const t = now();

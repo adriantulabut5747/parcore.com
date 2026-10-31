@@ -1002,5 +1002,4 @@
       $('wsHud').innerHTML = '<p class="gi-empty">Couldn’t load the wishes right now. Try again in a bit.</p>';
     });
 
-  GI.jumpNav($('wsJump'));
 })();

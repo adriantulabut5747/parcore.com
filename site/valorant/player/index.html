@@ -17,10 +17,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/codm-banner.css?v=20261029h">
 <link rel="stylesheet" href="/codm-tools.css?v=20261029d">
-<link rel="stylesheet" href="/valorant.css?v=20261030a">
+<link rel="stylesheet" href="/valorant.css?v=20261031a">
 <link rel="stylesheet" href="/valorant-agents.css?v=20261030c">
-<link rel="stylesheet" href="/valorant-player.css?v=20261030a">
-<link rel="stylesheet" href="/coc-villager.css?v=20261027d">
+<link rel="stylesheet" href="/valorant-player.css?v=20261030c">
 </head>
 <body class="vl-ground vp-page" data-game-nav="valorant">
 
@@ -95,6 +94,15 @@
 
 <!-- PLAYER PAGE: everything inside is drawn by valorant-player.js (one page for every player, see its header). -->
 <div class="vp-root" id="vpRoot" data-state="loading">
+<div class="vp-load" role="status" aria-live="polite">
+  <span class="vp-load-mark" aria-hidden="true"><i></i><i></i></span>
+  <p class="vp-load-k">Looking up</p>
+  <p class="vp-load-name" id="vpLoadName">Player</p>
+  <span class="vp-load-bar" aria-hidden="true"><i id="vpLoadBar"></i></span>
+  <ol class="vp-load-steps" id="vpLoadSteps">
+    <li data-step="account">Account</li><li data-step="rank">Rank</li><li data-step="rr">RR history</li><li data-step="matches">Matches</li><li data-step="stored">Older games</li>
+  </ol>
+</div>
 <header class="cb vp-cb" aria-labelledby="cbTitle">
   <span class="cb-art vp-art" id="vpArt" aria-hidden="true"></span>
   <span class="cb-ico vp-ico" id="vpIco" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.7-5.4 6-5.4s6 2.4 6 5.4"/><path d="M16 5.5a3 3 0 0 1 0 5"/><path d="M17.5 14c2 .6 3.5 2.5 3.5 5"/></svg></span>
@@ -104,16 +112,18 @@
     <p class="cb-text" id="vpSub">Look up any Riot ID: rank, RR, every match, agents, maps and guns.</p>
     <div class="vp-wells" id="vpWells"></div>
   </div>
-  <button type="button" class="vp-copy" id="vpCopy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Copy link</span><span class="vp-copied">Copied</span></button>
+  <div class="vp-top">
+    <button type="button" class="vp-copy" id="vpCopy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Copy link</span><span class="vp-copied">Copied</span></button>
+  </div>
 </header>
 
 <div class="cb-tabs cb-tabs--many vp-tabs" id="vpTabs" role="tablist" aria-label="Player sections">
   <button type="button" role="tab" data-tab="overview" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="4" rx="1"/><rect x="13" y="10" width="7" height="10" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/></svg>Overview</button>
   <button type="button" role="tab" data-tab="matches" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Matches</button>
-  <button type="button" role="tab" data-tab="agents" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/></svg>Agents</button>
-  <button type="button" role="tab" data-tab="maps" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg>Maps</button>
-  <button type="button" role="tab" data-tab="weapons" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h13l2-2h3v4h-3l-1 1H10l-1 5H6l1-5H3z"/></svg>Weapons</button>
   <button type="button" role="tab" data-tab="acts" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 21 8v8l-9 5-9-5V8z"/><path d="M12 8v8M8 10.5v3M16 10.5v3"/></svg>Acts</button>
+  <button type="button" role="tab" data-tab="agents" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/></svg>Agents</button>
+  <button type="button" role="tab" data-tab="maps" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3.5" width="7" height="7" rx="1"/><rect x="14" y="3.5" width="7" height="7" rx="1"/><rect x="8" y="15" width="8" height="5.5" rx="1"/><path d="M6.5 10.5v7H8M17.5 10.5v7H16M10 7h4"/><path class="vp-ico-fill" d="M6.5 5.3 8.2 7 6.5 8.7 4.8 7z"/></svg>Maps</button>
+  <button type="button" role="tab" data-tab="weapons" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20v-5q0-3 2-4.5q2 1.5 2 4.5v5zM10 20v-9q0-3 2-4.5q2 1.5 2 4.5v9zM17 20V7q0-3 2-4.5Q21 4 21 7v13z"/><path d="M3 15h4M10 11h4M17 7h4"/></svg>Weapons</button>
 </div>
 
 <section class="ct-sec vp-err-box" aria-live="polite">
@@ -123,41 +133,34 @@
 <!-- OVERVIEW -->
 <div class="vp-panel" data-tab="overview">
   <section class="ct-sec" aria-labelledby="vpRankTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpRankTitle">Rank</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Their rank right now, their best ever and this act's record. The bar shows how close the next rank is. Almost there!</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpRankTitle">Rank</h2></header>
     <div id="vpRank"><p class="vp-empty">Loading...</p></div>
   </section>
   <section class="ct-sec" aria-labelledby="vpRRTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpRRTitle">RR over time</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every ranked game's RR, oldest on the left. Hover or use the arrow keys to read a game. Up and to the right is my kind of chart.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpRRTitle">RR over time</h2></header>
     <div id="vpRR"><p class="vp-empty">Loading...</p></div>
   </section>
   <section class="ct-sec" aria-labelledby="vpFormTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpFormTitle">Last 20 games</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Their recent games, oldest first, then the numbers behind them. Click a square to open that game's scoreboard. Quick ones, I hope.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpFormTitle">Last 20 games</h2></header>
     <div id="vpForm"><p class="vp-empty">Loading...</p></div>
     <div class="vp-tiles" id="vpNums"></div>
   </section>
   <section class="ct-sec" aria-labelledby="vpMainTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpMainTitle">Main agent</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Their most played agent and how they do on it, from every game we have. If it's me, great taste.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpMainTitle">Main agent</h2></header>
     <div id="vpMain"><p class="vp-empty">Loading...</p></div>
   </section>
   <div class="vp-duo">
     <section class="ct-sec" aria-labelledby="vpHitsTitle">
-      <header class="ct-head"><h2 class="ct-title" id="vpHitsTitle">Hit zones</h2>
-        <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Where their shots landed in the last 20 games. The brighter the zone, the more hits. Aim high!</p></div></header>
+      <header class="ct-head"><h2 class="ct-title" id="vpHitsTitle">Hit zones</h2></header>
       <div class="vp-box" id="vpHits"><p class="vp-empty">Loading...</p></div>
     </section>
     <section class="ct-sec" aria-labelledby="vpRolesTitle">
-      <header class="ct-head"><h2 class="ct-title" id="vpRolesTitle">Roles</h2>
-        <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Which roles they play, by games. Someone has to smoke, and it's never the duelist.</p></div></header>
+      <header class="ct-head"><h2 class="ct-title" id="vpRolesTitle">Roles</h2></header>
       <div class="vp-box" id="vpRoles"><p class="vp-empty">Loading...</p></div>
     </section>
   </div>
   <section class="ct-sec" aria-labelledby="vpMatesTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpMatesTitle">Plays with</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Friends who queued with them in the last 20 games. Click a name to open their page. Bring snacks.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpMatesTitle">Plays with</h2></header>
     <div id="vpMates"><p class="vp-empty">Loading...</p></div>
   </section>
 </div>
@@ -165,28 +168,32 @@
 <!-- MATCHES -->
 <div class="vp-panel" data-tab="matches" hidden>
   <section class="ct-sec" aria-labelledby="vpMatchTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpMatchTitle">Recent games</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Their last 20 games in any mode. Click one for the scoreboard, every round and every kill. Night night to the bottom fragger.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpMatchTitle">Recent games</h2></header>
     <div class="gs-seg vp-modes" id="vpModes" role="group" aria-label="Modes"></div>
     <ol class="vp-list" id="vpMatchList"><li><p class="vp-empty">Loading...</p></li></ol>
   </section>
   <section class="ct-sec" aria-labelledby="vpOldTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpOldTitle">Older games <small id="vpOldN"></small></h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Older games from HenrikDev's stored copies, one line each with no scoreboard. Old news, but still news.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpOldTitle">Older games <small id="vpOldN"></small></h2></header>
     <ol class="vp-list" id="vpOld"><li><p class="vp-empty">Loading...</p></li></ol>
+  </section>
+</div>
+
+<!-- ACTS -->
+<div class="vp-panel" data-tab="acts" hidden>
+  <section class="ct-sec" aria-labelledby="vpActsTitle">
+    <header class="ct-head"><h2 class="ct-title" id="vpActsTitle">Ranked acts</h2></header>
+    <div id="vpActs"><p class="vp-empty">Loading...</p></div>
   </section>
 </div>
 
 <!-- AGENTS -->
 <div class="vp-panel" data-tab="agents" hidden>
   <section class="ct-sec" aria-labelledby="vpAgentsTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpAgentsTitle">Agents played <small id="vpAgentsN"></small></h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every agent they've played, most games first, without deathmatches. Click a card for that agent's page. I'm at the top, right?</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpAgentsTitle">Agents played <small id="vpAgentsN"></small></h2></header>
     <div class="va-grid vp-agents" id="vpAgents"><p class="vp-empty">Loading...</p></div>
   </section>
   <section class="ct-sec" aria-labelledby="vpAgentTblTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpAgentTblTitle">Every number</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The same agents side by side, all the numbers in one table. Read it fast, I'm not waiting.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpAgentTblTitle">Every number</h2></header>
     <div class="gs-table-wrap"><table class="gs-table vp-atable"><thead><tr><th scope="col">Agent</th><th scope="col">Games</th><th scope="col">W-L</th><th scope="col">Win %</th><th scope="col">K/D</th><th scope="col">KDA</th><th scope="col">ACS</th><th scope="col">ADR</th><th scope="col">HS %</th></tr></thead><tbody id="vpAgentRows"></tbody></table></div>
   </section>
 </div>
@@ -194,8 +201,7 @@
 <!-- MAPS -->
 <div class="vp-panel" data-tab="maps" hidden>
   <section class="ct-sec" aria-labelledby="vpMapsTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpMapsTitle">Maps</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Their win rate on every map, plus attack and defense rounds from the last 20 games. Click a map for its callouts. Learn the corners!</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpMapsTitle">Maps</h2></header>
     <div class="vp-maps" id="vpMaps"><p class="vp-empty">Loading...</p></div>
   </section>
 </div>
@@ -203,37 +209,25 @@
 <!-- WEAPONS -->
 <div class="vp-panel" data-tab="weapons" hidden>
   <section class="ct-sec" aria-labelledby="vpGunsTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpGunsTitle">Kills by gun</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every kill in the last 20 games, by the gun or ability that did it, with the average distance. Operator on top? Respect.</p></div></header>
+    <header class="ct-head"><h2 class="ct-title" id="vpGunsTitle">Kills by gun</h2></header>
     <div class="vp-box" id="vpGuns"><p class="vp-empty">Loading...</p></div>
   </section>
   <div class="vp-duo">
     <section class="ct-sec" aria-labelledby="vpDistTitle">
-      <header class="ct-head"><h2 class="ct-title" id="vpDistTitle">Kill distance</h2>
-        <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>How far away their kills were, in 5 metre steps. Close range is my favourite range.</p></div></header>
+      <header class="ct-head"><h2 class="ct-title" id="vpDistTitle">Kill distance</h2></header>
       <div class="vp-box" id="vpDist"><p class="vp-empty">Loading...</p></div>
     </section>
     <section class="ct-sec" aria-labelledby="vpBuysTitle">
-      <header class="ct-head"><h2 class="ct-title" id="vpBuysTitle">Buys</h2>
-        <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>What they held each round and how often they bought shields. Full buys, saves and everything between.</p></div></header>
+      <header class="ct-head"><h2 class="ct-title" id="vpBuysTitle">Buys</h2></header>
       <div class="vp-box" id="vpBuys"><p class="vp-empty">Loading...</p></div>
     </section>
   </div>
 </div>
 
-<!-- ACTS -->
-<div class="vp-panel" data-tab="acts" hidden>
-  <section class="ct-sec" aria-labelledby="vpActsTitle">
-    <header class="ct-head"><h2 class="ct-title" id="vpActsTitle">Ranked acts</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every act they played ranked: the rank they ended on, wins and games. The small icons are their best wins that act.</p></div></header>
-    <div id="vpActs"><p class="vp-empty">Loading...</p></div>
-  </section>
-</div>
 </div>
 
 <section class="ct-sec ct-sec--last vp-find-sec" aria-labelledby="vpFindTitle">
-  <header class="ct-head"><h2 class="ct-title" id="vpFindTitle">Find a player</h2>
-    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Type a Riot ID and its tag to open their page. Let's see who else can keep up.</p></div></header>
+  <header class="ct-head"><h2 class="ct-title" id="vpFindTitle">Find a player</h2></header>
   <div class="vp-find">
     <form class="lb-search vp-form" data-vp-find role="search" novalidate>
       <label class="vl-sr" for="vpName">Riot ID</label>
@@ -307,6 +301,6 @@ body {
 </div>
 
 <script src="/11layout.js?v=20261029b"></script>
-<script src="/valorant-player.js?v=20261030a"></script>
+<script src="/valorant-player.js?v=20261030c"></script>
 </body>
 </html>

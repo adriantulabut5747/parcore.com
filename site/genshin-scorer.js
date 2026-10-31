@@ -291,11 +291,13 @@
     const sol = subs.length ? solve(subs, st.lv) : null;
     const set = setOf();
     const piece = set && set.pieces.find((p) => p.slot === slot.n);
+    // No set picked: the card still shows a piece of that slot (Gladiator's, the plainest one) so it never looks empty.
+    const art = (piece || ((SETS.find((s) => s.slug === 'gladiator_s_finale') || { pieces: [] }).pieces.find((p) => p.slot === slot.n)) || {}).art;
 
     // The card (in-game artifact detail look).
     const rollsOf = (i) => (sol && sol.best ? sol.best.pick[i] : candidates(subs[i].k, subs[i].v)[0]);
     $('asCard').innerHTML = `<div class="as-card-top">
-        ${piece ? `<img class="as-card-art" src="${esc(piece.art)}" alt="" loading="lazy">` : ''}
+        ${art ? `<img class="as-card-art" src="${esc(art)}" alt="" loading="lazy">` : ''}
         <p class="as-card-name">${esc(piece ? piece.name : slot.n)}</p>
         <p class="as-card-type">${esc(slot.n)}</p>
         <p class="as-card-mk">${esc(main.n)}</p>
@@ -493,5 +495,4 @@
       paint();
     })
     .catch(() => {});
-  GI.jumpNav($('asJump'));
 })();

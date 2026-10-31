@@ -156,7 +156,7 @@
       return `<button type="button" class="fm-wk-day${g === cur ? ' is-today' : ''}" data-go="${g}"><b>${TABS[g].short}</b>${g === cur ? '<span class="fm-now">Today</span>' : ''}${mine.size ? `<small>${my} of yours</small>` : ''}</button>`;
     }).join('');
     const rows = NATIONS.filter((n) => GROUPS.some((g) => F[g].books.some((b) => b.city === n.name)))
-      .map((n) => `<div class="fm-wk-nat"><img src="${natIcon(n)}" alt="" width="22" height="22"><span>${esc(n.name)}</span></div>${GROUPS.map((g) => cell(n, g)).join('')}`)
+      .map((n) => `<div class="fm-wk-nat" title="${esc(n.name)}"><img src="${natIcon(n)}" alt="" width="22" height="22"><span>${esc(n.name)}</span></div>${GROUPS.map((g) => cell(n, g)).join('')}`)
       .join('');
     $('fmWeek').innerHTML = `<div class="fm-wk-corner"></div>${heads}${rows}<button type="button" class="fm-wk-sun${now === 'sunday' ? ' is-today' : ''}" data-go="sunday"><b>Sunday</b><span>Every domain is open: every book and material above.</span>${now === 'sunday' ? '<span class="fm-now">Today</span>' : ''}</button>`;
   }

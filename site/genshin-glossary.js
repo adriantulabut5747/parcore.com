@@ -171,5 +171,4 @@
     return NAMES[p] || p;
   }
 
-  GI.jumpNav($('glJump'));
 })();

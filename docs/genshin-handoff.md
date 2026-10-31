@@ -197,8 +197,8 @@ Times are unix seconds, Asia's. Thursday/Friday/Saturday reuse Monday/Tuesday/We
 ## 5. Design system
 
 ### 5.1 Tokens and ground
-- Ground: a still night sky in our red (soft glows on near-black). **Still**: no page stars, no diagonal tiles (their
-  edges read as lines). `GI.stars(host)` draws rising stars only inside a box (the wish cards), while on screen.
+- Ground (Oct 29 2026, Adrian): the CoC TH Layouts / Armies ground (film grain, near-black fade, a faint red light at
+  the top; genshin.css GROUND). Replaced the still night sky. **Still**: no page stars, no diagonal tiles. `GI.stars(host)` draws rising stars only inside a box (the wish cards), while on screen.
 - Raised UI from 11layout: `--lb-box`, `--lb-edge`, `--lb-raise`, `--lb-well`, `--lb-btn`, `--lb-shadow`, `--lb-red`, `--lb-r`.
 - Genshin: `--gi-text #eceef1`, `--gi-muted #9aa0a8`, `--gi-dim #6f737b`, `--gi-line`, `--gi-el` (element colour), `--gi-r4`/`--gi-r5`.
 - Element colours: Pyro #ef8a4c, Hydro #4cb8ef, Anemo #5fd3b4, Electro #b48ef0, Dendro #a5c83b, Cryo #98d8f0, Geo #efc35e.

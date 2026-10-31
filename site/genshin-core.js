@@ -203,11 +203,23 @@
     `<span class="gi-tile r${rarity || 4}"><img src="${esc(icon)}" alt="${esc(name || '')}" title="${esc(name || '')}" loading="lazy" decoding="async"></span>`;
   const elIcon = (el) => `/images/genshin/element/${el}.webp`;
 
-  // One redeem code row (.gi-code, genshin.css): code, rewards, Primogems, Copy + Redeem.
+  // When a code went out + how long it's been live (+ its announced last day): the feed's wiki dates (YYYY-MM-DD,
+  // Oct 29 2026). A code the wiki doesn't list has no line.
+  const codeWhen = (c) => {
+    const day = (d) => {
+      const [y, m, n] = d.split('-').map(Number);
+      return { t: Date.UTC(y, m - 1, n), s: new Date(Date.UTC(y, m - 1, n)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC', ...(y !== new Date().getFullYear() && { year: 'numeric' }) }) };
+    };
+    if (!c.start) return '';
+    const s = day(c.start);
+    const live = Math.max(0, Math.floor((Date.now() - s.t) / 864e5));
+    return `<p class="gi-code-when">Out since ${s.s} &middot; live ${live === 1 ? '1 day' : live + ' days'}${c.end ? ` &middot; ends ${day(c.end).s}` : ''}</p>`;
+  };
+  // One redeem code row (.gi-code, genshin.css): code, rewards, when it went out, Primogems, Copy + Redeem.
   // Redeem opens HoYoverse's gift page with the code filled in.
   const codeRow = (
     c,
-  ) => `<div class="gi-box gi-code"><div class="gi-code-text"><p class="gi-code-name">${esc(c.code)}</p><p class="gi-code-rw">${esc((c.rewards || []).join(', '))}</p></div>
+  ) => `<div class="gi-box gi-code"><div class="gi-code-text"><p class="gi-code-name">${esc(c.code)}</p><p class="gi-code-rw">${esc((c.rewards || []).join(', '))}</p>${codeWhen(c)}</div>
       ${c.primos ? `<span class="gi-primo">${PRIMO}${c.primos}</span>` : ''}
       <div class="gi-code-acts"><button type="button" class="gi-key" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1"/></svg><span>Copy</span></button>
       <a class="gi-key" href="https://genshin.hoyoverse.com/en/gift?code=${encodeURIComponent(c.code)}" target="_blank" rel="noopener" aria-label="Redeem ${esc(c.code)}">Redeem<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M10 6H4v14h14v-6"/></svg></a></div></div>`;
@@ -303,20 +315,9 @@
     });
   }
 
-  // ---- HEADER FRAME (Oct 23 2026): every page header (.gi-tb) gets the same quiet gold frame
-  // (genshin.css "HEADER FRAME"): four cut corners, each with a fainter echo line (one drawing,
-  // mirrored by CSS), and the star on the top edge. The edges themselves are CSS gradients.
-  const TBF =
-    ['tl', 'tr', 'bl', 'br']
-      .map(
-        (k) =>
-          `<i class="gi-tbf-c gi-tbf-c--${k}"><svg viewBox="0 0 32 32"><path d="M.5 12 12 .5"/><path class="i" d="M5 24v-9.5L14.5 5H24"/></svg></i>`,
-      )
-      .join('') +
-    '<i class="gi-tbf-star"><svg viewBox="0 0 12 12"><path d="M6 0c.6 4.2 1.8 5.4 6 6-4.2.6-5.4 1.8-6 6-.6-4.2-1.8-5.4-6-6 4.2-.6 5.4-1.8 6-6z"/></svg></i>';
-  document
-    .querySelectorAll('.gi-tb')
-    .forEach((tb) => tb.insertAdjacentHTML('beforeend', `<span class="gi-tbf" aria-hidden="true">${TBF}</span>`));
+  // ---- FRAME (Oct 29 2026): the quiet frame (genshin.css "FRAME") of the help panel + the weapon panel's hero:
+  // a hairline + a red tick in each corner, all drawn by CSS.
+  const TBF = ['tl', 'tr', 'bl', 'br'].map((k) => `<i class="gi-tbf-c gi-tbf-c--${k}"></i>`).join('');
 
   // Stat icons (moved here from genshin-weapons.js, Oct 23 2026; the weapons page and the wish card use them): the player page's drawn set (genshin-player.js SI), the ones a weapon can show.
   const SI = {
@@ -389,60 +390,6 @@
     requestAnimationFrame(step);
   }
 
-  // ---- JUMP NAV (Oct 24 2026, Achievements first): a .gi-tray of #section links. Clicking glides there;
-  // scrolling lights the section you're in. The picked key is ONE raised pill (.gi-pill) that slides and
-  // resizes from tab to tab instead of each tab lighting up on its own; during a glide it goes straight to
-  // the target (the sections passed on the way don't pull it back). On phones the tray scrolls itself so
-  // the picked tab stays in view. The first section's link leaves the address clean (no #hash).
-  function jumpNav(nav) {
-    if (!nav) return;
-    const links = [...nav.querySelectorAll('a[href^="#"]')];
-    const parts = links.map((a) => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
-    const pill = document.createElement('i');
-    pill.className = 'gi-pill';
-    pill.setAttribute('aria-hidden', 'true');
-    nav.prepend(pill);
-    nav.classList.add('has-pill');
-    let lock = null; // the section a glide is heading to
-    function place() {
-      const a = links.find((x) => x.classList.contains('active'));
-      pill.classList.toggle('is-on', !!a);
-      if (!a) return;
-      pill.style.width = a.offsetWidth + 'px';
-      pill.style.transform = `translateX(${a.offsetLeft}px)`;
-      if (nav.scrollWidth > nav.clientWidth + 1)
-        nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: still() ? 'auto' : 'smooth' });
-    }
-    function pick(id) {
-      links.forEach((a) => {
-        const on = a.getAttribute('href') === '#' + id;
-        a.classList.toggle('active', on);
-        if (on) a.setAttribute('aria-current', 'location');
-        else a.removeAttribute('aria-current');
-      });
-      place();
-    }
-    links.forEach((a) =>
-      a.addEventListener('click', (e) => {
-        const target = document.getElementById(a.getAttribute('href').slice(1));
-        if (!target) return;
-        e.preventDefault();
-        history.replaceState(null, '', location.pathname + location.search + (a === links[0] ? '' : a.getAttribute('href')));
-        lock = target.id;
-        pick(lock);
-        glide(target, () => (lock = null));
-      }),
-    );
-    const spy = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && !lock && pick(x.target.id)), {
-      rootMargin: '-40% 0px -55% 0px',
-    });
-    parts.forEach((p) => spy.observe(p));
-    pick(parts.length ? parts[0].id : ''); // at the top nothing crosses the spy's band yet: start on the first section
-    window.addEventListener('resize', place);
-    if (document.fonts) document.fonts.ready.then(place); // tab widths change once Sora loads
-    requestAnimationFrame(() => requestAnimationFrame(() => nav.classList.add('is-ready'))); // no slide-in from 0 on load
-  }
-
   // ---- SHEET DRAG (phones; moved here from genshin-weapons.js Oct 24 2026 for Artifacts + Enemies too): drag
   // the grip (.gi-grip) or the header down to close a bottom sheet, like the More sheet; pulling the content
   // down once it's at the top drags it too (also mid-gesture: scroll up to the top and keep going). Touch
@@ -507,7 +454,6 @@
   window.GI = {
     sheetDrag,
     glide,
-    jumpNav,
     ON_PAGES,
     API,
     playerHref,

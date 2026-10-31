@@ -26,12 +26,17 @@ for (const q of [
   'type=stored&region=ap&name=Foo&tag=123&mode=deathmatch',
   'type=rr&region=xx&name=Foo&tag=123',
   'type=mmr3&region=na&name=F&tag=123',
-  'type=matches&region=na&name=Foo&tag=123&start=20',
+  'type=matches&region=na&name=Foo&tag=123&start=50',
+  'type=matches&region=na&name=Foo&tag=123&start=15',
 ]) {
   asked.length = 0;
   assert.equal((await call(q)).status, 400, q);
   assert.equal(asked.length, 0, q + ' must not reach Henrik');
 }
+// the match list's fake answer isn't a list (502 from matchList), so check only the Henrik URL it asked for
+asked.length = 0;
+await call('type=matches&region=na&name=Foo&tag=123&start=40');
+assert.deepEqual(asked, [H + 'v4/matches/na/pc/Foo/123?size=10&start=40']);
 console.log('worker routes ok');
 
 // slimMatch on a real Henrik match (optional: E:\claude-tmp\...\m.json style sample passed as argv[2])

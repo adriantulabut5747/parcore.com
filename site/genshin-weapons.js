@@ -116,7 +116,8 @@
     $('wpMoreN').hidden = !hidden;
     $('wpMoreN').textContent = hidden;
     $('wpClear').hidden = !(state.type || state.rarity || state.sub || state.day || state.q.trim());
-    $('wpLive').hidden = !hasLive || !!(state.type || state.rarity || state.sub || state.day); // a ticked filter = you're hunting, not browsing
+    // Anything off the default (a filter, a search, another view) = you're hunting, not browsing (Adrian, Oct 29 2026).
+    $('wpLive').hidden = !hasLive || !!(state.type || state.rarity || state.sub || state.day || state.q.trim() || state.view !== 'type');
     paint();
     save();
     if (open) position();

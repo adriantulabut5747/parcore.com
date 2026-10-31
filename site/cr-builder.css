@@ -1,0 +1,549 @@
+/* ============================================================
+   /clash-royale/deck-builder (Oct 31 2026). Links cr-decks.css for the deck pieces it shares with the
+   Decks page (.crd-head / .crd-hand / .crd-card / .crd-cost / .crd-curve / .crd-st chips), so a deck
+   looks the same in both places. Desktop: your deck on the left (sticky), the card pool on the right.
+   Phones: deck first, pool under it.
+   ============================================================ */
+.crb {
+  display: grid;
+  grid-template-columns: minmax(340px, 440px) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  margin: 16px var(--codm-side) 0;
+}
+.crb-side {
+  position: sticky;
+  top: calc(var(--topbar-height, 16px) + 64px);
+  display: grid;
+  gap: 12px;
+}
+.crb-deck,
+.crb-meta,
+.crb-pool {
+  position: relative;
+  min-width: 0;
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crb-deck {
+  display: grid;
+  gap: 12px;
+}
+.crb-clear {
+  margin-left: auto;
+}
+
+/* an empty slot = a sunken card-shaped hole with a + */
+.crb-empty {
+  position: relative;
+  display: block;
+  aspect-ratio: 136 / 200;
+  background:
+    linear-gradient(#3a3c45, #3a3c45) center / 30% 2px no-repeat,
+    linear-gradient(#3a3c45, #3a3c45) center / 2px 20% no-repeat;
+}
+.crb-empty::before {
+  content: '';
+  position: absolute;
+  inset: 15% 6% 4%;
+  border: 2px dashed #2f3138;
+  border-radius: 8px;
+}
+
+/* tower troop: the 4 portraits along the mat's foot, picked = raised */
+.crb-towers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px -10px 0;
+  padding: 7px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0 0 var(--lb-r) var(--lb-r);
+  background: rgba(0, 0, 0, 0.18);
+}
+.crb-towers small,
+.crb-sock small {
+  color: #8d8f95;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.crb-towers small {
+  margin-right: auto;
+}
+.crb-tower {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 46px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--lb-r);
+  background: none;
+  cursor: pointer;
+  opacity: 0.45;
+  filter: grayscale(0.6);
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+.crb-tower img {
+  width: 26px;
+  height: auto;
+}
+.crb-tower:hover {
+  opacity: 0.85;
+  filter: none;
+}
+.crb-tower[aria-checked='true'] {
+  border-color: var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  opacity: 1;
+  filter: none;
+}
+.crb-tower:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 1px;
+}
+
+/* the 3 special slots, as sockets: filled = raised with the card, empty = a sunken hole */
+.crb-slots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.crb-sock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #6b6e76;
+  font-size: 12px;
+  font-weight: 600;
+}
+.crb-sock > span {
+  display: grid;
+  min-width: 0;
+}
+.crb-sock > span,
+.crb-sock small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crb-sock img {
+  flex: none;
+  width: 24px;
+  height: auto;
+}
+.crb-sock i {
+  flex: none;
+  width: 20px;
+  height: 28px;
+  border: 2px dashed #2f3138;
+  border-radius: 4px;
+}
+.crb-sock.is-on {
+  border: 2px solid var(--lb-edge);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+
+.crb-act {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.crb-copy[aria-disabled='true'] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.cr-key:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* "In our data" / "Decks like yours" */
+.crb-h {
+  margin: 0;
+  color: #fff;
+  font: 400 19px/1.1 'Lilita One', 'Oxanium', sans-serif;
+  text-shadow: 0 0 1px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 2px 0 #000;
+}
+.crb-meta-sub {
+  margin: 6px 0 10px;
+  color: #a3a5ab;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.crb-meta-sub b {
+  color: #fff;
+}
+.crb-like {
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crb-like:empty {
+  display: none;
+}
+.crb-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 10px 6px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--lb-row);
+  box-shadow: var(--lb-row-ring);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.crb-row:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+.crb-row:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 1px;
+}
+.crb-row-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 18px);
+  gap: 1px;
+}
+.crb-row-cards img {
+  width: 18px;
+  height: auto;
+}
+.crb-row-name {
+  display: grid;
+  min-width: 0;
+}
+.crb-row-name b {
+  overflow: hidden;
+  color: #fff;
+  font: 400 15px/1.2 'Lilita One', 'Oxanium', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crb-row-name small {
+  color: #8d8f95;
+  font-size: 11px;
+}
+.crb-row-wr {
+  color: #c4c6cc;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.crb-row-wr.is-up {
+  color: #66cf98;
+}
+
+/* ---- the pool ---- */
+.crb-pool {
+  display: grid;
+  gap: 12px;
+}
+.crb-pool .cv-say {
+  margin: 0;
+}
+.crb-hide {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.crb-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+.crb-chips {
+  margin: 0;
+}
+.crb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 4px 8px;
+  padding: 8px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crb-pc {
+  container-type: inline-size;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.15s var(--lb-ease), opacity 0.15s ease;
+}
+.crb-pc img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.crb-pc .crd-cost {
+  font-size: clamp(10px, 20cqi, 18px);
+}
+.crb-pc:hover {
+  z-index: 1;
+  transform: translateY(-3px);
+}
+.crb-pc:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+/* in your deck = dimmed with a red tick */
+.crb-pc[aria-pressed='true'] img {
+  opacity: 0.32;
+  filter: grayscale(0.7);
+}
+.crb-pc[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  width: 34%;
+  aspect-ratio: 1;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: 50%;
+  background: var(--lb-red) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 62% no-repeat;
+  box-shadow: var(--lb-btn-red);
+  transform: translate(-50%, -50%);
+}
+.crb-tags {
+  position: absolute;
+  right: 0;
+  bottom: 3%;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.crb-tag {
+  padding: 2px 4px 1px;
+  border-radius: 3px;
+  color: #fff;
+  font: 700 8px/1 'Oxanium', sans-serif;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+.crb-tag--evo {
+  background: #7a3cc4;
+}
+.crb-tag--hero {
+  background: #b8862b;
+}
+.crb-none {
+  grid-column: 1 / -1;
+  padding: 18px 8px;
+  color: #8d8f95;
+  text-align: center;
+}
+
+/* the deck card menu */
+.crb-pop {
+  position: fixed;
+  z-index: 60;
+  display: grid;
+  gap: 2px;
+  width: 230px;
+  padding: 6px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: #1a1b20;
+  box-shadow: var(--lb-shadow), 0 16px 34px rgba(0, 0, 0, 0.65);
+}
+.crb-pop[hidden] {
+  display: none;
+}
+.crb-pop-h {
+  margin: 2px 6px 6px;
+  color: #fff;
+  font: 400 16px/1.1 'Lilita One', 'Oxanium', sans-serif;
+}
+.crb-pop-note {
+  margin: 0 6px 6px;
+  color: #8d8f95;
+  font-size: 12px;
+}
+.crb-pop button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: #d5d8de;
+  font: 600 13px/1.2 'Oxanium', sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.crb-pop button img {
+  width: 22px;
+  height: auto;
+}
+.crb-pop button span {
+  display: grid;
+}
+.crb-pop button small {
+  color: #8d8f95;
+  font-size: 11px;
+  font-weight: 500;
+}
+.crb-pop button:hover:not(:disabled),
+.crb-pop button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  outline: none;
+}
+.crb-pop button[aria-checked='true'] {
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #fff;
+}
+.crb-pop button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.crb-pop .crb-pop-out {
+  justify-content: center;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0;
+  color: var(--lb-red-text);
+}
+
+#cbCountSub.is-warn {
+  color: var(--lb-red-text);
+}
+
+/* the phone dock: your deck in one row, floating above the bottom bar (only while the deck box is off screen) */
+.crb-dock {
+  position: fixed;
+  right: 10px;
+  bottom: calc(var(--bn-bar-h, 0px) + env(safe-area-inset-bottom, 0px) + 10px);
+  left: 10px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 8px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(26, 27, 32, 0.97);
+  box-shadow: var(--lb-shadow), 0 12px 28px rgba(0, 0, 0, 0.7);
+  color: #fff;
+  cursor: pointer;
+}
+.crb-dock[hidden] {
+  display: none;
+}
+.crb-dock-cards {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 3px;
+  max-width: 300px;
+}
+.crb-dock-cards img {
+  width: 100%;
+  height: auto;
+}
+.crb-dock-cards i {
+  aspect-ratio: 136 / 200;
+  margin-top: 14%;
+  border: 2px dashed #34363e;
+  border-radius: 4px;
+}
+.crb-dock-n {
+  display: grid;
+  margin-left: auto;
+  text-align: right;
+}
+.crb-dock-n b {
+  font: 400 18px/1 'Lilita One', 'Oxanium', sans-serif;
+}
+.crb-dock-n small {
+  color: #8d8f95;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* sticky only when the whole column fits on screen */
+@media (max-height: 1000px) {
+  .crb-side {
+    position: static;
+  }
+}
+
+/* ---- phones + narrow desktops: one column: deck, the pool, then the meta decks ---- */
+@media (max-width: 1100px) {
+  .crb {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .crb-side {
+    display: contents;
+  }
+  .crb-meta {
+    order: 3;
+  }
+}
+@media (min-width: 1101px) {
+  .crb-dock {
+    display: none;
+  }
+}
+@media (max-width: 970px) {
+  .crb-deck,
+  .crb-meta,
+  .crb-pool {
+    padding: 12px;
+  }
+  .crb-grid {
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 2px 6px;
+    padding: 6px;
+  }
+  .crb-filters .crd-styles {
+    width: 100%;
+  }
+  .crb-sock {
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crb-pc,
+  .crb-tower {
+    transition: none;
+  }
+}
