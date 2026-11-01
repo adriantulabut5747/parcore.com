@@ -55,9 +55,11 @@
 }
 .am-title {
   margin: 0;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Oxanium', sans-serif; /* every CoC tool's title (Nov 1 2026, Adrian) */
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--am-text);
 }
 .am-intro {
@@ -129,7 +131,7 @@
   border-radius: 4px;
   background: none;
   color: #d5d8de;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -274,7 +276,7 @@
 }
 .am-part-title {
   margin: 0;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.6px;
@@ -295,8 +297,7 @@
 .am-btn,
 .am-th,
 .am-mode,
-.am-picker-remove,
-.am-picker-close {
+.am-picker-remove {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -308,7 +309,7 @@
   background: rgba(11, 11, 12, 0.8);
   box-shadow: none;
   color: var(--text-muted, #949ba4);
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 1.3px;
@@ -333,8 +334,7 @@
 .am-btn:hover,
 .am-th:hover,
 .am-mode:hover,
-.am-picker-remove:hover,
-.am-picker-close:hover {
+.am-picker-remove:hover {
   background: var(--flat-hover, #1e1f23);
   color: var(--text-secondary, #c8cbcd);
 }
@@ -371,8 +371,7 @@
 .am-btn:focus-visible,
 .am-th:focus-visible,
 .am-mode:focus-visible,
-.am-picker-remove:focus-visible,
-.am-picker-close:focus-visible {
+.am-picker-remove:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.35);
   outline-offset: 2px;
 }
@@ -464,6 +463,21 @@ b.is-over {
 .am-actions .am-btn-main {
   grid-column: 1 / -1;
 }
+/* Phones: Share and Clear are their icons only (Adrian: no "Sh..." ellipsis); Copy army link gets the room */
+@media (max-width: 970px) {
+  .am-actions {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+  .am-share .am-btn-text,
+  .am-btn-clear .am-btn-text {
+    display: none;
+  }
+  .am-share .am-btn,
+  .am-btn-clear {
+    width: 48px;
+    padding: 0;
+  }
+}
 /* Room for all four on one line (a wide box): Open in game first, the
    rest beside it. Narrower boxes keep the two-line arrangement above. */
 @container (min-width: 700px) {
@@ -488,7 +502,7 @@ b.is-over {
 }
 .am-group-title {
   margin: 0;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 1.8px;
@@ -496,7 +510,7 @@ b.is-over {
   color: var(--am-muted);
 }
 .am-group-meter {
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 11.5px;
   font-weight: 700;
   color: var(--am-faint);
@@ -586,7 +600,7 @@ b.is-over {
   padding: 0 4px;
   border-radius: 4px;
   background: rgba(10, 11, 13, 0.78);
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 11px;
   font-weight: 700;
   line-height: 1.35;
@@ -647,25 +661,84 @@ b.is-over {
 .am-modal[hidden] {
   display: none;
 }
+.am-modal.is-closing {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+/* The picker is a drawer in the equipment panel's dress (coc-guides.css "EQUIPMENT PANEL"):
+   a raised box, a fixed bar (title + X key), the list scrolling under it. */
 .am-modal-box {
+  display: flex;
+  flex-direction: column;
   width: min(520px, 100%);
   max-height: min(80vh, 640px);
-  overflow-y: auto;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  background: #16171b;
-  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: 14px;
+  background: var(--lb-box);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 30px 80px -20px rgba(0, 0, 0, 0.9);
   animation: am-rise 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.am-modal-title {
+/* the bar both drawers share (the tray's head wears the same) */
+.am-sheet-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 18px;
+  border-bottom: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
+}
+.am-sheet-ttl {
+  flex: 1;
+  min-width: 0;
   margin: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--am-text);
+  font: 700 14px/1.2 'Sora', sans-serif;
+  color: #fff;
+}
+/* close = an X key (the equipment panel's / Damage Calculator's) */
+.am-sheet-x {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 36px;
+  padding: 0 0 2px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.am-sheet-x:hover {
+  background: var(--lb-raise-hover);
+  color: #fff;
+}
+.am-sheet-x:active {
+  transform: translateY(1px);
+  box-shadow: var(--lb-btn-down);
+}
+.am-sheet-x:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+.am-sheet-x svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.am-sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 18px;
 }
 .am-modal-note {
   margin: -2px 0 12px;
@@ -720,38 +793,43 @@ html.am-modal-open {
     transform: translateY(14px) scale(0.98);
   }
 }
-@media (max-width: 640px) {
+/* Phones: a bottom sheet (same breakpoint as cocSheetDrag and the tray) */
+@media (max-width: 970px) {
   .am-modal {
     align-items: end;
     padding: 0;
   }
   .am-modal-box {
     width: 100%;
-    max-height: 78vh;
-    border-radius: var(--lb-r) var(--lb-r) 0 0; /* a bottom sheet: square where it meets the screen edge */
-    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    max-height: calc(100% - 40px);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: am-sheet-up 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .am-modal.is-closing .am-modal-box {
+    transform: translateY(100%);
+    transition-duration: 0.2s;
+  }
+  .am-modal-box.is-dragging,
+  .am-tray.is-dragging {
+    transition: none;
+  }
+  .am-sheet-bar {
+    padding: 10px 10px 12px 16px;
+    touch-action: none;
+  }
+  .am-sheet-body {
+    padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   }
   .am-modal .am-grid-sm {
     grid-template-columns: repeat(4, 1fr);
   }
 }
-.am-picker-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 1.3px;
-  text-transform: uppercase;
-  color: var(--am-text);
-}
-.am-picker-close {
-  min-height: 32px;
-  width: 32px;
-  padding: 0;
-  font-size: 18px;
+@keyframes am-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
 }
 .am-grid-sm {
   grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
@@ -945,7 +1023,7 @@ html.am-modal-open {
   height: 22px;
   margin: -3px 0 -3px 8px;
   padding: 0 7px;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
@@ -1038,11 +1116,14 @@ html.am-modal-open {
   display: flex;
   flex-direction: column;
   max-height: min(46vh, 430px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--lb-edge);
   border-bottom: 0;
-  border-radius: 4px;
-  background: #16171b;
-  box-shadow: 0 -24px 60px -12px rgba(0, 0, 0, 0.85);
+  border-radius: 14px 14px 0 0;
+  background: var(--lb-box);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 -24px 60px -12px rgba(0, 0, 0, 0.85);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   animation: am-tray-up 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1061,20 +1142,16 @@ html.am-modal-open {
   align-items: center;
   gap: 10px;
   padding: 10px 12px 10px 16px;
-  border-bottom: 1px solid #202227;
+  border-bottom: 1px solid var(--am-line, rgba(255, 255, 255, 0.07));
 }
 .am-tray-title {
   margin: 0;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.3px;
-  text-transform: uppercase;
-  color: var(--am-text);
+  font: 700 14px/1.2 'Sora', sans-serif; /* = .am-sheet-ttl */
+  color: #fff;
 }
 .am-tray-meter {
   margin-right: auto;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -1091,10 +1168,6 @@ html.am-modal-open {
   background: var(--lb-raise);
   box-shadow: var(--lb-btn);
   color: var(--am-text);
-}
-.am-tray .am-picker-close {
-  min-height: 34px;
-  width: 34px;
 }
 .am-tray-body {
   overflow-y: auto;
@@ -1114,9 +1187,11 @@ html.am-modal-open {
 @media (max-width: 970px) {
   .am-tray {
     max-height: 52vh;
+    border-radius: 18px 18px 0 0;
   }
   .am-tray-head {
-    padding: 8px 10px 8px 14px;
+    padding: 8px 10px 10px 14px;
+    touch-action: none;
   }
   .am-tray-body {
     padding: 10px 12px 14px;

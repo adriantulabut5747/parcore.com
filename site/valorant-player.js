@@ -228,7 +228,21 @@
   const track = (k, p) => p.then((v) => (step(k, true), v), (e) => (step(k, false), Promise.reject(e)));
 
   const S = { acc: null, region: 'ap', mmr: null, mmr3: null, rr: [], recent: [], stored: [], games: [] };
-  track('account', getJSON(api('account', who)))
+
+  // THE LINE (valorant-line.js): a profile takes up to 11 Henrik calls (account, rank + its fallback, 2 RR,
+  // 5 match pages, stored), so it waits for a pass of 11 when the key is busy. The loader shows the place in line.
+  const PROFILE_CALLS = 11;
+  let pass = '';
+  const lined = (url) => vlLine.get(url, getJSON, pass, showLine);
+  function showLine(t) {
+    const el = $('vpLoadLine');
+    $('vpLoadK').textContent = t ? 'In line' : 'Looking up';
+    el.hidden = !t;
+    if (t) el.innerHTML = `Lots of players right now. You're <b>#${t.place}</b> in line${t.line > 1 ? ` of ${t.line}` : ''}, ${vlLine.eta(t.wait)}. Keep this tab open.`;
+  }
+  vlLine
+    .ticket(PROFILE_CALLS, showLine)
+    .then((p) => ((pass = p), track('account', lined(api('account', who)))))
     .then(async (j) => {
       const acc = (S.acc = j.data || {});
       S.region = REGIONS.includes(acc.region) ? acc.region : 'ap';
@@ -244,8 +258,8 @@
       log(name, tag, S.region);
       const q = { region: S.region, name, tag };
       await rosterP;
-      const rank = track('rank', getJSON(api('mmr3', q)).then((r) => (S.mmr3 = r.data)).catch(() => getJSON(api('mmr', q)).then((r) => (S.mmr = r.data))));
-      const rr = track('rr', Promise.allSettled([getJSON(api('rr', q)), getJSON(api('rrstored', q))]).then(([a, b]) => {
+      const rank = track('rank', lined(api('mmr3', q)).then((r) => (S.mmr3 = r.data)).catch(() => lined(api('mmr', q)).then((r) => (S.mmr = r.data))));
+      const rr = track('rr', Promise.allSettled([lined(api('rr', q)), lined(api('rrstored', q))]).then(([a, b]) => {
         const seen = new Map();
         const add = (h) => h && !seen.has(h.match_id || h.date) && seen.set(h.match_id || h.date, h);
         (a.status === 'fulfilled' ? a.value.data?.history || [] : []).forEach(add);
@@ -253,7 +267,7 @@
         S.rr = [...seen.values()].filter((h) => Number.isFinite(h.elo)).sort((x, y) => Date.parse(x.date) - Date.parse(y.date));
         if (a.status === 'rejected' && b.status === 'rejected') throw a.reason;
       }));
-      const pages = Array.from({ length: COUNT / 10 }, (_, i) => getJSON(api('matches', { ...q, start: i * 10 })));
+      const pages = Array.from({ length: COUNT / 10 }, (_, i) => lined(api('matches', { ...q, start: i * 10 })));
       const recent = track('matches', Promise.allSettled(pages).then((res) => {
         const ms = res.flatMap((r) => (r.status === 'fulfilled' ? r.value.data || [] : []));
         const ids = new Set();
@@ -262,7 +276,7 @@
         S.recent.forEach((g) => g.m.rounds?.length && (g.x = deep(g)));
         if (res.every((r) => r.status === 'rejected')) throw res[0].reason;
       }));
-      const stored = track('stored', getJSON(api('stored', q)).then((r) => (S.stored = (r.data || []).map(fromStored).filter((g) => g.id))));
+      const stored = track('stored', lined(api('stored', q)).then((r) => (S.stored = (r.data || []).map(fromStored).filter((g) => g.id))));
 
       // every section draws (or drops itself) while the loader is still up; reveal() then shows them all at once
       const drawn = [
@@ -294,7 +308,8 @@
       $('vpSub').textContent = err.message;
       $('vpErr').textContent = err.message;
       console.warn(err);
-    });
+    })
+    .finally(() => vlLine.done(pass));
 
   /* ---- banner: their player card stretched behind the name, the numbers in wells ---- */
   function drawBanner(acc, name, tag) {
@@ -349,7 +364,7 @@
     wells.push(well('Rank', r.tier, tierName(r.tier), r.tier >= 3 ? `${num(r.rr)} RR${Number.isFinite(r.change) && r.change ? ` · <i data-sign="${r.change > 0 ? 'up' : 'down'}">${r.change > 0 ? '+' : ''}${r.change}</i> last game` : ''}` : 'No rank this act'));
     if (r.peak >= 3) wells.push(well('Peak', r.peak, tierName(r.peak), esc(actName(r.peakSeason))));
     if (cur?.games) wells.push(`<div class="vp-well"><span class="vp-well-ico vp-well-n">${num(cur.wins)}</span><span><small>This act</small><b>${num(cur.wins)}W ${num(cur.games - cur.wins)}L</b><em>${pct(cur.wins, cur.games)} won · ${num(cur.games)} games</em></span></div>`);
-    if (Number.isFinite(r.lb) && r.lb > 0) wells.push(`<div class="vp-well"><span class="vp-well-ico vp-well-n">#</span><span><small>Leaderboard</small><b>#${num(r.lb)}</b><em>${S.region.toUpperCase()} ranked</em></span></div>`);
+    if (Number.isFinite(r.lb) && r.lb > 0) wells.push(`<a class="vp-well vp-well--link" href="/valorant/leaderboard?region=${S.region}&rank=${r.lb}"><span class="vp-well-ico vp-well-n">#</span><span><small>Leaderboard</small><b>#${num(r.lb)}</b><em>${S.region.toUpperCase()} ranked</em></span></a>`);
     $('vpWells').innerHTML = wells.join('');
 
     // the Rank section: the progress bar to the next rank + the act's best wins

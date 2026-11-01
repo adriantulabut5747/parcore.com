@@ -1,0 +1,804 @@
+/* ============================================================
+   CLASH ROYALE LOBBY = "the Throne Room" (Oct 31 2026, Adrian's pick). On top of codm-banner.css / codm-tools.css
+   (--codm-side, .ct-sec / .ct-card), coc-villager.css (the guide bubble), cr.css (titles, keys, rarity frames, FAQ)
+   and cr-decks.css (.crd-card / .crd-cost hands, .crd-st chips). Raised boxes, sunken wells, ONE red key a section.
+   Hero art = lobby/throne.webp (a skeleton reaching for the crown, 1000px): on desktop it sits top-right at about its
+   own size and fades out left + down (a full-bleed cover blurred it and pushed the crown under the title), so the
+   crown stays clear between the copy and the Steal console. Phones: the art on top, cropped to the hand + crown.
+   ============================================================ */
+
+/* ---- 1. HERO ---- */
+.crh {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+  align-items: end;
+  column-gap: 40px;
+  min-height: max(700px, calc(100svh - 64px));
+  padding: 0 var(--codm-side) 48px;
+}
+/* the throne room's light: warm red from the art's side */
+.crh::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(70% 70% at 78% 30%, rgba(194, 59, 59, 0.16), transparent 70%);
+  pointer-events: none;
+}
+.crh-art {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  width: min(80%, 1400px);
+  aspect-ratio: 1000 / 502;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.7) 18%, #000 34%), linear-gradient(180deg, #000 50%, transparent 98%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.7) 18%, #000 34%), linear-gradient(180deg, #000 50%, transparent 98%);
+  mask-composite: intersect;
+}
+.crh-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.9) saturate(1.05);
+}
+.crh-copy {
+  max-width: 560px;
+}
+.crh-eye {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 14px;
+  color: #b9bcc3;
+  font: 700 11px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.crh-eye span::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  vertical-align: 1px;
+  background: var(--lb-red);
+}
+.crh-title {
+  margin: 0;
+  font: italic 900 clamp(44px, 4.4vw, 80px)/0.92 'Tourney', 'Oxanium', sans-serif;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 1px #000, 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000, 0 5px 0 #000, 0 10px 22px rgba(0, 0, 0, 0.6);
+}
+.crh-title em {
+  display: block;
+  font-style: inherit;
+  color: var(--lb-red);
+}
+.crh-say {
+  margin-top: 22px;
+}
+.crh-say p {
+  background: rgba(20, 21, 24, 0.92);
+}
+/* the live numbers: one sunken tray, four cells */
+.crh-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, auto));
+  width: fit-content;
+  margin: 24px 0 0;
+  border-radius: var(--lb-r);
+  background: rgba(18, 19, 23, 0.9);
+  box-shadow: var(--lb-ring-well);
+}
+.crh-facts div {
+  padding: 12px 20px 13px;
+}
+.crh-facts div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+.crh-facts dt {
+  color: #8d9098;
+  font: 700 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.crh-facts dd {
+  margin: 7px 0 0;
+  color: #fff;
+  font: italic 900 22px/1 'Tourney', 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Steal the crown: a raised box under the art's crown; its top edge = the deck's verdict (green / red / none) */
+.crh-steal {
+  padding: 16px 16px 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: rgba(20, 21, 24, 0.94);
+  box-shadow: var(--lb-shadow), 0 24px 48px -20px rgba(0, 0, 0, 0.9);
+}
+.crh-steal[data-v='win'] { border-top-color: #3a9d6a; }
+.crh-steal[data-v='loss'] { border-top-color: var(--lb-red); }
+.crh-steal-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+.crh-crown {
+  width: 52px;
+  height: auto;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+/* a steal: the crown hops off its pillow and lands again (transform only) */
+.crh-crown.is-grab {
+  animation: crh-grab 0.6s var(--lb-ease);
+}
+@keyframes crh-grab {
+  35% { transform: translateY(-10px) rotate(-14deg) scale(1.08); }
+  70% { transform: translateY(1px) rotate(4deg); }
+}
+.crh-steal-id small {
+  display: block;
+  color: var(--lb-red-text);
+  font: 700 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.crh-deck {
+  margin: 5px 0 0;
+  overflow: hidden;
+  color: #fff;
+  font: italic 900 22px/1.05 'Tourney', 'Oxanium', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crh-var {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: #9a9da4;
+  font: 400 12px/1.3 'Sora', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crh-wr {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+.crh-wr b {
+  color: #fff;
+  font: italic 900 24px/1 'Tourney', 'Oxanium', sans-serif;
+}
+.crh-wr small {
+  color: #8d9098;
+  font: 600 10.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* the hand: 8 across in a sunken mat */
+.crh-hand {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  margin: 14px 0 0;
+  padding: 10px 8px 8px;
+  list-style: none;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crh-hand .crd-cost,
+.crl-hand .crd-cost,
+.crw-c .crd-cost {
+  font-size: 11px;
+}
+.crh-hand li {
+  animation: crh-deal 0.5s var(--lb-ease) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+@keyframes crh-deal {
+  from {
+    opacity: 0;
+    transform: translateY(-22px) rotate(-10deg) scale(0.9);
+  }
+}
+.crh-steal-keys {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 40px;
+  gap: 8px;
+  margin-top: 12px;
+}
+.crh-pen {
+  padding: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .crh-hand li, .crh-crown.is-grab { animation: none; }
+}
+
+/* ---- section heads with a key on the right ---- */
+.crl-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.crl-all {
+  flex: none;
+  height: 36px;
+  padding: 0 12px 0 14px;
+}
+.crl-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.crl-fail {
+  margin: 0;
+  padding: 18px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #a3a5ab;
+  font: 400 13.5px/1.5 'Sora', sans-serif;
+}
+
+/* ---- 2. CROWN DECKS: raised boxes, 3 a row; the win condition's art behind the name, verdict on the top edge ---- */
+.crl-decks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.crl-deck {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crl-deck[data-v='win'] { border-top-color: #3a9d6a; }
+.crl-deck[data-v='loss'] { border-top-color: var(--lb-red); }
+.crl-deck-head {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.crl-deck-head::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  right: 30px;
+  bottom: -8px;
+  z-index: -1;
+  width: 50%;
+  background: var(--art) 50% 24% / 100% auto no-repeat;
+  opacity: 0.2;
+  -webkit-mask-image: radial-gradient(farthest-side, #000 35%, transparent);
+  mask-image: radial-gradient(farthest-side, #000 35%, transparent);
+  pointer-events: none;
+}
+.crl-rank {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  color: #c9cbd0;
+  font: italic 900 15px/1 'Tourney', 'Oxanium', sans-serif;
+}
+.crl-rank svg {
+  width: 12px;
+  height: 9px;
+  fill: #fff;
+}
+.crl-rank--top {
+  color: #fff;
+}
+.crl-id h3 {
+  margin: 0;
+  overflow: hidden;
+  color: #fff;
+  font: italic 900 19px/1.1 'Tourney', 'Oxanium', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crl-id p {
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: #9a9da4;
+  font: 400 12px/1.3 'Sora', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crl-pen {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #c9cbd0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.crl-pen:hover { background: var(--lb-raise-hover); color: #fff; }
+.crl-pen:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
+.crl-pen svg,
+.crh-pen svg,
+.crl-all svg,
+.crc-copy--ico svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.crl-hand {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px 8px;
+  margin: 14px 0 0;
+  padding: 12px 12px 8px;
+  list-style: none;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crl-hand .crd-cost {
+  font-size: 13px;
+}
+.crl-foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+.crl-wr,
+.crl-n {
+  display: grid;
+  gap: 4px;
+}
+.crl-wr b,
+.crl-n b {
+  color: #fff;
+  font: italic 900 19px/1 'Tourney', 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.crl-n b {
+  color: #c9cbd0;
+  font-size: 16px;
+}
+.crl-wr small,
+.crl-n small {
+  color: #7d8088;
+  font: 600 9.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.crl-copy {
+  margin-left: auto;
+  height: 36px;
+  padding: 0 14px;
+}
+
+/* ---- 3. THE ROYAL COURT: one raised box over the Champions art; podium 2 | 1 | 3, then rows 4-10 in a well ---- */
+.crc {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 28px 24px 24px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crc::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  height: 420px;
+  background: url('/images/clash-royale/lobby/court.webp') 50% 22% / cover no-repeat;
+  opacity: 0.28;
+  -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
+  pointer-events: none;
+}
+.crc-pod {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crc-p {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 34px 14px 14px;
+  border-radius: var(--lb-r);
+  background: rgba(18, 19, 23, 0.94);
+  box-shadow: var(--lb-ring-well);
+  text-align: center;
+}
+.crc-p--1 { order: 2; padding-top: 44px; padding-bottom: 22px; }
+.crc-p--2 { order: 1; }
+.crc-p--3 { order: 3; }
+/* the crowns sit on the plinth's top edge: 3 for #1, 2 for #2, 1 for #3 (a three-crown win) */
+.crc-crowns {
+  position: absolute;
+  top: -22px;
+  display: flex;
+}
+.crc-crowns img {
+  width: 46px;
+  height: auto;
+  margin: 0 -5px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7));
+}
+.crc-p--1 .crc-crowns { top: -28px; }
+.crc-p--1 .crc-crowns img { width: 56px; }
+.crc-p--1 .crc-crowns img:nth-child(2) { transform: translateY(-8px); }
+.crc-place {
+  color: #fff;
+  font: italic 900 34px/1 'Tourney', 'Oxanium', sans-serif;
+  text-shadow: 0 0 1px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 3px 0 #000;
+}
+.crc-p--1 .crc-place { font-size: 44px; color: var(--lb-red); }
+.crc-who {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  max-width: 100%;
+}
+.crc-name {
+  overflow: hidden;
+  color: #fff;
+  font: 600 15px/1.25 'Sora', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crc-clan {
+  overflow: hidden;
+  color: #8d9098;
+  font: 400 12px/1.25 'Sora', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crc-elo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.crc-elo b {
+  color: #fff;
+  font: italic 900 20px/1 'Tourney', 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.crc-elo small {
+  color: #7d8088;
+  font: 600 9.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.crc-deckname {
+  margin: 2px 0 0;
+  color: #9a9da4;
+  font: 400 12px/1.3 'Sora', sans-serif;
+}
+.crc-deckname b {
+  color: #e6e8ec;
+  font-weight: 600;
+}
+.crc-hand {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px 5px;
+  width: 100%;
+  max-width: 230px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crc-copy {
+  height: 34px;
+  padding: 0 14px;
+}
+.crc-none {
+  margin: 0;
+  color: #7d8088;
+  font: 400 12px/1.4 'Sora', sans-serif;
+}
+.crc-p .crc-none {
+  padding: 10px 4px 4px;
+}
+.crc-rows {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 8px;
+  list-style: none;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crc-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(0, 300px) 110px 36px;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  background: var(--lb-row);
+  box-shadow: var(--lb-row-ring);
+}
+.crc-rk {
+  color: #c9cbd0;
+  font: italic 900 18px/1 'Tourney', 'Oxanium', sans-serif;
+  text-align: center;
+}
+.crc-row .crc-who { justify-items: start; }
+.crc-hand--row {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  max-width: none;
+}
+.crc-row .crc-elo { justify-content: flex-end; }
+.crc-copy--ico {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+/* ---- 4. THE CARD WALL: brighter = more played (--u = sqrt of its share of the most used card) ---- */
+.crw-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.crw-sort {
+  margin: 0;
+}
+.crw-note {
+  color: #7d8088;
+  font: 600 10.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.crw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 12px 8px;
+  margin: 14px 0 0;
+  padding: 16px 14px 12px;
+  list-style: none;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+}
+.crw-c {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-decoration: none;
+  opacity: calc(0.38 + 0.62 * var(--u));
+  transition: opacity 0.2s ease, transform 0.18s var(--lb-ease);
+}
+.crw-c img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.crw-c .crd-cost {
+  top: 7%;
+}
+.crw-v {
+  color: #c9cbd0;
+  font: 700 10.5px/1 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.crw-c.is-cold {
+  opacity: 0.28;
+  filter: grayscale(1);
+}
+.crw-c:hover,
+.crw-c:focus-visible {
+  z-index: 1;
+  opacity: 1;
+  filter: none;
+  transform: translateY(-4px) scale(1.05);
+}
+.crw-c:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.crw-more {
+  display: flex;
+  margin: 12px auto 0;
+}
+
+/* ---- 5. EVERY PAGE: one raised board, the tabs as columns (Meta | Players | Tools) of compact rows, the Golden
+   Knight standing on the right ---- */
+.crp {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 250px);
+  align-items: end;
+  gap: 20px;
+  padding: 22px 0 0 22px;
+  overflow: hidden;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: radial-gradient(60% 80% at 92% 90%, rgba(194, 59, 59, 0.16), transparent 70%), var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crp-pages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 18px 14px;
+  align-self: start;
+  padding-bottom: 22px;
+}
+.crp-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: #b9bcc3;
+  font: 700 11px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.crp-label svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--lb-red-text);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.crp-grid {
+  display: grid;
+  gap: 8px;
+}
+.crp .ct-card {
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  padding: 10px 12px 10px 10px;
+  background: var(--lb-box2);
+}
+.crp .ct-art {
+  order: -1;
+}
+.crp .ct-card b {
+  font: italic 900 16px/1.05 'Tourney', 'Oxanium', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.crp .ct-card b + span {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.crp .ct-tag {
+  left: auto;
+  right: 10px;
+}
+.crp-knight {
+  align-self: end;
+  width: 100%;
+  height: auto;
+  margin-bottom: -6px;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.6));
+}
+
+/* ---- WIDTHS ---- */
+@media (max-width: 1280px) {
+  .crl-decks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .crp { grid-template-columns: minmax(0, 1fr) minmax(0, 190px); }
+  .crc-row { grid-template-columns: 40px minmax(0, 1fr) minmax(0, 240px) 96px 36px; }
+}
+@media (max-width: 1100px) and (min-width: 971px) {
+  .crl-decks > :nth-child(n + 5) { display: none; }
+}
+@media (max-width: 970px) {
+  /* hero: art on top (cropped to the hand + crown), the copy over its foot, then the console */
+  .crh {
+    display: block;
+    min-height: 0;
+    padding: 0 0 4px;
+  }
+  .crh-art {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    max-height: 62vh;
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+  }
+  .crh-art img { object-position: 82% 40%; }
+  .crh-copy {
+    position: relative;
+    margin-top: -88px;
+    padding: 0 var(--codm-side);
+  }
+  .crh-eye { font-size: 10px; letter-spacing: 0.16em; }
+  .crh-title { font-size: clamp(40px, 12cqi, 58px); }
+  .crh { container-type: inline-size; }
+  .crh-say { margin-top: 16px; }
+  .crh-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); width: auto; margin-top: 16px; }
+  .crh-facts div { padding: 10px 10px 11px; }
+  .crh-facts dt { font-size: 9px; letter-spacing: 0.1em; }
+  .crh-facts dd { font-size: 17px; }
+  .crh-steal { margin: 16px var(--codm-side) 0; padding: 14px 12px 12px; }
+  .crh-hand { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; padding: 10px 14px 6px; }
+  .crh-hand .crd-cost { font-size: 13px; }
+
+  .crl-head { flex-wrap: wrap; }
+  .crl-decks { grid-template-columns: minmax(0, 1fr); }
+  .crl-decks > :nth-child(n + 4) { display: none; }
+
+  .crc { padding: 30px 10px 10px; }
+  .crc::before { height: 260px; }
+  .crc-pod { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-top: 6px; }
+  .crc-p--1, .crc-p--2, .crc-p--3 { order: 0; padding-top: 34px; padding-bottom: 14px; }
+  .crc-p--1 { padding-top: 40px; }
+  .crc-rows { padding: 6px; margin-top: 18px; }
+  .crc-row {
+    grid-template-columns: 34px minmax(0, 1fr) auto 36px;
+    grid-template-areas: 'rk who elo copy' 'hand hand hand hand';
+    gap: 8px 10px;
+    padding: 10px;
+  }
+  .crc-rk { grid-area: rk; }
+  .crc-row .crc-who { grid-area: who; }
+  .crc-row .crc-elo { grid-area: elo; }
+  .crc-row .crc-copy { grid-area: copy; }
+  .crc-hand--row, .crc-row .crc-none { grid-area: hand; gap: 4px; }
+
+  .crw-grid { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px 6px; padding: 12px 10px 10px; }
+  .crw-note { display: none; }
+
+  .crp { grid-template-columns: minmax(0, 1fr); padding: 14px; }
+  .crp-pages { grid-template-columns: minmax(0, 1fr); padding-bottom: 0; }
+  .crp-knight { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crw-c { transition: none; }
+}

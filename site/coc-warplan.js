@@ -595,6 +595,10 @@
     app.querySelectorAll('[data-auto]').forEach(function (b) {
       b.addEventListener('click', function () {
         var k = b.dataset.auto;
+        if (k === 'clear')
+          return cocConfirm('Clear the plan?', 'Every attacker loses their target. Undo brings it back.', 'Clear').then(function (ok) {
+            if (ok) replacePlan({}, 'Clear');
+          });
         replacePlan(k === 'best' ? bestFitPlan() : k === 'mirror' ? mirrorPlan() : {}, { best: 'Best fit', mirror: 'Mirror', clear: 'Clear' }[k]);
       });
     });

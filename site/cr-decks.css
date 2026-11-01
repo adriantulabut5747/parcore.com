@@ -1,23 +1,17 @@
 /* ============================================================
    /clash-royale/decks (Oct 30 2026; v2 Oct 31 2026, Adrian: "it should look like a real deck").
    On top of codm-banner.css + codm-tools.css (banner, tray, .ct-sec rhythm, --codm-side inset)
-   and cr.css (titles, the King, keys).
+   and cr.css (titles, the Golden Knight, keys).
    A deck = one raised box: rank + name (CR.name) + the evo/hero line + the edit pen; the 8 cards
    4 x 2 in a sunken well (the game's own art, cost on an elixir drop), tower + avg + cycle under them;
-   win rate with its 95% margin strip, numbers, elixir curve; then the CoC card bar (flame like,
-   grey Copy deck, share). 2 decks a row on desktop, 1 on phones; each deck lays itself out by its own
-   width (container query), so the stats sit beside the cards only when there's room.
-   Under the list: the meta map (cr-decks.js metaMap).
+   win rate (its 95% range on hover), games / wins / usage; then the CoC card bar (flame like, grey Copy deck, share).
+   2 decks a row on desktop, 1 on phones; each deck lays itself out by its own width (container query),
+   so the stats sit beside the cards only when there's room.
+   Oct 31 2026 cleanup (Adrian: "doing too much"): the surest winner, the meta map, the elixir curve and the Speed
+   filter are gone; sort moved into the finder. The rest of the deck card is his v3 card, kept on purpose.
    ============================================================ */
 
-/* ---- filter row: the card picker key + the picked cards as chips ---- */
-.crd-tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 12px var(--codm-side) 0;
-}
+/* ---- the finder console's foot: the picked cards as chips + the count (console: "v3" at the end) ---- */
 .crd-count {
   margin-left: auto;
   font-size: 12px;
@@ -31,9 +25,6 @@
   background: var(--lb-red);
   color: #fff;
   font-size: 10px;
-}
-.crd-chips {
-  display: contents;
 }
 .crd-chip {
   display: inline-flex;
@@ -65,15 +56,6 @@
 }
 .crd-chip--without img {
   filter: grayscale(1) brightness(0.6);
-}
-.crd-chip--clear {
-  padding: 0 12px;
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  color: #8d8f95;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 /* ---- playstyle chips: the CoC recipe (a well at rest, the grey raised key when picked) ---- */
@@ -240,7 +222,7 @@
   background: var(--lb-well);
   box-shadow: var(--lb-ring-well);
   color: #a3a5ab;
-  font: 400 16px/1 'Lilita One', 'Oxanium', sans-serif;
+  font: italic 900 16px/1 'Tourney', 'Oxanium', sans-serif;
   font-variant-numeric: tabular-nums;
 }
 .crd-rank--top {
@@ -257,7 +239,7 @@
 .crd-name {
   margin: 0;
   overflow: hidden;
-  font: 400 21px/1.15 'Lilita One', 'Oxanium', sans-serif;
+  font: italic 900 21px/1.15 'Tourney', 'Oxanium', sans-serif;
   letter-spacing: 0.01em;
   color: #fff;
   white-space: nowrap;
@@ -298,14 +280,27 @@
   outline-offset: 2px;
 }
 
-/* ---- body: the hand + the numbers (side by side once the deck is wide enough) ---- */
+/* ---- body: the hand + the numbers + the card bar. Wide deck: numbers top right, the bar in the
+   bottom-right corner beside the hand (Adrian: that corner was blank); narrow: all three stacked ---- */
 .crd-body {
   display: grid;
   gap: 12px;
 }
 @container deck (min-width: 540px) {
   .crd-body {
-    grid-template-columns: minmax(0, 1fr) 190px;
+    grid-template-columns: minmax(0, 1fr) 200px;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'hand stats' 'hand bar';
+  }
+  .crd-hand {
+    grid-area: hand;
+  }
+  .crd-stats {
+    grid-area: stats;
+  }
+  .crd-bar {
+    grid-area: bar;
+    align-self: end;
   }
 }
 
@@ -363,7 +358,7 @@
   padding-top: 9%;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 30'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.4' cy='.62' r='.6'%3E%3Cstop offset='0' stop-color='%23ffb6f8'/%3E%3Cstop offset='.5' stop-color='%23d34ed8'/%3E%3Cstop offset='1' stop-color='%237a1c84'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M12 1.5S2.2 13.2 2.2 19.6a9.8 9.8 0 0 0 19.6 0C21.8 13.2 12 1.5 12 1.5z' fill='url(%23g)' stroke='%23240629' stroke-width='2'/%3E%3Cellipse cx='8.6' cy='16' rx='2' ry='3.2' fill='%23fff' opacity='.45'/%3E%3C/svg%3E") center / contain no-repeat;
   color: #fff;
-  font: 400 clamp(11px, 4.6cqi, 19px)/1 'Lilita One', 'Oxanium', sans-serif;
+  font: italic 900 clamp(11px, 4.6cqi, 19px)/1 'Tourney', 'Oxanium', sans-serif;
   text-shadow: 0 0 1px #240629, 1px 1px 0 #240629, -1px 1px 0 #240629, 1px -1px 0 #240629, -1px -1px 0 #240629;
   pointer-events: none;
 }
@@ -404,7 +399,7 @@
 }
 .crd-fact b {
   color: #fff;
-  font: 400 16px/1 'Lilita One', 'Oxanium', sans-serif;
+  font: italic 900 16px/1 'Tourney', 'Oxanium', sans-serif;
 }
 .crd-fact small {
   color: #8d8f95;
@@ -443,8 +438,7 @@
   align-items: end;
   gap: 2px 10px;
 }
-.crd-wr small,
-.crd-curve-wrap > small {
+.crd-wr small {
   grid-column: 1 / -1;
   color: #8d8f95;
   font-size: 10px;
@@ -454,7 +448,7 @@
 }
 .crd-wr b {
   color: #fff;
-  font: 400 34px/0.95 'Lilita One', 'Oxanium', sans-serif;
+  font: italic 900 34px/0.95 'Tourney', 'Oxanium', sans-serif;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 2px 0 #000;
 }
@@ -463,92 +457,6 @@
   font-size: 0.55em;
   font-style: normal;
   color: #c4c6cc;
-}
-.crd-verdict {
-  justify-self: end;
-  margin-bottom: 3px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: help;
-}
-.crd-verdict em {
-  margin-left: 3px;
-  color: #8d8f95;
-  font-style: normal;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-}
-.crd-verdict--win {
-  color: var(--win-text);
-}
-.crd-verdict--loss {
-  color: var(--loss-text);
-}
-.crd-verdict--flip {
-  color: #c4c6cc;
-}
-/* win rate strip (35-65%): the band = the 95% margin, the dot = the deck, the bright line = 50% */
-.crd-strip {
-  position: relative;
-  height: 10px;
-  margin: 2px 0 14px;
-  border-radius: 5px;
-  background: var(--lb-well);
-  box-shadow: var(--lb-ring-well);
-  --c: #8d8f95;
-}
-.crd-strip--win {
-  --c: var(--win);
-}
-.crd-strip--loss {
-  --c: var(--loss);
-}
-.crd-strip::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  bottom: -3px;
-  left: 50%;
-  width: 2px;
-  margin-left: -1px;
-  background: rgba(255, 255, 255, 0.4);
-}
-.crd-band {
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  border-radius: 3px;
-  background: var(--c);
-  opacity: 0.35;
-}
-.crd-dot {
-  position: absolute;
-  top: 50%;
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--lb-edge);
-  border-radius: 50%;
-  background: var(--c);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transform: translate(-50%, -50%);
-}
-.crd-strip small {
-  position: absolute;
-  top: 13px;
-  color: #6b6e76;
-  font-size: 9.5px;
-  font-variant-numeric: tabular-nums;
-  transform: translateX(-50%);
-}
-.crd-strip small:first-of-type {
-  transform: none;
-}
-.crd-strip small:last-of-type {
-  transform: translateX(-100%);
 }
 /* compact rows: label left, number right, raised rows in one well */
 .crd-rows {
@@ -583,87 +491,18 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-/* elixir curve: how many cards at each cost */
-.crd-curve-wrap {
-  display: grid;
-  gap: 6px;
-}
-.crd-curve {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  align-items: end;
-  gap: 3px;
-  height: 52px;
-  padding-top: 12px; /* room for the tallest bar's count */
-  margin-bottom: 14px;
-}
-.crd-curve i {
-  position: relative;
-  height: max(3px, calc(var(--h) * 100%));
-  border-radius: 3px 3px 0 0;
-  background: linear-gradient(#e2e4e9, #8d8f95);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-.crd-curve i[data-n=''] {
-  background: #2a2c35;
-  box-shadow: none;
-}
-.crd-curve i::before {
-  content: attr(data-n);
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  right: 0;
-  margin-bottom: 2px;
-  color: #c4c6cc;
-  font-size: 9.5px;
-  font-weight: 700;
-  text-align: center;
-}
-.crd-curve b {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 3px;
-  color: #6b6e76;
-  font-size: 9.5px;
-  font-weight: 600;
-  text-align: center;
-}
-
 /* narrow deck (phones, small desktops): the numbers sit under the hand, two columns */
 @container deck (max-width: 539px) {
   .crd-stats {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: 'wr rows' 'strip rows' 'curve rows';
     gap: 8px 14px;
     align-items: start;
-  }
-  .crd-wr {
-    grid-area: wr;
-  }
-  .crd-strip {
-    grid-area: strip;
-  }
-  .crd-rows {
-    grid-area: rows;
-    align-self: start;
-  }
-  .crd-curve-wrap {
-    grid-area: curve;
-  }
-  .crd-curve {
-    height: 42px;
   }
 }
 @container deck (max-width: 380px) {
   .crd-wr {
     grid-template-columns: auto;
-  }
-  .crd-verdict {
-    justify-self: start;
   }
   .crd-tower {
     font-size: 0;
@@ -717,6 +556,16 @@
   letter-spacing: 0.7px;
   text-transform: uppercase;
   white-space: nowrap;
+}
+/* wide deck: the bar fits the 200px corner beside the hand (after the rules above, so it wins) */
+@container deck (min-width: 540px) {
+  .crd-bar {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+  .crd-copy {
+    min-width: 0;
+    padding: 0 8px;
+  }
 }
 .crd-like:disabled {
   cursor: progress;
@@ -822,16 +671,6 @@
   color: #25d366;
 }
 
-/* a deck opened from the meta map glows twice */
-.crd-deck.is-target {
-  animation: crd-glow 1.6s ease-in-out 2;
-}
-@keyframes crd-glow {
-  50% {
-    box-shadow: var(--lb-shadow), 0 0 0 2px rgba(255, 255, 255, 0.5);
-  }
-}
-
 .crd-more {
   display: flex;
   margin: 16px auto 0;
@@ -852,199 +691,6 @@
 .crd-fail {
   grid-column: 1 / -1;
   color: #a3a5ab;
-}
-
-/* ============================================================
-   THE META MAP: x = games (log), y = win rate; one dot per deck = its win condition's art,
-   ringed by the verdict (green = winning for sure, grey = too close to call, red = losing for sure).
-   One series, so no legend box: the key under it names the three rings.
-   ============================================================ */
-.crm {
-  position: relative;
-  padding: 22px 22px 40px 54px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: var(--lb-box);
-  box-shadow: var(--lb-shadow);
-}
-.crm-plot {
-  position: relative;
-  height: 440px;
-  border-radius: var(--lb-r);
-  background: radial-gradient(90% 60% at 100% 0%, rgba(58, 157, 106, 0.07), transparent 70%), var(--lb-well);
-  box-shadow: var(--lb-ring-well);
-}
-.crm-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.crm-gy {
-  position: absolute;
-  left: 0;
-  right: 0;
-  border-top: 1px dashed rgba(255, 255, 255, 0.06);
-}
-.crm-gy b,
-.crm-gx b {
-  position: absolute;
-  color: #6b6e76;
-  font-size: 10px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.crm-gy b {
-  right: 100%;
-  margin-right: 8px;
-  transform: translateY(-50%);
-}
-.crm-gy--50 {
-  border-top: 2px solid rgba(255, 255, 255, 0.22);
-}
-.crm-gy--50 b {
-  color: #e6e8ec;
-}
-.crm-gx {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  border-left: 1px dashed rgba(255, 255, 255, 0.05);
-}
-.crm-gx b {
-  top: 100%;
-  margin-top: 7px;
-  transform: translateX(-50%);
-}
-.crm-q {
-  position: absolute;
-  color: rgba(255, 255, 255, 0.2);
-  font: 700 10.5px/1 'Oxanium', sans-serif;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-.crm-q--tl {
-  top: 12px;
-  left: 14px;
-}
-.crm-q--tr {
-  top: 12px;
-  right: 14px;
-}
-.crm-q--br {
-  bottom: 12px;
-  right: 14px;
-}
-.crm-q--bl {
-  bottom: 12px;
-  left: 14px;
-}
-.crm-dot {
-  --ring: #8d8f95;
-  position: absolute;
-  z-index: 1;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 2px solid var(--ring);
-  border-radius: 50%;
-  background: var(--art) 50% 40% / 165% auto no-repeat, #1b1c21;
-  box-shadow: 0 0 0 2px var(--lb-well), 0 4px 10px rgba(0, 0, 0, 0.5);
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  transition: transform 0.15s var(--lb-ease), opacity 0.2s ease, filter 0.2s ease;
-}
-.crm-dot--win {
-  --ring: #3a9d6a;
-}
-.crm-dot--loss {
-  --ring: var(--lb-red);
-}
-.crm-dot:hover,
-.crm-dot:focus-visible {
-  z-index: 3;
-  transform: translate(-50%, -50%) scale(1.3);
-  outline: none;
-}
-.crm-dot.is-out {
-  opacity: 0.18;
-  filter: grayscale(1);
-}
-.crm-tip {
-  position: absolute;
-  z-index: 5;
-  display: grid;
-  gap: 3px;
-  max-width: 240px;
-  padding: 10px 12px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: #1a1b20;
-  box-shadow: var(--lb-shadow), 0 14px 30px rgba(0, 0, 0, 0.6);
-  transform: translate(-50%, calc(-100% - 26px));
-  pointer-events: none;
-}
-.crm-tip.is-below {
-  transform: translate(-50%, 30px);
-}
-.crm-tip[hidden] {
-  display: none;
-}
-.crm-tip b {
-  color: #fff;
-  font: 400 16px/1.1 'Lilita One', 'Oxanium', sans-serif;
-}
-.crm-tip span {
-  color: #a3a5ab;
-  font-size: 12px;
-}
-.crm-tip-cards {
-  display: flex;
-  gap: 2px;
-  margin-top: 5px;
-}
-.crm-tip-cards img {
-  width: 25px;
-  height: auto;
-}
-.crm-axis {
-  position: absolute;
-  margin: 0;
-  color: #8d8f95;
-  font: 700 10px/1 'Oxanium', sans-serif;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.crm-axis--x {
-  right: 22px;
-  bottom: 12px;
-}
-.crm-axis--y {
-  top: 22px;
-  left: 10px;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-.crm-key {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 8px;
-  margin: 12px 0 0;
-  color: #a3a5ab;
-  font-size: 12px;
-}
-.crm-key-dot {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-left: 8px;
-  border: 2px solid var(--ring, #8d8f95);
-  border-radius: 50%;
-}
-.crm-key-dot:first-child {
-  margin-left: 0;
 }
 
 /* phones (Oct 31 2026, Adrian: "so tall"): the numbers hide behind the win-rate key in the mat's foot strip */
@@ -1069,7 +715,7 @@
     cursor: pointer;
   }
   .crd-stats-key b {
-    font: 400 15px/1 'Lilita One', 'Oxanium', sans-serif;
+    font: italic 900 15px/1 'Tourney', 'Oxanium', sans-serif;
     font-variant-numeric: tabular-nums;
   }
   .crd-stats-key--win b {
@@ -1128,11 +774,6 @@
 
 /* ---- phones ---- */
 @media (max-width: 970px) {
-  .crd-count {
-    width: 100%;
-    margin-left: 0;
-    order: 9;
-  }
   /* playstyles scroll sideways in one row */
   .crd-styles {
     flex-wrap: nowrap;
@@ -1148,28 +789,301 @@
   .crd-name {
     font-size: 19px;
   }
-  .crm {
-    padding: 14px 12px 36px 40px;
-  }
-  .crm-plot {
-    height: 340px;
-  }
-  .crm-dot {
-    width: 28px;
-    height: 28px;
-  }
-  .crm-q {
-    font-size: 9px;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .crd-card,
-  .crm-dot,
   .crd-key {
     transition: none;
   }
-  .crd-like.just-liked .crd-flame,
-  .crd-deck.is-target {
+  .crd-like.just-liked .crd-flame {
     animation: none;
+  }
+}
+
+/* ============================================================
+   v3 (Oct 31 2026, Adrian: "an overall design buff"): the snapshot panels over the list, the finder console,
+   the deck box's win-condition art + crowns + verdict edge. Ask the Golden Knight's FAQ look lives in cr.css.
+   ============================================================ */
+
+/* ---- THE META RIGHT NOW: most used cards | evolutions + heroes ---- */
+.crs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.crs-panel {
+  min-width: 0;
+  padding: 16px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crs-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  color: #fff;
+  font: italic 900 21px/1.1 'Tourney', 'Oxanium', sans-serif;
+  text-shadow: 0 0 1px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 2px 0 #000;
+}
+.crs-h small {
+  color: #8d8f95;
+  font: 700 9.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: none;
+  white-space: nowrap;
+}
+/* one column grid for every row (subgrid), so a long sub-line can't shorten one row's bar */
+.crs-rows {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 6px;
+  border-radius: var(--lb-r);
+  background: var(--lb-well);
+  box-shadow: var(--lb-ring-well);
+  list-style: none;
+}
+.crs-rows li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+.crs-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 7px 10px 7px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--lb-row);
+  box-shadow: var(--lb-row-ring);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.crs-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.crs-row:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: -2px;
+}
+.crs-row img {
+  display: block;
+  width: 30px;
+  height: auto;
+}
+.crs-row-t {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+.crs-row-t b {
+  overflow: hidden;
+  color: #e6e8ec;
+  font: 600 13px/1.1 'Oxanium', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.crs-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #0a0b0d;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+.crs-bar i {
+  display: block;
+  width: calc(var(--f) * 100%);
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #5a5d65, #a3a5ab);
+}
+.crs-row-n {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  white-space: nowrap;
+}
+.crs-row-n b {
+  color: #fff;
+  font: italic 900 16px/1 'Tourney', 'Oxanium', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.crs-row-n small {
+  color: #8d8f95;
+  font-size: 10.5px;
+}
+/* ---- THE FINDER CONSOLE: one raised box = search + card filter, playstyle, speed, then the active filters ---- */
+.crd-find {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-box);
+  box-shadow: var(--lb-shadow);
+}
+.crd-find-top {
+  display: flex;
+  gap: 8px;
+}
+.crd-search {
+  flex: 1;
+  min-width: 0;
+}
+.crd-find-top > .cr-key {
+  height: auto;
+  min-height: 52px;
+}
+.crd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.crd-find-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+.crd-find-l {
+  color: #8d8f95;
+  font: 700 10px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+html body .crd-find .crd-styles {
+  margin: 0;
+}
+/* the card picker opens inside the console */
+.crd-find .crd-pick {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.crd-find-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.crd-chips {
+  display: contents;
+}
+.crd-reset {
+  height: 30px;
+  padding: 0 12px;
+  border: 2px solid var(--lb-edge);
+  border-radius: var(--lb-r);
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
+  font: 700 10.5px/1 'Oxanium', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.crd-reset:hover {
+  background: var(--lb-raise-hover);
+}
+.crd-reset[hidden] {
+  display: none;
+}
+.crd-reset:focus-visible {
+  outline: 2px solid #e6e8ec;
+  outline-offset: 2px;
+}
+
+/* ---- the deck box: its win condition's art behind the name, a crown on the 3 most played, the verdict on its top edge ---- */
+.crd-head {
+  position: relative;
+  isolation: isolate;
+}
+.crd-head::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  right: 34px;
+  bottom: -6px;
+  z-index: -1;
+  width: 52%;
+  background: var(--art) 50% 24% / 100% auto no-repeat;
+  opacity: 0.2;
+  /* faded on every side, so the strip has no edge */
+  -webkit-mask-image: radial-gradient(farthest-side, #000 35%, transparent);
+  mask-image: radial-gradient(farthest-side, #000 35%, transparent);
+  pointer-events: none;
+}
+.crd-deck[data-v='win'] {
+  border-top-color: #3a9d6a;
+}
+.crd-deck[data-v='loss'] {
+  border-top-color: var(--lb-red);
+}
+.crd-rank--top {
+  align-content: center;
+  gap: 2px;
+  font-size: 14px;
+}
+.crd-crown {
+  display: block;
+  width: 12px;
+  height: 9px;
+  margin: 0 auto;
+  fill: #fff;
+}
+
+@media (max-width: 970px) {
+  .crs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .crs-panel {
+    padding: 12px;
+  }
+  .crd-find {
+    padding: 12px;
+  }
+  .crd-find-top > .cr-key {
+    min-height: 48px;
+    padding: 0 12px;
+  }
+  .crd-find-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+@media (max-width: 520px) {
+  .crd-find-top {
+    flex-wrap: wrap;
+  }
+  .crd-search,
+  .crd-find-top > .cr-key {
+    flex: 1 0 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crs-row {
+    transition: none;
   }
 }

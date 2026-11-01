@@ -2,15 +2,18 @@
 // window.CR = card data, card pictures, deck maths and the game's copy-deck link.
 // A deck everywhere = [[id] | [id, 1 = evolution / 2 = hero], ...] (the shape cr-decks.json uses).
 window.CR = (() => {
-  let cardsP;
+  let cardsP, known;
   // site/cr-cards.json (scripts/cr-meta.mjs): every card + tower troop, keyed by id
   const cards = () =>
     (cardsP ||= fetch('/cr-cards.json')
       .then((r) => r.json())
-      .then((d) => ({ ...d, byId: new Map([...d.cards, ...d.towers].map((c) => [c.id, c])) })));
+      .then((d) => ({ ...d, byId: (known = new Map([...d.cards, ...d.towers].map((c) => [c.id, c]))) })));
 
   // pictures baked by scripts/cr-assets.py
   const img = (id, evo) => '/images/clash-royale/cards/' + id + (evo === 1 ? '-evo' : evo === 2 ? '-hero' : '') + '.webp';
+  // an <img>'s src + its frame: rarity rim, evo / hero glow (cr.css "RARITY FRAMES"). Call after cards() has loaded.
+  const src = (id, evo) =>
+    `src="${img(id, evo)}" data-r="${known?.get(id)?.rarity || 'common'}"` + (evo === 1 ? ' data-f="evo"' : evo === 2 ? ' data-f="hero"' : '');
 
   // The game's deck order: its first slots hold the evolution / hero cards (slot 1 evo, slot 2 hero, then
   // any other), then the rest cheapest first.
@@ -164,5 +167,5 @@ window.CR = (() => {
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => '&#' + c.charCodeAt(0) + ';');
   const num = (n) => Number(n).toLocaleString('en-US');
 
-  return { cards, img, order, avgElixir, cycle, copyLink, copyDeck, touch, esc, num, name, specials, key, builderLink, firestore };
+  return { cards, img, src, order, avgElixir, cycle, copyLink, copyDeck, touch, esc, num, name, specials, key, builderLink, firestore };
 })();

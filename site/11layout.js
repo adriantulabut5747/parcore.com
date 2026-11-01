@@ -1114,7 +1114,7 @@ document.addEventListener('DOMContentLoaded', function () {
       bar = document.createElement('div');
       bar.className = 'secondary-top-bar stb-generated';
       bar.id = 'secondary-top-bar';
-      bar.innerHTML = '<div class="secondary-left"><img class="th-icon" src="/icons/home.jpg" alt=""><div class="secondary-content">Lobby</div></div>';
+      bar.innerHTML = '<div class="secondary-left"><img class="th-icon" src="/icons/parchrome-logo.svg" alt=""><div class="secondary-content">Lobby</div></div>';
       document.body.appendChild(bar);
     }
     if (!bar.querySelector('.stb-search')) {

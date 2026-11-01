@@ -31,7 +31,7 @@ SHELL = OUT / 'index.html'
 BUILDS = Path(__file__).with_name('genshin-builds.json')
 SITE = 'https://parchrome.netlify.app'
 # Cache version for genshin-character.css / .js on every character page: bump it when either file changes, then rerun.
-ASSET_V = '20261025e'
+ASSET_V = '20261101w9'
 UTC8 = datetime.timezone(datetime.timedelta(hours=8))
 
 e = html.escape

@@ -6,7 +6,7 @@
 # scripts/valorant-agents.json (release date + patch, real name, origin, Protocol number, voice: from the wiki).
 # The page shell (head, bars, sidebar, footer, More sheet) is the Weapons page's, swapped in at build time.
 # Pictures are baked once into site/images/valorant/agents/ (WebP; valorant-api's portraits are 2048px PNGs).
-# Also writes site/valorant-roster.json (id, slug, role, colours) for the player page.
+# Also writes site/valorant-roster.json (id, slug, role, colours, release date, patch, origin, bio, ability names) for the player page + lobby.
 #
 # Run:  python scripts/valorant-agents.py            (--images re-bakes the pictures, --cards only the card crops)
 # Needs Pillow.
@@ -33,7 +33,7 @@ IMG = ROOT / 'images' / 'valorant' / 'agents'
 SHELL = ROOT / 'valorant' / 'weapons.html'
 DATA = HERE / 'valorant-agents.json'
 # Cache version for valorant-agents.css / .js and the card crops on every agents page: bump it when any of them change, then rerun.
-ASSET_V = '20261030c'
+ASSET_V = '20261101x3'
 VALORANT_CSS_V = vm.VALORANT_CSS_V
 
 ROLES = ['Duelist', 'Initiator', 'Controller', 'Sentinel']
@@ -181,7 +181,9 @@ def index_page(agents, roles, data):
     tabs = [f'<button type="button" role="tab" data-role="" aria-selected="true">{AGENT_ICON}All<span class="cb-n">{len(agents)}</span></button>'] + [
         f'<button type="button" role="tab" data-role="{r.lower()}" aria-selected="false">{role_img(r, 18)}{r}s<span class="cb-n">{len(by_role[r])}</span></button>'
         for r in ROLES]
-    body += f'<div class="cb-tabs" id="vaTabs" role="tablist" aria-label="Roles">{"".join(tabs)}</div>\n'
+    # the role tray sits under the roster's search + order row, not under the banner (Adrian, Nov 1 2026); it still
+    # filters the table further down too
+    tray = f'  <div class="cb-tabs va-roster-tabs" id="vaTabs" role="tablist" aria-label="Roles">{"".join(tabs)}</div>'
 
     cards = '\n'.join(card(a, a is newest) for a in reversed(agents))
     bar = '''  <div class="va-bar">
@@ -197,7 +199,7 @@ def index_page(agents, roles, data):
   </div>'''
     body += section('vaRosterTitle', 'The roster',
                     'Every agent, newest first, with the day they dropped. Click a card for their abilities and file. Pick me, obviously.',
-                    f'{bar}\n  <div class="va-grid" id="vaGrid">\n{cards}\n  </div>\n  <p class="va-none" id="vaNone" hidden>No agent by that name. Yet.</p>')
+                    f'{bar}\n{tray}\n  <div class="va-grid" id="vaGrid">\n{cards}\n  </div>\n  <p class="va-none" id="vaNone" hidden>No agent by that name. Yet.</p>')
 
     # release years as columns of faces: each column is as tall as that year's intake, so it reads as a chart
     years = {}
@@ -391,7 +393,10 @@ def main():
         (OUT / f"{a['slug']}.html").write_text(agent_page(a, agents, roles), encoding='utf-8', newline='\n')
     (OUT / 'index.html').write_text(index_page(agents, roles, data), encoding='utf-8', newline='\n')
     # the player page (valorant-player.js) draws agents with these pages' art + colours: match ids -> slug
-    roster = [dict(id=a['api']['uuid'], name=a['name'], slug=a['slug'], role=a['role'], ac=a['c1'], ac2=a['c2']) for a in agents]
+    # + release date, patch, origin, Riot's bio and the C/Q/E/X ability names for the lobby's agent-select hero (valorant-lobby.js)
+    roster = [dict(id=a['api']['uuid'], name=a['name'], slug=a['slug'], role=a['role'], ac=a['c1'], ac2=a['c2'], released=a.get('released', ''),
+                   patch=a['patch'], origin=a['origin'] or '', bio=a['bio'],
+                   ab=[[ab['key'], ab['name']] for ab in a['abilities'] if ab['key']]) for a in agents]
     (ROOT / 'valorant-roster.json').write_text(json.dumps(roster, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8', newline='\n')
     print(f'wrote {len(agents)} agent pages + the index ({datetime.date.today()})')
 

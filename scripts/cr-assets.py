@@ -2,8 +2,11 @@
 
   site/images/clash-royale/cards/<id>.webp        every card (+ -evo / -hero art where it has one) and tower troop,
                                                   from the official API's icons (names in site/cr-cards.json)
-  site/images/clash-royale/king/face*.webp        the guide's faces, from Supercell's fan kit (fankit.supercell.com)
+  site/images/clash-royale/knight/face*.webp      the guide's faces (the Golden Knight, Oct 31 2026), + full.webp = his
+                                                  whole render, from Supercell's fan kit (fankit.supercell.com)
   site/images/clash-royale/banner-*.webp          banner art, fan kit key art
+  site/images/clash-royale/lobby/*.webp           the Lobby's art (fan kit). lobby/throne.webp (the hero: a skeleton
+                                                  reaching for the crown) is Adrian's file, not the kit's: not baked here
 
 Run after scripts/cr-meta.mjs adds a card:  python scripts/cr-assets.py  (only missing files are fetched;
 --force re-bakes all). No key needed: both hosts are public.
@@ -18,13 +21,22 @@ FORCE = '--force' in sys.argv
 API = 'https://api-assets.clashroyale.com/'
 FANKIT = 'https://media.ffycdn.net/eu/supercell/{}?width={}'
 
-# Fan kit files (the kit's title -> its file on the kit's CDN). The King's head renders are 960px, transparent.
+# Fan kit files (the kit's title -> its file on the kit's CDN).
+# The Golden Knight's faces: file, width fetched, then a square (centre x, centre y, side) in that picture's pixels.
 FACES = {
-    'face': '1xq9RhxUySJiFXaEHP6r.png',        # King_06, the grin: default
-    'face-laugh': '4SXo14aYyQTCMpesjyWm.png',  # King_24, the classic "He he he he"
-    'face-shock': 'bNkEtNmGMgmC23J5d3Hp.png',  # King_19, worried, teary: for a "Whoa" line
+    'face': ('WFdgFwDaXr2SUHRYieJK.png', 2048, (1010, 500, 440)),       # Golden_Knight render, the smirk: default
+    'face-laugh': ('HArsmUd6d7fXoQNTF8QH.png', 2048, (530, 1110, 320)),  # group_champions, the cheeky grin: a joke line
+    'face-mew': ('qHRbHZxrFZExfYizQ5ns.png', 1000, (330, 470, 860)),     # emotes_goldenknight_mewing: a line about his looks
+    'face-shock': ('Ttir3pbPF6qVbMFuhKd1.png', 256, (128, 98, 170)),     # emote_golden_knight_fail, crying: a "Whoa" line
 }
+FULL = 'WFdgFwDaXr2SUHRYieJK.png'  # the same render, whole (Ask the Golden Knight)
 BANNERS = {'banner-battle': 'dquPj9JBAFkkcMRBhbwi.png'}  # group_6, the classic arena: King tower, Giant, Goblin, Fireball
+# Lobby art: name -> (file, width fetched, saved as photo (RGB) or cut-out (RGBA))
+LOBBY = {
+    'court': ('HJKaA9PCxoi56qbWQiFo.jpeg', 1600, 'RGB'),  # groups_champions_2: Golden Knight, Skeleton King, Archer Queen
+    'crown-red': ('QTQoZZ8e18aR8d3ZtvEK.png', 400, 'RGBA'),  # Red Crown 1
+    'crown-blue': ('m1xRh8chWGRUyA5BcuWA.png', 400, 'RGBA'),  # Blue Crown 1
+}
 
 
 def get(url):
@@ -60,19 +72,19 @@ def cards():
 
 
 def faces():
-    for name, file in FACES.items():
-        out = OUT / 'king' / f'{name}.webp'
+    for name, (file, width, (cx, cy, s)) in FACES.items():
+        out = OUT / 'knight' / f'{name}.webp'
         if out.exists() and not FORCE:
             continue
-        im = Image.open(io.BytesIO(get(FANKIT.format(file, 960)))).convert('RGBA')
-        im = im.crop(im.getbbox())  # trim the empty margin, then a square on the face (crown to beard)
-        w, h = im.size
-        s = min(w, h)
-        im = im.crop(((w - s) // 2, 0, (w - s) // 2 + s, s))
-        pad = Image.new('RGBA', (int(s * 1.1), int(s * 1.1)))  # headroom: the round frame clipped the crown
-        pad.alpha_composite(im, (int(s * 0.05), int(s * 0.07)))
-        im = pad.resize((128, 128), Image.LANCZOS)
+        im = Image.open(io.BytesIO(get(FANKIT.format(file, width)))).convert('RGBA')
+        im = im.crop((cx - s // 2, cy - s // 2, cx + s // 2, cy + s // 2)).resize((128, 128), Image.LANCZOS)
         save(im, out, 90)
+    out = OUT / 'knight' / 'full.webp'
+    if FORCE or not out.exists():
+        im = Image.open(io.BytesIO(get(FANKIT.format(FULL, 2048)))).convert('RGBA')
+        im = im.crop(im.getbbox())
+        im.thumbnail((900, 900), Image.LANCZOS)
+        save(im, out, 86)
     print('faces: ok')
 
 
@@ -86,7 +98,17 @@ def banners():
     print('banners: ok')
 
 
+def lobby():
+    for name, (file, width, mode) in LOBBY.items():
+        out = OUT / 'lobby' / f'{name}.webp'
+        if out.exists() and not FORCE:
+            continue
+        save(Image.open(io.BytesIO(get(FANKIT.format(file, width)))).convert(mode), out, 80 if mode == 'RGB' else 88)
+    print('lobby: ok')
+
+
 if __name__ == '__main__':
     cards()
     faces()
     banners()
+    lobby()

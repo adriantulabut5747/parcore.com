@@ -70,7 +70,6 @@
   margin-top: 16px;
 }
 .tl-row {
-  position: relative; /* the remove key sits in the slot's top right */
   display: grid;
   grid-template-columns: var(--tl-label) 1fr;
   align-items: stretch;
@@ -110,7 +109,7 @@
   max-width: 100%;
   min-width: 0.6em;
   color: rgb(var(--tl-rgb));
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oxanium', sans-serif;
   font-size: 34px;
   font-weight: 900;
   line-height: 1.1;
@@ -122,15 +121,14 @@
 }
 /* A renamed tier: the key label type (Oxanium caps). */
 .tl-name.tl-long {
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.3px;
 }
 
-/* Slot: the layout cards' well. The right padding keeps tiles clear of
-   the remove key; the bottom padding is a strip that's always empty, so a
-   full row can still be tapped to drop a picked piece into it. */
+/* Slot: the layout cards' well. The bottom padding is a strip that's always
+   empty, so a full row can still be tapped to drop a picked piece into it. */
 .tl-zone {
   display: flex;
   flex-wrap: wrap;
@@ -138,7 +136,7 @@
   gap: 8px;
   min-width: 0;
   min-height: calc(var(--tl-tile) + 22px);
-  padding: 8px 44px 14px 8px;
+  padding: 8px 8px 14px;
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
   background: var(--lb-well);
@@ -158,11 +156,24 @@
   cursor: pointer;
 }
 
-/* Remove: a small grey key in the slot's top right corner, red X on hover. */
-.tl-del {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+/* Edit tiers (Nov 1 2026, Adrian): the row's tools are hidden until the Edit tiers key
+   (#tlEdit) puts .is-editing on the box; then a third column of small grey keys,
+   two by two: move up / down, the colour (an <input type="color"> under a swatch of
+   the row's colour), remove (red X on hover). */
+.tl-tools {
+  display: none;
+}
+.tl.is-editing .tl-row {
+  grid-template-columns: var(--tl-label) minmax(0, 1fr) auto;
+}
+.tl.is-editing .tl-tools {
+  display: grid;
+  grid-template-columns: repeat(2, 28px);
+  align-content: start;
+  gap: 4px;
+}
+.tl-key {
+  position: relative;
   display: grid;
   place-items: center;
   width: 28px;
@@ -179,27 +190,58 @@
     background-color 0.15s,
     transform 0.1s;
 }
-.tl-del svg {
+.tl-key svg {
   width: 14px;
   height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tl-key:hover {
+  background: var(--lb-raise-hover);
+  color: #e6e8ec;
 }
 .tl-del:hover {
-  background: var(--lb-raise-hover);
   color: #e86a6a;
 }
-.tl-del:active {
+.tl-key:active {
   transform: translateY(1px);
   box-shadow: var(--lb-btn-down);
 }
-.tl-del:focus-visible {
+.tl-key:focus-visible,
+.tl-paint:focus-within {
   outline: 2px solid #e6e8ec;
   outline-offset: 2px;
 }
+.tl-key:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+/* the colour key: the row's colour as a swatch; the real picker sits on top, invisible */
+.tl-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgb(var(--tl-rgb));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.tl-paint input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
 /* The last row can't go. */
 .tl-one-row .tl-del {
-  display: none;
+  visibility: hidden;
 }
-
 .tl-add {
   justify-self: start;
 }
@@ -330,11 +372,22 @@
   .tl-row {
     gap: 6px;
   }
-  /* a deeper always-empty strip on phones: a fingertip, not a cursor */
+  /* a deeper always-empty strip on phones: a fingertip, not a cursor. Fixed counts
+     (Adrian, Nov 1 2026): 5 a row in a tier, 6 a row in Unranked; the tiles fill them. */
   .tl-zone {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px;
     min-height: calc(var(--tl-tile) + 34px);
-    padding: 6px 36px 28px 6px;
+    padding: 6px 6px 28px;
+  }
+  .tl-pool.tl-zone {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .tl-zone .tl-tile {
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
   }
   .tl-plate {
     min-height: calc(var(--tl-tile) + 34px);
@@ -348,9 +401,10 @@
     letter-spacing: 0.3px;
     overflow-wrap: break-word;
   }
-  .tl-del {
-    top: 6px;
-    right: 6px;
+  .tl.is-editing .tl-tools {
+    grid-template-columns: repeat(2, 26px);
+  }
+  .tl-key {
     width: 26px;
     height: 26px;
   }
@@ -387,7 +441,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .tl-tile,
-  .tl-del,
+  .tl-key,
   .tl-hero img {
     transition: none;
   }

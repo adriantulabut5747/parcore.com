@@ -27,8 +27,8 @@ IMG = ROOT / 'images' / 'valorant' / 'maps'
 SHELL = ROOT / 'valorant' / 'weapons.html'
 DATA = Path(__file__).with_name('valorant-maps.json')
 # Cache version for valorant-maps.css / .js on every maps page: bump it when either file changes, then rerun.
-ASSET_V = '20261030g'
-VALORANT_CSS_V = '20261031a'
+ASSET_V = '20261101w9'
+VALORANT_CSS_V = '20261101x1'
 
 e = html.escape
 MONTHS = 'January February March April May June July August September October November December'.split()

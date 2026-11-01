@@ -1,3 +1,38 @@
+## Home Web Resources (moved from CLAUDE.md, Nov 1 2026)
+
+📖 **Read [`parcore.com/docs/hwr-readme.md`](parcore.com/docs/hwr-readme.md) before touching any
+`hwr-` file.** It has the full file inventory, the JSON→page data flow, and the
+gotchas.
+
+The two things to know up front:
+
+**1. The `-old` files are gone** (deleted Oct 2026). If you see an old pattern
+referenced in docs, it's history.
+
+**2. Content lives in JSON, not in the HTML.** The pages are shells; `hwr-js.js`
+fetches `hwr-websites.json` (610 site listings) and `hwr-categories.json` (sections,
+hub nav, categories, glossary) and builds the cards at runtime. To add a website you
+edit `hwr-websites.json` — never the page markup.
+
+The secondary top bar's two scroll strips are byte-for-byte identical across all 15
+live pages deliberately. Change one → change all 15.
+
+**Lobby (Oct 22 2026):** `site/hwr-lobby.css` + `site/hwr-lobby.js`, lobby only. Hero = `.wh-*`
+classes (not `.hero-*`: hwr-css.css styles those for the category pages); the GIF's subject sits
+centre-right, so ≥1200px it's a 3-zone grid: text left, the art's middle left clear, the Roll a site
+console (`#wrRoll`, "From" category menu) right; narrower = one column. The GIF renders
+`image-rendering: pixelated` (640×360 pixel art). Below: the wire (one row of 24 random sites in a
+sunken channel, hover-stop / drag, NOT tied to page scroll (Adrian removed that); hwr-categories.json
+"featured" is no longer shown). Desktop hero = full screen minus the wire (`calc(100vh - 90px)`, so
+the wire row sits at the screen's foot), title in Orbitron 900,
+then the categories header band = /articles/' streak art as `site/images/band-streaks.svg`
+(`python _tools/articles-band.py site/images/band-streaks.svg`), holding title + search, then the
+category shelves (`#categoriesGrid`; biggest category spans 2 columns),
+Your Library restyle, "The setup" (hwr-recommended.json as numbered steps). Titles = /coc/'s
+`.lob-title` recipe as `.wr-title`. The lobby's search functions are `wrFilter` / `wrClearSearch`:
+hwr-js.js declares global `filterAll` / `clearFilterSearch` for category pages and used to
+overwrite the lobby's, which is why its search did nothing.
+
 # Home Web Resources (HWR) — how this section works
 
 Reference doc for the `hwr-*` part of the site. If you're new to this codebase (or

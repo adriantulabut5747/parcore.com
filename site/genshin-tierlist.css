@@ -34,7 +34,7 @@
 
 /* ---- Board: one row = label plate + slot ---- */
 .tl-board { display: grid; gap: 8px; margin-top: 16px; }
-.tl-row { position: relative; display: grid; grid-template-columns: var(--tl-label) 1fr; align-items: stretch; gap: 8px; }
+.tl-row { display: grid; grid-template-columns: var(--tl-label) 1fr; align-items: stretch; gap: 8px; }
 .tl-plate {
   display: flex;
   align-items: center;
@@ -50,22 +50,31 @@
 }
 .tl-plate:hover { box-shadow: inset 0 0 0 1px rgba(var(--tl-rgb), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 18px -12px rgba(0, 0, 0, 0.85); }
 .tl-plate:focus-within { outline: 2px solid #e6e8ec; outline-offset: 2px; }
-.tl-name { max-width: 100%; min-width: 0.6em; color: rgb(var(--tl-rgb)); font: 900 36px/1.1 'Cinzel', serif; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; outline: none; caret-color: #eff2f5; }
+.tl-name { max-width: 100%; min-width: 0.6em; color: rgb(var(--tl-rgb)); font: 900 30.5px/1.1 'Orbitron', sans-serif; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; outline: none; caret-color: #eff2f5; }
 /* A renamed tier: small Sora caps. */
 .tl-name.tl-long { font: 800 12px/1.25 'Sora', sans-serif; letter-spacing: 1.3px; }
-/* Slot: a sunken well. Right padding = room for the remove key; the bottom strip stays empty so a
-   full row can still take a tap. */
-.tl-zone { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-width: 0; min-height: calc(var(--tl-tile) + 22px); padding: 8px 44px 14px 8px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); transition: background-color 0.15s; }
+/* Slot: a sunken well. The bottom strip stays empty so a full row can still take a tap. */
+.tl-zone { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-width: 0; min-height: calc(var(--tl-tile) + 22px); padding: 8px 8px 14px; border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-well); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); transition: background-color 0.15s; }
 .tl-over,
 .tl-picking .tl-row:hover .tl-zone,
 .tl-picking .tl-pool:hover { background: rgba(var(--tl-rgb, var(--tl-red)), 0.08); box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(var(--tl-rgb, var(--tl-red)), 0.55); }
 .tl-picking .tl-row, .tl-picking .tl-pool { cursor: pointer; }
-.tl-del { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-raise); box-shadow: var(--lb-btn); color: #8b9099; cursor: pointer; transition: color 0.15s, background-color 0.15s, transform 0.1s; }
-.tl-del svg { width: 14px; height: 14px; }
-.tl-del:hover { background: var(--lb-raise-hover); color: var(--gi-acc-text); }
-.tl-del:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
-.tl-del:focus-visible { outline: 2px solid #e6e8ec; outline-offset: 2px; }
-.tl-one-row .tl-del { display: none; }
+/* Edit tiers (Nov 1 2026, the CoC maker's): the row's tools hide until #tlEdit puts .is-editing on the box;
+   then a third column of small grey keys, two by two: move up / down, the colour (an <input type="color">
+   under a swatch of the row's colour), remove. */
+.tl-tools { display: none; }
+.tl.is-editing .tl-row { grid-template-columns: var(--tl-label) minmax(0, 1fr) auto; }
+.tl.is-editing .tl-tools { display: grid; grid-template-columns: repeat(2, 28px); align-content: start; gap: 4px; }
+.tl-key { position: relative; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 2px solid var(--lb-edge); border-radius: 4px; background: var(--lb-raise); box-shadow: var(--lb-btn); color: #8b9099; cursor: pointer; transition: color 0.15s, background-color 0.15s, transform 0.1s; }
+.tl-key svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.tl-key:hover { background: var(--lb-raise-hover); color: #e6e8ec; }
+.tl-del:hover { color: var(--gi-acc-text); }
+.tl-key:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
+.tl-key:focus-visible, .tl-paint:focus-within { outline: 2px solid #e6e8ec; outline-offset: 2px; }
+.tl-key:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+.tl-swatch { width: 12px; height: 12px; border-radius: 3px; background: rgb(var(--tl-rgb)); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5); }
+.tl-paint input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.tl-one-row .tl-del { visibility: hidden; }
 .tl-add { justify-self: start; }
 .tl-add[hidden] { display: none; }
 
@@ -127,11 +136,16 @@
 @media (max-width: 600px) {
   .tl { --tl-tile: 50px; --tl-label: 64px; }
   .tl-row { gap: 6px; }
-  .tl-zone { gap: 6px; min-height: calc(var(--tl-tile) + 34px); padding: 6px 36px 28px 6px; }
+  /* fixed counts (Adrian, Nov 1 2026): 5 a row in a tier, 6 a row in Unranked; the tiles fill them */
+  .tl-zone { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; min-height: calc(var(--tl-tile) + 34px); padding: 6px 6px 28px; }
+  .tl-pool.tl-zone { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .tl-pool .gi-empty { grid-column: 1 / -1; }
+  .tl-zone .tl-tile { width: auto; height: auto; aspect-ratio: 1; }
   .tl-plate { min-height: calc(var(--tl-tile) + 34px); padding: 6px 3px; }
-  .tl-name { font-size: 26px; }
+  .tl-name { font-size: 22px ; }
   .tl-name.tl-long { font-size: 9.5px; letter-spacing: 0.3px; overflow-wrap: break-word; }
-  .tl-del { top: 6px; right: 6px; width: 26px; height: 26px; }
+  .tl.is-editing .tl-tools { grid-template-columns: repeat(2, 26px); }
+  .tl-key { width: 26px; height: 26px; }
   .tl-pool { padding: 6px; }
   .tl-pool-head { flex-direction: column; align-items: stretch; gap: 10px; }
   .tl-actions { display: grid; grid-template-columns: 0.8fr 1fr 1.35fr; gap: 6px; }
@@ -143,5 +157,5 @@
   .tl-actions .gi-key svg { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tl-tile, .tl-del, .tl-el img, .tl-toast { transition: none; }
+  .tl-tile, .tl-key, .tl-el img, .tl-toast { transition: none; }
 }

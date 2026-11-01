@@ -4,7 +4,9 @@
    face + a dialogue bubble. It takes the subtitle's place, so a section keeps
    its spacing. Face = images/coc/villager/face.webp (her WWE announcer look).
    Faces: -flat (the intimidating look) almost everywhere, Adrian's pick; -shock for a "Whoa" line.
-   Never -cheer or the plain smile (Adrian: "looks like a clown"). Text = Sora (Adrian).
+   Never -cheer or the plain smile (Adrian: "looks like a clown"). Text = Sora (Adrian; Orbitron and Oxanium were tried Nov 1 2026
+   and turned down: "so bad"). Sizes Nov 1 2026: desktop 14.5px (label 12), phones 11px (label 9);
+   Klee (genshin.css .gi-klee) and the Piglin (mc-nether.css .ml-guide) match: change all three together.
    Voice: the in-game tutorial's -- calls you "Chief", polite, a little
    dramatic. Mostly plain help; a joke only where a short one fits.
 
@@ -42,7 +44,7 @@
   background: var(--lb-box);
   box-shadow: var(--lb-shadow);
   font-family: 'Sora', sans-serif;
-  font-size: 13.5px;
+  font-size: 14.5px;
   line-height: 1.5;
   color: #d4d6da;
 }
@@ -61,7 +63,9 @@
   clip-path: polygon(0 0, 0 100%, 100% 100%); /* only the half outside the bubble */
 }
 /* p > b: one step past a section's own `b` colour. */
-.cv-say p > b { margin-right: 8px; font: 800 11px/1 'Sora', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lb-red-text); }
+/* script-written <span>s + links keep the line's font (pages' `* { font-family }` resets beat inheritance) */
+.cv-say p > span:not([class]), .cv-say p > a { font-family: inherit; }
+.cv-say p > b { margin-right: 8px; font: 800 12px/1 'Sora', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lb-red-text); }
 
 /* Damage Calculator's "Your attack" is a narrow box on desktop too: title + TH chip keep their row, the bubble
    drops under them (squeezed beside the chip, it pushed the chip out of the box). */
@@ -85,5 +89,11 @@
   :is(.am-head, .dc-head):not(:has(.am-head-tools)):has(> div > .cv-say) { flex-wrap: wrap; align-items: center; }
   :is(.am-head, .dc-head):not(:has(.am-head-tools)) > div:has(> .cv-say) { display: contents; }
   :is(.am-head, .dc-head):not(:has(.am-head-tools)) > div > .cv-say { order: 2; flex: 1 0 100%; margin-top: 0; }
-  .cv-say p { padding: 8px 12px 9px; font-size: 13px; }
+  .cv-say p { padding: 8px 12px 9px; font-size: 11px; }
+  .cv-say p > b { font-size: 9px; }
+}
+/* Narrow box (coc-armymaker.css stacks .am-head into a column): stretch, or the
+   row's align-items: center above centers the title (Adrian: keep it left). */
+@container (max-width: 560px) {
+  :is(.am-head, .dc-head):not(:has(.am-head-tools)):has(> div > .cv-say) { align-items: stretch; }
 }

@@ -1,8 +1,8 @@
-// /clash-royale/decks (Oct 30 2026; v2 Oct 31 2026: decks drawn as real hands). Data = /cr-decks.json + /cr-cards.json,
-// both written daily by scripts/cr-meta.mjs. The address holds the view: ?sort=wr|elixir, ?style=cycle,
-// ?with=<ids>&without=<ids>. Each deck: name (CR.name), the 8 cards 4 x 2, tower + elixir, win rate with its
-// 95% margin, elixir curve, the CoC card bar (flame like / Copy deck / share) and a pen into the Deck Builder.
-// Under the list: the meta map (every deck by games x win rate, its win condition as the dot).
+// /clash-royale/decks (Oct 30 2026; v2 Oct 31 2026: decks drawn as real hands; v3 the same day: the snapshot panels,
+// the finder console + Ask the Golden Knight; cleanup the same day: no surest winner / meta map / elixir curve / speed filter,
+// sort in the finder). Data = /cr-decks.json + /cr-cards.json, both written daily by scripts/cr-meta.mjs.
+// The address holds the view: ?sort=wr|elixir, ?style=cycle, ?q=hog, ?with=<ids>&without=<ids>. Each deck: name (CR.name), the 8 cards 4 x 2, tower + elixir, win rate with its
+// 95% range on hover, games / wins / usage, the CoC card bar (flame like / Copy deck / share) and a pen into the Deck Builder.
 (() => {
   const $ = (id) => document.getElementById(id);
   const { esc, num } = CR;
@@ -23,13 +23,23 @@
     ['control', 'Control'],
   ];
   const pick = (k, list) => (list.some(([v]) => v === url.searchParams.get(k)) ? url.searchParams.get(k) : '');
-  const state = { sort: pick('sort', SORTS) || 'games', style: pick('style', STYLES), with: new Set(ids('with')), without: new Set(ids('without')), shown: PAGE };
+  const state = {
+    sort: pick('sort', SORTS) || 'games',
+    style: pick('style', STYLES),
+    q: (url.searchParams.get('q') || '').slice(0, 60),
+    with: new Set(ids('with')),
+    without: new Set(ids('without')),
+    shown: PAGE,
+  };
+  // search: "P.E.K.K.A" / "X-Bow" / "2.6" squash to pekka / xbow / 26; every query word must start a word of the deck's text
+  const words = (t) => t.toLowerCase().replace(/[.'\-]/g, '').split(/[^a-z0-9]+/).filter(Boolean);
 
   const drop = '<svg class="crd-drop" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 0C6 0 0 7 0 10.5a6 6 0 0 0 12 0C12 7 6 0 6 0z"/></svg>';
   const cycleIco = '<svg class="crd-cyc" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg>';
   // the CoC card bar's icons (th-layouts.js): Lucide flame, share, pencil-line (ISC)
   const FLAME = '<svg viewBox="0 0 24 24" class="crd-flame" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>';
   const SHARE = '<svg viewBox="0 0 24 24" class="crd-ico" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>';
+  const CROWN = '<svg class="crd-crown" viewBox="0 0 13 10" aria-hidden="true"><path d="M0 2l3 3 3.5-5L10 5l3-3-1 8H1z"/></svg>';
   const PEN = '<svg viewBox="0 0 24 24" class="crd-ico" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
   Promise.all([fetch('/cr-decks.json').then((r) => r.json()), CR.cards()])
@@ -47,6 +57,8 @@
       d.avg = CR.avgElixir(d.cards, byId);
       // 95% margin of the win rate (normal approximation; every deck has 50+ games)
       d.margin = 196 * Math.sqrt((d.winRate / 100) * (1 - d.winRate / 100) / d.games);
+      d.verdict = d.winRate - d.margin > 50 ? 'win' : d.winRate + d.margin < 50 ? 'loss' : 'flip';
+      d.words = words([d.name, d.style, ...CR.specials(d.cards, byId), ...d.cards.map(([id]) => byId.get(id)?.name || '')].join(' '));
     });
     // usage rank = the "#" on each deck, whatever the sort
     [...data.decks].sort((a, b) => b.games - a.games).forEach((d, n) => (d.rank = n + 1));
@@ -58,9 +70,9 @@
     $('cbDays').textContent = data.days + (data.days === 1 ? ' day' : ' days');
     $('cbDaysSub').textContent = 'Updated ' + new Date(data.updated).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // sort tray
+    // sort chips (first row of the finder)
     const tabs = $('crdSort');
-    tabs.innerHTML = SORTS.map(([k, t]) => `<button type="button" role="tab" data-sort="${k}">${t}</button>`).join('');
+    tabs.innerHTML = SORTS.map(([k, t]) => `<button type="button" class="crd-st" data-sort="${k}">${t}</button>`).join('');
     tabs.addEventListener('click', (e) => {
       const b = e.target.closest('[data-sort]');
       if (!b) return;
@@ -82,11 +94,25 @@
       state.shown = PAGE;
       draw();
     });
+    const q = $('crdQ');
+    q.value = state.q;
+    q.addEventListener('input', () => {
+      state.q = q.value.slice(0, 60);
+      state.shown = PAGE;
+      draw();
+    });
+    $('crdReset').addEventListener('click', () => {
+      Object.assign(state, { style: '', q: '', shown: PAGE });
+      state.with.clear();
+      state.without.clear();
+      q.value = '';
+      draw();
+    });
 
     // card picker: tap = must have, tap again = must not have, again = off
     const playable = cards.cards.filter((c) => c.games).sort((a, b) => b.games - a.games);
     $('crdPickGrid').innerHTML = playable
-      .map((c) => `<button type="button" class="crd-pc" data-id="${c.id}" title="${esc(c.name)}"><img src="${CR.img(c.id)}" alt="${esc(c.name)}" width="68" height="100" loading="lazy" decoding="async"></button>`)
+      .map((c) => `<button type="button" class="crd-pc" data-id="${c.id}" title="${esc(c.name)}"><img ${CR.src(c.id)} alt="${esc(c.name)}" width="68" height="100" loading="lazy" decoding="async"></button>`)
       .join('');
     const cycleCard = (id) => {
       if (state.with.delete(id)) state.without.add(id);
@@ -106,8 +132,7 @@
     $('crdChips').addEventListener('click', (e) => {
       const b = e.target.closest('[data-off]');
       if (!b) return;
-      if (b.dataset.off === 'all') state.with.clear(), state.without.clear(), (state.style = '');
-      else state.with.delete(+b.dataset.off), state.without.delete(+b.dataset.off);
+      state.with.delete(+b.dataset.off), state.without.delete(+b.dataset.off);
       draw();
     });
     $('crdMore').addEventListener('click', () => {
@@ -127,14 +152,7 @@
       } else if (k?.dataset.act === 'share') share(k, d);
       else if (k?.dataset.act === 'like') like(k, d);
       else if (k?.dataset.act === 'stats') k.setAttribute('aria-expanded', deckEl.classList.toggle('is-open'));
-      else if (k?.dataset.act === 'card') {
-        // a card in a deck = "every deck with this card"
-        state.with.add(+k.dataset.id);
-        state.without.delete(+k.dataset.id);
-        state.shown = PAGE;
-        draw();
-        $('crdBar').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      else if (k?.dataset.act === 'card') withCard(+k.dataset.id); // a card in a deck = "every deck with this card"
     });
 
     // ---- likes: Firestore layoutLikes/cr-decks, one counts map keyed by CR.key (same rule as the CoC cards) ----
@@ -235,19 +253,28 @@
     document.addEventListener('click', (e) => shareFor && !e.target.closest('.crd-sp, [data-act=share]') && closeShare());
     document.addEventListener('keydown', (e) => e.key === 'Escape' && closeShare());
 
-    // ---- the meta map ----
-    const map = metaMap();
+    // "every deck with this card" (a card in a deck, or a snapshot row)
+    function withCard(id) {
+      state.with.add(id);
+      state.without.delete(id);
+      state.shown = PAGE;
+      draw();
+      $('crdBar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    snapshot();
 
     function draw() {
       // address
       const set = (k, v) => (v ? url.searchParams.set(k, v) : url.searchParams.delete(k));
       set('sort', state.sort === 'games' ? '' : state.sort);
       set('style', state.style);
+      set('q', state.q.trim());
       set('with', [...state.with].join(','));
       set('without', [...state.without].join(','));
       history.replaceState(null, '', url.pathname + url.search + url.hash);
 
-      tabs.querySelectorAll('[data-sort]').forEach((b) => b.setAttribute('aria-selected', b.dataset.sort === state.sort));
+      tabs.querySelectorAll('[data-sort]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.sort === state.sort));
       $('crdStyles').querySelectorAll('[data-style]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.style === state.style));
       $('crdPickGrid').querySelectorAll('.crd-pc').forEach((b) => {
         const id = +b.dataset.id;
@@ -255,15 +282,23 @@
         b.setAttribute('aria-pressed', !!b.dataset.s);
       });
       const chip = (id, kind) =>
-        `<button type="button" class="crd-chip crd-chip--${kind}" data-off="${id}" aria-label="Remove ${esc(byId.get(id)?.name || '')}"><img src="${CR.img(id)}" alt="" width="20" height="29">${kind === 'without' ? 'No ' : ''}${esc(byId.get(id)?.name || id)}<span aria-hidden="true">×</span></button>`;
+        `<button type="button" class="crd-chip crd-chip--${kind}" data-off="${id}" aria-label="Remove ${esc(byId.get(id)?.name || '')}"><img ${CR.src(id)} alt="" width="20" height="29">${kind === 'without' ? 'No ' : ''}${esc(byId.get(id)?.name || id)}<span aria-hidden="true">×</span></button>`;
       const any = state.with.size + state.without.size;
       $('crdChips').innerHTML = any
-        ? [...state.with].map((id) => chip(id, 'with')).join('') + [...state.without].map((id) => chip(id, 'without')).join('') + '<button type="button" class="crd-chip crd-chip--clear" data-off="all">Clear</button>'
+        ? [...state.with].map((id) => chip(id, 'with')).join('') + [...state.without].map((id) => chip(id, 'without')).join('')
         : '';
       $('crdPickN').textContent = any ? any : '';
+      $('crdReset').hidden = !(any || state.style || state.q.trim());
+      const qw = words(state.q);
 
       const list = data.decks
-        .filter((d) => (!state.style || d.style === state.style) && [...state.with].every((id) => d.ids.has(id)) && ![...state.without].some((id) => d.ids.has(id)))
+        .filter(
+          (d) =>
+            (!state.style || d.style === state.style) &&
+            qw.every((w) => d.words.some((x) => x.startsWith(w))) &&
+            [...state.with].every((id) => d.ids.has(id)) &&
+            ![...state.without].some((id) => d.ids.has(id)),
+        )
         .sort((a, b) =>
           state.sort === 'wr' ? b.winRate - a.winRate || b.games - a.games : state.sort === 'elixir' ? a.avg - b.avg || b.games - a.games : b.games - a.games,
         );
@@ -274,7 +309,6 @@
       $('crdList').innerHTML = list.slice(0, state.shown).map(deck).join('');
       $('crdList').querySelectorAll('.crd-like').forEach(paintLike);
       $('crdMore').hidden = list.length <= state.shown;
-      map.paint(new Set(list.map((d) => d.i)));
     }
 
     function deck(d) {
@@ -283,26 +317,16 @@
         .map(([id, evo]) => {
           const c = byId.get(id);
           const name = (evo === 1 ? 'Evo ' : evo === 2 ? 'Hero ' : '') + (c?.name || id);
-          return `<li><button type="button" class="crd-card" data-act="card" data-id="${id}" title="${esc(name)}: show every deck with it"><img src="${CR.img(id, evo)}" alt="${esc(name)}" width="136" height="200" loading="lazy" decoding="async"><span class="crd-cost">${c?.elixir ?? '?'}</span></button></li>`;
+          return `<li><button type="button" class="crd-card" data-act="card" data-id="${id}" title="${esc(name)}: show every deck with it"><img ${CR.src(id, evo)} alt="${esc(name)}" width="136" height="200" loading="lazy" decoding="async"><span class="crd-cost">${c?.elixir ?? '?'}</span></button></li>`;
         })
         .join('');
-      // elixir curve: how many cards cost 1, 2 ... 7+
-      const bins = Array(7).fill(0);
-      d.cards.forEach(([id]) => {
-        const e = byId.get(id)?.elixir;
-        if (e != null) bins[Math.min(7, Math.max(1, e)) - 1]++;
-      });
-      const top = Math.max(...bins);
-      const curve = bins.map((n, i) => `<i style="--h:${n / top}" data-n="${n || ''}"><b>${i === 6 ? '7+' : i + 1}</b></i>`).join('');
-      // win rate on a 35-65% strip: the dot = this deck, the band = its 95% margin, the line = a coin flip
+      // the win rate's 95% range, shown on hover
       const lo = d.winRate - d.margin;
       const hi = d.winRate + d.margin;
-      const at = (v) => Math.max(0, Math.min(100, ((v - 35) / 30) * 100)).toFixed(1) + '%';
-      const verdict = lo > 50 ? ['win', 'Winning'] : hi < 50 ? ['loss', 'Losing'] : ['flip', 'Coin flip'];
       const specials = CR.specials(d.cards, byId);
-      return `<article class="crd-deck" data-i="${d.i}" data-style="${d.style}">
-  <header class="crd-head">
-    <span class="crd-rank${d.rank <= 3 ? ' crd-rank--top' : ''}" title="Most played #${d.rank}">#${d.rank}</span>
+      return `<article class="crd-deck" data-i="${d.i}" data-style="${d.style}" data-v="${d.verdict}">
+  <header class="crd-head" style="--art:url('${CR.img(d.wincon)}')">
+    <span class="crd-rank${d.rank <= 3 ? ' crd-rank--top' : ''}" title="Most played #${d.rank}">${d.rank <= 3 ? CROWN : ''}#${d.rank}</span>
     <div class="crd-id"><h3 class="crd-name">${esc(d.name)}</h3><p class="crd-var">${specials.map(esc).join(' · ') || 'No evolutions'}</p></div>
     <a class="crd-edit" href="${CR.builderLink(d.cards, d.tower)}" aria-label="Edit ${esc(d.name)} in the Deck Builder" title="Edit in the Deck Builder">${PEN}</a>
   </header>
@@ -310,99 +334,55 @@
     <div class="crd-hand">
       <ol class="crd-cards" aria-label="Cards">${hand}</ol>
       <div class="crd-foot">
-        ${tower ? `<span class="crd-tower" title="Tower troop"><img src="${CR.img(tower.id)}" alt="" width="34" height="50" loading="lazy">${esc(tower.name)}</span>` : ''}
+        ${tower ? `<span class="crd-tower" title="Tower troop"><img ${CR.src(tower.id)} alt="" width="34" height="50" loading="lazy">${esc(tower.name)}</span>` : ''}
         <span class="crd-fact" title="Average elixir">${drop}<b>${d.avg.toFixed(1)}</b><small>avg</small></span>
         <span class="crd-fact" title="4-card cycle: what it costs to get back to the same card">${cycleIco}<b>${CR.cycle(d.cards, byId)}</b><small>cycle</small></span>
-        <button type="button" class="crd-stats-key crd-stats-key--${verdict[0]}" data-act="stats" aria-expanded="false" title="Win rate and numbers"><b>${d.winRate.toFixed(1)}%</b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <button type="button" class="crd-stats-key crd-stats-key--${d.verdict}" data-act="stats" aria-expanded="false" title="Win rate and numbers"><b>${d.winRate.toFixed(1)}%</b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       </div>
     </div>
     <div class="crd-stats">
-      <div class="crd-wr">
+      <div class="crd-wr" title="95% sure the real win rate is between ${lo.toFixed(1)}% and ${hi.toFixed(1)}%">
         <small>Win rate</small>
         <b>${d.winRate.toFixed(1)}<i>%</i></b>
-        <span class="crd-verdict crd-verdict--${verdict[0]}" title="95% sure the real win rate is between ${lo.toFixed(1)}% and ${hi.toFixed(1)}%">${verdict[1]} <em>±${d.margin.toFixed(1)}</em></span>
       </div>
-      <div class="crd-strip crd-strip--${verdict[0]}" aria-hidden="true"><span class="crd-band" style="left:${at(lo)};right:calc(100% - ${at(hi)})"></span><span class="crd-dot" style="left:${at(d.winRate)}"></span><small style="left:0">35</small><small style="left:50%">50</small><small style="left:100%">65</small></div>
       <dl class="crd-rows">
         <div><dt>Games</dt><dd>${num(d.games)}</dd></div>
         <div><dt>Wins</dt><dd>${num(d.wins)}</dd></div>
         <div><dt>Usage</dt><dd>${d.usage.toFixed(2)}%</dd></div>
       </dl>
-      <div class="crd-curve-wrap"><small>Elixir curve</small><div class="crd-curve" aria-hidden="true">${curve}</div></div>
     </div>
-  </div>
-  <div class="crd-bar">
-    <button type="button" class="crd-key crd-like" data-act="like" data-key="${d.key}" aria-pressed="false">${FLAME}<span></span></button>
-    <a class="crd-key crd-copy" data-act="copy" href="${esc(CR.copyLink(d.cards, d.tower))}" rel="noopener" title="Open this deck in Clash Royale">Copy deck</a>
-    <button type="button" class="crd-key crd-share" data-act="share" aria-expanded="false" aria-label="Share this deck" title="Share this deck">${SHARE}</button>
+    <div class="crd-bar">
+      <button type="button" class="crd-key crd-like" data-act="like" data-key="${d.key}" aria-pressed="false">${FLAME}<span></span></button>
+      <a class="crd-key crd-copy" data-act="copy" href="${esc(CR.copyLink(d.cards, d.tower))}" rel="noopener" title="Open this deck in Clash Royale">Copy deck</a>
+      <button type="button" class="crd-key crd-share" data-act="share" aria-expanded="false" aria-label="Share this deck" title="Share this deck">${SHARE}</button>
+    </div>
   </div>
 </article>`;
     }
 
-    // ---- META MAP: x = games (log), y = win rate, one dot per deck = its win condition's art. A dot opens its deck. ----
-    function metaMap() {
-      const box = $('crmPlot');
-      const tip = $('crmTip');
-      const g = data.decks.map((d) => d.games);
-      const xMin = Math.log(Math.min(...g) * 0.92);
-      const xMax = Math.log(Math.max(...g) * 1.08);
-      const w = data.decks.map((d) => d.winRate);
-      const yMin = Math.floor((Math.min(...w) - 2) / 5) * 5;
-      const yMax = Math.ceil((Math.max(...w) + 2) / 5) * 5;
-      const X = (v) => ((Math.log(v) - xMin) / (xMax - xMin)) * 100;
-      const Y = (v) => 100 - ((v - yMin) / (yMax - yMin)) * 100;
-      let grid = '';
-      for (let v = yMin; v <= yMax; v += 5) grid += `<span class="crm-gy${v === 50 ? ' crm-gy--50' : ''}" style="top:${Y(v)}%"><b>${v}%</b></span>`;
-      [50, 75, 100, 150, 200, 300, 500, 1000].filter((v) => Math.log(v) > xMin && Math.log(v) < xMax).forEach((v) => (grid += `<span class="crm-gx" style="left:${X(v)}%"><b>${v}</b></span>`));
-      const dots = data.decks
-        .map(
-          (d) =>
-            `<button type="button" class="crm-dot crm-dot--${d.winRate - d.margin > 50 ? 'win' : d.winRate + d.margin < 50 ? 'loss' : 'flip'}" data-i="${d.i}" style="left:${X(d.games)}%;top:${Y(d.winRate)}%;--art:url('${CR.img(d.wincon)}')" aria-label="${esc(d.name)}: ${d.winRate.toFixed(1)}% in ${num(d.games)} games"></button>`,
-        )
+    // ---- SNAPSHOT: the two panels over the list (every number from the same two files) ----
+    function snapshot() {
+      // a row: card picture, name + a bar in a well, the number; tap = every deck with that card
+      const row = (id, e, label, val, frac, sub) =>
+        `<li><button type="button" class="crs-row" data-card="${id}" title="${esc(label)}: every deck with it"><img ${CR.src(id, e)} alt="" width="34" height="50" loading="lazy" decoding="async"><span class="crs-row-t"><b>${esc(label)}</b><span class="crs-bar"><i style="--f:${frac.toFixed(3)}"></i></span></span><span class="crs-row-n"><b>${val}</b><small>${sub}</small></span></button></li>`;
+      const used = cards.cards.filter((c) => c.usage).sort((a, b) => b.usage - a.usage).slice(0, 6);
+      $('crsCards').innerHTML = used
+        .map((c) => row(c.id, 0, c.name, c.usage.toFixed(1) + '%', c.usage / used[0].usage, c.winRate.toFixed(1) + '% win rate'))
         .join('');
-      box.innerHTML = `<div class="crm-grid" aria-hidden="true">${grid}</div><span class="crm-q crm-q--tl">Hidden gems</span><span class="crm-q crm-q--tr">Meta kings</span><span class="crm-q crm-q--br">Overplayed</span><span class="crm-q crm-q--bl">Struggling</span>${dots}`;
-      const show = (b) => {
-        const d = data.decks[+b.dataset.i];
-        tip.innerHTML = `<b>${esc(d.name)}</b><span>${d.winRate.toFixed(1)}% win rate · ${num(d.games)} games</span><span class="crm-tip-cards">${d.cards.map(([id, e]) => `<img src="${CR.img(id, e)}" alt="" width="27" height="40">`).join('')}</span>`;
-        tip.hidden = false;
-        const r = b.getBoundingClientRect();
-        const p = tip.parentElement.getBoundingClientRect(); // .crm: the tip and the plot both sit in it
-        const left = Math.min(Math.max(r.left - p.left + r.width / 2, 120), p.width - 120);
-        tip.style.left = left + 'px';
-        tip.style.top = r.top - p.top + 'px';
-        tip.classList.toggle('is-below', r.top - p.top < 130);
-      };
-      box.addEventListener('pointerover', (e) => {
-        const b = e.target.closest('.crm-dot');
-        if (b) show(b);
-      });
-      box.addEventListener('pointerleave', () => (tip.hidden = true));
-      box.addEventListener('focusin', (e) => e.target.closest('.crm-dot') && show(e.target));
-      box.addEventListener('focusout', () => (tip.hidden = true));
-      box.addEventListener('click', (e) => {
-        const b = e.target.closest('.crm-dot');
-        if (!b) return;
-        const d = data.decks[+b.dataset.i];
-        // make sure its deck is in the list, then go to it
-        if (b.classList.contains('is-out')) {
-          state.style = '';
-          state.with.clear();
-          state.without.clear();
-        }
-        let el = $('crdList').querySelector(`[data-i="${d.i}"]`);
-        if (!el) {
-          state.shown = data.decks.length;
-          draw();
-          el = $('crdList').querySelector(`[data-i="${d.i}"]`);
-        }
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.remove('is-target');
-        void el.offsetWidth;
-        el.classList.add('is-target');
-      });
-      return {
-        paint: (on) => box.querySelectorAll('.crm-dot').forEach((b) => b.classList.toggle('is-out', !on.has(+b.dataset.i))),
-      };
+      const forms = cards.cards
+        .flatMap((c) => [c.evoGames && { c, e: 1, g: c.evoGames }, c.heroGames && { c, e: 2, g: c.heroGames }])
+        .filter(Boolean)
+        .sort((a, b) => b.g - a.g)
+        .slice(0, 6);
+      $('crsForms').innerHTML = forms
+        .map(({ c, e, g }) => row(c.id, e, (e === 1 ? 'Evo ' : 'Hero ') + c.name, num(g), g / forms[0].g, Math.round((g / c.games) * 100) + '% of ' + c.name + ' games'))
+        .join('');
+      document.querySelectorAll('.crs-rows').forEach((ol) =>
+        ol.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-card]');
+          if (b) withCard(+b.dataset.card);
+        }),
+      );
     }
 
     draw();

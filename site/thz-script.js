@@ -654,7 +654,7 @@ const FOOTER_HTML = `
 
   <div class="pf-footer-top">
     <div class="pf-footer-brand">
-      <img src="/icons/home.jpg" alt="Parchrome" class="pf-footer-logo">
+      <img src="/icons/parchrome-logo.svg" alt="Parchrome" class="pf-footer-logo">
       <p class="pf-footer-tagline">Parchrome - all in one gaming portal, prioritizes quality over quantity</p>
     </div>
     <div class="pf-footer-social">

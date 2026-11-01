@@ -19,7 +19,7 @@
   const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   // Parcore watermark chip (favicon + name), top left of strip pictures.
-  const WM = '<span class="asp-wm"><img src="/icons/home.jpg" alt=""><span>Parcore</span></span>';
+  const WM = '<span class="asp-wm"><img src="/icons/parchrome-logo.svg" alt=""><span>Parcore</span></span>';
 
   // Live = a link; soon = a greyed block with the badge.
   function shell(a, cls, inner) {

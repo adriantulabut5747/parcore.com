@@ -340,6 +340,16 @@
     });
   }
 
+  // ---- Drawers (the picker and the tray) --------------------------------------
+  // Phones drag them closed by the grip / top bar, or by pulling the list down at
+  // its top: cocSheetDrag (th-layouts.js, loaded after this file, so wired on first open).
+  var SHEET_X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>';
+  function sheetDrag(box, body, hide) {
+    if (box.dataset.drag || typeof cocSheetDrag !== 'function') return;
+    box.dataset.drag = '1';
+    cocSheetDrag(box, [box.querySelector('.sheet-grip'), box.querySelector('.am-sheet-bar, .am-tray-head')], body, hide);
+  }
+
   // ---- Picker modal (a hero, or one hero's pet / equipment) -----------------
   // Opened from the army sheet: an empty hero slot or a hero's portrait
   // (slot 'hero'), or a pet / equipment box. It lists what can go there;
@@ -348,8 +358,17 @@
   var modal = document.createElement('div');
   modal.className = 'am-modal';
   modal.hidden = true;
-  modal.innerHTML = '<div class="am-modal-box" id="amPicker" role="dialog" aria-modal="true" aria-labelledby="amPickerTitle"></div>';
+  // A drawer like the Damage Calculator's sheet: grip + fixed bar, the list scrolls under it.
+  modal.innerHTML =
+    '<div class="am-modal-box" id="amPicker" role="dialog" aria-modal="true" aria-labelledby="amPickerTitle">' +
+    '<div class="sheet-grip" aria-hidden="true"></div>' +
+    '<header class="am-sheet-bar"><h3 class="am-sheet-ttl" id="amPickerTitle"></h3>' +
+    '<button type="button" class="am-sheet-x" data-pick="close" aria-label="Close">' +
+    SHEET_X +
+    '</button></header><div class="am-sheet-body"></div></div>';
   document.body.appendChild(modal);
+  var pickerBox = modal.querySelector('#amPicker');
+  var pickerBody = modal.querySelector('.am-sheet-body');
   var lastFocus = null;
   function optHtml(o, on, taken, title) {
     return (
@@ -422,28 +441,38 @@
           (which === 'hero' ? 'Remove hero' : 'Remove') +
           '</button>'
         : '';
-    modal.querySelector('#amPicker').innerHTML =
-      '<div class="am-picker-head"><h3 class="am-modal-title" id="amPickerTitle">' +
-      esc(title) +
-      '</h3><button type="button" class="am-picker-close" data-pick="close" aria-label="Close">&times;</button></div>' +
+    modal.querySelector('#amPickerTitle').textContent = title;
+    pickerBody.innerHTML =
       (note ? '<p class="am-modal-note">' + note + '</p>' : '') +
       '<div class="am-grid am-grid-sm">' +
       opts.join('') +
       '</div>' +
       (mode || remove ? '<div class="am-modal-foot">' + mode + remove + '</div>' : '');
-    lastFocus = document.activeElement;
+    if (modal.hidden) lastFocus = document.activeElement;
+    clearTimeout(pickerShut);
+    modal.classList.remove('is-closing');
+    pickerBox.style.transform = '';
     modal.hidden = false;
+    pickerBody.scrollTop = 0;
+    sheetDrag(pickerBox, pickerBody, closePicker);
     document.documentElement.classList.add('am-modal-open');
     var first =
       modal.querySelector('#amPicker .am-opt.is-on') ||
       modal.querySelector('#amPicker .am-opt:not(.is-taken)') ||
-      modal.querySelector('#amPicker .am-picker-close');
+      modal.querySelector('#amPicker .am-sheet-x');
     first.focus({ preventScroll: true });
   }
+  var pickerShut = 0;
   function closePicker() {
-    if (modal.hidden) return;
+    if (modal.hidden || modal.classList.contains('is-closing')) return;
     picking = null;
-    modal.hidden = true;
+    // slides away first (phones: down, as the equipment panel does), then hides
+    modal.classList.add('is-closing');
+    pickerShut = setTimeout(function () {
+      modal.hidden = true;
+      modal.classList.remove('is-closing');
+      pickerBox.style.transform = '';
+    }, 200);
     document.documentElement.classList.remove('am-modal-open');
     if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
   }
@@ -505,8 +534,11 @@
   tray.innerHTML =
     '<div class="am-tray-head"><h3 class="am-tray-title" id="amTrayTitle"></h3><span class="am-tray-meter" data-meter=""></span>' +
     '<button type="button" class="am-btn am-tray-done" data-tray="close">Done</button>' +
-    '<button type="button" class="am-picker-close" data-tray="close" aria-label="Close">&times;</button></div>' +
+    '<button type="button" class="am-sheet-x" data-tray="close" aria-label="Close">' +
+    SHEET_X +
+    '</button></div>' +
     '<div class="am-tray-body"></div>';
+  tray.insertAdjacentHTML('afterbegin', '<div class="sheet-grip" aria-hidden="true"></div>');
   document.body.appendChild(tray);
 
   function placeTray() {
@@ -558,6 +590,7 @@
     editing = row;
     if (tray.hidden) lastTrayFocus = document.activeElement;
     tray.hidden = false;
+    sheetDrag(tray, tray.querySelector('.am-tray-body'), closeTray);
     root.classList.add('is-tray-open');
     fillTray(); // redraws the sheet too (refresh), with the row lit
     placeTray();
@@ -574,6 +607,7 @@
     editing = null;
     stopHold();
     tray.hidden = true;
+    tray.style.transform = '';
     root.classList.remove('is-tray-open');
     root.style.removeProperty('--tray-h');
     renderBar();
@@ -918,7 +952,10 @@
   }
   root.addEventListener('click', function (e) {
     var rc = e.target.closest('[data-row-clear]');
-    if (rc) return clearRow(rc.dataset.rowClear);
+    if (rc) {
+      var row = rc.dataset.rowClear;
+      return cocConfirm('Clear ' + ROWS[row].title + '?', 'Everything in this row comes out. This can’t be undone.', 'Clear').then((ok) => ok && clearRow(row));
+    }
     // A unit row: a closed one opens (wherever you tap it); in the open
     // one a unit's tap is the remove badge (pointers: startHold above;
     // this is the keyboard's Enter / Space).
@@ -955,17 +992,13 @@
     if (act === 'share') return shareMenu();
     if (t.dataset.to) return setTimeout(() => shareMenu(false), 0); // a Facebook / X / ... link: let it open, then close
     if (act === 'clear') {
-      // Two taps, so one stray tap can't wipe a finished army.
-      if (!t.classList.contains('is-armed')) {
-        t.classList.add('is-armed');
-        t.querySelector('.am-btn-text').textContent = 'Tap again';
-        setTimeout(() => disarm(t), 2600);
-        return;
-      }
-      disarm(t);
-      ['troops', 'spells', 'heroes', 'ccTroops', 'ccSpells'].forEach((k) => s[k].clear());
-      closePicker();
-      changed();
+      // Asks first, so one stray tap can't wipe a finished army.
+      cocConfirm('Clear your army?', 'Every troop, spell, hero and Clan Castle unit comes out. This can’t be undone.', 'Clear').then(function (ok) {
+        if (!ok) return;
+        ['troops', 'spells', 'heroes', 'ccTroops', 'ccSpells'].forEach((k) => s[k].clear());
+        closePicker();
+        changed();
+      });
       return;
     }
   });
@@ -1001,10 +1034,6 @@
     btn.setAttribute('aria-expanded', open);
     btn.classList.toggle('active', open);
     if (open) $('#amImportInput').focus();
-  }
-  function disarm(btn) {
-    btn.classList.remove('is-armed');
-    btn.querySelector('.am-btn-text').textContent = 'Clear';
   }
 
   // ---- Share drop-up ---------------------------------------------------------

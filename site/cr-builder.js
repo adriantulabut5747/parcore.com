@@ -78,7 +78,7 @@
     $('crbTowers').innerHTML =
       '<small>Tower troop</small>' +
       towers
-        .map((t) => `<button type="button" role="radio" class="crb-tower" data-tower="${t.id}" title="${esc(t.name)}"><img src="${CR.img(t.id)}" alt="${esc(t.name)}" width="34" height="50" loading="lazy"></button>`)
+        .map((t) => `<button type="button" role="radio" class="crb-tower" data-tower="${t.id}" title="${esc(t.name)}"><img ${CR.src(t.id)} alt="${esc(t.name)}" width="34" height="50" loading="lazy"></button>`)
         .join('');
     $('crbTowers').addEventListener('click', (e) => {
       const b = e.target.closest('[data-tower]');
@@ -140,7 +140,7 @@
       const c = byId.get(id);
       const slot = deck.find((x) => x[0] === id)[1];
       const opt = (v, label, why) =>
-        `<button type="button" role="menuitemradio" aria-checked="${slot === v}" data-slot="${v}"${why ? ` disabled title="${esc(why)}"` : ''}><img src="${CR.img(id, v)}" alt="" width="27" height="40"><span>${label}${why ? `<small>${esc(why)}</small>` : ''}</span></button>`;
+        `<button type="button" role="menuitemradio" aria-checked="${slot === v}" data-slot="${v}"${why ? ` disabled title="${esc(why)}"` : ''}><img ${CR.src(id, v)} alt="" width="27" height="40"><span>${label}${why ? `<small>${esc(why)}</small>` : ''}</span></button>`;
       pop.innerHTML =
         `<p class="crb-pop-h">${esc(c.name)}</p>` +
         opt(0, 'Normal') +
@@ -211,7 +211,7 @@
           .map(([id, s]) => {
             const c = byId.get(id);
             const n = (s === 1 ? 'Evo ' : s === 2 ? 'Hero ' : '') + c.name;
-            return `<li><button type="button" class="crd-card" data-id="${id}" aria-haspopup="menu" title="${esc(n)}: evolution, hero or take it out"><img src="${CR.img(id, s)}" alt="${esc(n)}" width="136" height="200" decoding="async"><span class="crd-cost">${c.elixir ?? '?'}</span></button></li>`;
+            return `<li><button type="button" class="crd-card" data-id="${id}" aria-haspopup="menu" title="${esc(n)}: evolution, hero or take it out"><img ${CR.src(id, s)} alt="${esc(n)}" width="136" height="200" decoding="async"><span class="crd-cost">${c.elixir ?? '?'}</span></button></li>`;
           })
           .join('') + '<li><span class="crb-empty" aria-hidden="true"></span></li>'.repeat(8 - ordered.length);
 
@@ -220,7 +220,7 @@
       const heroes = ordered.filter((c) => c[1] === 2);
       const wild = evos[1] || heroes[1];
       const sock = (c, label) =>
-        `<span class="crb-sock${c ? ' is-on' : ''}">${c ? `<img src="${CR.img(c[0], c[1])}" alt="" width="27" height="40">` : '<i></i>'}<span><small>${label}</small>${c ? esc(byId.get(c[0]).name) : 'Empty'}</span></span>`;
+        `<span class="crb-sock${c ? ' is-on' : ''}">${c ? `<img ${CR.src(c[0], c[1])} alt="" width="27" height="40">` : '<i></i>'}<span><small>${label}</small>${c ? esc(byId.get(c[0]).name) : 'Empty'}</span></span>`;
       $('crbSlots').innerHTML = sock(evos[0], 'Evolution') + sock(heroes[0], 'Hero') + sock(wild, 'Evo or hero');
 
       // tower
@@ -250,7 +250,7 @@
 
       // the phone dock
       $('crbDock').innerHTML =
-        `<span class="crb-dock-cards">${ordered.map(([id, s]) => `<img src="${CR.img(id, s)}" alt="" width="27" height="40">`).join('')}${'<i></i>'.repeat(8 - ordered.length)}</span>` +
+        `<span class="crb-dock-cards">${ordered.map(([id, s]) => `<img ${CR.src(id, s)} alt="" width="27" height="40">`).join('')}${'<i></i>'.repeat(8 - ordered.length)}</span>` +
         `<span class="crb-dock-n"><b>${deck.length}/8</b><small>${deck.length ? avg.toFixed(1) + ' avg' : 'cards'}</small></span>`;
 
       drawMeta(ordered, full);
@@ -283,7 +283,7 @@
       $('crbLike').innerHTML = rows
         .map(
           ({ d, n }) => `<button type="button" class="crb-row" data-load="${meta.decks.indexOf(d)}">
-  <span class="crb-row-cards">${d.cards.map(([id, e]) => `<img src="${CR.img(id, e)}" alt="" width="27" height="40" loading="lazy">`).join('')}</span>
+  <span class="crb-row-cards">${d.cards.map(([id, e]) => `<img ${CR.src(id, e)} alt="" width="27" height="40" loading="lazy">`).join('')}</span>
   <span class="crb-row-name"><b>${esc(d.name)}</b><small>${deck.length ? n + ' of 8 cards · ' : ''}${num(d.games)} games</small></span>
   <span class="crb-row-wr${d.winRate >= 50 ? ' is-up' : ''}">${d.winRate.toFixed(1)}%</span>
 </button>`,
@@ -306,7 +306,7 @@
         ? shown
             .map(
               (c) =>
-                `<button type="button" class="crb-pc" data-id="${c.id}" aria-pressed="${inDeck.has(c.id)}" title="${esc(c.name)}"><img src="${CR.img(c.id)}" alt="${esc(c.name)}" width="136" height="200" loading="lazy" decoding="async"><span class="crd-cost">${c.elixir ?? '?'}</span>${
+                `<button type="button" class="crb-pc" data-id="${c.id}" aria-pressed="${inDeck.has(c.id)}" title="${esc(c.name)}"><img ${CR.src(c.id)} alt="${esc(c.name)}" width="136" height="200" loading="lazy" decoding="async"><span class="crd-cost">${c.elixir ?? '?'}</span>${
                   canEvo(c) || canHero(c) ? `<span class="crb-tags">${canEvo(c) ? '<i class="crb-tag crb-tag--evo">Evo</i>' : ''}${canHero(c) ? '<i class="crb-tag crb-tag--hero">Hero</i>' : ''}</span>` : ''
                 }</button>`,
             )

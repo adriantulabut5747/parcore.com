@@ -4,22 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valorant | Parchrome</title>
-<meta name="description" content="Look up any Valorant player's rank and last 20 matches, plus the live ranked map pool, Immortal and Radiant counts, pro events and the latest Valorant news.">
+<meta name="description" content="Look up any Valorant player's rank and last 50 matches, plus every agent, gun and rank, the live ranked map pool, Immortal and Radiant counts, pro events and the latest Valorant news.">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tourney:ital,wdth,wght@1,75..125,100..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<link rel="icon" href="/icons/home.jpg">
-<link rel="shortcut icon" href="/icons/home.jpg">
-<link rel="apple-touch-icon" href="/icons/home.jpg">
-<link rel="stylesheet" href="/11layout.css?v=20261029b">
+<link rel="icon" href="/icons/parchrome-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/parchrome-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/parchrome-touch-180.png">
+<link rel="stylesheet" href="/11layout.css?v=20261101w9">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/codm-banner.css?v=20261029h">
-<link rel="stylesheet" href="/codm-tools.css?v=20261029d">
-<link rel="stylesheet" href="/valorant.css?v=20261031a">
-<link rel="stylesheet" href="/valorant-lobby.css?v=20261030b">
-<link rel="stylesheet" href="/coc-villager.css?v=20261027d">
+<link rel="stylesheet" href="/codm-banner.css?v=20261101tt">
+<link rel="stylesheet" href="/codm-tools.css?v=20261101tt">
+<link rel="stylesheet" href="/valorant.css?v=20261101x1">
+<link rel="stylesheet" href="/valorant-lobby.css?v=20261101w4">
+<link rel="stylesheet" href="/coc-villager.css?v=20261101ed">
 </head>
 <body class="vl-ground" data-game-nav="valorant">
 
@@ -39,7 +39,7 @@
     <span></span><span></span><span></span>
   </div>
   <div class="top-bar-title">
-    <div class="topbar-logo"><img src="/icons/home.jpg" alt="" decoding="async"></div>
+    <div class="topbar-logo"><img src="/icons/parchrome-logo.svg" alt="" decoding="async"></div>
     Parchrome
   </div>
   <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
@@ -92,13 +92,30 @@
 
   <div class="coc-main" >
 
-<!-- HERO: player search (Adrian). Facts + search: valorant-lobby.js; a search opens the player page /valorant/player/<name>-<tag>. -->
-<header class="vh" aria-labelledby="vlTitle">
-  <span class="vh-art" aria-hidden="true"></span>
+<!-- VALORANT LOBBY v3 (Nov 1 2026, Adrian: "upgrade it your way"). Full-width bands with real art, each page shown
+     with its real content; Jett's line is every section's subtitle (v4 "live hub", Nov 1 2026, Adrian).
+     Script: valorant-lobby.js, styles: valorant-lobby.css. -->
+
+<!-- HERO "agent select" (Nov 1 2026, Adrian: one agent, centred, < > to step through the roster newest first).
+     Copy | stage (the agent over their own name art, valorant-roster.json) | the agent's card; the live strip runs
+     across the bottom. All of it is drawn by valorant-lobby.js (agentSelect). -->
+<header class="vh" id="vlHero" aria-labelledby="vlTitle">
+  <!-- the contour lines + motes behind everything (valorant-lobby.css "BACKDROP") -->
+  <div class="vh-fx" aria-hidden="true"><i></i><i></i></div>
+  <!-- .vh-main: nothing on desktop (display: contents); phones: the stage + copy fill one screen, search just above the phone bar -->
+  <div class="vh-main">
+  <div class="vh-stage" id="vlStage" aria-roledescription="carousel" aria-label="Agents, newest first">
+    <div class="vh-fig" id="vlFig"></div>
+    <div class="vh-pager">
+      <button type="button" class="vh-step" id="vlPrev" aria-label="Previous agent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <p class="vh-count" id="vlCount" aria-live="polite"></p>
+      <button type="button" class="vh-step" id="vlNext" aria-label="Next agent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
   <div class="vh-copy">
-    <p class="cb-kicker">Valorant</p>
-    <h1 class="cb-title vh-title" id="vlTitle">Find any player</h1>
-    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" decoding="async"><p><b>Jett</b>Type a Riot ID and its tag to see their rank, top agents and last 20 matches. Let's find out if they can keep up!</p></div>
+    <p class="cb-kicker">Valorant <span id="vlKickAct"></span> <span id="vlKickPatch"></span></p>
+    <h1 class="cb-title vh-title" id="vlTitle">See who<br><em>keeps up</em></h1>
+    <p class="vl-sub vh-sub">Type a Riot ID and its tag to see their rank, top agents and last 50 matches. Spoiler: most of them can't.</p>
     <form class="lb-search vh-find" id="vlFind" role="search" novalidate>
       <label class="vl-sr" for="vlName">Riot ID</label>
       <input class="lb-search-input" id="vlName" type="text" placeholder="Riot ID" maxlength="16" autocomplete="off" autocapitalize="none" spellcheck="false">
@@ -108,62 +125,117 @@
       <button class="lb-search-btn" type="submit">Search</button>
     </form>
     <p class="vh-status" id="vlStatus" role="status" aria-live="polite"></p>
-    <div class="cb-strip">
-      <span class="cb-fact" id="vlAct" hidden><small>Act</small><b></b><em></em></span>
-      <span class="cb-fact" id="vlPatch" hidden><small>Patch</small><b></b><em></em></span>
-      <span class="cb-fact" id="vlPoolN" hidden><small>Map pool</small><b></b><em></em></span>
-    </div>
   </div>
+  </div>
+  <!-- the agent on the stage: role, bio, facts, kit (valorant-roster.json) -->
+  <aside class="vh-card" id="vlCard" aria-live="polite" aria-label="Agent on the stage" hidden></aside>
+  <!-- LIVE STRIP (a card under the search below 1100px): the act clock (valorant-weapons.json acts) + NA's top 3
+       (Worker type=leaderboard). Each half hides on its own when its source fails. -->
+  <aside class="vh-live" id="vlLive" aria-label="Live now" hidden>
+    <section class="vh-act" id="vlActBox" hidden>
+      <div class="vh-live-head">
+        <span class="vh-live-ico"><img src="/icons/valorant.png" alt="" width="26" height="26"></span>
+        <span class="vh-live-name"><b id="vlActName"></b><small id="vlActWhen"></small></span>
+        <span class="vh-chip">Live</span>
+      </div>
+      <div class="vh-clock" role="timer" aria-label="Time left in the act">
+        <span><b data-u="d">-</b><small>Days</small></span>
+        <span><b data-u="h">--</b><small>Hours</small></span>
+        <span><b data-u="m">--</b><small>Mins</small></span>
+        <span><b data-u="s">--</b><small>Secs</small></span>
+      </div>
+      <div class="vh-run"><span><i id="vlActBar"></i></span><small id="vlActFrom"></small><small id="vlActTo"></small></div>
+    </section>
+    <section class="vh-top" id="vlTopBox" hidden>
+      <p class="vl-label">Top of NA <span>live</span></p>
+      <ol id="vlTop3"></ol>
+      <a class="vl-key" href="/valorant/leaderboard">Full leaderboard</a>
+    </section>
+  </aside>
 </header>
 
-<section class="ct-sec" aria-labelledby="vlPagesTitle">
-  <header class="ct-head">
-    <h2 class="ct-title" id="vlPagesTitle">Every page</h2>
-    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every Valorant page on Parchrome, sorted by tab. The grey ones are still being built, so check back soon. Waiting isn't my thing either.</p></div>
-  </header>
-  <!-- game-nav.json "valorant" groups: a new page = its row there, it shows up here by itself -->
-  <div id="vlPages"></div>
-</section>
-
-<section class="ct-sec" aria-labelledby="vlPoolTitle">
-  <header class="ct-head">
-    <h2 class="ct-title" id="vlPoolTitle">Map pool</h2>
-    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The maps in ranked right now, checked live. Click one for its callouts and site guides. Learn them before I take your space!</p></div>
+<!-- MAP POOL: tall slices, the one you point at opens up (live, Worker type=queue) -->
+<section class="vl-sec" aria-labelledby="vlPoolTitle">
+  <header class="vl-sh">
+    <div><h2 class="ct-title" id="vlPoolTitle">Competitive map pool</h2><div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>These are the maps in ranked right now, checked live. Open one for its callouts and site guides. Learn them fast, I won't wait.</p></div></div>
+    <a class="vl-key" href="/valorant/maps/">Every map</a>
   </header>
   <div class="vl-pool" id="vlPool"></div>
-  <a class="vl-more" href="/valorant/maps/">Every map</a>
 </section>
 
-<div class="vl-duo">
-  <section class="ct-sec" aria-labelledby="vlLadderTitle">
-    <header class="ct-head">
-      <h2 class="ct-title" id="vlLadderTitle">Top of the ladder</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>How many players sit at each Immortal and Radiant tier in NA right now, live from the leaderboard. See you up there!</p></div>
-    </header>
-    <div class="vl-box">
-      <ol id="vlLadder"></ol>
-      <a class="vl-more" href="/valorant/ranks">Every rank</a>
-    </div>
-  </section>
-
-  <section class="ct-sec" aria-labelledby="vlEventsTitle">
-    <header class="ct-head">
-      <h2 class="ct-title" id="vlEventsTitle">Pro events</h2>
-      <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The pro events running now or starting soon, from VLR.gg. Click one for brackets and results. Watch closely, you might learn something.</p></div>
-    </header>
-    <div class="vl-box">
-      <ol id="vlEvents"></ol>
-      <a class="vl-more" href="https://www.vlr.gg/events" target="_blank" rel="noopener">All events</a>
-    </div>
-  </section>
-</div>
-
-<section class="ct-sec ct-sec--last" aria-labelledby="vlNewsTitle">
-  <header class="ct-head">
-    <h2 class="ct-title" id="vlNewsTitle">Latest news</h2>
-    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The newest Valorant stories from VLR.gg, patch notes included. If anyone nerfs my knives, you'll read it here first.</p></div>
+<!-- ROSTER: every agent by role, newest first in each (valorant-roster.json); the hero shows one at a time, this shows them all.
+     Phones: one role at a time under the role tabs. -->
+<section class="vl-sec" aria-labelledby="vlRosterTitle">
+  <header class="vl-sh">
+    <div><h2 class="ct-title" id="vlRosterTitle">Agents</h2><div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every agent sorted by role, newest first. Open one for their abilities, story and release date. Duelists go first, obviously.</p></div></div>
+    <a class="vl-key" href="/valorant/agents/">Every agent</a>
   </header>
-  <div class="vl-feed" id="vlNews"></div>
+  <div class="vl-tabs vl-role-tabs" id="vlRoleTabs" role="tablist" aria-label="Role"></div>
+  <div class="vl-roster" id="vlRoster" data-show="Duelist"></div>
+</section>
+
+<!-- RANKED: the 9 ranks as a staircase | the live Immortal + Radiant counts -->
+<section class="vl-sec" aria-labelledby="vlRankedTitle">
+  <header class="vl-sh">
+    <div><h2 class="ct-title" id="vlRankedTitle">Ranked</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Click a rank to see how RR works and who you can queue with. The top step is Radiant, which is where you'll find me.</p></div></div>
+    <a class="vl-key" href="/valorant/ranks">How ranks work</a>
+  </header>
+  <div class="vl-ranked">
+    <div class="vl-stairs-wrap">
+      <p class="vl-label">The climb <span>9 ranks, 25 tiers</span></p>
+      <div class="vl-stairs" id="vlStairs"></div>
+    </div>
+    <div class="vl-box vl-top">
+      <p class="vl-label">Top of the ladder <span>NA, live · <b id="vlBoardN"></b></span></p>
+      <div class="vl-split" id="vlSplit" aria-hidden="true"></div>
+      <ol id="vlLadder"></ol>
+      <a class="vl-key" href="/valorant/leaderboard">Full leaderboard</a>
+    </div>
+  </div>
+</section>
+
+<!-- WEAPONS: one buy menu, shops in the game's four columns (valorant-weapons.json) -->
+<section class="vl-sec" aria-labelledby="vlGunsTitle">
+  <header class="vl-sh">
+    <div><h2 class="ct-title" id="vlGunsTitle">Buy menu</h2><div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every gun in the game with its price. Click one for its damage, kill times and skins. Or just buy the Operator, like me.</p></div></div>
+    <a class="vl-key" href="/valorant/weapons">Compare guns</a>
+  </header>
+  <!-- phones: the shops become tabs over one grid (valorant-lobby.js) -->
+  <div class="vl-tabs vl-shop-tabs" id="vlShopTabs" role="tablist" aria-label="Shop"></div>
+  <div class="vl-buy" id="vlGuns"></div>
+</section>
+
+<!-- TOOLS: each card shows the tool doing its job -->
+<section class="vl-sec" aria-labelledby="vlToolsTitle">
+  <header class="vl-sh">
+    <div><h2 class="ct-title" id="vlToolsTitle">Tools</h2><div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Build your crosshair, bring your sens over from another game, or draw something for chat. Then go get your aim up!</p></div></div>
+  </header>
+  <div class="vl-tools" id="vlTools"></div>
+</section>
+
+<!-- PRO SCENE: events (vlr.orlandomm.net) | news (VLR's RSS via the Worker) -->
+<section class="vl-sec vl-sec--last" aria-labelledby="vlSceneTitle">
+  <header class="vl-sh">
+    <div><h2 class="ct-title" id="vlSceneTitle">Pro scene</h2><div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Here are the events running now and the newest stories from VLR.gg. Open one to catch up. One day they'll all be about me.</p></div></div>
+  </header>
+  <!-- phones: one box, Events | News tabs (valorant-lobby.js); desktop shows both side by side -->
+  <div class="vl-tabs vl-scene-tabs" id="vlSceneTabs" role="tablist" aria-label="Pro scene">
+    <button type="button" class="vl-tab" role="tab" aria-selected="true" data-p="ev">Events</button>
+    <button type="button" class="vl-tab" role="tab" aria-selected="false" data-p="news">News</button>
+  </div>
+  <div class="vl-scene" id="vlScene" data-show="ev">
+    <div class="vl-box" data-p="ev">
+      <p class="vl-label">Events</p>
+      <ol id="vlEvents"></ol>
+      <a class="vl-key" href="https://www.vlr.gg/events" target="_blank" rel="noopener">All events</a>
+    </div>
+    <div class="vl-box" data-p="news">
+      <p class="vl-label">Latest news</p>
+      <div class="vl-feed" id="vlNews"></div>
+      <a class="vl-key" href="https://www.vlr.gg/news" target="_blank" rel="noopener">More news</a>
+    </div>
+  </div>
 </section>
 
   <footer class="pf-footer">
@@ -221,7 +293,7 @@ body {
   </div>
 </div>
 
-<script src="/11layout.js?v=20261029b"></script>
-<script src="/valorant-lobby.js?v=20261030b"></script>
+<script src="/11layout.js?v=20261031logo"></script>
+<script src="/valorant-lobby.js?v=20261101w1"></script>
 </body>
 </html>

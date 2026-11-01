@@ -1086,26 +1086,5 @@ function cocPagePath(u) {
     calc();
     reveal(fromRow);
     reveal(toRow);
-
-    // Share: the phone's share sheet where there is one, otherwise copy
-    // the address. The button says what happened for two seconds.
-    var shareBtn = $('#wallShare');
-    if (shareBtn) {
-      var label = shareBtn.querySelector('span');
-      var say = function (t) {
-        label.textContent = t;
-        clearTimeout(say.t);
-        say.t = setTimeout(() => (label.textContent = 'Share'), 2000);
-      };
-      shareBtn.addEventListener('click', function () {
-        var url = location.href;
-        if (navigator.share) navigator.share({ title: 'CoC wall upgrade cost', url: url }).catch(function () {});
-        else if (navigator.clipboard)
-          navigator.clipboard.writeText(url).then(
-            () => say('Link copied'),
-            () => say('Copy failed'),
-          );
-      });
-    }
   }
 })();

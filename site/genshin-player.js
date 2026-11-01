@@ -1088,7 +1088,7 @@
         <div class="gp-pieces">${arts}</div>
       </div>
       <ul class="gp-brk" aria-label="Substat breakdown">${brk}</ul>
-      <p class="gp-brand"><img src="/icons/home.jpg" alt="">Parchrome</p>
+      <p class="gp-brand"><img src="/icons/parchrome-logo.svg" alt="">Parchrome</p>
     </article>`;
   }
 

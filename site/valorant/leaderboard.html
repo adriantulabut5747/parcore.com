@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valorant Leaderboard: Top Radiant and Immortal Players by Region | Parchrome</title>
+<meta name="description" content="The live Valorant ranked leaderboard for NA, EU, AP, KR, LATAM and BR: every Radiant and Immortal player, their RR and wins, the Radiant cutoff, and a Riot ID search.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tourney:ital,wdth,wght@1,75..125,100..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/parchrome-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/parchrome-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/parchrome-touch-180.png">
+<link rel="stylesheet" href="/11layout.css?v=20261101w9">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/codm-banner.css?v=20261101tt">
+<link rel="stylesheet" href="/codm-tools.css?v=20261101tt">
+<link rel="stylesheet" href="/valorant.css?v=20261101x1">
+<link rel="stylesheet" href="/valorant-leaderboard.css?v=20261101q">
+<link rel="stylesheet" href="/coc-villager.css?v=20261101ed">
+</head>
+<body class="vl-ground" data-game-nav="valorant">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/parchrome-logo.svg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/valorant.png" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">Valorant</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Valorant pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main" >
+
+<header class="cb" aria-labelledby="cbTitle">
+  <span class="cb-art" aria-hidden="true"></span>
+  <span class="cb-ico" aria-hidden="true"><img src="/images/valorant/ranks/27.webp" alt="" width="128" height="128" decoding="async"></span>
+  <div class="cb-copy">
+    <p class="cb-kicker">Valorant</p>
+    <h1 class="cb-title" id="cbTitle">Leaderboard</h1>
+    <p class="cb-text">Every ranked player from Immortal 1 to Radiant in six regions, live from Riot's leaderboard. Find anyone and open their profile.</p>
+    <div class="cb-strip" id="lbdFacts">
+      <span class="cb-fact" data-f="total" hidden><small>On the board</small><b></b><em></em></span>
+      <span class="cb-fact" data-f="rad" hidden><small>Radiant</small><b></b><em></em></span>
+      <span class="cb-fact" data-f="top" hidden><small>#1 has</small><b></b><em></em></span>
+      <span class="cb-fact" data-f="when" hidden><small>Updated</small><b></b><em></em></span>
+    </div>
+  </div>
+</header>
+<!-- one tab per region (?region=na), filled by valorant-leaderboard.js -->
+<div class="cb-tabs lbd-tray" id="lbdRegions" role="tablist" aria-label="Region"></div>
+<!-- shown only while this visit waits in line for Henrik (valorant-line.js) -->
+<p class="lbd-line" id="lbdLine" role="status" aria-live="polite" hidden></p>
+
+<!-- THE PAGE: valorant-leaderboard.js. Data = Riot's ranked leaderboard through HenrikDev and our Worker
+     (cloudflare/valorant-api, type=ladder: 100 places a page, or one Riot ID). Card art = valorant-api.com. -->
+<section class="ct-sec" aria-labelledby="lbdTopTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="lbdTopTitle">Top 3</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The three highest players in the region right now, by RR. Click a card to see their matches. One day that middle spot is mine.</p></div>
+  </header>
+  <div class="lbd-podium" id="lbdPodium" aria-busy="true"></div>
+</section>
+
+<section class="ct-sec" aria-labelledby="lbdTiersTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="lbdTiersTitle">Radiant and Immortal</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>The RR you need for each Immortal division and Radiant here, and how many players hold each one. Pick a tier to jump to it. Radiant, obviously.</p></div>
+  </header>
+  <div class="lbd-split" id="lbdSplit" aria-hidden="true"></div>
+  <div class="lbd-tiers" id="lbdTiers"></div>
+</section>
+
+<section class="ct-sec ct-sec--last" aria-labelledby="lbdListTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="lbdListTitle">The ladder</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every player on the board, 100 a page. Type a Riot ID to find their place, or jump to any number. Try not to blink.</p></div>
+  </header>
+  <div class="lbd-tools">
+    <form class="lb-search lbd-find" id="lbdFind" role="search" novalidate>
+      <label class="vl-sr" for="lbdName">Riot ID</label>
+      <input class="lb-search-input" id="lbdName" type="text" placeholder="Riot ID" maxlength="16" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <span class="lbd-hash" aria-hidden="true">#</span>
+      <label class="vl-sr" for="lbdTag">Tag</label>
+      <input class="lb-search-input lbd-tag" id="lbdTag" type="text" placeholder="Tag" maxlength="6" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button class="lb-search-btn" type="submit">Find</button>
+    </form>
+    <form class="lb-search lbd-jump" id="lbdJump" novalidate>
+      <label class="lbd-jump-l" for="lbdPlace">Go to place</label>
+      <input class="lb-search-input" id="lbdPlace" type="number" inputmode="numeric" min="1" placeholder="1" autocomplete="off">
+      <button class="lb-search-btn" type="submit" aria-label="Go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </form>
+  </div>
+  <p class="lbd-status" id="lbdStatus" role="status" aria-live="polite"></p>
+  <div class="lbd-board">
+    <div class="lbd-head" aria-hidden="true"><span>#</span><span>Player</span><span>Rank</span><span>RR</span><span>Wins</span></div>
+    <ol class="lbd-list" id="lbdList" aria-busy="true"></ol>
+  </div>
+  <nav class="lbd-pager" id="lbdPager" aria-label="Leaderboard pages"></nav>
+  <p class="lbd-note" id="lbdNote"></p>
+</section>
+
+<script src="/valorant-line.js?v=20261101a"></script>
+<script src="/valorant-leaderboard.js?v=20261101q"></script>
+  <footer class="pf-footer">
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+</footer>
+</div>
+
+<style>
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;
+}}
+
+</style>
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/valorant.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Valorant Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261031logo"></script>
+</body>
+</html>

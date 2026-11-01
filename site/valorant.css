@@ -64,17 +64,42 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
    not ours to host; Anton, League Gothic and the Valorant look were turned down), so Valorant titles
    don't read like CODM's stencil. `html body` beats the pages' own <style> blocks, which come after
    this file. ---- */
-html body .cb-title, html body .ct-title,
 html body .hero-title, html body .tracker-subheader, html body .featured-title {
   font-family: 'Tourney', 'Oxanium', sans-serif;
   font-style: italic;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.01em;
 }
 /* the lobby's small headers sit beside badges: Tourney's narrower cut keeps "Rank distribution" on one line */
 html body .tracker-subheader { font-stretch: 85%; }
-/* no red tab on the banner's top edge here (Adrian): that's CODM's mark */
-.cb::before { content: none; }
+/* no red tab on the banner's top edge here (Adrian): that's CODM's mark. ::before carries the lobby hero's contour lines
+   instead of CODM's grid squares (Nov 1 2026, Adrian): very faint, left side only on desktop, all across on phones.
+   topo.webp = scripts/valorant-topo.py. */
+.cb {
+  background: radial-gradient(ellipse 50% 90% at 0% 0%, rgba(194, 59, 59, 0.09), transparent 60%), var(--lb-box);
+}
+.cb::before {
+  content: '';
+  inset: 0;
+  z-index: -2;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: #fff;
+  -webkit-mask: url('/images/valorant/topo.webp') 0 0 / 760px repeat, linear-gradient(90deg, #000 10%, transparent 55%);
+  -webkit-mask-composite: source-in;
+  mask: url('/images/valorant/topo.webp') 0 0 / 760px repeat, linear-gradient(90deg, #000 10%, transparent 55%);
+  mask-composite: intersect;
+  opacity: 0.035;
+  pointer-events: none;
+}
+@media (max-width: 970px) {
+  .cb::before {
+    -webkit-mask: url('/images/valorant/topo.webp') 0 0 / 640px repeat;
+    mask: url('/images/valorant/topo.webp') 0 0 / 640px repeat;
+    opacity: 0.03;
+  }
+}
 /* ---- LABELS: the small uppercase subtitles that used to get Oxanium from the `*` reset keep it ---- */
 .va-name small, .va-yr-foot small, .va-starters h3, .va-faces--big small, .va-bio cite, .va-facts dt, .va-ab-slot, .va-step small,
 .xh-hex, .vm-pool, .vm-txt small, .vm-cg h3, .vm-side h4, .vm-facts dt, .vm-pin--atk > span, .vm-pin--def > span,

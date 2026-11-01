@@ -72,6 +72,43 @@ function cocSheetDrag(sheet, handles, body, hide) {
   if (dlg) dlg.addEventListener('close', () => (sheet.style.transform = ''));
 }
 
+// CONFIRM (Nov 1 2026, Adrian: every erase on the CoC tools asks first; was the Tier
+// list's own box): cocConfirm(title, text, okLabel) -> Promise<boolean>. The
+// leaving-Parchrome dialog's look (.lv, coc-tools.css), built on first use. True on
+// the red button; Cancel, Escape or a backdrop click = false. The buttons answer
+// directly instead of waiting for "close", which arrives a beat later (and not at all headless).
+function cocConfirm(title, text, okLabel) {
+  let dlg = document.getElementById('cocConfirm');
+  if (!dlg) {
+    dlg = document.createElement('dialog');
+    dlg.className = 'lv';
+    dlg.id = 'cocConfirm';
+    dlg.setAttribute('aria-labelledby', 'cocConfirmTitle');
+    dlg.setAttribute('aria-describedby', 'cocConfirmText');
+    dlg.innerHTML =
+      '<div class="lv-box"><h2 class="lv-title" id="cocConfirmTitle"></h2><p class="lv-text" id="cocConfirmText"></p>' +
+      '<div class="lv-actions"><button type="button" class="lv-btn lv-stay" autofocus>Cancel</button>' +
+      '<button type="button" class="lv-btn lv-go"></button></div></div>';
+    document.body.appendChild(dlg);
+    const finish = (ok) => {
+      if (dlg._answer) dlg._answer(ok);
+      dlg._answer = null;
+      if (dlg.open) dlg.close();
+    };
+    dlg.querySelector('.lv-go').addEventListener('click', () => finish(true));
+    dlg.querySelector('.lv-stay').addEventListener('click', () => finish(false));
+    dlg.addEventListener('click', (e) => e.target === dlg && finish(false));
+    // a close left over from the last answer must not cancel a question asked since
+    dlg.addEventListener('close', () => !dlg.open && finish(false));
+  }
+  if (dlg._answer) dlg._answer(false);
+  dlg.querySelector('.lv-title').textContent = title;
+  dlg.querySelector('.lv-text').textContent = text;
+  dlg.querySelector('.lv-go').textContent = okLabel;
+  if (!dlg.open) dlg.showModal();
+  return new Promise((done) => (dlg._answer = done));
+}
+
 /* =======================================================================
    TOWN HALL LAYOUTS PAGES (thNN-layouts.html) -- shared script.
    Every TH layouts page loads this (defer, at the end of <body>) with

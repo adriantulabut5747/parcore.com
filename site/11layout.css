@@ -1,3 +1,5 @@
+/* TOURNEY (Nov 1 2026, Adrian): titles are Tourney 900 on every page, so the font loads here; most pages never linked it. */
+@import url('https://fonts.googleapis.com/css2?family=Tourney:ital,wght@0,100..900;1,100..900&display=swap');
 /* PARCHROME LOADER */
 body { visibility: hidden; }
 #page-loader { position: fixed; inset: 0; background: radial-gradient(circle at center, #1a1a1c 0%, #0f0f10 70%); display: flex; flex-direction: column; align-items: center;
@@ -345,6 +347,10 @@ body { visibility: hidden; }
      1rem is always the root's 16px, while em is the parent's size and
      compounds when text nests (.lob-sub > span). Phone values are below. */
   --fs-title: clamp(1.75rem, 2.45vw, 2.25rem); /* section titles: 28-36px */
+  /* TOURNEY TITLE SIZES: every section reads these (see "TOURNEY TITLES" below). Nov 1 2026, Adrian: +2px on desktop. */
+  --fs-title-tourney: calc(var(--fs-title) + 4px);                  /* section titles: 32-40px */
+  --fs-banner-tourney: calc(clamp(26px, 2.5vw, 38px) + 4px);        /* page banners (CoC .tb, Minecraft tool, Genshin .gi-tb) */
+  --fs-banner-tourney-lg: clamp(42px, calc(3.8vw + 2px), 58px);     /* CODM / Valorant / Clash Royale .cb banner */
   --fs-sub: 0.9375rem;                         /* text under a section title: 15px */
   --fs-card: 1.125rem;                         /* card titles: 18px */
   --fs-body: 0.875rem;                         /* card / body text: 14px */
@@ -355,6 +361,8 @@ body { visibility: hidden; }
 @media (max-width: 970px) {
   :root {
     --fs-title: 1.125rem;  /* 18px */
+    --fs-title-tourney: 1.5rem; /* 24px (Nov 1 2026, Adrian: phone Tourney titles bigger) */
+    --fs-banner-tourney: 28px;
     --fs-sub: 0.8125rem;   /* 13px */
     --fs-card: 1.0625rem;  /* 17px */
     --fs-body: 0.8125rem;  /* 13px */
@@ -649,9 +657,11 @@ body { visibility: hidden; }
   height: 100%;
   object-fit: cover;}
 
-.top-bar-title {font-family: 'Oxanium'; position:absolute; left:50%; transform:translateX(-50%); font-size:17px; font-weight:600; display:flex; align-items:center; gap:8px; ;}
+.top-bar-title {font-family: 'Sora', sans-serif; position:absolute; left:50%; transform:translateX(-50%); font-size:15.5px; /* Sora = 17px Oxanium x 0.92 (Nov 1 2026) */ font-weight:600; display:flex; align-items:center; gap:8px; ;}
 .top-bar-title a {text-decoration: none; color: white;}
-.topbar-logo {width:24px; height:24px; border-radius:4px; overflow:hidden; background-color: var(--bg-box);}
+/* pages' own `* { font-family }` resets beat inheritance */
+html body .top-bar-title, html body .top-bar-title * {font-family: 'Sora', sans-serif;}
+.topbar-logo {width:24px; height:24px;}
 .topbar-logo img {width:100%; height:100%; object-fit:cover;}
 .top-bar-avatar {margin-left:auto; width:30px; height:30px; border-radius:50%; background:var(--accent); margin-right: 5px;}
 
@@ -664,7 +674,7 @@ body { visibility: hidden; }
   .main { margin-top: 40px; }
   .sidebar { height: calc(100vh - 40px); }
 
-  .top-bar-title { font-size: 15px; gap: 7px; }
+  .top-bar-title { font-size: 14px; gap: 7px; }
   .topbar-logo { width: 21px; height: 21px; }
   .top-bar-avatar { width: 26px; height: 26px; }
 }
@@ -2660,7 +2670,7 @@ controls there. */
   border-radius: 8px;
   background: #16171a;
   box-shadow: none;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif; /* Nov 1 2026, Adrian: every top-bar button + menu is Sora */
   font-size: 10.5px;
   font-weight: 700; /* 700, not the tabs' 800: at this size 800 read too wide */
   letter-spacing: 1px;
@@ -2778,8 +2788,8 @@ controls there. */
   text-decoration: none;
   transition: color 0.15s ease;
 }
-/* BREADCRUMB FONT (Oct 24 2026, Adrian): every breadcrumb on every page is
-   Oxanium (was Sora) -- set HERE only, page stylesheets don't set a crumb font.
+/* BREADCRUMB FONT (Nov 1 2026, Adrian): every breadcrumb on every page is
+   Sora (Oxanium Oct 24 - Nov 1) -- set HERE only, page stylesheets don't set a crumb font.
    Covers the shared trail (.stb-crumbs: CoC, Minecraft, Genshin, game sections,
    Web Resources + article desktops), the articles' phone trail (.secondary-content
    with .sc-sep) and the Web Resources / Minecraft phone trail (.secondary-content-
@@ -2789,13 +2799,13 @@ html body .secondary-top-bar .stb-crumbs,
 html body .secondary-top-bar .stb-crumbs *,
 html body .secondary-top-bar .secondary-content:has(> .sc-sep),
 html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
 }
 @media (max-width: 970px) {
   html body .secondary-top-bar .secondary-content:has(.secondary-content-mobile),
   html body .secondary-top-bar .secondary-content:has(.secondary-content-mobile) *,
   html body .secondary-top-bar .stb-page {
-    font-family: 'Oxanium', sans-serif;
+    font-family: 'Sora', sans-serif;
   }
 }
 /* PLAIN PAGE TITLE (phones; desktop's is in ONE DESKTOP BAR): a bar title with no trail is
@@ -2806,6 +2816,11 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   font-family: 'Sora', sans-serif;
   font-weight: 500;
   color: #eef0f3;
+}
+/* /coc/ (Nov 1 2026, Adrian): the section name alone = a breadcrumb root, so the trail's grey, not white */
+html body.coc-home .secondary-top-bar .secondary-left .secondary-content:not(.has-crumbs),
+html body.coc-home .secondary-top-bar .secondary-left .secondary-content:not(.has-crumbs) * {
+  color: var(--text-muted, #949ba4);
 }
 /* Every step keeps its width except a page's own name (a player or clan,
    set by window.setCrumbName in thz-script.js), which gives way first and
@@ -2916,7 +2931,7 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   gap:4px;
   text-decoration:none;
   color:#7d7f85;
-  font-family:'Oxanium',sans-serif;
+  font-family:'Sora',sans-serif;
   font-size:10.5px;
   font-weight:500;
   letter-spacing:0;
@@ -2984,7 +2999,7 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   letter-spacing:0;
   text-transform:none;
   color:#7d7f85;
-  font-family:'Oxanium',sans-serif;
+  font-family:'Sora',sans-serif;
   transition:color .15s;
 }
 :root .bn-more-wrap.open .bn-more-label{ color:#e9e9ec; }
@@ -3049,7 +3064,7 @@ html body .secondary-top-bar .secondary-content:has(> .sc-sep) * {
   border-bottom:1px solid #232326;
 }
 :root .more-sheet-title{
-  font-family:'Oxanium',sans-serif;
+  font-family:'Sora',sans-serif;
   font-size:13px;
   font-weight:800;
   letter-spacing:1.5px;
@@ -3220,7 +3235,7 @@ body.search-modal-open .bn-bar{ display:none !important; }
 .more-sheet .mx-hdr .more-sheet-title {
   padding-left: 0;
   overflow: hidden;
-  font: 800 14px/1 'Oxanium', sans-serif;
+  font: 800 14px/1 'Sora', sans-serif;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   white-space: nowrap;
@@ -3269,7 +3284,7 @@ body.search-modal-open .bn-bar{ display:none !important; }
 }
 .mx-label {
   margin: 0;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 10px;
   font-weight: 700;
   line-height: 1;
@@ -3308,7 +3323,7 @@ body.search-modal-open .bn-bar{ display:none !important; }
   border-radius: 6px;
   background: none;
   color: #8b9099;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.8px;
@@ -3420,7 +3435,7 @@ body.search-modal-open .bn-bar{ display:none !important; }
   flex-shrink: 0;
 }
 .mx-th span {
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
@@ -3437,7 +3452,7 @@ body.search-modal-open .bn-bar{ display:none !important; }
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
@@ -3458,7 +3473,7 @@ body.search-modal-open .bn-bar{ display:none !important; }
   border: 1px solid var(--lb-red-edge, #5c1515);
   border-radius: 3px;
   background: var(--lb-red, #c73a3a);
-  font: 800 8px/1 'Oxanium', sans-serif;
+  font: 800 8px/1 'Sora', sans-serif;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: #fff;
@@ -3584,9 +3599,9 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
   html body .secondary-top-bar .stb-crumbs * {
     font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #eef0f3;
   }
-  /* Breadcrumbs are Oxanium (BREADCRUMB FONT); no negative tracking on it. */
+  /* Breadcrumbs: Sora runs ~8% wider than the Oxanium they had, so 13px keeps the old 14px width. */
   html body .secondary-top-bar .stb-crumbs,
-  html body .secondary-top-bar .stb-crumbs * { font-family: 'Oxanium', sans-serif; letter-spacing: 0; }
+  html body .secondary-top-bar .stb-crumbs * { font-size: 13px; letter-spacing: 0; }
   /* ...but a breadcrumb stays flat grey, current page included
      (BREADCRUMB above); the white "*" above would otherwise win. */
   html body .secondary-top-bar .stb-crumbs * { color: var(--text-muted, #949ba4); }
@@ -3943,7 +3958,7 @@ cursor: pointer; transition: background .2s ease, border-color .2s ease, color .
 .stb-dd-tag {
   padding: 3px 7px;
   background: #c23b3b;
-  font-family: 'Oxanium', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -4354,4 +4369,31 @@ textarea.fb-field { min-height: 116px; resize: vertical; }
   .fb-seg span { padding: 9px 2px; font-size: clamp(11px, 3.2vw, 13px); }
   .fb-row { flex-direction: column; }
   .fb-send { width: 100%; }
+}
+
+/* PHONE BAR = SORA (Oct 31 2026, Adrian): on phones every word in the secondary top bar (title, breadcrumbs,
+   page count, section chips) is Sora, on every section; the Oxanium rules above stay for desktop. The "i" help
+   panel hanging from it keeps its own fonts. */
+@media (max-width: 970px) {
+  html body .secondary-top-bar,
+  html body .secondary-top-bar *:not(.stb-info-dropdown, .stb-info-dropdown *) {
+    font-family: 'Sora', sans-serif !important; /* the breadcrumb / :has() rules above are more specific */
+  }
+}
+
+/* MORE SHEET + PHONE BAR = SORA (Oct 31 2026, Adrian): every word in the More sheet and the bottom bar is Sora, on
+   every section (pages' own `* { font-family }` resets used to put Oxanium on the unstyled spans). */
+html body :is(.more-sheet, .bn-bar),
+html body :is(.more-sheet, .bn-bar) * {
+  font-family: 'Sora', sans-serif !important; /* section rules ([data-game-nav] .gn-soon, Minecraft's bar) are more specific */
+}
+
+/* ---- TOURNEY TITLES (Nov 1 2026, Adrian): one place for the title font + sizes on every section. Sizes = the
+   --fs-*-tourney tokens in :root above (section files read them). The CODM / Valorant / Clash Royale titles share
+   codm-banner.css + codm-tools.css; their font lives here (was valorant.css / cr.css; CODM was a stencil). ---- */
+html body :is(.cb-title, .ct-title, .pg-title, .li-title, .li-row-title) {
+  font-family: 'Tourney', 'Oxanium', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.01em;
 }

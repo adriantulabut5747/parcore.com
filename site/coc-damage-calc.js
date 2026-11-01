@@ -638,9 +638,12 @@
       return refocus('#dcThBtn');
     }
     if (b.id === 'dcClear') {
-      s.kit = {};
-      wasDead = {};
-      return renderAll();
+      return cocConfirm('Clear your attack?', 'Every spell and piece of equipment comes out of the attack. This can’t be undone.', 'Clear').then((ok) => {
+        if (!ok) return;
+        s.kit = {};
+        wasDead = {};
+        renderAll();
+      });
     }
     if (b.id === 'dcSort') {
       s.sort = !s.sort;

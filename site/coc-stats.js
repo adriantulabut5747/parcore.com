@@ -11,7 +11,7 @@
   var ON_PAGES = location.hostname.endsWith('github.io'); // same rule as coc-tracker.js
 
   // Region -> its boards (keys into data.rankings). World has players only.
-  // ?region=global in the address opens the World list (the CoC home links there).
+  // World opens first (Adrian, Nov 1 2026); ?region=ph in the address opens the Philippines.
   var REGIONS = {
     global: [{ key: 'globalPlayers', label: 'Players', unit: 'trophies', clan: false }],
     ph: [
@@ -162,7 +162,7 @@
       history.replaceState(null, '', url);
       setRegion(regionEl.value);
     });
-    setRegion(new URLSearchParams(location.search).get('region') === 'global' ? 'global' : 'ph');
+    setRegion(new URLSearchParams(location.search).get('region') === 'ph' ? 'ph' : 'global');
   }
 
   function equipment(data, eq) {

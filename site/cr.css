@@ -1,12 +1,17 @@
 /* ============================================================
    CLASH ROYALE -- shared by every /clash-royale/ page (Oct 30 2026, plan: docs/clash-royale-plan.md).
    Adrian: "CoC look but far more different". The CoC recipe stays (raised boxes, sunken wells,
-   grey key when picked, one red main key); what's Clash Royale's own: Lilita One titles with the
-   game's dark outline, full-width fan kit art in the banner, the King in the banner's well and
+   grey key when picked, one red main key); what's Clash Royale's own: titles with the
+   game's dark outline, full-width fan kit art in the banner, the Golden Knight in the banner's well and
    in every guide bubble (coc-villager.css .cv-say), the cards' own art. Red stays the accent:
    Clash Royale's blue / gold appear only inside game art.
    Chrome (bars, menus, sheets) is 11layout's: never re-add it here.
    ============================================================ */
+
+/* ---- WELLS: every sunken surface here uses --lb-ring-well (cr-*.css + the borrowed codm-banner / codm-tools pieces).
+   11layout's token has only the dark edge + top shadow; Adrian wants the search bar's (--card-well) light line under
+   the bottom edge too, so the Clash Royale pages redefine it once here (Oct 31 2026). ---- */
+:root { --lb-ring-well: inset 0 0 0 2px var(--lb-edge), inset 0 4px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05); }
 
 /* ---- BASE: reset + scroll layout (same as valorant.css / genshin.css) ---- */
 body { visibility: hidden; }
@@ -40,26 +45,23 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
   background-attachment: local, scroll, local;
 }
 
-/* ---- TITLES: Lilita One (free, Google Fonts) = the closest open cut to the game's chunky lettering
-   (Supercell's own font is licensed, never host it). White with the in-game dark outline + drop.
+/* ---- TITLES: Tourney italic 800, Valorant's title font (Adrian, Oct 31 2026: Lilita One is gone from every
+   Clash Royale page; Supercell's own font is licensed, never host it). White with the in-game dark outline + drop.
    `html body` beats codm-banner.css / codm-tools.css, which this page links first. ---- */
 html body .cb-title,
 html body .ct-title {
-  font-family: 'Lilita One', 'Oxanium', sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  text-transform: none;
+  text-transform: none; /* font: 11layout.css TOURNEY TITLES */
   color: #fff;
   text-shadow: 0 0 1px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 3px 0 #000, 0 5px 8px rgba(0, 0, 0, 0.55);
 }
 
 /* ---- BANNER: CODM's .cb card (codm-banner.css), redressed. The fan kit art fills the whole card and
-   fades into it from the left; the well holds the King; the kicker's mark is a crown. ---- */
+   fades into it from the left; the well holds the Golden Knight; the kicker's mark is a crown. ---- */
 .cb::before { content: none; } /* CODM's red tab */
 .cb { background: var(--lb-box); }
 .cb-art {
   width: 100%;
-  background: url('/images/clash-royale/banner-battle.webp') 62% 38% / cover no-repeat;
+  background: url('/images/clash-royale/banner-chess.webp') 50% 32% / cover no-repeat;
   filter: brightness(0.62) saturate(0.95);
   -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.55) 38%, #000 72%);
   mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.55) 38%, #000 72%);
@@ -82,13 +84,17 @@ html body .ct-title {
 }
 .cb-text { color: #c4c6cc; }
 @media (max-width: 970px) {
-  .cb-art { opacity: 0.7; background-position: 70% 38%; }
+  .cb-art { opacity: 0.7; background-position: 50% 32%; }
 }
 
-/* ---- THE KING: the guide (coc-villager.css bubble, label "King"). Faces: images/clash-royale/king/
-   face (grin, default), face-laugh (a joke line), face-shock (a "Whoa" line). His face is a cut-out,
-   so the circle gets the game's red instead of the Villager's dark. ---- */
-.cv-face.cr-king { background: radial-gradient(circle at 50% 35%, #7a2a2a, #1a0e0f 75%); object-fit: cover; }
+/* ---- THE GOLDEN KNIGHT: the guide (Oct 31 2026, replaced the Red King; coc-villager.css bubble, label "Golden Knight").
+   Faces (images/clash-royale/knight/, scripts/cr-assets.py): face (the smirk, default), face-laugh (a joke line),
+   face-mew (a line about his looks: the mewing emote), face-shock (crying emote: an "Oh no!" line).
+   Voice = his card + battle lines: "A warrior with luxurious hair and outstanding flexibility. Demonstrates his
+   aerobics skills on demand." Says "Oh hi!", sings his own name, dashes, laughs, wails when he falls. Cheerful,
+   vain about his hair / jawline / golden armor, flexes and stretches; never mean. Lines follow the .cv-say rules.
+   His face is a cut-out, so the circle gets the game's red instead of the Villager's dark. ---- */
+.cv-face.cr-knight { background: radial-gradient(circle at 50% 35%, #7a2a2a, #1a0e0f 75%); object-fit: cover; }
 .cv-say p > span:not([class]), .cv-say p > a { font-family: inherit; }
 
 /* ---- KEYS: grey key + the one red main action (the 11layout "key" recipe) ---- */
@@ -120,4 +126,96 @@ html body .ct-title {
 .cr-key:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .cr-key { transition: none; }
+}
+
+/* ---- RARITY FRAMES (Oct 31 2026, Adrian's reference: the deck sites' glowing card edges). Every card <img> gets
+   data-r = its rarity + data-f = evo / hero from CR.src (cr-core.js). The pictures are already cut to the card's
+   shape (evo / hero tops, the legendary hex), so drop-shadow draws the rim along that shape: common = no rim,
+   rare = orange, epic = purple, legendary = pale cyan rim + pink haze (the game's shimmer), champion = pale gold;
+   an evolution wears a strong purple glow, a hero a gold one. Thumbnails get a thinner rim (--rw / --gw). ---- */
+img[data-r] {
+  --rim: transparent;
+  --glow: transparent;
+  --rw: 1px;
+  --gw: 3px;
+  /* two 0-blur shadows per axis = a solid outline --rw wide (crisp like the reference), then the glow */
+  filter: drop-shadow(var(--rw) 0 0 var(--rim)) drop-shadow(calc(var(--rw) * -1) 0 0 var(--rim)) drop-shadow(0 var(--rw) 0 var(--rim))
+    drop-shadow(0 calc(var(--rw) * -1) 0 var(--rim)) drop-shadow(0 0 var(--gw) var(--glow)) brightness(var(--lit, 1));
+}
+img[data-r='rare'] { --rim: #ff9a2e; --glow: rgba(255, 138, 40, 0.38); }
+img[data-r='epic'] { --rim: #c561ff; --glow: rgba(186, 82, 255, 0.42); }
+img[data-r='legendary'] { --rim: #b9f1ff; --glow: rgba(255, 128, 222, 0.34); }
+img[data-r='champion'] { --rim: #ffe08f; --glow: rgba(255, 206, 92, 0.34); }
+img[data-r][data-f='evo'] { --rim: #e57dff; --glow: rgba(206, 66, 255, 0.8); }
+img[data-r][data-f='hero'] { --rim: #ffd447; --glow: rgba(255, 186, 30, 0.78); }
+.crd-card img[data-r],
+.crb-pc img[data-r] { --rw: 2px; --gw: 8px; }
+.crd-pc img[data-r] { --rw: 1.5px; --gw: 5px; }
+.crd-card img[data-r][data-f],
+.crb-pc img[data-r][data-f] { --gw: 14px; }
+
+/* hand cards: evo / hero breathe (a glow behind the picture, opacity only), every card lights up on hover */
+.crd-card { isolation: isolate; }
+.crd-card:has(> img[data-f])::before {
+  content: '';
+  position: absolute;
+  inset: 4% 2% 2%;
+  z-index: -1;
+  border-radius: 30%;
+  background: radial-gradient(closest-side, var(--halo), transparent);
+  opacity: 0.45;
+  animation: cr-halo 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.crd-card:has(> img[data-f='evo'])::before { --halo: rgba(206, 66, 255, 0.75); }
+.crd-card:has(> img[data-f='hero'])::before { --halo: rgba(255, 186, 30, 0.7); }
+@keyframes cr-halo { to { opacity: 1; transform: scale(1.06); } }
+.crd-card img,
+.crb-pc img,
+.crd-pc img { transition: filter 0.18s ease; }
+.crd-card:hover img[data-r],
+.crb-pc:hover img[data-r],
+.crd-pc:hover img[data-r] { --lit: 1.14; }
+@media (prefers-reduced-motion: reduce) {
+  .crd-card::before { animation: none; }
+}
+
+/* ---- ASK THE GOLDEN KNIGHT (Oct 31 2026): /coc/'s FAQ look (mc-nether.css .ml-qa, copied: CR doesn't load Minecraft CSS).
+   Questions = <details name="qa"> (one open at a time, no script) beside the shared feedback box (<div data-feedback>,
+   11layout.js). Phones: title, questions, then the box. The icon well holds a card picture. ---- */
+.crq { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: start; gap: 48px; interpolate-size: allow-keywords; }
+.crq-side [data-feedback] { margin-top: 8px; }
+.qa-list { display: grid; gap: 8px; }
+.qa-item { border: 2px solid var(--lb-edge); border-radius: var(--lb-r); background: var(--lb-box); box-shadow: var(--lb-shadow); transition: background-color 0.2s; }
+.qa-item[open] { background: var(--lb-box2); }
+.qa-item::details-content { block-size: 0; overflow: hidden; transition: block-size 0.3s var(--lb-ease), content-visibility 0.3s allow-discrete; }
+.qa-item[open]::details-content { block-size: auto; }
+.qa-item summary { display: grid; grid-template-columns: 40px minmax(0, 1fr) 28px; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 4px; list-style: none; cursor: pointer; transition: background-color 0.15s; }
+.qa-item summary::-webkit-details-marker { display: none; }
+.qa-item summary:hover { background: rgba(255, 255, 255, 0.03); }
+.qa-item summary:focus-visible { outline: 2px solid #f2f3f5; outline-offset: -2px; }
+.qa-ico { display: grid; place-items: center; width: 40px; height: 40px; overflow: hidden; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.qa-ico img { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; object-position: 50% 28%; filter: grayscale(1); transition: filter 0.25s; }
+.qa-item[open] .qa-ico img, .qa-item summary:hover .qa-ico img { filter: none; }
+.qa-q { font: 600 14.5px/1.4 'Sora', sans-serif; color: #e8eaee; }
+.qa-tog { position: relative; width: 28px; height: 28px; box-sizing: border-box; border: 2px solid var(--lb-edge); border-radius: 5px; background: var(--lb-raise); box-shadow: var(--lb-btn); }
+.qa-tog::before, .qa-tog::after { content: ''; position: absolute; top: 50%; left: 50%; width: 10px; height: 2px; margin: -1px 0 0 -5px; border-radius: 1px; background: #e6e8ec; transition: transform 0.3s var(--lb-ease); }
+.qa-tog::after { transform: rotate(90deg); }
+.qa-item[open] .qa-tog::after { transform: rotate(0deg); }
+.qa-item[open] .qa-tog { background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.qa-a { margin: 0 12px 12px 66px; padding: 14px 16px; border-radius: var(--lb-r); background: var(--lb-well); box-shadow: var(--lb-ring-well); }
+.qa-a p { margin: 0; font: 400 13.5px/1.7 'Sora', sans-serif; color: #a9aeb6; }
+.qa-a b { font-weight: 600; color: #e6e8ec; }
+@media (max-width: 970px) {
+  .crq { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .crq-side { display: contents; }
+  .crq-side [data-feedback] { order: 2; margin-top: 12px; }
+  .qa-item summary { grid-template-columns: 34px minmax(0, 1fr) 26px; gap: 12px; padding: 9px 10px; }
+  .qa-ico { width: 34px; height: 34px; }
+  .qa-ico img { width: 24px; height: 24px; }
+  .qa-q { font-size: 13.5px; }
+  .qa-a { margin: 0 10px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qa-item::details-content, .qa-tog::before, .qa-tog::after { transition: none; }
 }

@@ -13,8 +13,8 @@
    one r per row, top to bottom: "name:ids". The name is split off at the
    LAST colon (ids never contain one). No r at all = the default board.
    So "Copy link" just copies the address, and the articles' "Open this
-   list" links pre-fill a ranking. A row's colour goes by its position (PAL),
-   so it isn't stored.
+   list" links pre-fill a ranking. A row's colour goes by its position (PAL) unless it was picked or the
+   row moved (Edit tiers): then c=,,3b82f6 holds one hex per row ("" = PAL).
    Moving: drag (mouse at once, touch after a 200ms hold so a swipe still
    scrolls the page), or tap a piece then tap a tier / the pool.
    Switching lists (the Troops / Equipment keys) is a page load; with
@@ -181,8 +181,13 @@
     row.innerHTML =
       '<div class="tl-plate"><span class="tl-name" spellcheck="false" role="textbox" aria-label="Tier name"></span></div>' +
       '<div class="tl-zone"></div>' +
-      '<button type="button" class="tl-del" aria-label="Remove this tier" title="Remove tier">' +
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>';
+      // Edit tiers only (.is-editing): move up / down, the colour, remove.
+      '<div class="tl-tools">' +
+      '<button type="button" class="tl-key" data-move="-1" aria-label="Move this tier up" title="Move up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>' +
+      '<button type="button" class="tl-key" data-move="1" aria-label="Move this tier down" title="Move down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>' +
+      '<label class="tl-key tl-paint" title="Tier colour"><input type="color" aria-label="Tier colour"><span class="tl-swatch"></span></label>' +
+      '<button type="button" class="tl-key tl-del" aria-label="Remove this tier" title="Remove tier"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>' +
+      '</div>';
     var n = row.querySelector('.tl-name');
     n.contentEditable = 'plaintext-only';
     if (n.contentEditable !== 'plaintext-only') n.contentEditable = 'true'; // older Firefox; paste is cleaned below
@@ -194,7 +199,10 @@
   function refresh() {
     var rs = rows();
     rs.forEach((r, i) => {
-      r.style.setProperty('--tl-rgb', PAL[i]);
+      r.style.setProperty('--tl-rgb', r.dataset.rgb || PAL[i]);
+      r.querySelector('input[type="color"]').value = toHex(r.dataset.rgb || PAL[i]);
+      r.querySelector('[data-move="-1"]').disabled = !i;
+      r.querySelector('[data-move="1"]').disabled = i === rs.length - 1;
       sizeName(r.querySelector('.tl-name'));
     });
     addBtn.hidden = rs.length >= MAX;
@@ -219,6 +227,36 @@
     if (picked && !box.contains(picked)) pick(null);
     row.remove();
     refresh();
+    save();
+  });
+
+  // Edit tiers: the key shows each row's tools (and hides them again).
+  var editBtn = document.getElementById('tlEdit');
+  editBtn.addEventListener('click', () => {
+    var on = box.classList.toggle('is-editing');
+    editBtn.setAttribute('aria-pressed', on);
+    editBtn.lastElementChild.textContent = on ? 'Done' : 'Edit tiers';
+  });
+  // "r, g, b" <-> "#rrggbb" (the colour key is an <input type="color">)
+  var toHex = (rgb) => '#' + rgb.split(',').map((n) => (+n).toString(16).padStart(2, '0')).join('');
+  var toRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+  board.addEventListener('click', (e) => {
+    var mv = e.target.closest('[data-move]');
+    if (!mv) return;
+    var row = mv.closest('.tl-row');
+    // A row keeps its colour when it moves (pinned here, or it would take its new spot's).
+    rows().forEach((r, i) => (r.dataset.rgb = r.dataset.rgb || PAL[i]));
+    if (mv.dataset.move < 0) board.insertBefore(row, row.previousElementSibling);
+    else board.insertBefore(row.nextElementSibling, row);
+    refresh();
+    save();
+    if (!mv.disabled) mv.focus();
+  });
+  board.addEventListener('input', (e) => {
+    if (e.target.type !== 'color') return;
+    var row = e.target.closest('.tl-row');
+    row.dataset.rgb = toRgb(e.target.value);
+    row.style.setProperty('--tl-rgb', row.dataset.rgb);
     save();
   });
 
@@ -257,11 +295,14 @@
   // q: the address's query, or an imported link's (see Import list below).
   function load(q) {
     var rs = q.getAll('r').slice(0, MAX);
+    var cs = (q.get('c') || '').split(',');
     if (!rs.length) defaultRows();
     rs.forEach((v, i) => {
       var cut = v.lastIndexOf(':');
       var name = (cut < 0 ? v : v.slice(0, cut)).trim().slice(0, NAME_MAX) || NAMES[i];
-      var zone = addRow(name).querySelector('.tl-zone');
+      var row = addRow(name);
+      if (/^[0-9a-f]{6}$/i.test(cs[i])) row.dataset.rgb = toRgb('#' + cs[i]);
+      var zone = row.querySelector('.tl-zone');
       (cut < 0 ? '' : v.slice(cut + 1)).split(',').forEach((id) => {
         var t = byId[id] && pool.querySelector('[data-id="' + id + '"]');
         if (t) zone.appendChild(t);
@@ -278,8 +319,10 @@
       name: r.querySelector('.tl-name').textContent.trim(),
       ids: [...r.querySelector('.tl-zone').children].map((x) => x.dataset.id).join(','),
     }));
-    var pristine = list.length === LIST.rows && list.every((r, i) => r.name === NAMES[i] && !r.ids);
+    var cs = rows().map((r, i) => (r.dataset.rgb && r.dataset.rgb !== PAL[i] ? toHex(r.dataset.rgb).slice(1) : '')).join(',');
+    var pristine = list.length === LIST.rows && list.every((r, i) => r.name === NAMES[i] && !r.ids) && !cs.replace(/,/g, '');
     if (!pristine) list.forEach((r) => q.append('r', r.name + ':' + r.ids));
+    if (cs.replace(/,/g, '')) q.set('c', cs);
     if (filter) q.set(LIST.param, filter);
     var qs = q.toString().replace(/%2C/g, ',').replace(/%3A/g, ':'); // readable share link
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
@@ -390,7 +433,7 @@
   // (A tap on another piece picks that one instead -- handled by pointerup.)
   box.addEventListener('click', (e) => {
     if (e.detail === 0 && e.target.closest('.tl-tile')) return pick(e.target.closest('.tl-tile')); // keyboard Enter/Space
-    if (!picked || e.target.closest('.tl-tile, .tl-name, button')) return;
+    if (!picked || e.target.closest('.tl-tile, .tl-name, .tl-tools, button')) return;
     var row = e.target.closest('.tl-row');
     var z = row ? row.querySelector('.tl-zone') : e.target.closest('.tl-zone');
     if (z) {
@@ -461,30 +504,7 @@
     toast('Tier list loaded');
   }
 
-  // Confirm box: the leaving-Parchrome dialog's look (.lv, coc-tools.css).
-  // Resolves true on the red button; Cancel, Escape or a backdrop click = false.
-  // The buttons answer directly instead of waiting for the dialog's "close"
-  // event, which arrives a beat later (and not at all in headless tests).
-  var dlg = document.getElementById('tlConfirm');
-  var answer = null;
-  function finish(ok) {
-    if (answer) answer(ok);
-    answer = null;
-    if (dlg.open) dlg.close();
-  }
-  dlg.querySelector('.lv-go').addEventListener('click', () => finish(true));
-  dlg.querySelector('.lv-stay').addEventListener('click', () => finish(false));
-  dlg.addEventListener('click', (e) => e.target === dlg && finish(false));
-  // Escape. A close event arrives a beat after dlg.close(), so one left over
-  // from the last answer must not cancel a question asked since (dialog open again).
-  dlg.addEventListener('close', () => !dlg.open && finish(false));
-  function ask(title, text, okLabel) {
-    document.getElementById('tlConfirmTitle').textContent = title;
-    document.getElementById('tlConfirmText').textContent = text;
-    document.getElementById('tlConfirmOk').textContent = okLabel;
-    dlg.showModal();
-    return new Promise((done) => (answer = done));
-  }
+  var ask = (title, text, okLabel) => cocConfirm(title, text, okLabel); // th-layouts.js
 
   // ---- buttons ------------------------------------------------------------
   document.getElementById('tlReset').addEventListener('click', async () => {
@@ -560,7 +580,7 @@
       sw = W - PAD - sx;
     var per = Math.floor((sw - 16 + GAP) / (T + GAP));
     var list = rows().map((r, i) => ({
-      rgb: PAL[i],
+      rgb: r.dataset.rgb || PAL[i],
       name: r.querySelector('.tl-name').textContent.trim().toUpperCase(),
       tiles: [...r.querySelector('.tl-zone').children].filter((t) => !t.hidden).map((t) => byId[t.dataset.id]),
     }));
@@ -575,7 +595,7 @@
     var imgs = {};
     btn.disabled = true;
     Promise.all(
-      [document.fonts.load('900 40px Orbitron'), document.fonts.load('800 14px Oxanium')].concat(
+      [document.fonts.load('italic 900 42px Tourney'), document.fonts.load('800 44px Oxanium'), document.fonts.load('800 14px Sora')].concat(
         [...srcs].map(
           (s) =>
             new Promise((ok) => {
@@ -591,7 +611,7 @@
       // Name font + lines first: a long name can make its row taller than its pieces.
       list.forEach((r) => {
         r.long = r.name.length > 2;
-        r.font = r.long ? '800 15px Oxanium' : '900 44px Orbitron';
+        r.font = r.long ? '800 15px Sora' : '800 44px Oxanium';
         x.font = r.font;
         x.letterSpacing = r.long ? '1.5px' : '0px'; // measure with the spacing it's drawn with
         r.lines = r.long ? wrap(x, r.name, LABEL - 24) : [r.name];
@@ -607,8 +627,8 @@
       x.fillStyle = bg;
       x.fillRect(0, 0, W, H);
       x.textBaseline = 'middle';
-      // Title: the banner's Orbitron caps, "TIER LIST" in red.
-      x.font = '900 40px Orbitron';
+      // Title: the banner's Tourney italic caps, "TIER LIST" in red.
+      x.font = 'italic 900 42px Tourney';
       var t1 = LIST.title(data, filter);
       x.fillStyle = '#eff2f5';
       x.fillText(t1, PAD, TOP / 2);
@@ -648,7 +668,7 @@
         });
         y += r.rh + RGAP;
       });
-      x.font = '800 14px Oxanium';
+      x.font = '800 14px Sora';
       x.letterSpacing = '1.5px';
       x.fillStyle = '#c23b3b';
       x.fillText('PARCHROME', PAD, H - FOOT / 2);

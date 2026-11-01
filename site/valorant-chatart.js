@@ -226,9 +226,9 @@
 
   // gallery pieces built at 26 wide
   const loadGallery = () =>
-    fetch('/valorant-chatart.json').then((r) => r.json()).then((d) => ({
+    fetch('/valorant-chatart.json?v=20261101pixelgun').then((r) => r.json()).then((d) => ({
       cats: d.cats,
-      art: d.art.map((p) => ({ ...p, a: p.text ? banner(p.text, DEF_W, LIGHT, 0, p.big ? 2 : 1).art : fromPixels(p.px, DEF_W, LIGHT, 2) })),
+      art: d.art.map((p) => ({ ...p, a: p.code ? decode(p.code) : p.text ? banner(p.text, DEF_W, LIGHT, 0, p.big ? 2 : 1).art : fromPixels(p.px, DEF_W, LIGHT, 2) })),
     }));
   const chars = (a) => a.g.length + ' characters';
 

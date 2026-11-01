@@ -137,8 +137,8 @@ player battles, Deck builder, Decks for you).
   (base, ground, titles, banner art, `.cr-key`) + `site/cr-core.js` (`window.CR`: card data + pictures, deck
   order, avg elixir, 4-card cycle, copy link), then the page's `cr-<page>.css/.js`. Copy
   `site/clash-royale/decks.html` for a new page.
-- **What makes it Clash Royale:** titles in **Lilita One** (free; the game's own font is licensed) white with
-  the in-game dark outline; the banner art = fan kit key art filling the whole card (`banner-battle.webp`);
+- **What makes it Clash Royale:** titles in **Tourney** italic 800 (Valorant's; Lilita One was dropped Oct 31 2026, Adrian) white with
+  the in-game dark outline; the banner art = the King at the chessboard filling the whole card (`banner-chess.webp`, Adrian's pick Oct 31 2026; `banner-battle.webp` from cr-assets.py is unused);
   the King in the banner's well; the cards' own art everywhere (evo = purple crest, hero = gold, cost on a pink
   elixir drop = game art). The CoC recipe stays: raised boxes, sunken wells, grey key when picked, ONE red key
   (Copy deck). Red is the accent; Clash Royale's blue/gold only inside game art.
@@ -147,12 +147,14 @@ player battles, Deck builder, Decks for you).
   `python scripts/cr-assets.py` (cards from the API's icons, King faces + banners from the kit, file names pinned
   in the script). Other good banners for later pages (kit titles): `Forbidden City` (dark red sunset),
   `group_6` (used), `Birthday 4`, `MergeTactics_KeyART`; 36 King renders `King_01`..`King_47`.
-- **Guide = the Red King** (label "King", `.cv-face.cr-king`). Faces: `king/face` (grin, default),
-  `face-laugh` (a line ending in a joke), `face-shock` ("Whoa" lines). Voice (Fandom wiki blocks scripts, so
-  this is from his in-game sounds + the fan kit's King emote names: Laughing, Crying, Angry, Thumbs up/down,
-  Begging, Sweating, Hide, Absolute Cinema, Emperor, No. 1, Belt): a smug, theatrical showman who loves
-  crowns, cackles "He he he he" at you, sulks when a tower falls. He's the player's own King, so he wants
-  crowns brought to him. Lines follow the `.cv-say` rules (coc-villager.css). Adrian is the judge of the voice.
+- **Guide = the Golden Knight** (Oct 31 2026, Adrian; replaced the Red King). Label "Golden Knight", `.cv-face.cr-knight`.
+  Faces (`knight/`, cr-assets.py `FACES`): `face` (the 4K render's smirk, default), `face-laugh` (his grin from
+  `group_champions`), `face-mew` (the mewing emote: lines about his looks), `face-shock` (the crying emote: "Oh no!" lines);
+  `full` = the whole render. Voice from his card text ("A warrior with luxurious hair and outstanding flexibility.
+  Demonstrates his aerobics skills on demand."), his battle lines ("Oh hi!" when deployed, sings "Golden Knight!" on an
+  empty dash, laughs, wails when he falls) and the kit's emotes (mewing, hair spin, rock-star sparkle, crying, selfie):
+  cheerful, vain about his hair / jawline / golden armor, stretches and dashes, never mean. Lines follow the `.cv-say`
+  rules (coc-villager.css). Adrian is the judge of the voice.
 - Phones first: most visitors are on phones.
 
 ## 6. Build order (one page at a time, Adrian QCs each)
