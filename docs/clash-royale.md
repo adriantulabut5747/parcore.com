@@ -8,7 +8,7 @@ Moved out of CLAUDE.md on Nov 1 2026, unchanged. Paths like `parcore.com/docs/x.
 building any Clash Royale page or `cr-` file.** Tabs (Adrian, Oct 30 2026): Lobby / Meta (Decks, Cards) /
 Players (Leaderboard, Clan + River Race, player page) / Tools (Deck builder, Upgrade calculator, Decks for
 you). Look (Adrian, Oct 30 2026): CoC look "far more different" = outlined titles, fan kit art, a guide. **Oct 31 2026
-(Adrian): titles = Valorant's Tourney italic 800 on every CR page (Lilita One is gone: never bring it back); guide = the
+(Adrian): titles = Orbitron Title on every CR page (Nov 12 2026; Tourney italic before) (Lilita One is gone: never bring it back); guide = the
 GOLDEN KNIGHT** (replaced the Red King; label "Golden Knight", `.cv-face.cr-knight`, faces in `images/clash-royale/knight/`:
 `face` smirk = default, `face-laugh` joke, `face-mew` a line about his looks, `face-shock` crying = "Oh no!" line, `full` =
 his whole render; all baked by cr-assets.py). Voice = his card text ("luxurious hair and outstanding flexibility.
@@ -50,3 +50,17 @@ exists (Adrian: front end only). The home tile is still "soon". **Live since Oct
 `CR_API_KEY`, no key = a warning, no change) -> `data/cr/<day>.json` (private, 7 kept) -> `site/cr-decks.json`,
 `cr-cards.json`, `cr-top.json` (no page reads them yet). API answers (evo/hero codes, tower ids, River Race
 shape, no events endpoint): the plan's section 7.
+
+**Nov 2 2026 (Adrian):** Crown decks = the 6 best win rates among the **30 most played** decks (`CROWN_POOL` in cr-lobby.js;
+Adrian picked this over "highest win rate overall", which lets a thin 50-game deck top it); the rank badge is the win-rate
+place, hover = its most-played rank. The Royal Court shows each player's win rate over the ranked games in their last 30
+battles (cr-meta.mjs writes `games` / `wins` into cr-top.json; `games: 0` or missing = hidden). Decks page: "The meta right
+now" removed (HTML, `snapshot()`, `.crs-*` CSS); don't bring it back. Every CR title (`.ct-title`, `.cb-title`, the hero) is
+uppercase (cr.css TITLES). Lobby hero copy is vertically centred on desktop. **Nav icons** = the game's own menu icons from
+the fan kit (`NAV` in cr-assets.py -> `images/clash-royale/nav/*.webp`, 96px; lobby = King tower, meta = battle swords, decks =
+cards tab, cards = Book of Cards, players = friends, leaderboard = Path of Legends, river race = clan wars, tools = Builder's
+Workshop, deck builder = golden elixir, upgrade = wild card, for you = star level); game-nav.json `img` (tabs) / `icon`
+(pages). **Deck Builder perf:** the card pool is drawn once and filters / taps only flip `hidden` / `aria-pressed` (never
+rebuild it with innerHTML); common cards skip the 5-drop-shadow rarity chain; `.coc-main`'s background layers are all
+`local` (a `scroll` layer made Chrome repaint the whole page on every scroll frame). Don't run prettier over the cr- files:
+they aren't prettier-formatted and it rewrites hundreds of lines.

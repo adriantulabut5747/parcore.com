@@ -8,7 +8,8 @@ Four tabs like CoC / Genshin: **Lobby** (`/minecraft/` = the old Discover page, 
 the sidebar opens it; the old `/minecraft/ → /minecraft/java/` 301 is gone, `mc-java-home` now 301s to
 `/minecraft/`) / **Resources** (named "Java" until Oct 29 2026, Adrian; mc-java.js `pagesOf('Resources')` and
 mc-lobby.js's map key find the group BY THAT NAME, so a rename touches them too; `/minecraft/java/` = the group page: banner + tabs tray ("All" raised) + one
-`.tc-card` per Java page; a new Java page = its row in game-nav.json + a card there) / **Tools** / **Spin-offs**
+`.tc-card` per Java page; a new Java page = its row in game-nav.json + a card there) / **Tools** (`"cols": 3` =
+a 3-across hover menu, `.stb-dd--3col`; the old `.stb-dd--tools` died with the Oct 27 move to the groups engine) / **Spin-offs**
 (Story Mode + Dungeons, all "soon": no group page; desktop = hover menu only, phones = a tap opens the More sheet at its
 section via `#gn-sec-N`, which never touches the address). Every Minecraft page has `data-game-nav="minecraft"`:
 11layout.js `buildGroups` builds the top bar, menus, phone bar, More sheet and trail from **game-nav.json
@@ -25,7 +26,7 @@ step into the Overworld (piglins zombify there in 15 s); short lines, max 2 in a
 face.webp` (+ `face-gold.webp` = admiring an ingot), cut from Adrian's piglin render
 (`_tools/lobby-hero/src/refs/6.png`) by nether.py, shown smooth (not pixelated). `src/refs/` also keeps his other
 piglin pictures + a Pinterest piglin video (`piglin-pin.mp4`) for later sections; nothing there is published. **Hero v3 = the Nether**
-(Adrian: ignore the old lobby look, follow home + /coc/: dark, our red, raised/sunken; title = Tourney (was Handjet) like the
+(Adrian: ignore the old lobby look, follow home + /coc/: dark, our red, raised/sunken; title = Orbitron Title (was Tourney, Handjet) like the
 lobby's section titles (Adrian's later call), Sora text, Oxanium labels/keys, no game font; no quick-keys row). Art = official Nether Update art (ghast, piglin,
 portal, soul fire), baked + graded by `python _tools/lobby-hero/nether.py` (src in `_tools/lobby-hero/src/`; 1200px
 source, so it's upscaled -- a bigger copy would be sharper) into `lobby/nether.webp` + `nether-phone.webp` (4:3 crop).
@@ -37,7 +38,7 @@ the piglin's middle kept clear; on desktop the ghast sits behind the title (dark
 notes) = `.ml-btn` (NOT `.ml-key`: that's the map section's key list). The old 3D floating island (Wandy + llamas) is saved in
 `_tools/lobby-hero/island/` with a README; the Launcher's Java picture is still `lobby/launcher-java.webp`.
 **Sections = real Minecraft screens** (round 2, Adrian: card grids were "AI slop"; never go back to cards here).
-Fonts (Oct 31 2026, Adrian; Handjet titles before): titles = **Tourney** italic on EVERY Minecraft page, mc-hero.css "TOURNEY TITLES" (banner + section titles, Orbitron-era sizes + 2px), each page links the font; **Orbitron** = eyebrows, small heads, numbers; **Sora** = everything else; no Oxanium or Handjet in page content (shared coc-cards / article-cards pieces: mc-hero.css "MINECRAFT FONTS"). Handjet's game-screen bits (map key, worlds search) went to Sora / Orbitron. Game sprites = `minecrafticons/gui/lobby/` (pulled from the
+Fonts (Oct 31 2026, Adrian; Handjet titles before): titles = **Tourney** italic on EVERY Minecraft page, mc-hero.css "ORBITRON TITLES" (banner + section titles, Orbitron-era sizes + 2px), each page links the font; **Orbitron** = eyebrows, small heads, numbers; **Sora** = everything else; no Oxanium or Handjet in page content (shared coc-cards / article-cards pieces: mc-hero.css "MINECRAFT FONTS"). Handjet's game-screen bits (map key, worlds search) went to Sora / Orbitron. Game sprites = `minecrafticons/gui/lobby/` (pulled from the
 official 26.3 client jar, GUI scale 2, always pixelated); `.mcf[data-mc]` text is redrawn in the game font
 (mc-font.js) by `mc-lobby.js` "GAME FONT". Order: hero; **Piglin's map** = a REAL seed's (8608349220991265627)
 **Nether** (Oct 28 2026, was the Overworld; "netherfying" every section starts here) drawn as a filled map item by
@@ -94,7 +95,12 @@ into one 64px tile (`images/minecraft/ground-blackstone.png`, `python _tools/gro
 "soft", 0.26 read as a tiled grid) + the red/grey top glow: mc-hero.css "GROUND" (glow = `.mch-hero--page::before`
 behind the content; chapter bands are see-through except the Play deepslate pit). Only the lobby
 (`body.mc-home.mc-lobby`) keeps the old film grain; hcpc.html (old design) keeps its dirt wallpaper. A section
-that paints its own solid fill hides the stone: use a transparent glow instead (Worlds' `#ch-worlds`). Under the tray: 64px desktop / 40px phones to the first content on every
+that paints its own solid fill hides the stone: use a transparent glow instead (Worlds' `#ch-worlds`).
+**Under a deepslate pit it's solid (Nov 2 2026, Adrian):** the pit's floor fades to #0d0e10 and the blackstone
+never met it cleanly, so everything after a pit is flat #0d0e10 (`.mch-ch--solid`, mc-hero.css "Solid ground").
+A pit keeps only its first section (Seed map tools, Most downloaded on Modrinth, Mod launchers, Where to paste,
+Data packs' Where to get them, Worlds' Install); the rest of it is split into a `.mch-ch--solid.mch-ch--cont`
+chapter, which has no top spacing so sections stay 96 / 56px apart. Under the tray: 64px desktop / 40px phones to the first content on every
 page (mc-hero.css "SPACE UNDER THE TABS"). Tool pages: tabs = the tools A-Z (mc-contents.json `tools` is
 kept alphabetical; the /minecraft/tools/ hub cards too), no "All tools" tab -- mc-java.js adds an
 "All tools" back button (`.mch-back`) above the title. The tools lobby has no tray at all (`.mch-hero-tabs > nav.mch-nav`, filled by

@@ -409,6 +409,8 @@
       return `<span class="vl-pv vl-pv--sens"><span><small>CS2</small><b>1.00</b></span><i aria-hidden="true">→</i><span><small>Valorant</small><b>${val.toFixed(3)}</b></span>
         <em>${(914.4 / (800 * val * 0.07)).toFixed(1)} cm / 360 at 800 DPI</em></span>`;
     },
+    // a small wheel: grey slices, the winner red under the pin, the red hub (valorant-roulette's look)
+    '/valorant/instalock-roulette': () => `<span class="vl-pv vl-pv--rl"><i></i><u></u></span>`,
     // a piece the gallery card doesn't show, never the crosshair one (it read as a crosshair, not chat art)
     '/valorant/chat-art': (art) => {
       const pool = art.slice(6).filter((p) => p.id !== 'crosshair');

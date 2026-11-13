@@ -153,8 +153,9 @@ function buildSidebarFromJSON(data) {
       (game.activeOn?.map(normalizePage).includes(currentPage)) ||
       (prefix && (currentPage === prefix || currentPage.startsWith(prefix + '/')))) {
       a.classList.add('active');}
+    // glyph = our own one-colour SVG, painted with currentColor via CSS mask (game logos can't be used here)
     a.innerHTML = `
-      <img src="${game.icon}" class="sidebar-icon" alt="">
+      ${game.glyph ? `<i class="sidebar-glyph" style="--glyph:url('${game.glyph}')" aria-hidden="true"></i>` : `<img src="${game.icon}" class="sidebar-icon" alt="">`}
       <span>${game.name}</span> `;
     gamesContainer.appendChild(a);});
 
@@ -308,34 +309,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 /* ============================================================
-   HUB NAV — SHARED (Lobby / Bookmark / Contribute / Glossary, etc.)
-   Builds BOTH the mobile bottom bar (#bottomNav, around #bnMoreWrap)
-   and the desktop hub strip (#stbHubNav) from hwr-categories.json's
-   "hubNav" array — edit that file (name/link/icon/activeIcon) and
-   both update everywhere, on every hwr-*.html page, automatically.
-   Active state is no longer hardcoded per page: whichever entry's
-   "link" matches the current page lights up (none do on pages that
-   aren't one of these destinations, e.g. /web-resources/ai-tools). Runs its own
-   fetch (rather than reusing a page's own hwr-categories.json fetch)
-   so it works regardless of script order or whether the page happens
-   to load that file itself.
+   HUB NAV — SHARED
+   Builds the mobile bottom bar (#bottomNav, around #bnMoreWrap) and the
+   desktop hub strip (#stbHubNav) from game-nav.json, for pages with
+   <body data-game-nav="<key>">. Whichever entry's "link" matches the
+   current page lights up.
    ============================================================ */
 (function initHubNav() {
   const stbHubNav = document.getElementById('stbHubNav');
   const bnBar = document.getElementById('bottomNav');
   const bnMoreWrap = document.getElementById('bnMoreWrap');
 
-  // The bottom-bar half of this is hwr-only. The Clash pages (coc-home,
-  // th18-layouts) load this file for the shared layout behaviour further
-  // down, but they ship their own bottom nav -- Home / Layouts / Armies /
-  // Guides, with their own icons and their own active-state logic. Without
-  // this opt-out the block below deleted every .bn-item and rebuilt the bar
-  // from hwr-categories.json's hubNav, so those pages ended up showing
-  // hwr's Home / Bookmarks / Contribute / Glossary instead of their own.
+  // The Clash pages ship their own bottom nav (Home / Layouts / Armies /
+  // Guides) with their own active-state logic: data-hub-nav="off" keeps
+  // this block from rebuilding it.
   const bnSelfManaged = !!(bnBar && bnBar.dataset.hubNav === 'off');
   const buildBottomBar = !!(bnBar && bnMoreWrap && !bnSelfManaged);
 
-  // Same opt-out for the desktop strip: a page can carry hwr's #stbHubNav
+  // Same opt-out for the desktop strip: a page can carry #stbHubNav
   // markup but fill it with its own destinations (Minecraft's editions).
   const hubSelfManaged = !!(stbHubNav && stbHubNav.dataset.hubNav === 'off');
   const buildHubStrip = !!(stbHubNav && !hubSelfManaged);
@@ -344,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Game sections (Valorant, CODM, Genshin, Tekken) put
   // <body data-game-nav="<key>"> on every page and read that key's entry in
-  // game-nav.json instead of hwr's hubNav: its pages fill the bar's strip,
+  // game-nav.json: its pages fill the bar's strip,
   // the "bottomNav": true ones the phone bar, and all of them the More sheet.
   const gameKey = document.body && document.body.dataset.gameNav;
 
@@ -386,15 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildHubNav(data) {
-    let items = (data && data.hubNav) || [];
+    const items = (data && data.hubNav) || [];
     if (!items.length) return;
-    // Web Resources: "Resources" (the hub home) stays lit on every category
-    // page too, since the categories sit under it (its menu lists them).
-    const cats = (!gameKey && data.categories) || [];
-    if (cats.length) {
-      items = items.map(it => normalizePage(it.link) === normalizePage('/web-resources/')
-        ? Object.assign({}, it, { activeOn: cats.map(c => c.link) }) : it);
-    }
 
     // Only strips that aren't self-managed (Minecraft fills its own with its
     // editions; it only lets this build its bottom bar).
@@ -403,24 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // fallback covers a page that ships the nav without the strip.
       const hubStrip = stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav;
       hubStrip.innerHTML = items.map(item => itemHtml(item, 'stb-hub-link')).join('');
-
-      // Web Resources menu: hovering "Resources" lists the categories, and
-      // hovering a category lists that page's sections (its table of
-      // contents from hwr-categories.json "sections"), each linking to the
-      // section's #toc-<id> anchor.
-      if (cats.length && window.stbHubMenus) {
-        const secs = data.sections || {};
-        window.stbHubMenus(hubStrip, {
-          keyOf: link => (normalizePage(link.getAttribute('href')) === normalizePage('/web-resources/') ? 'resources' : ''),
-          labels: { resources: 'Resources' },
-          lists: {
-            resources: cats.map(c => ({
-              href: c.link, icon: c.icon, name: c.name,
-              children: (secs[c.link] || []).map(sec => ({ href: c.link + '#toc-' + sec.id, svg: sec.icon, name: sec.title }))
-            }))
-          }
-        });
-      }
     }
 
     if (buildBottomBar) {
@@ -452,13 +418,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Breadcrumb (Oct 2026, the Clash bar's trail brought over): desktop
-  // shows "Web Resources > Anime" in place of the plain "Web Resources"
-  // title. Steps are real pages only, each a link. The lobby gets none,
+  // shows "Valorant › Crosshairs" in place of the plain section title. Steps are real pages only, each a link. The lobby gets none,
   // like Clash home. Phones keep their title + scroll-spy group name
   // (#scMobileGroup). .secondary-content is itself a link, so the trail
   // sits beside it, not inside it (no links inside a link); CSS swaps
   // them (BREADCRUMB in 11layout.css).
-  // The game sections use the same trail: "Valorant › Crosshairs".
   // Genshin (Oct 24 2026): `opts.short` = the first step's phone wording ("Genshin", like CoC's
   // "COC"); `opts.mid` = a middle step (the page's group: "Genshin Impact › Events › Banners"),
   // `opts.here` = the page when it isn't in `pages` (a group's own page, e.g. /genshin-impact/tools).
@@ -479,7 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
     crumbs.setAttribute('aria-label', 'Breadcrumb');
     crumbs.innerHTML =
       `<a href="${homeLink}">${home}</a>` + sep +
-      (opts.mid ? `<a href="${opts.mid.link}">${esc(opts.mid.name)}</a>` + sep : '') +
+      // a group with no page of its own (Valorant's Tracker / Database / Tools) = plain text, not a dead link
+      (opts.mid ? (opts.mid.link ? `<a href="${opts.mid.link}">` : '<a>') + `${esc(opts.mid.name)}</a>` + sep : '') +
       `<a href="${here.link}" aria-current="page">${esc(here.name)}</a>`;
     title.after(crumbs);
     left.classList.add('has-crumbs');
@@ -536,9 +501,10 @@ document.addEventListener('DOMContentLoaded', () => {
       window.stbHubMenus(stbHubNav.querySelector('#stbHubNavScroll') || stbHubNav, {
         keyOf: link => keyOf[keyStr(link.getAttribute('href') || '')] || '',
         labels: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.name])),
-        cols: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.cols])), // "cols": 2 in game-nav.json = a 2-across menu
+        cols: Object.fromEntries(menus.map((g, i) => ['gn-' + i, g.cols])), // "cols": 2 / 3 in game-nav.json = a 2- / 3-across menu
         // an icon that is SVG markup (CODM) rather than a picture path goes in as `svg`
-        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, rows(g).map(p => ({ href: p.soon ? '' : p.link, name: p.name, sub: p.sub, soon: p.soon, [isSvg(p.icon) ? 'svg' : 'icon']: p.icon }))]))
+        // on: lit by here(), so activePrefix pages (a player, an agent) light their row too
+        lists: Object.fromEntries(menus.map((g, i) => ['gn-' + i, rows(g).map(p => ({ href: p.soon ? '' : p.link, on: here(p), name: p.name, sub: p.sub, soon: p.soon, [isSvg(p.icon) ? 'svg' : 'icon']: p.icon }))]))
       });
     }
     document.addEventListener('click', e => {
@@ -631,18 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buildCrumbs(game.home, game.name, game.pages);
       })
       .catch(err => console.error('Game nav data failed to load:', err));
-    return;
   }
-
-  fetch('/hwr-categories.json')
-    .then(res => res.json())
-    .then(data => {
-      buildHubNav(data);
-      if (currentPage.indexOf('/web-resources/') === 0) {
-        buildCrumbs('/web-resources/', 'Web Resources', [].concat(data.categories || [], data.hubNav || []));
-      }
-    })
-    .catch(err => console.error('Hub nav data failed to load:', err));
 })();
 
 /* ============================================================
@@ -859,9 +814,9 @@ let searchSel = 0; // the row Enter opens (arrow keys move it)
 let searchoverlay, searchinput, searchIcon, resultsContainer, searchInputClearBtn;
 
 // ---- Featured Topics data: the home page's tile groups. home.json
-// "featured" lists the groups; a group either lists its tiles or pulls
-// them from hwr-categories.json ("from": "hwr") or game-nav.json
-// ("gameNav": key). Edit those files, not this code.
+// "featured" lists the groups; each pulls its pages (and their menu icons)
+// from the menus themselves -- "cocNav": coc-nav-data.json, "gameNav": key in
+// game-nav.json -- plus any extra "tiles" a menu doesn't list. Edit those files, not this code.
 // (404.html has a short copy of this for its "Find a page" box.)
 // the cache lives on the function: initHubNav (above) calls this while the script is still loading
 function getFeaturedJSON(url) {
@@ -872,21 +827,41 @@ function getFeaturedJSON(url) {
 // One download per JSON per page (Oct 28 2026): game-nav.json was fetched 4 times on /minecraft/, Mojang's version
 // list twice. Page scripts call window.pcJSON(url); callers share the parsed object, so never mutate it.
 window.pcJSON = getFeaturedJSON;
+// Tile = { name, sub, link, icon (picture path or SVG markup), soon }. Real pages only: a
+// ?filter view (CODM "SMGs") is skipped, and each link shows once.
 function featuredTilesOf(g) {
-  if (g.from === 'hwr') {
-    return getFeaturedJSON('/hwr-categories.json').then(c => (c.categories || []).map(x => ({
-      name: x.name, sub: 'Web Resources', link: x.link,
-      // home uses small copies of the category banners: /icons/home/<same name>.webp
-      image: (x.bg || '').replace(/^\/webresources-icon\/(.+)\.\w+$/, '/icons/home/$1.webp')
-    })));
+  const out = [], seen = new Set();
+  const add = (name, sub, link, icon, soon) => {
+    if (link ? link.indexOf('?') > -1 || seen.has(link) : !soon) return;
+    if (link) seen.add(link);
+    out.push({ name: name, sub: sub || g.title, link: link, icon: icon, soon: !!soon });
+  };
+  let pages = Promise.resolve();
+  if (g.cocNav) {
+    pages = getFeaturedJSON('/coc-nav-data.json').then(d => {
+      const prim = d.primaryNav || {};
+      add('Lobby', '', '/coc/', (prim.home || {}).icon);
+      add('All tools', '', '/coc/tools/', (prim.guides || {}).icon);
+      (d.guides || []).forEach(t => add(t.name, t.desc, t.href, t.icon, t.soon));
+      (d.townhalls || []).forEach(t => add(t.label + ' Layouts', 'Town Hall ' + t.label.slice(2) + ' bases', t.layoutHref, t.navIcon));
+      (d.townhalls || []).forEach(t => add(t.label + ' Armies', 'Town Hall ' + t.label.slice(2) + ' attacks', t.armyHref, t.navArmyIcon));
+    });
+  } else if (g.gameNav) {
+    pages = getFeaturedJSON('/game-nav.json').then(n => {
+      const nav = n[g.gameNav] || {};
+      (nav.groups || []).forEach(gr => {
+        const pp = gr.pages || [];
+        // a group's own page (Lobby) is a tile unless its hub row ("All tools") already is
+        if (gr.link && !pp.some(p => p.link === gr.link)) add(gr.name, '', gr.link, gr.img || gr.icon);
+        pp.forEach(p => add(p.name, p.sub || p.desc, p.link, p.img || p.icon, p.soon));
+      });
+      (nav.pages || []).forEach(p => add(p.name, p.sub || p.desc, p.link, p.img || p.icon, p.soon));
+    });
   }
-  if (g.gameNav) {
-    return getFeaturedJSON('/game-nav.json').then(n => ((n[g.gameNav] || {}).pages || []).map(p => {
-      const o = (g.tiles || {})[p.link] || {};
-      return { name: o.name || p.name, sub: o.sub || g.title, link: p.link, image: o.image || g.cover, soon: p.soon };
-    }));
-  }
-  return Promise.resolve(g.tiles || []);
+  return pages.then(() => {
+    (g.tiles || []).forEach(t => add(t.name, t.sub, t.link, t.icon, t.soon));
+    return out;
+  });
 }
 // -> Promise of [{ title, link, icon, tiles: [...] }], groups in page order.
 function loadFeaturedGroups() {
@@ -1702,22 +1677,25 @@ window.toggleMoreAcc = toggleMoreAcc;
 })();
 
 /* ============================================================
-   SITE FOOTER (.pf-footer) — SHARED
+   SITE FOOTER (.pf-footer) — SHARED (rebuilt Nov 2 2026)
    ============================================================
-   Moved here from hwr-js.js so every page renders the same footer, not
-   just the hwr ones. Nothing in the markup is hardcoded — it is all data:
-     11footer.json : social links, legal links, copyright, disclaimer
-     sidebar.json  : the link row, mirroring the sidebar's own nav
-                     (topBox + games; tripleA is left out because those
-                     entries all point at the same placeholder page)
-   Returns immediately on pages with no .pf-footer, so it costs them
-   nothing. Styles live in 11layout.css. */
+   One pure-black section (Adrian's pick, 2nd pass the same day: "make it
+   look professional"): logo + name + tagline on the left, WEBSITE and GAMES
+   columns on the right, a hairline, then one row (copyright + legal links |
+   socials) and the fan-site notices in small print. On phones the two
+   columns fold into tap-to-open rows and Back to top sits beside the logo.
+   Pages only carry <footer class="pf-footer">: whatever is inside it is
+   replaced here, so no page markup ever needs editing.
+     11footer.json : tagline, socials, WEBSITE + legal links, notices, copyright
+     sidebar.json  : GAMES (games + upcoming games that have a page)
+   Returns immediately on pages with no .pf-footer. Styles: 11layout.css. */
 (function initSiteFooter() {
   // Some pages load this file from partway down the body (it has to run
   // before their own inline script, which references these globals), so the
   // footer markup further down the document does not exist yet. Wait for the
   // parse to finish before deciding the page simply has no footer.
-  if (!document.querySelector('.pf-footer')) {
+  var footer = document.querySelector('.pf-footer');
+  if (!footer) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initSiteFooter);
     }
@@ -1730,48 +1708,77 @@ window.toggleMoreAcc = toggleMoreAcc;
     x: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>',
     reddit: '<path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>'
   };
+  var CHEVRON = '<svg class="pf-col-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 
-  // "Back to top" (phones only -- hidden over 970px in 11layout.css).
-  // Sits on the right of the "PARCHROME.NETLIFY.APP" label + social icons:
-  // those two are wrapped in .pf-footer-head here, so no page's markup
-  // has to change. The page scrolls in different places (the window on
-  // phones, .coc-main on the Clash pages' desktop), so it scrolls every
-  // scrolled box the footer sits in, plus the window.
-  (function backToTop() {
-    var label = document.getElementById('pfSocialLabel');
-    var social = document.getElementById('pfFooterSocial');
-    if (!label || !social || label.parentNode !== social.parentNode) return;
-    var head = document.createElement('div');
-    head.className = 'pf-footer-head';
-    var brand = document.createElement('div');
-    brand.className = 'pf-footer-head-main';
-    label.parentNode.insertBefore(head, label);
-    brand.appendChild(label);
-    brand.appendChild(social);
-    head.appendChild(brand);
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'pf-to-top';
-    btn.innerHTML =
-      '<span>Back to top</span><span class="pf-to-top-ring" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 18.5V6M6.5 11.5L12 6l5.5 5.5"/></svg></span>';
-    head.appendChild(btn);
-    btn.addEventListener('click', function() {
-      var smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-      var how = { top: 0, behavior: smooth ? 'smooth' : 'auto' };
-      for (var el = head.parentNode; el && el !== document.body; el = el.parentNode) {
-        if (el.scrollTop > 0) el.scrollTo(how);
-      }
-      window.scrollTo(how);
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
-  })();
+  }
+
+  // Skeleton first, so the footer has its height before the JSON lands.
+  footer.innerHTML =
+    '<div class="pf-in">' +
+    '<div class="pf-top">' +
+    '<div class="pf-brand">' +
+    '<div class="pf-brand-row">' +
+    '<a class="pf-logo" href="/" aria-label="Parchrome home"><img src="/icons/parchrome-logo.svg" alt="" width="32" height="32" decoding="async"><span>Parchrome</span></a>' +
+    '<button type="button" class="pf-to-top"><span>Back to top</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18.5V6M6.5 11.5L12 6l5.5 5.5"/></svg></button>' +
+    '</div>' +
+    '<p class="pf-tagline" id="pfTagline"></p>' +
+    '</div>' +
+    '<nav class="pf-cols" aria-label="Footer">' +
+    '<details class="pf-col"><summary><span>Website</span>' + CHEVRON + '</summary><ul id="pfColWebsite"></ul></details>' +
+    '<details class="pf-col"><summary><span>Games</span>' + CHEVRON + '</summary><ul id="pfColGames"></ul></details>' +
+    '</nav>' +
+    '</div>' +
+    '<div class="pf-bottom">' +
+    '<div class="pf-legal"><span id="pfFooterCopyright"></span><ul id="pfLegal"></ul></div>' +
+    '<div class="pf-footer-social" id="pfFooterSocial"></div>' +
+    '</div>' +
+    '<div class="pf-notices" id="pfNotices"></div>' +
+    '</div>';
+
+  // Columns: always open on desktop (the summary is just a heading there),
+  // tap-to-open rows on phones. Re-synced when the width crosses 970px.
+  var desk = window.matchMedia('(min-width: 971px)');
+  var cols = footer.querySelectorAll('.pf-col');
+  function syncCols() {
+    for (var i = 0; i < cols.length; i++) cols[i].open = desk.matches;
+  }
+  syncCols();
+  if (desk.addEventListener) desk.addEventListener('change', syncCols);
+  footer.querySelector('.pf-cols').addEventListener('click', function(e) {
+    if (desk.matches && e.target.closest('summary')) e.preventDefault();
+  });
+
+  // The page scrolls in different places (the window on phones, .coc-main
+  // on most desktops), so scroll every scrolled box above the footer too.
+  footer.querySelector('.pf-to-top').addEventListener('click', function() {
+    var smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var how = { top: 0, behavior: smooth ? 'smooth' : 'auto' };
+    for (var el = footer.parentNode; el && el !== document.body; el = el.parentNode) {
+      if (el.scrollTop > 0) el.scrollTo(how);
+    }
+    window.scrollTo(how);
+  });
+
+  // Current page = lit link (full-path match, same rule as the rest of the chrome).
+  var here = location.pathname.replace(/\/index(\.html)?$/, '/').replace(/\.html$/, '');
+  function linkHtml(item) {
+    var path = String(item.link || '').split(/[?#]/)[0];
+    var cur = path === here || (path.length > 1 && path.slice(-1) === '/' && here === path.slice(0, -1));
+    return (
+      '<li><a href="' + esc(item.link) + '"' + (cur ? ' aria-current="page"' : '') + '>' + esc(item.name) + '</a></li>'
+    );
+  }
 
   fetch('/11footer.json')
     .then(function(r) {
       return r.json();
     })
     .then(function(cfg) {
-      var labelEl = document.getElementById('pfSocialLabel');
-      if (cfg.socialLabel) labelEl.textContent = cfg.socialLabel;
+      document.getElementById('pfTagline').textContent = cfg.tagline || '';
 
       var socialEl = document.getElementById('pfFooterSocial');
       (cfg.socials || []).forEach(function(s) {
@@ -1783,52 +1790,36 @@ window.toggleMoreAcc = toggleMoreAcc;
           a.target = '_blank';
           a.rel = 'noopener';
         } else {
-          a.href = '#';
           a.className = 'pf-social-disabled';
           a.setAttribute('aria-disabled', 'true');
-          a.setAttribute('tabindex', '-1');
-          a.title = 'Coming soon';
-          a.onclick = function() {
-            return false;
-          };
+          a.title = s.name + ': coming soon';
         }
-        var svgPath = ICONS[s.icon] || '';
-        a.innerHTML = '<svg viewBox="0 0 24 24">' + svgPath + '</svg>';
+        a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[s.icon] || '') + '</svg>';
         socialEl.appendChild(a);
       });
 
-      var legalEl = document.getElementById('pfFooterLegal');
-      (cfg.legalLinks || []).forEach(function(l) {
-        var a = document.createElement('a');
-        a.href = l.link;
-        a.textContent = l.name;
-        legalEl.appendChild(a);
-      });
+      document.getElementById('pfColWebsite').innerHTML = (cfg.website || [])
+        .map(function(l) {
+          return linkHtml(l);
+        })
+        .join('');
+      document.getElementById('pfLegal').innerHTML = (cfg.legal || [])
+        .map(function(l) {
+          return linkHtml(l);
+        })
+        .join('');
 
-      document.getElementById('pfFooterCopyright').textContent = cfg.copyright || '';
-      document.getElementById('pfFooterDisclaimer').textContent = cfg.disclaimer || '';
+      document.getElementById('pfNotices').innerHTML = (cfg.notices || [])
+        .map(function(n) {
+          return '<p>' + esc(n) + '</p>';
+        })
+        .join('');
+
+      document.getElementById('pfFooterCopyright').textContent = (cfg.copyright || '').replace('{year}', new Date().getFullYear());
     })
     .catch(function(err) {
       console.error('Failed to load 11footer.json', err);
     });
-
-  // ===================================================
-  // FOOTER LINKS — built from sidebar.json's "topBox" + "games" entries
-  // (name + link only), so the footer mirrors the sidebar's own nav
-  // instead of listing the page categories. "tripleA" is intentionally
-  // left out — those all point at the same placeholder page for now.
-  // ===================================================
-  function renderFooterLinks(entries) {
-    var footerLinks = document.getElementById('pfFooterLinks');
-    if (!footerLinks) return;
-    var html = '';
-    entries.forEach(function(entry) {
-      var name = entry.name || '';
-      var link = entry.link || '#';
-      html += '<a href="' + link + '">' + name + '</a>';
-    });
-    footerLinks.innerHTML = html;
-  }
 
   // Deliberately its own fetch rather than the cached loadSidebarData()
   // above: that helper sets `sidebarLoaded`, which toggleSidebar() reads as
@@ -1842,8 +1833,13 @@ window.toggleMoreAcc = toggleMoreAcc;
     })
     .then(function(data) {
       if (!data) return;
-      var entries = [].concat(data.topBox || [], data.games || []);
-      renderFooterLinks(entries);
+      // Upcoming games with no page yet show as dimmed text, never a dead link.
+      var games = (data.games || []).concat(data.upcoming || []);
+      document.getElementById('pfColGames').innerHTML = games
+        .map(function(g) {
+          return g.link ? linkHtml(g) : '<li><span class="pf-soon">' + esc(g.name) + ' <em>Soon</em></span></li>';
+        })
+        .join('');
     })
     .catch(function(err) {
       console.error('Failed to load sidebar.json', err);
@@ -1898,7 +1894,7 @@ window.stbHubMenus = function (hubScroll, opts) {
     return '';
   }
   function row(o, i) {
-    const on = !!o.href && o.href.indexOf('#') < 0 && norm(o.href) === here;
+    const on = o.on != null ? !!o.on : !!o.href && o.href.indexOf('#') < 0 && norm(o.href) === here;
     const kids = !!(o.children && o.children.length);
     const tail = o.soon ? '<span class="stb-dd-tag">Soon</span>'
       : o.hot ? '<span class="stb-dd-tag stb-dd-tag--hot">Hot</span>'
@@ -1933,7 +1929,7 @@ window.stbHubMenus = function (hubScroll, opts) {
     const old = document.getElementById('stbMenu-' + key);
     if (old) old.remove();
     const panel = document.createElement('div');
-    panel.className = 'stb-dd stb-dd--' + key + (opts.cols && opts.cols[key] === 2 ? ' stb-dd--2col' : '');
+    panel.className = 'stb-dd stb-dd--' + key + (opts.cols && opts.cols[key] > 1 ? ' stb-dd--' + opts.cols[key] + 'col' : '');
     panel.id = 'stbMenu-' + key;
     panel.setAttribute('role', 'navigation');
     panel.setAttribute('aria-label', (opts.labels && opts.labels[key]) || link.textContent.trim());

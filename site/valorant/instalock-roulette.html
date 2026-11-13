@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valorant Instalock Roulette: Random Agent &amp; Gun Wheel | Parchrome</title>
+<meta name="description" content="Spin a wheel for a random Valorant agent or gun, roll a full team of 5 with every role, add a challenge and share the link. Pick your own pool.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/parchrome-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/parchrome-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/parchrome-touch-180.png">
+<link rel="stylesheet" href="/11layout.css?v=20261112sb">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/codm-banner.css?v=20261112or">
+<link rel="stylesheet" href="/codm-tools.css?v=20261112or">
+<link rel="stylesheet" href="/valorant.css?v=20261112or">
+<link rel="stylesheet" href="/valorant-roulette.css?v=20261112or">
+<link rel="stylesheet" href="/coc-villager.css?v=20261101ed">
+</head>
+<body class="vl-ground" data-game-nav="valorant">
+
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
+  </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/parchrome-logo.svg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar. The title turns into a breadcrumb on sub-pages and the
+     strip holds this game's pages -- both filled from game-nav.json by
+     initHubNav() in 11layout.js, so edit that file, not this markup. -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/valorant.png" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">Valorant</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="Valorant pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+
+  <div class="coc-main" >
+
+<header class="cb" aria-labelledby="cbTitle">
+  <span class="cb-art" aria-hidden="true"></span>
+  <span class="cb-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8"/><path d="M12 5v16M4 13h16M6.3 7.3l11.4 11.4M17.7 7.3 6.3 18.7"/><path d="M10 2h4l-2 3z"/></svg></span>
+  <div class="cb-copy">
+    <p class="cb-kicker">Valorant</p>
+    <h1 class="cb-title" id="cbTitle">Instalock Roulette</h1>
+    <p class="cb-text">Spin for your agent or your gun, roll a whole team, add a challenge, and play whatever lands. No rerolls.</p>
+    <div class="cb-strip">
+      <span class="cb-fact"><small>Agents</small><b id="cbAgents">&nbsp;</b><em>In the game</em></span>
+      <span class="cb-fact"><small>Guns</small><b id="cbGuns">&nbsp;</b><em>In the shop</em></span>
+      <span class="cb-fact"><small>On the wheel</small><b id="cbPool">&nbsp;</b><em id="cbPoolOf">Your pool</em></span>
+    </div>
+  </div>
+</header>
+
+<!-- THE WHEEL: valorant-roulette.js. Left = the wheel (the hub is the spin key), right = roll options + what you got. -->
+<section class="ct-sec" aria-labelledby="rlTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="rlTitle">Spin the wheel</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b><span id="rlSay">Pick agents or guns, then hit Spin and play whatever it lands on. No rerolls. Okay, maybe one.</span></p></div>
+  </header>
+
+  <div class="gs-seg rl-modes" id="rlModes" role="group" aria-label="Wheel">
+    <button type="button" data-mode="a" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-4 4-6 7.5-6s6.3 2 7.5 6"/></svg>Agents</button>
+    <button type="button" data-mode="w" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h15l3 2v2h-9l-1 2H8l-1 4H4l1-6H3z"/></svg>Weapons</button>
+  </div>
+
+  <div class="rl-grid">
+    <div class="rl-stage" id="rlStage">
+      <div class="rl-wheel" id="rlWheel">
+        <svg class="rl-bulbs" id="rlBulbs" viewBox="-250 -250 500 500" aria-hidden="true"></svg>
+        <svg class="rl-disc" viewBox="-250 -250 500 500" aria-hidden="true">
+          <defs>
+            <radialGradient id="rlShade"><stop offset="0.25" stop-color="#000" stop-opacity="0.4"/><stop offset="0.7" stop-color="#000" stop-opacity="0.1"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></radialGradient>
+          </defs>
+          <circle class="rl-rim" r="240"/>
+          <g id="rlSpin"></g>
+          <circle r="228" fill="url(#rlShade)" pointer-events="none"/>
+          <circle class="rl-rim-line" r="229"/>
+        </svg>
+        <span class="rl-pointer" id="rlPointer" aria-hidden="true"></span>
+        <button type="button" class="rl-hub" id="rlHub" disabled><b id="rlHubTxt">Spin</b><small id="rlHubSub">&nbsp;</small></button>
+        <span class="rl-stamp" id="rlStamp" aria-hidden="true">Locked in</span>
+      </div>
+      <p class="rl-now" id="rlNow">&nbsp;</p>
+    </div>
+
+    <div class="rl-side">
+      <div class="rl-ctrl">
+        <div class="gs-seg rl-roll" id="rlRoll" role="group" aria-label="Roll">
+          <button type="button" data-team="0" aria-pressed="true">One pick</button>
+          <button type="button" data-team="1" aria-pressed="false">Team of 5</button>
+        </div>
+        <div class="rl-toggles">
+          <button type="button" class="rl-tog" id="rlRule" aria-pressed="true" hidden><i aria-hidden="true"></i>Every role</button>
+          <button type="button" class="rl-tog" id="rlChal" aria-pressed="false"><i aria-hidden="true"></i>Challenge</button>
+          <button type="button" class="rl-tog rl-tog--snd" id="rlSound" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path class="rl-snd-on" d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/><path class="rl-snd-off" d="m16 9.5 5 5m0-5-5 5"/></svg>Sound</button>
+        </div>
+      </div>
+      <div class="rl-out" id="rlOut" aria-live="polite"></div>
+      <div class="rl-chal" id="rlChalBox" hidden></div>
+      <div class="rl-acts">
+        <button type="button" class="rl-key" id="rlShare" disabled>Copy link</button>
+        <p class="rl-msg" id="rlMsg" role="status"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POOL: what's on the wheel. A tap takes one off; a group's head switches the group; weapons also get a price cap. -->
+<section class="ct-sec" aria-labelledby="rlPoolTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="rlPoolTitle">Your pool</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Tap an agent or gun to take it off the wheel, or a group's name to switch the whole group. Leave me on, though.</p></div>
+  </header>
+  <div class="rl-pbar">
+    <p class="rl-pcount" id="rlPCount">&nbsp;</p>
+    <div class="gs-dist rl-cost" id="rlCostRow" hidden>
+      <label for="rlCost">Up to</label>
+      <input type="range" id="rlCost" min="0" max="5000" step="50" value="5000">
+      <output id="rlCostOut" for="rlCost">&nbsp;</output>
+    </div>
+    <button type="button" class="rl-key" id="rlAll">Put all back</button>
+  </div>
+  <div class="rl-pool" id="rlPool"></div>
+</section>
+
+<section class="ct-sec" aria-labelledby="rlHistTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="rlHistTitle">Recent spins</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Your last 10 spins stay on this device. Open one to share it, or to prove you really did roll Sage.</p></div>
+  </header>
+  <ol class="rl-hist" id="rlHist"></ol>
+  <button type="button" class="rl-key rl-hist-clear" id="rlHistClear" hidden>Clear spins</button>
+</section>
+
+<section class="ct-sec ct-sec--last" aria-labelledby="rlHowTitle">
+  <header class="ct-head">
+    <h2 class="ct-title" id="rlHowTitle">How it works</h2>
+    <div class="cv-say"><img class="cv-face" src="/images/valorant/jett/face.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Jett</b>Every slice is the same size and the pick is made before the wheel moves, so nobody can rig it. Not even me.</p></div>
+  </header>
+  <ol class="ct-steps">
+    <li>Every agent or gun in your pool gets <b>one slice of the same size</b>. The winner is drawn with your browser's secure random numbers before the wheel starts turning; the spin just shows you where it landed.</li>
+    <li><b>Team of 5</b> spins five times and takes each pick off the wheel, so nobody gets the same agent. With <b>Every role</b> on, the last spins only offer the roles the team is still missing.</li>
+    <li><b>Challenge</b> adds one rule to play by, written by us. On the Weapons wheel you never get a challenge that changes your gun.</li>
+    <li><b>Copy link</b> saves the whole roll in the address, so a friend opens exactly what you got. Your pool, sound and last 10 spins stay on this device.</li>
+  </ol>
+</section>
+
+<script src="/valorant-roulette.js?v=20261102b"></script>
+  <footer class="pf-footer">
+  <!-- Nothing here is hardcoded. Socials, legal links, copyright and the
+  disclaimer come from 11footer.json; the link row mirrors the sidebar
+  (sidebar.json's topBox + games, minus tripleA). Both are rendered by
+  11layout.js at runtime, so edit those JSON files, not this markup. -->
+  <p class="pf-footer-social-label" id="pfSocialLabel">Follow us on</p>
+  <div class="pf-footer-social" id="pfFooterSocial"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-links" id="pfFooterLinks"></div>
+  <div class="pf-footer-divider"></div>
+  <div class="pf-footer-bottom">
+    <div class="pf-footer-legal" id="pfFooterLegal"></div>
+  </div>
+  <p class="pf-footer-disclaimer" id="pfFooterDisclaimer"></p>
+  <div class="pf-footer-copyright" id="pfFooterCopyright"></div>
+</footer>
+</div>
+
+<style>
+
+@media (max-width: 970px) {
+body {
+  overflow: auto; /*removes top bar */
+  height: auto;
+}}
+
+</style>
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json (initHubNav in 11layout.js); open/close is in 11layout.js. -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header mx-hdr">
+          <span class="mx-hdr-ico"><img src="/icons/valorant.png" alt=""></span><span class="mx-hdr-text"><span class="more-sheet-title">All Valorant Pages</span><span class="mx-hdr-count"></span></span>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261112sb"></script>
+</body>
+</html>

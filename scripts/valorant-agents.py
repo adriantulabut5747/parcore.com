@@ -33,7 +33,7 @@ IMG = ROOT / 'images' / 'valorant' / 'agents'
 SHELL = ROOT / 'valorant' / 'weapons.html'
 DATA = HERE / 'valorant-agents.json'
 # Cache version for valorant-agents.css / .js and the card crops on every agents page: bump it when any of them change, then rerun.
-ASSET_V = '20261101x3'
+ASSET_V = '20261102a'
 VALORANT_CSS_V = vm.VALORANT_CSS_V
 
 ROLES = ['Duelist', 'Initiator', 'Controller', 'Sentinel']
@@ -114,12 +114,12 @@ def shell(title, desc, body_html, page_class):
     return head + body_html + f'\n<script src="/valorant-agents.js?v={ASSET_V}"></script>\n' + tail
 
 
-def banner(kicker, title, text, a, facts, ico):
+def banner(kicker, title, text, a, facts, ico, ico_class=''):
     strip = ''.join(
         f'<span class="cb-fact"><small>{e(k)}</small><b>{b}</b><em>{e(sub)}</em></span>' for k, b, sub in facts)
     return f'''<header class="cb" aria-labelledby="cbTitle" style="--ac:{a['c1']}">
   <span class="cb-art" aria-hidden="true" style="--art:url('/images/valorant/agents/{a['slug']}.webp')"></span>
-  <span class="cb-ico" aria-hidden="true"><img src="{ico}" alt="" width="160" height="160" decoding="async"></span>
+  <span class="cb-ico" aria-hidden="true"><img{f' class="{ico_class}"' if ico_class else ''} src="{ico}" alt="" width="160" height="160" decoding="async"></span>
   <div class="cb-copy">
     <p class="cb-kicker">{e(kicker)}</p>
     <h1 class="cb-title" id="cbTitle">{e(title)}</h1>
@@ -177,7 +177,7 @@ def index_page(agents, roles, data):
         ('Free from the start', str(len(data['starters'])), 'Starter agents'),
     ]
     body = banner('Valorant', 'Agents', f'All {len(agents)} agents: every ability, role and release date, from the closed beta to {newest["name"]}.',
-                  newest, facts, f'/images/valorant/agents/{newest["slug"]}-icon.webp')
+                  newest, facts, '/icons/valorant-nav/agents.webp', 'va-ico-pic')  # the nav's Agents picture (_tools/valorant-icons)
     tabs = [f'<button type="button" role="tab" data-role="" aria-selected="true">{AGENT_ICON}All<span class="cb-n">{len(agents)}</span></button>'] + [
         f'<button type="button" role="tab" data-role="{r.lower()}" aria-selected="false">{role_img(r, 18)}{r}s<span class="cb-n">{len(by_role[r])}</span></button>'
         for r in ROLES]

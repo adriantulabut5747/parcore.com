@@ -74,6 +74,8 @@ Adrian's additions (all required):
 | Legend Tracker | Oct 25 2026, LIVE (`lgt-`): the Legend Trophy decoration (`icons/legend-trophy.webp`, from ClashKing's assets, also the nav icon). Idle 6s: one hit, tap bounce + "+40" (max trophies per Legend attack) rises. Hover 2.4s: three hits. |
 | War Planner | Oct 25 2026, LIVE (`ws-`; `wp-` is the planner page's): two swords (`clashofclans/coctools/sword.webp`, ClashKing; the second mirrored) swing back on their grips and clash (flash, sparkles, streaks). Idle 6s: one clash. Hover 2.4s: two. |
 
+**Nov 12 2026 (Adrian): /coc/ = 4 HOT cards + a quiet list.** Ten animated cards at once were too busy to read. On /coc/ only, the HOT four keep their cards (HOT tags hidden: the size says it) and the other six are rows in one sunken well (`.ptm-list` / `.ptm`, "MORE TOOLS LIST" in build_cards.py): the Tools menu's still icon from `coc-nav-data.json` (matched by href), name in Sora 600, the short blurb (2 lines max), an arrow. 3 columns / 2 / 1 by band width. build_cards.py builds that block from the cards themselves, so edit a card's name / blurb / link once. /coc/tools/ keeps all ten animated cards.
+
 **Oct 26 2026 (Adrian): Army Maker + Damage Calculator are HOT too** (4 HOT cards). The top bar's Tools menu, the More sheet's Tools tiles and the tool-page chips follow the band's order, read from `coc-nav-data.json` `guides` (array order = menu order; `"hot": true` = the tag: `.stb-dd-tag--hot` in 11layout.css, `.mx-hot` in 11layout.css "MORE SHEET" (straddles the tile's top edge so it costs the name no width), `.dsn-hot`). Change the band's order or HOT set? Change that JSON too.
 
 **Oct 25 2026 (Adrian): order + HOT.** Player Tracker and Equipment lead the band with a HOT tag (`.ptc-hot`, the TH pages' `.base-tag--hot` red key + flame): desktop = its own line above the name, tiles = top-left corner. Still frames (reduced motion + /coc/ phones): Army Maker shows its three troop cards round the camp; Damage Calculator shows the Monolith destroyed (DESTROYED stamp, no HP bar).
@@ -188,7 +190,7 @@ folder; open the HTML in Chrome **with `python _tools/serve.py` running**
 - `site/coc-damage-calc.json`: Cannon 19 = 2000 HP, Cannon 21 = 2250 HP,
   Lightning 13 = 720. 3×720 = 2160 destroys Cannon 19, NOT Cannon 21.
 - Walls: Hammer Jam halves the price, Gold Pass then takes 20% (−60% total).
-- The /coc/ hero says **8 tools**; the band now has **8** cards too (Oct 21 2026, tier lists merged).
+- The /coc/ hero no longer shows a tool count (stats row removed Nov 12 2026). The band has 10 cards.
 
 ## 5. Other changes made this session (all live in `site/`)
 - Minecraft Java home (`site/minecraft/java/index.html`): hero headline

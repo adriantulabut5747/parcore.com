@@ -4,7 +4,7 @@
    (the full list is 3.6 MB).
    TTK: shots = ceil((100 + shields) / damage at that distance and hit zone), time = (shots - 1) gaps at
    the gun's fire rate. Shotguns get none (pellets spread).
-   Address: ?type=<type>, ?m=<metres>, ?hit=head|leg, ?arm=0|25, ?vs=<id>,<id>, ?w=<id> (the panel). */
+   Address: ?m=<metres>, ?hit=head|leg, ?arm=0|25, ?vs=<id>,<id>, ?w=<id> (the panel). */
 (async function () {
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -54,7 +54,6 @@
   const q = new URLSearchParams(location.search);
   const DEF_VS = ['vandal', 'phantom'].filter((id) => byId[id]);
   const st = {
-    type: typeOf[q.get('type')] ? q.get('type') : '',
     m: Math.min(MAXM, Math.max(0, q.has('m') ? parseInt(q.get('m'), 10) || 0 : 15)),
     hit: HITS[q.get('hit')] ? q.get('hit') : 'body',
     arm: q.get('arm') === '0' ? 0 : q.get('arm') === '25' ? 25 : 50,
@@ -69,7 +68,7 @@
   function save() {
     const u = new URL(location.href);
     const set = (k, v) => (v !== '' && v != null ? u.searchParams.set(k, v) : u.searchParams.delete(k));
-    set('type', st.type);
+    u.searchParams.delete('type'); // the type tray is gone (Nov 2 2026): drop it from old links
     set('m', st.m === 15 ? '' : st.m);
     set('hit', st.hit === 'body' ? '' : st.hit);
     set('arm', st.arm === 50 ? '' : st.arm);
@@ -77,8 +76,7 @@
     set('w', st.w);
     history.replaceState(null, '', u.pathname + u.search + u.hash);
   }
-  const shown = (g) =>
-    (!st.type || g.type === st.type) && (!st.find || g.name.toLowerCase().includes(st.find) || typeOf[g.type].name.toLowerCase().includes(st.find));
+  const shown = (g) => !st.find || g.name.toLowerCase().includes(st.find) || typeOf[g.type].name.toLowerCase().includes(st.find);
 
   /* ---- banner: count, patch, the running act ---- */
   const costs = guns.map((g) => g.cost);
@@ -98,20 +96,6 @@
       `<i>${Math.ceil((end - now) / 864e5)}d left</i><span class="cb-end"> · ends ` + end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + '</span>';
     f.hidden = false;
   }
-
-  /* ---- type tray ---- */
-  const tray = $('vwTabs');
-  tray.innerHTML = [{ t: '', name: 'All' }, ...TYPES]
-    .map((t) => `<button type="button" role="tab" data-type="${t.t}" aria-selected="${st.type === t.t}">${t.name}<span class="cb-n">${t.t ? guns.filter((g) => g.type === t.t).length : guns.length}</span></button>`)
-    .join('');
-  tray.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-type]');
-    if (!b) return;
-    st.type = b.dataset.type;
-    tray.querySelectorAll('[data-type]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
-    save();
-    lists();
-  });
 
   /* ---- the bar ---- */
   const range = $('vwM');

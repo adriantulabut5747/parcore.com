@@ -44,10 +44,10 @@
   const foot = (b, keys) => `<div class="gbw-foot">
       <div class="gbw-ends"><span class="gi-label">Ends in</span><div class="gi-clock-units" role="timer" aria-live="off" data-clock="${+b.end}">${CLOCK}</div><small>${srvDate(b.end)} server time</small></div>
       <div class="gbw-keys">${keys}<a class="gi-key" href="/genshin-impact/wish-simulator">Wish simulator${ARROW}</a></div></div>`;
-  const fours = (list, labelText, sub) =>
+  const fours = (list, labelText, sub, link) =>
     list.length
       ? `<div class="gbw-four"><p class="gi-label">${labelText}</p><ul>${list
-          .map((x) => `<li>${tile(x.icon, 4, '')}<span><b>${esc(x.name)}</b><small>${sub(x)}</small></span></li>`)
+          .map((x) => `<li>${tile(x.icon, 4, '')}<span><b>${link ? `<a href="${GI.charHref(x.name)}">${esc(x.name)}</a>` : esc(x.name)}</b><small>${sub(x)}</small></span></li>`)
           .join('')}</ul></div>`
       : '';
 
@@ -64,7 +64,7 @@
       <div class="gbw-info">
         ${head(b, five.name, `<p class="gbw-title">${esc(five.title || '')} <span class="gi-rarity" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></p><p class="gbw-meta">${meta}</p>`)}
         ${hist ? `<p class="gbw-run">${runLine(back(five.name, b, true))}</p>` : ''}
-        ${fours(four, 'Featured 4&#9733;', sub4)}
+        ${fours(four, 'Featured 4&#9733;', sub4, true)}
         ${foot(b, `<a class="gi-key" href="/genshin-impact/characters/${slug(five.name)}" data-guide hidden>Build guide${ARROW}</a>`)}
       </div></article>`;
   }
@@ -125,8 +125,16 @@
     const t = now();
     const live = (feed.banners || []).filter((b) => (fiveOf(b) || (b.weapons || []).some((w) => w.rarity === 5)) && srvEnd(b.end) > t);
     if (!live.length) {
-      $('gbList').innerHTML = '<p class="gi-empty">No wish is live right now. New ones show up here within three hours of going live.</p>';
-      $('gbKlee').textContent = 'No wishes right now. Klee is waiting for the next ones too!';
+      const fives = feed.next && feed.next.start > t ? feed.next.fives || [] : [];
+      $('gbKlee').textContent = fives.length
+        ? `Save your Intertwined Fates: ${fives.map((c) => c.name).join(' and ')} ${fives.length === 1 ? 'arrives' : 'arrive'} when the timer runs out. Klee is counting on her fingers!`
+        : 'No event wish right now, but the Standard wish never closes. Klee is waiting for the next ones too!';
+      GI.betweenWishes(feed).then((html) => {
+        $('gbList').innerHTML = html
+          ? `<div class="gi-row gwl">${html}</div>`
+          : '<p class="gi-empty">No wish is live right now. New ones show up here within three hours of going live.</p>';
+        setInterval(GI.countdowns, 1000);
+      });
       return;
     }
     $('gbList').innerHTML = live.map((b) => (fiveOf(b) ? charCard(b, fiveOf(b)) : wepCard(b))).join('');

@@ -2,6 +2,11 @@
 
 Moved out of CLAUDE.md on Nov 1 2026, unchanged. Paths like `parcore.com/docs/x.md` are relative to the outer folder.
 
+**Web Resources is gone (Nov 2 2026).** Adrian is making it its own website. Its pages, `hwr-*` files, icons and
+`docs/hwr-readme.md` were moved to `C:\Users\adrian\Downloads\web-resources-site\` (same layout); `/web-resources/*`
+and the old `hwr-*.html` addresses now 404 (the old redirect rules are saved there). Mentions of "hwr" / Web Resources
+below are history. When the new domain is live, add `/web-resources/*  https://<new domain>/:splat  301` to `_redirects`.
+
 ## Raised UI (Oct 2026, laby.net-style look, site-wide)
 
 Every box / button / field wears one of three recipes: **box** (2px #060708 edge, light
@@ -45,8 +50,7 @@ th-layouts.css…) can't re-position the bar. `--topbar-height` is 16px on deskt
 (= 64 − the old 48px bar), which is what keeps every page's content gap intact.
 Hover menus: one engine, `window.stbHubMenus(strip, {lists, keyOf, …})` in
 11layout.js (rows can have `children` → side panel). Data: coc-hub-menus.js
-(CoC), buildHubNav in 11layout.js (Web Resources: Resources → categories →
-sections from hwr-categories.json "sections"), buildGroups in 11layout.js (Minecraft + Genshin: game-nav.json
+(CoC), buildGroups in 11layout.js (Minecraft + Genshin: game-nav.json
 `groups`). CoC nav icons are pictures (Oct 2026), not SVGs: `site/icons/coc-nav/`
 (96px WebP — lobby tower, tools anvil, thNN Town Hall, barracks-thNN), paths in
 coc-nav-data.json (`primaryNav.*.icon` = TH18 defaults, per-TH `navIcon` /
@@ -71,7 +75,7 @@ when 11layout.js/css change.
 **Chrome fonts (Oct 31 2026, Adrian; Nov 1 2026):** breadcrumbs are **Sora on every width** (desktop 13px = the old
 14px Oxanium's width), the top bar's "Parchrome" word is Sora (15.5px phones, = 17px Oxanium x 0.92), and so is every
 desktop menu key, hover menu row and its Soon / Hot tag. /coc/'s lone bar title "Clash of Clans" is the trail's grey (not
-white); the Minecraft lobby's phone trail is just "Minecraft". **Tourney section titles** use `--fs-title-tourney`
+white); the Minecraft lobby's phone trail is just "Minecraft". **Section titles (Orbitron Title)** use `--fs-title-orb`
 (11layout.css: `--fs-title` + 2px on desktop, **24px on phones**, Nov 1 2026, every section); phone page banners
 (`.tb-title`, Minecraft's tool `.mch-hero-title`) are 28px so they stay above them. On phones the secondary top bar, and on every width the More sheet + bottom
 bar, are Sora on every section (11layout.css "PHONE BAR = SORA" / "MORE SHEET + PHONE BAR = SORA", `!important` so
@@ -112,6 +116,33 @@ Adrian's pick "Faceted": half an octagon ring + a red triangle folded into a lit
 PNG + SVG `rel="icon"` pair and the apple-touch icon; copy them from any page. `icons/home.jpg` (the old anime
 avatar) is no longer referenced anywhere: never link it again. `.topbar-logo` has no box behind it any more.
 
+## Home titles + Featured Topics (Nov 2 2026)
+
+Hero = the original (PARCHROME + "Your Unfair advantage", Orbitron, Jett centred): Adrian tried a Tourney
+rewrite on Nov 2 2026 and reverted it. Home section titles (`.hm-title`, perks head) = Orbitron Title 900 (Tourney until Nov 12) at
+`--fs-title-orb`, solid colour. Featured Topics cards = dark key (`--lb-box2`) + the page's MENU icon on a
+sunken plate + name/sub (each up to 2 lines, no "…"), no page art; hover = a touch brighter (`--lb-box-hover`) +
+icon tilts -4deg, never a coloured ring/border (Adrian, Nov 2 2026). Every group is full width, no pairing short
+groups two to a row (same day). Grid = 4 columns, 3 at 971-1150px
+(shows 15 before "Show N more"), 2 on phones. Tiles are built at runtime from the menus (`featuredTilesOf` in 11layout.js): home.json groups say
+`"cocNav": true` (coc-nav-data.json: lobby, tools, every TH layouts + armies) or `"gameNav": "<key>"`
+(game-nav.json groups/pages); `?filter` views and repeated links are skipped, soon pages stay greyed, `tiles` =
+extras no menu lists (HCPC). A new menu page shows up on its own. Genshin character pages are not in the menus, so
+never here. Clash Royale is listed (Adrian, Nov 2 2026): sidebar `games` (moved out of `upcoming`) and Featured Topics, above CODM; its Featured Games tile is still "soon". 404.html carries a
+short copy of the builder for its "Find a page" box: change both.
+
+## Sidebar game glyphs (Nov 12 2026)
+
+Featured games in the sidebar show one-colour logo glyphs, not the app icons (Adrian's call, modelled on
+theglobalgaming.com's nav): `site/icons/sidebar/<game>.svg`, set per game as sidebar.json `"glyph"`. 11layout.js
+draws them as `<i class="sidebar-glyph">` painted by CSS mask, so the colour comes from 11layout.css "10. GAME
+GLYPHS": grey at rest, white on hover, `--lb-red-text` when active. `"icon"` stays for the home tiles, search and
+footer. Sources: Valorant = Simple Icons path; Tekken = the "8" cut from the Wikimedia Commons Tekken 8 logo SVG;
+Genshin = the Anemo emblem, CODM = the "M" mark, Clash Royale = the crown shield (Adrian's reference images, traced:
+shield edges traced, crown redrawn straight-edged because the source was 73px; stretched 1.37x wide to fill the square, Adrian's call); CoC (shield + arrows), Mobile Legends
+("M" badge) are hand-simplified from the official marks; Minecraft = a pixel pickaxe (Adrian's pick; never the Creeper face). Glyphs are white on transparent;
+lighter tones are alpha. Triple A rows keep their pictures, desaturated (`saturate(0.2)`).
+
 ## Home Featured Games tiles (Oct 26 2026)
 
 The home page's Featured Games grid = wide tiles (3 / 2 / 1 columns, 5:2, phones 3:1): name + sub left,
@@ -141,3 +172,33 @@ article-cards.js fills them. `data-game` = that game only; `data-order="random"`
 **Section subtitles + tool-card blurbs** (Oct 21 2026) share one quiet look: 11layout.css
 "QUIET SUBTITLE" (`.mch-sec-sub`, `.tc-desc`, /coc/'s `.lob-sub`/`.lb-text`/`.cl-feature-text`).
 Opt a new one in there, don't size subtitles in page CSS.
+
+## Footer (Nov 2 2026)
+
+Adrian's pick after two rejected passes (3 raised plates with a Tourney wordmark read "childish"): ONE pure-black
+(#000) section, hairlines only, no boxes. Logo + "Parchrome" in Sora 600 + tagline | WEBSITE | GAMES (plain text
+links, no icons), a hairline, then copyright + Terms / Privacy / DMCA | plain grey social icons, then the fan-site
+notices in small print (generic + Supercell Fan Content Policy + Riot "legal jibber jabber" + Mojang line; those three
+are the publishers' required wording, don't paraphrase them). Phones: Back to top beside the logo, WEBSITE / GAMES
+fold into tap-to-open rows (`<details>`, forced open on desktop by JS), bottom padding clears `--bn-bar-h`.
+Pages only carry an empty `<footer class="pf-footer">`: 11layout.js "SITE FOOTER" replaces whatever is inside,
+so never edit page markup for it. Data: `11footer.json` (tagline, socials, `website`, `legal`, notices, copyright
+with `{year}`); GAMES = sidebar.json `games` + all `upcoming`; an upcoming game with no `link` (Mobile Legends) shows as dimmed
+"Soon" text, never a dead link. Web Resources is not on
+Parchrome any more (see the note at the top). Styles: 11layout.css "SITE FOOTER"; `.pf-footer *` pins Sora
+because some section files set `* { font-family }`. 3rd pass (Nov 2, modelled on a gaming-site footer
+Adrian liked; black kept, socials kept bottom right): brand | WEBSITE (2 columns) | GAMES (3 columns, stretched to the
+right edge) sit side by side, no dead gap; both lists end up 3 rows. Desktop tiers go by the footer's own width
+(container query on `.pf-in`): side by side from 1080px, brand on top below; GAMES 3 columns from 700px, else 2. Phones unchanged. The box
+holding the footer and every box around that get `padding-bottom: 0 !important` (`:has(.pf-footer)`; Minecraft nests it in .coc-content) so nothing shows under it; the footer
+clears the phone bar with its own padding.
+
+## About pages (`/about/`, Nov 2 2026)
+
+About, Contact, Support, Terms, Privacy, DMCA. Shell = the game sections' (strip + phone bar + More sheet from
+game-nav.json `"about"`), looks = `about.css`, copy-email / share / game tiles / "On this page" = `about.js`.
+Plain hand-edited HTML (no generator). Contact email: wildparchrome@gmail.com (Adrian, Nov 2 2026).
+**Privacy page = a real inventory**: when a page starts storing or sending something new (a Firestore collection,
+an analytics tag, a new lookup API, a localStorage key), update its tables the same day. As of Nov 2 2026:
+Firestore `feedback`, `layoutLikes`, `siteSubmissions` (parchrome-feedback) + `searches` (trackervalorant-42e14,
+Valorant player lookups incl. user agent); Google Analytics only on /coc/.

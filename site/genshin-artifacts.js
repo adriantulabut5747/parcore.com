@@ -181,7 +181,7 @@
       ? `<section class="af-sec"><h3 class="af-h">Best for</h3><div class="af-best">${who
           .map(
             (n) =>
-              `<a class="af-face" href="/genshin-impact/characters?q=${encodeURIComponent(n)}"><span class="gi-tile r${faces[n].rarity}"><img src="${esc(faces[n].icon)}" alt="" loading="lazy" width="56" height="56"></span><span>${esc(n)}</span></a>`,
+              `<a class="af-face" href="${GI.charHref(n)}"><span class="gi-tile r${faces[n].rarity}"><img src="${esc(faces[n].icon)}" alt="" loading="lazy" width="56" height="56"></span><span>${esc(n)}</span></a>`,
           )
           .join('')}</div></section>`
       : '';

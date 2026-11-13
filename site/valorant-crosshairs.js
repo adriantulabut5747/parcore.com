@@ -11,28 +11,70 @@
   /* ================= CODE ENGINE (no DOM: node can test it) ================= */
   // the game's colour list (index = c), hex = the preview colour
   const COLORS = [
-    ['White', 'FFFFFF'], ['Green', '00FF00'], ['Yellow green', '7FFF00'], ['Green yellow', 'DFFF00'],
-    ['Yellow', 'FFFF00'], ['Cyan', '00FFFF'], ['Pink', 'FF00FF'], ['Red', 'FF0000'],
+    ['White', 'FFFFFF'],
+    ['Green', '00FF00'],
+    ['Yellow green', '7FFF00'],
+    ['Green yellow', 'DFFF00'],
+    ['Yellow', 'FFFF00'],
+    ['Cyan', '00FFFF'],
+    ['Pink', 'FF00FF'],
+    ['Red', 'FF0000'],
   ];
   // the primary crosshair of code "0"
   const DEF = {
-    c: '0', h: '1', t: '1', o: '0.5', d: '0', z: '2', a: '1', f: '1',
-    '0b': '1', '0t': '2', '0l': '6', '0v': '6', '0g': '0', '0o': '3', '0a': '0.8', '0m': '0', '0s': '1', '0f': '1', '0e': '1',
-    '1b': '1', '1t': '2', '1l': '2', '1v': '2', '1g': '0', '1o': '10', '1a': '0.35', '1m': '1', '1s': '1', '1f': '1', '1e': '1',
+    c: '0',
+    h: '1',
+    t: '1',
+    o: '0.5',
+    d: '0',
+    z: '2',
+    a: '1',
+    f: '1',
+    '0b': '1',
+    '0t': '2',
+    '0l': '6',
+    '0v': '6',
+    '0g': '0',
+    '0o': '3',
+    '0a': '0.8',
+    '0m': '0',
+    '0s': '1',
+    '0f': '1',
+    '0e': '1',
+    '1b': '1',
+    '1t': '2',
+    '1l': '2',
+    '1v': '2',
+    '1g': '0',
+    '1o': '10',
+    '1a': '0.35',
+    '1m': '1',
+    '1s': '1',
+    '1f': '1',
+    '1e': '1',
   };
   const LINE = ['b', 't', 'l', 'v', 'g', 'o', 'a', 'm', 's', 'f', 'e'];
-  const ORDER = ['c', 'u', 'h', 't', 'o', 'd', 'z', 'a', 'b', 'f', 's', 'm'].concat(LINE.map((k) => '0' + k), LINE.map((k) => '1' + k));
+  const ORDER = ['c', 'u', 'h', 't', 'o', 'd', 'z', 'a', 'b', 'f', 's', 'm'].concat(
+    LINE.map((k) => '0' + k),
+    LINE.map((k) => '1' + k),
+  );
   const rank = (k) => (ORDER.includes(k) ? ORDER.indexOf(k) : 999);
 
   function parse(code) {
-    const tok = String(code || '').trim().split(';').map((s) => s.trim());
+    const tok = String(code || '')
+      .trim()
+      .split(';')
+      .map((s) => s.trim());
     if (tok[tok.length - 1] === '') tok.pop();
     if (tok[0] !== '0') throw new Error('A Valorant crosshair code starts with "0;".');
     const x = { G: [], P: {}, A: [], S: [] };
     let sec = 'G';
     for (let i = 1; i < tok.length; i++) {
       const k = tok[i];
-      if (k === 'P' || k === 'A' || k === 'S') { sec = k; continue; }
+      if (k === 'P' || k === 'A' || k === 'S') {
+        sec = k;
+        continue;
+      }
       const v = tok[++i];
       // keys and values reach the page's markup: letters, digits, dots only
       if (v === undefined || !/^[0-9a-zA-Z]{1,3}$/.test(k) || !/^[0-9A-Fa-f.]{1,12}$/.test(v)) {
@@ -54,9 +96,13 @@
   function build(x) {
     const out = ['0'];
     x.G.forEach((kv) => out.push(kv[0], kv[1]));
-    const p = Object.keys(x.P).filter((k) => carries(x.P, k)).sort((a, b) => rank(a) - rank(b));
+    const p = Object.keys(x.P)
+      .filter((k) => carries(x.P, k))
+      .sort((a, b) => rank(a) - rank(b));
     if (p.length) out.push('P', ...p.flatMap((k) => [k, x.P[k]]));
-    ['A', 'S'].forEach((s) => { if (x[s].length) out.push(s, ...x[s].flat()); });
+    ['A', 'S'].forEach((s) => {
+      if (x[s].length) out.push(s, ...x[s].flat());
+    });
     return out.join(';');
   }
 
@@ -87,9 +133,17 @@
       const y0 = Math.round(cy + gy * u);
       return [x0, y0, Math.max(1, Math.round(cx + (gx + gw) * u) - x0), Math.max(1, Math.round(cy + (gy + gh) * u) - y0)];
     };
+    // the outline is a frame, not a block behind: a line at 0 opacity still shows its outline
+    // (trick crosshairs like hollow boxes are built that way)
     const piece = (gx, gy, gw, gh, alpha) => {
-      fills.push([R(gx, gy, gw, gh), alpha]);
-      if (outline && ot > 0) outs.push([R(gx - ot, gy - ot, gw + ot * 2, gh + ot * 2), oa]);
+      if (alpha > 0) fills.push([R(gx, gy, gw, gh), alpha]);
+      if (!outline || ot <= 0) return;
+      [
+        [gx - ot, gy - ot, gw + ot * 2, ot],
+        [gx - ot, gy + gh, gw + ot * 2, ot],
+        [gx - ot, gy, ot, gh],
+        [gx + gw, gy, ot, gh],
+      ].forEach((r) => outs.push([R(...r), oa]));
     };
 
     ['0', '1'].forEach((p) => {
@@ -105,7 +159,7 @@
         o += err.fire * 10 * val(x, p + 'e');
         if (fade) a *= 1 - 0.65 * err.fire;
       }
-      if (t <= 0 || a <= 0) return;
+      if (t <= 0) return;
       if (l > 0) {
         piece(o, -t / 2, l, t, a);
         piece(-o - l, -t / 2, l, t, a);
@@ -120,10 +174,27 @@
       piece(-z / 2, -z / 2, z, z, val(x, 'a'));
     }
     ctx.fillStyle = '#000';
-    outs.forEach(([r, al]) => { ctx.globalAlpha = al; ctx.fillRect(...r); });
+    outs.forEach(([r, al]) => {
+      ctx.globalAlpha = al;
+      ctx.fillRect(...r);
+    });
     ctx.fillStyle = col;
-    fills.forEach(([r, al]) => { ctx.globalAlpha = al; ctx.fillRect(...r); });
+    fills.forEach(([r, al]) => {
+      ctx.globalAlpha = al;
+      ctx.fillRect(...r);
+    });
     ctx.globalAlpha = 1;
+  }
+
+  // how far the crosshair reaches from its centre, in game px (cards shrink big ones to fit)
+  function reach(x) {
+    let r = on(x, 'd') ? val(x, 'z') / 2 : 0;
+    ['0', '1'].forEach((p) => {
+      if (!on(x, p + 'b')) return;
+      const l = val(x, p + 'l');
+      r = Math.max(r, val(x, p + 'o') + Math.max(l, on(x, p + 'g') ? val(x, p + 'v') : l), val(x, p + 't') / 2);
+    });
+    return Math.max(1, r + (on(x, 'h') ? val(x, 't') : 0));
   }
 
   // background: a flat colour, a texture tile repeated at `ts` device px per texture px, or a map
@@ -153,7 +224,7 @@
     if (!pics[src]) {
       pics[src] = new Image();
       pics[src].decoding = 'async';
-      pics[src].onload = () => { drawAll(); };
+      pics[src].onload = () => (stage ? drawAll() : drawCards());
       pics[src].src = src;
     }
     return pics[src];
@@ -161,25 +232,65 @@
 
   /* ================= DATA ================= */
   const MAPS = [
-    ['summit', 'Summit'], ['corrode', 'Corrode'], ['abyss', 'Abyss'], ['sunset', 'Sunset'], ['lotus', 'Lotus'],
-    ['pearl', 'Pearl'], ['fracture', 'Fracture'], ['breeze', 'Breeze'], ['icebox', 'Icebox'], ['ascent', 'Ascent'],
-    ['split', 'Split'], ['haven', 'Haven'], ['bind', 'Bind'], ['glitch', 'Glitch'], ['drift', 'Drift'],
-    ['district', 'District'], ['kasbah', 'Kasbah'], ['piazza', 'Piazza'], ['gauntlet', 'Gauntlet'],
-    ['skirmish', 'Skirmish'], ['basic-training', 'Basic Training'], ['the-range', 'The Range'],
+    ['summit', 'Summit'],
+    ['corrode', 'Corrode'],
+    ['abyss', 'Abyss'],
+    ['sunset', 'Sunset'],
+    ['lotus', 'Lotus'],
+    ['pearl', 'Pearl'],
+    ['fracture', 'Fracture'],
+    ['breeze', 'Breeze'],
+    ['icebox', 'Icebox'],
+    ['ascent', 'Ascent'],
+    ['split', 'Split'],
+    ['haven', 'Haven'],
+    ['bind', 'Bind'],
+    ['glitch', 'Glitch'],
+    ['drift', 'Drift'],
+    ['district', 'District'],
+    ['kasbah', 'Kasbah'],
+    ['piazza', 'Piazza'],
+    ['gauntlet', 'Gauntlet'],
+    ['skirmish', 'Skirmish'],
+    ['basic-training', 'Basic Training'],
+    ['the-range', 'The Range'],
   ];
   // our own seamless surfaces, baked by scripts/valorant-crosshair-backgrounds.py (same ids there)
   const TEXTURES = [
-    ['sandstone', 'Sandstone'], ['stone-floor', 'Stone floor'], ['brick', 'Brick'], ['crate', 'Crate'],
-    ['metal', 'Container'], ['concrete', 'Concrete'], ['tile-floor', 'Tiles'], ['snow', 'Snow'],
-    ['foliage', 'Foliage'], ['sky', 'Sky'],
+    ['sandstone', 'Sandstone'],
+    ['stone-floor', 'Stone floor'],
+    ['brick', 'Brick'],
+    ['crate', 'Crate'],
+    ['metal', 'Container'],
+    ['concrete', 'Concrete'],
+    ['tile-floor', 'Tiles'],
+    ['snow', 'Snow'],
+    ['foliage', 'Foliage'],
+    ['sky', 'Sky'],
   ];
   const T = '/images/valorant/crosshairs/';
-  const BGS = TEXTURES.map(([id, name]) => ({ id, name, group: 'tex', tex: true, src: T + 'tex-' + id + '.webp', tile: T + 'tex-' + id + '-tile.webp' }))
+  const BGS = TEXTURES.map(([id, name]) => ({
+    id,
+    name,
+    group: 'tex',
+    tex: true,
+    src: T + 'tex-' + id + '.webp',
+    tile: T + 'tex-' + id + '-tile.webp',
+  }))
     .concat([
       { id: 'flat-dark', name: 'Dark', group: 'tex', flat: '#0b0c0e' },
       { id: 'flat-light', name: 'Bright', group: 'tex', flat: '#ecebe6' },
     ])
-    .concat(MAPS.map(([slug, name]) => ({ id: slug, name, group: 'map', src: '/images/valorant/maps/' + slug + '.webp', card: '/images/valorant/maps/' + slug + '-card.webp', tile: T + slug + '.webp' })));
+    .concat(
+      MAPS.map(([slug, name]) => ({
+        id: slug,
+        name,
+        group: 'map',
+        src: '/images/valorant/maps/' + slug + '.webp',
+        card: '/images/valorant/maps/' + slug + '-card.webp',
+        tile: T + slug + '.webp',
+      })),
+    );
 
   // Parchrome's own starters (made in this maker, nobody's settings)
   const STARTERS = [
@@ -206,29 +317,49 @@
     { tog: p + 'f', label: 'Firing error', when: [p + 'b'] },
   ];
   const TABS = [
-    ['Crosshair', [
-      { color: true },
-      { head: 'Outlines' },
-      { tog: 'h', label: 'Outlines' },
-      { num: 'o', label: 'Opacity', min: 0, max: 1, step: 0.01, when: ['h'] },
-      { num: 't', label: 'Thickness', min: 1, max: 6, step: 1, when: ['h'] },
-      { head: 'Center dot' },
-      { tog: 'd', label: 'Center dot' },
-      { num: 'a', label: 'Opacity', min: 0, max: 1, step: 0.01, when: ['d'] },
-      { num: 'z', label: 'Thickness', min: 1, max: 6, step: 1, when: ['d'] },
-      { head: 'Firing' },
-      { tog: 'f', label: 'Fade with firing error' },
-    ]],
+    [
+      'Crosshair',
+      [
+        { color: true },
+        { head: 'Outlines' },
+        { tog: 'h', label: 'Outlines' },
+        { num: 'o', label: 'Opacity', min: 0, max: 1, step: 0.01, when: ['h'] },
+        { num: 't', label: 'Thickness', min: 1, max: 6, step: 1, when: ['h'] },
+        { head: 'Center dot' },
+        { tog: 'd', label: 'Center dot' },
+        { num: 'a', label: 'Opacity', min: 0, max: 1, step: 0.01, when: ['d'] },
+        { num: 'z', label: 'Thickness', min: 1, max: 6, step: 1, when: ['d'] },
+        { head: 'Firing' },
+        { tog: 'f', label: 'Fade with firing error' },
+      ],
+    ],
     ['Inner lines', ROWS_LINE('0', 'inner lines')],
     ['Outer lines', ROWS_LINE('1', 'outer lines')],
   ];
 
   // "Inside the code": names for every key we can name; the rest say "kept as is"
   const NAMES = {
-    c: 'Colour', u: 'Custom colour', h: 'Outlines', t: 'Outline thickness', o: 'Outline opacity',
-    d: 'Center dot', z: 'Center dot thickness', a: 'Center dot opacity', f: 'Fade with firing error',
+    c: 'Colour',
+    u: 'Custom colour',
+    h: 'Outlines',
+    t: 'Outline thickness',
+    o: 'Outline opacity',
+    d: 'Center dot',
+    z: 'Center dot thickness',
+    a: 'Center dot opacity',
+    f: 'Fade with firing error',
   };
-  const LNAMES = { b: 'Show', t: 'Thickness', l: 'Length', v: 'Vertical length', g: 'Separate vertical length', o: 'Offset', a: 'Opacity', m: 'Movement error', f: 'Firing error' };
+  const LNAMES = {
+    b: 'Show',
+    t: 'Thickness',
+    l: 'Length',
+    v: 'Vertical length',
+    g: 'Separate vertical length',
+    o: 'Offset',
+    a: 'Opacity',
+    m: 'Movement error',
+    f: 'Firing error',
+  };
   const SNAMES = { c: 'Dot colour', s: 'Dot size', o: 'Dot opacity', t: 'Custom dot colour' };
   const TOGS = new Set(['h', 'd', 'f', '0b', '0g', '0m', '0f', '1b', '1g', '1m', '1f']);
 
@@ -236,8 +367,21 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => '&#' + c.charCodeAt(0) + ';');
   const store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private window: fine */ } },
+    get(k, d) {
+      try {
+        const v = localStorage.getItem(k);
+        return v === null ? d : JSON.parse(v);
+      } catch (e) {
+        return d;
+      }
+    },
+    set(k, v) {
+      try {
+        localStorage.setItem(k, JSON.stringify(v));
+      } catch (e) {
+        /* private window: fine */
+      }
+    },
   };
 
   let x = parse('0');
@@ -247,18 +391,34 @@
   let err = { move: 0, fire: 0 };
   let bg = BGS.find((b) => b.id === store.get('vl-xh-bg', 'sandstone')) || BGS[0];
   let bgGroup = bg.group;
-  let saved = store.get('vl-xh-saved', []).filter((s) => s && typeof s.n === 'string' && ok(s.c)).slice(0, 48);
+  let saved = store
+    .get('vl-xh-saved', [])
+    .filter((s) => s && typeof s.n === 'string' && ok(s.c))
+    .slice(0, 48);
 
-  function ok(code) { try { parse(code); return true; } catch (e) { return false; } }
+  function ok(code) {
+    try {
+      parse(code);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  const dpr = () => Math.min(window.devicePixelRatio || 1, 3);
+  const stage = $('xhStage');
+  // the gallery page (/valorant/crosshair-gallery) has no maker: it runs gallery() at the bottom instead
+  if (!stage) {
+    gallery();
+    return;
+  }
 
   const q = new URLSearchParams(location.search).get('c');
   if (q && ok(q)) x = parse(q);
 
   /* ================= STAGE ================= */
-  const stage = $('xhStage');
   const cv = $('xhCanvas');
   const ctx = cv.getContext('2d');
-  const dpr = () => Math.min(window.devicePixelRatio || 1, 3);
 
   function drawStage() {
     const W = cv.width;
@@ -281,10 +441,12 @@
   function drawIcon() {
     const c = $('cbIco');
     const k = dpr();
-    if (c.width !== 104 * k) { c.width = c.height = 104 * k; }
+    if (c.width !== 104 * k) {
+      c.width = c.height = 104 * k;
+    }
     const g = c.getContext('2d');
     g.clearRect(0, 0, c.width, c.height);
-    drawCross(g, x, c.width / 2, c.height / 2, 3 * k, { move: 0, fire: 0 });
+    drawCross(g, x, c.width / 2, c.height / 2, Math.min(3 * k, (c.width * 0.42) / reach(x)), { move: 0, fire: 0 });
   }
 
   // one canvas per starter / saved card: the card's code on the picked background
@@ -296,11 +458,24 @@
     c.height = Math.round(r.height * k);
     const g = c.getContext('2d');
     drawBg(g, bg.group === 'map' ? { src: bg.card } : bg, c.width, c.height, c.height * 1.6, c.height / 288);
-    drawCross(g, parse(c.dataset.code), Math.floor(c.width / 2), Math.floor(c.height / 2), Math.max(1, Math.round(1.6 * k)), { move: 0, fire: 0 });
+    const cx = parse(c.dataset.code);
+    drawCross(
+      g,
+      cx,
+      Math.floor(c.width / 2),
+      Math.floor(c.height / 2),
+      Math.min(Math.max(1, Math.round(1.6 * k)), (c.height * 0.42) / reach(cx)),
+      { move: 0, fire: 0 },
+    );
   }
-  function drawCards() { document.querySelectorAll('canvas[data-code]').forEach(drawCard); }
+  function drawCards() {
+    document.querySelectorAll('canvas[data-code]').forEach(drawCard);
+  }
 
-  function drawAll() { drawStage(); drawCards(); }
+  function drawAll() {
+    drawStage();
+    drawCards();
+  }
 
   // walk = the lines push out and bob; spray = they kick out per shot and settle back
   let raf = 0;
@@ -344,7 +519,9 @@
   /* ================= PANEL ================= */
   const rowsEl = $('xhRows');
   const tabsEl = $('xhTabs');
-  tabsEl.innerHTML = TABS.map((t, i) => `<button type="button" role="tab" data-tab="${i}" aria-pressed="${i === tab}">${t[0]}</button>`).join('');
+  tabsEl.innerHTML = TABS.map(
+    (t, i) => `<button type="button" role="tab" data-tab="${i}" aria-pressed="${i === tab}">${t[0]}</button>`,
+  ).join('');
   tabsEl.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
@@ -354,36 +531,52 @@
   });
 
   function renderRows() {
-    rowsEl.innerHTML = TABS[tab][1].map((r) => {
-      if (r.head) return `<p class="xh-head">${r.head}</p>`;
-      if (r.color) {
-        const c = val(x, 'c');
-        const custom = /^[0-9A-Fa-f]{6}/.test(x.P.u || '') ? x.P.u.slice(0, 6) : 'FF4655';
-        return `<div class="xh-row xh-row--color"><span class="xh-lab">Colour</span><div class="xh-swatches">` +
-          COLORS.map((cc, i) => `<button type="button" class="xh-sw" style="--c:#${cc[1]}" data-color="${i}" aria-pressed="${c === i}" title="${cc[0]}"><span class="xh-sr">${cc[0]}</span></button>`).join('') +
-          `<label class="xh-sw xh-sw--custom" style="--c:#${custom}" aria-pressed="${c === 8}" title="Custom colour"><input type="color" id="xhPick" value="#${custom.toLowerCase()}"><span class="xh-sr">Custom colour</span></label>` +
-          `<input class="xh-hex" id="xhHex" type="text" value="${esc((c === 8 ? custom : colorOf(x).slice(1)).toUpperCase())}" maxlength="6" spellcheck="false" aria-label="Custom colour hex"></div></div>`;
-      }
-      const off = (r.when || []).some((k) => !on(x, k));
-      if (r.tog) {
-        return `<div class="xh-row${off ? ' is-off' : ''}"><span class="xh-lab" id="xl-${r.tog}">${r.label}</span>` +
-          `<button type="button" class="xh-tog" role="switch" data-k="${r.tog}" aria-checked="${on(x, r.tog)}" aria-labelledby="xl-${r.tog}"${off ? ' disabled' : ''}><i></i></button></div>`;
-      }
-      const v = val(x, r.num);
-      const fill = Math.max(0, Math.min(100, ((v - r.min) / (r.max - r.min)) * 100));
-      return `<div class="xh-row xh-row--num${off ? ' is-off' : ''}"><label class="xh-lab" for="xr-${r.num}">${r.label}</label>` +
-        `<input class="xh-range" type="range" id="xr-${r.num}" data-k="${r.num}" min="${r.min}" max="${r.max}" step="${r.step}" value="${v}" style="--fill:${fill}%"${off ? ' disabled' : ''}>` +
-        `<input class="xh-num" type="number" data-k="${r.num}" min="${r.min}" max="${r.max}" step="${r.step}" value="${v}" aria-label="${r.label}"${off ? ' disabled' : ''}></div>`;
-    }).join('');
+    rowsEl.innerHTML = TABS[tab][1]
+      .map((r) => {
+        if (r.head) return `<p class="xh-head">${r.head}</p>`;
+        if (r.color) {
+          const c = val(x, 'c');
+          const custom = /^[0-9A-Fa-f]{6}/.test(x.P.u || '') ? x.P.u.slice(0, 6) : 'FF4655';
+          return (
+            `<div class="xh-row xh-row--color"><span class="xh-lab">Colour</span><div class="xh-swatches">` +
+            COLORS.map(
+              (cc, i) =>
+                `<button type="button" class="xh-sw" style="--c:#${cc[1]}" data-color="${i}" aria-pressed="${c === i}" title="${cc[0]}"><span class="xh-sr">${cc[0]}</span></button>`,
+            ).join('') +
+            `<label class="xh-sw xh-sw--custom" style="--c:#${custom}" aria-pressed="${c === 8}" title="Custom colour"><input type="color" id="xhPick" value="#${custom.toLowerCase()}"><span class="xh-sr">Custom colour</span></label>` +
+            `<input class="xh-hex" id="xhHex" type="text" value="${esc((c === 8 ? custom : colorOf(x).slice(1)).toUpperCase())}" maxlength="6" spellcheck="false" aria-label="Custom colour hex"></div></div>`
+          );
+        }
+        const off = (r.when || []).some((k) => !on(x, k));
+        if (r.tog) {
+          return (
+            `<div class="xh-row${off ? ' is-off' : ''}"><span class="xh-lab" id="xl-${r.tog}">${r.label}</span>` +
+            `<button type="button" class="xh-tog" role="switch" data-k="${r.tog}" aria-checked="${on(x, r.tog)}" aria-labelledby="xl-${r.tog}"${off ? ' disabled' : ''}><i></i></button></div>`
+          );
+        }
+        const v = val(x, r.num);
+        const fill = Math.max(0, Math.min(100, ((v - r.min) / (r.max - r.min)) * 100));
+        return (
+          `<div class="xh-row xh-row--num${off ? ' is-off' : ''}"><label class="xh-lab" for="xr-${r.num}">${r.label}</label>` +
+          `<input class="xh-range" type="range" id="xr-${r.num}" data-k="${r.num}" min="${r.min}" max="${r.max}" step="${r.step}" value="${v}" style="--fill:${fill}%"${off ? ' disabled' : ''}>` +
+          `<input class="xh-num" type="number" data-k="${r.num}" min="${r.min}" max="${r.max}" step="${r.step}" value="${v}" aria-label="${r.label}"${off ? ' disabled' : ''}></div>`
+        );
+      })
+      .join('');
   }
 
   // the game writes opacities with up to 3 decimals; whole numbers stay whole
   const fmt = (v, step) => (step < 1 ? String(Math.round(v * 1000) / 1000) : String(Math.round(v)));
-  function rowOf(k) { return TABS.flatMap((t) => t[1]).find((r) => r.num === k || r.tog === k); }
+  function rowOf(k) {
+    return TABS.flatMap((t) => t[1]).find((r) => r.num === k || r.tog === k);
+  }
 
   rowsEl.addEventListener('input', (e) => {
     const el = e.target;
-    if (el.id === 'xhPick') { setCustom(el.value.slice(1)); return; }
+    if (el.id === 'xhPick') {
+      setCustom(el.value.slice(1));
+      return;
+    }
     if (el.id === 'xhHex') {
       const h = el.value.replace(/[^0-9a-f]/gi, '');
       if (h.length === 6) setCustom(h);
@@ -397,15 +590,21 @@
     v = Math.max(r.min, Math.min(r.max, v));
     x.P[k] = fmt(v, r.step);
     // keep the twin control (slider <-> number) in step without redrawing the panel
-    el.closest('.xh-row').querySelectorAll('[data-k]').forEach((t) => {
-      if (t !== el) t.value = v;
-      if (t.type === 'range') t.style.setProperty('--fill', ((v - r.min) / (r.max - r.min)) * 100 + '%');
-    });
+    el.closest('.xh-row')
+      .querySelectorAll('[data-k]')
+      .forEach((t) => {
+        if (t !== el) t.value = v;
+        if (t.type === 'range') t.style.setProperty('--fill', ((v - r.min) / (r.max - r.min)) * 100 + '%');
+      });
     changed(false);
   });
   rowsEl.addEventListener('click', (e) => {
     const sw = e.target.closest('[data-color]');
-    if (sw) { x.P.c = sw.dataset.color; changed(true); return; }
+    if (sw) {
+      x.P.c = sw.dataset.color;
+      changed(true);
+      return;
+    }
     const t = e.target.closest('.xh-tog');
     if (!t) return;
     const k = t.dataset.k;
@@ -458,9 +657,13 @@
       const old = btn.textContent;
       btn.textContent = done || 'Copied';
       btn.classList.add('is-done');
-      setTimeout(() => { btn.textContent = old; btn.classList.remove('is-done'); }, 1400);
+      setTimeout(() => {
+        btn.textContent = old;
+        btn.classList.remove('is-done');
+      }, 1400);
     };
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(flash, () => say('Copy failed: select the code and copy it by hand.', true));
+    if (navigator.clipboard && window.isSecureContext)
+      navigator.clipboard.writeText(text).then(flash, () => say('Copy failed: select the code and copy it by hand.', true));
     else say('Copy failed: select the code and copy it by hand.', true);
   }
 
@@ -492,7 +695,10 @@
   $('xhImport').addEventListener('submit', (e) => {
     e.preventDefault();
     const v = $('xhPaste').value.trim();
-    if (!v) { say('Paste a code first.', true); return; }
+    if (!v) {
+      say('Paste a code first.', true);
+      return;
+    }
     if (load(v, 'Your code')) $('xhPaste').value = '';
   });
 
@@ -500,10 +706,16 @@
   const bgsEl = $('xhBgs');
   function renderBgs() {
     pressed($('xhBgTabs'), 'group', bgGroup);
-    bgsEl.innerHTML = BGS.filter((b) => b.group === bgGroup).map((b) =>
-      `<button type="button" class="xh-bg" role="radio" data-bg="${b.id}" aria-checked="${b === bg}"${b.flat ? ` style="--flat:${b.flat}"` : ''}>` +
-      (b.flat ? '<span class="xh-bg-pic xh-bg-pic--flat"></span>' : `<span class="xh-bg-pic"><img src="${b.tile}" alt="" width="240" height="135" decoding="async"></span>`) +
-      `<b>${b.name}</b></button>`).join('');
+    bgsEl.innerHTML = BGS.filter((b) => b.group === bgGroup)
+      .map(
+        (b) =>
+          `<button type="button" class="xh-bg" role="radio" data-bg="${b.id}" aria-checked="${b === bg}"${b.flat ? ` style="--flat:${b.flat}"` : ''}>` +
+          (b.flat
+            ? '<span class="xh-bg-pic xh-bg-pic--flat"></span>'
+            : `<span class="xh-bg-pic"><img src="${b.tile}" alt="" width="240" height="135" decoding="async"></span>`) +
+          `<b>${b.name}</b></button>`,
+      )
+      .join('');
   }
   $('xhBgTabs').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -527,13 +739,15 @@
 
   /* ================= STARTERS + SAVED ================= */
   function card(name, code, i, mine) {
-    return `<article class="xh-card">` +
+    return (
+      `<article class="xh-card">` +
       `<button type="button" class="xh-card-pic" data-load="${i}" data-mine="${mine ? 1 : ''}" aria-label="Load ${esc(name)} into the maker"><canvas data-code="${esc(code)}"></canvas></button>` +
       `<div class="xh-card-txt"><b>${esc(name)}</b><code>${esc(code)}</code></div>` +
       `<div class="xh-card-keys"><button type="button" class="xh-key" data-copy="${i}" data-mine="${mine ? 1 : ''}">Copy</button>` +
       `<button type="button" class="xh-key" data-load="${i}" data-mine="${mine ? 1 : ''}">Edit</button>` +
       (mine ? `<button type="button" class="xh-key xh-key--x" data-del="${i}" aria-label="Delete ${esc(name)}">&times;</button>` : '') +
-      `</div></article>`;
+      `</div></article>`
+    );
   }
   $('xhStarters').innerHTML = STARTERS.map((s, i) => card(s[0], s[1], i, false)).join('');
 
@@ -558,7 +772,10 @@
     }
     const it = list[+(b.dataset.load !== undefined ? b.dataset.load : b.dataset.copy)];
     if (!it) return;
-    if (b.dataset.copy !== undefined) { copy(it[1], b); return; }
+    if (b.dataset.copy !== undefined) {
+      copy(it[1], b);
+      return;
+    }
     if (load(it[1], it[0])) $('xhTitle').scrollIntoView({ behavior: still.matches ? 'auto' : 'smooth', block: 'start' });
   }
   $('xhStarters').addEventListener('click', onCards);
@@ -581,20 +798,26 @@
   function words(k, v, sec) {
     const n = parseFloat(v);
     if (sec === 'P' && TOGS.has(k)) return n === 1 ? 'On' : 'Off';
-    if ((k === 'c' && sec !== 'G') && COLORS[n]) return `<i class="xh-dot" style="--c:#${COLORS[n][1]}"></i>${COLORS[n][0]}`;
+    if (k === 'c' && sec !== 'G' && COLORS[n]) return `<i class="xh-dot" style="--c:#${COLORS[n][1]}"></i>${COLORS[n][0]}`;
     if (k === 'c' && n === 8 && sec !== 'G') return 'Custom';
-    if ((sec === 'P' && k === 'u') || (sec === 'S' && k === 't')) return `<i class="xh-dot" style="--c:#${esc(v.slice(0, 6))}"></i>#${esc(v.slice(0, 6).toUpperCase())}`;
+    if ((sec === 'P' && k === 'u') || (sec === 'S' && k === 't'))
+      return `<i class="xh-dot" style="--c:#${esc(v.slice(0, 6))}"></i>#${esc(v.slice(0, 6).toUpperCase())}`;
     return esc(v);
   }
   function li(k, v, name, sec) {
     return `<li${name ? '' : ' class="is-unk"'}><code>${esc(k)}</code><span>${name || 'Not documented, kept as is'}</span><b>${words(k, v, sec)}</b></li>`;
   }
   function renderRead() {
-    const P = Object.keys(x.P).filter((k) => carries(x.P, k)).sort((a, b) => rank(a) - rank(b));
+    const P = Object.keys(x.P)
+      .filter((k) => carries(x.P, k))
+      .sort((a, b) => rank(a) - rank(b));
     const groups = [];
     const top = P.filter((k) => !/^[01]/.test(k));
     if (top.length) groups.push(['Crosshair', top.map((k) => li(k, x.P[k], NAMES[k], 'P'))]);
-    [['0', 'Inner lines'], ['1', 'Outer lines']].forEach(([p, title]) => {
+    [
+      ['0', 'Inner lines'],
+      ['1', 'Outer lines'],
+    ].forEach(([p, title]) => {
       const ks = P.filter((k) => k[0] === p);
       if (ks.length) groups.push([title, ks.map((k) => li(k, x.P[k], LNAMES[k.slice(1)], 'P'))]);
     });
@@ -608,11 +831,14 @@
 
   /* ================= GO ================= */
   // the live patch, from the daily weapons feed (scripts/valorant-feed.mjs)
-  fetch('/valorant-weapons.json').then((r) => (r.ok ? r.json() : null)).then((d) => {
-    if (!d || !d.patch) return;
-    $('cbPatch').querySelector('b').textContent = d.patch.branch;
-    $('cbPatch').hidden = false;
-  }).catch(() => {});
+  fetch('/valorant-weapons.json')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      if (!d || !d.patch) return;
+      $('cbPatch').querySelector('b').textContent = d.patch.branch;
+      $('cbPatch').hidden = false;
+    })
+    .catch(() => {});
 
   pressed($('xhZoom'), 'zoom', zoom);
   $('xhZoomTag').textContent = zoom + 'x zoom';
@@ -621,4 +847,68 @@
   changed(true);
   // card canvases are sized by CSS: draw again once the layout has settled
   new ResizeObserver(() => drawCards()).observe($('xhStarters'));
+
+  /* ================= THE GALLERY (/valorant/crosshair-gallery) ================= */
+  // cards from valorant-crosshair-gallery.json on the background picked in the maker; Edit opens the maker
+  function gallery() {
+    const grid = $('xgGrid');
+    const MAKER = '/valorant/crosshairs?c=';
+    let all = [];
+    let cat = 'All';
+    function draw() {
+      const q = $('xgQ').value.trim().toLowerCase();
+      const list = all.filter((p) => (cat === 'All' || p.cat === cat) && (!q || (p.name + ' ' + p.cat + (p.hot ? ' hot' : '')).toLowerCase().includes(q)));
+      grid.innerHTML = list.length
+        ? list
+            .map(
+              (p) =>
+                `<article class="xh-card">` +
+                `<a class="xh-card-pic" href="${MAKER}${esc(p.code)}" aria-label="Edit ${esc(p.name)} in the maker"><canvas data-code="${esc(p.code)}"></canvas>${p.hot ? '<i class="xh-hot">Hot</i>' : ''}</a>` +
+                `<div class="xh-card-txt"><b>${esc(p.name)}</b><code>${esc(p.code)}</code></div>` +
+                `<div class="xh-card-keys"><button type="button" class="xh-key" data-copy="${esc(p.id)}">Copy</button>` +
+                `<a class="xh-key" href="${MAKER}${esc(p.code)}">Edit</a></div></article>`,
+            )
+            .join('')
+        : '<p class="xh-empty">No crosshair matches that. Try another word, or make your own in the maker.</p>';
+      drawCards();
+    }
+    $('cbBg').textContent = bg.name;
+    fetch('/valorant-crosshair-gallery.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => {
+        all = d.xh.filter((p) => ok(p.code));
+        $('cbCount').textContent = all.length;
+        $('cbCats').textContent = d.cats.length;
+        $('xgCats').innerHTML = ['All']
+          .concat(d.cats)
+          .map(
+            (c) =>
+              `<button type="button" data-cat="${esc(c)}" aria-pressed="${c === 'All'}">${esc(c)} <small>${c === 'All' ? all.length : all.filter((p) => p.cat === c).length}</small></button>`,
+          )
+          .join('');
+        // the banner well shows a random one each visit
+        x = parse(all[Math.floor(Math.random() * all.length)].code);
+        drawIcon();
+        draw();
+      })
+      .catch(() => {
+        grid.innerHTML = '<p class="xh-empty">The gallery did not load. Refresh the page to try again.</p>';
+      });
+    $('xgCats').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-cat]');
+      if (!b) return;
+      cat = b.dataset.cat;
+      $('xgCats')
+        .querySelectorAll('button')
+        .forEach((y) => y.setAttribute('aria-pressed', String(y === b)));
+      draw();
+    });
+    $('xgQ').addEventListener('input', draw);
+    grid.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-copy]');
+      const p = b && all.find((y) => y.id === b.dataset.copy);
+      if (p) copy(p.code, b);
+    });
+    new ResizeObserver(() => drawCards()).observe(grid);
+  }
 })();

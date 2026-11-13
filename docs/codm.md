@@ -1,6 +1,6 @@
 # Call of Duty Mobile
 
-**Nov 1 2026 (Adrian):** every CODM title (hero `.li-title`, `.pg-title`, `.cb-title`, `.ct-title`) is **Tourney** italic now, not Big Shoulders Stencil / Orbitron: font in 11layout.css "TOURNEY TITLES", sizes = its `--fs-*-tourney` tokens. Notes below that say "stencil" are history.
+**Nov 1 2026 (Adrian):** every CODM title (hero `.li-title`, `.pg-title`, `.cb-title`, `.ct-title`) is **Orbitron Title** now (Nov 12 2026; Tourney italic Nov 1-12), not Big Shoulders Stencil / Orbitron: font in 11layout.css "ORBITRON TITLES", sizes = its `--fs-*-orb` tokens. Nov 2: the loadouts `.gun-card-gun` and Valorant `.vw-d-name` moved to Tourney too, and no page loads Big Shoulders Stencil any more. Notes below that say "stencil" are history.
 
 Moved out of CLAUDE.md on Nov 1 2026, unchanged. Paths like `parcore.com/docs/x.md` are relative to the outer folder.
 

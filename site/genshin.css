@@ -186,8 +186,8 @@ body.gi-page { background: #040404; }
 .gi-sec { padding-top: 72px; }
 .gi-sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
 .gi-title {
-  font-family: 'Tourney', sans-serif !important;
-  font-size: var(--fs-title-tourney) ;
+  font-family: 'Orbitron Title', sans-serif !important;
+  font-size: var(--fs-title-orb) ;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: 0.01em;
@@ -199,7 +199,7 @@ body.gi-page { background: #040404; }
   background: linear-gradient(90deg, #ffffff, #c0c9d4);
   -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent; font-style: italic; }
+  -webkit-text-fill-color: transparent; }
 .gi-title em { font-style: italic; font-family: inherit !important; }
 /* TITLE GEM (Oct 23 2026, every Genshin page Oct 24, Adrian): every section title leads with
    the gem (--gi-gem) like a bullet. em-sized, so it follows --fs-title on phones. Section
@@ -502,7 +502,7 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
   box-shadow: var(--lb-btn), 0 0 0 5px rgba(214, 100, 106, 0.55);
   margin: 5px; /* room for the ring */
 }
-.gi-tb .gi-title { grid-column: 2; font-size: var(--fs-banner-tourney); line-height: 1.04; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55)); }
+.gi-tb .gi-title { grid-column: 2; font-size: var(--fs-banner-orb); line-height: 1.04; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55)); }
 .gi-tb-desc { grid-column: 2; margin-top: 10px; max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #b9bdc4; text-wrap: pretty; }
 /* Facts (Oct 23 2026): no chip boxes -- one flat line of numbers under a gold
    hairline (the frame's colour), gold diamonds between, wrapping instead of
@@ -619,7 +619,7 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
 .gh-kick::before, .gh-kick::after { content: ''; width: 5px; height: 5px; background: var(--gi-acc, #a3464b); transform: rotate(45deg); }
 .gh-title {
   margin-top: 10px;
-  font-family: 'Tourney', sans-serif !important;
+  font-family: 'Orbitron Title', sans-serif !important;
   font-size: calc(24px + 2px) ;
   font-weight: 900;
   line-height: 1.1;
@@ -627,7 +627,7 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
   background: linear-gradient(90deg, #fff, #c0c9d4);
   -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent; font-style: italic; }
+  -webkit-text-fill-color: transparent; }
 .gh-sub { margin-top: 8px; font-size: 12px; line-height: 1.5; color: #9aa0a8; }
 .gh-srv { display: inline-flex; margin-top: 14px; }
 .gh-list { margin: 0 14px; padding: 0; list-style: none; border-top: 1px solid rgba(211, 188, 142, 0.16); }
@@ -793,4 +793,102 @@ a.gi-card:hover { border-color: rgba(var(--gi-acc-rgb), 0.55); background-color:
   .gi-qa-a { padding: 0 14px 14px; }
   .gi-foot { margin-top: 16px; }
   .gi-foot-key { width: 100%; justify-content: center; }
+}
+
+/* ---- LIGHT WISH CARDS (.gwl-card; moved here from genshin-lobby.css Nov 3 2026 so the Banners page can
+   draw the between-versions cards too). The Lobby's Current wishes row, and GI.betweenWishes(). ---- */
+.gi-row { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 4px 2px 12px; margin: -4px -2px 0; }
+.gi-row::-webkit-scrollbar { display: none; }
+.gwl-card { flex: 0 0 calc((100% - 32px) / 3); scroll-snap-align: start; display: flex; flex-direction: column; overflow: hidden; color: inherit; text-decoration: none; transition: transform 0.25s var(--gi-ease), box-shadow 0.25s ease; }
+/* Element dress (Oct 27 2026, Adrian: the grey cards were plain): the featured 5-star's element, like the
+   Player lookup's build card (.gp-build). Toned down Oct 29 2026 (Adrian: "still want the dark grey"): the
+   element lives in the art (glow behind the character, star dust, sparkles, a thin line under it); the body
+   is our box grey with only a breath of the colour at its top, and the edge is the site's dark edge.
+   The weapon wish has no element: it wears the 5-star gold. */
+.gwl-card {
+  --gwl-spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0C10.9 6.6 13.4 9.1 20 10 13.4 10.9 10.9 13.4 10 20 9.1 13.4 6.6 10.9 0 10 6.6 9.1 9.1 6.6 10 0Z'/%3E%3C/svg%3E");
+  position: relative;
+  isolation: isolate;
+  border-color: var(--lb-edge);
+  background:
+    radial-gradient(90% 45% at 50% 18%, color-mix(in srgb, var(--gi-el) 16%, transparent), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--gi-el) 9%, var(--lb-box)) 0%, var(--lb-box) 50%);
+}
+.gwl-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(color-mix(in srgb, var(--gi-el) 55%, #fff) 0.8px, transparent 1.4px),
+    radial-gradient(color-mix(in srgb, var(--gi-el) 80%, #fff) 0.6px, transparent 1.1px);
+  background-size: 97px 89px, 53px 61px;
+  background-position: 11px 7px, 38px 29px;
+  opacity: 0.35;
+  -webkit-mask-image: linear-gradient(180deg, #000 25%, transparent 55%);
+  mask-image: linear-gradient(180deg, #000 25%, transparent 55%);
+}
+.gwl-art {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in srgb, var(--gi-el) 40%, transparent);
+  background: radial-gradient(60% 80% at 50% 62%, color-mix(in srgb, var(--gi-el) 32%, transparent), transparent 72%);
+}
+/* Three sparkles over the art, top left and right. */
+.gwl-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--gi-el) 60%, #fff);
+  -webkit-mask: var(--gwl-spark) 14px 14px / 18px no-repeat, var(--gwl-spark) 38px 38px / 9px no-repeat, var(--gwl-spark) right 18px top 24px / 13px no-repeat;
+  mask: var(--gwl-spark) 14px 14px / 18px no-repeat, var(--gwl-spark) 38px 38px / 9px no-repeat, var(--gwl-spark) right 18px top 24px / 13px no-repeat;
+  opacity: 0.7;
+}
+.gwl-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 0.6s var(--gi-ease); }
+.gwl-card--wep .gwl-art { gap: 10%; }
+.gwl-card--wep .gwl-art img { position: relative; inset: auto; width: auto; height: 118%; margin-top: -2%; object-fit: contain; transform: rotate(-16deg); }
+.gwl-card--wep .gwl-art img + img { transform: rotate(16deg); }
+.gwl-body { display: flex; flex: 1; flex-direction: column; gap: 6px; padding: 14px 16px 16px; }
+.gwl-tag { color: var(--gi-dim); }
+.gwl-name { overflow: hidden; font: 900 calc(26px + 2px)/1.1 'Orbitron Title', sans-serif; text-transform: uppercase; color: #fff; white-space: nowrap; text-overflow: ellipsis; }
+.gwl-card--wep .gwl-name { font-size: 17px; line-height: 1.3; white-space: normal; }
+.gwl-name small { font-size: 0.8em; color: var(--gi-dim); }
+.gwl-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gi-muted); }
+.gwl-meta img { width: 18px; height: 18px; }
+.gwl-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--gi-line); }
+.gwl-four { display: flex; gap: 5px; }
+.gwl-four .gi-tile { width: 34px; height: 34px; }
+.gwl-end { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.gwl-end b { font: 700 15px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gwl-end b.is-ending { color: var(--gi-acc-text); }
+@media (hover: hover) {
+  .gwl-card:hover { transform: translateY(-3px); box-shadow: var(--lb-shadow-hover), 0 10px 30px -12px color-mix(in srgb, var(--gi-el) 35%, transparent); }
+  .gwl-card:hover .gwl-art img { transform: scale(1.04); }
+  .gwl-card--wep:hover .gwl-art img { transform: rotate(-16deg) scale(1.04); }
+  .gwl-card--wep:hover .gwl-art img + img { transform: rotate(16deg) scale(1.04); }
+}
+.gwl-card:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* Between versions (Nov 3 2026, GI.betweenWishes): two cards, so half the row each; a lower art band.
+   The next wishes' art = the countdown on the first 5-star's element glow. */
+.gwl-card--next, .gwl-card--std { flex-basis: calc((100% - 16px) / 2); }
+.gwl-card--next .gwl-art, .gwl-card--std .gwl-art { aspect-ratio: 21 / 9; }
+.gwl-clock { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.gwl-clock b { font: 700 46px/1 'Sora', sans-serif; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; text-shadow: 0 2px 18px color-mix(in srgb, var(--gi-el) 60%, transparent); }
+.gwl-with { font-size: 13px; color: var(--gi-muted); }
+/* The 8 Standard 5-stars shrink to fit one line. */
+.gwl-card--std .gwl-four { flex: 1; min-width: 0; }
+.gwl-card--std .gwl-four .gi-tile { flex: 1 1 0; width: auto; max-width: 40px; height: auto; aspect-ratio: 1; }
+@media (max-width: 1280px) and (min-width: 971px) {
+  .gwl-card { flex-basis: calc((100% - 16px) / 2); }
+}
+@media (max-width: 970px) {
+  .gwl-card { flex-basis: 84%; }
+  .gwl-name { font-size: calc(22px + 2px); }
+  .gwl-card--next .gwl-art, .gwl-card--std .gwl-art { aspect-ratio: 16 / 9; }
+  .gwl-clock b { font-size: 36px; }
 }

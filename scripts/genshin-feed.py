@@ -7,6 +7,7 @@
 # Run every 3 hours by .github/workflows/genshin-feed.yml. No keys: both sources are public.
 #   ennead  -- api.ennead.cc/mihoyo/genshin: calendar (banners, events, challenges) + codes
 #   yatta   -- gi.yatta.moe (Project Amber): characters, daily domains, materials, wish art
+#   hoyoverse -- the official news API: the next version's start + Phase I wishes (`next`)
 #
 # Each source is fetched on its own: if one fails, the old value for it is kept, so
 # one broken site never blanks a section. The file is only rewritten when the data
@@ -165,6 +166,42 @@ def banners(calendar):
             'characters': chars,
             'weapons': [weapon(w, arms.get(w['name'])) for w in sorted(b.get('weapons', []), key=lambda w: -w['rarity'])],
         })
+    return out
+
+
+# Between versions (Nov 3 2026): ennead lists no upcoming wish, so the "next wishes" countdown reads
+# HoYoverse's own notices: the newest "Version X Update Maintenance Preview" (channel 397: start + hours)
+# and that version's "Event Wishes Notice - Phase I" (channel 395: who's featured). Wishes open when
+# maintenance ends, at the same moment on every server.
+# shortcut: Phase I only (Phase II starts the minute Phase I ends, so there's no gap to count down to).
+NEWS = 'https://sg-public-api-static.hoyoverse.com/content_v2_user/app/a1b1f9d3315447cc/'
+
+
+def news_list(chan):
+    return get(NEWS + 'getContentList?iAppId=32&iChanId=%d&iPageSize=20&iPage=1&sLangKey=en-us' % chan)['data']['list']
+
+
+def news_text(info_id):
+    return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', get(NEWS + 'getContent?iAppId=32&iInfoId=%s&sLangKey=en-us' % info_id)['data']['sContent'])))
+
+
+def next_wishes():
+    pre = next(x for x in news_list(397) if re.fullmatch(r'Version \S+ Update Maintenance Preview', x['sTitle'].strip()))
+    ver = pre['sTitle'].split()[1]
+    m = re.search(r'begins (\d{4}/\d\d/\d\d \d\d:\d\d) \(UTC\+8\) and is estimated to take (\d+) hours?', news_text(pre['iInfoId']))
+    maint = int(datetime.datetime.strptime(m.group(1), '%Y/%m/%d %H:%M').replace(tzinfo=UTC8).timestamp())
+    out = {'version': ver, 'maint': maint, 'start': maint + int(m.group(2)) * 3600, 'fives': [], 'fours': [],
+           'url': 'https://genshin.hoyoverse.com/en/news/detail/%s' % pre['iInfoId']}
+    note = next((x for x in news_list(395) if x['sTitle'].strip() == 'Version %s Event Wishes Notice - Phase I' % ver), None)
+    if note:  # posted ~2 days before the update; until then the card shows the clock alone
+        text = news_text(note['iInfoId'])
+        out['url'] = 'https://genshin.hoyoverse.com/en/news/detail/%s' % note['iInfoId']
+        who = r'"([^"]+)" ([^"(]+?) \((Pyro|Hydro|Anemo|Electro|Dendro|Cryo|Geo)\)'
+        for rank, key in ((5, 'fives'), (4, 'fours')):
+            for part in re.findall(r'%d-star characters? (.*?) will receive' % rank, text):
+                for title, name, el in re.findall(who, part):
+                    if name not in [c['name'] for c in out[key]]:
+                        out[key].append({'name': name, 'title': title, 'element': el})
     return out
 
 
@@ -1396,6 +1433,7 @@ def main():
         'expired': expired,
         'endgame': endgame,
         'farm': farm,
+        'next': next_wishes,
     }
     for key, job in jobs.items():
         if calendar is None and key in ('banners', 'events', 'challenges'):

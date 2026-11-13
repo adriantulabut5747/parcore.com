@@ -142,6 +142,7 @@
         <dl class="bd-s-facts">${fact('Nation', c.region || 'None', natImg)}${fact('Element', c.element, elImg)}${fact('Constellation', p.constellation)}${fact('Affiliation', p.affiliation)}${fact('Special dish', p.dish && p.dish[0], dish)}${fact('Namecard', p.card)}</dl>
         <div class="bd-s-count"><span class="gi-label">${now0 ? 'Ends in' : 'Starts in'}</span><div class="gi-clock-units" data-bd-count="${now0 ? nextReset() : startOf(c.birthday[0], c.birthday[1], u.y)}"></div></div>
         <div class="bd-s-keys">
+          ${GI.charHas(c.name) ? `<a class="gi-key" href="${GI.charHref(c.name)}">Character page</a>` : ''}
           <button type="button" class="gi-key" data-copy="${esc(location.origin + location.pathname + '?c=' + slug(c.name))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Copy</span></button>
           <button type="button" class="gi-key" data-ics="one:${c.id}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Add to calendar</button>
         </div>

@@ -65,7 +65,7 @@
 }
 .mch-hero-title {
   margin: 22px 0 0;
-  font-family: 'Tourney', sans-serif !important; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif !important;
   font-size: calc(clamp(33px, 3.6vw, 60px) + 2px); /* = /coc/ .ch-title */
   font-weight: 900;
   line-height: 1.02;
@@ -733,6 +733,29 @@ body.mc-home:not(.mt-page) .mch-ch:not(.mch-ch--play) {
 body.mc-home:not(.mt-page) .mch-ch.mch-ch--deepslate {
   background: rgba(255, 255, 255, 0.03);
 }
+/* Solid ground (Nov 2 2026, Adrian): the deepslate pit's floor fades to #0d0e10
+   and the blackstone tile never met it cleanly, so what follows a pit is flat
+   #0d0e10. A pit keeps only its first section; .mch-ch--cont is the rest of it,
+   split into its own chapter with no top spacing so the sections stay 96px
+   (phones 56px) apart, same as before the split. */
+body.mc-home:not(.mt-page) .mch-ch.mch-ch--solid {
+  background: #0d0e10;
+}
+.mch-ch.mch-ch--cont {
+  padding-top: 0;
+}
+.mch-ch--cont .mch-frame > .mch-sec:first-of-type {
+  margin-top: 0;
+}
+/* A trailing margin used to fold into the 96px gap; at a pit's end it would add to it (Commands' Where to paste). */
+.mch-vs:last-child {
+  margin-bottom: 0;
+}
+@media (max-width: 970px) {
+  .mch-ch--cont .mch-frame > .mch-sec:first-of-type {
+    margin-top: 24px; /* + the pit's 32px bottom padding = 56 */
+  }
+}
 /* mc-java.css's 80% black sheet over .coc-content (the old dirt wallpaper's
    dimmer; mc-tool.css drops it too) was hidden under those bands. */
 body.mc-home:not(.mt-page) .coc-content::before {
@@ -1085,15 +1108,13 @@ body.mc-home.mt-page .mch-hero--tool + .mch-hero-tabs {
 }
 /* Phone trail: 11layout.css BREADCRUMB (Oct 28 2026, shared with Genshin). */
 
-/* ---- TOURNEY TITLES (Oct 31 2026, Adrian; Handjet before, Orbitron before that) ----
-   Every Minecraft page's banner + section titles in Tourney italic 800, like CoC / Valorant / Clash Royale.
-   Sizes = the Orbitron ones + 2px (Tourney runs small); the tool banner = CoC's .tb-title. Each page links the
-   font (Google Fonts "Tourney:ital,wght@1,100..900"). hcpc.html's old hero is left alone. */
+/* ---- TITLES (Oct 31 2026, Adrian; Orbitron Title since Nov 12 2026, Tourney before, Handjet before that) ----
+   Every Minecraft page's banner + section titles in 'Orbitron Title' (11layout.css), like CoC / Valorant / Clash Royale.
+   The tool banner = CoC's .tb-title. hcpc.html's old hero is left alone. */
 html body .mch .mch-sec-title,
 html body .mch .lob-title,
 html body .mch-hero-title {
-  font-family: 'Tourney', sans-serif !important;
-  font-style: italic;
+  font-family: 'Orbitron Title', sans-serif !important;
   font-weight: 900;
   letter-spacing: 0.01em;
 }
@@ -1102,7 +1123,7 @@ html body .mch-hero-title--sora {
 }
 html body .mch .mch-sec-title,
 html body .mch .lob-title {
-  font-size: var(--fs-title-tourney);
+  font-size: var(--fs-title-orb);
   line-height: 1.05;
 }
 html body .mch .mch-sec-title em,
@@ -1111,16 +1132,16 @@ html body .mch .lob-title em {
   font-style: inherit;
 }
 body.mc-home .mch-hero--tool .mch-hero-title {
-  font-size: var(--fs-banner-tourney);
+  font-size: var(--fs-banner-orb);
   line-height: 1.04;
 }
 @media (max-width: 970px) {
   body.mc-home .mch-hero--tool .mch-hero-title {
-    font-size: var(--fs-banner-tourney);
+    font-size: var(--fs-banner-orb);
   }
 }
 
-/* ---- MINECRAFT FONTS (Oct 31 2026, Adrian): Sora text, Tourney italic titles, Orbitron for eyebrows + numbers, no
+/* ---- MINECRAFT FONTS (Oct 31 2026, Adrian): Sora text, Orbitron Title titles, Orbitron for eyebrows + numbers, no
    Oxanium or Handjet. The mc-* files say so themselves; these are the pieces from files other sections share (the
    tool cards' coc-cards.css, the article strip), overridden on Minecraft pages only (this file is on all of them). ---- */
 html body :is(.tc-name, .th-card .th-tag, .th-card .th-label, .art-cat, .art-soon, .art-row-cat, .art-read-mark),

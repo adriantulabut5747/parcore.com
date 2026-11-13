@@ -307,7 +307,7 @@
   const faceHtml = (n) => {
     const c = faces[n];
     if (!c) return '';
-    return `<a class="en-face${isMine(n) ? ' is-mine' : ''}" href="/genshin-impact/characters?q=${encodeURIComponent(n)}" title="${esc(n)}"><span class="gi-tile r${c.rarity}"><img src="${esc(c.icon)}" alt="${esc(n)}" loading="lazy" width="40" height="40"></span></a>`;
+    return `<a class="en-face${isMine(n) ? ' is-mine' : ''}" href="${GI.charHref(n)}" title="${esc(n)}"><span class="gi-tile r${c.rarity}"><img src="${esc(c.icon)}" alt="${esc(n)}" loading="lazy" width="40" height="40"></span></a>`;
   };
   function facesRow(users, cap) {
     const sorted = [...users].filter((n) => faces[n]).sort((a, b) => isMine(b) - isMine(a));

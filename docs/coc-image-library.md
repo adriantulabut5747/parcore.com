@@ -44,7 +44,7 @@ dark-orb, earthquake-boots, electro-boots, electro-fangs, eternal-tome,
 fire-heart, fireball, flame-blower, frost-flake, frozen-arrow, giant-arrow,
 giant-gauntlet, haste-vial, healer-puppet, healing-tome, henchmen-puppet,
 heroic-torch, hog-rider-doll, invisibility-vial, lavaloon-puppet, life-gem,
-magic-mirror, metal-pants, meteor-staff, monolith-arrow, noble-iron, rage-gem,
+magic-mirror, metal-pants, meteor-staff, monolith-arrow, noble-iron, portal-pendant, rage-gem,
 rage-vial, revenge-deck, rocket-backpack, rocket-spear, royal-gem, ruin-witch,
 seeking-shield, sky-wagon, snake-bracelet, spiky-ball, stick-horse,
 stun-blaster, vampstache

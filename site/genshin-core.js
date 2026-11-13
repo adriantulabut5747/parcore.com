@@ -451,7 +451,72 @@
     sheet.closest('dialog').addEventListener('close', () => (sheet.style.transform = ''));
   }
 
+  // ---- BETWEEN VERSIONS (Nov 3 2026): no event wish is live (the gap between a version's last wish and
+  // the next update). Two light cards (.gwl-card, genshin.css): the next wishes' countdown (feed `next`,
+  // from HoYoverse's own notices) and the Standard wish, which never closes (genshin-wishpool.json).
+  // Lobby + Banners page. Times are the reader's own clock: an update goes live everywhere at once.
+  function betweenWishes(feed) {
+    const pool = fetch('/genshin-wishpool.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+    const at = (s) => new Date(s * 1000).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return pool.then((wp) => {
+      const t = now();
+      const icons = {};
+      (feed.characters || []).forEach((c) => (icons[c.name] = c.icon));
+      const els = (list) =>
+        [...new Set(list.map((c) => c.element))].map((e) => `<img src="${elIcon(e.toLowerCase())}" alt="${esc(e)}">`).join('');
+      let out = '';
+      const nx = feed.next;
+      // A day past the start with still no wish in the feed: drop the card, not show a stale clock.
+      if (nx && nx.start > t - 86400) {
+        const fives = nx.fives || [];
+        const fours = (nx.fours || []).map((c) => esc(c.name));
+        const open = nx.start <= t;
+        out += `<a class="gi-box gwl-card gwl-card--next" href="${esc(nx.url)}" target="_blank" rel="noopener" style="--gi-el:${EL[(fives[0] || {}).element] || NEUTRAL}">
+          <span class="gwl-art"><span class="gwl-clock">${
+            open
+              ? `<span class="gi-label">Version ${esc(nx.version)} is out</span><b>Any moment</b>`
+              : `<span class="gi-label">New wishes in about</span><b role="timer" aria-live="off" data-end="${+nx.start}">${short(nx.start - t)}</b>`
+          }</span></span>
+          <span class="gwl-body"><span class="gi-label gwl-tag">Next wishes · Version ${esc(nx.version)}</span><b class="gwl-name">${
+            fives.length ? fives.map((c) => esc(c.name)).join(' <small>&amp;</small> ') : 'Version ' + esc(nx.version)
+          }</b>
+          <span class="gwl-meta">${els(fives)}${
+            open
+              ? 'The new wishes show up here within three hours.'
+              : `Maintenance from ${at(nx.maint)}, about ${Math.round((nx.start - nx.maint) / 3600)} hours`
+          }</span>
+          <span class="gwl-foot"><span class="gwl-with">${fours.length ? 'With ' + fours.slice(0, -1).join(', ') + (fours.length > 1 ? ' &amp; ' : '') + fours.slice(-1) : 'Official notice'}</span>${
+            open ? '' : `<span class="gwl-end"><span class="gi-label">Opens, your time</span><b>${at(nx.start)}</b></span>`
+          }</span></span></a>`;
+      }
+      const std = wp && wp.pool && wp.pool['5c'];
+      if (std) {
+        const mona = (wp.chars && wp.chars.Mona) || {};
+        out += `<a class="gi-box gwl-card gwl-card--std" href="/genshin-impact/wish-simulator" style="--gi-el:${EL.Hydro}">
+          <span class="gwl-art">${mona.splash ? `<img src="${esc(mona.splash)}" alt="" loading="lazy" decoding="async">` : ''}</span>
+          <span class="gwl-body"><span class="gi-label gwl-tag">Wanderlust Invocation · always open</span><b class="gwl-name">Standard wish</b>
+          <span class="gwl-meta">${std.length} 5-star characters, paid with Acquaint Fates</span>
+          <span class="gwl-foot"><span class="gwl-four">${std
+            .filter((n) => icons[n])
+            .map((n) => tile(icons[n], 5, n))
+            .join('')}</span></span></span></a>`;
+      }
+      return out;
+    });
+  }
+
+  // Character pages built so far (scripts/genshin-characters.py writes the list; GI.feed waits for it). A face without one opens the list's search.
+  let charPages = new Set();
+  const charSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const charHas = (name) => charPages.has(charSlug(name));
+  const charHref = (name) => (charHas(name) ? '/genshin-impact/characters/' + charSlug(name) : '/genshin-impact/characters?q=' + encodeURIComponent(name));
+
   window.GI = {
+    charHas,
+    charHref,
+    betweenWishes,
     sheetDrag,
     glide,
     ON_PAGES,
@@ -488,9 +553,17 @@
     TBF,
     SI,
     SUB_ICON,
-    feed: fetch('/genshin-feed.json').then((r) => {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
+    feed: Promise.all([
+      fetch('/genshin-feed.json').then((r) => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      }),
+      fetch('/genshin-character-pages.json')
+        .then((r) => (r.ok ? r.json() : []))
+        .catch(() => []),
+    ]).then(([feed, pages]) => {
+      charPages = new Set(pages);
+      return feed;
     }),
   };
 

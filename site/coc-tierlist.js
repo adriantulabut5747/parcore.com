@@ -595,7 +595,7 @@
     var imgs = {};
     btn.disabled = true;
     Promise.all(
-      [document.fonts.load('italic 900 42px Tourney'), document.fonts.load('800 44px Oxanium'), document.fonts.load('800 14px Sora')].concat(
+      [document.fonts.load("900 42px 'Orbitron Title'"), document.fonts.load('800 44px Oxanium'), document.fonts.load('800 14px Sora')].concat(
         [...srcs].map(
           (s) =>
             new Promise((ok) => {
@@ -627,8 +627,8 @@
       x.fillStyle = bg;
       x.fillRect(0, 0, W, H);
       x.textBaseline = 'middle';
-      // Title: the banner's Tourney italic caps, "TIER LIST" in red.
-      x.font = 'italic 900 42px Tourney';
+      // Title: the banner's Orbitron caps, "TIER LIST" in red.
+      x.font = "900 42px 'Orbitron Title'";
       var t1 = LIST.title(data, filter);
       x.fillStyle = '#eff2f5';
       x.fillText(t1, PAD, TOP / 2);

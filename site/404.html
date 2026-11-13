@@ -406,12 +406,7 @@ a { color: inherit; }
           <span><strong>Valorant</strong><small>Player search and a crosshair maker</small></span>
           <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
         </a></li>
-        <li><a class="lobby" href="/web-resources/" data-blip="3">
-          <img src="/icons/web-resources.svg" alt="">
-          <span><strong>Web Resources</strong><small>Free sites for anime, movies, music, games and AI tools</small></span>
-          <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-        </a></li>
-        <li><a class="lobby" href="/" data-blip="4">
+        <li><a class="lobby" href="/" data-blip="3">
           <img src="/icons/parchrome-logo.svg" alt="">
           <span><strong>Parchrome home</strong><small>Every game and section in one place</small></span>
           <span class="join"><span>Join</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
@@ -453,7 +448,7 @@ a { color: inherit; }
   // ping delay matches the moment the sweep (which starts at 12 o'clock and
   // turns clockwise) passes that angle, so each blip lights as it's swept.
   var lobbies = document.querySelectorAll('.lobby');
-  var spots = [[38, 30], [110, 40], [200, 26], [258, 40], [322, 18]]; // [degrees, % from centre]
+  var spots = [[38, 30], [110, 40], [200, 26], [322, 18]]; // [degrees, % from centre]
   var sweepSecs = 3.6 * 1.6;
   var blips = [];
   lobbies.forEach(function (a, i) {
@@ -528,19 +523,30 @@ a { color: inherit; }
     function get(u) { return fetch(u).then(function (r) { return r.json(); }); }
     return get('/home.json').then(function (d) {
       return Promise.all((d.featured || []).map(function (g) {
-        var tiles;
-        if (g.from === 'hwr') tiles = get('/hwr-categories.json').then(function (c) {
-          return (c.categories || []).map(function (x) { return { name: x.name, sub: 'Web Resources', link: x.link }; });
+        var out = [], seen = {};
+        function add(name, sub, link, soon) {
+          if (soon || !link || link.indexOf('?') > -1 || seen[link]) return;
+          seen[link] = 1;
+          out.push({ name: name, sub: sub || g.title, link: link, icon: g.icon, group: g.title });
+        }
+        var pages = Promise.resolve();
+        if (g.cocNav) pages = get('/coc-nav-data.json').then(function (c) {
+          add('Lobby', '', '/coc/');
+          add('All tools', '', '/coc/tools/');
+          (c.guides || []).forEach(function (t) { add(t.name, t.desc, t.href, t.soon); });
+          (c.townhalls || []).forEach(function (t) { add(t.label + ' Layouts', '', t.layoutHref); add(t.label + ' Armies', '', t.armyHref); });
         });
-        else if (g.gameNav) tiles = get('/game-nav.json').then(function (n) {
-          return ((n[g.gameNav] || {}).pages || []).filter(function (p) { return !p.soon; }).map(function (p) {
-            var o = (g.tiles || {})[p.link] || {};
-            return { name: o.name || p.name, sub: o.sub || g.title, link: p.link };
+        else if (g.gameNav) pages = get('/game-nav.json').then(function (n) {
+          var nav = n[g.gameNav] || {};
+          (nav.groups || []).forEach(function (gr) {
+            add(gr.name, '', gr.link);
+            (gr.pages || []).forEach(function (p) { add(p.name, p.sub || p.desc, p.link, p.soon); });
           });
+          (nav.pages || []).forEach(function (p) { add(p.name, p.sub || p.desc, p.link, p.soon); });
         });
-        else tiles = Promise.resolve((g.tiles || []).filter(function (t) { return !t.soon; }));
-        return tiles.then(function (ts) {
-          return ts.map(function (t) { return { name: t.name, sub: t.sub, link: t.link, icon: g.icon, group: g.title }; });
+        return pages.then(function () {
+          (g.tiles || []).forEach(function (t) { add(t.name, t.sub, t.link, t.soon); });
+          return out;
         });
       }));
     }).then(function (groups) { index = [].concat.apply([], groups); return index; })

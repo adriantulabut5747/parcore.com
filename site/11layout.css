@@ -1,5 +1,22 @@
-/* TOURNEY (Nov 1 2026, Adrian): titles are Tourney 900 on every page, so the font loads here; most pages never linked it. */
-@import url('https://fonts.googleapis.com/css2?family=Tourney:ital,wght@0,100..900;1,100..900&display=swap');
+/* TITLE FONT (Nov 12 2026, Adrian): Tourney is gone, titles are Orbitron again, upright (it has no italic). Self-hosted so
+   size-adjust can shrink it: Orbitron runs ~25% wider than Tourney did, and 80% puts every title back at its Tourney width
+   (measured on 179 caps titles across 14 pages). Plain 'Orbitron' (eyebrows, numbers) stays full size from Google Fonts. */
+@font-face {
+  font-family: 'Orbitron Title';
+  src: url('/fonts/orbitron.woff2') format('woff2');
+  font-weight: 400 900;
+  font-display: swap;
+  size-adjust: 80%;
+}
+/* same file as the italic: Orbitron has none, so <em> / italic spans inside titles stay upright instead of a fake slant */
+@font-face {
+  font-family: 'Orbitron Title';
+  src: url('/fonts/orbitron.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: italic;
+  font-display: swap;
+  size-adjust: 80%;
+}
 /* PARCHROME LOADER */
 body { visibility: hidden; }
 #page-loader { position: fixed; inset: 0; background: radial-gradient(circle at center, #1a1a1c 0%, #0f0f10 70%); display: flex; flex-direction: column; align-items: center;
@@ -347,10 +364,10 @@ body { visibility: hidden; }
      1rem is always the root's 16px, while em is the parent's size and
      compounds when text nests (.lob-sub > span). Phone values are below. */
   --fs-title: clamp(1.75rem, 2.45vw, 2.25rem); /* section titles: 28-36px */
-  /* TOURNEY TITLE SIZES: every section reads these (see "TOURNEY TITLES" below). Nov 1 2026, Adrian: +2px on desktop. */
-  --fs-title-tourney: calc(var(--fs-title) + 4px);                  /* section titles: 32-40px */
-  --fs-banner-tourney: calc(clamp(26px, 2.5vw, 38px) + 4px);        /* page banners (CoC .tb, Minecraft tool, Genshin .gi-tb) */
-  --fs-banner-tourney-lg: clamp(42px, calc(3.8vw + 2px), 58px);     /* CODM / Valorant / Clash Royale .cb banner */
+  /* TITLE SIZES: every section reads these (see "ORBITRON TITLES" below). Nov 1 2026, Adrian: +2px on desktop. */
+  --fs-title-orb: calc(var(--fs-title) + 4px);                  /* section titles: 32-40px */
+  --fs-banner-orb: calc(clamp(26px, 2.5vw, 38px) + 4px);        /* page banners (CoC .tb, Minecraft tool, Genshin .gi-tb) */
+  --fs-banner-orb-lg: clamp(42px, calc(3.8vw + 2px), 58px);     /* CODM / Valorant / Clash Royale .cb banner */
   --fs-sub: 0.9375rem;                         /* text under a section title: 15px */
   --fs-card: 1.125rem;                         /* card titles: 18px */
   --fs-body: 0.875rem;                         /* card / body text: 14px */
@@ -361,8 +378,8 @@ body { visibility: hidden; }
 @media (max-width: 970px) {
   :root {
     --fs-title: 1.125rem;  /* 18px */
-    --fs-title-tourney: 1.5rem; /* 24px (Nov 1 2026, Adrian: phone Tourney titles bigger) */
-    --fs-banner-tourney: 28px;
+    --fs-title-orb: 1.5rem; /* 24px (Nov 1 2026, Adrian: phone titles bigger) */
+    --fs-banner-orb: 28px;
     --fs-sub: 0.8125rem;   /* 13px */
     --fs-card: 1.0625rem;  /* 17px */
     --fs-body: 0.8125rem;  /* 13px */
@@ -1168,27 +1185,34 @@ body.search-modal-open .coc-main {
   #search-input-wrap:has(#search-input:not(:placeholder-shown))::after { display: none; }
 }
 
-/* ---- Tile (.ft-tile): compact name + subtitle over the page's faded art.
-   Shared by the top-bar search results (below) and the home page's
-   Featured Topics (index.html adds its groups, "+N more" and logos). */
+/* ---- Tile (.ft-tile): the home page's Featured Topics card (index.html adds its groups and
+   "Show N more"). A dark key: the page's menu icon on a sunken plate, then name + a subtitle of up
+   to two lines. Nov 2 2026, Adrian: the grey-at-rest wall was too bright. */
 .ft-tile {
-  position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 9px 14px;
-overflow: hidden; isolation: isolate;text-decoration: none;
+  display: flex; align-items: center; gap: 10px; height: 100%; min-height: 64px; padding: 10px 12px 10px 10px; text-decoration: none;
   border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
-  background: var(--lb-raise);
+  background: var(--lb-box2);
   box-shadow: var(--lb-btn);
   color: #e6e8ec;
-  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
-.ft-art { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
-/* dark on the left where the text sits, art showing through on the right */
-.ft-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(20, 20, 22, 0.96) 0%, rgba(20, 20, 22, 0.85) 45%, rgba(20, 20, 22, 0.45) 100%); }
-.ft-name { font: 700 14.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* game logo before the name (search results, where games are mixed) */
-.ft-name-logo { display: inline-block; width: 16px; height: 16px; margin-right: 7px; border-radius: 0; object-fit: cover; vertical-align: -3px; }
-.ft-sub { margin-top: 3px; font: 500 11.5px/1.3 'Sora', sans-serif; color: #9a9ca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
+/* icon = a picture path or SVG markup from the menus (coc-nav-data.json / game-nav.json), sat in a well */
+.ft-ico {
+  flex: none; box-sizing: border-box; width: 40px; height: 40px; padding: 5px; object-fit: contain;
+  border: 2px solid var(--lb-edge); border-radius: var(--lb-r);
+  background: #0d0e11; box-shadow: var(--card-well);
+}
+img.ft-ico[src^="/minecrafticons/"] { image-rendering: pixelated; }
+span.ft-ico { display: grid; place-items: center; color: #c9ccd2; }
+span.ft-ico svg { width: 22px; height: 22px; }
+.ft-text { display: flex; flex-direction: column; min-width: 0; }
+/* names and subs wrap to two lines instead of being cut off */
+.ft-name { font: 700 14.5px/1.25 'Sora', sans-serif; letter-spacing: -0.01em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ft-sub {
+  margin-top: 3px; font: 500 11.5px/1.35 'Sora', sans-serif; color: #8b8e96;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
 .ft-tile:focus-visible {
   outline: 2px solid var(--lb-red-text);
   outline-offset: 2px;
@@ -1197,23 +1221,33 @@ a.ft-tile:hover .ft-art { transform: scale(1.06); opacity: 0.8; }
   transform: translateY(1px);
   box-shadow: var(--lb-btn-down);
 }
+/* Nov 2 2026, Adrian: hover = a touch brighter + the icon tilts a little; no coloured ring */
 .ft-tile:hover {
-  border-color: var(--lb-edge);
-  background: var(--lb-raise-hover);
+  background: var(--lb-box-hover);
   color: #fff;
 }
+.ft-tile:hover .ft-sub { color: #9ea1a9; }
+.ft-ico { transition: transform 0.2s ease; }
+.ft-tile:hover .ft-ico { transform: rotate(-4deg); }
+@media (prefers-reduced-motion: reduce) { .ft-tile:hover .ft-ico { transform: none; } }
+.ft-soon { background: var(--lb-box); }
 /* coming soon: not a link, greyed out */
-.ft-soon .ft-art { filter: grayscale(1); opacity: 0.3; }
+.ft-soon .ft-ico { filter: grayscale(1); opacity: 0.4; }
 .ft-soon .ft-name { color: rgba(255, 255, 255, 0.6); }
 .ft-soon .ft-sub { color: rgba(255, 255, 255, 0.4); }
-@media (max-width: 970px) {
-  .ft-tile { min-height: 52px; padding: 8px 10px; }
-  /* names wrap to two lines instead of being cut off */
-  .ft-name { font-size: 13px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .ft-sub { font-size: 10.5px; margin-top: 2px; }
+/* small laptops: sidebar + 4 columns leave narrow tiles, so the plate and type shrink */
+@media (min-width: 971px) and (max-width: 1320px) {
+  .ft-tile { gap: 8px; padding: 8px 10px 8px 8px; }
+  .ft-ico { width: 34px; height: 34px; padding: 4px; }
+  .ft-name { font-size: 13px; }
+  .ft-sub { font-size: 11px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .ft-art { transition: none; }
+@media (max-width: 970px) {
+  .ft-tile { min-height: 56px; padding: 8px 10px 8px 8px; gap: 10px; }
+  .ft-ico { width: 34px; height: 34px; padding: 4px; }
+  span.ft-ico svg { width: 19px; height: 19px; }
+  .ft-name { font-size: 13px; }
+  .ft-sub { font-size: 10.5px; margin-top: 2px; }
 }
 
 /* Results: one row per page -- game icon, name, tags. Rows are flat until
@@ -1386,241 +1420,330 @@ body {
 }
 
 /* ============================================================
-   SITE FOOTER (.pf-footer) — SHARED
+   SITE FOOTER (.pf-footer) — SHARED (rebuilt Nov 2 2026, 2nd pass)
    ============================================================
-   Moved here from hwr-css.css so every page can use the same footer
-   instead of it being hwr-only. Content is data-driven: socials, legal
-   links, copyright and disclaimer come from 11footer.json, and the link
-   row mirrors the sidebar (sidebar.json's topBox + games, minus tripleA).
-   The builder lives in 11layout.js. hwr pages load this file too, so they
-   keep the footer they already had. */
-/* ---- Flat, Supercell-inspired footer: solid black, no gradient,
-     no border-top, so it continues cleanly from the body above
-     instead of showing a seam. ---- */
+   One pure-black section, no plates (Adrian: "make it look professional,
+   black black"): logo + name + tagline | WEBSITE | GAMES, a hairline, then
+   copyright + legal links | plain social icons, then the fan-site notices in
+   small print. Phones: the columns fold into tap-to-open rows (<details>,
+   forced open on desktop by 11layout.js "SITE FOOTER", which builds the markup).
+   Side padding follows the content (12% / 15% / 5%).
+   3rd pass (Nov 2): columns sit right beside the brand and GAMES spreads
+   over 4 columns to the right edge, so there is no dead gap in the middle. */
 .pf-footer {
-  background: #0a0a0a;
-  padding: 32px 12% 48px;
+  --pf-pad: 12%;
+  background: #000;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 56px 0 36px;
+}
+/* The footer ends the page: drop the bottom padding section files put on the
+   boxes around it (cr.css 60px, mc-java 76px on .coc-main, which wraps the footer
+   one level deep on Minecraft). The footer clears the phone bar itself. */
+:has(.pf-footer) {
+  padding-bottom: 0 !important;
+}
+/* pinned on every child: some section files set * { font-family } */
+.pf-footer * {
+  font-family: 'Sora', 'Inter', sans-serif;
+}
+.pf-in {
+  padding-inline: var(--pf-pad);
 }
 
-/* ---- "Follow us on" label + plain (no button-bg) social icons ---- */
-.pf-footer-social-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 0.3px;
-  margin: 0 0 12px;
+.pf-top {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: 40px 96px;
+  padding-bottom: 44px;
 }
-
-.pf-footer-social {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.pf-footer-social a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s ease;
-}
-
-.pf-footer-social a:hover {
-  opacity: 0.7;
-}
-
-.pf-footer-social svg {
-  width: 18px;
-  height: 18px;
-  fill: #fff;
-}
-
-/* Accounts that aren't live yet — kept visually uniform with the
- rest of the row, just not interactive/clickable. */
-.pf-footer-social a.pf-social-disabled {
-  cursor: default;
-  pointer-events: none;
-}
-
-.pf-footer-divider {
-  width: 100%;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 20px 0;
-}
-
-/* ---- Web Resources links: populated at runtime from the shared
-     hwr-categories.json fetch (window.HwrCategoriesPromise), the
-     same data source the dsn-chip nav uses. On desktop these sit
-     in a single flowing row; on mobile they stack, one per line,
-     to match the reference layout. ---- */
-.pf-footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 28px;
-}
-
-.pf-footer-links a {
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  white-space: nowrap;
-}
-
-.pf-footer-links a:hover {
-  color: var(--text-muted);
-}
-
-/* ---- Bottom row: legal links + copyright ---- */
-.pf-footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.pf-footer-legal {
-  display: flex;
-  gap: 20px;
-}
-
-.pf-footer-legal a {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-.pf-footer-legal a:hover {
-  color: var(--text-main);
-}
-
-.pf-footer-copyright {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 10px 0 0;
-}
-
-/* ---- Small disclaimer line — not a real legal page yet, just a
-     short "we don't own this stuff" note for professionalism
-     until a proper Terms of Service page is built. ---- */
-.pf-footer-disclaimer {
-  font-size: 11px;
-  line-height: 1.6;
-  color: #5c5c5c;
-  max-width: 640px;
-  margin: 14px 0 0;
-}
-
-/* "Back to top": phones only. 11layout.js wraps the label + icons in
-   .pf-footer-head and puts the button on their right. Deliberately quiet:
-   a plain label and a hairline ring around the arrow, so it reads as part
-   of the footer rather than another button competing with the page. */
-.pf-footer-head {
+.pf-brand-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-.pf-to-top {
+.pf-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+}
+.pf-logo img {
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+.pf-logo span {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.pf-tagline {
+  max-width: 300px;
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #7d828a;
+}
+
+/* Columns */
+.pf-cols {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 32px 96px;
+}
+.pf-col summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: default;
+}
+.pf-col summary::-webkit-details-marker {
   display: none;
 }
+.pf-col-chev {
+  display: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+.pf-col ul,
+.pf-legal ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pf-col ul {
+  display: grid;
+  gap: 11px 32px;
+}
+/* Desktop tiers go by the footer's own width (the sidebar and box-two eat a
+   different share at every viewport): side by side from 1080px, brand on
+   top below that. WEBSITE 2 columns, GAMES 3 from 700px, else 2. */
+@media (min-width: 971px) {
+  .pf-in {
+    container-type: inline-size;
+  }
+  #pfColWebsite,
+  #pfColGames {
+    grid-template-columns: repeat(2, max-content);
+  }
+  @container (min-width: 700px) {
+    #pfColGames {
+      grid-template-columns: repeat(3, minmax(max-content, 1fr));
+    }
+  }
+  @container (max-width: 1079.98px) {
+    .pf-top {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+.pf-col a,
+.pf-legal a {
+  color: #8b9099;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+.pf-col a,
+.pf-soon {
+  font-size: 13.5px;
+}
+.pf-soon {
+  color: #50545b;
+  white-space: nowrap;
+}
+.pf-soon em {
+  margin-left: 4px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.pf-col a:hover,
+.pf-legal a:hover,
+.pf-col a[aria-current='page'],
+.pf-legal a[aria-current='page'] {
+  color: #fff;
+}
 
-@media (max-width: 970px) {
+/* Bottom row: copyright + legal | socials */
+.pf-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.pf-legal {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  font-size: 12.5px;
+  color: #6b7079;
+}
+.pf-legal ul {
+  display: flex;
+  gap: 22px;
+}
+.pf-footer-social {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.pf-footer-social a {
+  display: grid;
+  place-items: center;
+}
+.pf-footer-social svg {
+  width: 17px;
+  height: 17px;
+  fill: #8b9099;
+  transition: fill 0.15s ease;
+}
+.pf-footer-social a[href]:hover svg {
+  fill: #fff;
+}
+.pf-footer-social a.pf-social-disabled {
+  cursor: default;
+}
+.pf-footer-social a.pf-social-disabled svg {
+  fill: #4b4f56;
+}
+
+.pf-notices {
+  margin-top: 20px;
+}
+.pf-notices p {
+  max-width: 900px;
+  margin: 0 0 6px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #50545b;
+}
+
+/* Back to top: phones only, beside the logo. */
+.pf-to-top {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #8b9099;
+  font-size: 12.5px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.pf-to-top svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pf-to-top:active {
+  color: #fff;
+}
+
+.pf-footer a:focus-visible,
+.pf-to-top:focus-visible,
+.pf-col summary:focus-visible {
+  outline: 2px solid #8b9099;
+  outline-offset: 3px;
+}
+
+/* Tablet tier: once box-two stacks under box-one (the 1400px sidebar
+   breakpoint) the stacked content uses 15% side margins; match them. */
+@media (min-width: 971px) and (max-width: 1400px) {
   .pf-footer {
-    padding: 30px 5% 120px;
-  }
-
-  .pf-to-top {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px; /* full tap target; the ring is smaller */
-    margin-right: -4px;
-    padding: 0 4px 0 8px;
-    border: 0;
-    background: none;
-    color: var(--text-muted);
-    font-family: 'Inter', sans-serif;
-    font-size: 12.5px;
-    font-weight: 500;
-    letter-spacing: 0.1px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s ease;
-  }
-  .pf-to-top-ring {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 0;
-    color: var(--text-main);
-    transition:
-      border-color 0.2s ease,
-      background-color 0.2s ease;
-  }
-  .pf-to-top svg {
-    width: 15px;
-    height: 15px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .pf-to-top:active {
-    color: var(--text-main);
-  }
-  .pf-to-top:active .pf-to-top-ring {
-    border-color: rgba(255, 255, 255, 0.32);
-    background: rgba(255, 255, 255, 0.05);
-  }
-  .pf-to-top:active svg {
-    transform: translateY(-2px);
-  }
-  .pf-to-top:focus-visible {
-    outline: none;
-  }
-  .pf-to-top:focus-visible .pf-to-top-ring {
-    box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #8b9099;
-  }
-
-  .pf-footer-links {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 20px;
-  }
-
-  .pf-footer-links a {
-    font-size: 14px;
-    font-weight: 500;
-    white-space: normal;
-  }
-
-  .pf-footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .pf-footer-disclaimer {
-    font-size: 10px;
+    --pf-pad: 15%;
   }
 }
 
-/* Tablet tier: once box-two collapses and stacks below box-one
- (the 1400px sidebar breakpoint), the stacked content uses 15%
- side margins, not the ~12% used above 1400px (which comes from
- box-one's 15% margin inside its own ~79%-wide column). Match
- that 15% here so the footer keeps lining up with the stacked
- cards, right up until the 970px tier takes over at 5%. */
-@media (min-width: 971px) and (max-width: 1400px) {
+/* ---- Phones ---- */
+@media (max-width: 970px) {
   .pf-footer {
-    padding: 32px 15% 48px;
+    --pf-pad: 5%;
+    padding: 30px 0 calc(28px + var(--bn-bar-h, 0px) + env(safe-area-inset-bottom, 0px));
+  }
+  .pf-top {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding-bottom: 8px;
+  }
+  .pf-to-top {
+    display: inline-flex;
+  }
+  .pf-tagline {
+    max-width: 420px;
+    margin-top: 6px;
+  }
+  .pf-cols {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .pf-col {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .pf-col summary {
+    min-height: 52px;
+    margin: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pf-col-chev {
+    display: block;
+    color: #8b9099;
+  }
+  .pf-col[open] .pf-col-chev {
+    transform: rotate(180deg);
+  }
+  .pf-col ul {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+    padding-bottom: 12px;
+  }
+  .pf-col a,
+  .pf-soon {
+    display: flex;
+    align-items: center;
+    min-height: 40px; /* tap target */
+    font-size: 14px;
+  }
+  .pf-bottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .pf-legal a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+  }
+  .pf-notices p {
+    font-size: 10.5px;
   }
 }
 
@@ -2528,6 +2651,25 @@ controls there. */
 .sidebar .top-box-item span,
 .sidebar .triple-a-game span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* 10. GAME GLYPHS (Nov 12 2026). Featured games show our own one-colour SVGs
+      (site/icons/sidebar/, sidebar.json "glyph"), not the games' app icons: the
+      publishers' terms don't allow their logos here. Grey at rest, white on
+      hover, red when it's the page you're on. Triple A rows keep their pictures,
+      desaturated so they sit quietly under the glyphs. */
+.sidebar .sidebar-glyph {
+  width: var(--sidebar-icon-lg);
+  height: var(--sidebar-icon-lg);
+  flex-shrink: 0;
+  background: #7d828b;
+  -webkit-mask: var(--glyph) center / contain no-repeat;
+  mask: var(--glyph) center / contain no-repeat;
+  transition: background-color 0.16s ease;
+}
+.sidebar .games-container .game { gap: 14px; padding-top: 10px; padding-bottom: 10px; }
+.sidebar .game:hover .sidebar-glyph { background: var(--text-main); }
+.sidebar .game.active .sidebar-glyph { background: var(--lb-red-text); }
+.sidebar .triple-a-game .sidebar-icon { filter: saturate(0.2) brightness(0.85); }
+
 /* Desktop: 10px more room on both sides (phones: none). Inset drops 16 -> 14
    so rows stay wide enough for the longest names: 24px gutters either side. The
    raised top group still reaches both edges, and the accent bar re-centres in
@@ -2861,8 +3003,8 @@ html body.coc-home .secondary-top-bar .secondary-left .secondary-content:not(.ha
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
-.stb-crumbs a:hover,
-.stb-crumbs a:focus-visible {
+.stb-crumbs a[href]:hover,
+.stb-crumbs a[href]:focus-visible {
   color: #c3c7ce;
   text-decoration: underline;
 }
@@ -2883,15 +3025,15 @@ html body.coc-home .secondary-top-bar .secondary-left .secondary-content:not(.ha
     display: none;
   }
 }
-/* Genshin + Minecraft phones show the trail too ("Genshin › Events › Banners"), like CoC's
+/* Genshin + Minecraft + Valorant (Nov 2 2026) phones show the trail too ("Genshin › Events › Banners"), like CoC's
    in-title one: it replaces the title, every step the same flat grey (current page included,
    Adrian), and the middle steps give way first. One rule since Oct 28 2026 (was genshin.css +
    mc-hero.css). Web Resources keeps its title + scroll-spy section on phones. */
 @media (max-width: 970px) {
-  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left.has-crumbs > .secondary-content { display: none; }
-  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left > .stb-crumbs { display: flex; font-size: 13px; font-weight: 500; line-height: 1; color: var(--text-muted, #949ba4); }
-  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left > .stb-crumbs a { color: inherit; }
-  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"]) .secondary-left > .stb-crumbs a:not([aria-current]) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"], [data-game-nav="valorant"]) .secondary-left.has-crumbs > .secondary-content { display: none; }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"], [data-game-nav="valorant"]) .secondary-left > .stb-crumbs { display: flex; font-size: 13px; font-weight: 500; line-height: 1; color: var(--text-muted, #949ba4); }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"], [data-game-nav="valorant"]) .secondary-left > .stb-crumbs a { color: inherit; }
+  :is([data-game-nav="genshin-impact"], [data-game-nav="minecraft"], [data-game-nav="valorant"]) .secondary-left > .stb-crumbs a:not([aria-current]) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 }
 
 /* ============================================================
@@ -3169,8 +3311,6 @@ body.search-modal-open .bn-bar{ display:none !important; }
 
 @media (max-width:970px){
   :root .bn-bar{ display:flex; }
-  /* Room for the bar under the footer's last line. */
-  [data-game-nav] .pf-footer{ padding-bottom:90px; }
   /* Bottom bar steps aside while the sidebar drawer is open (it is z-index
      9999 against the drawer's 15). Two rules, not one list: an unsupported
      :has() would invalidate the whole list. */
@@ -3606,8 +3746,8 @@ html body .stb-search-wrap { display: none; }      /* desktop-only search button
      (BREADCRUMB above); the white "*" above would otherwise win. */
   html body .secondary-top-bar .stb-crumbs * { color: var(--text-muted, #949ba4); }
   html body .secondary-top-bar .stb-crumbs .stb-crumb-sep { color: #6d7178; }
-  html body .secondary-top-bar .stb-crumbs a:hover,
-  html body .secondary-top-bar .stb-crumbs a:hover * { color: #c3c7ce; }
+  html body .secondary-top-bar .stb-crumbs a[href]:hover,
+  html body .secondary-top-bar .stb-crumbs a[href]:hover * { color: #c3c7ce; }
 
   /* centre: the menus sit in the exact middle of the bar, out of the row
      (left/right 0 + auto margins; not a transform, which would break the
@@ -3850,12 +3990,12 @@ cursor: pointer; transition: background .2s ease, border-color .2s ease, color .
 .stb-dd--guides {
   width: 300px;
 }
-/* Minecraft Tools (18 tools): three across, read left to right, so the menu
-   is 6 rows tall instead of 18. place() in 11layout.js keeps it on screen. */
-.stb-dd--tools {
+/* A game-nav.json group with "cols": 3 (Minecraft Tools, 19 tools): three across, read left
+   to right, 7 rows instead of 19. place() in 11layout.js keeps it on screen. */
+.stb-dd--3col {
   width: min(840px, calc(100vw - 24px));
 }
-.stb-dd--tools .stb-dd-list {
+.stb-dd--3col .stb-dd-list {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 /* A game-nav.json group with "cols": 2 (Genshin's Database, 12 pages): two across, half as tall. */
@@ -4388,12 +4528,11 @@ html body :is(.more-sheet, .bn-bar) * {
   font-family: 'Sora', sans-serif !important; /* section rules ([data-game-nav] .gn-soon, Minecraft's bar) are more specific */
 }
 
-/* ---- TOURNEY TITLES (Nov 1 2026, Adrian): one place for the title font + sizes on every section. Sizes = the
-   --fs-*-tourney tokens in :root above (section files read them). The CODM / Valorant / Clash Royale titles share
+/* ---- ORBITRON TITLES (Nov 1 2026, Adrian; Orbitron Title since Nov 12, was Tourney): one place for the title font + sizes on every section. Sizes = the
+   --fs-*-orb tokens in :root above (section files read them). The CODM / Valorant / Clash Royale titles share
    codm-banner.css + codm-tools.css; their font lives here (was valorant.css / cr.css; CODM was a stencil). ---- */
 html body :is(.cb-title, .ct-title, .pg-title, .li-title, .li-row-title) {
-  font-family: 'Tourney', 'Oxanium', sans-serif;
-  font-style: italic;
+  font-family: 'Orbitron Title', 'Oxanium', sans-serif;
   font-weight: 900;
   letter-spacing: 0.01em;
 }

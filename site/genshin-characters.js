@@ -2,7 +2,7 @@
 // from the feed's `characters` (scripts/genshin-feed.py; `strip` = their wish-result card, cut
 // to the top half). Three views: newest first (the default), nation bands (GI.NATIONS order, then Other),
 // A-Z. Filters: element, weapon, rarity, nation, search; every choice lives in the address so a
-// filtered list can be shared. Cards aren't links until the character pages exist.
+// filtered list can be shared. A card links to its character page once that exists (GI.charHas).
 // "On banner" badge = the feed's current event wishes. The last-banner line (shown with the
 // hover / tap info, never at rest) comes from /genshin-history.json, as on the Rerun tracker.
 // Shared helpers: genshin-core.js. Styles: genshin-characters.css.
@@ -68,7 +68,9 @@
     const nation = c.region || 'No nation';
     const info = [els(c).length > 1 ? 'Every element' : els(c)[0], c.weapon, nation].filter(Boolean).map(esc).join(' &middot; ');
     const art = c.strip ? `<img class="ch-art" src="${esc(c.strip)}" alt="" loading="lazy" decoding="async" width="320" height="512">` : `<img class="ch-art is-icon" src="${esc(c.icon)}" alt="" loading="lazy" decoding="async">`;
-    return `<li class="ch-card r${c.rarity}" tabindex="0">
+    const page = GI.charHas(c.name);
+    return `<li class="ch-card r${c.rarity}"${page ? '' : ' tabindex="0"'}>
+      ${page ? `<a class="ch-link" href="${GI.charHref(c.name)}" aria-label="${esc(c.name)}"></a>` : ''}
       ${art}
       <span class="ch-els">${els(c).slice(0, 1).map((e) => `<img src="${elIcon(e.toLowerCase())}" alt="" title="${esc(e)}">`).join('')}${els(c).length > 1 ? `<i>+${els(c).length - 1}</i>` : ''}</span>
       ${fresh || live ? `<span class="ch-tags">${live ? '<span class="ch-live">On banner</span>' : ''}${fresh ? '<span class="ch-new">New</span>' : ''}</span>` : ''}

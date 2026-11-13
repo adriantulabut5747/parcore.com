@@ -1,7 +1,7 @@
 """Render a thumbnail template to a WebP.
 
-    python _tools/thumbs/render.py music              -> site/icons/home/wr-music.webp
-    python _tools/thumbs/render.py music out.webp     -> custom output path
+    python _tools/thumbs/render.py equipment-tier-list           -> its thumb.webp
+    python _tools/thumbs/render.py equipment-tier-list out.webp  -> custom output path
 
 Each template is _tools/thumbs/<name>.html, laid out at exactly 1280x720.
 OUT maps a template to the image the site already uses, so no page code changes.
@@ -14,7 +14,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, '..', '..', 'site'))
 CHROME = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 OUT = {
-    'music': 'icons/home/wr-music.webp',
     'equipment-tier-list': 'clashofclans/articles/equipment-tier-list/thumb.webp',
     # A folder (trailing /) = article art: shot at 1.5x, saved as banner.webp (1920) + thumb.webp (800).
     'first-hardcore-world': 'minecrafticons/articles/first-hardcore-world/',

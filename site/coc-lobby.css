@@ -59,7 +59,7 @@
 }
 .lb-title {
   margin: 0 0 14px;
-  font-family: 'Tourney', sans-serif; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif;
   text-transform: uppercase;
   font-weight: 900;
   line-height: 1.1;
@@ -72,13 +72,12 @@
 /* 1coclayouts.css puts Oxanium on every element, so any <span>/<em>
    inside a title has to ask for Orbitron itself. */
 .lb-title * {
-  font-family: 'Tourney', sans-serif; font-weight: 900; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif; font-weight: 900;
 }
 .lb-title em {
   /* 1coclayouts.css puts Oxanium on every element, so the accent part has to
      ask for Orbitron itself. */
-  font-family: 'Tourney', sans-serif; font-weight: 900;
-  font-style: italic;
+  font-family: 'Orbitron Title', sans-serif; font-weight: 900;
   white-space: nowrap; /* "top 10" never splits across lines */
   color: #fff;
 }
@@ -209,7 +208,9 @@
   grid-auto-columns: clamp(290px, (100% - 2 * 16px) / 2.75, 340px);
   gap: 16px;
   margin: 0 calc(-1 * var(--bleed));
-  padding: 184px var(--bleed) 24px; /* the tallest action pose (x1.12, below) stands ~178px above its card */
+  padding: 184px var(--bleed) 64px; /* the tallest action pose (x1.12, below) stands ~178px above its card */
+  /* bottom: room for the hover glow (~50px below the card; the scroller clips it); the margin keeps the old gap */
+  margin-bottom: -40px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
@@ -711,9 +712,8 @@
 
 /* ---- FAQ (.qa, Oct 24 2026 rebuild) ------------------------------------
    Help desk left (kicker, title, line, then the site's feedback box from
-   11layout.css "FEEDBACK BOX"), questions right. The left column is sticky
-   on desktop: it rides down beside the questions instead of leaving a hole
-   under itself. Each question is a raised box; its answer opens into a well
+   11layout.css "FEEDBACK BOX"), questions right, starting level with the
+   feedback box (not sticky, Nov 2 2026). Each question is a raised box; its answer opens into a well
    inside it. Phones: header, questions, then the feedback box. */
 .qa {
   position: relative;
@@ -733,10 +733,37 @@
 .qa-side [data-feedback] {
   margin-top: 26px;
 }
+/* Desktop (Nov 2 2026, Adrian): the questions start level with the feedback
+   box, not the kicker. The side column unwraps into the grid: header lines
+   stack in column 1, then the box and the questions share the last row. */
 @media (min-width: 1201px) {
+  .qa-inner {
+    row-gap: 0;
+  }
   .qa-side {
-    position: sticky;
-    top: 96px; /* the 64px desktop bar + breathing room */
+    display: contents;
+  }
+  .qa-side > * {
+    grid-column: 1;
+  }
+  .qa-side [data-feedback],
+  .qa-list {
+    grid-row: 4;
+    margin-top: 26px;
+  }
+  /* The box stretches to the questions' height; the message field takes the extra room. */
+  .qa-side [data-feedback] {
+    align-self: stretch;
+    display: flex;
+  }
+  .qa-side .fb {
+    flex: 1;
+  }
+  .qa-side textarea.fb-field {
+    flex: 1;
+  }
+  .qa-list {
+    grid-column: 2;
   }
 }
 

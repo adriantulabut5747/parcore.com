@@ -8,13 +8,13 @@
 <!-- Loader, top bar, sidebar and search styles all come from 11layout.css below. -->
 
 
-<title>Parchrome | CoC Base Layouts, Game Guides &amp; Web Resources</title>
-<meta name="description" content="CoC base layouts and army comps, guides for Minecraft, Genshin Impact, Valorant, CODM and Tekken, and free websites for movies, anime and games.">
+<title>Parchrome | CoC Base Layouts &amp; Game Guides</title>
+<meta name="description" content="CoC base layouts and army comps, and guides for Minecraft, Genshin Impact, Valorant, CODM and Tekken.">
 <link rel="canonical" href="https://parchrome.netlify.app/">
 <meta property="og:site_name" content="Parchrome">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Parchrome | Game Guides, CoC Layouts &amp; Web Resources">
-<meta property="og:description" content="CoC base layouts and army comps, guides for Minecraft, Genshin Impact, Valorant, CODM and Tekken, and free websites for movies, anime and games.">
+<meta property="og:title" content="Parchrome | Game Guides &amp; CoC Layouts">
+<meta property="og:description" content="CoC base layouts and army comps, and guides for Minecraft, Genshin Impact, Valorant, CODM and Tekken.">
 <meta property="og:url" content="https://parchrome.netlify.app/">
 <meta property="og:image" content="https://parchrome.netlify.app/og/home.jpg">
 <meta property="og:image:width" content="1200">
@@ -27,12 +27,12 @@
 <link rel="icon" href="/icons/parchrome-favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/parchrome-touch-180.png">
 
-<!-- Fonts, one request: Oxanium (sidebar), Orbitron (hero title, section titles), Sora (body, subtitles) -->
+<!-- Fonts, one request: Oxanium (sidebar), Orbitron (hero title, numbers band), Sora (body, subtitles); Orbitron Title (titles) loads in 11layout.css -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Orbitron:wght@500;600;700;800;900&family=Sora:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/11layout.css?v=20261101w9">
+<link rel="stylesheet" href="/11layout.css?v=20261112sb">
 <link rel="stylesheet" href="/article-cards.css?v=20261031logo">
 
 <!-- ============================================================
@@ -71,6 +71,8 @@
 @media (max-width: 970px) {
   :root { --hm-gut: 5%; }
 }
+/* Shared footer lines up with this page's gutter, not its 12% / 15% default. */
+.pf-footer { --pf-pad: var(--hm-gut); }
 
 /* ---- Base ---- */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', sans-serif; }
@@ -103,20 +105,17 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .hm-in { width: 100%; max-width: 1320px; margin-inline: auto; }
 
-/* Section headings: Orbitron caps, solid (no gradient fill). */
-.hm-title {
-  font: 800 clamp(18px, 1.8vw, 24px)/1.15 'Orbitron', sans-serif;
-  letter-spacing: 0.02em;
+/* Section headings: Orbitron Title 900 caps (Nov 2 2026, Adrian; was Tourney), solid, size = 11layout.css token. */
+.hm-title, .hm-perks-head h3 {
+  font: 900 var(--fs-title-orb)/1.15 'Orbitron Title', sans-serif;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--hm-text);
 }
-/* Section title box: gradient Orbitron title over a grey subtitle. No rule
+/* Section title box: Orbitron title over a grey subtitle. No rule
    under it (the hairline + red stub were dropped, Adrian, Oct 21 2026). */
 .hm-head { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 12px 0; margin-bottom: 24px; }
-.hm-head .hm-title {
-  margin: 0; font: 900 clamp(15px, 2vw, 26px)/1.15 'Orbitron', sans-serif; letter-spacing: 1px;
-  background: linear-gradient(90deg, #ffffff, #c0c9d4); -webkit-background-clip: text; background-clip: text; color: transparent;
-}
+.hm-head .hm-title { margin: 0; }
 .hm-head-sub { margin: 0; font: 400 12px/1.5 'Sora', sans-serif; letter-spacing: 0.2px; color: #7a7d82; }
 @media (max-width: 970px) {
   .hm-head { margin-bottom: 18px; }
@@ -383,8 +382,10 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .ft-logo { flex: none; width: 24px; height: 24px; border-radius: var(--lb-r); object-fit: cover; }
 .ft-group h3 a:hover { color: #ff5874; }
 .ft-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; list-style: none; }
-/* The tile itself (.ft-tile, .ft-art, .ft-name, .ft-sub, .ft-soon) lives in
-   11layout.css: the top-bar search results use the same tile. */
+/* small laptops: 4 columns are too narrow for names like "Leaderboards" (JS shows 15, not 16) */
+@media (min-width: 971px) and (max-width: 1150px) { .ft-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* The tile itself (.ft-tile, .ft-ico, .ft-name, .ft-sub, .ft-soon) lives in
+   11layout.css. */
 /* "+N more": the last visible slot of a long group (16th on desktop, 10th on
    phones) opens the rest; same tile, dashed edge so it reads as an action */
 /* "Show N more": a quiet text row under the grid, not a tile -- it isn't
@@ -476,7 +477,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   box-shadow: var(--lb-shadow);
 }
 .hm-perks-head { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
-.hm-perks-head h3 { font: 800 clamp(18px, 1.8vw, 24px)/1.25 'Orbitron', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; color: var(--hm-text); }
+.hm-perks-head h3 { line-height: 1.2; }
 .hm-perks-list { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 56px); }
 .hm-perks-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 14px; padding: 24px 0; border-top: 1px solid var(--lb-edge); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
 .hm-perks-list li:nth-child(-n+2) { padding-top: 0; border-top: 0; box-shadow: none; }
@@ -601,13 +602,6 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   font: 600 11.5px/1 'Sora', sans-serif; color: var(--hm-muted);
   border: 1px solid var(--lb-edge); background: var(--lb-box); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
-/* two groups side by side when both are short (CODM/Genshin/Tekken/Valorant) */
-@media (min-width: 1200px) {
-  #ftGroups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  #ftGroups > .ft-group { margin: 0; }
-  #ftGroups > .ft-wide { grid-column: 1 / -1; }
-  #ftGroups > :not(.ft-wide) .ft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
 @media (max-width: 970px) {
   .ft-group { padding: 14px 12px 12px; }
   .ft-group + .ft-group { margin-top: 12px; }
@@ -617,7 +611,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 /* Numbers band: four wells inside one box, filled from the site's JSON */
 .hm-stats {
   margin-top: 72px; padding: 8px; list-style: none;
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
   border: 2px solid var(--lb-edge); border-radius: calc(var(--lb-r) + 4px);
   background: var(--lb-box); box-shadow: var(--lb-shadow);
 }
@@ -630,7 +624,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 .hm-stat a { color: inherit; text-decoration: none; }
 .hm-stat a:hover { color: #fff; }
 @media (max-width: 970px) {
-  .hm-stats { margin-top: 44px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hm-stats { margin-top: 44px; }
   .hm-stat { padding: 14px; }
   .hm-stat span { font-size: 12px; }
 }
@@ -785,7 +779,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
      jump to a game (smoke section), game guides, featured topics, about,
      feedback + FAQ.
      Lists here are built from JSON at runtime: home.json (featured
-     topics, also game-nav.json + hwr-categories.json), sidebar.json (game guides).
+     topics, also game-nav.json), sidebar.json (game guides).
      ============================================================ -->
 <div class="coc-main">
 
@@ -1133,16 +1127,15 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
     </div>
   </section>
 
-  <!-- ---- FEATURED TOPICS: one group of compact tiles per section (Web
-       Resources, then the games in sidebar order). Built from home.json
-       ("featured"); Web Resources comes from hwr-categories.json and the
-       CODM/Genshin/Tekken/Valorant groups from game-nav.json, so a page
+  <!-- ---- FEATURED TOPICS: one group of compact tiles per section (the
+       games in sidebar order). Built from home.json ("featured"); the
+       CODM/Genshin/Tekken/Valorant groups come from game-nav.json, so a page
        added there (or taken out of "soon") shows up here too. ---- -->
   <section class="hm-ft" id="topics" aria-labelledby="topicsTitle">
     <div class="hm-in">
       <div class="hm-head">
         <h2 class="hm-title" id="topicsTitle">Featured Topics</h2>
-        <p class="hm-head-sub">Every guide, tool and website list on Parchrome.</p>
+        <p class="hm-head-sub">Every guide and tool on Parchrome.</p>
       </div>
       <div id="ftGroups" aria-busy="true">
         <div class="ft-group"><div class="ft-grid"><div class="ft-ph"></div><div class="ft-ph"></div><div class="ft-ph"></div><div class="ft-ph"></div><div class="ft-ph"></div></div></div>
@@ -1152,7 +1145,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 
   <!-- ---- ABOUT: what Parchrome is, on a laptop + phone mockup.
        The two screens are real captures of /coc/town-hall-18/layouts
-       (desktop) and /web-resources/ (phone): /icons/home/screen-*.webp.
+       (desktop) and /articles/ (phone): /icons/home/screen-*.webp.
        Re-shoot them when those pages change a lot. ---- -->
   <section class="hm-about" id="about" aria-labelledby="aboutTitle">
     <div class="hm-in hm-about-grid">
@@ -1168,16 +1161,16 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
       </div>
       <div class="hm-about-copy">
         <h2 class="hm-about-title" id="aboutTitle">We skip the junk part, so you don't have to</h2>
-        <p>Parchrome is a free hub of game guides, tools and websites that actually work. We keep the best and leave the rest out.</p>
+        <p>Parchrome is a free hub of game guides and tools that actually work. We keep the best and leave the rest out.</p>
         <ul class="hm-about-points">
           <li><b>Everything is tested first.</b> Nothing goes on a page until we've used it ourselves.</li>
           <li><b>Made by real players.</b> Each game's guides and tools are built by someone who plays that game seriously.</li>
           <li><b>Live timers keep you on time.</b> See when events and resets end without opening the game.</li>
-          <li><b>Fewer taps, faster answers.</b> Every page is built to get you to the right base, guide or site quickly.</li>
+          <li><b>Fewer taps, faster answers.</b> Every page is built to get you to the right base, guide or tool quickly.</li>
         </ul>
         <div class="hm-actions">
           <a class="hm-btn" href="/coc/">Browse Clash of Clans</a>
-          <a class="hm-btn hm-btn-ghost" href="/web-resources/">Web Resources</a>
+          <a class="hm-btn hm-btn-ghost" href="/articles/">Read the articles</a>
         </div>
         <p class="hm-note">Parchrome works just as well on a phone. Add it to your home screen from your browser's menu to keep it one tap away.</p>
       </div>
@@ -1185,12 +1178,11 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 
     <div class="hm-in">
       <!-- Numbers band: real counts only, read from the JSON the site already
-           runs on (sidebar.json, home.json groups, articles.json,
-           hwr-websites.json) by the page script. "–" until loaded. -->
+           runs on (sidebar.json, home.json groups, articles.json)
+           by the page script. "–" until loaded. -->
       <ul class="hm-stats" id="hmStats" aria-label="Parchrome in numbers">
         <li class="hm-stat"><b data-stat="games">–</b><span>games with guides</span></li>
         <li class="hm-stat"><b data-stat="pages">–</b><span>guides and tools</span></li>
-        <li class="hm-stat"><b data-stat="sites">–</b><span><a href="/web-resources/">websites tested</a></span></li>
         <li class="hm-stat"><b data-stat="articles">–</b><span><a href="/articles/">articles written</a></span></li>
       </ul>
 
@@ -1214,12 +1206,12 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
           <li>
             <span class="hm-perk-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5.2c0 4.4-2.9 8.2-7 9.8-4.1-1.6-7-5.4-7-9.8V6l7-3Z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg></span>
             <h4>Proven and tested</h4>
-            <p>Every guide, tool and website is tried and tested before it goes live.</p>
+            <p>Every guide and tool is tried and tested before it goes live.</p>
           </li>
           <li>
             <span class="hm-perk-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span>
             <h4>Quality over quantity</h4>
-            <p>We'd rather list ten sites that work than a hundred that don't.</p>
+            <p>We'd rather list ten bases that work than a hundred that don't.</p>
           </li>
         </ul>
       </div>
@@ -1252,12 +1244,8 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
             <div class="hm-a"><p>New bases and guides go up as the games update. Fresh bases carry a red NEW tag on their page, and the banner above the game rows tells you when a Town Hall gets new ones.</p></div>
           </details>
           <details class="hm-q" name="faq">
-            <summary>Are the websites in Web Resources safe?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
-            <div class="hm-a"><p>Every site is checked before it goes on the list, but free sites can still run heavy ads and pop-ups. Use an ad blocker such as uBlock Origin, and never download a file you did not ask for.</p></div>
-          </details>
-          <details class="hm-q" name="faq">
-            <summary>Can I suggest a game, guide or website?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
-            <div class="hm-a"><p>Yes. Use the feedback form on this page for guides and games. To suggest a website, use the <a href="/web-resources/contribute">Contribute page</a> in Web Resources.</p></div>
+            <summary>Can I suggest a game or guide?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+            <div class="hm-a"><p>Yes. Use the feedback form on this page.</p></div>
           </details>
           <details class="hm-q" name="faq">
             <summary>Why isn't my game on Parchrome yet?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
@@ -1297,7 +1285,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 </div><!-- /.main -->
 
 <!-- Sidebar, top-bar search, scroll-to-top, pull-to-refresh: all shared, from 11layout.js. -->
-<script src="/11layout.js?v=20261031logo"></script>
+<script src="/11layout.js?v=20261112sb"></script>
 <script>
 /* ============================================================
    HOME PAGE SCRIPT (Oct 2026 rebuild). Needs 11layout.js first
@@ -1394,14 +1382,13 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
 
     // Rotating placeholder: example searches typed out every few seconds.
     const examples = [
-      'Search games, guides, resources...',
+      'Search games, guides, tools...',
       'TH18 base layouts',
       'Vanilla resource packs',
       'Genshin Impact banners',
       'CODM loadouts',
       'TH18 armies',
-      'Valorant crosshairs',
-      'Anime streaming sites'
+      'Valorant crosshairs'
     ];
     let exampleIndex = 0;
     let typer = null;
@@ -1470,7 +1457,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
   })();
 
   // ---------- FEATURED TOPICS: one titled grid of tiles per group. A group
-  // lists its tiles, or pulls them from hwr-categories.json / game-nav.json.
+  // lists its tiles, or pulls them from game-nav.json.
   (function () {
     const host = document.getElementById('ftGroups');
     if (!host) return;
@@ -1479,17 +1466,24 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
       const box = el(t.soon ? 'div' : 'a', t.soon ? 'ft-tile ft-soon' : 'ft-tile');
       if (!t.soon) box.href = t.link;
       box.title = t.soon ? t.name + ' (coming soon)' : t.name;
-      if (t.image) box.appendChild(img(t.image, 'ft-art', 480, 270));
-      box.appendChild(el('span', 'ft-name', t.name));
-      box.appendChild(el('span', 'ft-sub', t.soon ? 'Coming soon' : t.sub || ''));
+      // the page's menu icon: a picture path, or SVG markup (CODM, Tekken)
+      if (t.icon && t.icon.charAt(0) === '<') {
+        const ico = el('span', 'ft-ico');
+        ico.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + t.icon + '</svg>';
+        box.appendChild(ico);
+      } else if (t.icon) box.appendChild(img(t.icon, 'ft-ico', 32, 32));
+      const text = el('span', 'ft-text');
+      text.append(el('span', 'ft-name', t.name), el('span', 'ft-sub', t.soon ? 'Coming soon' : t.sub || ''));
+      box.appendChild(text);
       const li = el('li');
       li.appendChild(box);
       return li;
     }
 
-    // Long groups show 4 full rows on desktop (16 tiles) and 5 on phones
-    // (10), then a quiet "Show N more" text row under the grid.
+    // Long groups show 4 full rows on desktop (16 tiles, 15 on the 3-column
+    // small laptop grid) and 5 on phones (10), then a quiet "Show N more" row.
     const phone = window.matchMedia('(max-width: 970px)');
+    const mid = window.matchMedia('(min-width: 971px) and (max-width: 1150px)');
     const clamps = [];
     function clamp(grid) {
       const items = [...grid.children];
@@ -1501,7 +1495,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
       btn.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
       li.appendChild(btn);
       function lay() {
-        const shown = phone.matches ? 10 : 16;
+        const shown = phone.matches ? 10 : mid.matches ? 15 : 16;
         const extra = items.length - shown;
         const on = extra > 0;
         items.forEach((x, i) => { x.hidden = on && i >= shown; });
@@ -1517,14 +1511,14 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
       clamps.push(lay);
       lay();
     }
-    phone.addEventListener('change', () => clamps.forEach(f => f()));
+    [phone, mid].forEach(m => m.addEventListener('change', () => clamps.forEach(f => f())));
 
     // Data: loadFeaturedGroups() in 11layout.js (the top-bar search uses it too).
+    // Every group is full width (Adrian, Nov 2 2026: no pairing short groups two to a row).
     loadFeaturedGroups().then(all => all.map(g => {
       const tiles = g.tiles;
       if (!tiles.length) return null;
-      // short groups (8 or fewer) pair up two to a row on wide screens
-      const wrap = el('div', tiles.length > 8 ? 'ft-group ft-wide' : 'ft-group');
+      const wrap = el('div', 'ft-group');
       const h = el('h3');
       const name = el('span', 'ft-h-name');
       if (g.icon) name.appendChild(img(g.icon, 'ft-logo', 24, 24));
@@ -1549,8 +1543,7 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
     });
   })();
 
-  // ---------- NUMBERS BAND: real counts from the site's own JSON. The
-  // 150 KB websites list is only fetched once the band is near the screen.
+  // ---------- NUMBERS BAND: real counts from the site's own JSON.
   (function () {
     const band = document.getElementById('hmStats');
     if (!band) return;
@@ -1558,10 +1551,6 @@ body.search-modal-open .coc-main { overflow: hidden !important; }
     loadSidebarData().then(d => set('games', (d.games || []).filter(e => e.card && !e.card.soon).length)).catch(() => {});
     loadFeaturedGroups().then(all => set('pages', all.reduce((n, g) => n + g.tiles.filter(t => !t.soon).length, 0))).catch(() => {});
     getJSON('/articles.json').then(d => set('articles', (d.articles || []).filter(a => a.status === 'live').length)).catch(() => {});
-    const sites = () => getJSON('/hwr-websites.json').then(d => set('sites', d.length)).catch(() => {});
-    if (!('IntersectionObserver' in window)) return sites();
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); sites(); } }, { rootMargin: '400px 0px' });
-    io.observe(band);
   })();
 
   // ---------- FEATURED GAMES: one wide tile per sidebar.json entry whose

@@ -138,6 +138,7 @@
     const all = now() - T0;
     return `left:${(((s - T0) / all) * 100).toFixed(2)}%;width:${Math.max(0.5, ((Math.min(e, now()) - s) / all) * 100).toFixed(2)}%`;
   };
+  const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'); // 1st, 2nd, 3rd, 11th
   const runCount = (r) => plural(r.events, 'run') + (r.chron ? ` + ${r.chron} Chronicled` : '');
   // A face that opens that character's row (any data-go, see the click handler).
   function face(name, cls) {
@@ -221,7 +222,8 @@
     if (r.avg) bits.push(`average gap <b>${plural(r.avg, 'day')}</b>`);
     if (r.longest && r.gaps.length > 1) bits.push(`longest <b>${plural(r.longest.d, 'day')}</b> (v${esc(r.longest.from.v)} to v${esc(r.longest.to.v)})`);
     bits.push(r.live ? '<b>on a banner right now</b>' : `<b>${plural(r.wait, 'day')}</b> since the last one ended`);
-    return `<div class="rt-log">${cards}</div><p class="rt-sum">${bits.join(' &middot; ')}.</p>`;
+    const page = GI.charHas(name) ? `<a class="gi-key rt-page" href="${GI.charHref(name)}">Character page</a>` : '';
+    return `<div class="rt-log">${cards}</div><p class="rt-sum">${bits.join(' &middot; ')}.</p>${page}`;
   }
 
   function filtered() {

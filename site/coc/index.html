@@ -15,9 +15,9 @@
 
 <script src="https://cdn.counter.dev/script.js" data-id="2ccee6e7-877f-4e6d-94fc-898fad2c1238" data-utcoffset="8"></script>
 
-<link rel="stylesheet" href="/11layout.css?v=20261101w9">
+<link rel="stylesheet" href="/11layout.css?v=20261112sb">
 <!-- Live events + official clan card, shared with /coc/town-hall-18/layouts -->
-<link rel="stylesheet" href="/coc-clan-clock.css?v=20261101w9">
+<link rel="stylesheet" href="/coc-clan-clock.css?v=20261112or">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoC Base Layouts, Army Comps &amp; Tools | Clash of Clans | Parchrome</title>
@@ -58,7 +58,7 @@
      Rendered Fonts row. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Tourney:ital,wght@1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -313,8 +313,8 @@ margin: auto;
 })();
 </script>
   <link rel="stylesheet" href="/coc-help.css?v=20261028my" />
-  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261101w9" />
-  <link rel="stylesheet" href="/tool-cards.css?v=3410a759" />
+  <link rel="stylesheet" href="/coc-hub-menus.css?v=20261112sk" />
+  <link rel="stylesheet" href="/tool-cards.css?v=cfb3ef8d" />
 </head>
 <body class="coc-home">
 
@@ -623,80 +623,13 @@ Please open this page in Chrome for the best experience.</li><br>
             and copy it straight into the game.
           </p>
 
-          <!-- PLAYER SEARCH (Oct 24 2026; was the Goated Layouts / Army comps keys --
-               the cards on the right already open both). The Genshin lobby's idea: a
-               tag well + the red Search key. Search asks /api/coc for the player and
-               shows them as a card (#chFound) that opens their tracker page; nothing is
-               fetched before the first Search. Script: "HERO PLAYER SEARCH" at the end
-               of the tracker search script (it shares that one's tag rules + API). -->
-          <div class="ch-find">
-            <form class="ch-find-form" id="chFind" role="search" autocomplete="off" novalidate>
-              <div class="lb-search ch-find-field">
-                <span class="ch-find-hash" aria-hidden="true">#</span>
-                <input class="lb-search-input" id="chFindInput" type="text" placeholder="Player tag, e.g. LL9PUCG8V" aria-label="Player tag" maxlength="15" autocapitalize="characters" spellcheck="false" enterkeyhint="search">
-                <button type="submit" class="lb-search-btn ch-find-go" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg></button>
-              </div>
-            </form>
-            <p class="ch-find-status" id="chFindStatus" aria-live="polite"></p>
-            <div class="ch-found" id="chFound" aria-live="polite" hidden></div>
-          </div>
 
-          <!-- Proof row, desktop only (hidden at <=970px). Real counts from
-               the data files (Oct 2026: 251 layouts in thNN-layouts.json, 109
-               armies in thNN-army.json; 7 tools in coc-nav-data.json) -- rounded down, so update them when
-               the totals pass the next step rather than rounding up. -->
-          <div class="ch-stats">
-            <div class="ch-stat">
-              <span class="ch-stat-lbl">Layouts</span>
-              <span class="ch-stat-num">250<span>+</span></span>
-            </div>
-            <div class="ch-stat">
-              <span class="ch-stat-lbl">Armies</span>
-              <span class="ch-stat-num">100<span>+</span></span>
-            </div>
-            <div class="ch-stat">
-              <span class="ch-stat-lbl">Tools</span>
-              <span class="ch-stat-num">8</span>
-            </div>
-          </div>
-          <script>
-          /* Stats count-up (Oct 2026): every number in the row counts from 0
-             to its value once, ~1s, when the row scrolls into view. Set to 0
-             here, before first paint, so the real value never flashes first.
-             Reduced motion: left alone. */
-          (function () {
-            var row = document.currentScript.previousElementSibling;
-            if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            var nodes = [];
-            row.querySelectorAll('.ch-stat-num').forEach(function (el) {
-              el.childNodes.forEach(function (n) {
-                var v = n.nodeType === 3 ? parseInt(n.nodeValue, 10) : NaN;
-                if (!isNaN(v)) { nodes.push({ n: n, v: v }); n.nodeValue = '0'; }
-              });
-            });
-            function run() {
-              var t0 = null, D = 1000;
-              function step(t) {
-                if (t0 === null) t0 = t;
-                var k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
-                nodes.forEach(function (o) { o.n.nodeValue = String(Math.round(o.v * e)); });
-                if (k < 1) requestAnimationFrame(step);
-              }
-              requestAnimationFrame(step);
-            }
-            if (!('IntersectionObserver' in window)) return run();
-            var io = new IntersectionObserver(function (es) {
-              if (es[0].isIntersecting) { io.disconnect(); setTimeout(run, 350); }
-            }, { threshold: 0.25 });
-            io.observe(row);
-          })();
-          </script>
 
         </div>
 
         <!-- RIGHT (Oct 24 2026, Adrian: the left was cramped): the Raid Weekend
              clock across the top, then Base layouts and Army Maker side by side
-             under it, each with a red HOT tag (.ch-card-hot). Leaderboards
+             under it (HOT tags + arrow keys removed Nov 12 2026, Adrian: the whole card is the link). Leaderboards
              and Army Maker went (World top 10 and the tools band below cover
              them). Each card: the screenshot on top, a footer strip with the
              nav icon on a key, the name, a live count (data-count-from) and an
@@ -792,22 +725,20 @@ Please open this page in Chrome for the best experience.</li><br>
           })();
           </script>
           <a class="ch-card" href="/coc/town-hall-18/layouts">
-            <span class="ch-card-shot"><img class="ch-card-img" src="/clashofclans/home/compressed-th18-14_watermarked-compresso.webp" alt="" loading="lazy" decoding="async"><span class="ch-card-hot">Hot</span></span>
+            <span class="ch-card-shot"><img class="ch-card-img" src="/clashofclans/home/compressed-th18-14_watermarked-compresso.webp" alt="" loading="lazy" decoding="async"></span>
             <span class="ch-card-foot">
               <span class="ch-card-ico"><img src="/icons/coc-nav/th18.webp" alt="" width="96" height="96" loading="lazy" decoding="async"></span>
               <span class="ch-card-text"><span class="ch-card-name">Base layouts</span><span class="ch-card-sub">TH18 &middot; <span data-count-from="/th18-layouts.json">21 layouts</span></span></span>
-              <span class="ch-card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
             </span>
           </a>
           <!-- Army Maker (Oct 24 2026; was Army comps -- the menus and bottom nav
                still open those). Art = the tools band's campfire (.pt-band-bg),
                cropped to 640x360 so the card doesn't load the 2000px original. -->
           <a class="ch-card" href="/coc/tools/army-maker">
-            <span class="ch-card-shot"><img class="ch-card-img" src="/clashofclans/home/shot-army-maker-camp.webp" alt="" loading="lazy" decoding="async"><span class="ch-card-hot">Hot</span></span>
+            <span class="ch-card-shot"><img class="ch-card-img" src="/clashofclans/home/shot-army-maker-camp.webp" alt="" loading="lazy" decoding="async"></span>
             <span class="ch-card-foot">
               <span class="ch-card-ico"><img src="/icons/coc-nav/barracks-th18.webp" alt="" width="96" height="96" loading="lazy" decoding="async"></span>
               <span class="ch-card-text"><span class="ch-card-name">Army Maker</span><span class="ch-card-sub">TH8 &ndash; TH18</span></span>
-              <span class="ch-card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
             </span>
           </a>
         </div>
@@ -879,8 +810,8 @@ Please open this page in Chrome for the best experience.</li><br>
   inset: auto;
   z-index: 2;
   height: auto;
-  /* Desktop banner fills the viewport below the fixed 64px top bar. */
-  min-height: calc(100vh - 64px);
+  /* Hugs its content (Nov 12 2026, Adrian: the full-screen banner "looks so boring" and hid everything below). */
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -889,7 +820,9 @@ Please open this page in Chrome for the best experience.</li><br>
      shrink-wraps .ch-hero to its content and makes its margins meaningless. */
   align-items: stretch;
   /* 48px clears the fixed secondary top bar at >=971px. Sides = the page column. */
-  padding: 48px var(--coc-side) 56px;
+  /* Nov 12 2026: the top 48px sits under the fixed 64px bar, so 150 / 104 leaves the same ~104px of visible air
+     above and below the tallest column (the Raid Weekend + cards stack) (it was ~50 above vs ~120 below). */
+  padding: 150px var(--coc-side) 104px;
   /* Dark where the copy needs contrast (left), lighter toward the cards
      (right) -- they carry their own scrim. The first layer is a soft warm
      light on the King (he stands at ~48% across, between the copy and the
@@ -993,7 +926,7 @@ Please open this page in Chrome for the best experience.</li><br>
    hero headlines on the site are the same scale. Negative tracking is the
    "pulled-in" display setting esports sites use for impact. */
 .ch-title {
-  font-family: 'Tourney', sans-serif; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif;
   font-size: calc(clamp(33px, 3.6vw, 60px) + 5px); /* +3px Nov 1 2026 (Adrian) */
   font-weight: 900;
   line-height: 1.02;
@@ -1059,7 +992,7 @@ Please open this page in Chrome for the best experience.</li><br>
   line-height: 1.65;
   color: #a3a7ae;
   max-width: 500px;
-  margin: 0 0 26px;
+  margin: 0; /* last in the column since the search went: a bottom margin pushed the text off-centre */
   text-wrap: balance; /* no lone "player." on the last line */
 }
 
@@ -1069,57 +1002,6 @@ Please open this page in Chrome for the best experience.</li><br>
   font-weight: 600;
 }
 
-/* PLAYER SEARCH (Oct 24 2026) ------------------------------------------
-   The shared hero search (11layout.css "SUNKEN SEARCH BAR": well + red key inside,
-   Oct 28 2026, same as the home and Genshin heroes) holding a "#" and the tag.
-   Only width and the tag's own type live here. */
-/* 420px (was 520): a tag is 9-10 characters, the field needn't run the column. */
-.ch-find { max-width: 420px; margin-bottom: 34px; }
-.ch-find-field { gap: 4px; }
-.ch-find-hash { font: 800 16px/1 'Oxanium', sans-serif; color: var(--lb-red-text); }
-.ch-find-field .lb-search-input { text-transform: uppercase; }
-.ch-find-field .lb-search-input::placeholder { text-transform: none; }
-.ch-find-go[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
-.ch-find-status {
-  margin: 10px 0 0;
-  font: 500 12.5px/1.5 'Sora', sans-serif;
-  color: #9aa0a8;
-}
-.ch-find-status:empty { display: none; }
-.ch-find-status.is-error { color: var(--lb-red-text); }
-
-/* The player Search found: a raised box that opens their tracker page. */
-.ch-found { margin-top: 10px; }
-.ch-found-card {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px 12px 12px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: rgba(20, 21, 24, 0.86);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--lb-shadow);
-  color: #e6e8ec;
-  text-decoration: none;
-  animation: ch-found-in 0.35s var(--lb-ease) both;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-.ch-found-card:hover { background: rgba(32, 33, 40, 0.92); box-shadow: var(--lb-shadow-hover); }
-.ch-found-card:focus-visible { outline: 2px solid var(--lb-red-text); outline-offset: 3px; }
-.ch-found-th { width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); }
-.ch-found-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.ch-found-main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 17px/1.1 'Oxanium', sans-serif; color: #fff; }
-.ch-found-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px/1.3 'Sora', sans-serif; color: #9aa0a8; }
-.ch-found-nums { display: flex; gap: 16px; }
-.ch-found-num { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-.ch-found-num b { font: 900 16px/1 'Oxanium', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
-.ch-found-num small { font: 700 9px/1 'Sora', sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: #8b9099; }
-.ch-found-card .cl-result-arrow { width: 16px; height: 16px; color: #8b9099; transition: transform 0.2s var(--lb-ease), color 0.15s ease; }
-.ch-found-card:hover .cl-result-arrow { color: #fff; transform: translateX(3px); }
-@keyframes ch-found-in { from { opacity: 0; transform: translateY(-6px); } }
 
 /* RAID WEEKEND CLOCK (Oct 24 2026) --------------------------------------
    A raised box on the hero art, glass so the art reads through it (the Genshin
@@ -1359,9 +1241,7 @@ Please open this page in Chrome for the best experience.</li><br>
   .hero-overlay::before,
   .ch-btn-primary svg,
   .ch-raid-hall,
-  .ch-raid-chip::before,
-  .ch-card-hot::before,
-  .ch-found-card {
+  .ch-raid-chip::before {
     animation: none;
   }
 }
@@ -1372,51 +1252,6 @@ Please open this page in Chrome for the best experience.</li><br>
    screenshot on top (its own sunken edge under it), then a footer strip --
    the nav icon on a grey key, the name in the title face, a live count, and
    an arrow in a well that turns into the red key on hover. */
-/* PROOF ROW (desktop only): small label over a large numeral, under a
-   hairline. */
-.ch-stats {
-  display: flex;
-  align-items: flex-start;
-  gap: 40px;
-  /* Hairline only as wide as the three stats (desktop); phones reset it. */
-  width: fit-content;
-  padding-top: 22px;
-  padding-right: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.ch-stat { min-width: 0; }
-
-.ch-stat-lbl {
-  display: block;
-  font-family: 'Sora', sans-serif;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  color: #9aa0a8; /* Oct 12: was #6d7178, under 4.5:1 on the art */
-  margin-bottom: 7px;
-}
-
-.ch-stat-num {
-  display: block;
-  font-family: 'Oxanium', sans-serif;
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1;
-  color: #f2f3f5;
-  letter-spacing: 0.5px;
-}
-
-.ch-stat-num span {
-  color: #8b9097; /* Oct 12: was red */
-  font-size: 16px;
-}
-
-@media (max-width: 970px) {
-  .ch-stats { display: none; } /* desktop only (Adrian, Oct 27 2026) */
-}
-
 .ch-hero-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1491,8 +1326,7 @@ Please open this page in Chrome for the best experience.</li><br>
   gap: 9px;
   padding: 8px;
 }
-.ch-card-ico,
-.ch-card-go {
+.ch-card-ico {
   flex: none;
   display: grid;
   place-items: center;
@@ -1535,72 +1369,6 @@ Please open this page in Chrome for the best experience.</li><br>
 .ch-card-sub * {
   font: 600 10.5px/1.2 'Sora', sans-serif;
   color: #8b9099;
-}
-/* HOT tag (Oct 24 2026): the raid clock's red "Live" chip recipe (a small red
-   key), pinned to the screenshot's top-left, a white flame where the chip has
-   its square. The flame flickers (scale only) and the tag lifts on hover. */
-.ch-card-hot {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px 4px 6px;
-  border: 2px solid var(--lb-red-edge);
-  border-radius: 4px;
-  background: var(--lb-red);
-  box-shadow: var(--lb-btn-red), 0 4px 12px -2px rgba(0, 0, 0, 0.55);
-  font: 800 9.5px/1 'Sora', sans-serif;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  color: #fff;
-  transition: transform 0.25s var(--lb-ease);
-}
-.ch-card-hot::before {
-  content: '';
-  width: 8px;
-  height: 10px;
-  background: #fff;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M8 0c1 3.5 6 6 6 11.5A6 6 0 0 1 2 11.5c0-2.6 1.3-4.3 2.6-5.6.2 1.9 1 3 2.2 3.6C6.4 6.2 6.9 3 8 0z'/%3E%3C/svg%3E") center / contain no-repeat;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M8 0c1 3.5 6 6 6 11.5A6 6 0 0 1 2 11.5c0-2.6 1.3-4.3 2.6-5.6.2 1.9 1 3 2.2 3.6C6.4 6.2 6.9 3 8 0z'/%3E%3C/svg%3E") center / contain no-repeat;
-  transform-origin: 50% 100%;
-  animation: ch-hot-flicker 1.8s ease-in-out infinite alternate;
-}
-@keyframes ch-hot-flicker {
-  0%   { transform: scale(1, 1); }
-  40%  { transform: scale(0.92, 1.08); }
-  70%  { transform: scale(1.06, 0.94); }
-  100% { transform: scale(0.96, 1.05); }
-}
-.ch-card:hover .ch-card-hot { transform: translateY(-2px); }
-.ch-card-go {
-  width: 30px;
-  height: 30px;
-  background: var(--lb-well);
-  box-shadow: var(--lb-ring-well);
-  color: #8b9099;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-}
-.ch-card-go svg {
-  width: 14px;
-  height: 14px;
-  transition: transform 0.2s var(--lb-ease);
-}
-.ch-card:hover .ch-card-go {
-  border-color: var(--lb-red-edge);
-  background: var(--lb-red);
-  box-shadow: var(--lb-btn-red);
-  color: #fff;
-}
-.ch-card:hover .ch-card-go svg {
-  transform: translateX(2px);
-}
-/* Narrower desktops: the arrow key gives its room to the name
-   ("BASE LAYOU..." at 1440); the whole card is the link anyway. */
-@media (max-width: 1500px) {
-  .ch-card-go { display: none; }
 }
 
 /* NARROW DESKTOP / TABLET -------------------------------------------- */
@@ -1756,9 +1524,6 @@ Please open this page in Chrome for the best experience.</li><br>
     text-wrap: pretty;
   }
 
-  /* No player search on phones (Oct 24 2026, Adrian): the tracker below
-     the Town Halls does the same job. */
-  .ch-find { display: none; }
 
   /* RAID CLOCK STRIP: medal + name on the left, the four wells on the right,
      one row. The "Live" chip gives way to the state line turning red. */
@@ -2066,7 +1831,7 @@ function warModalEscHandler(e) {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-family: 'Tourney', sans-serif; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif;
   background: linear-gradient(90deg, #ffffff, #c0c9d4);
   -webkit-background-clip: text;
   background-clip: text;
@@ -2177,7 +1942,7 @@ function warModalEscHandler(e) {
 <!-- Popular Articles strip: shared with every game section. -->
 <link rel="stylesheet" href="/article-cards.css?v=20261031logo" />
 <!-- Most picked equipment + Top players of the week + FAQ (coc-lobby.css). -->
-<link rel="stylesheet" href="/coc-lobby.css?v=20261101w9" />
+<link rel="stylesheet" href="/coc-lobby.css?v=20261112gl" />
 <link rel="stylesheet" href="/coc-villager.css?v=20261101ed" />
 
 <!-- The .ql-wrap "Quality Over Quantity" block that used to sit here (its
@@ -2935,7 +2700,6 @@ function warModalEscHandler(e) {
           <button type="button" role="radio" aria-checked="true" data-mode="clan">Clan</button>
           <button type="button" role="radio" aria-checked="false" data-mode="player" tabindex="-1">Player</button>
         </div>
-        <span class="cl-track-free">Free &middot; No sign-in</span>
       </div>
       <div class="cl-track-bar">
         <svg class="cl-track-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -2947,14 +2711,6 @@ function warModalEscHandler(e) {
         </button>
       </div>
       <p class="cl-track-hint" id="clTrackHint"><span>The tag sits under the clan&rsquo;s name in game.</span> <button type="button" class="cl-track-try" data-mode="clan" data-try="#2GYPGPJP9">Try Ascendere</button></p>
-      <!-- QUICK PICKS: the players / clans this device opened last (localStorage
-           "pt-recent", written by coc-tracker.js, so it's the same list as
-           /coc/tools/player-tracker's), or the tracker's three Featured ones
-           before there are any. Filled by the tracker script below. -->
-      <div class="cl-quick">
-        <span class="cl-quick-label" id="clQuickLabel">Featured</span>
-        <ul class="cl-quick-list" id="clQuickList"></ul>
-      </div>
     </form>
 
     <div class="cl-feature-device">
@@ -3040,30 +2796,6 @@ function warModalEscHandler(e) {
     other: 'This couldn&rsquo;t be loaded. Check your connection and try again.'
   };
 
-  // QUICK PICKS: coc-tracker.js's "pt-recent" list (same entries: { kind, tag,
-  // name, icon, th }), or its FEATURED three -- keep these in step with it.
-  var FEATURED = [
-    { kind: 'clan', tag: '2GYPGPJP9', name: 'ASCENDERE', icon: 'https://api-assets.clashofclans.com/badges/70/hoeu9IEsBCOUOoPkJ6jquo0mG3J8ls4l7zA1wt0AjEA.png' },
-    { kind: 'player', tag: 'LL9PUCG8V', name: 'Wild_Parkour', icon: '/icons/th18icon.png' },
-    { kind: 'clan', tag: 'YJ9Q9YY0', name: 'LIBRA', icon: 'https://api-assets.clashofclans.com/badges/70/Im4DlsayRpIdshkgZm9GCV7o2-SRyywwyYPwZxy-a8c.png' }
-  ];
-  (function () {
-    var recent = [];
-    try { recent = JSON.parse(localStorage.getItem('pt-recent') || '[]'); } catch (e) {}
-    if (!Array.isArray(recent)) recent = [];
-    // Entries come from storage: keep only real tags, so nothing odd reaches an href.
-    recent = recent.filter(function (r) { return r && /^[0289PYLQGRJCUV]{3,12}$/.test(r.tag); });
-    var picks = recent.length ? recent.slice(0, 3) : FEATURED;
-    document.getElementById('clQuickLabel').textContent = recent.length ? 'Recently viewed' : 'Featured';
-    document.getElementById('clQuickList').innerHTML = picks.map(function (r) {
-      var clan = r.kind === 'clan';
-      var icon = /^(https:\/\/api-assets\.clashofclans\.com\/|\/icons\/)/.test(r.icon || '') ? r.icon : '';
-      // The badge / TH icon already says clan or player; the label says it for screen readers.
-      return '<li><a class="cl-pick" href="' + (clan ? clanHref(r.tag) : playerHref(r.tag)) + '" aria-label="' + esc(r.name) + ', ' + (clan ? 'clan' : 'player') + ' #' + r.tag + '">' +
-        (icon ? '<img src="' + esc(icon) + '" alt="" width="30" height="30" loading="lazy">' : '<span class="cl-pick-th">TH' + (+r.th || '') + '</span>') +
-        '<span><b>' + esc(r.name) + '</b><small>#' + r.tag + '</small></span></a></li>';
-    }).join('');
-  })();
 
   function setMode(m) {
     mode = m;
@@ -3205,52 +2937,6 @@ function warModalEscHandler(e) {
     }).then(function () { busy(false); });
   }
 
-  /* HERO PLAYER SEARCH (Oct 24 2026): the hero's tag bar (#chFind). Same tag
-     rules, API and wording as the phone search above; the player shows as one
-     card under the bar (#chFound) that opens their tracker page. War stars + XP
-     level, not trophies: since the 2025 league change most profiles read 0. */
-  var hForm = document.getElementById('chFind');
-  if (!hForm) return;
-  var hInput = document.getElementById('chFindInput');
-  var hStatus = document.getElementById('chFindStatus');
-  var hHit = document.getElementById('chFound');
-  var hGo = hForm.querySelector('.ch-find-go');
-  function hSay(html, isError) {
-    hStatus.innerHTML = html || '';
-    hStatus.classList.toggle('is-error', !!isError);
-    if (isError) hInput.setAttribute('aria-invalid', 'true');
-    else hInput.removeAttribute('aria-invalid');
-  }
-  function heroCard(p) {
-    var icon = thIcon(p.townHallLevel);
-    return '<a class="ch-found-card" href="' + playerHref(p.tag.slice(1)) + '">' +
-      (icon ? '<img class="ch-found-th" src="' + icon + '" alt="Town Hall ' + p.townHallLevel + '" width="52" height="52">' : '<span class="cl-result-th">TH' + p.townHallLevel + '</span>') +
-      '<span class="ch-found-main"><b>' + esc(p.name) + '</b><small>#' + p.tag.slice(1) + ' &middot; ' + (p.clan ? esc(p.clan.name) : 'Not in a clan') + '</small></span>' +
-      '<span class="ch-found-nums"><span class="ch-found-num"><b>' + num(p.warStars) + '</b><small>War stars</small></span>' +
-      '<span class="ch-found-num"><b>' + p.expLevel + '</b><small>Level</small></span></span>' + ARROW + '</a>';
-  }
-  hInput.addEventListener('input', function () {
-    // The well already shows the "#", so a pasted "#LL9PUCG8V" doesn't read "##".
-    if (hInput.value.indexOf('#') !== -1) hInput.value = hInput.value.replace(/#/g, '');
-    if (hStatus.classList.contains('is-error')) hSay('');
-  });
-  hForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var raw = hInput.value.trim();
-    var tag = cleanTag(raw);
-    hHit.hidden = true;
-    if (!raw) return hSay('Type a player tag first. It starts with # and sits under the name on the in-game profile.', true);
-    if (!tag) return hSay('That isn&rsquo;t a player tag. Tags only use the characters 0 2 8 9 P Y L Q G R J C U V.', true);
-    hSay('Searching&hellip;');
-    hGo.setAttribute('aria-busy', 'true');
-    api('type=player&tag=' + tag).then(function (p) {
-      hSay('');
-      hHit.innerHTML = heroCard(p);
-      hHit.hidden = false;
-    }).catch(function (err) {
-      hSay(ERR[err.message === 'notFound' ? 'notFoundPlayer' : ERR[err.message] ? err.message : 'other'], true);
-    }).then(function () { hGo.setAttribute('aria-busy', 'false'); });
-  });
 })();
 </script>
 
@@ -3454,7 +3140,7 @@ function warModalEscHandler(e) {
         <h2 class="lob-title" id="ptTitle">Parchrome <em>tools.</em></h2>
         <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Builder made all of these. Please sign your approval here&hellip; and here&hellip; and here&hellip;</p></div>
       </div>
-      <a class="art-all" href="/coc/tools/">Browse all tools<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="art-all" href="/coc/tools/">All tools<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
 
     <!-- TOOL CARDS: generated by _tools/tool-cards/build_cards.py -->
@@ -3530,123 +3216,14 @@ function warModalEscHandler(e) {
         <p class="ptc-desc"><span class="ptc-long">Spell and equipment damage on any building.</span><span class="ptc-short">Spell and equipment damage on any building.</span></p>
       </div>
     </a>
-
-    <a class="ptc ptc-lgt" href="/coc/tools/legend-tracker">
-      <div class="ptc-art lgt-art" data-go="lgt-go" data-clock="lgth-cup" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="lgt-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="lgt-cup"><img loading="lazy" decoding="async" src="/icons/legend-trophy.webp" alt=""><i class="fx-spark lgt-sp" style="left:14px;top:20px;--z:9px"></i><i class="fx-spark lgt-sp" style="left:74px;top:14px;--z:10px;animation-delay:-0.05s"></i><i class="fx-spark lgt-sp" style="left:82px;top:52px;--z:7px;animation-delay:-0.1s"></i><i class="fx-spark lgt-sp" style="left:8px;top:58px;--z:7px;animation-delay:-0.08s"></i></div>
-        </div>
-        <div class="ptc-layer ptc-near"><span class="lgt-chip lgt-c0"><img loading="lazy" decoding="async" src="/clashofclans/coctools/trophy.webp" alt="">+40</span><span class="lgt-chip lgt-c1"><img loading="lazy" decoding="async" src="/clashofclans/coctools/trophy.webp" alt="">+40</span><span class="lgt-chip lgt-c2"><img loading="lazy" decoding="async" src="/clashofclans/coctools/trophy.webp" alt="">+40</span></div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Legend Tracker<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc"><span class="ptc-long">Every Legend attack and defense, trophies each.</span><span class="ptc-short">Every Legend attack, with trophies each.</span></p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-ws" href="/coc/tools/war-planner">
-      <div class="ptc-art ws-art" data-go="ws-go" data-clock="wsh-sw" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="ws-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="ws-x"><div class="ws-b"><img loading="lazy" decoding="async" src="/clashofclans/coctools/sword.webp" alt=""></div><div class="ws-b"><img loading="lazy" decoding="async" src="/clashofclans/coctools/sword.webp" alt=""></div></div>
-          <div class="ws-hit"><i class="ws-flash"></i><i class="fx-spark ws-sp" style="left:-14px;top:-12px;--z:10px"></i><i class="fx-spark ws-sp" style="left:12px;top:-16px;--z:8px;animation-delay:-0.04s"></i><i class="fx-spark ws-sp" style="left:16px;top:8px;--z:7px;animation-delay:-0.08s"></i><i class="fx-spark ws-sp" style="left:-12px;top:12px;--z:6px;animation-delay:-0.06s"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:-4deg;--d:30px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:39deg;--d:32px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:66deg;--d:25px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:102deg;--d:25px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:148deg;--d:24px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:181deg;--d:25px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:212deg;--d:27px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:258deg;--d:29px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:279deg;--d:25px"></i><i class="fx-st ws-st" style="left:0px;top:0px;width:9px;--r:318deg;--d:32px"></i></div>
-        </div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">War Planner<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc"><span class="ptc-long">Give every attacker a target and share the plan.</span><span class="ptc-short">Give every attacker a target, share the plan.</span></p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-lr" href="/coc/tools/leaderboards">
-      <div class="ptc-art lr-art" data-go="lr-go" data-clock="lrh-cup" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="lr-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="lr-cup">
-            <img loading="lazy" decoding="async" src="/icons/leaderboards.webp" alt="">
-            <img class="lr-shine" src="/icons/leaderboards.webp" alt="">
-            <i class="fx-spark lr-tw" style="left:26px;top:12px;--z:9px;animation-delay:0s"></i><i class="fx-spark lr-tw" style="left:60px;top:4px;--z:7px;animation-delay:-2s"></i><i class="fx-spark lr-tw" style="left:22px;top:44px;--z:6px;animation-delay:-4s"></i>
-            <i class="fx-spark lr-sp" style="left:10px;top:18px;--z:10px"></i><i class="fx-spark lr-sp" style="left:68px;top:2px;--z:11px;animation-delay:-0.06s"></i><i class="fx-spark lr-sp" style="left:80px;top:34px;--z:8px;animation-delay:-0.12s"></i><i class="fx-spark lr-sp" style="left:2px;top:50px;--z:7px;animation-delay:-0.09s"></i><i class="fx-spark lr-sp" style="left:40px;top:-4px;--z:8px;animation-delay:-0.03s"></i><i class="fx-spark lr-sp" style="left:76px;top:66px;--z:7px;animation-delay:-0.15s"></i><i class="fx-spark lr-sp" style="left:30px;top:70px;--z:6px;animation-delay:-0.18s"></i>
-          </div>
-        </div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Leaderboards<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc"><span class="ptc-long">This week’s top 200, Philippines and world.</span><span class="ptc-short">This week’s top 200 in PH and the world.</span></p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-wc" href="/coc/tools/walls">
-      <div class="ptc-art wc-art" data-go="wc-go" data-clock="wch-num" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="wc-glow"></div></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="fx-rays wc-rays"></div>
-          <div class="wc-wall">
-            <i class="wc-dust"></i>
-            <img class="wc-18" src="/clashofclans/coctools/walls/wall-18.webp" alt="">
-            <img class="wc-19" src="/clashofclans/coctools/walls/wall-19.webp" alt="">
-            <img class="wc-shine" src="/clashofclans/coctools/walls/wall-19.webp" alt="">
-          </div>
-          <div class="wc-beam"></div>
-          <i class="fx-em wc-em" style="left:68px;top:128px;--dx:7px;--dy:-62px;width:2px;height:2px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:20px;--dy:-63px;width:3px;height:3px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:9px;--dy:-67px;width:2px;height:2px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:-8px;--dy:-66px;width:4px;height:4px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:3px;--dy:-57px;width:2px;height:2px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:14px;--dy:-51px;width:3px;height:3px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:25px;--dy:-63px;width:3px;height:3px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:16px;--dy:-41px;width:4px;height:4px"></i><i class="fx-em wc-em" style="left:68px;top:128px;--dx:-22px;--dy:-39px;width:2px;height:2px"></i>
-        </div>
-        <div class="ptc-layer ptc-near">
-          <div class="wc-tag"><img loading="lazy" decoding="async" src="/clashofclans/coctools/Gold.webp" alt=""><span class="wc-num"></span></div>
-          <span class="wc-old wc-old1">10M</span><span class="wc-old wc-old2">5M</span>
-          <i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:5deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:36deg;--d:21px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:63deg;--d:25px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:107deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:142deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:176deg;--d:26px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:220deg;--d:22px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:253deg;--d:25px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:282deg;--d:24px"></i><i class="fx-st wc-st" style="left:62px;top:24px;width:8px;--r:329deg;--d:21px"></i>
-          <img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-18px;--dy:-12px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:15px;--dy:-12px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:4px;--dy:-14px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-44px;--dy:-16px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-46px;--dy:-15px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-43px;--dy:-12px"><img class="fx-em wc-coin" src="/clashofclans/coctools/Gold.webp" alt="" style="left:87px;top:32px;--dx:-8px;--dy:-18px">
-          <img class="wc-jam" src="/clashofclans/coctools/walls/hammer-jam.webp" alt="">
-          <img class="wc-gp" src="/clashofclans/coctools/walls/builder-boost.webp" alt="">
-        </div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Wall Calculator<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc"><span class="ptc-long">Wall costs with Gold Pass and Hammer Jam savings.</span><span class="ptc-short">Wall upgrade costs with Hammer Jam savings.</span></p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-tl" href="/coc/tools/tier-list">
-      <div class="ptc-art tl-art" data-go="tl-go" data-clock="tlh-reel" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="tl-glow"></div><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i><i class="dc-star"></i></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="tl-row">
-            <div class="tl-lab"><div class="tl-reel"><b style="--tl:224, 99, 99">S</b><b style="--tl:160, 116, 232">F</b><b style="--tl:84, 156, 232">E</b><b style="--tl:64, 184, 140">D</b><b style="--tl:120, 194, 92">C</b><b style="--tl:222, 190, 72">B</b><b style="--tl:230, 140, 64">A</b><b style="--tl:224, 99, 99">S</b></div><i class="tl-glint"></i></div>
-            <div class="tl-card"><img loading="lazy" decoding="async" src="/clashofclans/coctools/units/dragon.webp" alt=""></div>
-            <i class="fx-spark tl-sp" style="left:4px;top:2px;--z:11px"></i><i class="fx-spark tl-sp" style="left:58px;top:-4px;--z:9px;animation-delay:-0.05s"></i><i class="fx-spark tl-sp" style="left:62px;top:40px;--z:8px;animation-delay:-0.1s"></i><i class="fx-spark tl-sp" style="left:2px;top:58px;--z:8px;animation-delay:-0.08s"></i><i class="fx-spark tl-sp" style="left:30px;top:-10px;--z:7px;animation-delay:-0.03s"></i>
-          </div>
-        </div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Clash Tier List<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc"><span class="ptc-long">Rank anything in Clash from S to F and share it.</span><span class="ptc-short">Rank anything in Clash from S to F, share it.</span></p>
-      </div>
-    </a>
-
-    <a class="ptc ptc-gl" href="/coc/tools/slang">
-      <div class="ptc-art gl-art" data-go="gl-go" data-clock="glh-l0" aria-hidden="true">
-        <div class="ptc-layer ptc-far"><div class="gl-glow"></div></div>
-        <div class="ptc-layer ptc-mid">
-          <div class="gl-stage">
-            <div class="gl-book">
-              <i class="gl-board"></i>
-              <div class="gl-page gl-pr"><b class="gl-term gl-t0">Queen Walk</b><b class="gl-term gl-t1">Lavaloon</b><b class="gl-term gl-t2">Funneling</b><i class="gl-lines"></i></div>
-              <div class="gl-leaf gl-l2"><div class="gl-face gl-front gl-blank"><i class="gl-lines"></i></div><div class="gl-face gl-back"><i class="gl-lines"></i></div></div>
-              <div class="gl-leaf gl-l1"><div class="gl-face gl-front"><b class="gl-term gl-t0">Queen Walk</b><b class="gl-term gl-t1">Lavaloon</b><b class="gl-term gl-t2">Funneling</b><i class="gl-lines"></i></div><div class="gl-face gl-back"><i class="gl-lines"></i></div></div>
-              <div class="gl-leaf gl-l0"><div class="gl-face gl-front"><b class="gl-term gl-t0">Queen Walk</b><b class="gl-term gl-t1">Lavaloon</b><b class="gl-term gl-t2">Funneling</b><i class="gl-lines"></i></div><div class="gl-face gl-back"><i class="gl-lines"></i></div></div>
-              <i class="gl-shade"></i>
-              <div class="gl-cover"><div class="gl-cf"><svg viewBox="0 0 24 32"><defs><linearGradient id="glHg" x1="0" x2="1"><stop offset="0" stop-color="#ffd978"/><stop offset=".55" stop-color="#f0bb48"/><stop offset="1" stop-color="#b77d22"/></linearGradient></defs><path d="M2 1h20v3.5h-2.2L14 14v4l5.8 9.5H22V31H2v-3.5h2.2L10 18v-4L4.2 4.5H2Z" fill="url(#glHg)" stroke="#2a0907" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 3h9" stroke="rgba(255,255,255,.7)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="gl-cb"><i></i><i class="gl-lines"></i></div></div>
-              <i class="gl-ribbon"></i>
-            </div>
-            <i class="fx-spark gl-sp" style="left:30px;top:-6px;--z:10px"></i><i class="fx-spark gl-sp" style="left:82px;top:-12px;--z:12px;animation-delay:-0.08s"></i><i class="fx-spark gl-sp" style="left:108px;top:10px;--z:8px;animation-delay:-0.15s"></i><i class="fx-spark gl-sp" style="left:4px;top:16px;--z:8px;animation-delay:-0.05s"></i><i class="fx-spark gl-sp" style="left:60px;top:-20px;--z:7px;animation-delay:-0.12s"></i><i class="fx-spark gl-sp" style="left:100px;top:44px;--z:7px;animation-delay:-0.2s"></i>
-          </div>
-        </div>
-      </div>
-      <div class="ptc-copy">
-        <div class="ptc-name">Glossary<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-        <p class="ptc-desc"><span class="ptc-long">Queen Walk, Lavaloon and 32 more terms, explained.</span><span class="ptc-short">Clash slang and terms in plain English.</span></p>
-      </div>
-    </a>
+    </div>
+    <div class="ptm-list">
+      <a class="ptm" href="/coc/tools/legend-tracker"><img src="/icons/legend-trophy.webp" alt="" width="32" height="32" loading="lazy" decoding="async"><span class="ptm-copy"><b>Legend Tracker</b><span>Every Legend attack, with trophies each.</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="ptm" href="/coc/tools/war-planner"><img src="/icons/war-planner.webp" alt="" width="32" height="32" loading="lazy" decoding="async"><span class="ptm-copy"><b>War Planner</b><span>Give every attacker a target, share the plan.</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="ptm" href="/coc/tools/leaderboards"><img src="/icons/leaderboards.webp" alt="" width="32" height="32" loading="lazy" decoding="async"><span class="ptm-copy"><b>Leaderboards</b><span>This week’s top 200 in PH and the world.</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="ptm" href="/coc/tools/walls"><img src="/clashofclans/coctools/walls/wall-18.webp" alt="" width="32" height="32" loading="lazy" decoding="async"><span class="ptm-copy"><b>Wall Calculator</b><span>Wall upgrade costs with Hammer Jam savings.</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="ptm" href="/coc/tools/tier-list"><img src="/clashofclans/coctools/units/dragon.webp" alt="" width="32" height="32" loading="lazy" decoding="async"><span class="ptm-copy"><b>Clash Tier List</b><span>Rank anything in Clash from S to F, share it.</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="ptm" href="/coc/tools/slang"><img src="/icons/Book_of_Everything.webp" alt="" width="32" height="32" loading="lazy" decoding="async"><span class="ptm-copy"><b>Glossary</b><span>Clash slang and terms in plain English.</span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div></div>
     <!-- /TOOL CARDS -->
     </section>
@@ -3755,7 +3332,8 @@ function warModalEscHandler(e) {
   background-blend-mode: normal, luminosity, normal;
   border-top: 2px solid var(--lb-edge);
   border-bottom: 2px solid var(--lb-edge);
-  box-shadow: var(--card-well);
+  /* Raised top (Nov 2 2026, Adrian): the box's light line under the top edge, not the well's dark lip. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 -10px 24px -12px rgba(0, 0, 0, 0.85);
   z-index: 1;
 }
 
@@ -4436,13 +4014,15 @@ function warModalEscHandler(e) {
   }
 }
 @media (min-width: 1200px) {
+  /* Sunken (Nov 12 2026, Adrian): the tool cards' well -- darker than the section, shadow inside the top edge,
+     a faint light line under the bottom one -- so the picked row (the grey key) sits up out of it. */
   .th-pick .layouts-list {
     gap: 4px;
     padding: 6px;
     border: 2px solid var(--lb-edge);
     border-radius: var(--lb-r);
-    background: var(--lb-well);
-    box-shadow: var(--lb-ring-well);
+    background: #0d0e11;
+    box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.4), inset 0 14px 22px -14px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.05);
   }
   .th-pick .th-card + .th-card { border-top: 0; }
   .th-pick .th-card,
@@ -4469,7 +4049,7 @@ function warModalEscHandler(e) {
   .th-pick .th-card .th-name,
   .th-pick .th-card.th-card--wide .th-name,
   .th-pick .th-card:not(.th-card--wide) .th-name {
-    font-family: 'Oxanium', sans-serif; font-style: normal; /* Oxanium on the desktop picker (Nov 1 2026, Adrian); phones keep Tourney */
+    font-family: 'Oxanium', sans-serif; font-style: normal; /* Oxanium on the desktop picker (Nov 1 2026, Adrian); phones keep Orbitron Title */
     font-size: calc(15px + 2px);
     font-weight: 800;
   }
@@ -4580,15 +4160,14 @@ function warModalEscHandler(e) {
    - desktop >=1341px: copy over the console on the left, the phone beside them;
    - narrower: copy, console, phone -- search results open in the phone, so it
      sits right under the field.
-   Raised UI: the console is one box with a red glow under it (the section's
-   one light besides the phone's); Clan / Player is the CoC switch (sunken
-   well, the picked side the grey key); the field a well; Scout the red key,
-   the section's one main action. */
+   Nov 12 2026 (Adrian: "messy, you don't know which the focal point is"): the PHONE leads, the copy + search
+   on the left are read second. The console lost its box, red tint, red pool of light and drop shadow, and
+   Scout is the grey key (CoC search keys are grey); the phone keeps the section's only red glow. */
 .cl-feature-inner {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
   grid-template-rows: 1fr auto auto 1fr;
   grid-template-areas:
     '. device'
@@ -4605,7 +4184,7 @@ function warModalEscHandler(e) {
 .cl-feature-copy { grid-area: copy; min-width: 0; }
 .cl-feature-title {
   margin: 0 0 12px;
-  font-family: 'Tourney', sans-serif; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.5px;
@@ -4614,8 +4193,7 @@ function warModalEscHandler(e) {
 }
 /* Same white Orbitron as the line: /coc/'s `* { Oxanium }` reset beats inheritance. */
 .cl-feature-title em {
-  font-family: 'Tourney', sans-serif; font-weight: 900;
-  font-style: italic;
+  font-family: 'Orbitron Title', sans-serif; font-weight: 900;
   color: inherit;
 }
 .cl-feature-text {
@@ -4626,32 +4204,12 @@ function warModalEscHandler(e) {
   color: #a3a7ae;
 }
 
-/* SEARCH CONSOLE: bigger than anything else in the section on purpose. */
+/* SEARCH CONSOLE: plain controls on the section, no box of its own (the phone is the focal point). */
 .cl-track {
   grid-area: track;
   position: relative;
   min-width: 0;
-  margin-top: 30px;
-  padding: 16px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background:
-    radial-gradient(90% 70% at 0% 0%, rgba(194, 59, 59, 0.1), transparent 60%),
-    var(--lb-box);
-  box-shadow: var(--lb-shadow), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
-}
-/* A red pool of light under the console, so the eye lands here first. */
-.cl-track::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  left: 6%;
-  right: 6%;
-  top: 30%;
-  bottom: -18%;
-  background: radial-gradient(closest-side, rgba(194, 59, 59, 0.28), rgba(194, 59, 59, 0));
-  filter: blur(24px);
-  pointer-events: none;
+  margin-top: 28px;
 }
 .cl-track-head {
   display: flex;
@@ -4659,13 +4217,6 @@ function warModalEscHandler(e) {
   justify-content: space-between;
   gap: 12px;
   margin: 0 0 12px;
-}
-.cl-track-free {
-  font: 700 9.5px/1 'Sora', sans-serif;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  color: #6f747c;
-  white-space: nowrap;
 }
 .cl-track-modes {
   display: inline-flex;
@@ -4700,7 +4251,7 @@ function warModalEscHandler(e) {
 .cl-track-bar {
   display: flex;
   align-items: center;
-  height: 62px;
+  height: 56px;
   box-sizing: border-box;
   padding: 6px 6px 6px 16px;
   border: 2px solid var(--lb-edge);
@@ -4736,19 +4287,18 @@ function warModalEscHandler(e) {
 }
 .cl-track:not(.is-clan) .cl-track-bar input { padding-left: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
 .cl-track-bar input::placeholder { color: #6d7178; font-weight: 400; letter-spacing: 0; text-transform: none; }
-/* Hover goes darker, not lighter: white on a lighter red falls under 4.5:1. */
 .cl-track-go {
   flex: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 46px;
-  padding: 0 22px;
-  border: 2px solid var(--lb-red-edge);
+  height: 40px;
+  padding: 0 16px;
+  border: 2px solid var(--lb-edge);
   border-radius: var(--lb-r);
-  background: var(--lb-red);
-  box-shadow: var(--lb-btn-red);
-  color: #fff;
+  background: var(--lb-raise);
+  box-shadow: var(--lb-btn);
+  color: #e6e8ec;
   font-family: 'Sora', sans-serif;
   font-size: 15px;
   font-weight: 700;
@@ -4756,7 +4306,7 @@ function warModalEscHandler(e) {
   transition: background-color 0.15s ease, transform 0.1s ease;
 }
 .cl-track-go svg { width: 16px; height: 16px; transition: transform 0.2s var(--lb-ease); }
-.cl-track-go:hover { background: #b23333; }
+.cl-track-go:hover { background: #343642; color: #fff; }
 .cl-track-go:hover svg { transform: translateX(2px); }
 .cl-track-go:active { transform: translateY(1px); box-shadow: var(--lb-btn-down); }
 .cl-track-go[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
@@ -4790,52 +4340,6 @@ function warModalEscHandler(e) {
 }
 .cl-track-try:hover { text-decoration-color: #c23b3b; }
 
-/* QUICK PICKS: under a hairline in the console, a label then up to three
-   rows-as-chips (badge / TH icon, name, tag). Wells at rest, the grey key on
-   hover -- the CoC chip recipe. */
-.cl-quick {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 14px -16px 0;
-  padding: 12px 16px 0;
-  border-top: 2px solid var(--lb-edge);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-.cl-quick-label { font: 700 9.5px/1 'Oxanium', sans-serif; letter-spacing: 1.8px; text-transform: uppercase; color: #6f747c; }
-.cl-quick-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.cl-pick {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  height: 46px;
-  box-sizing: border-box;
-  padding: 0 8px 0 6px;
-  border: 2px solid var(--lb-edge);
-  border-radius: var(--lb-r);
-  background: var(--lb-well);
-  box-shadow: var(--lb-ring-well);
-  color: #e6e8ec;
-  text-decoration: none;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s var(--lb-ease);
-}
-.cl-pick:hover { background: var(--lb-raise); box-shadow: var(--lb-btn); transform: translateY(-1px); }
-.cl-pick:focus-visible { outline: 2px solid #f2f3f5; outline-offset: 2px; }
-.cl-pick img { flex: none; width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5)); }
-.cl-pick-th { flex: none; width: 24px; font: 800 10px/1 'Oxanium', sans-serif; color: #c9ccd2; text-align: center; }
-.cl-pick > span:last-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.cl-pick b,
-.cl-pick small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cl-pick b { font: 800 12px/1.1 'Oxanium', sans-serif; color: #f2f3f5; }
-.cl-pick small { font: 600 9.5px/1.1 'Sora', sans-serif; color: #7d828a; }
 .cl-track-modes button:focus-visible,
 .cl-track-go:focus-visible,
 .cl-track-try:focus-visible,
@@ -4915,31 +4419,19 @@ function warModalEscHandler(e) {
 @media (max-width: 970px) {
   .cl-feature-inner { margin: 0 5%; padding: 72px 0; }
   /* Phones (Oct 24 2026, Adrian): shorter -- title, the phone, then the search.
-     No quick picks and no help line (an error still shows in its place). */
+     No help line (an error still shows in its place). */
   .cl-feature-inner { grid-template-areas: 'copy' 'device' 'track'; }
   .cl-feature-device { margin: 8px 0 24px; }
   .cl-stage-cap { margin-top: 12px; }
-  .cl-quick,
   .cl-track-hint:not(.is-error) { display: none; }
   .cl-track { margin-top: 0; }
   .cl-track-modes { flex: 1; display: flex; }
   .cl-track-modes button { flex: 1; min-width: 0; }
   .pt-band { padding: 56px 0; }
 }
-/* Phones: the quick picks stay one row of three, without their tags. */
-@media (max-width: 600px) {
-  .cl-pick small { display: none; }
-  .cl-pick { height: 40px; }
-  .cl-track-free { display: none; }
-}
 @media (max-width: 520px) {
-  .cl-quick { margin: 12px -12px 0; padding: 10px 12px 0; }
-  .cl-track { padding: 12px; }
   .cl-track-bar { height: 56px; padding-left: 12px; }
-  .cl-track-go { height: 42px; padding: 0 14px; }
-}
-@media (max-width: 380px) {
-  .cl-quick-list { grid-template-columns: 1fr; }
+  .cl-track-go { height: 40px; padding: 0 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cl-phone-results { animation: none; }
@@ -4989,7 +4481,7 @@ function warModalEscHandler(e) {
       <div class="lb-head">
         <p class="lb-kicker" id="gtKicker">Global top 10</p>
         <h2 class="lb-title" id="gtTitle">Top players <em>of the week</em></h2>
-        <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-shock.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Whoa&hellip; the world&rsquo;s 10 best when this week&rsquo;s leaderboard closed. Tap a player to see their profile.</p></div>
+        <div class="cv-say"><img class="cv-face" src="/images/coc/villager/face-flat.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><p><b>Villager</b>Whoa&hellip; the world&rsquo;s 10 best when this week&rsquo;s leaderboard closed. Tap a player to see their profile.</p></div>
       </div>
       <a class="art-all" href="/coc/tools/leaderboards?region=global">Full leaderboard<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
@@ -5001,8 +4493,8 @@ function warModalEscHandler(e) {
 
 <!-- FAQ (Oct 24 2026 rebuild; was the TH pages' shared .t18-faq cards). Its own
      look (coc-lobby.css "FAQ"): help desk on the left (title, then the site's
-     shared feedback box, built into <div data-feedback> by 11layout.js;
-     sticky on desktop), the questions on the right. Native <details name="qa">:
+     shared feedback box, built into <div data-feedback> by 11layout.js),
+     the questions on the right, level with the feedback box. Native <details name="qa">:
      opening one closes the others with no script, keyboard-friendly, and
      the answers stay in the page text for search engines. -->
 <section class="qa" id="faq" aria-labelledby="qaTitle">
@@ -5168,7 +4660,7 @@ function warModalEscHandler(e) {
 </div>
 
 
-<script src="/11layout.js?v=20261031logo" defer></script>
+<script src="/11layout.js?v=20261112sb" defer></script>
 <!-- Fills the hero's event strip. Standalone rather than thz-script.js,
      which carries a footer injector and page-specific handlers this page
      does not want. -->
@@ -5866,16 +5358,9 @@ function cocPagePath(u) {
 })();
 </script>
   <script src="/coc-help.js" defer></script>
-  <script>
-  // (i) in the v8 nav icon style; coc-help.js builds the button.
-  window.addEventListener('load', function(){
-    var svg = document.querySelector('#stbInfoBtn svg');
-    if (svg) svg.outerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5.5\"/><path d=\"M12 7.7v.1\"/></svg>';
-  });
-  </script>
   <script src="/coc-more.js?v=20261028my" defer></script>
   <script src="/coc-hub-menus.js" defer></script>
-  <script src="/tool-cards.js?v=3410a759" defer></script>
+  <script src="/tool-cards.js?v=cfb3ef8d" defer></script>
 <style>
 /* ONE SPACING RHYTHM (Oct 2026, Adrian's pick). Every lobby section, from
    the Town Halls down to the clan card, gets the same --sy top and bottom.
@@ -5895,7 +5380,12 @@ function cocPagePath(u) {
 .coc-main .cl-feature-inner,
 .coc-main .hm,
 .coc-main .gt { padding-top: var(--sy); padding-bottom: var(--sy); }
-.coc-main .qa { padding-top: var(--sy); padding-bottom: 112px; } /* room for the Live band's Warden */
+/* Track any clan (Nov 12 2026, Adrian: "it needs height"): more air than the --sy rhythm, the phone needs room. */
+.coc-main .cl-feature-inner { padding-top: 112px; padding-bottom: 112px; }
+@media (max-width: 970px) { .coc-main .cl-feature-inner { padding-top: 64px; padding-bottom: 64px; } }
+.coc-main .qa { padding-top: var(--sy); padding-bottom: var(--sy); } /* was 112 "for the Warden": he is pinned to the band's bottom and never reaches up here */
+/* Live band (Nov 12 2026): was 48 / 52 from coc-clan-clock.css; the lobby rhythm here, the TH pages keep theirs. */
+.coc-main .cc-section.t18-band { padding-top: var(--sy); padding-bottom: var(--sy); }
 
 /* SECTION TITLES (Oct 21 2026, Adrian): every lobby heading below the hero
    wears the Minecraft section title (mc-home.css SECTION TITLES): Orbitron
@@ -5908,7 +5398,7 @@ html body.coc-home .lob-title,
 html body.coc-home .lb-title,
 html body.coc-home .cl-feature-title,
 html body.coc-home .cc-label {
-  font-family: 'Tourney', sans-serif; font-style: italic;
+  font-family: 'Orbitron Title', sans-serif;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.5px;
@@ -5922,7 +5412,7 @@ html body.coc-home .lob-title,
 html body.coc-home .lb-title,
 html body.coc-home .cl-feature-title,
 html body.coc-home .cc-label {
-  font-size: var(--fs-title-tourney);
+  font-size: var(--fs-title-orb);
 }
 /* Live events: was a 10px label with a pulsing dot; now a title, no dot. */
 html body.coc-home .cc-label::before { display: none; }

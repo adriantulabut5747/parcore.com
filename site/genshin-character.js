@@ -187,7 +187,7 @@
       const runs = hist.banners.filter((b) => (five ? b.five.includes(D.name) : b.four.includes(D.name) && b.kind === 'event')).sort((a, b) => a.start - b.start);
       wishes(runs, roster, now, !!live);
     })
-    .catch(() => ($('cpWishes').innerHTML = '<p class="gi-empty">Her wish history didn&rsquo;t load. Try again in a moment.</p>'));
+    .catch(() => ($('cpWishes').innerHTML = '<p class="gi-empty">The wish history didn&rsquo;t load. Try again in a moment.</p>'));
 
   function wishes(runs, roster, now, onNow) {
     const box = $('cpWishes');
@@ -204,7 +204,7 @@
     const nums = `<div class="cp-wnums">
       ${cell('Banners', runs.length, ev === runs.length ? 'all Event Wishes' : `${ev} Event · ${runs.length - ev} Chronicled`)}
       ${cell('First', esc(runs[0].version), date(runs[0].start))}
-      ${cell(onNow ? 'On now' : 'Waiting', onNow ? 'Live' : num(DAYS(now - lastEnd)), onNow ? 'on the wishes' : 'days since her last banner', onNow ? 'is-now' : '')}
+      ${cell(onNow ? 'On now' : 'Waiting', onNow ? 'Live' : num(DAYS(now - lastEnd)), onNow ? 'on the wishes' : `days since ${D.her} last banner`, onNow ? 'is-now' : '')}
       ${cell('Usual wait', gaps.length ? num(avg) : '—', gaps.length ? `days on average, longest ${num(Math.max(...gaps))}` : 'one banner so far')}
     </div>`;
     // The line, first banner to today: filled dots = Event Wishes, hollow = Chronicled, dashes = the wait.

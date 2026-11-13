@@ -25,7 +25,7 @@
     const [y, m, d] = (iso || '').split('-').map(Number);
     return y ? `${MONTHS[m - 1]} ${d}, ${y}` : '';
   };
-  const charLink = (name) => '/genshin-impact/characters?q=' + encodeURIComponent(name);
+  const charLink = GI.charHref;
 
   // ---- MAP: where each nation sits. Not to scale: placed from each nation's official one-line
   // description ("northeast", "east", "far east", "west-central", "center", "western",

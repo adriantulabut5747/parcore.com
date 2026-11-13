@@ -291,27 +291,43 @@
         .join('');
     }
 
+    // The pool is drawn once; a tap or a filter only flips attributes (rebuilding ~120 filtered pictures on every tap
+    // was the lag, Nov 2 2026).
+    $('crbGrid').innerHTML =
+      pool
+        .map(
+          (c) =>
+            `<button type="button" class="crb-pc" data-id="${c.id}" aria-pressed="false" title="${esc(c.name)}"><img ${CR.src(c.id)} alt="${esc(c.name)}" width="136" height="200" loading="lazy" decoding="async"><span class="crd-cost">${c.elixir ?? '?'}</span>${
+              canEvo(c) || canHero(c)
+                ? `<span class="crb-tags">${canEvo(c) ? '<i class="crb-tag crb-tag--evo">Evo</i>' : ''}${canHero(c) ? '<i class="crb-tag crb-tag--hero">Hero</i>' : ''}</span>`
+                : ''
+            }</button>`,
+        )
+        .join('') + '<p class="crb-none" hidden>No card matches that.</p>';
+    const poolEls = pool.map((c) => [c, $('crbGrid').querySelector(`[data-id="${c.id}"]`)]);
+    const none = $('crbGrid').querySelector('.crb-none');
+
     function drawPool() {
-      $('crbType').querySelectorAll('[data-v]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === filter.type));
-      $('crbCost').querySelectorAll('[data-v]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === filter.cost));
+      $('crbType')
+        .querySelectorAll('[data-v]')
+        .forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === filter.type));
+      $('crbCost')
+        .querySelectorAll('[data-v]')
+        .forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === filter.cost));
       const [lo, hi] = filter.cost ? filter.cost.split('-').map(Number) : [0, 99];
       const inDeck = new Set(deck.map((c) => c[0]));
-      const shown = pool.filter(
-        (c) =>
+      let any = false;
+      for (const [c, el] of poolEls) {
+        const show =
           (!filter.q || c.name.toLowerCase().includes(filter.q)) &&
           (!filter.type || c.type === filter.type) &&
-          (!filter.cost || ((c.elixir ?? -1) >= lo && (c.elixir ?? -1) <= (hi ?? lo))),
-      );
-      $('crbGrid').innerHTML = shown.length
-        ? shown
-            .map(
-              (c) =>
-                `<button type="button" class="crb-pc" data-id="${c.id}" aria-pressed="${inDeck.has(c.id)}" title="${esc(c.name)}"><img ${CR.src(c.id)} alt="${esc(c.name)}" width="136" height="200" loading="lazy" decoding="async"><span class="crd-cost">${c.elixir ?? '?'}</span>${
-                  canEvo(c) || canHero(c) ? `<span class="crb-tags">${canEvo(c) ? '<i class="crb-tag crb-tag--evo">Evo</i>' : ''}${canHero(c) ? '<i class="crb-tag crb-tag--hero">Hero</i>' : ''}</span>` : ''
-                }</button>`,
-            )
-            .join('')
-        : '<p class="crb-none">No card matches that.</p>';
+          (!filter.cost || ((c.elixir ?? -1) >= lo && (c.elixir ?? -1) <= (hi ?? lo)));
+        any ||= show;
+        if (el.hidden === show) el.hidden = !show;
+        const on = String(inDeck.has(c.id));
+        if (el.getAttribute('aria-pressed') !== on) el.setAttribute('aria-pressed', on);
+      }
+      none.hidden = any;
     }
 
     draw();

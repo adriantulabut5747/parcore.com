@@ -3,67 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Support Parchrome | Ko-fi</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Sora', Arial, sans-serif;
-    background: linear-gradient(180deg, #131212 0%, #0a0a0a 100%);
-    color: #e8e8e8;
-    min-height: 100vh;
-  }
-  .legal-wrap {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 80px 24px 100px;
-  }
-  h1 { color: #fff; font-size: 28px; margin-bottom: 8px; }
-  h2 { color: #fff; font-size: 18px; margin-top: 40px; margin-bottom: 12px; }
-  .legal-updated { color: #8a8d92; font-size: 13px; margin-bottom: 40px; }
-  p, li { line-height: 1.7; color: #c7c7c7; }
-  a { color: #c23b3b; }
-  .back-link { display: inline-block; margin-bottom: 32px; color: #8a8d92; text-decoration: none; font-size: 13px; }
-  .back-link:hover { color: #fff; }
-  .kofi-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    padding: 14px 24px;
-    background: #c23b3b;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 14px;
-    border-radius: 0;
-    opacity: 0.5;
-    pointer-events: none;
-    cursor: default;
-  }
-  .kofi-note {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #8a8d92;
-  }
-</style>
+<title>Support Parchrome | Parchrome</title>
+<meta name="description" content="Parchrome is free, has no ads and needs no account. Here is how to help keep it that way, most of it free.">
+<link rel="canonical" href="https://parchrome.netlify.app/about/support">
+<meta property="og:title" content="Support Parchrome | Parchrome">
+<meta property="og:description" content="Parchrome is free, has no ads and needs no account. Here is how to help keep it that way, most of it free.">
+<meta property="og:url" content="https://parchrome.netlify.app/about/support">
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/icons/parchrome-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/parchrome-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/parchrome-touch-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Sora:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261112sb">
+<link rel="stylesheet" href="/about.css?v=20261112or">
 </head>
-<body>
-  <div class="legal-wrap">
-    <a class="back-link" href="/">&larr; Back to Parchrome</a>
-    <h1>Support Parchrome</h1>
-    <p class="legal-updated">Keep the guides, layouts, and directory updated.</p>
+<!-- About section (Nov 2 2026): About, Contact, Support, Terms, Privacy, DMCA.
+     Nav = game-nav.json "about"; looks = about.css; copy / share / game tiles = about.js. -->
+<body data-game-nav="about">
 
-    <p>Parchrome is a free, independent fan resource — no ads slowing things down, no paywalls on guides. If you've found the site useful and want to help keep it running and updated, a Ko-fi donation goes a long way.</p>
-
-    <h2>Ko-fi</h2>
-    <p>Our Ko-fi page isn't set up yet — check back soon.</p>
-    <!-- Once the Ko-fi account exists, swap the href below for the real
-         page (https://ko-fi.com/yourname) and remove opacity/pointer-events/
-         cursor from .kofi-btn so it's a normal clickable button again. -->
-    <a class="kofi-btn" href="#" aria-disabled="true" tabindex="-1" onclick="return false;">
-      Support us on Ko-fi
-    </a>
-    <p class="kofi-note">Coming soon.</p>
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
   </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/parchrome-logo.svg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar: title / breadcrumb + the About pages strip (game-nav.json "about"). -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/parchrome-logo.svg" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">About Parchrome</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="About pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+
+<main class="ab">
+  <header class="ab-hero">
+    <p class="ab-kicker">Support us</p>
+    <h1 class="pg-title">Keep Parchrome free</h1>
+    <p class="ab-lead">No ads, no paywall, no account. If a layout won you a war or a tool saved you time, here is how to help keep it that way. Most of it costs nothing.</p>
+    <div class="ab-meta"><span class="ab-pill">Free forever</span><span class="ab-pill">No ads</span></div>
+  </header>
+
+  <div class="ab-grid">
+    <div class="ab-doc">
+      <section class="ab-sec" id="kofi" aria-labelledby="kofi-h">
+        <h2 id="kofi-h"><span class="ab-num" aria-hidden="true">01</span>Ko-fi</h2>
+        <p>Our Ko-fi page isn't set up yet. The button below goes live as soon as it is.</p>
+        <div class="ab-keys">
+          <a class="ab-key ab-key--red" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5s-7.5-4.4-7.5-9.8A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.5c0 5.4-7.5 9.8-7.5 9.8z"/></svg><span>Support us on Ko-fi (soon)</span></a>
+        </div>
+      </section>
+      <section class="ab-sec" id="free" aria-labelledby="free-h">
+        <h2 id="free-h"><span class="ab-num" aria-hidden="true">02</span>Free ways to help</h2>
+        <div class="ab-tiles">
+          <button type="button" class="ab-tile" data-share><span class="ab-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></svg></span><b>Share Parchrome</b><span>Send it to your clan, squad or Discord. More players means more reasons to keep building.</span><em>Share the link</em></button>
+          <a class="ab-tile" href="https://discord.gg/rfntEJ5w" target="_blank" rel="noopener"><span class="ab-ico"><svg class="ab-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></span><b>Join the Discord</b><span>Hang out, ask questions and hear about new tools first.</span><em>Join the server</em></a>
+          <a class="ab-tile" href="/about/contact#feedback"><span class="ab-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="8" width="9" height="12" rx="4.5"/><path d="M12 12v8M4 13h3.5M16.5 13H20M5 8l2.8 2M19 8l-2.8 2M5 19l2.8-2M19 19l-2.8-2M9.5 8V6.5a2.5 2.5 0 0 1 5 0V8"/></svg></span><b>Report a mistake</b><span>A wrong number or a broken button. Fixing those keeps the whole site trustworthy.</span><em>Send a report</em></a>
+          <a class="ab-tile" href="/articles/"><span class="ab-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5l1-4L16 5a2.1 2.1 0 0 1 3 3L8.5 18.5z"/><path d="M14 7l3 3"/></svg></span><b>Ask for a guide</b><span>Tell us what you are stuck on and it might be the next article.</span><em>Read the articles</em></a>
+        </div>
+      </section>
+      <section class="ab-sec" id="where" aria-labelledby="where-h">
+        <h2 id="where-h"><span class="ab-num" aria-hidden="true">03</span>Where support goes</h2>
+        <p>Keeping layouts, armies and stats current after every game update, the servers that answer player lookups, and building the tools people ask for.</p>
+      </section>
+    </div>
+    <aside class="ab-side">
+      <section class="ab-card" aria-labelledby="abHelpHead">
+        <h2 id="abHelpHead">Need a hand?</h2>
+        <p>Something wrong on a page, or a question about this one? Reach us here.</p>
+        <div class="ab-keys">
+          <a class="ab-key ab-key--red" href="mailto:wildparchrome@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg><span>Email us</span></a>
+          <a class="ab-key" href="https://discord.gg/rfntEJ5w" target="_blank" rel="noopener"><svg class="ab-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span>Join the Discord</span></a>
+          <a class="ab-key" href="/about/contact#feedback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5h-2.5z"/><path d="M8.5 9.5h7M8.5 12.5h4"/></svg><span>Send feedback</span></a>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<!-- Built by 11layout.js "SITE FOOTER" from 11footer.json + sidebar.json. -->
+<footer class="pf-footer"></footer>
+</div>  </div>
+
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json "about" (initHubNav in 11layout.js). -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+          <div class="more-sheet-title">About Parchrome</div>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261112sb"></script>
+<script src="/about.js?v=20261102a" defer></script>
 </body>
 </html>

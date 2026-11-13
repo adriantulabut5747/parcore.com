@@ -254,12 +254,12 @@
   // ---- CURRENT WISHES (Oct 27 2026): one light card per live wish, all opening the Banners page.
   // Character wish = the 5-star's wish art on its element colour; weapon wish = the two 5-star
   // weapons side by side. The clock is [data-end-srv], so tick() keeps it running.
-  function wishes(list) {
+  function wishes(feed) {
     const t = now();
-    const live = list.filter((b) => srvEnd(b.end) > t);
+    const live = (feed.banners || []).filter((b) => srvEnd(b.end) > t);
     const box = $('giWishes');
     if (!live.length) {
-      box.innerHTML = '<p class="gi-empty">No wishes are running right now.</p>';
+      GI.betweenWishes(feed).then((html) => (box.innerHTML = html || '<p class="gi-empty">No wishes are running right now.</p>'));
       return;
     }
     const fours = (arr) => `<span class="gwl-four">${(arr || []).filter((x) => x.rarity === 4).map((x) => tile(x.icon, 4, x.name)).join('')}</span>`;
@@ -451,7 +451,7 @@
       $('giNatAll').href = '/genshin-impact/characters?nation=' + n.key;
       fit($('giNatName'));
       $('giNatChars').innerHTML = list
-        .map((c) => `<a class="gi-nat-c" href="/genshin-impact/characters/${slug(c.name)}"><figure>${tile(c.icon, c.rarity, c.name)}<figcaption>${esc(c.name)}</figcaption></figure></a>`)
+        .map((c) => `<a class="gi-nat-c" href="${GI.charHref(c.name)}"><figure>${tile(c.icon, c.rarity, c.name)}<figcaption>${esc(c.name)}</figcaption></figure></a>`)
         .join('');
     };
     tabs.addEventListener('click', (e) => {
@@ -499,7 +499,7 @@
   GI.feed
     .then((feed) => {
       lede(feed);
-      wishes(feed.banners || []);
+      wishes(feed);
       const v = (feed.banners || []).find((b) => b.version);
       if (v) $('giVer').textContent = v.version;
       today(feed);

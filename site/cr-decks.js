@@ -1,4 +1,4 @@
-// /clash-royale/decks (Oct 30 2026; v2 Oct 31 2026: decks drawn as real hands; v3 the same day: the snapshot panels,
+// /clash-royale/decks (Oct 30 2026; v2 Oct 31 2026: decks drawn as real hands; v3 the same day:
 // the finder console + Ask the Golden Knight; cleanup the same day: no surest winner / meta map / elixir curve / speed filter,
 // sort in the finder). Data = /cr-decks.json + /cr-cards.json, both written daily by scripts/cr-meta.mjs.
 // The address holds the view: ?sort=wr|elixir, ?style=cycle, ?q=hog, ?with=<ids>&without=<ids>. Each deck: name (CR.name), the 8 cards 4 x 2, tower + elixir, win rate with its
@@ -253,7 +253,7 @@
     document.addEventListener('click', (e) => shareFor && !e.target.closest('.crd-sp, [data-act=share]') && closeShare());
     document.addEventListener('keydown', (e) => e.key === 'Escape' && closeShare());
 
-    // "every deck with this card" (a card in a deck, or a snapshot row)
+    // "every deck with this card" (a card in a deck)
     function withCard(id) {
       state.with.add(id);
       state.without.delete(id);
@@ -262,7 +262,6 @@
       $('crdBar').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    snapshot();
 
     function draw() {
       // address
@@ -358,31 +357,6 @@
     </div>
   </div>
 </article>`;
-    }
-
-    // ---- SNAPSHOT: the two panels over the list (every number from the same two files) ----
-    function snapshot() {
-      // a row: card picture, name + a bar in a well, the number; tap = every deck with that card
-      const row = (id, e, label, val, frac, sub) =>
-        `<li><button type="button" class="crs-row" data-card="${id}" title="${esc(label)}: every deck with it"><img ${CR.src(id, e)} alt="" width="34" height="50" loading="lazy" decoding="async"><span class="crs-row-t"><b>${esc(label)}</b><span class="crs-bar"><i style="--f:${frac.toFixed(3)}"></i></span></span><span class="crs-row-n"><b>${val}</b><small>${sub}</small></span></button></li>`;
-      const used = cards.cards.filter((c) => c.usage).sort((a, b) => b.usage - a.usage).slice(0, 6);
-      $('crsCards').innerHTML = used
-        .map((c) => row(c.id, 0, c.name, c.usage.toFixed(1) + '%', c.usage / used[0].usage, c.winRate.toFixed(1) + '% win rate'))
-        .join('');
-      const forms = cards.cards
-        .flatMap((c) => [c.evoGames && { c, e: 1, g: c.evoGames }, c.heroGames && { c, e: 2, g: c.heroGames }])
-        .filter(Boolean)
-        .sort((a, b) => b.g - a.g)
-        .slice(0, 6);
-      $('crsForms').innerHTML = forms
-        .map(({ c, e, g }) => row(c.id, e, (e === 1 ? 'Evo ' : 'Hero ') + c.name, num(g), g / forms[0].g, Math.round((g / c.games) * 100) + '% of ' + c.name + ' games'))
-        .join('');
-      document.querySelectorAll('.crs-rows').forEach((ol) =>
-        ol.addEventListener('click', (e) => {
-          const b = e.target.closest('[data-card]');
-          if (b) withCard(+b.dataset.card);
-        }),
-      );
     }
 
     draw();

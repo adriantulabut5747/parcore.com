@@ -27,8 +27,8 @@ IMG = ROOT / 'images' / 'valorant' / 'maps'
 SHELL = ROOT / 'valorant' / 'weapons.html'
 DATA = Path(__file__).with_name('valorant-maps.json')
 # Cache version for valorant-maps.css / .js on every maps page: bump it when either file changes, then rerun.
-ASSET_V = '20261101w9'
-VALORANT_CSS_V = '20261101x1'
+ASSET_V = '20261101x3'
+VALORANT_CSS_V = '20261101x2'
 
 e = html.escape
 MONTHS = 'January February March April May June July August September October November December'.split()
@@ -343,17 +343,22 @@ def index_page(maps, data):
         ('Newest', e(newest['name']), when(newest), ''),
     ]
     body = banner('Valorant', 'Maps', 'Every map in the game: callouts on the minimap, attack and defend tips, and the live ranked pool.',
-                  f"/images/valorant/maps/{newest['slug']}.webp", MAP_ICON, facts)
+                  f"/images/valorant/maps/{newest['slug']}.webp", '/icons/valorant-nav/maps.webp', facts)  # the nav's Maps picture (_tools/valorant-icons)
     modes = data['modes']
     tabs = [f'<button type="button" role="tab" data-mode="" aria-selected="true">All<span class="cb-n">{len(maps)}</span></button>'] + [
         f'<button type="button" role="tab" data-mode="{k}" aria-selected="false">{e(v["name"])}<span class="cb-n">{sum(m["mode"] == k for m in maps)}</span></button>'
         for k, v in modes.items()]
-    body += f'<div class="cb-tabs" id="vmTabs" role="tablist" aria-label="Map modes">{"".join(tabs)}</div>\n'
-    keys = list(modes)
-    for i, (k, v) in enumerate(modes.items()):
-        cards = '\n'.join(card(m) for m in maps if m['mode'] == k)
-        body += section(f'vmSec-{k}', v['title'], v['jett'], f'  <div class="vm-grid">\n{cards}\n  </div>', last=i == len(keys) - 1).replace(
-            '<section class="ct-sec', f'<section data-mode="{k}" class="ct-sec', 1)
+    # the mode tray sits under its own title + Jett line, never straight under the banner (Adrian, Nov 1 2026: every
+    # Database page = title, then its filters); not under 'Competitive maps', since picking TDM hides that section
+    # one grid per mode right under the tray, no title or Jett line of their own (Adrian, Nov 1 2026); the tray hides the
+    # other modes' grids (valorant-maps.js: section[data-mode])
+    grids = ''.join(
+        f'\n  <section class="vm-mode" data-mode="{k}" aria-label="{e(v["title"])}">\n  <div class="vm-grid">\n'
+        + '\n'.join(card(m) for m in maps if m['mode'] == k) + '\n  </div>\n  </section>'
+        for k, v in modes.items())
+    body += section('vmAllTitle', 'Every map',
+                    'Pick a mode to see only its maps, or open any map for its callouts and site tips. I could run them all blindfolded.',
+                    f'  <div class="cb-tabs" id="vmTabs" role="tablist" aria-label="Map modes">{"".join(tabs)}</div>{grids}', last=True)
     return shell('Valorant Maps: Every Map, Callouts and Guides | Parchrome',
                  'Every Valorant map, newest first: callouts drawn on each minimap, attack and defend tips for every site, release dates and the live ranked map pool.',
                  body)

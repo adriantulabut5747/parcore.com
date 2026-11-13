@@ -56,7 +56,8 @@
     if (ch) $('egTheaterSub').textContent = `Season ${t.season}, ${day(ch.start)} to ${lastDay(ch.end)}${t.version ? ' (version ' + t.version + ')' : ''}.`;
     const who = (n) => {
       const c = roster[n];
-      return `<figure class="eg-who">${c ? tile(c.icon, c.rarity, n) : '<span class="gi-tile"></span>'}<figcaption>${esc(n)}</figcaption></figure>`;
+      const fig = `<figure class="eg-who">${c ? tile(c.icon, c.rarity, n) : '<span class="gi-tile"></span>'}<figcaption>${esc(n)}</figcaption></figure>`;
+      return c ? `<a class="eg-who-a" href="${GI.charHref(n)}">${fig}</a>` : fig;
     };
     box.innerHTML = `<div class="eg-th-main">
         <div><span class="gi-label">Elements</span><div class="eg-els">${t.elements

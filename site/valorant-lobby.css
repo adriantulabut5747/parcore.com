@@ -5,7 +5,7 @@
    v5 (Nov 1 2026, Adrian: "upgrade the whole page"): hero = agent select (one agent centred, < > newest first, their card
    on the right), top 3 on their own player cards, the spotlight band became the roster by role, minimaps on the pool.
    On top of codm-banner.css (--codm-side inset, .cb-kicker / .cb-title), codm-tools.css (.ct-title)
-   and valorant.css (Tourney titles, the ground). A full-width hero with real art (the agent + their name art),
+   and valorant.css (Orbitron titles, the ground). A full-width hero with real art (the agent + their name art),
    everything else = raised boxes, sunken wells, grey keys, one red key per band (11layout.css --lb-*).
    ============================================================ */
 .vl-sr {
@@ -150,7 +150,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 440px) minmax(300px, 1fr) minmax(0, 400px);
+  grid-template-columns: minmax(0, 440px) minmax(300px, 1fr) minmax(0, 385px);
   grid-template-rows: minmax(0, 1fr) auto;
   column-gap: 28px;
   row-gap: 32px;
@@ -319,10 +319,10 @@
 }
 .vh-fig {
   position: absolute;
-  left: -180px;
-  right: -180px;
+  left: -188px;
+  right: -172px;
   bottom: -64px;
-  height: calc(100% + 100px); /* tops out ~36px under the bar, so the art never touches it */
+  height: calc(100% + 90px); /* tops out ~46px under the bar, so the art never touches it */
   max-height: 860px;
   pointer-events: none;
   -webkit-mask-image:
@@ -479,8 +479,51 @@ html body .vh-title {
   font-size: clamp(52px, 4.6vw, 84px);
   line-height: 0.9;
 }
+/* Three-line lock-up (Adrian, Nov 2 2026): CLUTCH huge in white, a small "OR" divider (a versus screen), GET CARRIED in red.
+   The font-size is GET CARRIED's (~6.5em wide, so it fits the copy column at 15cqi); CLUTCH is 1.72em, the same width.
+   width: fit-content = the divider spans the lock-up, not the column. */
+html body .vh-title {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  white-space: nowrap;
+}
+@media (min-width: 971px) {
+  .vh-copy {
+    container-type: inline-size;
+  }
+  html body .vh-title {
+    font-size: min(clamp(52px, 4vw, 72px), 15cqi);
+  }
+}
+.vh-t-big {
+  font-size: 1.72em;
+  line-height: 0.86;
+}
+.vh-or {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  margin: 0.18em 0 0.26em;
+  font-size: max(18px, 0.4em); /* the title's own Orbitron, a third of the size: the word between two fighters */
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: #8d9098;
+}
+.vh-or::before,
+.vh-or::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22));
+}
+.vh-or::after {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.22), transparent);
+}
 .vh-title em {
   font-style: inherit;
+  line-height: 0.9;
   color: var(--lb-red-text);
 }
 /* the search: the page's one job, so it gets the biggest, brightest field on the left */
@@ -588,7 +631,7 @@ html body .vh-title {
 .vh-card-name {
   margin: 0;
   font:
-    italic 900 var(--fs-banner-tourney-lg) / 0.9 'Tourney',
+    900 var(--fs-banner-orb-lg) / 0.9 'Orbitron Title',
     'Oxanium',
     sans-serif;
   text-transform: uppercase;
@@ -1153,7 +1196,7 @@ html body .vh-title {
 .vl-map-txt b {
   display: block;
   font:
-    italic 900 18px 'Tourney',
+    900 18px 'Orbitron Title',
     'Oxanium',
     sans-serif;
   text-transform: uppercase;
@@ -1214,7 +1257,7 @@ html body .vh-title {
   gap: 10px;
   margin: 0 0 12px;
   font:
-    italic 900 18px 'Tourney',
+    900 18px 'Orbitron Title',
     'Oxanium',
     sans-serif;
   text-transform: uppercase;
@@ -1291,7 +1334,7 @@ html body .vh-title {
   bottom: 6px;
   overflow: hidden;
   font:
-    italic 900 11.5px 'Tourney',
+    900 11.5px 'Orbitron Title',
     'Oxanium',
     sans-serif;
   text-transform: uppercase;
@@ -1654,7 +1697,7 @@ html body .vh-title {
 .vl-tool b {
   padding: 0 4px;
   font:
-    italic 900 17px 'Tourney',
+    900 17px 'Orbitron Title',
     'Oxanium',
     sans-serif;
   text-transform: uppercase;
@@ -1677,6 +1720,38 @@ html body .vh-title {
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+/* roulette: a small wheel (valorant-roulette.css's look) */
+.vl-pv--rl {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background:
+    conic-gradient(from -15deg, var(--lb-red) 0 30deg, transparent 30deg),
+    repeating-conic-gradient(from -15deg, #2a2c33 0 30deg, #1d1e23 30deg 60deg);
+  box-shadow:
+    0 0 0 3px #0b0c0e,
+    0 0 0 5px var(--lb-edge),
+    0 8px 18px rgba(0, 0, 0, 0.6);
+}
+.vl-pv--rl i {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--lb-red-edge);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #d64c4c, var(--lb-red) 60%);
+  box-shadow: 0 0 0 3px #0b0c0e;
+}
+.vl-pv--rl u {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 14px;
+  height: 18px;
+  margin-left: -7px;
+  background: var(--lb-red);
+  clip-path: polygon(0 0, 100% 0, 100% 46%, 50% 100%, 0 46%);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6));
 }
 /* crosshair: 4 lines + a dot over a real map shot, outlined like the game's */
 .vl-tool-pic[data-t='crosshairs'] {

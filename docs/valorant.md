@@ -4,10 +4,13 @@ Moved out of CLAUDE.md on Nov 1 2026, unchanged. Paths like `parcore.com/docs/x.
 
 ## Valorant (`/valorant/`, Oct 29 2026, Adrian)
 
-Tabs **Lobby / Tracker / Database / Tools** on the groups engine (game-nav.json `valorant`, SVG icons). Tracker +
-Database have no group page yet (no `link`; Tracker = Player Profile + Leaderboards (both live)); Tools = Crosshairs (live) +
-Economy Calculator / Sensitivity Converter / Chat Art / Valo Quiz (soon). Database = Agents / Maps / Weapons / Ranks from
+Tabs **Lobby / Tracker / Database / Tools** on the groups engine (game-nav.json `valorant`, SVG icons; picture icons being phased in, Nov 2 2026: Lobby tab = the Spike (Standard mode icon) on the Agents icon's dark red key (Adrian, Nov 2 2026: bright red, then light grey, both turned down), Tracker tab = Cypher's Spycam on that key, Database tab = a plain white database stack on the same key, Tools tab = Killjoy's Turret on the same key, Crosshairs / Chat Art = a white gap crosshair + red dot / the gallery's own Heart on a dark graphite key, their Galleries = the same key holding 2x2 sunken wells (Crosshair Gallery: ours, Valorant's default, a sniper sight, a small red cross; Chat Art Gallery: Heart, Smile, Star, Skull from valorant-chatart.json), Instalock Roulette = the page's wheel on that key (red winner under a red pin, red hub), Player Tracker = the Diamond 3 badge, big, under the CoC Player Tracker card's magnifier, Leaderboards = Radiant inside a gold laurel wreath, Agents = Jett breaking out of a dark red key, Weapons = the Classic tilted, Ranks = Silver 3 alone, Maps = a pin on Ascent's minimap (darkened) (Adrian: each looks different, no shared plate; the Agents + Maps index headers are set in scripts/valorant-agents.py + valorant-maps.py), both made by `_tools/valorant-icons/make_icons.py` into `site/icons/valorant-nav/`). Tracker +
+Database have no group page yet (no `link`; Tracker = Player Tracker + Leaderboards (both live)); Tools = Crosshair Maker, Crosshair Gallery, Chat Art Maker, Chat Art Gallery, Instalock Roulette, Sensitivity Converter (live, in that order; Adrian Nov 2 2026, "Maker" names on the menu, search, `<h1>`) +
+Valo Quiz (soon). Database = Agents / Maps / Weapons / Ranks from
 valorant-api.com (free, no key).
+**Trail + active states (Nov 2 2026, Adrian):** "Valorant › Tracker / Database / Tools › page" on every width (phones too, the
+Genshin + Minecraft rule in 11layout.css); the group step is plain text until that group gets a page (`link`), then it links by
+itself. Sub-pages (a player, an agent, a map) light their menu row via `activePrefix`; the sidebar uses `activePrefix: "/valorant/"`.
 **Lobby** (`/valorant/`, Oct 30 2026, full rebuild on the Weapons shell, Adrian to QC; old page backed up in
 `Downloads/parcore.com/_backup/valorant/`): `valorant-lobby.js/.css`. Hero = `.vh` (the `.cb` banner grown up) with the Riot ID
 search (Adrian's pick); a search opens the player page. Facts
@@ -40,7 +43,7 @@ side, #tags hidden there, card pics hidden 1101-1300px) with the agents' feet be
 and the copy rides over its fade; phones show the middle three only. Same day, Adrian: the desktop hero is
 `min-height: calc(100vh - var(--topbar-height))` (it starts under the fixed bar) with rows `1fr auto`, so the live strip always sits on
 the screen's bottom edge and the copy is centred in the space above it; the cast is capped at 860px tall; short screens (<=780px high)
-get less air. Plates have no coloured left edge (Adrian: never on any card, ever). **Ticker, "Opened lately" and the hero facts strip (Patch / Map pool / Agents / Guns) were dropped** (Adrian; the hero's Jett bubble stays; title = "See who / keeps up", Adrian's pick, so the bubble's joke is "Spoiler: most of them can't.";
+get less air. Plates have no coloured left edge (Adrian: never on any card, ever). **Ticker, "Opened lately" and the hero facts strip (Patch / Map pool / Agents / Guns) were dropped** (Adrian; the hero's Jett bubble stays; title = "Clutch / or / get carried" (Adrian's pick, Nov 2 2026; three-line lock-up: CLUTCH 1.72em white, a small Tourney "or" between two grey rules, GET CARRIED red, both big lines the same width, valorant-lobby.css `.vh-t-big` / `.vh-or`), so the sub ends "Find out which one they are.";
 the player page still keeps `vl-recent`).
 **v5 "agent select" (Nov 1 2026, Adrian: lineup felt boring; "remove all characters, keep Hush, < > to the next agent,
 centre it, fill the right"; then "upgrade the whole page"; to QC)**: the 5-agent lineup is gone. `.vh` = copy | `.vh-stage`
@@ -152,6 +155,12 @@ only non-defaults written; the general block, A (ADS), S (sniper) and unknown P 
 round-trip. Key meanings: agatasmurf.com's table + senslab.pro's defaults; `f` (fade with firing error) and `0g`/`1g`
 (separate vertical length) are inferred from pro codes, so Adrian should confirm them in game. Starters are Parchrome's own designs (never
 attribute a code to a player without a source); saved = localStorage `vl-xh-saved`; the address holds `?c=<code>`.
+**Crosshair Gallery** (`/valorant/crosshair-gallery`, Nov 1 2026, Adrian's codes, to QC): the Chat Art Gallery's layout (category tabs +
+search, Copy / Edit cards = the maker's `.xh-card`). Data = `site/valorant-crosshair-gallery.json` (cats Cross / Dot / Shapes; codes Adrian
+pasted, names his where given, ours otherwise; ids permanent). No own script: `valorant-crosshairs.js` runs `gallery()` when the page has no
+`#xhStage`; cards use the background picked in the maker, Edit = `/valorant/crosshairs?c=<code>`. Same day, engine: an outline is now a
+frame and still draws when its line is at 0 opacity (trick crosshairs like Glasses / Face are built that way; check in game), and
+cards + the banner well shrink a crosshair that wouldn't fit (`reach()`). Nov 2 2026 (Adrian): `hot: true` in the JSON = a red HOT tag in the card picture's corner (`.xh-hot`; "hot" also matches in search); first two = TenZ (was Cyan Gap) + White Dot (was Bead), ids kept.
 **Ranks** (`/valorant/ranks`, Oct 30 2026, Adrian to QC): `valorant-ranks.js/.css`. The `.cb-tabs` tray is the ladder (`?r=gold`, icon over
 name so all 9 fit 1280px); icons are baked to `images/valorant/ranks/<tier id>.webp` (valorant-api, 3 = Iron 1 ... 27 = Radiant). The rules
 come from Riot's support pages (RR, Iron-Ascendant, Immortal-Radiant, Competitive FAQ, May 2026): duo/trio = `partyOK`, regional Immortal 2/3 +
@@ -171,6 +180,17 @@ converters + KovaaK's agree on (CS2/Apex/TF2 0.022, OW2 + CoD 0.0066, Fortnite 0
 default 0.02 multiplier). Deadlock / Destiny 2 / Roblox / The Finals are left out until Adrian 360-tests them in game. Scoped aim is
 not converted (no source for a "correct" multiplier). Dial = top-down turn with Valorant's 103 degree cone + mouse-distance slider
 (`.gs-dist`). Address = `?from=<id>&sens=&dpi=`.
+**Instalock Roulette** (`/valorant/instalock-roulette`, Nov 2 2026, Adrian: "spin the wheel but better", to QC): `valorant-roulette.js/.css`,
+no API, no script. Adrian's picks: a **classic disc wheel** (the agent-select flicker and the case-opening reel were offered and turned
+down), **Agents | Weapons** switch (agents default, `?mode=w`), filters, Team of 5, Challenge, history + share link, a made-in-browser tick +
+lock sound (WebAudio, off until the Sound key; never Riot audio), Jett reacts to the roll. The wheel is SVG (`#rlSpin` rotated by rAF); the
+hub is the page's one red key. Fair: same-size slices, the winner drawn with `crypto.getRandomValues` before the wheel moves, the spin only
+eases onto it (lands inside the slice, never on a peg). Team of 5 = five spins, each pick taken off; **Every role** (on by default) narrows
+the last spins to the roles still missing. Pool = tap a face / gun, a group's name switches the group, "Only these", a price cap for guns;
+saved per wheel (`vl-rl-out-a` / `-w`, `vl-rl-cost`). Challenges = our own rules in `CHALLENGES` (`gun: true` ones never come up on the
+Weapons wheel). Address `?r=<id>[,<id>...]&c=<challenge>` (bad ids = empty state); last 10 = `vl-rl-hist`; Jett's lines = `SAY` (per role,
+per gun type, a few specials). Data: valorant-roster.json + valorant-weapons.json (each wheel hides if its file fails). The lobby's Tools
+card draws a small CSS wheel (`.vl-pv--rl`). Nav icon = the page's wheel on the Tools pages' dark key (`roulette()` in `_tools/valorant-icons/make_icons.py`, Nov 2 2026).
 **Agents** (`/valorant/agents/` + `/valorant/agents/<slug>`, Oct 30 2026, Adrian to QC): GENERATED by `python
 scripts/valorant-agents.py` (reuses valorant-maps.py's helpers + the Weapons shell) from valorant-api /v1/agents (pictures
 baked to `images/valorant/agents/`: portrait, face, name-art, a 3:4 card crop centred on the head = the JSON's `card_x`, set by eye because effects fooled the automatic guess; `--cards` re-crops, ability + role icons;
@@ -186,11 +206,15 @@ for the lobby hero's contour lines, very faint: valorant.css `.cb::before` (topo
 on desktop, all across at opacity 0.03 on phones). Bumping valorant.css's `?v=` = all 63 pages + `VALORANT_CSS_V` in
 valorant-maps.py (agents + maps pages are generated). Lobby, same day: the hero clips sideways only (`overflow: clip visible`)
 so the live strip's shadow fades past its bottom edge; the Ranked well redraws its ring over the steps (`.vl-stairs-wrap::after`).
-**Tabs under the search (Nov 1 2026, Adrian, every size)**: Weapons' type tray sits under its search / distance / hit / shields
-bar; Agents' role tray (`.va-roster-tabs`, written by valorant-agents.py; `.va-roles` was already taken) sits inside The roster
-under the search + order row and still filters the table further down. Maps + Ranks have no search, so their trays stay under
-the banner. Lobby phones (same day): NA's top 3 is hidden (the live card = act clock only), sections 64px apart.
-**Look (Oct 29 2026, Adrian):** titles = **Tourney** italic 800 (valorant.css "TITLES"; Riot's Tungsten is licensed,
+**Filters under the first title (Nov 1 2026, Adrian, every size)**: every Database page + Leaderboards = banner, then the
+first section's title + Jett line, then its search / tabs, then the content (inside that `.ct-sec`; valorant.css
+`.ct-sec > .cb-tabs, .gs-bar, .lbd-line` drops the banner margins). Weapons: bar under "Buy menu" (type tray removed Nov 2 2026, Adrian: the buy menu's columns already split by type); Agents: role tray
+(`.va-roster-tabs`, valorant-agents.py; `.va-roles` was taken) under the roster's search + order row, still filters the table
+too; Ranks: the ladder under the picked rank's title; Leaderboards: region tray + the line under "Top 3"; Maps: a new "Every
+map" section (valorant-maps.py) holds the mode tray, since under "Competitive maps" picking TDM would hide the tray with it. Same day: the mode sections lost their own titles + Jett lines; the index is now one section, the tray then
+one `.vm-mode` grid per mode (`section[data-mode]`, 14px apart), so "All" reads as one list.
+Tool pages already start with their title. Lobby phones (same day): NA's top 3 is hidden (the live card = act clock only), sections 64px apart.
+**Look (Oct 29 2026, Adrian):** titles = **Orbitron Title** (Nov 12 2026; Tourney italic 800 before) (valorant.css "TITLES"; Riot's Tungsten is licensed,
 never host it; Anton / League Gothic / the Valorant look were turned down), no red tab on the `.cb` banner.
 Text (Oct 31 2026, Adrian): paragraphs + small text (tables like `.gs-table-wrap`) = **Sora**, Oxanium only for
 subtitles / labels / keys (valorant.css: `.coc-main` = Sora, a rule must name Oxanium; uppercase labels = its "LABELS" list). Weapons

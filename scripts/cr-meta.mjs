@@ -4,7 +4,7 @@
 //   data/cr/YYYY-MM-DD.json  one run's counts (private, outside site/; the last 7 are kept)
 //   site/cr-decks.json       7-day totals, decks with >= FLOOR games
 //   site/cr-cards.json       every card (from /cards) + its 7-day usage
-//   site/cr-top.json         top 10 players + the deck of their latest ranked battle
+//   site/cr-top.json         top 10 players + the deck of their latest ranked battle + recent ranked win rate
 //
 // Run daily by .github/workflows/cr-meta.yml. Key = the CR_API_KEY secret; calls go
 // through RoyaleAPI's proxy (45.79.218.79 is the IP registered on the key).
@@ -183,9 +183,13 @@ const towers = (cardList.supportItems || []).map((t) => {
   return { id: t.id, name: t.name, rarity: t.rarity, icon: icon(t.iconUrls?.medium), games: s[0], winRate: rate(s[1], s[0]), usage: pct(s[0]) };
 });
 
-// Top 10 + the deck of each one's newest ranked battle (no extra calls).
+// Top 10 + the deck of each one's newest ranked battle + their win rate over the ranked games in that same
+// log (up to 30 battles, draws left out; no extra calls). games 0 = no ranked game, the page hides the rate.
 const top = players.slice(0, 10).map((p) => {
-  const last = (logs.get(p.tag) || []).find((b) => b.type === 'pathOfLegend')?.team[0];
+  const ranked = (logs.get(p.tag) || []).filter((b) => b.type === 'pathOfLegend' && b.team.length === 1 && b.opponent.length === 1);
+  const last = ranked[0]?.team[0];
+  const decided = ranked.filter((b) => b.team[0].crowns !== b.opponent[0].crowns);
+  const wins = decided.filter((b) => b.team[0].crowns > b.opponent[0].crowns).length;
   return {
     rank: p.rank,
     tag: p.tag,
@@ -193,7 +197,9 @@ const top = players.slice(0, 10).map((p) => {
     elo: p.eloRating,
     clan: p.clan?.name || '',
     deck: last ? last.cards.map((c) => (c.evolutionLevel ? [c.id, c.evolutionLevel] : [c.id])) : null,
-    tower: last?.supportCards?.[0]?.id || 0
+    tower: last?.supportCards?.[0]?.id || 0,
+    games: decided.length,
+    wins
   };
 });
 

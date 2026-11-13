@@ -109,7 +109,6 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
 .fc-type.suggestion { background: linear-gradient(90deg, #232323, #3a3a3a); }
 .fc-type.bug { background: linear-gradient(90deg, #5f0808, #ad0000); }
 .fc-type.rating { background: linear-gradient(90deg, #2b0707, #5f0808); }
-.fc-type.hwr { background: linear-gradient(90deg, #1a2f5f, #2d4fad); }
 .fc-type.valorant { background: linear-gradient(90deg, #4a1a5f, #8a2dad); }
 
 .fc-stars { font-size: 14px; letter-spacing: 2px; color: #e0302f; }
@@ -236,7 +235,6 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
     <div class="stat-chip"><div class="num" id="statSuggestion">—</div><div class="lbl">Suggestions</div></div>
     <div class="stat-chip"><div class="num" id="statBug">—</div><div class="lbl">Bugs</div></div>
     <div class="stat-chip"><div class="num" id="statRating">—</div><div class="lbl">Ratings</div></div>
-    <div class="stat-chip"><div class="num" id="statHwr">—</div><div class="lbl">HWR</div></div>
     <div class="stat-chip"><div class="num" id="statVal">—</div><div class="lbl">Valorant</div></div>
   </div>
 </div>
@@ -246,7 +244,6 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
   <button class="filter-btn" data-filter="suggestion">Suggestions</button>
   <button class="filter-btn" data-filter="bug">Bugs</button>
   <button class="filter-btn" data-filter="rating">Ratings</button>
-  <button class="filter-btn" data-filter="hwr">HWR</button>
   <button class="filter-btn" data-filter="valorant">Valorant</button>
 </div>
 
@@ -319,23 +316,7 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // Second project — hwr-ai's "Submit a Site" form (web-resources-suggestions).
-  // Initialized as a named secondary app since it's a separate Firebase
-  // project from the one above; each needs its own firebase.firestore()
-  // bound to its own app instance instead of sharing the default one.
-  const hwrFirebaseConfig = {
-    apiKey: "AIzaSyCdnRWE_asKaFD0MGmsWN6BnamohYEtdbg",
-    authDomain: "web-resources-suggestions.firebaseapp.com",
-    projectId: "web-resources-suggestions",
-    storageBucket: "web-resources-suggestions.firebasestorage.app",
-    messagingSenderId: "535893034287",
-    appId: "1:535893034287:web:27cc77db8d301d51efcdda"
-  };
-  const hwrApp = firebase.initializeApp(hwrFirebaseConfig, "hwrApp");
-  const hwrDb = hwrApp.firestore();
-
   let allFeedback = [];
-  let hwrSubmissions = [];
   let currentFilter = 'all';
 
   const listEl = document.getElementById('feedbackList');
@@ -448,7 +429,6 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
     document.getElementById('statSuggestion').textContent = allFeedback.filter(f => f.type === 'suggestion').length;
     document.getElementById('statBug').textContent = allFeedback.filter(f => f.type === 'bug').length;
     document.getElementById('statRating').textContent = allFeedback.filter(f => f.type === 'rating').length;
-    document.getElementById('statHwr').textContent = allFeedback.filter(f => f.type === 'hwr').length;
     document.getElementById('statVal').textContent = allFeedback.filter(f => f.type === 'valorant').length;
   }
 
@@ -456,7 +436,6 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
 
   function combineAndRender() {
     allFeedback = parchromeFeedback
-      .concat(hwrSubmissions)
       .concat(window.__valorantSubmissions || [])
       .sort((a, b) => {
         const at = a.createdAt ? a.createdAt.toMillis() : 0;
@@ -481,26 +460,6 @@ body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; p
     }, (error) => {
       console.error('Firestore read error:', error);
       listEl.innerHTML = '<div class="dash-status error">Could not load feedback. Check Firestore rules allow reads, or check the console for details.</div>';
-    });
-
-  // Second listener: hwr-ai's "siteSubmissions" collection, mapped into
-  // the same shape the cards above already know how to render (type,
-  // message, createdAt) so no changes are needed to render()/renderStars().
-  hwrDb.collection('siteSubmissions').orderBy('submittedAt', 'desc')
-    .onSnapshot((snapshot) => {
-      hwrSubmissions = snapshot.docs.map(doc => {
-        const d = doc.data();
-        return {
-          type: 'hwr',
-          message: 'Suggested site: ' + (d.website || '') + (d.ign ? ' — from ' + d.ign : ''),
-          createdAt: d.submittedAt || null,
-          email: null,
-          rating: null
-        };
-      });
-      combineAndRender();
-    }, (error) => {
-      console.error('HWR Firestore read error:', error);
     });
 
   document.querySelectorAll('.filter-btn').forEach(btn => {

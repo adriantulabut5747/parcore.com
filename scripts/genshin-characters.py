@@ -8,7 +8,8 @@
 # The page shell (head, bars, sidebar, footer, More sheet) is the Characters list page's, swapped in at build
 # time, so a ?v= bump there reaches every character page on the next run.
 #
-# Run:  python scripts/genshin-characters.py kamisato-ayaka     (slugs; none = every character)
+# Run:  python scripts/genshin-characters.py --built hu-tao     (every existing page + the slugs named; how-to: docs/genshin-character-pages.md)
+#       No arguments = EVERY character, builds or not: don't.
 # Needs Pillow only because it imports the feed script (which imports it at the top).
 
 import datetime
@@ -31,13 +32,16 @@ SHELL = OUT / 'index.html'
 BUILDS = Path(__file__).with_name('genshin-builds.json')
 SITE = 'https://parchrome.netlify.app'
 # Cache version for genshin-character.css / .js on every character page: bump it when either file changes, then rerun.
-ASSET_V = '20261101w9'
+ASSET_V = '20261104ts'
 UTC8 = datetime.timezone(datetime.timedelta(hours=8))
 
 e = html.escape
 load = lambda name: json.loads((ROOT / name).read_text(encoding='utf-8'))
 slug = lambda name: re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')  # = genshin-reruns.js / genshin-weapons.js slug()
 num = lambda n: f'{round(n):,}'
+# "Farm for X" / "Similar to X": the last word, unless that's not what the character is called.
+SHORT = {'Hu Tao': 'Hu Tao', 'Yae Miko': 'Yae Miko', 'Yun Jin': 'Yun Jin', 'Lan Yan': 'Lan Yan', 'Raiden Shogun': 'Raiden'}
+short_name = lambda name: SHORT.get(name, name.split()[-1])
 
 # genshin-core.js EL (keep in step), as "r,g,b" for rgba() tints.
 EL_RGB = {'Pyro': '239,138,76', 'Hydro': '76,184,239', 'Anemo': '95,211,180', 'Electro': '180,142,240', 'Dendro': '165,200,59', 'Cryo': '152,216,240', 'Geo': '239,195,94'}
@@ -94,9 +98,26 @@ def scaling(t, top):
         if not line or '|' not in line:
             continue
         label, tmpl = line.split('|', 1)
+        label = re.sub(r'\{[^}]*\}', '', re.sub(r'\{LAYOUT_PC#([^}]*)\}', r'\1', label.lstrip('#'))).strip()
         rows.append([label, [re.sub(r'\{param(\d+):([A-Z0-9]+)\}', lambda m: fmt(m.group(2), p['params'][int(m.group(1)) - 1]), tmpl) for p in levels]])
     return rows
 
+
+
+def merged_rows(rows):
+    # yatta writes "rowspan" for "same as the row above": turn each run into one real merged cell.
+    html_rows = []
+    for i, row in enumerate(rows):
+        cells = f'<th scope="row">{row[0]}</th>'
+        for j in range(1, len(row)):
+            if row[j] == 'rowspan':
+                continue
+            span = 1
+            while i + span < len(rows) and rows[i + span][j] == 'rowspan':
+                span += 1
+            cells += f'<td{f" rowspan=\"{span}\"" if span > 1 else ""}>{row[j]}</td>'
+        html_rows.append(f'<tr>{cells}</tr>')
+    return ''.join(html_rows)
 
 
 def page_href(name):
@@ -129,19 +150,20 @@ def build_page(c, d, fet, ctx):
     rgb = EL_RGB.get(el, '185,190,198')
     key = c['icon'].rsplit('UI_AvatarIcon_', 1)[1].rsplit('.', 1)[0]
     me = slug(name)
+    her, Her = ('his', 'His') if d.get('bodyType') in ('BOY', 'MALE') else ('her', 'Her')
     items = {k: [v['name'], v['rank'], gf.icon(v['icon'])] for k, v in (d.get('items') or {}).items() if v.get('icon')}
     fetter, other = d.get('fetter') or {}, d.get('other') or {}
     build = ctx['builds'].get(me)
     roster = {x['name']: x for x in ctx['feed']['characters']}
 
     # ---- talents: combat ones first (Normal, Skill, Alternate Sprint if any, Burst), then passives
-    tal = [t for _, t in sorted(d['talent'].items(), key=lambda kv: int(kv[0]))]
+    tal = [t for _, t in sorted(d['talent'].items(), key=lambda kv: int(kv[0])) if t.get('name')]  # yatta lists a nameless extra one for some (Citlali)
     cons = [x for _, x in sorted(d['constellation'].items(), key=lambda kv: int(kv[0]))]
     boosted = {}  # talent name -> constellation number that adds 3 levels (C3 / C5)
     for i, x in enumerate(cons):
-        m = re.search(r'Increases the Level of <color=[^>]*>(.*?)</color> by 3', x['description'])
-        if m:
-            boosted[m.group(1)] = i + 1
+        m = re.search(r'Increases the Level of (.*?)\s+by 3', x['description']) or re.search(r'^(.*?)\s+increases by 3 Levels', x['description'])  # Linnea's C5 words it the second way
+        if m:  # the name sits in {LINK#..} and <color> in either order; talents can add a prefix their own name doesn't have (Normal Attack, and Elemental Skill / Burst since Nod-Krai)
+            boosted[re.sub(r'^(the )?(Normal Attack: |Elemental Skill |Elemental Burst )', '', re.sub(r'\{[^}]*\}|<[^>]*>', '', m.group(1))).strip()] = i + 1
     t0 = [t for t in tal if t['type'] == 0]
     kinds = []
     for t in tal:
@@ -152,7 +174,7 @@ def build_page(c, d, fet, ctx):
             kinds.append(('normal', 'Normal Attack', 'NA') if n == 0 else ('skill', 'Elemental Skill', 'E') if n == 1 else ('sprint', 'Alternate Sprint', 'Sprint'))
         else:
             n = sum(1 for k in kinds if k[0].startswith('passive'))
-            kinds.append(('passive%d' % n, ['1st Ascension Passive', '4th Ascension Passive'][n] if n < 2 else 'Utility Passive', ['A1', 'A4'][n] if n < 2 else 'Passive'))
+            kinds.append(('passive%d' % n, ['1st Ascension Passive', '4th Ascension Passive'][n] if n < 2 else 'Passive', ['A1', 'A4'][n] if n < 2 else 'Passive'))
     order = sorted(range(len(tal)), key=lambda i: ['normal', 'skill', 'sprint', 'burst'].index(kinds[i][0]) if not kinds[i][0].startswith('passive') else 9 + i)
     talents_js = []
     tabs, panels = [], []
@@ -188,9 +210,9 @@ def build_page(c, d, fet, ctx):
                     elif v not in (None, ''):
                         words.append(str(v))
                 walk(a.get('internalCooldown'))
-                return e(' · '.join(words)) or 'None'
+                return e(' · '.join(dict.fromkeys(words))) or 'None'
             tech = ('<details class="cp-tech"><summary>Technical details</summary><table><thead><tr><th scope="col">Hit</th><th scope="col">Element gauge</th><th scope="col">Internal cooldown</th><th scope="col">Poise damage</th></tr></thead><tbody>'
-                    + ''.join(f'<tr><th scope="row">{e(a["name"])}</th><td>{e(str(a.get("elementalGaugeTheory") or "None"))}</td><td>{icd(a)}</td><td>{e(str(a.get("interruptionResistance") or "None"))}</td></tr>' for a in adv)
+                    + merged_rows([[e(a['name']), e(str(a.get('elementalGaugeTheory') or 'None')), icd(a), e(str(a.get('interruptionResistance') or 'None'))] for a in adv])
                     + '</tbody></table></details>')
         table = ''
         if rows:
@@ -242,6 +264,8 @@ def build_page(c, d, fet, ctx):
         return ''.join(tile(items[k], t[k]) for k in sorted(t, key=lambda k: (kind_of(k)[0], int(k))) if k in items)
 
     def kind_of(k):
+        if items.get(k, [''])[0] in {s['name'] for n in ctx['nations'] for s in n.get('specialties', [])}:
+            return 3, 'Specialty'
         k = int(k)
         if 104300 <= k < 104400 and k != 104319:
             return 0, 'Talent book'
@@ -273,6 +297,11 @@ def build_page(c, d, fet, ctx):
         if foes:
             weekly = foes[0]['cls'] == 'weekly'
             farm.append(chip(f'/genshin-impact/enemies?e={e(foes[0]["slug"])}', items[k][2], items[k][1], 'Weekly boss' if weekly else 'World boss', items[k][0], e(foes[0]['name'])))
+        else:  # our enemies file doesn't list who drops it: yatta's material record does. Never guess if neither says.
+            src = next((s['name'] for s in gf.yatta('material/%s' % k).get('source') or [] if re.match(r'(Dropped by )?Lv\. \d+\+', s['name'])), '')
+            who = re.sub(r'^(Dropped by )?Lv\. \d+\+ | Challenge Reward$', '', src)
+            label = 'Weekly boss' if src.endswith('Challenge Reward') else 'World boss' if who else 'Boss material'
+            farm.append(chip('/genshin-impact/enemies?q=' + urllib.parse.quote(who) if who else '/genshin-impact/enemies', items[k][2], items[k][1], label, items[k][0], e(who) or 'Source not listed yet'))
     gem = next((k for k in ids if kind_of(k)[1] == 'Gem'), None)
     if gem:
         top = str(int(gem) // 10 * 10 + 4)
@@ -287,13 +316,17 @@ def build_page(c, d, fet, ctx):
         foes = drops(common, ('common', 'elite'))
         tiers = ctx['enemies']['materials'].get(common, {}).get('series') or [common]
         topc = tiers[-1] if tiers[-1] in items else common
-        who = ', '.join(sorted({f['name'].split(':')[0] for f in foes}))  # Nobushi: Jintouban -> Nobushi
+        names = sorted({f['name'].split(':')[0] for f in foes})  # Nobushi: Jintouban -> Nobushi
+        who = ', '.join(names[:2]) + (f' +{len(names) - 2} more' if len(names) > 2 else '')
         farm.append(chip(f'/genshin-impact/enemies?q={e(items[common][0])}', items[topc][2], items[topc][1], 'Common drop', items[topc][0], e(who)))
 
     # ---- release, birthday
     hist = ctx['history']['banners']
+    # New characters come out a day or two before their banner opens, so trust a first banner only if it's close to release.
+    # Launch and standard characters got theirs much later: use the patch that was live on the day.
     first = next((h for h in hist if name in h['five'] + h['four']), None)
-    version = first['version'] if first else ''
+    live = [h for h in hist if h['start'] <= c['release'] + 86400]
+    version = first['version'] if first and abs(first['start'] - c['release']) < 30 * 86400 else max(live, key=lambda h: h['start'])['version'] if live else ''
     released = datetime.datetime.fromtimestamp(c['release'], UTC8)
     rel_txt = f'{released:%b} {released.day}, {released.year}'
     bday = f'{datetime.date(2000, *c["birthday"]):%b} {c["birthday"][1]}' if c.get('birthday') else ''
@@ -333,7 +366,7 @@ def build_page(c, d, fet, ctx):
     story = ''
     if paras or fetter.get('detail'):
         more = ''.join(f'<p>{e(x)}</p>' for x in paras[1:])
-        story = (f'<div class="cp-story"><p class="cp-sh">Her story</p>'
+        story = (f'<div class="cp-story"><p class="cp-sh">{Her} story</p>'
                  + (f'<blockquote>{e(gf.game_text(fetter["detail"]))}</blockquote>' if fetter.get('detail') else '')
                  + (f'<p>{e(paras[0])}</p>' if paras else '')
                  + (f'<details><summary>Read more</summary>{more}</details>' if more else '') + '</div>')
@@ -373,10 +406,11 @@ def build_page(c, d, fet, ctx):
         lines = [('Substats', chain(e(x) for x in b['subs'])),
                  ('Talents', chain(f'{nice[x["k"]]} <b>{x["lv"]}</b>' for x in b['talents'])),
                  ('Targets', ' · '.join(f'{e(x["stat"])} <b>{x["min"]}–{x["max"]}{x["unit"]}{"+" if x["stat"] == "CRIT DMG" else ""}</b>' for x in b['targets']))]
-        ck = datetime.date.fromisoformat(build['checked'])
+        lines = [x for x in lines if x[1]]
+        ck = datetime.date.fromisoformat(build['checked']) if build.get('checked') else None  # empty until Adrian has checked the entry
         build_html = (
             f'<section class="cp-block cp-build" id="build"><header class="cp-bh"><h2 class="cp-h">Best build</h2>'
-            f'<span class="cp-bh-r"><b>{e(b["name"])}</b><small>Checked {ck:%b} {ck.day}, {ck.year}</small></span></header>'
+            f'<span class="cp-bh-r"><b>{e(b["name"])}</b>{f"<small>Checked {ck:%b} {ck.day}, {ck.year}</small>" if ck else ""}</span></header>'
             f'<div class="cp-two"><div><h3 class="cp-sh">Best weapons</h3><ol class="cp-gls">{"".join(wrows)}</ol></div>'
             f'<div><h3 class="cp-sh">Best artifacts</h3><ol class="cp-gls">{"".join(srows)}</ol></div></div>'
             f'<ul class="cp-mains">{mains}</ul>'
@@ -395,7 +429,7 @@ def build_page(c, d, fet, ctx):
             video_html = (f'<section class="cp-block cp-video" id="video"><header class="cp-bh"><h2 class="cp-h">Video guide</h2>'
                           f'<span class="cp-bh-r">by <a href="{e(v["channel"])}" target="_blank" rel="noopener">{e(v["by"])}</a><small>{vd:%b} {vd.day}, {vd.year}</small></span></header>'
                           f'<div class="cp-yt" data-yt="{e(v["id"])}"><button type="button" aria-label="Play {e(v["title"])}">'
-                          f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/maxresdefault.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">'
+                          f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/{v.get("thumb", "maxresdefault")}.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">'
                           f'<span class="cp-yt-play" aria-hidden="true"></span><span class="cp-yt-t">{e(v["title"])}</span></button></div>'
                           + (f'<p class="cp-quiet">{e(v["note"])}</p>' if v.get('note') else '') + '</section>')
 
@@ -409,7 +443,7 @@ def build_page(c, d, fet, ctx):
             cards += (f'<li><a class="cp-sim r{x["rarity"]}" href="{page_href(n)}">{art}'
                       f'<img class="cp-sim-el" src="/images/genshin/element/{x["element"].lower()}.webp" alt="{e(x["element"])}" width="22" height="22">'
                       f'<span class="cp-sim-foot"><b>{e(n)}</b><span aria-label="{x["rarity"]} stars">{"★" * x["rarity"]}</span><small>{e(why)}</small></span></a></li>')
-        similar_html = (f'<section class="cp-block" id="similar"><header class="cp-bh"><h2 class="cp-h">Similar to {e(name.split()[-1])}</h2></header>'
+        similar_html = (f'<section class="cp-block" id="similar"><header class="cp-bh"><h2 class="cp-h">Similar to {e(short_name(name))}</h2></header>'
                         f'<ul class="cp-sims">{cards}</ul></section>')
 
     # ---- the rest, as plain blocks: Talents / Constellations / Materials / Base stats / Wish history (phones tab the first two)
@@ -418,9 +452,10 @@ def build_page(c, d, fet, ctx):
         boost = next((tn for tn, n in boosted.items() if n == i + 1), None)
         cons_items.append(f'<li><img src="{e(gf.icon(x["icon"]))}" alt="" loading="lazy" decoding="async"><div><p class="cp-kind">C{i + 1}{f" · +3 {e(boost)}" if boost else ""}</p>'
                           f'<h4>{e(x["name"])}</h4><div class="cp-text">{rich(x["description"])}</div></div></li>')
+    locked = len({x['description'] for x in cons}) == 1  # Aloy: six copies of the same locked star, none of them unlockable
     cons_head = f'<p class="cp-pane-note"><b>{e(fetter.get("constellation", ""))}</b>'
     if build:
-        cons_head += f' · {e(build["cons"])} priority. {e(build["consNote"])}'
+        cons_head += f' · {e(build["consNote"])}' if locked else f' · {e(build["cons"])} priority. {e(build["consNote"])}'
     cons_head += '</p>'
     mora_ico = f'<img src="{gf.icon("UI_ItemIcon_202")}" alt="" loading="lazy">'
 
@@ -458,11 +493,11 @@ def build_page(c, d, fet, ctx):
     stat_tbl = f'<div class="cp-stbl"><table><thead><tr><th scope="col">Lv</th>{head_cells}</tr></thead><tbody>{body_rows}</tbody></table></div>'
     panes = [
         ('talents', 'Talents', f'<div class="cp-ttabs" role="group" aria-label="Talents">{"".join(tabs)}</div><div class="cp-tpanels">{"".join(panels)}</div>'),
-        ('cons', 'Constellations', cons_head + f'<ol class="cp-cons">{"".join(cons_items)}</ol>'),
+        ('cons', 'Constellations', cons_head + ('' if locked else f'<ol class="cp-cons">{"".join(cons_items)}</ol>')),
         ('mats', 'Materials', mat_row('asc', 'Ascension to 90', asc_t, asc_m, asc_steps, [('Total', asc_t, asc_m)])
          + mat_row('tal', 'All three talents to 10', tal_t, tal_m, tal_steps, [('One talent', one_t, one_m), ('All three', tal_t, tal_m)]) + goal),
-        ('stats', 'Base stats', stat_tbl + f'<p class="cp-quiet">Before weapons and artifacts. {e(spname)} is her ascension stat.</p>'),
-        ('wishes', 'Wish history', f'<div id="cpWishes"><p class="gi-empty">Loading her banners&hellip;</p></div>'),
+        ('stats', 'Base stats', stat_tbl + f'<p class="cp-quiet">Before weapons and artifacts. {e(spname)} is {her} ascension stat.</p>'),
+        ('wishes', 'Wish history', f'<div id="cpWishes"><p class="gi-empty">Loading {her} banners&hellip;</p></div>'),
     ]
     # Each one its own block, all shown (Adrian: no tabs), same size as the old tab card's panes.
     mtabs = ('<div class="gi-tray cp-mtabs" id="cpMTabs" role="tablist" aria-label="Talents and constellations">'
@@ -470,11 +505,11 @@ def build_page(c, d, fet, ctx):
              '<button type="button" class="gi-tab" role="tab" data-m="cons" aria-selected="false">Constellations</button></div>')
     more_html = mtabs + ''.join(f'<section class="cp-block cp-pane" id="{k}"><header class="cp-bh"><h2 class="cp-h">{v}</h2></header>{body}</section>' for k, v, body in panes)
     servers = ''.join(f'<button type="button" class="gi-tab" data-server="{k}">{v}</button>' for k, v in (('asia', 'Asia'), ('america', 'NA'), ('europe', 'EU')))
-    farm_html = (f'<section class="cp-block cp-farm" id="farm"><header class="cp-bh"><h2 class="cp-h">Farm for {e(name.split()[-1])}</h2><span class="cp-bh-r" id="cpToday"></span>'
+    farm_html = (f'<section class="cp-block cp-farm" id="farm"><header class="cp-bh"><h2 class="cp-h">Farm for {e(short_name(name))}</h2><span class="cp-bh-r" id="cpToday"></span>'
                  f'<div class="gi-tray gi-tray--sm" id="cpSrv" role="tablist" aria-label="Server">{servers}</div></header>'
                  f'<ul class="cp-farms">{"".join(farm)}</ul></section>')
 
-    data = {'id': c['id'], 'name': name, 'slug': me, 'el': el, 'talents': talents_js, 'goal': {x['k']: x['lv'] for x in (build['build']['talents'] if build else [])},
+    data = {'id': c['id'], 'name': name, 'slug': me, 'el': el, 'her': her, 'talents': talents_js, 'goal': {x['k']: x['lv'] for x in (build['build']['talents'] if build else [])},
             'calc': {'asc': asc, 'tal': tl, 'items': {k: items[k] for k in ids if k in items}, 'caps': CAPS}}
     blob = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     main = (f'<main class="gi cp" style="--gi-el:rgb({rgb});--el:{rgb}">\n<div class="gi-frame cp-page">\n{head}\n{card}\n<div class="cp-col" id="cpCol" data-m="talents">\n'
@@ -503,7 +538,10 @@ def main():
         'enemies': load('genshin-enemies.json'), 'nations': load('genshin-nations.json')['nations'], 'birthdays': load('genshin-birthdays.json'),
         'history': load('genshin-history.json'), 'builds': json.loads(BUILDS.read_text(encoding='utf-8')), 'curve': gf.get('https://gi.yatta.moe/api/v2/static/avatarCurve')['data'],
     }
-    want = set(sys.argv[1:])
+    args = sys.argv[1:]
+    want = {a for a in args if a != '--built'}
+    if '--built' in args:  # every page that exists, plus any slugs named: run this after adding characters, so older pages link to them
+        want |= {f.stem for f in OUT.glob('*.html') if f.stem != 'index'}
     chars = [c for c in ctx['feed']['characters'] if c.get('element') and (not want or slug(c['name']) in want)]  # the Traveler (no element) gets its own page later
     if want - {slug(c['name']) for c in chars}:
         sys.exit('unknown slug(s): ' + ', '.join(sorted(want - {slug(c['name']) for c in chars})))
@@ -513,11 +551,40 @@ def main():
         head, body = build_page(c, d, fet, ctx)
         page = re.sub(r'<title>.*?</title>\s*<meta name="description"[^>]*>', lambda m: head, shell, count=1, flags=re.S)
         page = re.sub(r'/genshin-characters\.(css|js)\?v=[\w.]+', lambda m: f'/genshin-character.{m.group(1)}?v={ASSET_V}', page)
-        page = re.sub(r'<main class="gi">.*?</main>', lambda m: body, page, count=1, flags=re.S)
+        page = re.sub(r'<main class="gi[^"]*">.*?</main>', lambda m: body, page, count=1, flags=re.S)
         assert '/genshin-character.css' in page and 'id="cpData"' in page and '<link rel="canonical"' in page, 'the list page shell changed: update main()'
         out = OUT / (slug(c['name']) + '.html')
         out.write_text(page, encoding='utf-8', newline='\n')
         print('Wrote', out.relative_to(ROOT.parent))
+    sync_lists(ctx['feed']['characters'])
+
+
+def sync_lists(roster):
+    '''Every list of character pages follows the folder, so a new page can't be forgotten in one of them.'''
+    pages = sorted(f.stem for f in OUT.glob('*.html') if f.stem != 'index')
+    # genshin-core.js GI.charHref links faces that have a page; the rest open the list's search.
+    (ROOT / 'genshin-character-pages.json').write_text(json.dumps(pages), encoding='utf-8', newline='\n')
+    # The sitemap's block between its two markers.
+    path = ROOT / 'sitemap.xml'
+    raw = path.read_bytes().decode('utf-8')
+    nl = '\r\n' if '\r\n' in raw else '\n'
+    today = datetime.date.today().isoformat()
+    urls = nl.join(f'  <url>{nl}    <loc>{SITE}/genshin-impact/characters/{p}</loc>{nl}    <lastmod>{today}</lastmod>{nl}  </url>' for p in pages)
+    raw, n = re.subn(r'(<!-- genshin-characters:start -->).*?(<!-- genshin-characters:end -->)', lambda m: f'{m.group(1)}{nl}{urls}{nl}  {m.group(2)}', raw, flags=re.S)
+    assert n == 1, 'sitemap.xml lost its genshin-characters markers'
+    path.write_bytes(raw.encode('utf-8'))
+    # Site search: one line per page, after Ayaka's.
+    path = ROOT / 'search.json'
+    raw = path.read_bytes().decode('utf-8')
+    nl = '\r\n' if '\r\n' in raw else '\n'
+    anchor = next(line for line in raw.split(nl) if '"Kamisato Ayaka Build"' in line)
+    for c in sorted(roster, key=lambda x: x['name'], reverse=True):
+        p = slug(c['name'])
+        if p in pages and f'characters/{p}"' not in raw:
+            line = anchor.replace('Kamisato Ayaka Build', c['name'] + ' Build').replace('characters/kamisato-ayaka', 'characters/' + p).replace('"k": "ayaka cryo"', f'"k": "{c["name"].lower()} {c["element"].lower()}"')
+            raw = raw.replace(anchor, anchor + nl + line)
+    json.loads(raw)
+    path.write_bytes(raw.encode('utf-8'))
 
 
 if __name__ == '__main__':

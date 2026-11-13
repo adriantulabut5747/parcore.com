@@ -42,15 +42,15 @@ html, body { touch-action: pan-x pan-y; overscroll-behavior: contain; }
     linear-gradient(#111113, #050506 600px);
   background-size: auto, 220px 220px, auto;
   background-repeat: no-repeat, repeat, no-repeat;
-  background-attachment: local, scroll, local;
+  background-attachment: local; /* all local: a "scroll" layer here stops the GPU scrolling .coc-main, so every frame repainted (Nov 2 2026) */
 }
 
-/* ---- TITLES: Tourney italic 800, Valorant's title font (Adrian, Oct 31 2026: Lilita One is gone from every
+/* ---- TITLES: Orbitron Title (Nov 12 2026, was Tourney), Valorant's title font (Adrian, Oct 31 2026: Lilita One is gone from every
    Clash Royale page; Supercell's own font is licensed, never host it). White with the in-game dark outline + drop.
    `html body` beats codm-banner.css / codm-tools.css, which this page links first. ---- */
 html body .cb-title,
 html body .ct-title {
-  text-transform: none; /* font: 11layout.css TOURNEY TITLES */
+  text-transform: uppercase; /* Nov 2 2026 (Adrian): every CR title in capitals. Font: 11layout.css TOURNEY TITLES */
   color: #fff;
   text-shadow: 0 0 1px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 3px 0 #000, 0 5px 8px rgba(0, 0, 0, 0.55);
 }
@@ -142,6 +142,7 @@ img[data-r] {
   filter: drop-shadow(var(--rw) 0 0 var(--rim)) drop-shadow(calc(var(--rw) * -1) 0 0 var(--rim)) drop-shadow(0 var(--rw) 0 var(--rim))
     drop-shadow(0 calc(var(--rw) * -1) 0 var(--rim)) drop-shadow(0 0 var(--gw) var(--glow)) brightness(var(--lit, 1));
 }
+img[data-r='common']:not([data-f]) { filter: brightness(var(--lit, 1)); } /* no rim = no 5-shadow chain (it still cost a paint per card) */
 img[data-r='rare'] { --rim: #ff9a2e; --glow: rgba(255, 138, 40, 0.38); }
 img[data-r='epic'] { --rim: #c561ff; --glow: rgba(186, 82, 255, 0.42); }
 img[data-r='legendary'] { --rim: #b9f1ff; --glow: rgba(255, 128, 222, 0.34); }

@@ -1,12 +1,14 @@
 // /clash-royale/ = the Lobby, "the Throne Room" (Oct 31 2026, Adrian's pick). Guide = the Golden Knight (cr.css).
 // 1. Hero: live facts + "Steal the crown" (a random deck of the 12 most played, dealt as a hand; Steal another = the next).
-// 2. Crown decks: the 6 most played. 3. The Royal Court: cr-top.json's top 10 (podium 1-3 with 3 / 2 / 1 crowns, rows 4-10).
+// 2. Crown decks: the 6 best win rates of the 30 most played (Nov 2 2026, Adrian). 3. The Royal Court: cr-top.json's top 10
+// (podium 1-3 with 3 / 2 / 1 crowns, rows 4-10, each with the win rate of their recent ranked games).
 // 4. The Card Wall: every card, brighter = more played (?wall= keeps the sort). 5. Every page: game-nav.json.
 // Data = cr-decks.json + cr-top.json + cr-cards.json (scripts/cr-meta.mjs, daily). Real numbers only: a failed file says so.
 (() => {
   const $ = (id) => document.getElementById(id);
   const { esc, num } = CR;
   const POOL = 12; // Steal another deals from the 12 most played
+  const CROWN_POOL = 30; // Crown decks = the best win rates among this many most played (a big sample each, so no lucky streak tops it)
   const ROWS = 3; // full rows on the wall before "Show all" (columns come from the CSS grid, so rows never end ragged)
   const CROWN = '<svg viewBox="0 0 13 10" aria-hidden="true"><path d="M0 2l3 3 3.5-5L10 5l3-3-1 8H1z"/></svg>';
   const PEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
@@ -14,17 +16,17 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const json = (u) => fetch(u).then((r) => (r.ok ? r.json() : Promise.reject(r.status)));
 
-  // ---- 5. Every page: no deck data needed, so it never waits for (or fails with) the others.
+  // ---- 5. Every page (icons = game-nav.json pictures, the game's own menu icons): no deck data needed, so it never waits for (or fails with) the others.
   // 11layout.js (window.pcJSON, one shared download) loads after this script, hence DOMContentLoaded. ----
   addEventListener('DOMContentLoaded', () => (window.pcJSON || json)('/game-nav.json').then((nav) => {
     const groups = (nav['clash-royale']?.groups || []).filter((g) => g.pages?.length);
     const card = (p) => {
       const live = p.link && !p.soon;
       const tag = live ? 'a' : 'div';
-      return `<${tag} class="ct-card${live ? '' : ' ct-card--soon'}"${live ? ` href="${esc(p.link)}"` : ''}>${live ? '' : '<span class="ct-tag">Soon</span>'}<span><b>${esc(p.name)}</b><span>${esc(p.sub || '')}</span></span><span class="ct-art" aria-hidden="true"><svg viewBox="0 0 24 24">${p.icon || ''}</svg></span></${tag}>`;
+      return `<${tag} class="ct-card${live ? '' : ' ct-card--soon'}"${live ? ` href="${esc(p.link)}"` : ''}>${live ? '' : '<span class="ct-tag">Soon</span>'}<span><b>${esc(p.name)}</b><span>${esc(p.sub || '')}</span></span><span class="ct-art" aria-hidden="true">${p.icon ? `<img src="${esc(p.icon)}" alt="" width="96" height="96" loading="lazy" decoding="async">` : ''}</span></${tag}>`;
     };
     $('crpPages').innerHTML = groups
-      .map((g) => `<div class="crp-group"><h3 class="crp-label"><svg viewBox="0 0 24 24" aria-hidden="true">${g.icon || ''}</svg>${esc(g.name)}</h3><div class="crp-grid">${g.pages.map(card).join('')}</div></div>`)
+      .map((g) => `<div class="crp-group"><h3 class="crp-label">${g.img ? `<img src="${esc(g.img)}" alt="" width="20" height="20" loading="lazy" decoding="async">` : ''}${esc(g.name)}</h3><div class="crp-grid">${g.pages.map(card).join('')}</div></div>`)
       .join('');
   }));
 
@@ -113,13 +115,15 @@
     $('crhSteal').addEventListener('click', steal);
     steal();
 
-    // ---- 2. Crown decks ----
+    // ---- 2. Crown decks: the most played decks, best win rate first ----
     $('crlDecks').innerHTML = byGames
+      .slice(0, CROWN_POOL)
+      .sort((a, b) => b.winRate - a.winRate)
       .slice(0, 6)
       .map(
-        (d) => `<article class="crl-deck" data-v="${d.verdict}">
+        (d, i) => `<article class="crl-deck" data-v="${d.verdict}">
   <header class="crl-deck-head" style="--art:url('${CR.img(d.wincon)}')">
-    <span class="crl-rank${d.rank <= 3 ? ' crl-rank--top' : ''}">${d.rank <= 3 ? CROWN : ''}#${d.rank}</span>
+    <span class="crl-rank${i < 3 ? ' crl-rank--top' : ''}" title="Most played #${d.rank}">${i < 3 ? CROWN : ''}#${i + 1}</span>
     <div class="crl-id"><h3>${esc(d.name)}</h3><p>${esc(variants(d.cards))}</p></div>
     <a class="crl-pen" href="${CR.builderLink(d.cards, d.tower)}" aria-label="Edit ${esc(d.name)} in the Deck Builder" title="Edit in the Deck Builder">${PEN}</a>
   </header>
@@ -140,6 +144,13 @@
     const crowns = (n) => '<img src="/images/clash-royale/lobby/crown-red.webp" alt="" width="52" height="39" loading="lazy" decoding="async">'.repeat(n);
     const who = (p) => `<b class="crc-name">${esc(p.name)}</b><span class="crc-clan">${esc(p.clan || 'No clan')}</span>`;
     const noDeck = '<p class="crc-none">No ranked game in their last 30 battles</p>';
+    // rating, + the win rate of the ranked games in their last 30 battles (hidden when the file has none yet)
+    const stats = (p) =>
+      `<div class="crc-stat"><span class="crc-elo"><b>${num(p.elo)}</b><small>rating</small></span>${
+        p.games
+          ? `<span class="crc-elo crc-wr${p.wins / p.games >= 0.5 ? ' is-up' : ''}" title="${p.wins} wins in their last ${p.games} ranked games"><b>${Math.round((p.wins / p.games) * 100)}%</b><small>win rate</small></span>`
+          : ''
+      }</div>`;
     $('crcPod').innerHTML = players
       .slice(0, 3)
       .map(
@@ -147,7 +158,7 @@
   <div class="crc-crowns" aria-hidden="true">${crowns(4 - p.rank)}</div>
   <span class="crc-place">#${p.rank}</span>
   <div class="crc-who">${who(p)}</div>
-  <span class="crc-elo"><b>${num(p.elo)}</b><small>rating</small></span>
+  ${stats(p)}
   ${
     p.deck
       ? `<p class="crc-deckname">Plays <b>${esc(CR.name(p.deck, byId).name)}</b></p>
@@ -165,7 +176,7 @@
   <span class="crc-rk">#${p.rank}</span>
   <div class="crc-who">${who(p)}</div>
   ${p.deck ? `<ol class="crc-hand crc-hand--row" aria-label="${esc(p.name)}'s deck">${hand(p.deck, false)}</ol>` : noDeck}
-  <span class="crc-elo"><b>${num(p.elo)}</b><small>rating</small></span>
+  ${stats(p)}
   ${p.deck ? copyKey(p.deck, p.tower, 'cr-key crc-copy crc-copy--ico', COPY + '<span class="crl-sr">Copy deck</span>') : '<span></span>'}
 </li>`,
       )

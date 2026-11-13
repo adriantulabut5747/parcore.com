@@ -37,10 +37,27 @@ h2 { font: 900 37px/1.1 'Oxanium', sans-serif; letter-spacing: -.5px; text-trans
   display: grid; grid-template-columns: 1fr; gap: 8px;
 }
 /* columns follow the band's own width (the /coc/ sidebar eats 245px), not the
-   window's: 1 -> 2 (4 x 2) -> 3 (3 + 3 + 2; the last slot is left empty, Adrian's call) */
+   window's: 1 -> 2 -> 4 HOT tiles over 3 x 2 (12-col grid: HOT spans 3, the rest 4) */
 .ptc-wrap { container-type: inline-size; }
 @container (min-width: 620px) { .ptc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
-@container (min-width: 960px) { .ptc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@container (min-width: 960px) {
+  .ptc-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .ptc { grid-column: span 4; }
+  .ptc:has(.ptc-hot) { grid-column: span 3; }
+}
+/* FEATURED ROW (Nov 12 2026, Adrian: the band read "messy, hard to look at": tags pushed some names down,
+   Glossary sat alone on a 4th row). The HOT tools lead as tall showcase tiles -- art on top at a bigger
+   scale, the HOT tag pinned in the corner -- so every name in a row starts on one line, and the other
+   six fill an even 3 x 2 under them. HOT = coc-nav-data.json's set, listed first in the markup. */
+@container (min-width: 620px) {
+  .ptc:has(.ptc-hot) { --s: 1; flex-direction: column; align-items: stretch; justify-content: flex-start; min-height: 0; padding: 176px 18px 16px; }  /* text from a fixed top: every name on one line */
+  .ptc:has(.ptc-hot) .ptc-art { top: 8px; right: auto; left: 50%; margin: 0 0 0 calc(var(--art-w) / -2); }
+  .ptc:has(.ptc-hot) .ptc-layer { transform-origin: 50% 0; }
+  .ptc:has(.ptc-hot) .ptc-copy { position: static; flex: 0 0 auto; }  /* the tag pins to the tile, not the copy */
+  .ptc:has(.ptc-hot) .ptc-hot { position: absolute; top: 10px; left: 10px; margin: 0; z-index: 3; }
+  .ptc:has(.ptc-hot) .ptc-name { font-size: 20px; }
+  .ptc:has(.ptc-hot) .ptc-desc { max-width: 34ch; }
+}
 .ptc { --art-w: 150px; --s: .66; --well-w: 122px; position: relative; isolation: isolate; display: flex; align-items: center;
   min-height: 104px; padding: 12px calc(var(--well-w) + 14px) 12px 18px; overflow: hidden;
   border: 2px solid var(--edge); border-radius: var(--r); background: var(--sunk); box-shadow: var(--sink); font-family: 'Sora', sans-serif;
@@ -711,6 +728,34 @@ img.fx-em { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius:
   .ptc-desc { display: -webkit-box; -webkit-line-clamp: 2; margin: 2px auto 0; font-size: 11px; line-height: 1.35; white-space: normal; text-wrap: balance; }
   .ptc-long { display: none; }
   .ptc-short { display: inline; }
+}
+/* ===================================================================
+   MORE TOOLS LIST (ptm-), /coc/ only (Nov 12 2026, Adrian: ten animated cards
+   at once were too busy to read). The HOT four keep their cards; the other six
+   are quiet rows in one sunken well: the Tools menu's still icon
+   (coc-nav-data.json), the name in Sora, the short blurb. No art, no motion, no
+   HOT tags (size already says "featured"). /coc/tools/ keeps all ten cards.
+   Dividers: each row casts a 1px line up and left; the well clips the outer ones.
+   =================================================================== */
+.ptm-list { display: grid; grid-template-columns: 1fr; margin-top: 8px; overflow: hidden;
+  border: 2px solid var(--lb-edge, #060708); border-radius: var(--lb-r, 6px); background: #0d0e11;
+  box-shadow: inset 0 3px 0 rgba(0,0,0,.4), inset 0 14px 22px -14px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.05); }
+@container (min-width: 620px) { .ptm-list { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; } }
+@container (min-width: 960px) { .ptm-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ptm { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 16px 10px 14px; color: #eff1f4; text-decoration: none;
+  font-family: 'Sora', sans-serif; box-shadow: -1px -1px 0 rgba(255,255,255,.06); transition: background-color .2s; }
+.ptm:hover { background: #1a1b20; box-shadow: -1px -1px 0 rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.07); }
+.ptm:focus-visible { outline: 2px solid #e6e8ec; outline-offset: -4px; }
+.ptm img { flex: none; width: 32px; height: 32px; object-fit: contain; }
+.ptm-copy { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.ptm-copy b { font: 600 14.5px/1.25 'Sora', sans-serif; }
+.ptm-copy span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 12px; line-height: 1.35; color: #a4a8b0; text-wrap: pretty; }
+.ptm svg { flex: none; width: 15px; height: 15px; fill: none; stroke: #5f636b; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: .25s cubic-bezier(.22,1,.36,1); }
+.ptm:hover svg, .ptm:focus-visible svg { stroke: #fff; transform: translateX(3px); }
+.ptc-wrap:has(.ptm) .ptc-hot { display: none; }
+@container (max-width: 619px) {
+  .ptm { min-height: 58px; padding: 9px 14px 9px 12px; }
+  .ptm-copy b { font-size: 14px; }
 }
 /* @@CSS-END */
 @media (max-width: 760px) {

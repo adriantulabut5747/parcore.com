@@ -4,56 +4,186 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact | Parchrome</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Sora', Arial, sans-serif;
-    background: linear-gradient(180deg, #131212 0%, #0a0a0a 100%);
-    color: #e8e8e8;
-    min-height: 100vh;
-  }
-  .legal-wrap {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 80px 24px 100px;
-  }
-  h1 { color: #fff; font-size: 28px; margin-bottom: 8px; }
-  h2 { color: #fff; font-size: 18px; margin-top: 40px; margin-bottom: 12px; }
-  .legal-updated { color: #8a8d92; font-size: 13px; margin-bottom: 40px; }
-  p, li { line-height: 1.7; color: #c7c7c7; }
-  ul { padding-left: 20px; }
-  li { margin-bottom: 8px; }
-  a { color: #c23b3b; }
-  .back-link { display: inline-block; margin-bottom: 32px; color: #8a8d92; text-decoration: none; font-size: 13px; }
-  .back-link:hover { color: #fff; }
-  .contact-card {
-    background: #151516;
-    border: 1px solid #232324;
-    border-radius: 0;
-    padding: 20px 22px;
-    margin-top: 16px;
-  }
-  .contact-card p { margin: 0; }
-  .contact-card a { font-weight: 600; }
-</style>
+<meta name="description" content="How to reach Parchrome: email for business and data requests, Discord for quick questions, the feedback form for bugs and ideas.">
+<link rel="canonical" href="https://parchrome.netlify.app/about/contact">
+<meta property="og:title" content="Contact | Parchrome">
+<meta property="og:description" content="How to reach Parchrome: email for business and data requests, Discord for quick questions, the feedback form for bugs and ideas.">
+<meta property="og:url" content="https://parchrome.netlify.app/about/contact">
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/icons/parchrome-favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/icons/parchrome-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/parchrome-touch-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Sora:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/11layout.css?v=20261112sb">
+<link rel="stylesheet" href="/about.css?v=20261112or">
 </head>
-<body>
-  <div class="legal-wrap">
-    <a class="back-link" href="/">&larr; Back to Parchrome</a>
-    <h1>Contact</h1>
-    <p class="legal-updated">Reach out for feedback, bug reports, questions, or anything else.</p>
+<!-- About section (Nov 2 2026): About, Contact, Support, Terms, Privacy, DMCA.
+     Nav = game-nav.json "about"; looks = about.css; copy / share / game tiles = about.js. -->
+<body data-game-nav="about">
 
-    <h2>Discord</h2>
-    <p>The fastest way to reach us is our Discord server — that's where we're most active.</p>
-    <div class="contact-card">
-      <p><a href="https://discord.gg/rfntEJ5w" target="_blank">discord.gg/rfntEJ5w</a></p>
-    </div>
-
-    <h2>Feedback form</h2>
-    <p>Prefer not to use Discord? Every page on Parchrome has a feedback form where you can leave a suggestion, report a bug, or rate the site directly.</p>
-
-    <h2>Copyright / removal requests</h2>
-    <p>If you're a rights holder and need to report copyrighted content, see our <a href="/about/dmca">DMCA page</a> instead.</p>
+  <div id="page-loader">
+  <div class="parchrome-fade">
+    <div class="parchrome-ring"></div>
   </div>
+  <span class="parchrome-label">Parchrome</span>
+</div>
+
+<!-- Top Nav -->
+<div class="top-bar">
+  <div class="top-bar-left-avatar"></div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="top-bar-title">
+    <div class="topbar-logo"><img src="/icons/parchrome-logo.svg" alt="" decoding="async"></div>
+    Parchrome
+  </div>
+  <button id="search-btn" onclick="toggleSearch()" style="background:transparent; border:none; padding:0; cursor:pointer; right:15px; position:fixed; margin-top:2px;">
+    <span id="search-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <line x1="15" y1="15" x2="21" y2="21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span id="close-icon">✖</span>
+  </button>
+  <div id="search-overlay">
+    <div id="search-input-wrap">
+      <input type="search" id="search-input" placeholder="Find your next game" oninput="searchItems()" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="search-input-clear" aria-label="Clear search" style="display:none;">✖</button>
+    </div>
+    <div id="search-results"></div>
+    <div id="search-view-more" class="search-viewmore-sentinel" style="display:none;">Loading more…</div>
+  </div>
+</div>
+
+<!-- Secondary Top Bar: title / breadcrumb + the About pages strip (game-nav.json "about"). -->
+<div class="secondary-top-bar" id="secondary-top-bar">
+  <div class="secondary-left">
+    <img src="/icons/parchrome-logo.svg" alt="" class="th-icon" decoding="async">
+    <div class="secondary-content">About Parchrome</div>
+  </div>
+  <div class="stb-divider" aria-hidden="true"></div>
+  <nav class="stb-hub-nav" id="stbHubNav" aria-label="About pages">
+    <div class="dsn-categories-scroll" id="stbHubNavScroll"></div>
+  </nav>
+</div>
+
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="top-box" id="top-box"></div>
+    <div class="games-container" id="games-container"></div>
+    <div class="triple-a-container">
+      <div class="triple-a-header" onclick="toggleTripleA()">
+        <img src="/icons/controllericon.png" class="tripleimg" decoding="async" alt="">
+        Triple A Games <span class="arrow">></span>
+      </div>
+      <div class="triple-a-list" id="triple-a-list"></div>
+    </div>
+  </div>
+
+  <div class="coc-main">
+
+<main class="ab">
+  <header class="ab-hero">
+    <p class="ab-kicker">Contact</p>
+    <h1 class="pg-title">Talk to us</h1>
+    <p class="ab-lead">Questions, bug reports, business or a takedown request: here is the fastest way to reach us for each one.</p>
+    <div class="ab-meta"><span class="ab-pill">Email: <b>wildparchrome@gmail.com</b></span></div>
+  </header>
+
+  <div class="ab-grid">
+    <div class="ab-doc">
+      <section class="ab-sec" id="ways" aria-labelledby="ways-h">
+        <h2 id="ways-h"><span class="ab-num" aria-hidden="true">01</span>Pick the right door</h2>
+        <div class="ab-tiles">
+          <a class="ab-tile" href="mailto:wildparchrome@gmail.com"><span class="ab-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg></span><b>Email</b><span>Business, partnerships, press and data requests. Anything that needs a proper reply.</span><em>wildparchrome@gmail.com</em></a>
+          <a class="ab-tile" href="https://discord.gg/rfntEJ5w" target="_blank" rel="noopener"><span class="ab-ico"><svg class="ab-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></span><b>Discord</b><span>Quick questions, ideas, and talking with other players.</span><em>Join the server</em></a>
+          <a class="ab-tile" href="#feedback"><span class="ab-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5h-2.5z"/><path d="M8.5 9.5h7M8.5 12.5h4"/></svg></span><b>Feedback form</b><span>Bug reports, wrong numbers and requests for new tools or guides.</span><em>Open the form</em></a>
+          <a class="ab-tile" href="/about/dmca"><span class="ab-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.7a3.3 3.3 0 1 0 0 4.6"/></svg></span><b>Copyright</b><span>You own something on Parchrome and want it removed.</span><em>DMCA policy</em></a>
+        </div>
+      </section>
+      <section class="ab-sec" id="email" aria-labelledby="email-h">
+        <h2 id="email-h"><span class="ab-num" aria-hidden="true">02</span>Email us</h2>
+        <p>Write to us any time. Put what it is about in the subject line (for example <strong>Bug</strong>, <strong>Business</strong> or <strong>Data request</strong>) so it gets to the right pile quickly.</p>
+        <div class="ab-copy">
+          <span class="ab-copy-field">wildparchrome@gmail.com</span>
+          <button type="button" class="ab-key" data-copy="wildparchrome@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg><span>Copy</span></button>
+        </div>
+        <div class="ab-keys">
+          <a class="ab-key ab-key--red" href="mailto:wildparchrome@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg><span>Write an email</span></a>
+        </div>
+      </section>
+      <section class="ab-sec" id="which" aria-labelledby="which-h">
+        <h2 id="which-h"><span class="ab-num" aria-hidden="true">03</span>Which one should I use?</h2>
+        <div class="ab-table-wrap">
+          <table class="ab-table">
+            <thead><tr><th scope="col">If you want to</th><th scope="col">Best way</th></tr></thead>
+            <tbody>
+              <tr><td>Report something wrong or broken on a page</td><td data-th="Best way">Feedback form below. Paste the page link in your message so we know where to look.</td></tr>
+              <tr><td>Ask for a tool, layout or article</td><td data-th="Best way">Feedback form (pick Suggestion) or Discord</td></tr>
+              <tr><td>Talk business, a partnership or press</td><td data-th="Best way">Email</td></tr>
+              <tr><td>Get a copy of your data, or have it deleted</td><td data-th="Best way">Email, with the email address or in-game name you used</td></tr>
+              <tr><td>Have your copyrighted work removed</td><td data-th="Best way">The <a href="/about/dmca">DMCA page</a> lists what to send, then email us</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="ab-sec" id="feedback" aria-labelledby="feedback-h">
+        <h2 id="feedback-h"><span class="ab-num" aria-hidden="true">04</span>Send feedback</h2>
+        <p>Goes straight to us. Your email or in-game name is required so we can follow up; see the <a href="/about/privacy">Privacy Policy</a> for what is stored.</p>
+        <div data-feedback></div>
+      </section>
+    </div>
+    <aside class="ab-side">
+      <section class="ab-card" aria-labelledby="abHelpHead">
+        <h2 id="abHelpHead">Need a hand?</h2>
+        <p>Something wrong on a page, or a question about this one? Reach us here.</p>
+        <div class="ab-keys">
+          <a class="ab-key ab-key--red" href="mailto:wildparchrome@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg><span>Email us</span></a>
+          <a class="ab-key" href="https://discord.gg/rfntEJ5w" target="_blank" rel="noopener"><svg class="ab-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span>Join the Discord</span></a>
+          <a class="ab-key" href="/about/contact#feedback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5h-2.5z"/><path d="M8.5 9.5h7M8.5 12.5h4"/></svg><span>Send feedback</span></a>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<!-- Built by 11layout.js "SITE FOOTER" from 11footer.json + sidebar.json. -->
+<footer class="pf-footer"></footer>
+</div>  </div>
+
+<!-- More sheet + bottom nav (phones). Rows and items come from
+     game-nav.json "about" (initHubNav in 11layout.js). -->
+<div class="more-overlay" id="moreOverlay" onclick="closeMoreMenu()">
+  <div class="more-sheet" onclick="event.stopPropagation()">
+    <div class="more-sheet-scroll">
+      <div class="more-sheet-top">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-header">
+          <div class="more-sheet-title">About Parchrome</div>
+          <button type="button" class="more-sheet-close" onclick="closeMoreMenu()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="more-list"></div>
+    </div>
+  </div>
+</div>
+<div class="bn-bar" id="bottomNav">
+  <div class="bn-more-wrap" id="bnMoreWrap">
+    <div class="bn-more-spacer"></div>
+    <button type="button" class="bn-more" id="bnMoreBtn" onclick="toggleMoreMenu()" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke-width="1.8"/></svg>
+    </button>
+    <span class="bn-more-label">More</span>
+  </div>
+</div>
+
+<script src="/11layout.js?v=20261112sb"></script>
+<script src="/about.js?v=20261102a" defer></script>
 </body>
 </html>
